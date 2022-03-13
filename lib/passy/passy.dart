@@ -114,11 +114,13 @@ class PaymentCard {
 }
 
 class SecureNote {
+  String title = '';
   String note = '';
   late DateTime dateCreated;
   late DateTime dateModified;
 
   Map toJson() => {
+        'title': title,
         'note': note,
         'dateCreated': dateCreated.microsecondsSinceEpoch,
         'dateModified': dateModified.microsecondsSinceEpoch,
