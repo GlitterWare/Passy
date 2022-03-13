@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -135,6 +136,7 @@ class SecureNote {
 
 class IDCard {
   String nickname = '';
+  List<Uint8List> pictures = [];
   String type = '';
   String idNumber = '';
   String name = '';
