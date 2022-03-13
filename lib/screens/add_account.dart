@@ -95,6 +95,8 @@ class _AddAccount extends State<StatefulWidget> {
                           ),
                           FloatingActionButton(
                             onPressed: () async {
+                              if (_username.isEmpty) return;
+                              if (_password.isEmpty) return;
                               if (_password != _confirmPassword) return;
                               await addAccount();
                               loadApp(context);
