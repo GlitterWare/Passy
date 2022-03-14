@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../common/state.dart';
 import '../common/theme.dart';
@@ -19,12 +20,20 @@ class _AddAccount extends State<StatefulWidget> {
   String _confirmPassword = '';
 
   void addAccount() {
-    if (accounts.containsKey(_username)) {
+    List<String> _accounts = preferences.getStringList('accounts')!;
+    List<String> _passwords = preferences.getStringList('passwords')!;
+
+    if (passwords.containsKey(_username)) {
       throw Exception('Cannot have two accounts with the same login');
     }
-    if (accounts.isEmpty) preferences.setString('lastLogin', _username);
-    accounts[_username] = Account(_password);
-    preferences.setString('accounts', jsonEncode(accounts));
+    if (passwords.isEmpty) preferences.setString('lastLogin', _username);
+    Account _account = Account(_password);
+    _accounts.add(jsonEncode(_account));
+    _passwords.add(_username + ' ' + _account.password);
+
+    preferences.setStringList('accounts', _accounts);
+    preferences.setStringList('passwords', _passwords);
+    passwords[_username] = _account.password;
   }
 
   @override
@@ -65,6 +74,9 @@ class _AddAccount extends State<StatefulWidget> {
                                 border: outlineInputBorder,
                                 hintText: 'Username',
                               ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(' ')
+                              ],
                             ),
                           )
                         ],
@@ -79,6 +91,9 @@ class _AddAccount extends State<StatefulWidget> {
                                 border: outlineInputBorder,
                                 hintText: 'Password',
                               ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(' ')
+                              ],
                             ),
                           )
                         ],
@@ -93,6 +108,9 @@ class _AddAccount extends State<StatefulWidget> {
                                 hintText: 'Confirm password',
                               ),
                               onChanged: (a) => _confirmPassword = a,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(' ')
+                              ],
                             ),
                           ),
                           FloatingActionButton(

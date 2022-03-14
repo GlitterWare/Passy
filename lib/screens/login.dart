@@ -1,5 +1,8 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
 import 'package:passy/common/theme.dart';
 
 import '../common/state.dart';
@@ -15,7 +18,12 @@ class _Login extends State<Login> {
   String _username = preferences.getString('lastLogin')!;
   String _password = '';
 
-  void login(BuildContext context) async {}
+  void login(BuildContext context) async {
+    if (sha512.convert(utf8.encode(_password).toList()).toString() ==
+        passwords[_username]) {
+      Navigator.pushReplacementNamed(context, '/main');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +32,7 @@ class _Login extends State<Login> {
         children: [
           const Spacer(),
           Expanded(
-            child: SvgPicture.asset(
-              'assets/images/logo.svg',
-              color: accounts[_username]!.color,
-            ),
+            child: purpleLogo,
             flex: 3,
           ),
           const Spacer(),
@@ -54,14 +59,14 @@ class _Login extends State<Login> {
                           Expanded(
                             child: DropdownButtonFormField<String>(
                               value: _username,
-                              items: accounts.keys
+                              items: passwords.keys
                                   .map<DropdownMenuItem<String>>(
                                       (e) => DropdownMenuItem(
                                             child: Text(e),
                                             value: e,
                                           ))
                                   .toList(),
-                              onChanged: (value) => _username = value!,
+                              onChanged: (a) => _username = a!,
                               decoration: InputDecoration(
                                 border: outlineInputBorder,
                                 hintText: 'Username',
@@ -80,6 +85,9 @@ class _Login extends State<Login> {
                                 border: outlineInputBorder,
                                 hintText: 'Password',
                               ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(' ')
+                              ],
                             ),
                           ),
                           FloatingActionButton(

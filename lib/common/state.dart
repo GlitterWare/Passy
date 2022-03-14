@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../passy/passy.dart';
-
-Map<String, Account> accounts = {};
+Map<String, String> passwords = {};
 late SharedPreferences preferences;
 Completer loaded = Completer();
 
 Future<void> loadApp(BuildContext context) async {
-  accounts.isEmpty
+  passwords.isEmpty
       ? Navigator.pushReplacementNamed(context, '/addAccount')
-      : Navigator.pushReplacementNamed(context, '/signIn');
+      : Navigator.pushReplacementNamed(context, '/login');
 }
