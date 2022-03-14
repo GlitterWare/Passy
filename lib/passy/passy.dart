@@ -114,7 +114,7 @@ class PaymentCard {
   }
 }
 
-class SecureNote {
+class Note {
   String title = '';
   String note = '';
   late DateTime dateCreated;
@@ -127,7 +127,7 @@ class SecureNote {
         'dateModified': dateModified.microsecondsSinceEpoch,
       };
 
-  SecureNote() {
+  Note() {
     DateTime _now = DateTime.now().toUtc();
     dateCreated = _now;
     dateModified = _now;
@@ -216,7 +216,7 @@ class Identity {
 class AccountData {
   List<Password> passwords = [];
   List<PaymentCard> paymentCards = [];
-  List<SecureNote> secureNotes = [];
+  List<Note> notes = [];
   List<IDCard> idCards = [];
   List<Identity> identities = [];
   late DateTime dateCreated;
@@ -226,7 +226,7 @@ class AccountData {
   Map toJson() => {
         'passwords': passwords,
         'paymentCards': paymentCards,
-        'secureNotes': secureNotes,
+        'secureNotes': notes,
         'idCards': idCards,
         'identities': identities,
         'dateCreated': dateCreated.microsecondsSinceEpoch,
