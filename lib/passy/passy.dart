@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 enum FieldType { text, password, date, number }
 enum Title { mr, mrs, miss, other }
 enum Gender { male, female, other }
-enum RecordType { password, paymentCard, secureNote, idCard, identity }
+enum EntryType { password, paymentCard, note, idCard, identity }
 
 class CustomField {
   FieldType fieldType;
@@ -226,7 +226,7 @@ class AccountData {
   Map toJson() => {
         'passwords': passwords,
         'paymentCards': paymentCards,
-        'secureNotes': notes,
+        'notes': notes,
         'idCards': idCards,
         'identities': identities,
         'dateCreated': dateCreated.microsecondsSinceEpoch,
