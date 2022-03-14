@@ -46,7 +46,7 @@ class Account {
           jsonEncode(AccountData()),
           iv: encrypt.IV.fromLength(16),
         )
-        .toString();
+        .base16;
   }
 }
 

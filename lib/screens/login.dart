@@ -15,7 +15,7 @@ class _Login extends State<Login> {
   String _username = preferences.getString('lastLogin')!;
   String _password = '';
 
-  Future<void> login() async {}
+  void login(BuildContext context) async {}
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +83,7 @@ class _Login extends State<Login> {
                             ),
                           ),
                           FloatingActionButton(
-                            onPressed: () async => {
-                              login(),
-                            },
+                            onPressed: () => login(context),
                             child: const Icon(
                               Icons.arrow_forward_ios_rounded,
                             ),

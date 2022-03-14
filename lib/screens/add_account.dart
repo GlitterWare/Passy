@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../common/state.dart';
@@ -16,13 +18,13 @@ class _AddAccount extends State<StatefulWidget> {
   String _password = '';
   String _confirmPassword = '';
 
-  Future<void> addAccount() async {
+  void addAccount() {
     if (accounts.containsKey(_username)) {
       throw Exception('Cannot have two accounts with the same login');
     }
     if (accounts.isEmpty) preferences.setString('lastLogin', _username);
     accounts[_username] = Account(_password);
-    //jsonEncode(accounts);
+    preferences.setString('accounts', jsonEncode(accounts));
   }
 
   @override
@@ -98,7 +100,7 @@ class _AddAccount extends State<StatefulWidget> {
                               if (_username.isEmpty) return;
                               if (_password.isEmpty) return;
                               if (_password != _confirmPassword) return;
-                              await addAccount();
+                              addAccount();
                               loadApp(context);
                             },
                             child: const Icon(
