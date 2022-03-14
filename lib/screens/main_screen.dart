@@ -21,9 +21,11 @@ class _MainScreen extends State<MainScreen> {
         appBar: AppBar(
           title: Row(
             children: [
-              SvgPicture.asset(
-                'assets/images/logo_circle.svg',
-                height: 40,
+              IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset('assets/images/logo_circle.svg'),
+                splashRadius: 20,
+                iconSize: 40,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
