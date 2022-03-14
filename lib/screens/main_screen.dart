@@ -24,7 +24,6 @@ class _MainScreen extends State<MainScreen> {
               SvgPicture.asset(
                 'assets/images/logo_circle.svg',
                 height: 40,
-                color: Colors.white,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
