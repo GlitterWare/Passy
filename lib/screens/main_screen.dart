@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:passy/passy/passy.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -10,8 +9,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreen extends State<MainScreen> {
-  EntryType _page = EntryType.password;
   String _title = 'Passwords';
+
+  final List<Widget> _passwords = [];
+  final List<Widget> _notes = [];
+  final List<Widget> _paymentCards = [];
+  final List<Widget> _idCards = [];
+  final List<Widget> _identities = [];
 
   @override
   Widget build(BuildContext context) {
@@ -53,23 +57,18 @@ class _MainScreen extends State<MainScreen> {
             onTap: (value) {
               switch (value) {
                 case 0:
-                  _page = EntryType.password;
                   setState(() => _title = 'Passwords');
                   break;
                 case 1:
-                  _page = EntryType.password;
                   setState(() => _title = 'Notes');
                   break;
                 case 2:
-                  _page = EntryType.password;
                   setState(() => _title = 'Payment Cards');
                   break;
                 case 3:
-                  _page = EntryType.password;
                   setState(() => _title = 'ID Cards');
                   break;
                 case 4:
-                  _page = EntryType.password;
                   setState(() => _title = 'Identities');
                   break;
               }
@@ -87,6 +86,25 @@ class _MainScreen extends State<MainScreen> {
               Tab(icon: Icon(Icons.person)),
             ],
           ),
+        ),
+        body: TabBarView(
+          children: [
+            Column(
+              children: _passwords,
+            ),
+            Column(
+              children: _notes,
+            ),
+            Column(
+              children: _paymentCards,
+            ),
+            Column(
+              children: _idCards,
+            ),
+            Column(
+              children: _identities,
+            ),
+          ],
         ),
       ),
     );

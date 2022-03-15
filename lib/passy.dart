@@ -2,13 +2,21 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:flutter/material.dart';
+import 'package:encrypt/encrypt.dart' as enc;
 
 enum FieldType { text, password, date, number }
 enum Title { mr, mrs, miss, other }
 enum Gender { male, female, other }
 enum EntryType { password, paymentCard, note, idCard, identity }
+
+String getPasswordHash(String password) =>
+    sha512.convert(utf8.encode(password)).toString();
+
+String extendPassword(String password) {
+  int a = 32 - password.length;
+  password += ' ' * a;
+  return password;
+}
 
 class CustomField {
   FieldType fieldType;
@@ -21,33 +29,12 @@ class CustomField {
         'private': private,
       };
 
-  CustomField(this.fieldType);
-}
-
-class Account {
-  Color color = Colors.purple;
-
-  /// SHA512 encrypted password
-  late String password;
-
-  /// AES encrypted account data
-  late String data;
-
-  Map toJson() => {
-        'password': password,
-        'data': data,
-      };
-
-  Account(String password) {
-    this.password = sha512.convert(utf8.encode(password)).toString();
-    data = encrypt.Encrypter(
-            encrypt.AES(encrypt.Key.fromUtf8(password).stretch(32)))
-        .encrypt(
-          jsonEncode(AccountData()),
-          iv: encrypt.IV.fromLength(16),
-        )
-        .base16;
+  static CustomField reviver(Object? key, Object? value) {
+    CustomField _customField = CustomField();
+    return _customField;
   }
+
+  CustomField({this.fieldType = FieldType.password});
 }
 
 class Password {
@@ -75,7 +62,39 @@ class Password {
         'dateModified': dateCreated.microsecondsSinceEpoch,
       };
 
-  Password() {
+  static Password reviver(Object? key, Object? value) {
+    Password _password = Password(setTime: false);
+    return _password;
+  }
+
+  Password({bool setTime = true}) {
+    if (!setTime) return;
+    DateTime _now = DateTime.now().toUtc();
+    dateCreated = _now;
+    dateModified = _now;
+  }
+}
+
+class Note {
+  String title = '';
+  String note = '';
+  late DateTime dateCreated;
+  late DateTime dateModified;
+
+  Map toJson() => {
+        'title': title,
+        'note': note,
+        'dateCreated': dateCreated.microsecondsSinceEpoch,
+        'dateModified': dateModified.microsecondsSinceEpoch,
+      };
+
+  static Note reviver(Object? key, Object? value) {
+    Note _note = Note(setTime: false);
+    return _note;
+  }
+
+  Note({bool setTime = true}) {
+    if (!setTime) return;
     DateTime _now = DateTime.now().toUtc();
     dateCreated = _now;
     dateModified = _now;
@@ -107,27 +126,13 @@ class PaymentCard {
         'dateModified': dateModified.microsecondsSinceEpoch,
       };
 
-  PaymentCard() {
-    DateTime _now = DateTime.now().toUtc();
-    dateCreated = _now;
-    dateModified = _now;
+  static PaymentCard reviver(Object? key, Object? value) {
+    PaymentCard _paymentCard = PaymentCard(setTime: false);
+    return _paymentCard;
   }
-}
 
-class Note {
-  String title = '';
-  String note = '';
-  late DateTime dateCreated;
-  late DateTime dateModified;
-
-  Map toJson() => {
-        'title': title,
-        'note': note,
-        'dateCreated': dateCreated.microsecondsSinceEpoch,
-        'dateModified': dateModified.microsecondsSinceEpoch,
-      };
-
-  Note() {
+  PaymentCard({bool setTime = true}) {
+    if (!setTime) return;
     DateTime _now = DateTime.now().toUtc();
     dateCreated = _now;
     dateModified = _now;
@@ -164,7 +169,13 @@ class IDCard {
         'dateModified': dateModified.microsecondsSinceEpoch,
       };
 
-  IDCard() {
+  static IDCard reviver(Object? key, Object? value) {
+    IDCard _idCard = IDCard(setTime: false);
+    return _idCard;
+  }
+
+  IDCard({bool setTime = true}) {
+    if (!setTime) return;
     DateTime _now = DateTime.now().toUtc();
     dateCreated = _now;
     dateModified = _now;
@@ -211,22 +222,52 @@ class Identity {
         'dateCreated': dateCreated.microsecondsSinceEpoch,
         'dateModified': dateModified.microsecondsSinceEpoch,
       };
+
+  static Identity reviver(Object? key, Object? value) {
+    Identity _identity = Identity(setTime: false);
+    return _identity;
+  }
+
+  Identity({bool setTime = true}) {
+    if (!setTime) return;
+    DateTime _now = DateTime.now().toUtc();
+    dateCreated = _now;
+    dateModified = _now;
+  }
 }
 
 class AccountData {
   List<Password> passwords = [];
-  List<PaymentCard> paymentCards = [];
   List<Note> notes = [];
+  List<PaymentCard> paymentCards = [];
   List<IDCard> idCards = [];
   List<Identity> identities = [];
   late DateTime dateCreated;
   late DateTime dateModified;
   late DateTime dateRestored;
 
+  String encrypt(String password) =>
+      enc.Encrypter(enc.AES(enc.Key.fromUtf8(extendPassword(password)),
+              mode: enc.AESMode.ctr, padding: null))
+          .encrypt(
+            jsonEncode(this),
+            iv: enc.IV.fromLength(16),
+          )
+          .base16;
+
+  static AccountData decrypt(String encrypted, String password) => jsonDecode(
+      enc.Encrypter(enc.AES(enc.Key.fromUtf8(extendPassword(password)),
+              mode: enc.AESMode.ctr, padding: null))
+          .decrypt16(
+        encrypted,
+        iv: enc.IV.fromLength(16),
+      ),
+      reviver: AccountData.reviver);
+
   Map toJson() => {
         'passwords': passwords,
-        'paymentCards': paymentCards,
         'notes': notes,
+        'paymentCards': paymentCards,
         'idCards': idCards,
         'identities': identities,
         'dateCreated': dateCreated.microsecondsSinceEpoch,
@@ -234,7 +275,53 @@ class AccountData {
         'dateRestored': dateRestored.microsecondsSinceEpoch,
       };
 
-  AccountData() {
+  static AccountData reviver(Object? key, Object? value) {
+    AccountData _accountData = AccountData(setTime: false);
+    switch (key) {
+      case 'passwords':
+        for (String s in value as List<dynamic>) {
+          _accountData.passwords.add(jsonDecode(s, reviver: Password.reviver));
+        }
+        break;
+      case 'paymentCards':
+        for (String s in value as List<dynamic>) {
+          _accountData.paymentCards
+              .add(jsonDecode(s, reviver: PaymentCard.reviver));
+        }
+        break;
+      case 'notes':
+        for (String s in value as List<dynamic>) {
+          _accountData.notes.add(jsonDecode(s, reviver: Note.reviver));
+        }
+        break;
+      case 'idCards':
+        for (String s in value as List<dynamic>) {
+          _accountData.idCards.add(jsonDecode(s, reviver: IDCard.reviver));
+        }
+        break;
+      case 'identities':
+        for (String s in value as List<dynamic>) {
+          _accountData.identities.add(jsonDecode(s, reviver: Identity.reviver));
+        }
+        break;
+      case 'dateCreated':
+        _accountData.dateCreated =
+            DateTime.fromMicrosecondsSinceEpoch(value as int);
+        break;
+      case 'dateModified':
+        _accountData.dateModified =
+            DateTime.fromMicrosecondsSinceEpoch(value as int);
+        break;
+      case 'dateRestored':
+        _accountData.dateRestored =
+            DateTime.fromMicrosecondsSinceEpoch(value as int);
+        break;
+    }
+    return _accountData;
+  }
+
+  AccountData({bool setTime = true}) {
+    if (!setTime) return;
     DateTime _now = DateTime.now().toUtc();
     dateCreated = _now;
     dateModified = _now;

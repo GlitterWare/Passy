@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/empty.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:passy/common/state.dart';
+import 'package:passy/common/theme.dart';
+import 'package:passy/screens/add_account.dart';
 import 'package:passy/screens/login.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'common/state.dart';
-import 'common/theme.dart';
-import 'screens/add_account.dart';
 
 void main() {
   Future(() async => preferences = await SharedPreferences.getInstance())
       .whenComplete(() {
-    preferences.setString('version', '0.0.0');
-    if (!preferences.containsKey('accounts')) {
-      preferences.setStringList('accounts', []);
+    if (!preferences.containsKey('version')) {
+      preferences.setStringList('accountData', []);
+      preferences.setStringList('icons', []);
+      preferences.setStringList('iconColors', []);
       preferences.setStringList('passwords', []);
+      preferences.setStringList('usernames', []);
+      preferences.setString('version', '0.0.0');
     }
+    List<String> _icons = preferences.getStringList('icons')!;
+    List<String> _iconColors = preferences.getStringList('iconColors')!;
+    List<String> _usernames = preferences.getStringList('usernames')!;
     List<String> _passwords = preferences.getStringList('passwords')!;
-    for (String p in _passwords) {
-      List<String> _pair = p.split(' ');
-      passwords[_pair[0]] = _pair[1];
+    for (int i = 0; i != _usernames.length; i++) {
+      accounts[_usernames[i]] = Account(
+          i, _passwords[i], _icons[i], Color(int.parse(_iconColors[i])));
     }
     loaded.complete();
   });
@@ -35,7 +42,8 @@ class Passy extends StatelessWidget {
       title: 'Passy',
       theme: theme,
       routes: {
-        '/': (context) => const SplashScreen(),
+        '/': (context) => const Empty(),
+        '/splash': (context) => const SplashScreen(),
         '/addAccount': (context) => const AddAccount(),
         '/login': (context) => const Login(),
         '/main': (context) => const MainScreen(),

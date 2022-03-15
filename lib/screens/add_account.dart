@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../common/state.dart';
-import '../common/theme.dart';
-import '../passy/passy.dart';
+import 'package:passy/common/state.dart';
+import 'package:passy/common/theme.dart';
+import 'package:passy/passy.dart';
 
 class AddAccount extends StatefulWidget {
   const AddAccount({Key? key}) : super(key: key);
@@ -18,22 +16,37 @@ class _AddAccount extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
+  final String _icon = 'assets/images/logo_circle.cvg';
+  final Color _iconColor = Colors.purple;
 
   void addAccount() {
-    List<String> _accounts = preferences.getStringList('accounts')!;
-    List<String> _passwords = preferences.getStringList('passwords')!;
-
-    if (passwords.containsKey(_username)) {
+    if (accounts.containsKey(_username)) {
       throw Exception('Cannot have two accounts with the same login');
     }
-    if (passwords.isEmpty) preferences.setString('lastLogin', _username);
-    Account _account = Account(_password);
-    _accounts.add(jsonEncode(_account));
-    _passwords.add(_username + ' ' + _account.password);
+    if (accounts.isEmpty) preferences.setString('lastLogin', _username);
 
-    preferences.setStringList('accounts', _accounts);
+    List<String> _accountData = preferences.getStringList('accountData')!;
+    List<String> _icons = preferences.getStringList('icons')!;
+    List<String> _iconColors = preferences.getStringList('iconColors')!;
+    List<String> _passwords = preferences.getStringList('passwords')!;
+    List<String> _usernames = preferences.getStringList('usernames')!;
+
+    String _cryptoPassword = getPasswordHash(_password);
+
+    accounts[_username] =
+        Account(_usernames.length, _cryptoPassword, _icon, _iconColor);
+
+    _accountData.add(AccountData().encrypt(_password));
+    _icons.add(_icon);
+    _iconColors.add(_iconColor.value.toString());
+    _passwords.add(_cryptoPassword);
+    _usernames.add(_username);
+
+    preferences.setStringList('accountData', _accountData);
+    preferences.setStringList('icons', _icons);
+    preferences.setStringList('iconColors', _iconColors);
     preferences.setStringList('passwords', _passwords);
-    passwords[_username] = _account.password;
+    preferences.setStringList('usernames', _usernames);
   }
 
   @override
