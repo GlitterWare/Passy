@@ -15,18 +15,18 @@ void main() {
     if (!preferences.containsKey('version')) {
       preferences.setStringList('accountData', []);
       preferences.setStringList('icons', []);
-      preferences.setStringList('iconColors', []);
+      preferences.setStringList('colors', []);
       preferences.setStringList('passwords', []);
       preferences.setStringList('usernames', []);
       preferences.setString('version', '0.0.0');
     }
     List<String> _icons = preferences.getStringList('icons')!;
-    List<String> _iconColors = preferences.getStringList('iconColors')!;
+    List<String> _colors = preferences.getStringList('colors')!;
     List<String> _usernames = preferences.getStringList('usernames')!;
     List<String> _passwords = preferences.getStringList('passwords')!;
     for (int i = 0; i != _usernames.length; i++) {
-      accounts[_usernames[i]] = Account(
-          i, _passwords[i], _icons[i], Color(int.parse(_iconColors[i])));
+      accounts[_usernames[i]] =
+          Account(i, _passwords[i], _icons[i], Color(int.parse(_colors[i])));
     }
     loaded.complete();
   });

@@ -10,9 +10,9 @@ class Account {
   /// SHA512 encrypted password
   late String password;
   String icon;
-  Color iconColor;
+  Color color;
 
-  Account(this.index, this.password, this.icon, this.iconColor);
+  Account(this.index, this.password, this.icon, this.color);
 }
 
 late SharedPreferences preferences;

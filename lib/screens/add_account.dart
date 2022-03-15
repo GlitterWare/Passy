@@ -27,7 +27,7 @@ class _AddAccount extends State<StatefulWidget> {
 
     List<String> _accountData = preferences.getStringList('accountData')!;
     List<String> _icons = preferences.getStringList('icons')!;
-    List<String> _iconColors = preferences.getStringList('iconColors')!;
+    List<String> _iconColors = preferences.getStringList('colors')!;
     List<String> _passwords = preferences.getStringList('passwords')!;
     List<String> _usernames = preferences.getStringList('usernames')!;
 
@@ -44,7 +44,7 @@ class _AddAccount extends State<StatefulWidget> {
 
     preferences.setStringList('accountData', _accountData);
     preferences.setStringList('icons', _icons);
-    preferences.setStringList('iconColors', _iconColors);
+    preferences.setStringList('colors', _iconColors);
     preferences.setStringList('passwords', _passwords);
     preferences.setStringList('usernames', _usernames);
   }
