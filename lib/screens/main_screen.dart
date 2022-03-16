@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:passy/common/state.dart';
+import 'package:passy/passy/loaded_account.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -10,6 +12,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreen extends State<MainScreen> {
   String _title = 'Passwords';
+  LoadedAccount _account = data.loadedAccount!;
 
   final List<Widget> _passwords = [];
   final List<Widget> _notes = [];
@@ -27,7 +30,10 @@ class _MainScreen extends State<MainScreen> {
             children: [
               IconButton(
                 onPressed: () {},
-                icon: SvgPicture.asset('assets/images/logo_circle.svg'),
+                icon: SvgPicture.asset(
+                  _account.accountInfo.icon,
+                  color: _account.accountInfo.color,
+                ),
                 splashRadius: 20,
                 iconSize: 40,
               ),

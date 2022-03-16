@@ -15,7 +15,7 @@ class _AddAccount extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
-  final String _icon = 'assets/images/logo_circle.cvg';
+  final String _icon = 'assets/images/logo_circle.svg';
   final Color _color = Colors.purple;
 
   void addAccount() {

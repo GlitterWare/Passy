@@ -46,7 +46,7 @@ class AppData {
         .delete(recursive: true);
   }
 
-  void loadAccount(String username, String password) async {
+  loadAccount(String username, String password) {
     AccountInfo _info = _accounts[username]!;
     _loadedAccount =
         LoadedAccount(_info, _dataFiles[username]!, getEncrypter(password));
