@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'common/state.dart';
 import 'common/theme.dart';
-import 'json_hello.dart';
 import 'passy/passy_data.dart';
 import 'screens/add_account.dart';
 import 'screens/empty.dart';
@@ -16,9 +15,6 @@ import 'screens/splash_screen.dart';
 const String version = '0.0.0';
 
 void main() {
-  Test _test = Test();
-  _test.inside.setC(5);
-  Test.fromJson(_test.toJson()).inside.printC();
   Future(() async => data = AppData(
       (await getApplicationDocumentsDirectory()).path +
           Platform.pathSeparator +
@@ -35,7 +31,7 @@ class Passy extends StatelessWidget {
       title: 'Passy',
       theme: theme,
       routes: {
-        '/': (context) => const Empty(),
+        '/': (context) => const StartScreen(),
         '/splash': (context) => const SplashScreen(),
         '/addAccount': (context) => const AddAccount(),
         '/login': (context) => const Login(),

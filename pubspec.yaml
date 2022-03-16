@@ -48,6 +48,8 @@ dev_dependencies:
     sdk: flutter
   build_runner:
   json_serializable:
+  rename:
+  flutter_launcher_icons: ^0.9.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -55,6 +57,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+
+flutter_icons:
+  image_path: assets/images/icon.png
+  ios: true
+  android: launcher_icon
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -68,6 +75,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/images/icon.png
     - assets/images/logo.svg
     - assets/images/logo_circle.svg
 
