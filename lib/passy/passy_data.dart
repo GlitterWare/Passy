@@ -9,8 +9,8 @@ import 'package:passy/passy/loaded_account.dart';
 import 'account_info.dart';
 import 'app_data.dart';
 
-class PassyData {
-  final AppData passy;
+class AppData {
+  final PassyData passy;
   bool get noAccounts => _accounts.isEmpty;
   Iterable<String> get usernames => _accounts.keys;
   LoadedAccount? get loadedAccount => _loadedAccount;
@@ -54,15 +54,15 @@ class PassyData {
 
   void unloadAccount() => _loadedAccount = null;
 
-  static AppData _constructAppData(File file) {
+  static PassyData _constructAppData(File file) {
     if (!file.existsSync()) {
-      return AppData(file,
+      return PassyData(file,
           version: '0.0.0', lastUsername: '', theme: ThemeMode.system);
     }
-    return AppData.fromFile(file);
+    return PassyData.fromFile(file);
   }
 
-  PassyData(String path)
+  AppData(String path)
       : _accountsPath = path + Platform.pathSeparator + 'accounts',
         passy = _constructAppData(
             File(path + Platform.pathSeparator + 'passy.json')) {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy/passy_data.dart';
 
 Completer loaded = Completer();
-late PassyData data;
+late AppData data;
 
 Future<void> loadApp(BuildContext context) async {
   data.noAccounts

@@ -19,7 +19,7 @@ void main() {
   Test _test = Test();
   _test.inside.setC(5);
   Test.fromJson(_test.toJson()).inside.printC();
-  Future(() async => data = PassyData(
+  Future(() async => data = AppData(
       (await getApplicationDocumentsDirectory()).path +
           Platform.pathSeparator +
           'Passy')).whenComplete(() => loaded.complete());

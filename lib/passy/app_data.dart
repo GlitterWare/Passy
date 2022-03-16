@@ -10,7 +10,7 @@ const _$ThemeModeEnumMap = {
   ThemeMode.light: 'light',
 };
 
-class AppData {
+class PassyData {
   String version;
   String lastUsername;
   ThemeMode theme;
@@ -20,7 +20,7 @@ class AppData {
   Future<void> save() async => await _file.writeAsString(json.encode(this));
   void saveSync() => _file.writeAsStringSync(json.encode(toJson()));
 
-  AppData(
+  PassyData(
     this._file, {
     required this.version,
     required this.lastUsername,
@@ -30,9 +30,9 @@ class AppData {
     saveSync();
   }
 
-  factory AppData.fromFile(File file) {
+  factory PassyData.fromFile(File file) {
     Map<String, dynamic> _json = jsonDecode(file.readAsStringSync());
-    return AppData(
+    return PassyData(
       file,
       version: _json['version'] ?? '',
       lastUsername: _json['lastUsername'] ?? '',
@@ -41,15 +41,11 @@ class AppData {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    final result = <String, dynamic>{};
-
-    result.addAll({'version': version});
-    result.addAll({'lastUsername': lastUsername});
-    result.addAll({'theme': _$ThemeModeEnumMap[theme]});
-
-    return result;
-  }
+  Map<String, dynamic> toMap() => <String, dynamic>{
+        'version': version,
+        'lastUsername': lastUsername,
+        'theme': _$ThemeModeEnumMap[theme]
+      };
 
   Map<String, dynamic> toJson() => toMap();
 }
