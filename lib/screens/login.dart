@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/common/state.dart';
-import 'package:passy/passy.dart';
+import 'package:passy/passy/common.dart';
+import 'package:passy/passy/passy_data.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -12,18 +13,14 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
-  _Login() {
-    curUsername = preferences.getString('lastLogin')!;
-  }
+  String _password = '';
+  String _username = data.passy.lastUsername;
 
   void login(BuildContext context) async {
-    Account _account = accounts[curUsername]!;
-    if (getPasswordHash(curPassword) == _account.password) {
+    if (getPasswordHash(_password) == data.getPasswordHash(_username)) {
       Navigator.pushReplacementNamed(context, '/splash');
       Future(() {
-        curAccountData = AccountData.decrypt(
-            preferences.getStringList('accountData')![_account.index],
-            curPassword);
+        data.loadAccount(_username, _password);
         Navigator.pushReplacementNamed(context, '/main');
       });
     }
@@ -62,15 +59,15 @@ class _Login extends State<Login> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: curUsername,
-                              items: accounts.keys
+                              value: data.passy.lastUsername,
+                              items: data.usernames
                                   .map<DropdownMenuItem<String>>(
                                       (e) => DropdownMenuItem(
                                             child: Text(e),
                                             value: e,
                                           ))
                                   .toList(),
-                              onChanged: (a) => curUsername = a!,
+                              onChanged: (a) => _username = a!,
                               decoration: InputDecoration(
                                 border: outlineInputBorder,
                                 hintText: 'Username',
@@ -84,7 +81,7 @@ class _Login extends State<Login> {
                           Expanded(
                             child: TextField(
                               obscureText: true,
-                              onChanged: (a) => curPassword = a,
+                              onChanged: (a) => _password = a,
                               decoration: InputDecoration(
                                 border: outlineInputBorder,
                                 hintText: 'Password',

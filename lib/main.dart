@@ -1,35 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:passy/screens/empty.dart';
+import 'dart:io';
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:passy/common/state.dart';
-import 'package:passy/common/theme.dart';
-import 'package:passy/screens/add_account.dart';
-import 'package:passy/screens/login.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'common/state.dart';
+import 'common/theme.dart';
+import 'json_hello.dart';
+import 'passy/passy_data.dart';
+import 'screens/add_account.dart';
+import 'screens/empty.dart';
+import 'screens/login.dart';
+import 'screens/main_screen.dart';
+import 'screens/splash_screen.dart';
+
+const String version = '0.0.0';
 
 void main() {
-  Future(() async => preferences = await SharedPreferences.getInstance())
-      .whenComplete(() {
-    if (!preferences.containsKey('version')) {
-      preferences.setStringList('accountData', []);
-      preferences.setStringList('icons', []);
-      preferences.setStringList('colors', []);
-      preferences.setStringList('passwords', []);
-      preferences.setStringList('usernames', []);
-      preferences.setString('version', '0.0.0');
-    }
-    List<String> _icons = preferences.getStringList('icons')!;
-    List<String> _colors = preferences.getStringList('colors')!;
-    List<String> _usernames = preferences.getStringList('usernames')!;
-    List<String> _passwords = preferences.getStringList('passwords')!;
-    for (int i = 0; i != _usernames.length; i++) {
-      accounts[_usernames[i]] =
-          Account(i, _passwords[i], _icons[i], Color(int.parse(_colors[i])));
-    }
-    loaded.complete();
-  });
+  Test _test = Test();
+  _test.inside.setC(5);
+  Test.fromJson(_test.toJson()).inside.printC();
+  Future(() async => data = PassyData(
+      (await getApplicationDocumentsDirectory()).path +
+          Platform.pathSeparator +
+          'Passy')).whenComplete(() => loaded.complete());
   runApp(const Passy());
 }
 

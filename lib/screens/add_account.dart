@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import 'package:passy/common/state.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/passy.dart';
 
 class AddAccount extends StatefulWidget {
   const AddAccount({Key? key}) : super(key: key);
@@ -17,36 +16,17 @@ class _AddAccount extends State<StatefulWidget> {
   String _password = '';
   String _confirmPassword = '';
   final String _icon = 'assets/images/logo_circle.cvg';
-  final Color _iconColor = Colors.purple;
+  final Color _color = Colors.purple;
 
   void addAccount() {
-    if (accounts.containsKey(_username)) {
+    if (data.hasAccount(_username)) {
       throw Exception('Cannot have two accounts with the same login');
     }
-    if (accounts.isEmpty) preferences.setString('lastLogin', _username);
-
-    List<String> _accountData = preferences.getStringList('accountData')!;
-    List<String> _icons = preferences.getStringList('icons')!;
-    List<String> _iconColors = preferences.getStringList('colors')!;
-    List<String> _passwords = preferences.getStringList('passwords')!;
-    List<String> _usernames = preferences.getStringList('usernames')!;
-
-    String _cryptoPassword = getPasswordHash(_password);
-
-    accounts[_username] =
-        Account(_usernames.length, _cryptoPassword, _icon, _iconColor);
-
-    _accountData.add(AccountData().encrypt(_password));
-    _icons.add(_icon);
-    _iconColors.add(_iconColor.value.toString());
-    _passwords.add(_cryptoPassword);
-    _usernames.add(_username);
-
-    preferences.setStringList('accountData', _accountData);
-    preferences.setStringList('icons', _icons);
-    preferences.setStringList('colors', _iconColors);
-    preferences.setStringList('passwords', _passwords);
-    preferences.setStringList('usernames', _usernames);
+    if (data.noAccounts) {
+      data.passy.lastUsername = _username;
+      data.passy.save();
+    }
+    data.createAccount(_username, _password, _icon, _color);
   }
 
   @override
