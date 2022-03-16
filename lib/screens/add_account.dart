@@ -22,10 +22,8 @@ class _AddAccount extends State<StatefulWidget> {
     if (data.hasAccount(_username)) {
       throw Exception('Cannot have two accounts with the same login');
     }
-    if (data.noAccounts) {
-      data.passy.lastUsername = _username;
-      data.passy.save();
-    }
+    data.passy.lastUsername = _username;
+    data.passy.save();
     data.createAccount(_username, _password, _icon, _color);
   }
 
@@ -70,6 +68,7 @@ class _AddAccount extends State<StatefulWidget> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.deny(' ')
                               ],
+                              autofocus: true,
                             ),
                           )
                         ],
@@ -85,7 +84,8 @@ class _AddAccount extends State<StatefulWidget> {
                                 hintText: 'Password',
                               ),
                               inputFormatters: [
-                                FilteringTextInputFormatter.deny(' ')
+                                FilteringTextInputFormatter.deny(' '),
+                                LengthLimitingTextInputFormatter(32),
                               ],
                             ),
                           )

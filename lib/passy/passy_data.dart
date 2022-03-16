@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
 
+import 'account_data.dart';
 import 'account_info.dart';
 import 'app_data.dart';
 
@@ -33,6 +34,9 @@ class AppData {
       icon: icon,
       color: color,
     );
+    File _dataFile = File(_path + Platform.pathSeparator + 'data.json');
+    AccountData.loadOrCreate(_dataFile, getEncrypter(password));
+    _dataFiles[username] = _dataFile;
   }
 
   Future<void> removeAccount(String username) async {

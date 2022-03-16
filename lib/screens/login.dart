@@ -16,11 +16,38 @@ class _Login extends State<Login> {
   String _password = '';
   String _username = data.passy.lastUsername;
 
-  void login(BuildContext context) async {
-    if (getPasswordHash(_password) == data.getPasswordHash(_username)) {
+  List<DropdownMenuItem<String>> get usernames {
+    List<DropdownMenuItem<String>> _usernames = data.usernames
+        .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
+              child: Text(e),
+              value: e,
+            ))
+        .toList();
+    _usernames.insert(
+        0,
+        DropdownMenuItem(
+          child: Row(
+            children: const [
+              Icon(Icons.add_circle),
+              Padding(
+                child: Text('Add account'),
+                padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+              ),
+            ],
+          ),
+          value: 'addAccount',
+        ));
+    return _usernames;
+  }
+
+  void login(BuildContext context) {
+    if (getPasswordHash(_password) ==
+        data.getPasswordHash(data.passy.lastUsername)) {
       Navigator.pushReplacementNamed(context, '/splash');
       Future(() {
-        data.loadAccount(_username, _password);
+        data.passy.lastUsername = _username;
+        data.passy.saveSync();
+        data.loadAccount(data.passy.lastUsername, _password);
         Navigator.pushReplacementNamed(context, '/main');
       });
     }
@@ -59,21 +86,24 @@ class _Login extends State<Login> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: data.passy.lastUsername,
-                              items: data.usernames
-                                  .map<DropdownMenuItem<String>>(
-                                      (e) => DropdownMenuItem(
-                                            child: Text(e),
-                                            value: e,
-                                          ))
-                                  .toList(),
-                              onChanged: (a) => _username = a!,
+                              value: _username,
+                              items: usernames,
+                              onChanged: (a) {
+                                if (a! == 'addAccount') {
+                                  setState(() {
+                                    _username = data.passy.lastUsername;
+                                  });
+                                  Navigator.pushNamed(context, '/addAccount');
+                                  return;
+                                }
+                                _username = a;
+                              },
                               decoration: InputDecoration(
                                 border: outlineInputBorder,
                                 hintText: 'Username',
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       Row(
@@ -87,8 +117,10 @@ class _Login extends State<Login> {
                                 hintText: 'Password',
                               ),
                               inputFormatters: [
-                                FilteringTextInputFormatter.deny(' ')
+                                FilteringTextInputFormatter.deny(' '),
+                                LengthLimitingTextInputFormatter(32),
                               ],
+                              autofocus: true,
                             ),
                           ),
                           FloatingActionButton(
