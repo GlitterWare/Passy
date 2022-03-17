@@ -16,7 +16,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'common/state.dart';
 import 'common/theme.dart';
-import 'passy/passy_data.dart';
+import 'passy/app_data.dart';
 import 'screens/add_account_screen.dart';
 import 'screens/start_screen.dart';
 import 'screens/login_screen.dart';

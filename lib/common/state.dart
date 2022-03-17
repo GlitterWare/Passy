@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:passy/passy/passy_data.dart';
+import 'package:passy/passy/app_data.dart';
 
 Completer loaded = Completer();
 late AppData data;
