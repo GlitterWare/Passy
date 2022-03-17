@@ -152,18 +152,27 @@ class _MainScreen extends State<MainScreen>
                           ),
                     padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                   ),
-                  Column(
-                    children: [
-                      Text(_password.nickname),
-                      Text(_password.username),
-                    ],
-                  ),
-                  const Flexible(
-                    child: Align(
-                      child: Icon(Icons.keyboard_arrow_right_rounded),
-                      alignment: Alignment.centerRight,
+                  Flexible(
+                    child: Column(
+                      children: [
+                        Align(
+                          child: Text(
+                            _password.nickname,
+                          ),
+                          alignment: Alignment.centerLeft,
+                        ),
+                        Align(
+                          child: Text(
+                            _password.username,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          alignment: Alignment.centerLeft,
+                        ),
+                      ],
                     ),
+                    fit: FlexFit.tight,
                   ),
+                  const Icon(Icons.keyboard_arrow_right_rounded),
                 ],
               ),
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
