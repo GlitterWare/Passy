@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
 
@@ -11,6 +12,7 @@ import 'payment_card.dart';
 
 class AccountData {
   List<Password> passwords = [];
+  Map<String, Uint8List> passwordIcons = {};
   List<Note> notes = [];
   List<PaymentCard> paymentCards = [];
   List<IDCard> idCards = [];
@@ -45,6 +47,13 @@ class AccountData {
       ..passwords = (_json['passwords'] as List<dynamic>)
           .map((e) => Password.fromJson(e as Map<String, dynamic>))
           .toList()
+      ..passwordIcons = (_json['passwordIcons'] as Map<String, dynamic>)
+          .map((k, v) => MapEntry<String, Uint8List>(
+              k,
+              Uint8List.fromList(utf8.encode(encrypter.decrypt64(
+                File(v as String).readAsStringSync(),
+                iv: IV.fromLength(16),
+              )))))
       ..notes = (_json['notes'] as List<dynamic>)
           .map((e) => Note.fromJson(e as Map<String, dynamic>))
           .toList()
@@ -64,6 +73,14 @@ class AccountData {
 
   Map<String, dynamic> toMap() => <String, dynamic>{
         'passwords': passwords,
+        'passwordIcons': passwordIcons.map((k, v) => MapEntry<String, dynamic>(
+            k,
+            _encrypter
+                .encryptBytes(
+                  v,
+                  iv: IV.fromLength(16),
+                )
+                .base64)),
         'notes': notes,
         'paymentCards': paymentCards,
         'idCards': idCards,

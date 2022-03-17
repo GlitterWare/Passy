@@ -141,11 +141,15 @@ class _MainScreen extends State<MainScreen>
               child: Row(
                 children: [
                   Padding(
-                    child: ImageIcon(
-                      AssetImage(_password.icon),
-                      size: 50,
-                      color: Colors.purple,
-                    ),
+                    child: _account.accountData.passwordIcons
+                            .containsKey(_password.icon)
+                        ? Image.memory(
+                            _account.accountData.passwordIcons[_password.icon]!)
+                        : ImageIcon(
+                            AssetImage(_password.icon),
+                            size: 50,
+                            color: Colors.purple,
+                          ),
                     padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                   ),
                   Column(
