@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/state.dart';
 import 'package:passy/passy/loaded_account.dart';
+import 'package:otp/otp.dart';
+import 'package:passy/passy/password.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -17,10 +18,10 @@ class _MainScreen extends State<MainScreen>
 
   late TabController _controller;
   final List<Widget> _passwords = [];
-  final List<Widget> _notes = [];
-  final List<Widget> _paymentCards = [];
-  final List<Widget> _idCards = [];
-  final List<Widget> _identities = [];
+  final List<Widget> _notes = [const Text('Widgets not implemented')];
+  final List<Widget> _paymentCards = [const Text('Widgets not implemented')];
+  final List<Widget> _idCards = [const Text('Widgets not implemented')];
+  final List<Widget> _identities = [const Text('Widgets not implemented')];
 
   @override
   void initState() {
@@ -45,20 +46,120 @@ class _MainScreen extends State<MainScreen>
           break;
       }
     });
+    List<Password> _samplePasswords = [
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+      Password(
+          nickname: 'Nickname',
+          icon: 'assets/images/icon.png',
+          username: 'username',
+          password: '',
+          website: '',
+          tfaSecret: '',
+          additionalInfo: ''),
+    ];
+    for (var _password in _samplePasswords) {
+      _passwords.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
+          child: ElevatedButton(
+            onPressed: () {
+              //TODO: push password window here
+            },
+            child: Padding(
+              child: Row(
+                children: [
+                  Padding(
+                    child: ImageIcon(
+                      AssetImage(_password.icon),
+                      size: 50,
+                      color: Colors.purple,
+                    ),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                  ),
+                  Column(
+                    children: [
+                      Text(_password.nickname),
+                      Text(_password.username),
+                    ],
+                  ),
+                  const Flexible(
+                    child: Align(
+                      child: Icon(Icons.keyboard_arrow_right_rounded),
+                      alignment: Alignment.centerRight,
+                    ),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            ),
+            style: ElevatedButton.styleFrom(
+                primary: Colors.white, onPrimary: Colors.black),
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: Text(_title),
-            ),
-          ],
-        ),
+        title: Text(_title),
         actions: [
           Row(
             children: [
@@ -99,19 +200,19 @@ class _MainScreen extends State<MainScreen>
       body: TabBarView(
         controller: _controller,
         children: [
-          Column(
+          ListView(
             children: _passwords,
           ),
-          Column(
+          ListView(
             children: _notes,
           ),
-          Column(
+          ListView(
             children: _paymentCards,
           ),
-          Column(
+          ListView(
             children: _idCards,
           ),
-          Column(
+          ListView(
             children: _identities,
           ),
         ],
