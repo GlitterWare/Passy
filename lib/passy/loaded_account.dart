@@ -10,5 +10,5 @@ class LoadedAccount {
   final AccountData accountData;
 
   LoadedAccount(this.accountInfo, File dataFile, Encrypter encrypter)
-      : accountData = AccountData.loadOrCreate(dataFile, encrypter);
+      : accountData = AccountData(dataFile, encrypter);
 }

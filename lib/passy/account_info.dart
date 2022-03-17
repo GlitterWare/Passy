@@ -26,7 +26,7 @@ class AccountInfo {
     required this.color,
   });
 
-  AccountInfo.create(
+  AccountInfo(
     this._file,
     this.username,
     String password, {

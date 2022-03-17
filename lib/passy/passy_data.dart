@@ -25,7 +25,7 @@ class AppData {
   void createAccount(
       String username, String password, String icon, Color color) {
     String _path = _accountsPath + Platform.pathSeparator + username;
-    _accounts[username] = AccountInfo.create(
+    _accounts[username] = AccountInfo(
       File(_path + Platform.pathSeparator + 'info.json'),
       username,
       password,
@@ -33,7 +33,7 @@ class AppData {
       color: color,
     );
     File _dataFile = File(_path + Platform.pathSeparator + 'data.json');
-    AccountData.loadOrCreate(_dataFile, getEncrypter(password));
+    AccountData(_dataFile, getEncrypter(password));
     _dataFiles[username] = _dataFile;
   }
 

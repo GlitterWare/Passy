@@ -31,7 +31,7 @@ class AccountData {
 
   AccountData._(this._file, this._encrypter);
 
-  factory AccountData.loadOrCreate(File file, Encrypter encrypter) {
+  factory AccountData(File file, Encrypter encrypter) {
     AccountData _data;
     if (!file.existsSync()) {
       file.createSync();
