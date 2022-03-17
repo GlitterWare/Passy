@@ -4,14 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/state.dart';
 import 'package:passy/common/theme.dart';
 
-class AddAccount extends StatefulWidget {
-  const AddAccount({Key? key}) : super(key: key);
+class AddAccountScreen extends StatefulWidget {
+  const AddAccountScreen({Key? key}) : super(key: key);
+
+  static const routeName = '/addAccount';
 
   @override
-  State<StatefulWidget> createState() => _AddAccount();
+  State<StatefulWidget> createState() => _AddAccountScreen();
 }
 
-class _AddAccount extends State<StatefulWidget> {
+class _AddAccountScreen extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';

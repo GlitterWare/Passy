@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/state.dart';
+import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/passy/password.dart';
+import 'package:passy/screens/add_id_card_screen.dart';
+import 'package:passy/screens/add_identity_screen.dart';
+import 'package:passy/screens/add_note_screen.dart';
+import 'package:passy/screens/add_password_screen.dart';
+import 'package:passy/screens/add_payment_card_screen.dart';
+import 'package:passy/screens/password_screen.dart';
+import 'package:passy/screens/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
+
+  static const routeName = '/main';
 
   @override
   State<StatefulWidget> createState() => _MainScreen();
@@ -14,6 +24,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreen extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   String _title = 'Passwords';
+  EntryType _tab = EntryType.password;
   final LoadedAccount _account = data.loadedAccount!;
 
   late TabController _controller;
@@ -30,23 +41,28 @@ class _MainScreen extends State<MainScreen>
     _controller.addListener(() {
       switch (_controller.index) {
         case 0:
+          _tab = EntryType.password;
           setState(() => _title = 'Passwords');
           break;
         case 1:
+          _tab = EntryType.note;
           setState(() => _title = 'Notes');
           break;
         case 2:
+          _tab = EntryType.paymentCard;
           setState(() => _title = 'Payment Cards');
           break;
         case 3:
+          _tab = EntryType.idCard;
           setState(() => _title = 'ID Cards');
           break;
         case 4:
+          _tab = EntryType.identity;
           setState(() => _title = 'Identities');
           break;
       }
     });
-    List<Password> _samplePasswords = [
+    List<Password> _placeholderPasswords = [
       Password(
           nickname: 'Nickname',
           icon: 'assets/images/icon.png',
@@ -112,13 +128,14 @@ class _MainScreen extends State<MainScreen>
           tfaSecret: '',
           additionalInfo: ''),
     ];
-    for (var _password in _samplePasswords) {
+    for (var _password in _placeholderPasswords) {
       _passwords.add(
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
           child: ElevatedButton(
             onPressed: () {
-              //TODO: push password window here
+              Navigator.pushNamed(context, PasswordScreen.routeName,
+                  arguments: _password);
             },
             child: Padding(
               child: Row(
@@ -164,12 +181,32 @@ class _MainScreen extends State<MainScreen>
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () =>
+                    Navigator.pushNamed(context, SettingsScreen.routeName),
                 icon: const Icon(Icons.settings),
                 splashRadius: 20,
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  switch (_tab) {
+                    case EntryType.password:
+                      Navigator.pushNamed(context, AddPasswordScreen.routeName);
+                      break;
+                    case EntryType.paymentCard:
+                      Navigator.pushNamed(
+                          context, AddPaymentCardScreen.routeName);
+                      break;
+                    case EntryType.note:
+                      Navigator.pushNamed(context, AddNoteScreen.routeName);
+                      break;
+                    case EntryType.idCard:
+                      Navigator.pushNamed(context, AddIdCardScreen.routeName);
+                      break;
+                    case EntryType.identity:
+                      Navigator.pushNamed(context, AddIdentityScreen.routeName);
+                      break;
+                  }
+                },
                 icon: const Icon(Icons.add_rounded),
                 splashRadius: 20,
               ),

@@ -4,14 +4,16 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/common/state.dart';
 import 'package:passy/passy/common.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  static const routeName = '/login';
 
   @override
-  State<Login> createState() => _Login();
+  State<LoginScreen> createState() => _LoginScreen();
 }
 
-class _Login extends State<Login> {
+class _LoginScreen extends State<LoginScreen> {
   String _password = '';
   String _username = data.passy.lastUsername;
 
