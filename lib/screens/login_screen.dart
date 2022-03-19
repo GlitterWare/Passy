@@ -85,8 +85,7 @@ class _LoginScreen extends State<LoginScreen> {
                                       }
                                       _username = a;
                                     },
-                                    decoration: InputDecoration(
-                                      border: outlineInputBorder,
+                                    decoration: const InputDecoration(
                                       hintText: 'Username',
                                     ),
                                   ),
@@ -99,8 +98,7 @@ class _LoginScreen extends State<LoginScreen> {
                                   child: TextField(
                                     obscureText: true,
                                     onChanged: (a) => _password = a,
-                                    decoration: InputDecoration(
-                                      border: outlineInputBorder,
+                                    decoration: const InputDecoration(
                                       hintText: 'Password',
                                     ),
                                     inputFormatters: [

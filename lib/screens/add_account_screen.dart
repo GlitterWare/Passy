@@ -72,8 +72,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                               Expanded(
                                 child: TextField(
                                   onChanged: (a) => _username = a,
-                                  decoration: InputDecoration(
-                                    border: outlineInputBorder,
+                                  decoration: const InputDecoration(
                                     hintText: 'Username',
                                   ),
                                   inputFormatters: [
@@ -90,8 +89,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                 child: TextField(
                                   obscureText: true,
                                   onChanged: (a) => _password = a,
-                                  decoration: InputDecoration(
-                                    border: outlineInputBorder,
+                                  decoration: const InputDecoration(
                                     hintText: 'Password',
                                   ),
                                   inputFormatters: [
@@ -107,8 +105,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                               Expanded(
                                 child: TextField(
                                   obscureText: true,
-                                  decoration: InputDecoration(
-                                    border: outlineInputBorder,
+                                  decoration: const InputDecoration(
                                     hintText: 'Confirm password',
                                   ),
                                   onChanged: (a) => _confirmPassword = a,

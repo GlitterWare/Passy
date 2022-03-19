@@ -7,10 +7,6 @@ SvgPicture purpleLogo = SvgPicture.asset(
   width: 60,
 );
 
-final OutlineInputBorder outlineInputBorder = OutlineInputBorder(
-  borderRadius: BorderRadius.circular(100),
-);
-
 final theme = ThemeData(
   primarySwatch: Colors.purple,
   appBarTheme: const AppBarTheme(
@@ -21,5 +17,10 @@ final theme = ThemeData(
   ),
   tabBarTheme: const TabBarTheme(
     labelColor: Colors.black,
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(100),
+    ),
   ),
 );

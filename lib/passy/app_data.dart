@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
@@ -59,7 +60,10 @@ class AppData {
   static PassyData _constructAppData(File file) {
     if (!file.existsSync()) {
       return PassyData(file,
-          version: '0.0.0', lastUsername: '', theme: ThemeMode.system);
+          version: '0.0.0',
+          syncMode: kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
+          lastUsername: '',
+          theme: ThemeMode.system);
     }
     return PassyData.fromFile(file);
   }
