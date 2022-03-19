@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
+import 'package:passy/passy/id_card.dart';
 
 class IDCardScreen extends StatefulWidget {
   const IDCardScreen({Key? key}) : super(key: key);
@@ -10,12 +12,20 @@ class IDCardScreen extends StatefulWidget {
 }
 
 class _IDCardScreen extends State<IDCardScreen> {
+  Widget? _backButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _backButton = getBackButton(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final IDCard _idCard = ModalRoute.of(context)!.settings.arguments as IDCard;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(Icons.arrow_back_ios_new_rounded),
+      appBar: AppBar(
+        leading: _backButton,
       ),
     );
   }

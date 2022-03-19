@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 
 class AddNoteScreen extends StatefulWidget {
   const AddNoteScreen({Key? key}) : super(key: key);
@@ -10,12 +11,20 @@ class AddNoteScreen extends StatefulWidget {
 }
 
 class _AddNoteScreen extends State<AddNoteScreen> {
+  late Widget _backButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _backButton = getBackButton(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(Icons.arrow_back_ios_new_rounded),
+      appBar: AppBar(
+        leading: _backButton,
+        title: const Text('Add Note'),
       ),
     );
   }

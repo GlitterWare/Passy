@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -10,12 +11,20 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
+  Widget? _backButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _backButton = getBackButton(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(Icons.arrow_back_ios_new_rounded),
+      appBar: AppBar(
+        leading: _backButton,
+        title: const Text('Settings'),
       ),
     );
   }

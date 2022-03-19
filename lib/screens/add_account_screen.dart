@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:passy/common/common.dart';
 
 import 'package:passy/common/state.dart';
 import 'package:passy/common/theme.dart';
@@ -19,7 +20,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _confirmPassword = '';
   final String _icon = 'assets/images/logo_circle.svg';
   final Color _color = Colors.purple;
-  Widget? _backButton;
+  Widget? _floatingBackButton;
 
   void addAccount() {
     if (data.hasAccount(_username)) {
@@ -31,17 +32,20 @@ class _AddAccountScreen extends State<StatefulWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    _backButton = data.noAccounts
+  void initState() {
+    super.initState();
+    _floatingBackButton = data.noAccounts
         ? null
         : Padding(
             padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded),
-              onPressed: () => Navigator.pop(context),
-            ));
+            child: getBackButton(context),
+          );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _backButton,
+      floatingActionButton: _floatingBackButton,
       floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       body: CustomScrollView(slivers: [
         SliverFillRemaining(

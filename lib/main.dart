@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:passy/screens/add_id_card_screen.dart';
 import 'package:passy/screens/add_identity_screen.dart';
-import 'package:passy/screens/add_note_screen.dart';
 import 'package:passy/screens/add_password_screen.dart';
 import 'package:passy/screens/add_payment_card_screen.dart';
 import 'package:passy/screens/password_screen.dart';
@@ -45,7 +44,6 @@ class Passy extends StatelessWidget {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         AddIdCardScreen.routeName: (context) => const AddIdCardScreen(),
         AddIdentityScreen.routeName: (context) => const AddIdentityScreen(),
-        AddNoteScreen.routeName: (context) => const AddNoteScreen(),
         AddPasswordScreen.routeName: (context) => const AddPasswordScreen(),
         AddPaymentCardScreen.routeName: (context) =>
             const AddPaymentCardScreen(),

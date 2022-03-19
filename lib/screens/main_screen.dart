@@ -6,9 +6,9 @@ import 'package:otp/otp.dart';
 import 'package:passy/passy/password.dart';
 import 'package:passy/screens/add_id_card_screen.dart';
 import 'package:passy/screens/add_identity_screen.dart';
-import 'package:passy/screens/add_note_screen.dart';
 import 'package:passy/screens/add_password_screen.dart';
 import 'package:passy/screens/add_payment_card_screen.dart';
+import 'package:passy/screens/note_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/settings_screen.dart';
 
@@ -210,7 +210,7 @@ class _MainScreen extends State<MainScreen>
                           context, AddPaymentCardScreen.routeName);
                       break;
                     case EntryType.note:
-                      Navigator.pushNamed(context, AddNoteScreen.routeName);
+                      Navigator.pushNamed(context, NoteScreen.routeName);
                       break;
                     case EntryType.idCard:
                       Navigator.pushNamed(context, AddIdCardScreen.routeName);

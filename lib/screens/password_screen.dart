@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy/password.dart';
 
 class PasswordScreen extends StatefulWidget {
@@ -11,13 +12,21 @@ class PasswordScreen extends StatefulWidget {
 }
 
 class _PasswordScreen extends State<PasswordScreen> {
+  Widget? _backButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _backButton = getBackButton(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Password;
+    final Password _password =
+        ModalRoute.of(context)!.settings.arguments as Password;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(Icons.arrow_back_ios_new_rounded),
+      appBar: AppBar(
+        leading: _backButton,
       ),
     );
   }

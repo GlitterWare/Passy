@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
+import 'package:passy/passy/identity.dart';
 
 class AddIdentityScreen extends StatefulWidget {
   const AddIdentityScreen({Key? key}) : super(key: key);
@@ -10,13 +12,24 @@ class AddIdentityScreen extends StatefulWidget {
 }
 
 class _AddIdentityScreen extends State<AddIdentityScreen> {
+  late Widget _backButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _backButton = getBackButton(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Identity? _identity =
+        ModalRoute.of(context)!.settings.arguments as Identity?;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(Icons.arrow_back_ios_new_rounded),
-      ),
+      appBar: AppBar(
+          leading: _backButton,
+          title: _identity == null
+              ? const Text('Add Identity')
+              : const Text('Edit Identity')),
     );
   }
 }
