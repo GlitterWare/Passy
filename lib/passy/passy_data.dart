@@ -10,6 +10,7 @@ const _$ThemeModeEnumMap = {
   ThemeMode.light: 'light',
 };
 
+//TODO: add sync modes
 class PassyData {
   String version;
   String lastUsername;
