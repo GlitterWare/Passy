@@ -24,13 +24,7 @@ import 'screens/splash_screen.dart';
 
 const String version = '0.0.0';
 
-void main() {
-  Future(() async => data = AppData(
-      (await getApplicationDocumentsDirectory()).path +
-          Platform.pathSeparator +
-          'Passy')).whenComplete(() => loaded.complete());
-  runApp(const Passy());
-}
+void main() => runApp(const Passy());
 
 class Passy extends StatelessWidget {
   const Passy({Key? key}) : super(key: key);

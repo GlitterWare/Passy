@@ -24,7 +24,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
-        title: const Text('Settings'),
+        title: const Center(child: Text('Settings')),
       ),
     );
   }

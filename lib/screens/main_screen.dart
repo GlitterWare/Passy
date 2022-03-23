@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:passy/common/assets.dart';
 import 'package:passy/common/state.dart';
 import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
@@ -62,126 +64,59 @@ class _MainScreen extends State<MainScreen>
           break;
       }
     });
-    List<Password> _placeholderPasswords = [
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-      Password(
-          nickname: 'Nickname',
-          icon: 'assets/images/icon.png',
-          username: 'username',
-          password: '',
-          website: '',
-          tfaSecret: '',
-          additionalInfo: ''),
-    ];
-    for (var _password in _placeholderPasswords) {
-      _passwords.add(
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, PasswordScreen.routeName,
-                  arguments: _password);
-            },
-            child: Padding(
-              child: Row(
-                children: [
-                  Padding(
-                    child: _account.accountData.passwordIcons
-                            .containsKey(_password.icon)
-                        ? Image.memory(
-                            _account.accountData.passwordIcons[_password.icon]!)
-                        : ImageIcon(
-                            AssetImage(_password.icon),
-                            size: 50,
-                            color: Colors.purple,
-                          ),
-                    padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                  ),
-                  Flexible(
-                    child: Column(
-                      children: [
-                        Align(
-                          child: Text(
-                            _password.nickname,
-                          ),
-                          alignment: Alignment.centerLeft,
+
+    // Add passwords
+    for (Password p in _account.accountData.passwords) {
+      _passwords.add(Padding(
+        padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, PasswordScreen.routeName,
+                arguments: p);
+          },
+          child: Padding(
+            child: Row(
+              children: [
+                Padding(
+                  child: _account.accountData.passwordIcons.containsKey(p.icon)
+                      ? Image.memory(
+                          _account.accountData.passwordIcons[p.icon]!)
+                      : SvgPicture.asset(
+                          logoCircleSvg,
+                          width: 50,
+                          color: Colors.purple,
                         ),
-                        Align(
-                          child: Text(
-                            _password.username,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                ),
+                Flexible(
+                  child: Column(
+                    children: [
+                      Align(
+                        child: Text(
+                          p.nickname,
                         ),
-                      ],
-                    ),
-                    fit: FlexFit.tight,
+                        alignment: Alignment.centerLeft,
+                      ),
+                      Align(
+                        child: Text(
+                          p.username,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                        alignment: Alignment.centerLeft,
+                      ),
+                    ],
                   ),
-                  const Icon(Icons.keyboard_arrow_right_rounded),
-                ],
-              ),
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  fit: FlexFit.tight,
+                ),
+                const Icon(Icons.keyboard_arrow_right_rounded),
+              ],
             ),
-            style: ElevatedButton.styleFrom(
-                primary: Colors.white, onPrimary: Colors.black),
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
           ),
+          style: ElevatedButton.styleFrom(
+              primary: Colors.white, onPrimary: Colors.black),
         ),
-      );
+      ));
     }
   }
 

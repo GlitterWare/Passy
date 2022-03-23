@@ -28,8 +28,15 @@ class AccountData {
       )
       .base64;
 
-  Future<void> save() async => await _file.writeAsString(_encrypt(_encrypter));
-  void saveSync() => _file.writeAsStringSync(_encrypt(_encrypter));
+  Future<void> save() async {
+    sort();
+    await _file.writeAsString(_encrypt(_encrypter));
+  }
+
+  void saveSync() {
+    sort();
+    _file.writeAsStringSync(_encrypt(_encrypter));
+  }
 
   AccountData._(this._file, this._encrypter);
 
@@ -70,6 +77,8 @@ class AccountData {
     _data._encrypter = encrypter;
     return _data;
   }
+
+  void sort() => passwords.sort((a, b) => a.nickname.compareTo(b.nickname));
 
   Map<String, dynamic> toMap() => <String, dynamic>{
         'passwords': passwords,

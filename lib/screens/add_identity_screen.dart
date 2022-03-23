@@ -22,14 +22,10 @@ class _AddIdentityScreen extends State<AddIdentityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Identity? _identity =
-        ModalRoute.of(context)!.settings.arguments as Identity?;
     return Scaffold(
       appBar: AppBar(
           leading: _backButton,
-          title: _identity == null
-              ? const Text('Add Identity')
-              : const Text('Edit Identity')),
+          title: const Center(child: Text('Add Identity'))),
     );
   }
 }

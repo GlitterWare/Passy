@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/common/assets.dart';
 import 'package:passy/common/state.dart';
 import 'package:passy/passy/common.dart';
 
@@ -85,9 +85,6 @@ class _LoginScreen extends State<LoginScreen> {
                                       }
                                       _username = a;
                                     },
-                                    decoration: const InputDecoration(
-                                      hintText: 'Username',
-                                    ),
                                   ),
                                 ),
                               ],

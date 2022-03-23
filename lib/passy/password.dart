@@ -17,14 +17,14 @@ class Password {
   List<String> tags;
 
   Password({
-    required this.nickname,
-    required this.icon,
-    required this.username,
-    required this.password,
-    required this.website,
-    required this.tfaSecret,
+    this.nickname = '',
+    this.icon = '',
+    this.username = '',
+    this.password = '',
+    this.website = '',
+    this.tfaSecret = '',
     this.customFields = const [],
-    required this.additionalInfo,
+    this.additionalInfo = '',
     this.tags = const [],
   });
 

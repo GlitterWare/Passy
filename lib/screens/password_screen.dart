@@ -27,6 +27,7 @@ class _PasswordScreen extends State<PasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
+        title: const Center(child: Text('Password')),
       ),
     );
   }

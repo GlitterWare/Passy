@@ -26,7 +26,7 @@ class _NoteScreen extends State<NoteScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
-        title: const Text('Note'),
+        title: const Center(child: Text('Note')),
       ),
     );
   }

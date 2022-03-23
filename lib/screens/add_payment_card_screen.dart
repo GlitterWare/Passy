@@ -22,14 +22,10 @@ class _AddPaymentCardScreen extends State<AddPaymentCardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final PaymentCard? _paymentCard =
-        ModalRoute.of(context)!.settings.arguments as PaymentCard?;
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
-        title: _paymentCard == null
-            ? const Text('Add Payment Card')
-            : const Text('Edit Payment Card'),
+        title: const Center(child: Text('Settings')),
       ),
     );
   }

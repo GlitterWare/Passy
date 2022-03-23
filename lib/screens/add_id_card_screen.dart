@@ -22,14 +22,10 @@ class _AddIdCardScreen extends State<AddIdCardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final IDCard? _idCard =
-        ModalRoute.of(context)!.settings.arguments as IDCard?;
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
-        title: _idCard == null
-            ? const Text('Add ID Card')
-            : const Text('Edit ID Card'),
+        title: const Center(child: Text('Add ID Card')),
       ),
     );
   }

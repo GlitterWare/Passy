@@ -27,6 +27,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
+        title: const Center(child: Text('Payment Card')),
       ),
     );
   }

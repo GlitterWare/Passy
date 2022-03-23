@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-
 import 'package:passy/common/state.dart';
-import 'package:passy/common/theme.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
