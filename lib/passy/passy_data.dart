@@ -53,12 +53,10 @@ class PassyData {
     );
   }
 
-  Map<String, dynamic> toMap() => <String, dynamic>{
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'version': version,
         'syncMode': _$SyncModeEnumMap[syncMode],
         'lastUsername': lastUsername,
         'theme': _$ThemeModeEnumMap[theme]
       };
-
-  Map<String, dynamic> toJson() => toMap();
 }

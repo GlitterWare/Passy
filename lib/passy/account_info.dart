@@ -50,12 +50,10 @@ class AccountInfo {
     return _account;
   }
 
-  Map<String, dynamic> toMap() => <String, dynamic>{
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'username': username,
         'icon': icon,
         'color': color.value,
         'passwordHash': _passwordHash,
       };
-
-  Map<String, dynamic> toJson() => toMap();
 }

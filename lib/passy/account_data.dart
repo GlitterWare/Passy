@@ -80,7 +80,7 @@ class AccountData {
 
   void sort() => passwords.sort((a, b) => a.nickname.compareTo(b.nickname));
 
-  Map<String, dynamic> toMap() => <String, dynamic>{
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'passwords': passwords,
         'passwordIcons': passwordIcons.map((k, v) => MapEntry<String, dynamic>(
             k,
@@ -95,6 +95,4 @@ class AccountData {
         'idCards': idCards,
         'identities': identities,
       };
-
-  Map<String, dynamic> toJson() => toMap();
 }
