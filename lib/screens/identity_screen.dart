@@ -5,7 +5,7 @@ import 'package:passy/passy/identity.dart';
 class IdentityScreen extends StatefulWidget {
   const IdentityScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/identity';
+  static const routeName = '/main/identity';
 
   @override
   State<StatefulWidget> createState() => _IdentityScreen();

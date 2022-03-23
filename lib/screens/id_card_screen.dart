@@ -5,7 +5,7 @@ import 'package:passy/passy/id_card.dart';
 class IDCardScreen extends StatefulWidget {
   const IDCardScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/idCard';
+  static const routeName = '/main/idCard';
 
   @override
   State<StatefulWidget> createState() => _IDCardScreen();

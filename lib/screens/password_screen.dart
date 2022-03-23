@@ -5,7 +5,7 @@ import 'package:passy/passy/password.dart';
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/password';
+  static const routeName = '/main/password';
 
   @override
   State<StatefulWidget> createState() => _PasswordScreen();

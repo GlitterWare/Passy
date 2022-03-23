@@ -5,7 +5,7 @@ import 'package:passy/passy/note.dart';
 class NoteScreen extends StatefulWidget {
   const NoteScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/note';
+  static const routeName = '/main/note';
 
   @override
   State<StatefulWidget> createState() => _NoteScreen();

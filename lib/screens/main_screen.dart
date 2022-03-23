@@ -71,7 +71,7 @@ class _MainScreen extends State<MainScreen>
         padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
         child: ElevatedButton(
           onPressed: () {
-            Navigator.pushReplacementNamed(context, PasswordScreen.routeName,
+            Navigator.pushNamed(context, PasswordScreen.routeName,
                 arguments: p);
           },
           child: Padding(

@@ -4,7 +4,7 @@ import 'package:passy/common/common.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/settings';
+  static const routeName = '/main/settings';
 
   @override
   State<StatefulWidget> createState() => _SettingsScreen();

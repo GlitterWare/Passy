@@ -5,7 +5,7 @@ import 'package:passy/passy/payment_card.dart';
 class PaymentCardScreen extends StatefulWidget {
   const PaymentCardScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/paymentCard';
+  static const routeName = '/main/paymentCard';
 
   @override
   State<StatefulWidget> createState() => _PaymentCardScreen();
