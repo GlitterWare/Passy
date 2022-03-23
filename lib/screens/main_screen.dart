@@ -187,18 +187,23 @@ class _MainScreen extends State<MainScreen>
         children: [
           ListView(
             children: _passwords,
+            controller: ScrollController(),
           ),
           ListView(
             children: _notes,
+            controller: ScrollController(),
           ),
           ListView(
             children: _paymentCards,
+            controller: ScrollController(),
           ),
           ListView(
             children: _idCards,
+            controller: ScrollController(),
           ),
           ListView(
             children: _identities,
+            controller: ScrollController(),
           ),
         ],
       ),
