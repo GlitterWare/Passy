@@ -1,9 +1,10 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
+import 'package:universal_io/io.dart';
 
 import 'account_data.dart';
 import 'account_info.dart';
@@ -16,8 +17,8 @@ class AppData {
   LoadedAccount? get loadedAccount => _loadedAccount;
 
   final String _accountsPath;
-  Map<String, AccountInfo> _accounts = {};
-  Map<String, File> _dataFiles = {};
+  final Map<String, AccountInfo> _accounts = {};
+  final Map<String, File> _dataFiles = {};
   LoadedAccount? _loadedAccount;
 
   String getPasswordHash(String username) => _accounts[username]!.passwordHash;
@@ -57,21 +58,27 @@ class AppData {
 
   void unloadAccount() => _loadedAccount = null;
 
-  static PassyData _constructAppData(File file) {
-    if (!file.existsSync()) {
-      return PassyData(file,
-          version: '0.0.0',
-          syncMode: kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
-          lastUsername: '',
-          theme: ThemeMode.system);
-    }
-    return PassyData.fromFile(file);
+  Future<void> host() async {
+    await ServerSocket.bind('127.0.0.1', passy.localPort)
+        .then((s) => s.listen((_client) async {
+              print(_client.address);
+              _client.add(utf8.encode('{"hello": "world"}'));
+              _client.flush();
+            }));
+  }
+
+  Future<void> syncronize() async {
+    await Socket.connect(passy.remoteAddress, passy.remotePort)
+        .then((s) => s.listen((d) async {
+              Map<String, dynamic> _data = jsonDecode(utf8.decode(d));
+              print(_data);
+            }));
+    // Ask server for data hashes, if they are not the same, exchange data
   }
 
   AppData(String path)
       : _accountsPath = path + Platform.pathSeparator + 'accounts',
-        passy = _constructAppData(
-            File(path + Platform.pathSeparator + 'passy.json')) {
+        passy = PassyData(File(path + Platform.pathSeparator + 'passy.json')) {
     Directory _accountsDirectory =
         Directory(path + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync();

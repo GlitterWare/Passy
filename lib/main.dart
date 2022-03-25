@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:passy/screens/add_id_card_screen.dart';
 import 'package:passy/screens/add_identity_screen.dart';
@@ -11,11 +9,8 @@ import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/note_screen.dart';
 import 'package:passy/screens/payment_card_screen.dart';
 import 'package:passy/screens/settings_screen.dart';
-import 'package:path_provider/path_provider.dart';
 
-import 'common/state.dart';
 import 'common/theme.dart';
-import 'passy/app_data.dart';
 import 'screens/add_account_screen.dart';
 import 'screens/start_screen.dart';
 import 'screens/login_screen.dart';

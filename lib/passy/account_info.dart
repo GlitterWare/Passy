@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
+
+import 'package:universal_io/io.dart';
 
 import 'common.dart';
 
@@ -34,7 +35,6 @@ class AccountInfo {
     required this.color,
   }) : _passwordHash = getPasswordHash(password) {
     _file.createSync(recursive: true);
-    _file.writeAsStringSync(jsonEncode(this));
     saveSync();
   }
 

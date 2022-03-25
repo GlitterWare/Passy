@@ -36,36 +36,7 @@ class _MainScreen extends State<MainScreen>
   final List<Widget> _idCards = [const Text('Widgets not implemented')];
   final List<Widget> _identities = [const Text('Widgets not implemented')];
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = TabController(length: 5, vsync: this);
-    _controller.addListener(() {
-      switch (_controller.index) {
-        case 0:
-          _tab = EntryType.password;
-          setState(() => _title = 'Passwords');
-          break;
-        case 1:
-          _tab = EntryType.note;
-          setState(() => _title = 'Notes');
-          break;
-        case 2:
-          _tab = EntryType.paymentCard;
-          setState(() => _title = 'Payment Cards');
-          break;
-        case 3:
-          _tab = EntryType.idCard;
-          setState(() => _title = 'ID Cards');
-          break;
-        case 4:
-          _tab = EntryType.identity;
-          setState(() => _title = 'Identities');
-          break;
-      }
-    });
-
-    // Add passwords
+  void _loadPasswords() {
     for (Password p in _account.accountData.passwords) {
       _passwords.add(Padding(
         padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
@@ -108,7 +79,7 @@ class _MainScreen extends State<MainScreen>
                   ),
                   fit: FlexFit.tight,
                 ),
-                const Icon(Icons.keyboard_arrow_right_rounded),
+                const Icon(Icons.arrow_forward_ios_rounded)
               ],
             ),
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -118,6 +89,50 @@ class _MainScreen extends State<MainScreen>
         ),
       ));
     }
+  }
+
+  void _loadNotes() {}
+
+  void _loadPaymentCards() {}
+
+  void _loadIDCards() {}
+
+  void _loadIdentities() {}
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(length: 5, vsync: this);
+    _controller.addListener(() {
+      switch (_controller.index) {
+        case 0:
+          _tab = EntryType.password;
+          setState(() => _title = 'Passwords');
+          break;
+        case 1:
+          _tab = EntryType.note;
+          setState(() => _title = 'Notes');
+          break;
+        case 2:
+          _tab = EntryType.paymentCard;
+          setState(() => _title = 'Payment Cards');
+          break;
+        case 3:
+          _tab = EntryType.idCard;
+          setState(() => _title = 'ID Cards');
+          break;
+        case 4:
+          _tab = EntryType.identity;
+          setState(() => _title = 'Identities');
+          break;
+      }
+    });
+
+    _loadPasswords();
+    _loadNotes();
+    _loadPaymentCards();
+    _loadIDCards();
+    _loadIdentities();
   }
 
   @override
