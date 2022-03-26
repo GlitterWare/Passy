@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:universal_io/io.dart';
@@ -9,51 +10,56 @@ class AccountInfo {
   String username;
   String icon;
   Color color;
+  final String path;
+
   String get passwordHash => _passwordHash;
-  set password(String password) => _passwordHash = getPasswordHash(password);
 
   String _passwordHash;
-  late File _file;
+  final File _file;
 
-  Future<void> save() async => await _file.writeAsString(jsonEncode(this));
+  Future<void> save() => _file.writeAsString(jsonEncode(this));
 
   void saveSync() => _file.writeAsStringSync(jsonEncode(this));
 
   AccountInfo._(
-    this._file,
+    this.path,
     this.username,
     this._passwordHash, {
     required this.icon,
     required this.color,
-  });
+    required File file,
+  }) : _file = file;
 
   AccountInfo(
-    this._file,
+    this.path,
     this.username,
     String password, {
     required this.icon,
     required this.color,
-  }) : _passwordHash = getPasswordHash(password) {
+  })  : _passwordHash = getPasswordHash(password),
+        _file = File(path + Platform.pathSeparator + 'info.json') {
     _file.createSync(recursive: true);
     saveSync();
   }
 
-  factory AccountInfo.fromFile(File file) {
-    Map<String, dynamic> _json = jsonDecode(file.readAsStringSync());
+  factory AccountInfo.fromDirectory(String path) {
+    File _file = File(path + Platform.pathSeparator + 'info.json');
+    Map<String, dynamic> _json = jsonDecode(_file.readAsStringSync());
     AccountInfo _account = AccountInfo._(
-      file,
+      path,
       _json['username'],
       _json['passwordHash'],
       icon: _json['icon'],
       color: Color(_json['color']),
+      file: _file,
     );
     return _account;
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'username': username,
+        'passwordHash': _passwordHash,
         'icon': icon,
         'color': color.value,
-        'passwordHash': _passwordHash,
       };
 }

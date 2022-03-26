@@ -37,7 +37,7 @@ class _MainScreen extends State<MainScreen>
   final List<Widget> _identities = [const Text('Widgets not implemented')];
 
   void _loadPasswords() {
-    for (Password p in _account.accountData.passwords) {
+    for (Password p in _account._passwords) {
       _passwords.add(Padding(
         padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
         child: ElevatedButton(
@@ -49,9 +49,8 @@ class _MainScreen extends State<MainScreen>
             child: Row(
               children: [
                 Padding(
-                  child: _account.accountData.passwordIcons.containsKey(p.icon)
-                      ? Image.memory(
-                          _account.accountData.passwordIcons[p.icon]!)
+                  child: _account._passwordIcons.containsKey(p.icon)
+                      ? Image.memory(_account._passwordIcons[p.icon]!)
                       : SvgPicture.asset(
                           logoCircleSvg,
                           width: 50,

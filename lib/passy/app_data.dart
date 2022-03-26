@@ -1,12 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
 import 'package:universal_io/io.dart';
 
-import 'account_data.dart';
 import 'account_info.dart';
 import 'passy_data.dart';
 
@@ -14,11 +14,12 @@ class AppData {
   final PassyData passy;
   bool get noAccounts => _accounts.isEmpty;
   Iterable<String> get usernames => _accounts.keys;
+  Map<String, String> get passwordHashes =>
+      _accounts.map((key, value) => MapEntry(key, value.passwordHash));
   LoadedAccount? get loadedAccount => _loadedAccount;
 
   final String _accountsPath;
   final Map<String, AccountInfo> _accounts = {};
-  final Map<String, File> _dataFiles = {};
   LoadedAccount? _loadedAccount;
 
   String getPasswordHash(String username) => _accounts[username]!.passwordHash;
@@ -26,53 +27,105 @@ class AppData {
 
   void createAccount(
       String username, String password, String icon, Color color) {
-    String _path = _accountsPath + Platform.pathSeparator + username;
-    _accounts[username] = AccountInfo(
-      File(_path + Platform.pathSeparator + 'info.json'),
+    AccountInfo _info = AccountInfo(
+      _accountsPath + Platform.pathSeparator + username,
       username,
       password,
       icon: icon,
       color: color,
     );
-    File _dataFile = File(_path + Platform.pathSeparator + 'data.json');
-    AccountData(_dataFile, getEncrypter(password));
-    _dataFiles[username] = _dataFile;
+    _accounts[username] = _info;
+    LoadedAccount(_info, encrypter: getEncrypter(password));
   }
 
-  Future<void> removeAccount(String username) async {
+  Future<void> removeAccount(String username) {
     if (_loadedAccount != null) {
-      if (_loadedAccount!.accountInfo.username == username) {
+      if (_loadedAccount!._accountInfo.username == username) {
         _loadedAccount = null;
       }
     }
     _accounts.remove(username);
-    await Directory(_accountsPath + Platform.pathSeparator + username)
+    passy.lastUsername = _accounts.keys.first;
+    return Directory(_accountsPath + Platform.pathSeparator + username)
         .delete(recursive: true);
   }
 
   loadAccount(String username, String password) {
     AccountInfo _info = _accounts[username]!;
-    _loadedAccount =
-        LoadedAccount(_info, _dataFiles[username]!, getEncrypter(password));
+    _loadedAccount = LoadedAccount(_info, encrypter: getEncrypter(password));
   }
 
   void unloadAccount() => _loadedAccount = null;
 
-  Future<void> host() async {
-    await ServerSocket.bind('127.0.0.1', passy.localPort)
-        .then((s) => s.listen((_client) async {
-              print(_client.address);
-              _client.add(utf8.encode('{"hello": "world"}'));
-              _client.flush();
+  Future<void> host() {
+    return ServerSocket.bind('127.0.0.1', passy.localPort)
+        .then((s) => s.listen((c) {
+              StreamSubscription<Uint8List> _sub = c.listen(null);
+
+              void _receiveData(Uint8List data) {}
+
+              void _sendData() {
+                _sub.onData(_receiveData);
+              }
+
+              void _receiveDataHashes(Uint8List data) {
+                _sendData();
+              }
+
+              void _sendPasswordHashes() {
+                _sub.onData(_receiveDataHashes);
+                c.add(utf8.encode(jsonEncode(passwordHashes)));
+              }
+
+              void _receiveHello(Uint8List data) {
+                if (utf8.decode(data) == 'PASSYHELLO') {
+                  _sendPasswordHashes();
+                  return;
+                }
+                s.close();
+              }
+
+              void _sendHello() {
+                _sub.onData(_receiveHello);
+                c.add(utf8.encode('PASSYHELLO'));
+                c.flush();
+              }
+
+              _sendHello();
             }));
   }
 
-  Future<void> syncronize() async {
-    await Socket.connect(passy.remoteAddress, passy.remotePort)
-        .then((s) => s.listen((d) async {
-              Map<String, dynamic> _data = jsonDecode(utf8.decode(d));
-              print(_data);
-            }));
+  Future<void> syncronize() {
+    return Socket.connect(passy.remoteAddress, passy.remotePort).then((s) {
+      StreamSubscription<Uint8List> _sub = s.listen(null);
+
+      void _receiveAndSendData(Uint8List data) {}
+
+      void _receiveAndSendHashes(Uint8List data) {
+        Map<String, String> _local = passwordHashes;
+        Map<String, String> _remote = jsonDecode(utf8.decode(data));
+        String _response = '{';
+        for (String u in _local.keys) {
+          if (_remote.containsKey(u)) {
+            if (_remote[u] == _local[u]) {}
+          }
+        }
+        s.add(utf8.encode(_response));
+      }
+
+      void _sendHello() {
+        _sub.onData((d) {
+          if (utf8.decode(d) == 'PASSYHELLO') {
+            _sub.onData(_receiveAndSendHashes);
+            s.add(utf8.encode('PASSYHELLO'));
+            return;
+          }
+          s.close();
+        });
+      }
+
+      _sendHello();
+    });
     // Ask server for data hashes, if they are not the same, exchange data
   }
 
@@ -82,13 +135,9 @@ class AppData {
     Directory _accountsDirectory =
         Directory(path + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync();
-    List<FileSystemEntity> _accountFolders = _accountsDirectory.listSync();
-    for (FileSystemEntity _account in _accountFolders) {
-      String _username = _account.path.split(Platform.pathSeparator).last;
-      _accounts[_username] = AccountInfo.fromFile(
-          File(_account.path + Platform.pathSeparator + 'info.json'));
-      _dataFiles[_username] =
-          File(_account.path + Platform.pathSeparator + 'data.json');
-    }
+    _accountsDirectory.listSync().map((a) {
+      String _username = a.path.split(Platform.pathSeparator).last;
+      _accounts[_username] = AccountInfo.fromDirectory(a.path);
+    });
   }
 }

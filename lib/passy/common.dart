@@ -16,3 +16,16 @@ Encrypter getEncrypter(String password) {
 
 String getPasswordHash(String password) =>
     sha512.convert(utf8.encode(password)).toString();
+
+String encrypt(String data, {required Encrypter encrypter}) => encrypter
+    .encrypt(
+      data,
+      iv: IV.fromLength(16),
+    )
+    .base64;
+
+String decrypt(String data, {required Encrypter encrypter}) =>
+    encrypter.decrypt64(
+      data,
+      iv: IV.fromLength(16),
+    );

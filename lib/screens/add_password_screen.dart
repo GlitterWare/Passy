@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/state.dart';
-import 'package:passy/passy/account_data.dart';
+import 'package:passy/passy/loaded_account.dart';
 import 'package:passy/passy/password.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
@@ -28,12 +28,11 @@ class _AddPasswordScreen extends State<AddPasswordScreen> {
         title: 'Password',
         isNew: _isNew,
         onSave: () {
-          AccountData _accountData = data.loadedAccount!.accountData;
-          _accountData.passwords.add(_password);
+          LoadedAccount _account = data.loadedAccount!;
+          _account._passwords.add(_password);
           Navigator.pushReplacementNamed(context, SplashScreen.routeName);
-          _accountData.save().whenComplete(() =>
-              Navigator.pushNamedAndRemoveUntil(
-                  context, MainScreen.routeName, ((route) => false)));
+          _account.save().whenComplete(() => Navigator.pushNamedAndRemoveUntil(
+              context, MainScreen.routeName, ((route) => false)));
         },
       ),
       body: Column(children: [

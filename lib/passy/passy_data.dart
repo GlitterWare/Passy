@@ -31,7 +31,7 @@ class PassyData {
 
   late File _file;
 
-  Future<void> save() async => await _file.writeAsString(json.encode(this));
+  Future<void> save() => _file.writeAsString(json.encode(this));
   void saveSync() => _file.writeAsStringSync(json.encode(toJson()));
 
   PassyData._(
