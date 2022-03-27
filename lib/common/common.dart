@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:passy/passy/app_data.dart';
+import 'package:passy/passy_data/passy_data.dart';
 
-late AppData data;
+late PassyData data;
 
 Widget getBackButton(BuildContext context) => IconButton(
       icon: const Icon(Icons.arrow_back_ios_new_rounded),

@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/host_address.dart';
 import 'package:universal_io/io.dart';
 
 import 'common.dart';
@@ -68,6 +71,81 @@ class LoadedAccount {
     _paymentCards.saveSync();
     _idCards.saveSync();
     _identities.saveSync();
+  }
+
+  Future<HostAddress?> host() async {
+    HostAddress? _address;
+    await ServerSocket.bind('127.0.0.1', 0).then((s) {
+      _address = HostAddress(s.address, s.port);
+      s.listen((c) {
+        StreamSubscription<Uint8List> _sub = c.listen(null);
+
+        void _receiveData(Uint8List data) {}
+
+        void _sendData() {
+          _sub.onData(_receiveData);
+        }
+
+        void _receiveHistoryHash(Uint8List data) {
+          _sendData();
+        }
+
+        void _sendPasswordHash() {
+          _sub.onData(_receiveHistoryHash);
+          c.add(utf8.encode(jsonEncode(_accountInfo.passwordHash)));
+        }
+
+        void _receiveHello(Uint8List data) {
+          if (utf8.decode(data) == 'PASSYHELLO') {
+            _sendPasswordHash();
+            return;
+          }
+          s.close();
+        }
+
+        void _sendHello() {
+          _sub.onData(_receiveHello);
+          c.add(utf8.encode('PASSYHELLO'));
+          c.flush();
+        }
+
+        _sendHello();
+      });
+    });
+    return _address;
+  }
+
+  Future<void> syncronize(HostAddress address) {
+    return Socket.connect(address.ip, address.port).then((s) {
+      StreamSubscription<Uint8List> _sub = s.listen(null);
+
+      void _receiveAndSendData(Uint8List data) {
+        s.close();
+      }
+
+      void _receiveAndSendHashes(Uint8List data) {
+        if (utf8.decode(data) == _accountInfo.passwordHash) {
+          s.add(utf8.encode(jsonEncode(_history)));
+          _sub.onData(_receiveAndSendData);
+          return;
+        }
+        s.close();
+      }
+
+      void _sendHello() {
+        _sub.onData((d) {
+          if (utf8.decode(d) == 'PASSYHELLO') {
+            _sub.onData(_receiveAndSendHashes);
+            s.add(utf8.encode('PASSYHELLO'));
+            return;
+          }
+          s.close();
+        });
+      }
+
+      _sendHello();
+    });
+    // Ask server for data hashes, if they are not the same, exchange data
   }
 
   // Account Info wrappers

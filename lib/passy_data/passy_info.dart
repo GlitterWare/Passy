@@ -24,10 +24,6 @@ class PassyInfo {
   SyncMode syncMode;
   String lastUsername;
   ThemeMode themeMode;
-  int localPort;
-  bool scanNetwork;
-  String remoteAddress;
-  int remotePort;
 
   late File _file;
 
@@ -40,10 +36,6 @@ class PassyInfo {
     this.syncMode = kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
     this.lastUsername = '',
     this.themeMode = ThemeMode.system,
-    this.localPort = 778,
-    this.scanNetwork = true,
-    this.remoteAddress = '127.0.0.1',
-    this.remotePort = 778,
   });
 
   factory PassyInfo(
@@ -68,10 +60,6 @@ class PassyInfo {
         themeMode:
             $enumDecodeNullable(_$ThemeModeEnumMap, _json['themeMode']) ??
                 ThemeMode.system,
-        localPort: _json['localPort'],
-        scanNetwork: _json['scanNetwork'],
-        remoteAddress: _json['remoteAddress'],
-        remotePort: _json['remotePort'],
       );
     }
     file.createSync(recursive: true);
@@ -81,10 +69,6 @@ class PassyInfo {
       syncMode: syncMode,
       lastUsername: lastUsername,
       themeMode: themeMode,
-      localPort: localPort,
-      scanNetwork: scanNetwork,
-      remoteAddress: remoteAddress,
-      remotePort: remotePort,
     );
     _data.saveSync();
     return _data;
@@ -95,9 +79,5 @@ class PassyInfo {
         'syncMode': _$SyncModeEnumMap[syncMode],
         'lastUsername': lastUsername,
         'themeMode': _$ThemeModeEnumMap[themeMode],
-        'localPort': localPort,
-        'scanNetwork': scanNetwork,
-        'remoteAddress': remoteAddress,
-        'remotePort': remotePort,
       };
 }
