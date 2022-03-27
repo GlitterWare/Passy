@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy/common.dart';
 import 'package:universal_io/io.dart';
+
+import 'common.dart';
 
 class Images {
   final Map<String, Uint8List> _images;

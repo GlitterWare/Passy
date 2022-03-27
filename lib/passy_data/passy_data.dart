@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:passy/passy/common.dart';
-import 'package:passy/passy/loaded_account.dart';
 import 'package:universal_io/io.dart';
 
+import 'common.dart';
+import 'loaded_account.dart';
 import 'account_info.dart';
-import 'passy_data.dart';
+import 'passy_info.dart';
 
-class AppData {
-  final PassyData passy;
+class PassyData {
+  final PassyInfo passy;
   bool get noAccounts => _accounts.isEmpty;
   Iterable<String> get usernames => _accounts.keys;
   Map<String, String> get passwordHashes =>
@@ -139,9 +139,9 @@ class AppData {
     // Ask server for data hashes, if they are not the same, exchange data
   }
 
-  AppData(String path)
+  PassyData(String path)
       : _accountsPath = path + Platform.pathSeparator + 'accounts',
-        passy = PassyData(File(path + Platform.pathSeparator + 'passy.json')) {
+        passy = PassyInfo(File(path + Platform.pathSeparator + 'passy.json')) {
     Directory _accountsDirectory =
         Directory(path + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync();

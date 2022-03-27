@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:encrypt/encrypt.dart';
 import 'package:universal_io/io.dart';
 
-import 'package:passy/passy/dated_entry.dart';
+import 'dated_entry.dart';
 
 import 'common.dart';
 

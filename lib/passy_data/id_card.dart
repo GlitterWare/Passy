@@ -1,6 +1,5 @@
-import 'package:passy/passy/dated_entry.dart';
-
 import 'custom_field.dart';
+import 'dated_entry.dart';
 
 class IDCard extends DatedEntry<IDCard> {
   String nickname;

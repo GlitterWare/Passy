@@ -2,16 +2,16 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy/common.dart';
-import 'package:passy/passy/entry_event.dart';
-import 'package:passy/passy/history.dart';
-import 'package:passy/passy/id_card.dart';
-import 'package:passy/passy/identity.dart';
-import 'package:passy/passy/images.dart';
-import 'package:passy/passy/password.dart';
-import 'package:passy/passy/payment_card.dart';
 import 'package:universal_io/io.dart';
 
+import 'common.dart';
+import 'entry_event.dart';
+import 'history.dart';
+import 'id_card.dart';
+import 'identity.dart';
+import 'images.dart';
+import 'password.dart';
+import 'payment_card.dart';
 import 'account_info.dart';
 import 'dated_entries.dart';
 import 'note.dart';

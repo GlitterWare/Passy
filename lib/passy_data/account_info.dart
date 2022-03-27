@@ -3,10 +3,10 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy/loaded_account.dart';
 import 'package:universal_io/io.dart';
 
 import 'common.dart';
+import 'loaded_account.dart';
 
 class AccountInfo {
   String username;

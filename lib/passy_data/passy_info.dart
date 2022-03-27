@@ -19,7 +19,7 @@ const _$SyncModeEnumMap = {
   SyncMode.server: 'server',
 };
 
-class PassyData {
+class PassyInfo {
   String version;
   SyncMode syncMode;
   String lastUsername;
@@ -34,7 +34,7 @@ class PassyData {
   Future<void> save() => _file.writeAsString(json.encode(this));
   void saveSync() => _file.writeAsStringSync(json.encode(toJson()));
 
-  PassyData._(
+  PassyInfo._(
     this._file, {
     this.version = '0.0.0',
     this.syncMode = kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
@@ -46,7 +46,7 @@ class PassyData {
     this.remotePort = 778,
   });
 
-  factory PassyData(
+  factory PassyInfo(
     File file, {
     String version = '0.0.0',
     SyncMode syncMode = kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
@@ -59,7 +59,7 @@ class PassyData {
   }) {
     if (file.existsSync()) {
       Map<String, dynamic> _json = jsonDecode(file.readAsStringSync());
-      return PassyData._(
+      return PassyInfo._(
         file,
         syncMode: $enumDecodeNullable(_$SyncModeEnumMap, _json['syncMode']) ??
             SyncMode.clientAndServer,
@@ -75,7 +75,7 @@ class PassyData {
       );
     }
     file.createSync(recursive: true);
-    PassyData _data = PassyData._(
+    PassyInfo _data = PassyInfo._(
       file,
       version: version,
       syncMode: syncMode,

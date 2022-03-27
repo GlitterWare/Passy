@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy/loaded_account.dart';
-import 'package:passy/passy/password.dart';
+import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/main_screen.dart';
 
 class AddPasswordScreen extends StatefulWidget {

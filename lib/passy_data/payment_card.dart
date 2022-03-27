@@ -1,4 +1,4 @@
-import 'package:passy/passy/dated_entry.dart';
+import 'dated_entry.dart';
 
 import 'custom_field.dart';
 

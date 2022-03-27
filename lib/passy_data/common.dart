@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy/dated_entry.dart';
-import 'package:passy/passy/id_card.dart';
-import 'package:passy/passy/identity.dart';
-import 'package:passy/passy/password.dart';
-import 'package:passy/passy/payment_card.dart';
+
+import 'dated_entry.dart';
+import 'id_card.dart';
+import 'identity.dart';
+import 'password.dart';
+import 'payment_card.dart';
 
 import 'note.dart';
 

@@ -1,4 +1,4 @@
-import 'package:passy/passy/dated_entry.dart';
+import 'dated_entry.dart';
 
 class Note extends DatedEntry<Note> {
   String title;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy/payment_card.dart';
+import 'package:passy/passy_data/payment_card.dart';
 
 class PaymentCardScreen extends StatefulWidget {
   const PaymentCardScreen({Key? key}) : super(key: key);
