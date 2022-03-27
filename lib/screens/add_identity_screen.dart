@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy/identity.dart';
 
 class AddIdentityScreen extends StatefulWidget {
   const AddIdentityScreen({Key? key}) : super(key: key);

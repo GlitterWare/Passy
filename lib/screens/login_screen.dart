@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
-import 'package:passy/common/state.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy/common.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,10 +27,9 @@ class _LoginScreen extends State<LoginScreen> {
   void login(BuildContext context) {
     if (getPasswordHash(_password) ==
         data.getPasswordHash(data.passy.lastUsername)) {
-      Navigator.pushReplacementNamed(context, '/splash');
-      Future(() {
-        data.passy.lastUsername = _username;
-        data.passy.saveSync();
+      Navigator.popUntil(context, (route) => route.isFirst);
+      data.passy.lastUsername = _username;
+      data.passy.save().whenComplete(() {
         data.loadAccount(data.passy.lastUsername, _password);
         Navigator.pushReplacementNamed(context, '/main');
       });

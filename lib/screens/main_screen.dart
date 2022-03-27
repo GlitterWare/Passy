@@ -1,7 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/assets.dart';
-import 'package:passy/common/state.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy/common.dart';
 import 'package:passy/passy/loaded_account.dart';
 import 'package:otp/otp.dart';
@@ -13,6 +15,8 @@ import 'package:passy/screens/add_payment_card_screen.dart';
 import 'package:passy/screens/note_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/settings_screen.dart';
+
+//TODO: implement OTP display
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -37,7 +41,19 @@ class _MainScreen extends State<MainScreen>
   final List<Widget> _identities = [const Text('Widgets not implemented')];
 
   void _loadPasswords() {
-    for (Password p in _account._passwords) {
+    Widget _getIcon(String name) {
+      Uint8List? _icon = _account.getPasswordIcon(name);
+      if (_icon == null) {
+        return SvgPicture.asset(
+          logoCircleSvg,
+          width: 50,
+          color: Colors.purple,
+        );
+      }
+      return Image.memory(_icon);
+    }
+
+    for (Password p in _account.passwords) {
       _passwords.add(Padding(
         padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
         child: ElevatedButton(
@@ -49,13 +65,7 @@ class _MainScreen extends State<MainScreen>
             child: Row(
               children: [
                 Padding(
-                  child: _account._passwordIcons.containsKey(p.icon)
-                      ? Image.memory(_account._passwordIcons[p.icon]!)
-                      : SvgPicture.asset(
-                          logoCircleSvg,
-                          width: 50,
-                          color: Colors.purple,
-                        ),
+                  child: _getIcon(p.iconName),
                   padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                 ),
                 Flexible(

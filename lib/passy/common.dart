@@ -2,6 +2,22 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy/dated_entry.dart';
+import 'package:passy/passy/id_card.dart';
+import 'package:passy/passy/identity.dart';
+import 'package:passy/passy/password.dart';
+import 'package:passy/passy/payment_card.dart';
+
+import 'note.dart';
+
+const Map<Type, DatedEntry Function(Map<String, dynamic> json)>
+    fromJsonMethods = {
+  Password: Password.fromJson,
+  Note: Note.fromJson,
+  PaymentCard: PaymentCard.fromJson,
+  IDCard: IDCard.fromJson,
+  Identity: Identity.fromJson,
+};
 
 enum EntryType { password, paymentCard, note, idCard, identity }
 

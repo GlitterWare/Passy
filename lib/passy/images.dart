@@ -12,8 +12,10 @@ class Images {
   final List<String> _freeimageIndexes;
 
   final String _path;
-  final Encrypter _encrypter;
   final File _file;
+
+  Encrypter _encrypter;
+  set encrypter(Encrypter encrypter) => _encrypter = encrypter;
 
   Uint8List? getImage(String name) => _images[name];
 
@@ -73,9 +75,9 @@ class Images {
     File _file = File(path + Platform.pathSeparator + 'images.json');
     if (_file.existsSync()) {
       Map<String, dynamic> _json =
-          jsonDecode(encrypter.decrypt64(_file.readAsStringSync()));
+          jsonDecode(decrypt(_file.readAsStringSync(), encrypter: encrypter));
       Map<String, String> _imageIndexes =
-          (_json['imageIndexes'] as Map<String, String>).map((key, value) =>
+          (_json['imageIndexes'] as Map<String, dynamic>).map((key, value) =>
               MapEntry(decrypt(key, encrypter: encrypter), value));
       return Images._(path,
           encrypter: encrypter,
@@ -86,7 +88,8 @@ class Images {
                       .readAsStringSync(),
                   encrypter: encrypter)))),
           imageIndexes: _imageIndexes,
-          freeImageIndexes: _json['freeImageIndexes'],
+          freeImageIndexes:
+              (_json['freeImageIndexes'] as List<dynamic>).cast<String>(),
           file: _file);
     }
     _file.createSync(recursive: true);

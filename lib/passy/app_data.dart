@@ -29,18 +29,18 @@ class AppData {
       String username, String password, String icon, Color color) {
     AccountInfo _info = AccountInfo(
       _accountsPath + Platform.pathSeparator + username,
-      username,
-      password,
+      username: username,
+      password: password,
       icon: icon,
       color: color,
     );
     _accounts[username] = _info;
-    LoadedAccount(_info, encrypter: getEncrypter(password));
+    _info.load(getEncrypter(password));
   }
 
   Future<void> removeAccount(String username) {
     if (_loadedAccount != null) {
-      if (_loadedAccount!._accountInfo.username == username) {
+      if (_loadedAccount!.username == username) {
         _loadedAccount = null;
       }
     }
@@ -50,10 +50,20 @@ class AppData {
         .delete(recursive: true);
   }
 
-  loadAccount(String username, String password) {
-    AccountInfo _info = _accounts[username]!;
-    _loadedAccount = LoadedAccount(_info, encrypter: getEncrypter(password));
+  void removeAccountSync(String username) {
+    if (_loadedAccount != null) {
+      if (_loadedAccount!.username == username) {
+        _loadedAccount = null;
+      }
+    }
+    _accounts.remove(username);
+    passy.lastUsername = _accounts.keys.first;
+    Directory(_accountsPath + Platform.pathSeparator + username)
+        .deleteSync(recursive: true);
   }
+
+  loadAccount(String username, String password) =>
+      _loadedAccount = _accounts[username]!.load(getEncrypter(password));
 
   void unloadAccount() => _loadedAccount = null;
 
@@ -135,9 +145,10 @@ class AppData {
     Directory _accountsDirectory =
         Directory(path + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync();
-    _accountsDirectory.listSync().map((a) {
-      String _username = a.path.split(Platform.pathSeparator).last;
-      _accounts[_username] = AccountInfo.fromDirectory(a.path);
-    });
+    List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
+    for (FileSystemEntity d in _accountDirectories) {
+      String _username = d.path.split(Platform.pathSeparator).last;
+      _accounts[_username] = AccountInfo.fromDirectory(d.path);
+    }
   }
 }

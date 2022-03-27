@@ -1,17 +1,34 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:passy/passy/dated_entry.dart';
 
-part 'note.g.dart';
-
-@JsonSerializable(explicitToJson: true)
-class Note {
+class Note extends DatedEntry<Note> {
   String title;
   String note;
+
+  @override
+  int compareTo(Note other) => title.compareTo(other.title);
+
+  factory Note.fromJson(Map<String, dynamic> json) => Note._(
+        title: json['title'] as String,
+        note: json['note'] as String,
+        creationDate:
+            DateTime.tryParse(json['creationDate']) ?? DateTime.now().toUtc(),
+      );
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'note': note,
+        'creationDate': creationDate.toIso8601String(),
+      };
+
+  Note._({
+    required this.title,
+    required this.note,
+    required DateTime creationDate,
+  }) : super(creationDate);
 
   Note({
     required this.title,
     required this.note,
-  });
-
-  factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);
-  Map<String, dynamic> toJson() => _$NoteToJson(this);
+  }) : super(DateTime.now().toUtc());
 }

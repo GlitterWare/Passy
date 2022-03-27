@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/state.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
@@ -25,9 +24,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (data.hasAccount(_username)) {
       throw Exception('Cannot have two accounts with the same login');
     }
+    data.createAccount(_username, _password, _icon, _color);
     data.passy.lastUsername = _username;
     data.passy.save();
-    data.createAccount(_username, _password, _icon, _color);
   }
 
   @override

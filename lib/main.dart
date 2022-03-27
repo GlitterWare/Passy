@@ -15,7 +15,6 @@ import 'screens/add_account_screen.dart';
 import 'screens/start_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
-import 'screens/splash_screen.dart';
 
 const String version = '0.0.0';
 
@@ -44,7 +43,6 @@ class Passy extends StatelessWidget {
         PasswordScreen.routeName: (context) => const PasswordScreen(),
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
-        SplashScreen.routeName: (context) => const SplashScreen(),
         StartScreen.routeName: (context) => const StartScreen(),
       },
     );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy/id_card.dart';
 
 class AddIdCardScreen extends StatefulWidget {
   const AddIdCardScreen({Key? key}) : super(key: key);

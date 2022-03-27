@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:passy/passy/app_data.dart';
+
+late AppData data;
 
 Widget getBackButton(BuildContext context) => IconButton(
       icon: const Icon(Icons.arrow_back_ios_new_rounded),
@@ -25,3 +28,7 @@ AppBar getAddScreenAppBar(
         ),
       ],
     );
+
+Future<void> loadApp(BuildContext context) => data.noAccounts
+    ? Navigator.pushReplacementNamed(context, '/addAccount')
+    : Navigator.pushReplacementNamed(context, '/login');
