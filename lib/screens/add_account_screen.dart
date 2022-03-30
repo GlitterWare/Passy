@@ -22,11 +22,16 @@ class _AddAccountScreen extends State<StatefulWidget> {
 
   void addAccount() {
     if (data.hasAccount(_username)) {
+      //TODO: replace exception with popup
       throw Exception('Cannot have two accounts with the same login');
     }
+    if (_username.length < 2) {
+      //TODO: replace exception with popup
+      throw Exception('Cannot have a username less than 2 letters long');
+    }
     data.createAccount(_username, _password, _icon, _color);
-    data.passy.lastUsername = _username;
-    data.passy.save();
+    data.info.lastUsername = _username;
+    data.info.save();
   }
 
   @override
@@ -112,7 +117,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   ),
                                   onChanged: (a) => _confirmPassword = a,
                                   inputFormatters: [
-                                    FilteringTextInputFormatter.deny(' ')
+                                    FilteringTextInputFormatter.deny(' '),
+                                    LengthLimitingTextInputFormatter(32),
                                   ],
                                 ),
                               ),

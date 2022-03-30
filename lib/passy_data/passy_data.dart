@@ -9,7 +9,7 @@ import 'account_info.dart';
 import 'passy_info.dart';
 
 class PassyData {
-  final PassyInfo passy;
+  final PassyInfo info;
   bool get noAccounts => _accounts.isEmpty;
   Iterable<String> get usernames => _accounts.keys;
   Map<String, String> get passwordHashes =>
@@ -43,7 +43,7 @@ class PassyData {
       }
     }
     _accounts.remove(username);
-    passy.lastUsername = _accounts.keys.first;
+    info.lastUsername = _accounts.keys.first;
     return Directory(_accountsPath + Platform.pathSeparator + username)
         .delete(recursive: true);
   }
@@ -55,7 +55,7 @@ class PassyData {
       }
     }
     _accounts.remove(username);
-    passy.lastUsername = _accounts.keys.first;
+    info.lastUsername = _accounts.keys.first;
     Directory(_accountsPath + Platform.pathSeparator + username)
         .deleteSync(recursive: true);
   }
@@ -67,7 +67,7 @@ class PassyData {
 
   PassyData(String path)
       : _accountsPath = path + Platform.pathSeparator + 'accounts',
-        passy = PassyInfo(File(path + Platform.pathSeparator + 'passy.json')) {
+        info = PassyInfo(File(path + Platform.pathSeparator + 'passy.json')) {
     Directory _accountsDirectory =
         Directory(path + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync();

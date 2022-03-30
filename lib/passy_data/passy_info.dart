@@ -1,11 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:universal_io/io.dart';
-
-enum SyncMode { clientAndServer, client, server }
 
 const _$ThemeModeEnumMap = {
   ThemeMode.system: 'system',
@@ -13,15 +10,8 @@ const _$ThemeModeEnumMap = {
   ThemeMode.light: 'light',
 };
 
-const _$SyncModeEnumMap = {
-  SyncMode.clientAndServer: 'clientAndServer',
-  SyncMode.client: 'client',
-  SyncMode.server: 'server',
-};
-
 class PassyInfo {
   String version;
-  SyncMode syncMode;
   String lastUsername;
   ThemeMode themeMode;
 
@@ -33,7 +23,6 @@ class PassyInfo {
   PassyInfo._(
     this._file, {
     this.version = '0.0.0',
-    this.syncMode = kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
     this.lastUsername = '',
     this.themeMode = ThemeMode.system,
   });
@@ -41,7 +30,6 @@ class PassyInfo {
   factory PassyInfo(
     File file, {
     String version = '0.0.0',
-    SyncMode syncMode = kIsWeb ? SyncMode.client : SyncMode.clientAndServer,
     String lastUsername = '',
     ThemeMode themeMode = ThemeMode.system,
     int localPort = 778,
@@ -53,8 +41,6 @@ class PassyInfo {
       Map<String, dynamic> _json = jsonDecode(file.readAsStringSync());
       return PassyInfo._(
         file,
-        syncMode: $enumDecodeNullable(_$SyncModeEnumMap, _json['syncMode']) ??
-            SyncMode.clientAndServer,
         version: _json['version'] ?? '',
         lastUsername: _json['lastUsername'] ?? '',
         themeMode:
@@ -66,7 +52,6 @@ class PassyInfo {
     PassyInfo _data = PassyInfo._(
       file,
       version: version,
-      syncMode: syncMode,
       lastUsername: lastUsername,
       themeMode: themeMode,
     );
@@ -76,7 +61,6 @@ class PassyInfo {
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'version': version,
-        'syncMode': _$SyncModeEnumMap[syncMode],
         'lastUsername': lastUsername,
         'themeMode': _$ThemeModeEnumMap[themeMode],
       };

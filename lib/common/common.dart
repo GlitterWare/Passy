@@ -29,6 +29,6 @@ AppBar getAddScreenAppBar(
       ],
     );
 
-Future<void> loadApp(BuildContext context) => data.noAccounts
+void loadApp(BuildContext context) => data.noAccounts
     ? Navigator.pushReplacementNamed(context, '/addAccount')
     : Navigator.pushReplacementNamed(context, '/login');

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
@@ -10,6 +11,8 @@ import 'password.dart';
 import 'payment_card.dart';
 
 import 'note.dart';
+
+final Random random = Random.secure();
 
 const Map<Type, DatedEntry Function(Map<String, dynamic> json)>
     fromJsonMethods = {
@@ -31,8 +34,7 @@ Encrypter getEncrypter(String password) {
   return Encrypter(AES(Key.fromUtf8(password)));
 }
 
-String getPasswordHash(String password) =>
-    sha512.convert(utf8.encode(password)).toString();
+Digest getHash(String value) => sha512.convert(utf8.encode(value));
 
 String encrypt(String data, {required Encrypter encrypter}) => encrypter
     .encrypt(

@@ -14,7 +14,7 @@ class AccountInfo {
   Color color;
   final String path;
 
-  set password(String value) => _passwordHash = getPasswordHash(value);
+  set password(String value) => _passwordHash = getHash(value).toString();
   String get passwordHash => _passwordHash;
 
   String _passwordHash;
@@ -42,7 +42,7 @@ class AccountInfo {
     required String password,
     required this.icon,
     required this.color,
-  })  : _passwordHash = getPasswordHash(password),
+  })  : _passwordHash = getHash(password).toString(),
         _file = File(path + Platform.pathSeparator + 'info.json') {
     _file.createSync(recursive: true);
     saveSync();
