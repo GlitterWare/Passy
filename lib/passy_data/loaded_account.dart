@@ -216,7 +216,7 @@ class LoadedAccount {
     return _address;
   }
 
-  Future<void> syncronize(HostAddress address) {
+  Future<void> connect(HostAddress address) {
     print('SYNC: Synchronizing... ');
     //TODO: add onError to Socket.connect (could not connect to remote)
     return Socket.connect(address.ip, address.port).then(

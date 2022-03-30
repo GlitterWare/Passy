@@ -196,7 +196,7 @@ class _MainScreen extends State<MainScreen>
                                       .then((value) {
                                     try {
                                       _account
-                                          .syncronize(HostAddress.parse(value));
+                                          .connect(HostAddress.parse(value));
                                     } catch (e) {
                                       //TODO: show the popup context notification at the bottom of the screen
                                     }
