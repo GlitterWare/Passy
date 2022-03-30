@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/passy_data.dart';
+import 'package:universal_io/io.dart';
 
 late PassyData data;
+
+final bool cameraSupported = Platform.isAndroid || Platform.isIOS;
 
 Widget getBackButton(BuildContext context) => IconButton(
       icon: const Icon(Icons.arrow_back_ios_new_rounded),

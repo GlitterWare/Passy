@@ -8,6 +8,7 @@ import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/note_screen.dart';
 import 'package:passy/screens/payment_card_screen.dart';
+import 'package:passy/screens/connect_screen.dart';
 import 'package:passy/screens/settings_screen.dart';
 
 import 'common/theme.dart';
@@ -44,6 +45,7 @@ class Passy extends StatelessWidget {
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         StartScreen.routeName: (context) => const StartScreen(),
+        ConnectScreen.routeName: (context) => const ConnectScreen(),
       },
     );
   }
