@@ -6,34 +6,39 @@ import 'dart:ui';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/account_info_file.dart';
+import 'package:passy/passy_data/history_file.dart';
 import 'package:passy/passy_data/host_address.dart';
+import 'package:passy/passy_data/id_cards_file.dart';
+import 'package:passy/passy_data/identities_file.dart';
+import 'package:passy/passy_data/notes_file.dart';
+import 'package:passy/passy_data/passwords_file.dart';
+import 'package:passy/passy_data/payment_cards_file.dart';
 import 'package:universal_io/io.dart';
 
 import 'common.dart';
 import 'entry_event.dart';
-import 'history.dart';
 import 'id_card.dart';
 import 'identity.dart';
 import 'images.dart';
 import 'password.dart';
 import 'payment_card.dart';
 import 'account_info.dart';
-import 'dated_entries.dart';
 import 'note.dart';
 
 class LoadedAccount {
-  final AccountInfo _accountInfo;
-  final History _history;
-  final DatedEntries<Password> _passwords;
+  final AccountInfoFile _accountInfo;
+  final HistoryFile _history;
+  final PasswordsFile _passwords;
   final Images _passwordIcons;
-  final DatedEntries<Note> _notes;
-  final DatedEntries<PaymentCard> _paymentCards;
-  final DatedEntries<IDCard> _idCards;
-  final DatedEntries<Identity> _identities;
+  final NotesFile _notes;
+  final PaymentCardsFile _paymentCards;
+  final IDCardsFile _idCards;
+  final IdentitiesFile _identities;
   Encrypter _encrypter;
 
   void _setAccountPassword(String password) {
-    _accountInfo.password = password;
+    _accountInfo.value.password = password;
     _encrypter = getEncrypter(password);
     _history.encrypter = _encrypter;
     _passwords.encrypter = _encrypter;
@@ -90,48 +95,37 @@ class LoadedAccount {
           _connected = true;
           StreamSubscription<Uint8List> _sub = c.listen(null);
           String _random = '';
+          String _dataJson = '';
 
           //TODO: receive and merge data + merge history
           void _receiveData(Uint8List d) {
-            print('done.\nHOTS: Receiving data... ');
+            print('done.\nHOST: Receiving data... ');
             s.close();
           }
 
           //TODO: send relevant history and data + request missing data
           void _sendData() {
-            print('done.\nHOTS: Sending data... ');
-            Map<String, dynamic> _json = {
-              'passwords': {},
-              'passwordIcons': {},
-              'notes': {},
-              'paymentCards': {},
-              'idCards': {},
-              'identities': {},
-            };
-            _sub.onData(_receiveData);
-            c.add(utf8.encode(
-                '{"history":"${encrypt(jsonEncode(_json), encrypter: _encrypter)}","data":"","request":""}'));
+            print('done.\nHOST: Sending data... ');
+            s.close();
           }
 
           //TODO: receive and compare history
           void _receiveHistory(Uint8List d) {
-            print('done.\nHOTS: Receiving history... ');
-            Map<String, dynamic> _json =
-                jsonDecode(decrypt(utf8.decode(d), encrypter: _encrypter));
-            print(_json);
+            print('done.\nHOST: Receiving history... ');
             s.close();
           }
 
           void _sendHistoryHash() {
-            print('done.\nHOTS: Sending history hash... ');
+            print('done.\nHOST: Sending history hash... ');
             _sub.onData(_receiveHistory);
             c.add(getHash(jsonEncode(_history)).bytes);
+            c.flush();
           }
 
           void _receiveHello(Uint8List d) {
             print('done.\nHOST: Receiving hello... ');
-            Map<String, dynamic> _json = {};
-            String _remoteRandom = '';
+            Map<String, dynamic> _json;
+            String _remoteRandom;
             try {
               _json = jsonDecode(utf8.decode(d));
             } catch (e) {
@@ -142,7 +136,7 @@ class LoadedAccount {
             }
             if (!_json.containsKey('service')) {
               print(
-                  'HOST: Local exception has occurred: There is no key named service');
+                  'HOST: Local exception has occurred: There is no key named "service"');
               s.close();
               return;
             }
@@ -159,16 +153,16 @@ class LoadedAccount {
               c.flush().whenComplete(() => s.close());
               return;
             }
-            if (data.info.version != _json['version']) {
+            if (data.info.value.version != _json['version']) {
               String _err =
-                  'Local and remote versions are different. Local version: ${data.info.version}. Remote version: ${_json['version']}.';
+                  'Local and remote versions are different. Local version: ${data.info.value.version}. Remote version: ${_json['version']}.';
               print('HOST: Local exception has occurred: $_err');
               c.addError(_err);
               c.flush().whenComplete(() => s.close());
               return;
             }
             if (!_json.containsKey('random')) {
-              String _err = 'There is no key named random.';
+              String _err = 'There is no key named "random".';
               print('HOST: Local exception has occurred: $_err');
               c.addError(_err);
               c.flush().whenComplete(() => s.close());
@@ -200,14 +194,14 @@ class LoadedAccount {
             _sub.onData(_receiveHello);
             _random = random.nextInt(1000).toRadixString(36);
             c.add(utf8.encode(
-                '{"service":"passy","version":"${data.info.version}","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountInfo.username)), encrypter: _encrypter)}"}'));
+                '{"service":"passy","version":"${data.info.value.version}","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountInfo.value.username)), encrypter: _encrypter)}"}'));
             c.flush();
           }
 
           _sendHello();
         },
         onError: (e) {
-          print(e.runtimeType);
+          print('HOST: Remote exception has occurred: $e');
           s.close();
         },
         onDone: () => s.close(),
@@ -217,14 +211,14 @@ class LoadedAccount {
   }
 
   Future<void> connect(HostAddress address) {
-    print('SYNC: Synchronizing... ');
+    print('SYNC: Connecting... ');
     //TODO: add onError to Socket.connect (could not connect to remote)
     return Socket.connect(address.ip, address.port).then(
       (s) {
         StreamSubscription<Uint8List> _sub = s.listen(
           null,
           onError: (e) {
-            print(e.runtimeType);
+            print('SYNC: Remote exception has occurred: $e');
             s.destroy();
           },
         );
@@ -236,6 +230,7 @@ class LoadedAccount {
           s.destroy();
         }
 
+        //TODO: split receive data into multiple parts (Password, PasswordIcon, Note, PaymentCard, IDCard, Identity)
         //TODO: receive and merge data and history
         void _receiveData(Uint8List d) {
           print('done\nSYNC: Receiving data... ');
@@ -276,7 +271,7 @@ class LoadedAccount {
           print('done.\nSYNC: Sending hello... ');
           _sub.onData(_receiveHistoryHash);
           s.add(utf8.encode(
-              '{"service":"passy","version":"${data.info.version}","random":"${encrypt(random, encrypter: _encrypter)}"}'));
+              '{"service":"passy","version":"${data.info.value.version}","random":"${encrypt(random, encrypter: _encrypter)}"}'));
           s.flush();
         }
 
@@ -294,7 +289,7 @@ class LoadedAccount {
           }
           if (!_json.containsKey('service')) {
             print(
-                'SYNC: Local exception has occurred: There is no key named service');
+                'SYNC: Local exception has occurred: There is no key named "service"');
             s.destroy();
             return;
           }
@@ -305,22 +300,22 @@ class LoadedAccount {
             return;
           }
           if (!_json.containsKey('version')) {
-            String _err = 'There is no key named version.';
+            String _err = 'There is no key named "version".';
             print('SYNC: Local exception has occurred: $_err');
             s.addError(_err);
             s.flush().whenComplete(() => s.destroy());
             return;
           }
-          if (data.info.version != _json['version']) {
+          if (data.info.value.version != _json['version']) {
             String _err =
-                'Local and remote versions are different. Local version: ${data.info.version}. Remote version: ${_json['version']}.';
+                'Local and remote versions are different. Local version: ${data.info.value.version}. Remote version: ${_json['version']}.';
             print('SYNC: Local exception has occurred: $_err');
             s.addError(_err);
             s.flush().whenComplete(() => s.destroy());
             return;
           }
           if (!_json.containsKey('random')) {
-            String _err = 'There is no key named random.';
+            String _err = 'There is no key named "random".';
             print('SYNC: Local exception has occurred: $_err');
             s.addError(_err);
             s.flush().whenComplete(() => s.destroy());
@@ -329,7 +324,7 @@ class LoadedAccount {
           try {
             _random = decrypt(
               decrypt(_json['random'], encrypter: _encrypter),
-              encrypter: getEncrypter(_accountInfo.username),
+              encrypter: getEncrypter(_accountInfo.value.username),
             );
           } catch (e) {
             String _err =
@@ -349,132 +344,143 @@ class LoadedAccount {
   }
 
   // Account Info wrappers
-  String get username => _accountInfo.username;
-  set username(String value) => _accountInfo.username = value;
-  String get icon => _accountInfo.icon;
-  set icon(String value) => _accountInfo.icon = value;
-  Color get color => _accountInfo.color;
-  set color(Color value) => _accountInfo.color = color;
-  String get passwordHash => _accountInfo.passwordHash;
+  String get username => _accountInfo.value.username;
+  set username(String value) => _accountInfo.value.username = value;
+  String get icon => _accountInfo.value.icon;
+  set icon(String value) => _accountInfo.value.icon = value;
+  Color get color => _accountInfo.value.color;
+  set color(Color value) => _accountInfo.value.color = color;
+  String get passwordHash => _accountInfo.value.passwordHash;
 
   // Passwords wrappers
-  Iterable<Password> get passwords => _passwords.entries;
+  Iterable<Password> get passwords => _passwords.value.entries;
   void addPassword(Password password) {
-    _history.passwords[password.creationDate] = EntryEvent(
+    _history.value.passwords[password.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _passwords.add(password);
+    _passwords.value.add(password);
   }
 
-  void setPassword(Password password) =>
-      _history.passwords[password.creationDate]!.lastModified = DateTime.now();
+  void setPassword(Password password) {
+    _history.value.passwords[password.creationDate]!.lastModified =
+        DateTime.now();
+    _passwords.value.sort();
+  }
 
   void removePassword(Password password) {
-    _history.passwords[password.creationDate] = EntryEvent(
+    _history.value.passwords[password.creationDate] = EntryEvent(
         status: EntryStatus.removed, lastModified: DateTime.now().toUtc());
-    _passwords.remove(password);
+    _passwords.value.remove(password);
   }
 
   // Password Icons wrappers
   Uint8List? getPasswordIcon(String name) => _passwordIcons.getImage(name);
 
   void setPasswordIcon(String name, Uint8List image) {
-    _history.passwordIcons[name] = EntryEvent(
+    _history.value.passwordIcons[name] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwordIcons.setImage(name, image);
   }
 
   // Notes wrappers
-  Iterable<Note> get notes => _notes.entries;
+  Iterable<Note> get notes => _notes.value.entries;
   void addNote(Note note) {
-    _history.notes[note.creationDate] = EntryEvent(
+    _history.value.notes[note.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _notes.add(note);
+    _notes.value.add(note);
   }
 
-  void setNote(Note note) =>
-      _history.notes[note.creationDate]!.lastModified = DateTime.now();
+  void setNote(Note note) {
+    _history.value.notes[note.creationDate]!.lastModified = DateTime.now();
+    _notes.value.sort();
+  }
 
   void removeNote(Note note) {
-    _history.notes[note.creationDate] = EntryEvent(
+    _history.value.notes[note.creationDate] = EntryEvent(
         status: EntryStatus.removed, lastModified: DateTime.now().toUtc());
-    _notes.remove(note);
+    _notes.value.remove(note);
   }
 
   // Payment Cards wrappers
-  Iterable<PaymentCard> get paymentCards => _paymentCards.entries;
+  Iterable<PaymentCard> get paymentCards => _paymentCards.value.entries;
   void addPaymentCard(PaymentCard paymentCard) {
-    _history.paymentCards[paymentCard.creationDate] = EntryEvent(
+    _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _paymentCards.add(paymentCard);
+    _paymentCards.value.add(paymentCard);
   }
 
-  void setPaymentCard(PaymentCard paymentCard) =>
-      _history.paymentCards[paymentCard.creationDate]!.lastModified =
-          DateTime.now();
+  void setPaymentCard(PaymentCard paymentCard) {
+    _history.value.paymentCards[paymentCard.creationDate]!.lastModified =
+        DateTime.now();
+    _paymentCards.value.sort();
+  }
 
   void removePaymentCard(PaymentCard paymentCard) {
-    _history.paymentCards[paymentCard.creationDate] = EntryEvent(
+    _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
         status: EntryStatus.removed, lastModified: DateTime.now().toUtc());
-    _paymentCards.remove(paymentCard);
+    _paymentCards.value.remove(paymentCard);
   }
 
   // ID Cards wrappers
-  Iterable<IDCard> get idCards => _idCards.entries;
+  Iterable<IDCard> get idCards => _idCards.value.entries;
   void addIDCard(IDCard idCard) {
-    _history.idCards[idCard.creationDate] = EntryEvent(
+    _history.value.idCards[idCard.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _idCards.add(idCard);
+    _idCards.value.add(idCard);
   }
 
-  void setIDCard(IDCard idCard) =>
-      _history.idCards[idCard.creationDate]!.lastModified = DateTime.now();
+  void setIDCard(IDCard idCard) {
+    _history.value.idCards[idCard.creationDate]!.lastModified = DateTime.now();
+    _idCards.value.sort();
+  }
 
   void removeIDCard(IDCard idCard) {
-    _history.idCards[idCard.creationDate] = EntryEvent(
+    _history.value.idCards[idCard.creationDate] = EntryEvent(
         status: EntryStatus.removed, lastModified: DateTime.now().toUtc());
-    _idCards.remove(idCard);
+    _idCards.value.remove(idCard);
   }
 
   // Identities wrappers
-  Iterable<Identity> get identities => _identities.entries;
+  Iterable<Identity> get identities => _identities.value.entries;
   void addIdentity(Identity identity) {
-    _history.identities[identity.creationDate] = EntryEvent(
+    _history.value.identities[identity.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _identities.add(identity);
+    _identities.value.add(identity);
   }
 
-  void setIdentity(Identity identity) =>
-      _history.identities[identity.creationDate]!.lastModified = DateTime.now();
+  void setIdentity(Identity identity) {
+    _history.value.identities[identity.creationDate]!.lastModified =
+        DateTime.now();
+    _identities.value.sort();
+  }
 
   void removeIdentity(Identity identity) {
-    _history.identities[identity.creationDate] = EntryEvent(
+    _history.value.identities[identity.creationDate] = EntryEvent(
         status: EntryStatus.removed, lastModified: DateTime.now().toUtc());
-    _identities.remove(identity);
+    _identities.value.remove(identity);
   }
 
-  LoadedAccount(this._accountInfo, {required Encrypter encrypter})
-      : _history = History(
-            File(_accountInfo.path + Platform.pathSeparator + 'history.enc'),
-            encrypter: encrypter),
-        _passwords = DatedEntries<Password>(
-            File(_accountInfo.path + Platform.pathSeparator + 'passwords.enc'),
-            encrypter: encrypter),
+  LoadedAccount(
+    AccountInfo accountInfo, {
+    required String path,
+    required Encrypter encrypter,
+  })  : _encrypter = encrypter,
+        _accountInfo = AccountInfoFile(
+            File(path + Platform.pathSeparator + 'info.json'),
+            value: accountInfo),
+        _history = HistoryFile(
+            File(path + Platform.pathSeparator + 'history.enc'), encrypter),
+        _passwords = PasswordsFile(
+            File(path + Platform.pathSeparator + 'passwords.enc'), encrypter),
         _passwordIcons = Images(
-            _accountInfo.path + Platform.pathSeparator + 'password_icons',
+            path + Platform.pathSeparator + 'password_icons',
             encrypter: encrypter),
-        _notes = DatedEntries<Note>(
-            File(_accountInfo.path + Platform.pathSeparator + 'notes.enc'),
-            encrypter: encrypter),
-        _paymentCards = DatedEntries<PaymentCard>(
-            File(_accountInfo.path +
-                Platform.pathSeparator +
-                'payment_cards.enc'),
-            encrypter: encrypter),
-        _idCards = DatedEntries<IDCard>(
-            File(_accountInfo.path + Platform.pathSeparator + 'id_cards.enc'),
-            encrypter: encrypter),
-        _identities = DatedEntries<Identity>(
-            File(_accountInfo.path + Platform.pathSeparator + 'identities.enc'),
-            encrypter: encrypter),
-        _encrypter = encrypter;
+        _notes = NotesFile(
+            File(path + Platform.pathSeparator + 'notes.enc'), encrypter),
+        _paymentCards = PaymentCardsFile(
+            File(path + Platform.pathSeparator + 'payment_cards.enc'),
+            encrypter),
+        _idCards = IDCardsFile(
+            File(path + Platform.pathSeparator + 'id_cards.enc'), encrypter),
+        _identities = IdentitiesFile(
+            File(path + Platform.pathSeparator + 'identities.enc'), encrypter);
 }

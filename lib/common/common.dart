@@ -33,5 +33,5 @@ AppBar getAddScreenAppBar(
     );
 
 void loadApp(BuildContext context) => data.noAccounts
-    ? Navigator.pushReplacementNamed(context, '/addAccount')
-    : Navigator.pushReplacementNamed(context, '/login');
+    ? Navigator.pushNamedAndRemoveUntil(context, '/addAccount', (r) => false)
+    : Navigator.pushNamedAndRemoveUntil(context, '/login', (r) => false);

@@ -15,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> {
   String _password = '';
-  String _username = data.info.lastUsername;
+  String _username = data.info.value.lastUsername;
 
   List<DropdownMenuItem<String>> usernames = data.usernames
       .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
@@ -25,12 +25,11 @@ class _LoginScreen extends State<LoginScreen> {
       .toList();
 
   void login(BuildContext context) {
-    if (getHash(_password).toString() ==
-        data.getPasswordHash(data.info.lastUsername)) {
+    if (getHash(_password).toString() == data.getPasswordHash(_username)) {
       Navigator.popUntil(context, (route) => route.isFirst);
-      data.info.lastUsername = _username;
+      data.info.value.lastUsername = _username;
       data.info.save().whenComplete(() {
-        data.loadAccount(data.info.lastUsername, _password);
+        data.loadAccount(data.info.value.lastUsername, _password);
         Navigator.pushReplacementNamed(context, '/main');
       });
     }

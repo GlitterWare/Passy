@@ -1,26 +1,29 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/json_convertable.dart';
 import 'package:universal_io/io.dart';
 
 import 'dated_entry.dart';
 
 import 'common.dart';
 
-class DatedEntries<T extends DatedEntry<T>> {
+class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
   Iterable<T> get entries => _entryList;
+  final Map<DateTime, T> _entries;
+  final List<T> _entryList;
 
-  final File _file;
-  late Map<DateTime, T> _entries;
-  late List<T> _entryList;
-
-  Encrypter _encrypter;
-  set encrypter(Encrypter encrypter) => _encrypter = encrypter;
+  void sort() => _entryList.sort((a, b) => a.compareTo(b));
 
   void add(T entry) {
     _entries[entry.creationDate] = entry;
     _entryList.add(entry);
-    _entryList.sort((a, b) => a.compareTo(b));
+    sort();
+  }
+
+  void setEntry(T entry) {
+    _entries[entry.creationDate] = entry;
+    sort();
   }
 
   void remove(T entry) {
@@ -28,31 +31,22 @@ class DatedEntries<T extends DatedEntry<T>> {
     _entryList.remove(entry);
   }
 
-  Future<void> save() =>
-      _file.writeAsString(encrypt(jsonEncode(this), encrypter: _encrypter));
-  void saveSync() =>
-      _file.writeAsStringSync(encrypt(jsonEncode(this), encrypter: _encrypter));
-
+  @override
   Map<String, dynamic> toJson() => _entries
       .map((key, value) => MapEntry(key.toIso8601String(), value.toJson()));
 
-  DatedEntries(
-    this._file, {
-    required Encrypter encrypter,
-  }) : _encrypter = encrypter {
-    if (_file.existsSync()) {
-      _entries =
-          (jsonDecode(decrypt(_file.readAsStringSync(), encrypter: _encrypter))
-                  as Map<String, dynamic>)
-              .map((key, value) => MapEntry(DateTime.parse(key),
-                  fromJsonMethods[T]!(value as Map<String, dynamic>) as T));
-      _entryList = _entries.values.toList();
-      _entryList.sort((a, b) => a.compareTo(b));
-      return;
-    }
-    _entries = {};
-    _entryList = [];
-    _file.createSync();
-    saveSync();
+  factory DatedEntries.fromJson(String json) => DatedEntries(
+      entries: (jsonDecode(json) as Map<String, dynamic>).map((key, value) =>
+          MapEntry(DateTime.parse(key),
+              fromJsonMethods[T]!(value as Map<String, dynamic>) as T)));
+
+  factory DatedEntries.fromFile(File file, Encrypter encrypter) =>
+      DatedEntries.fromJson(
+          decrypt(file.readAsStringSync(), encrypter: encrypter));
+
+  DatedEntries({Map<DateTime, T> entries = const {}})
+      : _entries = entries,
+        _entryList = entries.values.toList() {
+    sort();
   }
 }

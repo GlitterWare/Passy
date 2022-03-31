@@ -17,6 +17,22 @@ class IDCard extends DatedEntry<IDCard> {
   @override
   int compareTo(IDCard other) => nickname.compareTo(other.nickname);
 
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'nickname': nickname,
+        'pictures': pictures,
+        'type': type,
+        'idNumber': idNumber,
+        'name': name,
+        'issDate': issDate,
+        'expDate': expDate,
+        'country': country,
+        'customFields': customFields.map((e) => e.toJson()).toList(),
+        'additionalInfo': additionalInfo,
+        'tags': tags,
+        'creationDate': creationDate.toIso8601String(),
+      };
+
   factory IDCard.fromJson(Map<String, dynamic> json) => IDCard._(
         nickname: json['nickname'] as String,
         pictures: (json['pictures'] as List<dynamic>)
@@ -40,22 +56,6 @@ class IDCard extends DatedEntry<IDCard> {
         creationDate:
             DateTime.tryParse(json['creationDate']) ?? DateTime.now().toUtc(),
       );
-
-  @override
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'nickname': nickname,
-        'pictures': pictures,
-        'type': type,
-        'idNumber': idNumber,
-        'name': name,
-        'issDate': issDate,
-        'expDate': expDate,
-        'country': country,
-        'customFields': customFields.map((e) => e.toJson()).toList(),
-        'additionalInfo': additionalInfo,
-        'tags': tags,
-        'creationDate': creationDate.toIso8601String(),
-      };
 
   IDCard._({
     required this.nickname,

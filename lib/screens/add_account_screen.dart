@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/account_info.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   final Color _color = Colors.purple;
   Widget? _floatingBackButton;
 
-  void addAccount() {
+  void _addAccount() {
     if (data.hasAccount(_username)) {
       //TODO: replace exception with popup
       throw Exception('Cannot have two accounts with the same login');
@@ -29,8 +30,14 @@ class _AddAccountScreen extends State<StatefulWidget> {
       //TODO: replace exception with popup
       throw Exception('Cannot have a username less than 2 letters long');
     }
-    data.createAccount(_username, _password, _icon, _color);
-    data.info.lastUsername = _username;
+    data.createAccount(
+        AccountInfo(
+            username: _username,
+            password: _password,
+            icon: _icon,
+            color: _color),
+        _password);
+    data.info.value.lastUsername = _username;
     data.info.save();
   }
 
@@ -127,7 +134,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   if (_username.isEmpty) return;
                                   if (_password.isEmpty) return;
                                   if (_password != _confirmPassword) return;
-                                  addAccount();
+                                  _addAccount();
                                   loadApp(context);
                                 },
                                 child: const Icon(
