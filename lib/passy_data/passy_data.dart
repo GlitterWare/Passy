@@ -1,11 +1,12 @@
 import 'dart:async';
 
-import 'package:passy/passy_data/passy_info_file.dart';
 import 'package:universal_io/io.dart';
 
+import 'package:passy/passy_data/passy_info.dart';
+
+import 'account_info.dart';
 import 'common.dart';
 import 'loaded_account.dart';
-import 'account_info.dart';
 
 class PassyData {
   final PassyInfoFile info;

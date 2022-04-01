@@ -5,26 +5,19 @@ import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/account_info_file.dart';
-import 'package:passy/passy_data/history_file.dart';
-import 'package:passy/passy_data/host_address.dart';
-import 'package:passy/passy_data/id_cards_file.dart';
-import 'package:passy/passy_data/identities_file.dart';
-import 'package:passy/passy_data/notes_file.dart';
-import 'package:passy/passy_data/passwords_file.dart';
-import 'package:passy/passy_data/payment_cards_file.dart';
 import 'package:universal_io/io.dart';
 
+import 'account_info.dart';
 import 'common.dart';
 import 'entry_event.dart';
+import 'history.dart';
+import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
 import 'images.dart';
+import 'note.dart';
 import 'password.dart';
 import 'payment_card.dart';
-import 'account_info.dart';
-import 'note.dart';
 
 class LoadedAccount {
   final AccountInfoFile _accountInfo;
@@ -153,9 +146,9 @@ class LoadedAccount {
               c.flush().whenComplete(() => s.close());
               return;
             }
-            if (data.info.value.version != _json['version']) {
+            if (passyVersion != _json['version']) {
               String _err =
-                  'Local and remote versions are different. Local version: ${data.info.value.version}. Remote version: ${_json['version']}.';
+                  'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_json['version']}.';
               print('HOST: Local exception has occurred: $_err');
               c.addError(_err);
               c.flush().whenComplete(() => s.close());
@@ -194,7 +187,7 @@ class LoadedAccount {
             _sub.onData(_receiveHello);
             _random = random.nextInt(1000).toRadixString(36);
             c.add(utf8.encode(
-                '{"service":"passy","version":"${data.info.value.version}","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountInfo.value.username)), encrypter: _encrypter)}"}'));
+                '{"service":"passy","version":"$passyVersion","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountInfo.value.username)), encrypter: _encrypter)}"}'));
             c.flush();
           }
 
@@ -271,7 +264,7 @@ class LoadedAccount {
           print('done.\nSYNC: Sending hello... ');
           _sub.onData(_receiveHistoryHash);
           s.add(utf8.encode(
-              '{"service":"passy","version":"${data.info.value.version}","random":"${encrypt(random, encrypter: _encrypter)}"}'));
+              '{"service":"passy","version":"$passyVersion","random":"${encrypt(random, encrypter: _encrypter)}"}'));
           s.flush();
         }
 
@@ -306,9 +299,9 @@ class LoadedAccount {
             s.flush().whenComplete(() => s.destroy());
             return;
           }
-          if (data.info.value.version != _json['version']) {
+          if (passyVersion != _json['version']) {
             String _err =
-                'Local and remote versions are different. Local version: ${data.info.value.version}. Remote version: ${_json['version']}.';
+                'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_json['version']}.';
             print('SYNC: Local exception has occurred: $_err');
             s.addError(_err);
             s.flush().whenComplete(() => s.destroy());

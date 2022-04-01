@@ -1,6 +1,31 @@
-import 'dated_entry.dart';
+import 'dart:io';
 
+import 'package:encrypt/encrypt.dart';
+
+import 'common.dart';
 import 'custom_field.dart';
+import 'dated_entries.dart';
+import 'dated_entry.dart';
+import 'encrypted_json_file.dart';
+
+class PaymentCardsFile extends EncryptedJsonFile<DatedEntries<PaymentCard>> {
+  PaymentCardsFile._(File file, Encrypter encrypter,
+      {required DatedEntries<PaymentCard> value})
+      : super(file, encrypter, value: value);
+
+  factory PaymentCardsFile(File file, Encrypter encrypter) {
+    if (file.existsSync()) {
+      return PaymentCardsFile._(file, encrypter,
+          value: DatedEntries<PaymentCard>.fromJson(
+              decrypt(file.readAsStringSync(), encrypter: encrypter)));
+    }
+    file.createSync(recursive: true);
+    PaymentCardsFile _file =
+        PaymentCardsFile._(file, encrypter, value: DatedEntries<PaymentCard>());
+    _file.saveSync();
+    return _file;
+  }
+}
 
 class PaymentCard extends DatedEntry<PaymentCard> {
   String nickname;

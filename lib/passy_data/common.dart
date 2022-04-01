@@ -12,6 +12,8 @@ import 'payment_card.dart';
 
 import 'note.dart';
 
+const String passyVersion = '0.0.0';
+
 final Random random = Random.secure();
 
 const Map<Type, DatedEntry Function(Map<String, dynamic> json)>

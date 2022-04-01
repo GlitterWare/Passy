@@ -1,11 +1,32 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/json_convertable.dart';
 import 'package:universal_io/io.dart';
 
+import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/json_convertable.dart';
+
 import 'common.dart';
+import 'encrypted_json_file.dart';
 import 'entry_event.dart';
+
+class HistoryFile extends EncryptedJsonFile<History> {
+  HistoryFile._(File file, Encrypter encrypter, {required History value})
+      : super(file, encrypter, value: value);
+
+  factory HistoryFile(File file, Encrypter encrypter) {
+    if (file.existsSync()) {
+      return HistoryFile._(file, encrypter,
+          value: History.fromJson(
+              decrypt(file.readAsStringSync(), encrypter: encrypter)));
+    }
+    file.createSync(recursive: true);
+    HistoryFile _file = HistoryFile._(file, encrypter, value: History());
+    _file.saveSync();
+    return _file;
+  }
+}
 
 class History extends JsonConvertable {
   final Map<DateTime, EntryEvent> passwords;

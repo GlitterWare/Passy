@@ -2,10 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:passy/passy_data/json_convertable.dart';
 import 'package:universal_io/io.dart';
 
+import 'package:passy/passy_data/json_convertable.dart';
+import 'package:passy/passy_data/json_file.dart';
+
 import 'common.dart';
+
+class AccountInfoFile extends JsonFile<AccountInfo> {
+  AccountInfoFile(File file, {required AccountInfo value})
+      : super(file, value: value) {
+    file.createSync(recursive: true);
+    saveSync();
+  }
+}
 
 class AccountInfo implements JsonConvertable {
   String username;
