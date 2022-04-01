@@ -24,17 +24,21 @@ class _LoginScreen extends State<LoginScreen> {
           ))
       .toList();
 
-  void login(BuildContext context) {
-    print(getHash(_password).toString());
-    print(data.getPasswordHash(_username));
-    if (getHash(_password).toString() == data.getPasswordHash(_username)) {
-      Navigator.popUntil(context, (route) => route.isFirst);
-      data.info.value.lastUsername = _username;
-      data.info.save().whenComplete(() {
-        data.loadAccount(data.info.value.lastUsername, _password);
-        Navigator.pushReplacementNamed(context, '/main');
-      });
+  static const _incorrectPasswordSnackBar =
+      SnackBar(content: Text('Incorrect password'));
+
+  void login() {
+    if (getHash(_password).toString() != data.getPasswordHash(_username)) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(_incorrectPasswordSnackBar);
+      return;
     }
+    Navigator.popUntil(context, (route) => route.isFirst);
+    data.info.value.lastUsername = _username;
+    data.info.save().whenComplete(() {
+      data.loadAccount(data.info.value.lastUsername, _password);
+      Navigator.pushReplacementNamed(context, '/main');
+    });
   }
 
   @override
@@ -106,7 +110,7 @@ class _LoginScreen extends State<LoginScreen> {
                                   ),
                                 ),
                                 FloatingActionButton(
-                                  onPressed: () => login(context),
+                                  onPressed: () => login(),
                                   child: const Icon(
                                     Icons.arrow_forward_ios_rounded,
                                   ),

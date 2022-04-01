@@ -18,14 +18,42 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _confirmPassword = '';
   Widget? _floatingBackButton;
 
+  static const _loginInUseSnackBar =
+      SnackBar(content: Text('Login is already in use'));
+  static const _twoLettersSnackBar =
+      SnackBar(content: Text('Username is shorter than 2 letters'));
+  static const _usernameEmptySnackBar =
+      SnackBar(content: Text('Username is empty'));
+  static const _passwordEmptySnackBar =
+      SnackBar(content: Text('Password is empty'));
+  static const _passwordsDoNotMatch =
+      SnackBar(content: Text('Passwords do not match'));
+
   void _addAccount() {
-    if (data.hasAccount(_username)) {
-      //TODO: replace exception with popup
-      throw Exception('Cannot have two accounts with the same login');
+    if (_username.isEmpty) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(_usernameEmptySnackBar);
+      return;
     }
     if (_username.length < 2) {
-      //TODO: replace exception with popup
-      throw Exception('Cannot have a username less than 2 letters long');
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(_twoLettersSnackBar);
+      return;
+    }
+    if (data.hasAccount(_username)) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(_loginInUseSnackBar);
+      return;
+    }
+    if (_password.isEmpty) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(_passwordEmptySnackBar);
+      return;
+    }
+    if (_password != _confirmPassword) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(_passwordsDoNotMatch);
+      return;
     }
     data.createAccount(
       _username,
@@ -33,6 +61,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     );
     data.info.value.lastUsername = _username;
     data.info.save();
+    loadApp(context);
   }
 
   @override
@@ -124,13 +153,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                 ),
                               ),
                               FloatingActionButton(
-                                onPressed: () async {
-                                  if (_username.isEmpty) return;
-                                  if (_password.isEmpty) return;
-                                  if (_password != _confirmPassword) return;
-                                  _addAccount();
-                                  loadApp(context);
-                                },
+                                onPressed: _addAccount,
                                 child: const Icon(
                                   Icons.arrow_forward_ios_rounded,
                                 ),
