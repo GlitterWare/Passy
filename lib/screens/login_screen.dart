@@ -25,6 +25,8 @@ class _LoginScreen extends State<LoginScreen> {
       .toList();
 
   void login(BuildContext context) {
+    print(getHash(_password).toString());
+    print(data.getPasswordHash(_username));
     if (getHash(_password).toString() == data.getPasswordHash(_username)) {
       Navigator.popUntil(context, (route) => route.isFirst);
       data.info.value.lastUsername = _username;

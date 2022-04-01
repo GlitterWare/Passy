@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:universal_io/io.dart';
 
+import 'account_credentials.dart';
 import 'account_info.dart';
 import 'common.dart';
 import 'entry_event.dart';
@@ -20,7 +21,8 @@ import 'password.dart';
 import 'payment_card.dart';
 
 class LoadedAccount {
-  final AccountInfoFile _accountInfo;
+  final AccountCredentialsFile _accountCredentials;
+  final AccountSettingsFile _accountSettings;
   final HistoryFile _history;
   final PasswordsFile _passwords;
   final Images _passwordIcons;
@@ -31,8 +33,9 @@ class LoadedAccount {
   Encrypter _encrypter;
 
   void _setAccountPassword(String password) {
-    _accountInfo.value.password = password;
+    _accountCredentials.value.password = password;
     _encrypter = getEncrypter(password);
+    _accountSettings.encrypter = _encrypter;
     _history.encrypter = _encrypter;
     _passwords.encrypter = _encrypter;
     _passwordIcons.encrypter = _encrypter;
@@ -53,7 +56,7 @@ class LoadedAccount {
   }
 
   Future<void> save() async {
-    await _accountInfo.save();
+    await _accountSettings.save();
     await _history.save();
     await _passwords.save();
     await _passwordIcons.save();
@@ -64,7 +67,7 @@ class LoadedAccount {
   }
 
   void saveSync() {
-    _accountInfo.saveSync();
+    _accountSettings.saveSync();
     _history.saveSync();
     _passwords.saveSync();
     _passwordIcons.saveSync();
@@ -187,7 +190,7 @@ class LoadedAccount {
             _sub.onData(_receiveHello);
             _random = random.nextInt(1000).toRadixString(36);
             c.add(utf8.encode(
-                '{"service":"passy","version":"$passyVersion","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountInfo.value.username)), encrypter: _encrypter)}"}'));
+                '{"service":"passy","version":"$passyVersion","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountCredentials.value.username)), encrypter: _encrypter)}"}'));
             c.flush();
           }
 
@@ -317,7 +320,7 @@ class LoadedAccount {
           try {
             _random = decrypt(
               decrypt(_json['random'], encrypter: _encrypter),
-              encrypter: getEncrypter(_accountInfo.value.username),
+              encrypter: getEncrypter(_accountCredentials.value.username),
             );
           } catch (e) {
             String _err =
@@ -336,14 +339,16 @@ class LoadedAccount {
     // Ask server for data hashes, if they are not the same, exchange data
   }
 
+  // Account Credentials wrappers
+  String get username => _accountCredentials.value.username;
+  set username(String value) => _accountCredentials.value.username = value;
+  String get passwordHash => _accountCredentials.value.passwordHash;
+
   // Account Info wrappers
-  String get username => _accountInfo.value.username;
-  set username(String value) => _accountInfo.value.username = value;
-  String get icon => _accountInfo.value.icon;
-  set icon(String value) => _accountInfo.value.icon = value;
-  Color get color => _accountInfo.value.color;
-  set color(Color value) => _accountInfo.value.color = color;
-  String get passwordHash => _accountInfo.value.passwordHash;
+  String get icon => _accountSettings.value.icon;
+  set icon(String value) => _accountSettings.value.icon = value;
+  Color get color => _accountSettings.value.color;
+  set color(Color value) => _accountSettings.value.color = color;
 
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
@@ -453,13 +458,13 @@ class LoadedAccount {
   }
 
   LoadedAccount(
-    AccountInfo accountInfo, {
+    AccountCredentialsFile credentials, {
     required String path,
     required Encrypter encrypter,
   })  : _encrypter = encrypter,
-        _accountInfo = AccountInfoFile(
-            File(path + Platform.pathSeparator + 'info.json'),
-            value: accountInfo),
+        _accountCredentials = credentials,
+        _accountSettings = AccountSettingsFile(
+            File(path + Platform.pathSeparator + 'settings.enc'), encrypter),
         _history = HistoryFile(
             File(path + Platform.pathSeparator + 'history.enc'), encrypter),
         _passwords = PasswordsFile(

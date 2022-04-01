@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/account_info.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
@@ -17,8 +16,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
-  final String _icon = 'assets/images/logo_circle.svg';
-  final Color _color = Colors.purple;
   Widget? _floatingBackButton;
 
   void _addAccount() {
@@ -31,12 +28,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
       throw Exception('Cannot have a username less than 2 letters long');
     }
     data.createAccount(
-        AccountInfo(
-            username: _username,
-            password: _password,
-            icon: _icon,
-            color: _color),
-        _password);
+      _username,
+      _password,
+    );
     data.info.value.lastUsername = _username;
     data.info.save();
   }

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:universal_io/io.dart';
 
-import 'package:passy/passy_data/passy_info.dart';
+import 'account_credentials.dart';
+import 'passy_info.dart';
 
-import 'account_info.dart';
 import 'common.dart';
 import 'loaded_account.dart';
 
@@ -13,21 +13,26 @@ class PassyData {
   bool get noAccounts => _accounts.isEmpty;
   Iterable<String> get usernames => _accounts.keys;
   Map<String, String> get passwordHashes =>
-      _accounts.map((key, value) => MapEntry(key, value.passwordHash));
+      _accounts.map((key, value) => MapEntry(key, value.value.passwordHash));
   LoadedAccount? get loadedAccount => _loadedAccount;
 
   final String accountsPath;
-  final Map<String, AccountInfo> _accounts = {};
+  final Map<String, AccountCredentialsFile> _accounts = {};
   LoadedAccount? _loadedAccount;
 
-  String getPasswordHash(String username) => _accounts[username]!.passwordHash;
+  String getPasswordHash(String username) =>
+      _accounts[username]!.value.passwordHash;
   bool hasAccount(String username) => _accounts.containsKey(username);
 
-  void createAccount(AccountInfo info, String password) {
-    _accounts[info.username] = info;
+  void createAccount(String username, String password) {
+    String _accountPath = accountsPath + Platform.pathSeparator + username;
+    AccountCredentialsFile _file = AccountCredentialsFile.create(
+        File(_accountPath + Platform.pathSeparator + 'credentials.json'),
+        value: AccountCredentials(username, password));
+    _accounts[username] = _file;
     LoadedAccount(
-      info,
-      path: accountsPath + Platform.pathSeparator + info.username,
+      _file,
+      path: _accountPath,
       encrypter: getEncrypter(password),
     );
   }
@@ -73,12 +78,12 @@ class PassyData {
     List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
     for (FileSystemEntity d in _accountDirectories) {
       String _username = d.path.split(Platform.pathSeparator).last;
-      _accounts[_username] = AccountInfo.fromFile(
+      _accounts[_username] = AccountCredentialsFile.read(
         File(accountsPath +
             Platform.pathSeparator +
             _username +
             Platform.pathSeparator +
-            'info.json'),
+            'credentials.json'),
       );
     }
     if (!_accounts.containsKey(info.value.lastUsername)) {
