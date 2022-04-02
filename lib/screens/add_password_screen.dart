@@ -3,6 +3,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/splash_screen.dart';
 
 class AddPasswordScreen extends StatefulWidget {
   const AddPasswordScreen({Key? key}) : super(key: key);
@@ -28,7 +29,8 @@ class _AddPasswordScreen extends State<AddPasswordScreen> {
         onSave: () {
           LoadedAccount _account = data.loadedAccount!;
           _account.addPassword(_password);
-          Navigator.popUntil(context, (route) => route.isFirst);
+          Navigator.pushNamedAndRemoveUntil(
+              context, SplashScreen.routeName, (r) => false);
           _account.save().whenComplete(() =>
               Navigator.pushReplacementNamed(context, MainScreen.routeName));
         },

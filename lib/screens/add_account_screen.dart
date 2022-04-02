@@ -18,41 +18,35 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _confirmPassword = '';
   Widget? _floatingBackButton;
 
-  static const _loginInUseSnackBar =
-      SnackBar(content: Text('Login is already in use'));
-  static const _twoLettersSnackBar =
-      SnackBar(content: Text('Username is shorter than 2 letters'));
-  static const _usernameEmptySnackBar =
-      SnackBar(content: Text('Username is empty'));
-  static const _passwordEmptySnackBar =
-      SnackBar(content: Text('Password is empty'));
-  static const _passwordsDoNotMatch =
-      SnackBar(content: Text('Passwords do not match'));
-
   void _addAccount() {
     if (_username.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(_usernameEmptySnackBar);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Username is empty')));
       return;
     }
     if (_username.length < 2) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(_twoLettersSnackBar);
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Username is shorter than 2 letters')));
       return;
     }
     if (data.hasAccount(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(_loginInUseSnackBar);
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login is already in use')));
       return;
     }
     if (_password.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(_passwordEmptySnackBar);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Password is empty')));
       return;
     }
     if (_password != _confirmPassword) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(_passwordsDoNotMatch);
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')));
       return;
     }
     data.createAccount(

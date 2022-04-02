@@ -24,13 +24,11 @@ class _LoginScreen extends State<LoginScreen> {
           ))
       .toList();
 
-  static const _incorrectPasswordSnackBar =
-      SnackBar(content: Text('Incorrect password'));
-
   void login() {
     if (getHash(_password).toString() != data.getPasswordHash(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(_incorrectPasswordSnackBar);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Incorrect password')));
       return;
     }
     Navigator.popUntil(context, (route) => route.isFirst);

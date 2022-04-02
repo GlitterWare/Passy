@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/widgets.dart';
 import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/splash_screen.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -141,7 +141,7 @@ class _ServerInfo implements JsonConvertable {
   _ServerInfo({
     History? history,
     _Request? request,
-  })  : this.history = history ?? History(),
+  })  : history = history ?? History(),
         request = request ?? _Request();
 }
 
@@ -291,14 +291,14 @@ class LoadedAccount {
             return;
           }
 
-          MainScreen.popUntil(context);
-
           _connected = true;
           StreamSubscription<Uint8List> _sub = socket.listen(null);
 
           void _sendData() {
             _log += 'done.\nSending data...';
             _server!.close();
+            Navigator.pushNamedAndRemoveUntil(
+                context, MainScreen.routeName, (r) => false);
           }
 
           void _receiveData(
@@ -531,6 +531,8 @@ class LoadedAccount {
             socket.flush();
           }
 
+          Navigator.pushNamedAndRemoveUntil(
+              context, SplashScreen.routeName, (r) => false);
           _sendHello();
         },
         onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
@@ -568,6 +570,9 @@ class LoadedAccount {
 
       void _receiveData(Uint8List data) {
         //TODO: receive data from server
+        Navigator.pushNamedAndRemoveUntil(
+            context, MainScreen.routeName, (r) => false);
+        socket.destroy();
       }
 
       Future<void> _sendData(_Request request) async {
@@ -667,6 +672,8 @@ class LoadedAccount {
       }
 
       _sub.onData(_receiveHello);
+      Navigator.pushNamedAndRemoveUntil(
+          context, SplashScreen.routeName, (r) => false);
     }, onError: (e) => _logException('Failed to connect. ${e.toString()}'));
     // Ask server for data hashes, if they are not the same, exchange data
   }

@@ -13,7 +13,7 @@ import 'package:passy/screens/settings_screen.dart';
 
 import 'common/theme.dart';
 import 'screens/add_account_screen.dart';
-import 'screens/start_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 
@@ -36,6 +36,7 @@ class Passy extends StatelessWidget {
         AddPasswordScreen.routeName: (context) => const AddPasswordScreen(),
         AddPaymentCardScreen.routeName: (context) =>
             const AddPaymentCardScreen(),
+        ConnectScreen.routeName: (context) => const ConnectScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
@@ -44,8 +45,7 @@ class Passy extends StatelessWidget {
         PasswordScreen.routeName: (context) => const PasswordScreen(),
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
-        StartScreen.routeName: (context) => const StartScreen(),
-        ConnectScreen.routeName: (context) => const ConnectScreen(),
+        SplashScreen.routeName: (context) => const SplashScreen(),
       },
     );
   }
