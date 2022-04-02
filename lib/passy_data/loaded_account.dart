@@ -156,6 +156,7 @@ class LoadedAccount {
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
   Encrypter _encrypter;
+  ServerSocket? _server;
 
   void _setAccountPassword(String password) {
     _credentials.value.password = password;
@@ -270,279 +271,277 @@ class LoadedAccount {
     }
 
     try {
-      await ServerSocket.bind(_ip, 0).then((server) {
-        _log += 'done. \nListening...';
-        _address = HostAddress(InternetAddress(_ip), server.port);
+      if (_server != null) await _server!.close();
+      _server = await ServerSocket.bind(_ip, 0);
+      _log += 'done. \nListening...';
+      _address = HostAddress(InternetAddress(_ip), _server!.port);
 
-        bool _connected = false;
+      bool _connected = false;
 
-        void _logExceptionAndDisconnect(String message,
-            {String prefix = 'Local exception has occurred: '}) {
-          _logException(message, prefix: prefix);
-          server.close();
-        }
+      void _logExceptionAndDisconnect(String message,
+          {String prefix = 'Local exception has occurred: '}) {
+        _logException(message, prefix: prefix);
+        _server!.close();
+      }
 
-        server.listen(
-          (socket) {
-            void _logAndSendException(String message,
-                {String prefix = 'Local exception has occurred: '}) {
-              _logException(message, prefix: prefix);
-              socket.addError(utf8.encode(message));
-              socket.flush().whenComplete(() => socket.destroy());
-            }
+      _server!.listen(
+        (socket) {
+          void _logAndSendException(String message,
+              {String prefix = 'Local exception has occurred: '}) {
+            _logException(message, prefix: prefix);
+            socket.addError(utf8.encode(message));
+            socket.flush().whenComplete(() => socket.destroy());
+          }
 
-            if (_connected) {
-              socket.close();
+          if (_connected) {
+            socket.close();
+            return;
+          }
+
+          MainScreen.popUntil(context);
+
+          _connected = true;
+          StreamSubscription<Uint8List> _sub = socket.listen(null);
+
+          void _sendData() {
+            _log += 'done.\nSending data...';
+            _server!.close();
+          }
+
+          void _receiveData(
+            Uint8List data, {
+            required Map<String, EntryType> entryTypes,
+            required History remoteHistory,
+          }) {
+            _DataEntry _entry;
+            try {
+              _entry = _DataEntry.fromJson(jsonDecode(
+                  decrypt(utf8.decode(data), encrypter: _encrypter)));
+            } catch (e) {
+              _logAndSendException(
+                  'Could not decode an entry.\n${e.toString()}');
               return;
             }
 
-            MainScreen.popUntil(context);
+            try {
+              switch (entryTypes[_entry.key]!) {
+                case EntryType.password:
+                  Password _decoded = Password.fromJson(_entry.value);
+                  _passwords.value.addOrSetEntry(_decoded);
+                  _history.value.passwords[_decoded.creationDate] =
+                      remoteHistory.passwords[_decoded.creationDate]!;
+                  break;
+                case EntryType.passwordIcon:
+                  _passwordIcons.setImage(
+                      _entry.key, base64.decode(_entry.value as String));
+                  _history.value.passwordIcons[_entry.key] =
+                      remoteHistory.passwordIcons[_entry.key]!;
+                  break;
+                case EntryType.paymentCard:
+                  PaymentCard _decoded = PaymentCard.fromJson(_entry.value);
+                  _paymentCards.value
+                      .addOrSetEntry(PaymentCard.fromJson(_entry.value));
+                  _history.value.paymentCards[_decoded.creationDate] =
+                      remoteHistory.paymentCards[_decoded.creationDate]!;
+                  break;
+                case EntryType.note:
+                  Note _decoded = Note.fromJson(_entry.value);
+                  _notes.value.addOrSetEntry(Note.fromJson(_entry.value));
+                  _history.value.notes[_decoded.creationDate] =
+                      remoteHistory.notes[_decoded.creationDate]!;
+                  break;
+                case EntryType.idCard:
+                  IDCard _decoded = IDCard.fromJson(_entry.value);
+                  _idCards.value.addOrSetEntry(IDCard.fromJson(_entry.value));
+                  _history.value.idCards[_decoded.creationDate] =
+                      remoteHistory.idCards[_decoded.creationDate]!;
+                  break;
+                case EntryType.identity:
+                  Identity _decoded = Identity.fromJson(_entry.value);
+                  _identities.value
+                      .addOrSetEntry(Identity.fromJson(_entry.value));
+                  _history.value.identities[_decoded.creationDate] =
+                      remoteHistory.identities[_decoded.creationDate]!;
+                  break;
+              }
+            } catch (e) {
+              _logAndSendException('Could not add an entry.\n${e.toString()}');
+            }
+          }
 
-            _connected = true;
-            StreamSubscription<Uint8List> _sub = socket.listen(null);
+          void _sendInfo(_ServerInfo info) {
+            _log += 'done.\nHOST: Sending info... ';
+            socket.add(
+                utf8.encode(encrypt(jsonEncode(info), encrypter: _encrypter)));
+            socket.flush();
+          }
 
-            void _sendData() {
-              _log += 'done.\nSending data...';
-              server.close();
+          void _receiveHistory(Uint8List data) {
+            _log += 'done.\nReceiving history... ';
+            Map<String, EntryType> _entryTypes = {};
+            _ServerInfo _info = _ServerInfo();
+            History _remoteHistory;
+            int _toReceive;
+
+            try {
+              _remoteHistory = History.fromJson(jsonDecode(
+                  decrypt(utf8.decode(data), encrypter: _encrypter)));
+            } catch (e) {
+              _logAndSendException(
+                  'Could not decode history.\n${e.toString()}');
+              return;
             }
 
-            void _receiveData(
-              Uint8List data, {
-              required Map<String, EntryType> entryTypes,
-              required History remoteHistory,
-            }) {
-              _DataEntry _entry;
-              try {
-                _entry = _DataEntry.fromJson(jsonDecode(
-                    decrypt(utf8.decode(data), encrypter: _encrypter)));
-              } catch (e) {
-                _logAndSendException(
-                    'Could not decode an entry.\n${e.toString()}');
+            _remoteHistory.passwords.forEach((key, value) {
+              if (!_history.value.passwords.containsKey(key)) {
+                _info.request.passwords.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.password;
                 return;
               }
-
-              try {
-                switch (entryTypes[_entry.key]!) {
-                  case EntryType.password:
-                    Password _decoded = Password.fromJson(_entry.value);
-                    _passwords.value.addOrSetEntry(_decoded);
-                    _history.value.passwords[_decoded.creationDate] =
-                        remoteHistory.passwords[_decoded.creationDate]!;
-                    break;
-                  case EntryType.passwordIcon:
-                    _passwordIcons.setImage(
-                        _entry.key, base64.decode(_entry.value as String));
-                    _history.value.passwordIcons[_entry.key] =
-                        remoteHistory.passwordIcons[_entry.key]!;
-                    break;
-                  case EntryType.paymentCard:
-                    PaymentCard _decoded = PaymentCard.fromJson(_entry.value);
-                    _paymentCards.value
-                        .addOrSetEntry(PaymentCard.fromJson(_entry.value));
-                    _history.value.paymentCards[_decoded.creationDate] =
-                        remoteHistory.paymentCards[_decoded.creationDate]!;
-                    break;
-                  case EntryType.note:
-                    Note _decoded = Note.fromJson(_entry.value);
-                    _notes.value.addOrSetEntry(Note.fromJson(_entry.value));
-                    _history.value.notes[_decoded.creationDate] =
-                        remoteHistory.notes[_decoded.creationDate]!;
-                    break;
-                  case EntryType.idCard:
-                    IDCard _decoded = IDCard.fromJson(_entry.value);
-                    _idCards.value.addOrSetEntry(IDCard.fromJson(_entry.value));
-                    _history.value.idCards[_decoded.creationDate] =
-                        remoteHistory.idCards[_decoded.creationDate]!;
-                    break;
-                  case EntryType.identity:
-                    Identity _decoded = Identity.fromJson(_entry.value);
-                    _identities.value
-                        .addOrSetEntry(Identity.fromJson(_entry.value));
-                    _history.value.identities[_decoded.creationDate] =
-                        remoteHistory.identities[_decoded.creationDate]!;
-                    break;
-                }
-              } catch (e) {
-                _logAndSendException(
-                    'Could not add an entry.\n${e.toString()}');
+              if (value.lastModified
+                  .isAfter(_history.value.passwords[key]!.lastModified)) {
+                _info.request.passwords.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.password;
               }
+            });
+            _remoteHistory.passwordIcons.forEach((key, value) {
+              if (!_history.value.passwordIcons.containsKey(key)) {
+                _info.request.passwordIcons.add(key);
+                _entryTypes[key] = EntryType.passwordIcon;
+                return;
+              }
+              if (value.lastModified
+                  .isAfter(_history.value.passwordIcons[key]!.lastModified)) {
+                _info.request.passwordIcons.add(key);
+                _entryTypes[key] = EntryType.passwordIcon;
+              }
+            });
+            _remoteHistory.notes.forEach((key, value) {
+              if (!_history.value.notes.containsKey(key)) {
+                _info.request.notes.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.note;
+                return;
+              }
+              if (value.lastModified
+                  .isAfter(_history.value.notes[key]!.lastModified)) {
+                _info.request.notes.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.note;
+              }
+            });
+            _remoteHistory.paymentCards.forEach((key, value) {
+              if (!_history.value.paymentCards.containsKey(key)) {
+                _info.request.paymentCards.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.paymentCard;
+                return;
+              }
+              if (value.lastModified
+                  .isAfter(_history.value.paymentCards[key]!.lastModified)) {
+                _info.request.paymentCards.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.paymentCard;
+              }
+            });
+            _remoteHistory.idCards.forEach((key, value) {
+              if (!_history.value.idCards.containsKey(key)) {
+                _info.request.idCards.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.idCard;
+                return;
+              }
+              if (value.lastModified
+                  .isAfter(_history.value.idCards[key]!.lastModified)) {
+                _info.request.idCards.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.idCard;
+              }
+            });
+            _remoteHistory.identities.forEach((key, value) {
+              if (!_history.value.identities.containsKey(key)) {
+                _info.request.identities.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.identity;
+                return;
+              }
+              if (value.lastModified
+                  .isAfter(_history.value.identities[key]!.lastModified)) {
+                _info.request.identities.add(key);
+                _entryTypes[key.toIso8601String()] = EntryType.identity;
+              }
+            });
+
+            _toReceive = _entryTypes.length;
+
+            _log += 'done.\nReceiving data... ';
+            _sub.onData((data) {
+              _toReceive--;
+              _receiveData(data,
+                  entryTypes: _entryTypes, remoteHistory: _remoteHistory);
+              if (_toReceive == 0) {
+                saveSync();
+                _sendData();
+                return;
+              }
+            });
+            _sendInfo(_info);
+          }
+
+          void _sendHistoryHash() {
+            _log += 'done.\nSending history hash... ';
+            _sub.onData(_receiveHistory);
+            socket.add(getHash(jsonEncode(_history.value)).bytes);
+            socket.flush();
+          }
+
+          void _receiveHello(Uint8List data, String random) {
+            _log += 'done.\nReceiving hello... ';
+            _Hello _hello;
+            String _random;
+            try {
+              _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
+            } catch (e) {
+              _logAndSendException('Could not decode hello.\n${e.toString()}');
+              return;
             }
-
-            void _sendInfo(_ServerInfo info) {
-              _log += 'done.\nHOST: Sending info... ';
-              socket.add(utf8
-                  .encode(encrypt(jsonEncode(info), encrypter: _encrypter)));
-              socket.flush();
+            if (_hello.service != 'passy') {
+              _logExceptionAndDisconnect('Remote service is not Passy.');
+              return;
             }
-
-            void _receiveHistory(Uint8List data) {
-              _log += 'done.\nReceiving history... ';
-              Map<String, EntryType> _entryTypes = {};
-              _ServerInfo _info = _ServerInfo();
-              History _remoteHistory;
-              int _toReceive;
-
-              try {
-                _remoteHistory = History.fromJson(jsonDecode(
-                    decrypt(utf8.decode(data), encrypter: _encrypter)));
-              } catch (e) {
-                _logAndSendException(
-                    'Could not decode history.\n${e.toString()}');
-                return;
-              }
-
-              _remoteHistory.passwords.forEach((key, value) {
-                if (!_history.value.passwords.containsKey(key)) {
-                  _info.request.passwords.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.password;
-                  return;
-                }
-                if (value.lastModified
-                    .isAfter(_history.value.passwords[key]!.lastModified)) {
-                  _info.request.passwords.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.password;
-                }
-              });
-              _remoteHistory.passwordIcons.forEach((key, value) {
-                if (!_history.value.passwordIcons.containsKey(key)) {
-                  _info.request.passwordIcons.add(key);
-                  _entryTypes[key] = EntryType.passwordIcon;
-                  return;
-                }
-                if (value.lastModified
-                    .isAfter(_history.value.passwordIcons[key]!.lastModified)) {
-                  _info.request.passwordIcons.add(key);
-                  _entryTypes[key] = EntryType.passwordIcon;
-                }
-              });
-              _remoteHistory.notes.forEach((key, value) {
-                if (!_history.value.notes.containsKey(key)) {
-                  _info.request.notes.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.note;
-                  return;
-                }
-                if (value.lastModified
-                    .isAfter(_history.value.notes[key]!.lastModified)) {
-                  _info.request.notes.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.note;
-                }
-              });
-              _remoteHistory.paymentCards.forEach((key, value) {
-                if (!_history.value.paymentCards.containsKey(key)) {
-                  _info.request.paymentCards.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.paymentCard;
-                  return;
-                }
-                if (value.lastModified
-                    .isAfter(_history.value.paymentCards[key]!.lastModified)) {
-                  _info.request.paymentCards.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.paymentCard;
-                }
-              });
-              _remoteHistory.idCards.forEach((key, value) {
-                if (!_history.value.idCards.containsKey(key)) {
-                  _info.request.idCards.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.idCard;
-                  return;
-                }
-                if (value.lastModified
-                    .isAfter(_history.value.idCards[key]!.lastModified)) {
-                  _info.request.idCards.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.idCard;
-                }
-              });
-              _remoteHistory.identities.forEach((key, value) {
-                if (!_history.value.identities.containsKey(key)) {
-                  _info.request.identities.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.identity;
-                  return;
-                }
-                if (value.lastModified
-                    .isAfter(_history.value.identities[key]!.lastModified)) {
-                  _info.request.identities.add(key);
-                  _entryTypes[key.toIso8601String()] = EntryType.identity;
-                }
-              });
-
-              _toReceive = _entryTypes.length;
-
-              _log += 'done.\nReceiving data... ';
-              _sub.onData((data) {
-                _toReceive--;
-                _receiveData(data,
-                    entryTypes: _entryTypes, remoteHistory: _remoteHistory);
-                if (_toReceive == 0) {
-                  saveSync();
-                  _sendData();
-                  return;
-                }
-              });
-              _sendInfo(_info);
+            if (passyVersion != _hello.version) {
+              _logAndSendException(
+                  'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
+              return;
             }
-
-            void _sendHistoryHash() {
-              _log += 'done.\nSending history hash... ';
-              _sub.onData(_receiveHistory);
-              socket.add(getHash(jsonEncode(_history.value)).bytes);
-              socket.flush();
+            try {
+              _random = decrypt(_hello.random, encrypter: _encrypter);
+            } catch (e) {
+              _logAndSendException(
+                  'Could not decrypt random. Make sure that local and remote username and password are the same.\n${e.toString()}');
+              return;
             }
-
-            void _receiveHello(Uint8List data, String random) {
-              _log += 'done.\nReceiving hello... ';
-              _Hello _hello;
-              String _random;
-              try {
-                _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
-              } catch (e) {
-                _logAndSendException(
-                    'Could not decode hello.\n${e.toString()}');
-                return;
-              }
-              if (_hello.service != 'passy') {
-                _logExceptionAndDisconnect('Remote service is not Passy.');
-                return;
-              }
-              if (passyVersion != _hello.version) {
-                _logAndSendException(
-                    'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
-                return;
-              }
-              try {
-                _random = decrypt(_hello.random, encrypter: _encrypter);
-              } catch (e) {
-                _logAndSendException(
-                    'Could not decrypt random. Make sure that local and remote username and password are the same.\n${e.toString()}');
-                return;
-              }
-              if (random != _random) {
-                _logAndSendException(
-                    'Local and remote randoms are different. Make sure that local and remote username and password are the same.');
-                return;
-              }
-              _sendHistoryHash();
+            if (random != _random) {
+              _logAndSendException(
+                  'Local and remote randoms are different. Make sure that local and remote username and password are the same.');
+              return;
             }
+            _sendHistoryHash();
+          }
 
-            void _sendHello() {
-              _log += 'done.\nSending hello... ';
-              String _random = random.nextInt(1000).toRadixString(36);
-              _sub.onData((data) => _receiveHello(data, _random));
-              socket.add(utf8.encode(jsonEncode(_Hello(
-                  service: 'passy',
-                  version: passyVersion,
-                  random: encrypt(
-                      encrypt(_random,
-                          encrypter: getEncrypter(_credentials.value.username)),
-                      encrypter: _encrypter)))));
-              socket.flush();
-            }
+          void _sendHello() {
+            _log += 'done.\nSending hello... ';
+            String _random = random.nextInt(1000).toRadixString(36);
+            _sub.onData((data) => _receiveHello(data, _random));
+            socket.add(utf8.encode(jsonEncode(_Hello(
+                service: 'passy',
+                version: passyVersion,
+                random: encrypt(
+                    encrypt(_random,
+                        encrypter: getEncrypter(_credentials.value.username)),
+                    encrypter: _encrypter)))));
+            socket.flush();
+          }
 
-            _sendHello();
-          },
-          onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
-              prefix: 'Remote exception has occurred: '),
-          onDone: () => server.close(),
-        );
-      });
+          _sendHello();
+        },
+        onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
+            prefix: 'Remote exception has occurred: '),
+        onDone: () => _server!.close(),
+      );
       return _address;
     } catch (e) {
       _logException('Failed to host.\n${e.toString()}');
