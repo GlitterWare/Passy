@@ -286,13 +286,6 @@ class LoadedAccount {
 
       _server!.listen(
         (socket) {
-          void _logAndSendException(String message,
-              {String prefix = 'Local exception has occurred: '}) {
-            _logException(message, prefix: prefix);
-            socket.addError(utf8.encode(message));
-            socket.flush().whenComplete(() => socket.destroy());
-          }
-
           if (_connected) {
             socket.close();
             return;
@@ -318,7 +311,7 @@ class LoadedAccount {
               _entry = _DataEntry.fromJson(jsonDecode(
                   decrypt(utf8.decode(data), encrypter: _encrypter)));
             } catch (e) {
-              _logAndSendException(
+              _logExceptionAndDisconnect(
                   'Could not decode an entry.\n${e.toString()}');
               return;
             }
@@ -365,7 +358,8 @@ class LoadedAccount {
                   break;
               }
             } catch (e) {
-              _logAndSendException('Could not add an entry.\n${e.toString()}');
+              _logExceptionAndDisconnect(
+                  'Could not add an entry.\n${e.toString()}');
             }
           }
 
@@ -387,7 +381,7 @@ class LoadedAccount {
               _remoteHistory = History.fromJson(jsonDecode(
                   decrypt(utf8.decode(data), encrypter: _encrypter)));
             } catch (e) {
-              _logAndSendException(
+              _logExceptionAndDisconnect(
                   'Could not decode history.\n${e.toString()}');
               return;
             }
@@ -495,7 +489,8 @@ class LoadedAccount {
             try {
               _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
             } catch (e) {
-              _logAndSendException('Could not decode hello.\n${e.toString()}');
+              _logExceptionAndDisconnect(
+                  'Could not decode hello.\n${e.toString()}');
               return;
             }
             if (_hello.service != 'passy') {
@@ -503,19 +498,19 @@ class LoadedAccount {
               return;
             }
             if (passyVersion != _hello.version) {
-              _logAndSendException(
+              _logExceptionAndDisconnect(
                   'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
               return;
             }
             try {
               _random = decrypt(_hello.random, encrypter: _encrypter);
             } catch (e) {
-              _logAndSendException(
+              _logExceptionAndDisconnect(
                   'Could not decrypt random. Make sure that local and remote username and password are the same.\n${e.toString()}');
               return;
             }
             if (random != _random) {
-              _logAndSendException(
+              _logExceptionAndDisconnect(
                   'Local and remote randoms are different. Make sure that local and remote username and password are the same.');
               return;
             }
@@ -565,13 +560,6 @@ class LoadedAccount {
         socket.destroy();
       }
 
-      void _logAndSendException(String message,
-          {String prefix = 'Local exception has occurred: '}) {
-        _logException(message, prefix: prefix);
-        socket.addError(utf8.encode(message));
-        socket.flush().whenComplete(() => socket.destroy());
-      }
-
       StreamSubscription<Uint8List> _sub = socket.listen(
         null,
         onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
@@ -602,7 +590,7 @@ class LoadedAccount {
           _info = _ServerInfo.fromJson(
               jsonDecode(decrypt(utf8.decode(data), encrypter: _encrypter)));
         } catch (e) {
-          _logAndSendException('Could not decode info.\n${e.toString()}');
+          _logExceptionAndDisconnect('Could not decode info.\n${e.toString()}');
           return;
         }
         _sub.onData(_receiveData);
@@ -622,11 +610,12 @@ class LoadedAccount {
         try {
           _same = getHash(_historyJson) == Digest(data);
         } catch (e) {
-          _logAndSendException('Could not read history hash.');
+          _logExceptionAndDisconnect('Could not read history hash.');
           return;
         }
         if (_same) {
-          _logAndSendException('Local and remote histories are the same.');
+          _logExceptionAndDisconnect(
+              'Local and remote histories are the same.');
           return;
         }
         _sub.onData(_receiveInfo);
@@ -647,7 +636,8 @@ class LoadedAccount {
         try {
           _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
         } catch (e) {
-          _logAndSendException('Could not decode hello.\n${e.toString()}');
+          _logExceptionAndDisconnect(
+              'Could not decode hello.\n${e.toString()}');
           return;
         }
         if (_hello.service != 'passy') {
@@ -655,7 +645,7 @@ class LoadedAccount {
           return;
         }
         if (passyVersion != _hello.version) {
-          _logAndSendException(
+          _logExceptionAndDisconnect(
               'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
           return;
         }
@@ -665,7 +655,7 @@ class LoadedAccount {
             encrypter: getEncrypter(_credentials.value.username),
           );
         } catch (e) {
-          _logAndSendException(
+          _logExceptionAndDisconnect(
               'Could not decrypt random. Make sure that username and password are the same for both local and remote.\n${e.toString()}');
           return;
         }
