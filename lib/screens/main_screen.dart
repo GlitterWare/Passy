@@ -175,9 +175,18 @@ class _MainScreen extends State<MainScreen>
                                 Center(
                                   child: SizedBox(
                                     width: 300,
-                                    height: 300,
-                                    child: QrImage(
-                                      data: value.toString(),
+                                    height: 350,
+                                    child: Column(
+                                      children: [
+                                        QrImage(
+                                          data: value.toString(),
+                                        ),
+                                        Expanded(
+                                          child: Center(
+                                            child: Text(value.toString()),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
