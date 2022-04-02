@@ -5,6 +5,8 @@ import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/widgets.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -247,7 +249,7 @@ class LoadedAccount {
     return _data;
   }
 
-  Future<HostAddress?> host() async {
+  Future<HostAddress?> host(BuildContext context) async {
     String _log = 'Hosting... ';
     HostAddress? _address;
     String _ip = '127.0.0.1';
@@ -289,7 +291,13 @@ class LoadedAccount {
               socket.flush().whenComplete(() => socket.destroy());
             }
 
-            if (_connected) socket.close();
+            if (_connected) {
+              socket.close();
+              return;
+            }
+
+            MainScreen.popUntil(context);
+
             _connected = true;
             StreamSubscription<Uint8List> _sub = socket.listen(null);
 
@@ -542,7 +550,7 @@ class LoadedAccount {
     return null;
   }
 
-  Future<void> connect(HostAddress address) {
+  Future<void> connect(HostAddress address, BuildContext context) {
     String _log = 'Connecting... ';
     void _logException(String message,
         {String prefix = 'Local exception has occurred: '}) {

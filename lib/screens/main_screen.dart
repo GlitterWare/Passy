@@ -26,6 +26,9 @@ import 'package:passy/screens/settings_screen.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
+  static void popUntil(BuildContext context) => Navigator.popUntil(
+      context, (route) => route.settings.name == MainScreen.routeName);
+
   static const routeName = '/main';
 
   @override
@@ -167,7 +170,7 @@ class _MainScreen extends State<MainScreen>
                       actions: [
                         TextButton(
                           child: const Text('Host'),
-                          onPressed: () => _account.host().then((value) {
+                          onPressed: () => _account.host(context).then((value) {
                             if (value == null) return;
                             showDialog(
                               context: context,
@@ -203,9 +206,10 @@ class _MainScreen extends State<MainScreen>
                                           false,
                                           ScanMode.QR)
                                       .then((value) {
+                                    MainScreen.popUntil(context);
                                     try {
-                                      _account
-                                          .connect(HostAddress.parse(value));
+                                      _account.connect(
+                                          HostAddress.parse(value), context);
                                     } catch (e) {
                                       //TODO: show the popup context notification at the bottom of the screen
                                     }
