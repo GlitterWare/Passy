@@ -72,19 +72,23 @@ class PassyData {
       : accountsPath = path + Platform.pathSeparator + 'accounts',
         info =
             PassyInfoFile(File(path + Platform.pathSeparator + 'passy.json')) {
+    if (info.value.version != passyVersion) {
+      info.value.version = passyVersion;
+      info.saveSync();
+    }
     Directory _accountsDirectory =
         Directory(path + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync();
     List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
     for (FileSystemEntity d in _accountDirectories) {
       String _username = d.path.split(Platform.pathSeparator).last;
-      _accounts[_username] = AccountCredentialsFile.read(
-        File(accountsPath +
-            Platform.pathSeparator +
-            _username +
-            Platform.pathSeparator +
-            'credentials.json'),
-      );
+      File _credentialsFile = File(accountsPath +
+          Platform.pathSeparator +
+          _username +
+          Platform.pathSeparator +
+          'credentials.json');
+      _credentialsFile.createSync();
+      _accounts[_username] = AccountCredentialsFile.read(_credentialsFile);
     }
     if (!_accounts.containsKey(info.value.lastUsername)) {
       if (_accounts.isEmpty) {

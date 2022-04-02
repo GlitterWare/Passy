@@ -15,15 +15,31 @@ class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
 
   void sort() => _entryList.sort((a, b) => a.compareTo(b));
 
-  void add(T entry) {
+  void addEntry(T entry) {
+    if (_entries.containsKey(entry.creationDate)) {
+      throw Exception('Can not add same entry twice.');
+    }
     _entries[entry.creationDate] = entry;
     _entryList.add(entry);
     sort();
   }
 
+  T? getEntry(DateTime key) => _entries[key];
+
   void setEntry(T entry) {
+    if (!_entries.containsKey(entry.creationDate)) {
+      throw Exception('Can not set inexistent entry');
+    }
     _entries[entry.creationDate] = entry;
     sort();
+  }
+
+  void addOrSetEntry(T entry) {
+    if (_entries.containsKey(entry.creationDate)) {
+      setEntry(entry);
+      return;
+    }
+    addEntry(entry);
   }
 
   void remove(T entry) {
@@ -35,14 +51,13 @@ class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
   Map<String, dynamic> toJson() => _entries
       .map((key, value) => MapEntry(key.toIso8601String(), value.toJson()));
 
-  factory DatedEntries.fromJson(String json) => DatedEntries(
-      entries: (jsonDecode(json) as Map<String, dynamic>).map((key, value) =>
-          MapEntry(DateTime.parse(key),
-              fromJsonMethods[T]!(value as Map<String, dynamic>) as T)));
+  factory DatedEntries.fromJson(Map<String, dynamic> json) => DatedEntries(
+      entries: json.map((key, value) => MapEntry(DateTime.parse(key),
+          fromJsonMethods[T]!(value as Map<String, dynamic>) as T)));
 
   factory DatedEntries.fromFile(File file, Encrypter encrypter) =>
       DatedEntries.fromJson(
-          decrypt(file.readAsStringSync(), encrypter: encrypter));
+          jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
 
   DatedEntries({Map<DateTime, T> entries = const {}})
       : _entries = entries,

@@ -35,17 +35,15 @@ class AccountSettings implements JsonConvertable {
         'color': color.value,
       };
 
-  factory AccountSettings.fromJson(String json) {
-    Map<String, dynamic> _json = jsonDecode(json);
-    return AccountSettings(
-      icon: _json['icon'],
-      color: Color(_json['color']),
-    );
-  }
+  factory AccountSettings.fromJson(Map<String, dynamic> json) =>
+      AccountSettings(
+        icon: json['icon'],
+        color: Color(json['color']),
+      );
 
   factory AccountSettings.fromFile(File file, Encrypter encrypter) =>
       AccountSettings.fromJson(
-          decrypt(file.readAsStringSync(), encrypter: encrypter));
+          jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
 
   AccountSettings({
     this.icon = 'assets/images/logo_circle.svg',

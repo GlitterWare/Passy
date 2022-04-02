@@ -17,7 +17,7 @@ class AccountCredentialsFile extends JsonFile<AccountCredentials> {
       : super(file, value: AccountCredentials.fromFile(file));
 }
 
-class AccountCredentials extends JsonConvertable {
+class AccountCredentials implements JsonConvertable {
   String username;
   set password(String value) => _passwordHash = getHash(value).toString();
   String get passwordHash => _passwordHash;
@@ -30,13 +30,11 @@ class AccountCredentials extends JsonConvertable {
         'passwordHash': _passwordHash,
       };
 
-  factory AccountCredentials.fromJson(String json) {
-    Map<String, dynamic> _json = jsonDecode(json);
-    return AccountCredentials._(_json['username'], _json['passwordHash']);
-  }
+  factory AccountCredentials.fromJson(Map<String, dynamic> json) =>
+      AccountCredentials._(json['username'], json['passwordHash']);
 
   factory AccountCredentials.fromFile(File file) =>
-      AccountCredentials.fromJson(file.readAsStringSync());
+      AccountCredentials.fromJson(jsonDecode(file.readAsStringSync()));
 
   AccountCredentials._(this.username, this._passwordHash);
 

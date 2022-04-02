@@ -1,3 +1,3 @@
-abstract class JsonConvertable {
+mixin JsonConvertable {
   Map<String, dynamic> toJson();
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
@@ -16,8 +17,8 @@ class IDCardsFile extends EncryptedJsonFile<DatedEntries<IDCard>> {
   factory IDCardsFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
       return IDCardsFile._(file, encrypter,
-          value: DatedEntries<IDCard>.fromJson(
-              decrypt(file.readAsStringSync(), encrypter: encrypter)));
+          value: DatedEntries<IDCard>.fromJson(jsonDecode(
+              decrypt(file.readAsStringSync(), encrypter: encrypter))));
     }
     file.createSync(recursive: true);
     IDCardsFile _file =

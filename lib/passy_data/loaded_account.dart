@@ -16,13 +16,136 @@ import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
 import 'images.dart';
+import 'json_convertable.dart';
 import 'note.dart';
 import 'password.dart';
 import 'payment_card.dart';
 
+class _Hello implements JsonConvertable {
+  final String service;
+  final String version;
+  final String random;
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'service': service,
+        'version': version,
+        'random': random,
+      };
+
+  factory _Hello.fromJson(Map<String, dynamic> json) => _Hello(
+        service: json['service'],
+        version: json['version'],
+        random: json['random'],
+      );
+
+  _Hello({
+    required this.service,
+    required this.version,
+    required this.random,
+  });
+}
+
+class _DataEntry implements JsonConvertable {
+  final String key;
+
+  /// Value can be Map<String, dynamic> if DatedEntry or String if image
+  final dynamic value;
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'key': key,
+        'entry': value,
+      };
+
+  factory _DataEntry.fromJson(Map<String, dynamic> json) =>
+      _DataEntry(key: json['key'], value: json['entry']);
+
+  _DataEntry({
+    required this.key,
+    required this.value,
+  });
+}
+
+class _Request implements JsonConvertable {
+  final List<DateTime> passwords;
+  final List<String> passwordIcons;
+  final List<DateTime> notes;
+  final List<DateTime> paymentCards;
+  final List<DateTime> idCards;
+  final List<DateTime> identities;
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'passwords': passwords.map<String>((e) => e.toIso8601String()).toList(),
+        'passwordIcons': passwordIcons,
+        'notes': notes.map<String>((e) => e.toIso8601String()).toList(),
+        'paymentCards':
+            paymentCards.map<String>((e) => e.toIso8601String()).toList(),
+        'idCards': idCards.map<String>((e) => e.toIso8601String()).toList(),
+        'identities':
+            identities.map<String>((e) => e.toIso8601String()).toList(),
+      };
+
+  factory _Request.fromJson(Map<String, dynamic> json) => _Request(
+        passwords: (json['passwords'] as List<dynamic>)
+            .map((e) => DateTime.parse(e))
+            .toList(),
+        passwordIcons: (json['passwordIcons'] as List<dynamic>).cast<String>(),
+        notes: (json['notes'] as List<dynamic>)
+            .map((e) => DateTime.parse(e))
+            .toList(),
+        paymentCards: (json['paymentCards'] as List<dynamic>)
+            .map((e) => DateTime.parse(e))
+            .toList(),
+        idCards: (json['idCards'] as List<dynamic>)
+            .map((e) => DateTime.parse(e))
+            .toList(),
+        identities: (json['identities'] as List<dynamic>)
+            .map((e) => DateTime.parse(e))
+            .toList(),
+      );
+
+  _Request({
+    List<DateTime>? passwords,
+    List<String>? passwordIcons,
+    List<DateTime>? notes,
+    List<DateTime>? paymentCards,
+    List<DateTime>? idCards,
+    List<DateTime>? identities,
+  })  : passwords = passwords ?? [],
+        passwordIcons = passwordIcons ?? [],
+        notes = notes ?? [],
+        paymentCards = paymentCards ?? [],
+        idCards = idCards ?? [],
+        identities = identities ?? [];
+}
+
+class _ServerInfo implements JsonConvertable {
+  final History history;
+  final _Request request;
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'history': history.toJson(),
+        'request': request.toJson(),
+      };
+
+  factory _ServerInfo.fromJson(Map<String, dynamic> json) => _ServerInfo(
+        history: History.fromJson(json['history']),
+        request: _Request.fromJson(json['request']),
+      );
+
+  _ServerInfo({
+    History? history,
+    _Request? request,
+  })  : this.history = history ?? History(),
+        request = request ?? _Request();
+}
+
 class LoadedAccount {
-  final AccountCredentialsFile _accountCredentials;
-  final AccountSettingsFile _accountSettings;
+  final AccountCredentialsFile _credentials;
+  final AccountSettingsFile _settings;
   final HistoryFile _history;
   final PasswordsFile _passwords;
   final Images _passwordIcons;
@@ -33,9 +156,9 @@ class LoadedAccount {
   Encrypter _encrypter;
 
   void _setAccountPassword(String password) {
-    _accountCredentials.value.password = password;
+    _credentials.value.password = password;
     _encrypter = getEncrypter(password);
-    _accountSettings.encrypter = _encrypter;
+    _settings.encrypter = _encrypter;
     _history.encrypter = _encrypter;
     _passwords.encrypter = _encrypter;
     _passwordIcons.encrypter = _encrypter;
@@ -56,7 +179,7 @@ class LoadedAccount {
   }
 
   Future<void> save() async {
-    await _accountSettings.save();
+    await _settings.save();
     await _history.save();
     await _passwords.save();
     await _passwordIcons.save();
@@ -67,7 +190,7 @@ class LoadedAccount {
   }
 
   void saveSync() {
-    _accountSettings.saveSync();
+    _settings.saveSync();
     _history.saveSync();
     _passwords.saveSync();
     _passwordIcons.saveSync();
@@ -77,285 +200,497 @@ class LoadedAccount {
     _identities.saveSync();
   }
 
-  //TODO: catch exceptions
+  List<List<int>> _encodeData(_Request request) {
+    List<List<int>> _data = [];
+
+    for (var element in request.passwords) {
+      _data.add(utf8.encode(encrypt(
+          jsonEncode(_DataEntry(
+              key: element.toIso8601String(),
+              value: _passwords.value.getEntry(element)!.toJson())),
+          encrypter: _encrypter)));
+    }
+    for (var element in request.passwordIcons) {
+      _data.add(utf8.encode(encrypt(
+          jsonEncode(_DataEntry(
+              key: element, value: _passwordIcons.getImage(element))),
+          encrypter: _encrypter)));
+    }
+    for (var element in request.notes) {
+      _data.add(utf8.encode(encrypt(
+          jsonEncode(_DataEntry(
+              key: element.toIso8601String(),
+              value: _notes.value.getEntry(element)!.toJson())),
+          encrypter: _encrypter)));
+    }
+    for (var element in request.paymentCards) {
+      _data.add(utf8.encode(encrypt(
+          jsonEncode(_DataEntry(
+              key: element.toIso8601String(),
+              value: _paymentCards.value.getEntry(element)!.toJson())),
+          encrypter: _encrypter)));
+    }
+    for (var element in request.idCards) {
+      _data.add(utf8.encode(encrypt(
+          jsonEncode(_DataEntry(
+              key: element.toIso8601String(),
+              value: _idCards.value.getEntry(element)!.toJson())),
+          encrypter: _encrypter)));
+    }
+    for (var element in request.identities) {
+      _data.add(utf8.encode(encrypt(
+          jsonEncode(_DataEntry(
+              key: element.toIso8601String(),
+              value: _identities.value.getEntry(element)!.toJson())),
+          encrypter: _encrypter)));
+    }
+    return _data;
+  }
+
   Future<HostAddress?> host() async {
-    print('HOST: Hosting... ');
+    String _log = 'Hosting... ';
     HostAddress? _address;
-    //TODO: add error handling to bind (Could not listen on {ip}:{port}.)
-    await ServerSocket.bind('127.0.0.1', 0).then((s) {
-      _address = HostAddress(s.address, s.port);
-      bool _connected = false;
-      s.listen(
-        (c) {
-          if (_connected) c.close();
-          _connected = true;
-          StreamSubscription<Uint8List> _sub = c.listen(null);
-          String _random = '';
-          String _dataJson = '';
+    String _ip = '127.0.0.1';
+    List<NetworkInterface> _interfaces =
+        await NetworkInterface.list(type: InternetAddressType.IPv4);
+    for (NetworkInterface element in _interfaces) {
+      for (InternetAddress ip in element.addresses) {
+        List<String> _ipList = ip.address.split('.');
+        if (_ipList[2] == '1') _ip = ip.address;
+      }
+    }
 
-          //TODO: receive and merge data + merge history
-          void _receiveData(Uint8List d) {
-            print('done.\nHOST: Receiving data... ');
-            s.close();
-          }
+    void _logException(String message,
+        {String prefix = 'Local exception has occurred: '}) {
+      String _exception = '\n' + prefix + message;
+      _log += _exception;
+      print(_log);
+    }
 
-          //TODO: send relevant history and data + request missing data
-          void _sendData() {
-            print('done.\nHOST: Sending data... ');
-            s.close();
-          }
+    try {
+      await ServerSocket.bind(_ip, 0).then((server) {
+        _log += 'done. \nListening...';
+        _address = HostAddress(InternetAddress(_ip), server.port);
 
-          //TODO: receive and compare history
-          void _receiveHistory(Uint8List d) {
-            print('done.\nHOST: Receiving history... ');
-            s.close();
-          }
+        bool _connected = false;
 
-          void _sendHistoryHash() {
-            print('done.\nHOST: Sending history hash... ');
-            _sub.onData(_receiveHistory);
-            c.add(getHash(jsonEncode(_history)).bytes);
-            c.flush();
-          }
+        void _logExceptionAndDisconnect(String message,
+            {String prefix = 'Local exception has occurred: '}) {
+          _logException(message, prefix: prefix);
+          server.close();
+        }
 
-          void _receiveHello(Uint8List d) {
-            print('done.\nHOST: Receiving hello... ');
-            Map<String, dynamic> _json;
-            String _remoteRandom;
-            try {
-              _json = jsonDecode(utf8.decode(d));
-            } catch (e) {
-              print(
-                  'HOST: Local exception has occurred: Could not decode hello json. ${e.toString()}');
-              s.close();
-              return;
+        server.listen(
+          (socket) {
+            void _logAndSendException(String message,
+                {String prefix = 'Local exception has occurred: '}) {
+              _logException(message, prefix: prefix);
+              socket.addError(utf8.encode(message));
+              socket.flush().whenComplete(() => socket.destroy());
             }
-            if (!_json.containsKey('service')) {
-              print(
-                  'HOST: Local exception has occurred: There is no key named "service"');
-              s.close();
-              return;
-            }
-            if (_json['service'] != 'passy') {
-              print(
-                  'HOST: Local error has occurred: Remote service is not Passy');
-              s.close();
-              return;
-            }
-            if (!_json.containsKey('version')) {
-              String _err = 'There is no key named version.';
-              print('HOST: Local exception has occurred: $_err');
-              c.addError(_err);
-              c.flush().whenComplete(() => s.close());
-              return;
-            }
-            if (passyVersion != _json['version']) {
-              String _err =
-                  'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_json['version']}.';
-              print('HOST: Local exception has occurred: $_err');
-              c.addError(_err);
-              c.flush().whenComplete(() => s.close());
-              return;
-            }
-            if (!_json.containsKey('random')) {
-              String _err = 'There is no key named "random".';
-              print('HOST: Local exception has occurred: $_err');
-              c.addError(_err);
-              c.flush().whenComplete(() => s.close());
-              return;
-            }
-            try {
-              _remoteRandom = decrypt(_json['random'], encrypter: _encrypter);
-            } catch (e) {
-              String _err =
-                  'Could not decrypt random. Make sure that local and remote username and password are the same. ${e.toString()}.';
-              print('HOST: Local exception has occurred: $_err');
-              c.addError(_err);
-              c.flush().whenComplete(() => s.close());
-              return;
-            }
-            if (_random != _remoteRandom) {
-              String _err =
-                  'Local and remote random are different. Make sure that local and remote username and password are the same.';
-              print('HOST: Local exception has occurred: $_err');
-              c.addError(_err);
-              c.flush().whenComplete(() => s.close());
-              return;
-            }
-            _sendHistoryHash();
-          }
 
-          void _sendHello() {
-            print('done.\nHOST: Sending hello... ');
-            _sub.onData(_receiveHello);
-            _random = random.nextInt(1000).toRadixString(36);
-            c.add(utf8.encode(
-                '{"service":"passy","version":"$passyVersion","random":"${encrypt(encrypt(_random, encrypter: getEncrypter(_accountCredentials.value.username)), encrypter: _encrypter)}"}'));
-            c.flush();
-          }
+            if (_connected) socket.close();
+            _connected = true;
+            StreamSubscription<Uint8List> _sub = socket.listen(null);
 
-          _sendHello();
-        },
-        onError: (e) {
-          print('HOST: Remote exception has occurred: $e');
-          s.close();
-        },
-        onDone: () => s.close(),
-      );
-    });
-    return _address;
+            void _sendData() {
+              _log += 'done.\nSending data...';
+              server.close();
+            }
+
+            void _receiveData(
+              Uint8List data, {
+              required Map<String, EntryType> entryTypes,
+              required History remoteHistory,
+            }) {
+              _DataEntry _entry;
+              try {
+                _entry = _DataEntry.fromJson(jsonDecode(
+                    decrypt(utf8.decode(data), encrypter: _encrypter)));
+              } catch (e) {
+                _logAndSendException(
+                    'Could not decode an entry.\n${e.toString()}');
+                return;
+              }
+
+              try {
+                switch (entryTypes[_entry.key]!) {
+                  case EntryType.password:
+                    Password _decoded = Password.fromJson(_entry.value);
+                    _passwords.value.addOrSetEntry(_decoded);
+                    _history.value.passwords[_decoded.creationDate] =
+                        remoteHistory.passwords[_decoded.creationDate]!;
+                    break;
+                  case EntryType.passwordIcon:
+                    _passwordIcons.setImage(
+                        _entry.key, base64.decode(_entry.value as String));
+                    _history.value.passwordIcons[_entry.key] =
+                        remoteHistory.passwordIcons[_entry.key]!;
+                    break;
+                  case EntryType.paymentCard:
+                    PaymentCard _decoded = PaymentCard.fromJson(_entry.value);
+                    _paymentCards.value
+                        .addOrSetEntry(PaymentCard.fromJson(_entry.value));
+                    _history.value.paymentCards[_decoded.creationDate] =
+                        remoteHistory.paymentCards[_decoded.creationDate]!;
+                    break;
+                  case EntryType.note:
+                    Note _decoded = Note.fromJson(_entry.value);
+                    _notes.value.addOrSetEntry(Note.fromJson(_entry.value));
+                    _history.value.notes[_decoded.creationDate] =
+                        remoteHistory.notes[_decoded.creationDate]!;
+                    break;
+                  case EntryType.idCard:
+                    IDCard _decoded = IDCard.fromJson(_entry.value);
+                    _idCards.value.addOrSetEntry(IDCard.fromJson(_entry.value));
+                    _history.value.idCards[_decoded.creationDate] =
+                        remoteHistory.idCards[_decoded.creationDate]!;
+                    break;
+                  case EntryType.identity:
+                    Identity _decoded = Identity.fromJson(_entry.value);
+                    _identities.value
+                        .addOrSetEntry(Identity.fromJson(_entry.value));
+                    _history.value.identities[_decoded.creationDate] =
+                        remoteHistory.identities[_decoded.creationDate]!;
+                    break;
+                }
+              } catch (e) {
+                _logAndSendException(
+                    'Could not add an entry.\n${e.toString()}');
+              }
+            }
+
+            void _sendInfo(_ServerInfo info) {
+              _log += 'done.\nHOST: Sending info... ';
+              socket.add(utf8
+                  .encode(encrypt(jsonEncode(info), encrypter: _encrypter)));
+              socket.flush();
+            }
+
+            void _receiveHistory(Uint8List data) {
+              _log += 'done.\nReceiving history... ';
+              Map<String, EntryType> _entryTypes = {};
+              _ServerInfo _info = _ServerInfo();
+              History _remoteHistory;
+              int _toReceive;
+
+              try {
+                _remoteHistory = History.fromJson(jsonDecode(
+                    decrypt(utf8.decode(data), encrypter: _encrypter)));
+              } catch (e) {
+                _logAndSendException(
+                    'Could not decode history.\n${e.toString()}');
+                return;
+              }
+
+              _remoteHistory.passwords.forEach((key, value) {
+                if (!_history.value.passwords.containsKey(key)) {
+                  _info.request.passwords.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.password;
+                  return;
+                }
+                if (value.lastModified
+                    .isAfter(_history.value.passwords[key]!.lastModified)) {
+                  _info.request.passwords.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.password;
+                }
+              });
+              _remoteHistory.passwordIcons.forEach((key, value) {
+                if (!_history.value.passwordIcons.containsKey(key)) {
+                  _info.request.passwordIcons.add(key);
+                  _entryTypes[key] = EntryType.passwordIcon;
+                  return;
+                }
+                if (value.lastModified
+                    .isAfter(_history.value.passwordIcons[key]!.lastModified)) {
+                  _info.request.passwordIcons.add(key);
+                  _entryTypes[key] = EntryType.passwordIcon;
+                }
+              });
+              _remoteHistory.notes.forEach((key, value) {
+                if (!_history.value.notes.containsKey(key)) {
+                  _info.request.notes.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.note;
+                  return;
+                }
+                if (value.lastModified
+                    .isAfter(_history.value.notes[key]!.lastModified)) {
+                  _info.request.notes.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.note;
+                }
+              });
+              _remoteHistory.paymentCards.forEach((key, value) {
+                if (!_history.value.paymentCards.containsKey(key)) {
+                  _info.request.paymentCards.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.paymentCard;
+                  return;
+                }
+                if (value.lastModified
+                    .isAfter(_history.value.paymentCards[key]!.lastModified)) {
+                  _info.request.paymentCards.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.paymentCard;
+                }
+              });
+              _remoteHistory.idCards.forEach((key, value) {
+                if (!_history.value.idCards.containsKey(key)) {
+                  _info.request.idCards.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.idCard;
+                  return;
+                }
+                if (value.lastModified
+                    .isAfter(_history.value.idCards[key]!.lastModified)) {
+                  _info.request.idCards.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.idCard;
+                }
+              });
+              _remoteHistory.identities.forEach((key, value) {
+                if (!_history.value.identities.containsKey(key)) {
+                  _info.request.identities.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.identity;
+                  return;
+                }
+                if (value.lastModified
+                    .isAfter(_history.value.identities[key]!.lastModified)) {
+                  _info.request.identities.add(key);
+                  _entryTypes[key.toIso8601String()] = EntryType.identity;
+                }
+              });
+
+              _toReceive = _entryTypes.length;
+
+              _log += 'done.\nReceiving data... ';
+              _sub.onData((data) {
+                _toReceive--;
+                _receiveData(data,
+                    entryTypes: _entryTypes, remoteHistory: _remoteHistory);
+                if (_toReceive == 0) {
+                  saveSync();
+                  _sendData();
+                  return;
+                }
+              });
+              _sendInfo(_info);
+            }
+
+            void _sendHistoryHash() {
+              _log += 'done.\nSending history hash... ';
+              _sub.onData(_receiveHistory);
+              socket.add(getHash(jsonEncode(_history.value)).bytes);
+              socket.flush();
+            }
+
+            void _receiveHello(Uint8List data, String random) {
+              _log += 'done.\nReceiving hello... ';
+              _Hello _hello;
+              String _random;
+              try {
+                _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
+              } catch (e) {
+                _logAndSendException(
+                    'Could not decode hello.\n${e.toString()}');
+                return;
+              }
+              if (_hello.service != 'passy') {
+                _logExceptionAndDisconnect('Remote service is not Passy.');
+                return;
+              }
+              if (passyVersion != _hello.version) {
+                _logAndSendException(
+                    'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
+                return;
+              }
+              try {
+                _random = decrypt(_hello.random, encrypter: _encrypter);
+              } catch (e) {
+                _logAndSendException(
+                    'Could not decrypt random. Make sure that local and remote username and password are the same.\n${e.toString()}');
+                return;
+              }
+              if (random != _random) {
+                _logAndSendException(
+                    'Local and remote randoms are different. Make sure that local and remote username and password are the same.');
+                return;
+              }
+              _sendHistoryHash();
+            }
+
+            void _sendHello() {
+              _log += 'done.\nSending hello... ';
+              String _random = random.nextInt(1000).toRadixString(36);
+              _sub.onData((data) => _receiveHello(data, _random));
+              socket.add(utf8.encode(jsonEncode(_Hello(
+                  service: 'passy',
+                  version: passyVersion,
+                  random: encrypt(
+                      encrypt(_random,
+                          encrypter: getEncrypter(_credentials.value.username)),
+                      encrypter: _encrypter)))));
+              socket.flush();
+            }
+
+            _sendHello();
+          },
+          onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
+              prefix: 'Remote exception has occurred: '),
+          onDone: () => server.close(),
+        );
+      });
+      return _address;
+    } catch (e) {
+      _logException('Failed to host.\n${e.toString()}');
+    }
+    return null;
   }
 
   Future<void> connect(HostAddress address) {
-    print('SYNC: Connecting... ');
-    //TODO: add onError to Socket.connect (could not connect to remote)
-    return Socket.connect(address.ip, address.port).then(
-      (s) {
-        StreamSubscription<Uint8List> _sub = s.listen(
-          null,
-          onError: (e) {
-            print('SYNC: Remote exception has occurred: $e');
-            s.destroy();
-          },
-        );
-        String _historyJson = '';
+    String _log = 'Connecting... ';
+    void _logException(String message,
+        {String prefix = 'Local exception has occurred: '}) {
+      String _exception = '\n' + prefix + message;
+      _log += _exception;
+      print(_log);
+    }
 
-        //TODO: send requested data
-        void _sendData() {
-          print('done\nSYNC: Sending data... ');
-          s.destroy();
+    return Socket.connect(address.ip, address.port).then((socket) {
+      void _logExceptionAndDisconnect(String message,
+          {String prefix = 'Local exception has occurred: '}) {
+        _logException(message, prefix: prefix);
+        socket.destroy();
+      }
+
+      void _logAndSendException(String message,
+          {String prefix = 'Local exception has occurred: '}) {
+        _logException(message, prefix: prefix);
+        socket.addError(utf8.encode(message));
+        socket.flush().whenComplete(() => socket.destroy());
+      }
+
+      StreamSubscription<Uint8List> _sub = socket.listen(
+        null,
+        onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
+            prefix: 'SYNC: Local exception has occurred: '),
+      );
+
+      void _receiveData(Uint8List data) {
+        //TODO: receive data from server
+      }
+
+      Future<void> _sendData(_Request request) async {
+        _log += 'done\nSending data... ';
+        List<List<int>> _data = _encodeData(request);
+        if (_data.isEmpty) {
+          socket.add(utf8.encode('ready'));
+          return;
         }
-
-        //TODO: split receive data into multiple parts (Password, PasswordIcon, Note, PaymentCard, IDCard, Identity)
-        //TODO: receive and merge data and history
-        void _receiveData(Uint8List d) {
-          print('done\nSYNC: Receiving data... ');
-          s.destroy();
+        for (List<int> element in _data) {
+          socket.add(element);
+          await socket.flush();
         }
+      }
 
-        void _sendHistory() {
-          print('done\nSYNC: Sending history... ');
-          _sub.onData(_receiveData);
-          s.add(utf8.encode(encrypt(_historyJson, encrypter: _encrypter)));
-          s.flush();
+      void _receiveInfo(Uint8List data) {
+        _log += 'done.\nReceiving info... ';
+        _ServerInfo _info;
+        try {
+          _info = _ServerInfo.fromJson(
+              jsonDecode(decrypt(utf8.decode(data), encrypter: _encrypter)));
+        } catch (e) {
+          _logAndSendException('Could not decode info.\n${e.toString()}');
+          return;
         }
+        _sub.onData(_receiveData);
+        _sendData(_info.request);
+      }
 
-        void _receiveHistoryHash(Uint8List d) {
-          print('done\nSYNC: Receiving history hash... ');
-          _historyJson = jsonEncode(_history);
-          bool _same = true;
-          try {
-            _same = getHash(_historyJson) == Digest(d);
-          } catch (e) {
-            String _err = 'Could not read history hash.';
-            print('SYNC: Local exception has occurred: $_err');
-            s.addError(_err);
-            s.flush().whenComplete(() => s.destroy());
-            return;
-          }
-          if (_same) {
-            String _err = 'Local and remote histories are the same.';
-            print('SYNC: Local exception has occurred: $_err');
-            s.addError(_err);
-            s.flush().whenComplete(() => s.destroy());
-            return;
-          }
-          _sendHistory();
+      void _sendHistory(String historyJson) {
+        _log += 'done.\nSending history... ';
+        socket.add(utf8.encode(encrypt(historyJson, encrypter: _encrypter)));
+        socket.flush();
+      }
+
+      void _receiveHistoryHash(Uint8List data) {
+        _log += 'done.\nReceiving history hash... ';
+        String _historyJson = jsonEncode(_history.value);
+        bool _same = true;
+        try {
+          _same = getHash(_historyJson) == Digest(data);
+        } catch (e) {
+          _logAndSendException('Could not read history hash.');
+          return;
         }
-
-        void _sendHello(String random) {
-          print('done.\nSYNC: Sending hello... ');
-          _sub.onData(_receiveHistoryHash);
-          s.add(utf8.encode(
-              '{"service":"passy","version":"$passyVersion","random":"${encrypt(random, encrypter: _encrypter)}"}'));
-          s.flush();
+        if (_same) {
+          _logAndSendException('Local and remote histories are the same.');
+          return;
         }
+        _sub.onData(_receiveInfo);
+        _sendHistory(_historyJson);
+      }
 
-        void _receiveHello(Uint8List d) {
-          print('done.\nSYNC: Receiving hello... ');
-          Map<String, dynamic> _json = {};
-          String _random = '';
-          try {
-            _json = jsonDecode(utf8.decode(d));
-          } catch (e) {
-            print(
-                'SYNC: Local exception has occurred: Could not decode hello json. ${e.toString()}');
-            s.destroy();
-            return;
-          }
-          if (!_json.containsKey('service')) {
-            print(
-                'SYNC: Local exception has occurred: There is no key named "service"');
-            s.destroy();
-            return;
-          }
-          if (_json['service'] != 'passy') {
-            print(
-                'SYNC: Local error has occurred: Remote service is not Passy');
-            s.destroy();
-            return;
-          }
-          if (!_json.containsKey('version')) {
-            String _err = 'There is no key named "version".';
-            print('SYNC: Local exception has occurred: $_err');
-            s.addError(_err);
-            s.flush().whenComplete(() => s.destroy());
-            return;
-          }
-          if (passyVersion != _json['version']) {
-            String _err =
-                'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_json['version']}.';
-            print('SYNC: Local exception has occurred: $_err');
-            s.addError(_err);
-            s.flush().whenComplete(() => s.destroy());
-            return;
-          }
-          if (!_json.containsKey('random')) {
-            String _err = 'There is no key named "random".';
-            print('SYNC: Local exception has occurred: $_err');
-            s.addError(_err);
-            s.flush().whenComplete(() => s.destroy());
-            return;
-          }
-          try {
-            _random = decrypt(
-              decrypt(_json['random'], encrypter: _encrypter),
-              encrypter: getEncrypter(_accountCredentials.value.username),
-            );
-          } catch (e) {
-            String _err =
-                'Could not decrypt random. Make sure that username and password are the same for both local and remote. ${e.toString()}.';
-            print('SYNC: Local exception has occurred: $_err');
-            s.addError(_err);
-            s.flush().whenComplete(() => s.destroy());
-            return;
-          }
-          _sendHello(_random);
+      void _sendHello(_Hello hello) {
+        _log += 'done.\nSending hello... ';
+
+        socket.add(utf8.encode(jsonEncode(hello)));
+        socket.flush();
+      }
+
+      void _receiveHello(Uint8List data) {
+        _log += 'done.\nReceiving hello... ';
+        _Hello _hello;
+        String _random = '';
+        try {
+          _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
+        } catch (e) {
+          _logAndSendException('Could not decode hello.\n${e.toString()}');
+          return;
         }
+        if (_hello.service != 'passy') {
+          _logExceptionAndDisconnect('Remote service is not Passy.');
+          return;
+        }
+        if (passyVersion != _hello.version) {
+          _logAndSendException(
+              'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
+          return;
+        }
+        try {
+          _random = decrypt(
+            decrypt(_hello.random, encrypter: _encrypter),
+            encrypter: getEncrypter(_credentials.value.username),
+          );
+        } catch (e) {
+          _logAndSendException(
+              'Could not decrypt random. Make sure that username and password are the same for both local and remote.\n${e.toString()}');
+          return;
+        }
+        _sub.onData(_receiveHistoryHash);
+        _sendHello(_Hello(
+            service: 'passy',
+            version: passyVersion,
+            random: encrypt(_random, encrypter: _encrypter)));
+      }
 
-        _sub.onData(_receiveHello);
-      },
-    );
+      _sub.onData(_receiveHello);
+    }, onError: (e) => _logException('Failed to connect. ${e.toString()}'));
     // Ask server for data hashes, if they are not the same, exchange data
   }
 
   // Account Credentials wrappers
-  String get username => _accountCredentials.value.username;
-  set username(String value) => _accountCredentials.value.username = value;
-  String get passwordHash => _accountCredentials.value.passwordHash;
+  String get username => _credentials.value.username;
+  set username(String value) => _credentials.value.username = value;
+  String get passwordHash => _credentials.value.passwordHash;
 
   // Account Info wrappers
-  String get icon => _accountSettings.value.icon;
-  set icon(String value) => _accountSettings.value.icon = value;
-  Color get color => _accountSettings.value.color;
-  set color(Color value) => _accountSettings.value.color = color;
+  String get icon => _settings.value.icon;
+  set icon(String value) => _settings.value.icon = value;
+  Color get color => _settings.value.color;
+  set color(Color value) => _settings.value.color = color;
 
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
   void addPassword(Password password) {
     _history.value.passwords[password.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _passwords.value.add(password);
+    _passwords.value.addEntry(password);
   }
 
   void setPassword(Password password) {
@@ -384,7 +719,7 @@ class LoadedAccount {
   void addNote(Note note) {
     _history.value.notes[note.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _notes.value.add(note);
+    _notes.value.addEntry(note);
   }
 
   void setNote(Note note) {
@@ -403,7 +738,7 @@ class LoadedAccount {
   void addPaymentCard(PaymentCard paymentCard) {
     _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _paymentCards.value.add(paymentCard);
+    _paymentCards.value.addEntry(paymentCard);
   }
 
   void setPaymentCard(PaymentCard paymentCard) {
@@ -423,7 +758,7 @@ class LoadedAccount {
   void addIDCard(IDCard idCard) {
     _history.value.idCards[idCard.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _idCards.value.add(idCard);
+    _idCards.value.addEntry(idCard);
   }
 
   void setIDCard(IDCard idCard) {
@@ -442,7 +777,7 @@ class LoadedAccount {
   void addIdentity(Identity identity) {
     _history.value.identities[identity.creationDate] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _identities.value.add(identity);
+    _identities.value.addEntry(identity);
   }
 
   void setIdentity(Identity identity) {
@@ -462,8 +797,8 @@ class LoadedAccount {
     required String path,
     required Encrypter encrypter,
   })  : _encrypter = encrypter,
-        _accountCredentials = credentials,
-        _accountSettings = AccountSettingsFile(
+        _credentials = credentials,
+        _settings = AccountSettingsFile(
             File(path + Platform.pathSeparator + 'settings.enc'), encrypter),
         _history = HistoryFile(
             File(path + Platform.pathSeparator + 'history.enc'), encrypter),

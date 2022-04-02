@@ -18,8 +18,7 @@ class HistoryFile extends EncryptedJsonFile<History> {
   factory HistoryFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
       return HistoryFile._(file, encrypter,
-          value: History.fromJson(
-              decrypt(file.readAsStringSync(), encrypter: encrypter)));
+          value: History.fromFile(file, encrypter));
     }
     file.createSync(recursive: true);
     HistoryFile _file = HistoryFile._(file, encrypter, value: History());
@@ -28,7 +27,7 @@ class HistoryFile extends EncryptedJsonFile<History> {
   }
 }
 
-class History extends JsonConvertable {
+class History implements JsonConvertable {
   final Map<DateTime, EntryEvent> passwords;
   final Map<String, EntryEvent> passwordIcons;
   final Map<DateTime, EntryEvent> notes;
@@ -38,50 +37,52 @@ class History extends JsonConvertable {
 
   @override
   Map<String, dynamic> toJson() => {
-        'passwords': passwords.map(
+        'passwords': passwords.map<String, dynamic>(
             (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'passwordIcons':
-            passwordIcons.map((key, value) => MapEntry(key, value.toJson())),
-        'notes': notes.map(
+        'passwordIcons': passwordIcons.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'notes': notes.map<String, dynamic>(
             (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'paymentCards': paymentCards.map(
+        'paymentCards': paymentCards.map<String, dynamic>(
             (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'idCards': idCards.map(
+        'idCards': idCards.map<String, dynamic>(
             (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'identities': identities.map(
+        'identities': identities.map<String, dynamic>(
             (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
       };
 
-  factory History.fromJson(String json) {
-    Map<String, dynamic> _json = jsonDecode(json);
-    return History(
-      passwords: (_json['passwords'] as Map<String, dynamic>).map(
-          (key, value) =>
-              MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-      passwordIcons: (_json['passwordIcons'] as Map<String, dynamic>)
-          .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
-      notes: (_json['notes'] as Map<String, dynamic>).map((key, value) =>
-          MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-      paymentCards: (_json['paymentCards'] as Map<String, dynamic>).map(
-          (key, value) =>
-              MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-      idCards: (_json['idCards'] as Map<String, dynamic>).map((key, value) =>
-          MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-      identities: (_json['identities'] as Map<String, dynamic>).map(
-          (key, value) =>
-              MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-    );
-  }
+  factory History.fromJson(Map<String, dynamic> json) => History(
+        passwords: (json['passwords'] as Map<String, dynamic>).map(
+            (key, value) =>
+                MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
+        passwordIcons: (json['passwordIcons'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        notes: (json['notes'] as Map<String, dynamic>).map((key, value) =>
+            MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
+        paymentCards: (json['paymentCards'] as Map<String, dynamic>).map(
+            (key, value) =>
+                MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
+        idCards: (json['idCards'] as Map<String, dynamic>).map((key, value) =>
+            MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
+        identities: (json['identities'] as Map<String, dynamic>).map(
+            (key, value) =>
+                MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
+      );
 
-  factory History.fromFile(File file, Encrypter encrypter) =>
-      History.fromJson(decrypt(file.readAsStringSync(), encrypter: encrypter));
+  factory History.fromFile(File file, Encrypter encrypter) => History.fromJson(
+      jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
 
   History({
-    this.passwords = const {},
-    this.passwordIcons = const {},
-    this.notes = const {},
-    this.paymentCards = const {},
-    this.idCards = const {},
-    this.identities = const {},
-  });
+    Map<DateTime, EntryEvent>? passwords,
+    Map<String, EntryEvent>? passwordIcons,
+    Map<DateTime, EntryEvent>? notes,
+    Map<DateTime, EntryEvent>? paymentCards,
+    Map<DateTime, EntryEvent>? idCards,
+    Map<DateTime, EntryEvent>? identities,
+  })  : passwords = passwords ?? {},
+        passwordIcons = passwordIcons ?? {},
+        notes = notes ?? {},
+        paymentCards = paymentCards ?? {},
+        idCards = idCards ?? {},
+        identities = identities ?? {};
 }

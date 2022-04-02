@@ -15,7 +15,7 @@ class PassyInfoFile extends JsonFile<PassyInfo> {
   factory PassyInfoFile(File file) {
     if (file.existsSync()) {
       return PassyInfoFile._(file,
-          value: PassyInfo.fromJson(file.readAsStringSync()));
+          value: PassyInfo.fromJson(jsonDecode(file.readAsStringSync())));
     }
     file.createSync(recursive: true);
     PassyInfoFile _file = PassyInfoFile._(file, value: PassyInfo());
@@ -42,15 +42,12 @@ class PassyInfo implements JsonConvertable {
         'themeMode': _$ThemeModeEnumMap[themeMode],
       };
 
-  factory PassyInfo.fromJson(String json) {
-    Map<String, dynamic> _json = jsonDecode(json);
-    return PassyInfo(
-      version: _json['version'] ?? '',
-      lastUsername: _json['lastUsername'] ?? '',
-      themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, _json['themeMode']) ??
-          ThemeMode.system,
-    );
-  }
+  factory PassyInfo.fromJson(Map<String, dynamic> json) => PassyInfo(
+        version: json['version'] ?? '',
+        lastUsername: json['lastUsername'] ?? '',
+        themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
+            ThemeMode.system,
+      );
 
   PassyInfo({
     this.version = passyVersion,

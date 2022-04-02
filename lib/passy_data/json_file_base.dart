@@ -1,4 +1,4 @@
-abstract class SaveableFileBase {
+mixin SaveableFileBase {
   Future<void> save();
   void saveSync();
 }
