@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:universal_io/io.dart';
@@ -23,30 +23,7 @@ import 'note.dart';
 import 'password.dart';
 import 'payment_card.dart';
 
-class _Hello implements JsonConvertable {
-  final String service;
-  final String version;
-  final String random;
-
-  @override
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'service': service,
-        'version': version,
-        'random': random,
-      };
-
-  factory _Hello.fromJson(Map<String, dynamic> json) => _Hello(
-        service: json['service'],
-        version: json['version'],
-        random: json['random'],
-      );
-
-  _Hello({
-    required this.service,
-    required this.version,
-    required this.random,
-  });
-}
+const String _hello = 'hello';
 
 class _DataEntry implements JsonConvertable {
   final String key;
@@ -157,6 +134,7 @@ class LoadedAccount {
   final IdentitiesFile _identities;
   Encrypter _encrypter;
   ServerSocket? _server;
+  String _syncLog = '';
 
   void _setAccountPassword(String password) {
     _credentials.value.password = password;
@@ -208,50 +186,76 @@ class LoadedAccount {
 
     for (var element in request.passwords) {
       _data.add(utf8.encode(encrypt(
-          jsonEncode(_DataEntry(
-              key: element.toIso8601String(),
-              value: _passwords.value.getEntry(element)!.toJson())),
-          encrypter: _encrypter)));
+              jsonEncode(_DataEntry(
+                  key: element.toIso8601String(),
+                  value: _passwords.value.getEntry(element)!.toJson())),
+              encrypter: _encrypter) +
+          ' '));
     }
     for (var element in request.passwordIcons) {
       _data.add(utf8.encode(encrypt(
-          jsonEncode(_DataEntry(
-              key: element, value: _passwordIcons.getImage(element))),
-          encrypter: _encrypter)));
+              jsonEncode(_DataEntry(
+                  key: element, value: _passwordIcons.getImage(element))),
+              encrypter: _encrypter) +
+          ' '));
     }
     for (var element in request.notes) {
       _data.add(utf8.encode(encrypt(
-          jsonEncode(_DataEntry(
-              key: element.toIso8601String(),
-              value: _notes.value.getEntry(element)!.toJson())),
-          encrypter: _encrypter)));
+              jsonEncode(_DataEntry(
+                  key: element.toIso8601String(),
+                  value: _notes.value.getEntry(element)!.toJson())),
+              encrypter: _encrypter) +
+          ' '));
     }
     for (var element in request.paymentCards) {
       _data.add(utf8.encode(encrypt(
-          jsonEncode(_DataEntry(
-              key: element.toIso8601String(),
-              value: _paymentCards.value.getEntry(element)!.toJson())),
-          encrypter: _encrypter)));
+              jsonEncode(_DataEntry(
+                  key: element.toIso8601String(),
+                  value: _paymentCards.value.getEntry(element)!.toJson())),
+              encrypter: _encrypter) +
+          ' '));
     }
     for (var element in request.idCards) {
       _data.add(utf8.encode(encrypt(
-          jsonEncode(_DataEntry(
-              key: element.toIso8601String(),
-              value: _idCards.value.getEntry(element)!.toJson())),
-          encrypter: _encrypter)));
+              jsonEncode(_DataEntry(
+                  key: element.toIso8601String(),
+                  value: _idCards.value.getEntry(element)!.toJson())),
+              encrypter: _encrypter) +
+          ' '));
     }
     for (var element in request.identities) {
       _data.add(utf8.encode(encrypt(
-          jsonEncode(_DataEntry(
-              key: element.toIso8601String(),
-              value: _identities.value.getEntry(element)!.toJson())),
-          encrypter: _encrypter)));
+              jsonEncode(_DataEntry(
+                  key: element.toIso8601String(),
+                  value: _identities.value.getEntry(element)!.toJson())),
+              encrypter: _encrypter) +
+          ' '));
     }
     return _data;
   }
 
+  void _logSyncException(String message, {required BuildContext context}) {
+    String _exception = '\nLocal exception has occurred: ' + message;
+    _syncLog += _exception;
+    print(_syncLog);
+    Navigator.pushNamedAndRemoveUntil(
+        context, MainScreen.routeName, (r) => false);
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(children: const [
+        Icon(Icons.sync_rounded, color: Colors.white),
+        SizedBox(width: 20),
+        Expanded(child: Text('Sync error')),
+      ]),
+      action: SnackBarAction(
+          label: 'Show',
+          onPressed: () => {
+                //TODO: show error log
+              }),
+    ));
+  }
+
   Future<HostAddress?> host(BuildContext context) async {
-    String _log = 'Hosting... ';
     HostAddress? _address;
     String _ip = '127.0.0.1';
     List<NetworkInterface> _interfaces =
@@ -263,53 +267,53 @@ class LoadedAccount {
       }
     }
 
-    void _logException(String message,
-        {String prefix = 'Local exception has occurred: '}) {
-      String _exception = '\n' + prefix + message;
-      _log += _exception;
-      print(_log);
-    }
-
     try {
       if (_server != null) await _server!.close();
       _server = await ServerSocket.bind(_ip, 0);
-      _log += 'done. \nListening...';
+      _syncLog += 'done. \nListening... ';
       _address = HostAddress(InternetAddress(_ip), _server!.port);
 
       bool _connected = false;
 
-      void _logExceptionAndDisconnect(String message,
-          {String prefix = 'Local exception has occurred: '}) {
-        _logException(message, prefix: prefix);
-        _server!.close();
-      }
-
       _server!.listen(
         (socket) {
+          void _logExceptionAndDisconnect(String message) {
+            _connected = false;
+            _logSyncException(message, context: context);
+            socket.destroy();
+            _server!.close();
+          }
+
           if (_connected) {
-            socket.close();
+            socket.destroy();
             return;
           }
 
           _connected = true;
-          StreamSubscription<Uint8List> _sub = socket.listen(null);
+          StreamSubscription<Uint8List> _sub = socket.listen(null, onDone: () {
+            if (_connected) {
+              _logExceptionAndDisconnect('Remote disconnected unexpectedly.');
+            }
+          });
 
           void _sendData() {
-            _log += 'done.\nSending data...';
+            _syncLog += 'done.\nSending data...';
+            _connected = false;
+            socket.destroy();
             _server!.close();
             Navigator.pushNamedAndRemoveUntil(
                 context, MainScreen.routeName, (r) => false);
           }
 
           void _receiveData(
-            Uint8List data, {
+            String data, {
             required Map<String, EntryType> entryTypes,
-            required History remoteHistory,
+            required History missingHistory,
           }) {
             _DataEntry _entry;
             try {
-              _entry = _DataEntry.fromJson(jsonDecode(
-                  decrypt(utf8.decode(data), encrypter: _encrypter)));
+              _entry = _DataEntry.fromJson(
+                  jsonDecode(decrypt(data, encrypter: _encrypter)));
             } catch (e) {
               _logExceptionAndDisconnect(
                   'Could not decode an entry.\n${e.toString()}');
@@ -322,39 +326,39 @@ class LoadedAccount {
                   Password _decoded = Password.fromJson(_entry.value);
                   _passwords.value.addOrSetEntry(_decoded);
                   _history.value.passwords[_decoded.creationDate] =
-                      remoteHistory.passwords[_decoded.creationDate]!;
+                      missingHistory.passwords[_decoded.creationDate]!;
                   break;
                 case EntryType.passwordIcon:
                   _passwordIcons.setImage(
                       _entry.key, base64.decode(_entry.value as String));
                   _history.value.passwordIcons[_entry.key] =
-                      remoteHistory.passwordIcons[_entry.key]!;
+                      missingHistory.passwordIcons[_entry.key]!;
                   break;
                 case EntryType.paymentCard:
                   PaymentCard _decoded = PaymentCard.fromJson(_entry.value);
                   _paymentCards.value
                       .addOrSetEntry(PaymentCard.fromJson(_entry.value));
                   _history.value.paymentCards[_decoded.creationDate] =
-                      remoteHistory.paymentCards[_decoded.creationDate]!;
+                      missingHistory.paymentCards[_decoded.creationDate]!;
                   break;
                 case EntryType.note:
                   Note _decoded = Note.fromJson(_entry.value);
                   _notes.value.addOrSetEntry(Note.fromJson(_entry.value));
                   _history.value.notes[_decoded.creationDate] =
-                      remoteHistory.notes[_decoded.creationDate]!;
+                      missingHistory.notes[_decoded.creationDate]!;
                   break;
                 case EntryType.idCard:
                   IDCard _decoded = IDCard.fromJson(_entry.value);
                   _idCards.value.addOrSetEntry(IDCard.fromJson(_entry.value));
                   _history.value.idCards[_decoded.creationDate] =
-                      remoteHistory.idCards[_decoded.creationDate]!;
+                      missingHistory.idCards[_decoded.creationDate]!;
                   break;
                 case EntryType.identity:
                   Identity _decoded = Identity.fromJson(_entry.value);
                   _identities.value
                       .addOrSetEntry(Identity.fromJson(_entry.value));
                   _history.value.identities[_decoded.creationDate] =
-                      remoteHistory.identities[_decoded.creationDate]!;
+                      missingHistory.identities[_decoded.creationDate]!;
                   break;
               }
             } catch (e) {
@@ -364,14 +368,14 @@ class LoadedAccount {
           }
 
           void _sendInfo(_ServerInfo info) {
-            _log += 'done.\nHOST: Sending info... ';
+            _syncLog += 'done.\nSending info... ';
             socket.add(
                 utf8.encode(encrypt(jsonEncode(info), encrypter: _encrypter)));
             socket.flush();
           }
 
           void _receiveHistory(Uint8List data) {
-            _log += 'done.\nReceiving history... ';
+            _syncLog += 'done.\nReceiving history... ';
             Map<String, EntryType> _entryTypes = {};
             _ServerInfo _info = _ServerInfo();
             History _remoteHistory;
@@ -461,117 +465,115 @@ class LoadedAccount {
 
             _toReceive = _entryTypes.length;
 
-            _log += 'done.\nReceiving data... ';
-            _sub.onData((data) {
-              _toReceive--;
-              _receiveData(data,
-                  entryTypes: _entryTypes, remoteHistory: _remoteHistory);
-              if (_toReceive == 0) {
-                saveSync();
-                _sendData();
-                return;
-              }
-            });
+            if (_toReceive != 0) {
+              _sub.onData((data) {
+                List<String> _data;
+                try {
+                  _data = utf8.decode(data).split(' ');
+                  _data.removeAt(_data.length - 1);
+                } catch (e) {
+                  _logExceptionAndDisconnect(
+                      'Could not decode data.\n${e.toString()}');
+                  return;
+                }
+                for (String _data in _data) {
+                  _toReceive--;
+                  _receiveData(_data,
+                      entryTypes: _entryTypes, missingHistory: _remoteHistory);
+                }
+                if (_toReceive == 0) {
+                  saveSync();
+                  _sendData();
+                  return;
+                }
+              });
+            } else {
+              _sub.onData((data) {
+                if (utf8.decode(data) == 'ready') _sendData();
+              });
+            }
             _sendInfo(_info);
+            _syncLog += 'done.\nReceiving data... ';
           }
 
           void _sendHistoryHash() {
-            _log += 'done.\nSending history hash... ';
+            _syncLog += 'done.\nSending history hash... ';
             _sub.onData(_receiveHistory);
             socket.add(getHash(jsonEncode(_history.value)).bytes);
             socket.flush();
           }
 
-          void _receiveHello(Uint8List data, String random) {
-            _log += 'done.\nReceiving hello... ';
-            _Hello _hello;
-            String _random;
+          void _receiveHello(Uint8List data) {
+            _syncLog += 'done.\nReceiving hello... ';
+            String _data;
             try {
-              _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
+              _data = utf8.decode(data);
             } catch (e) {
               _logExceptionAndDisconnect(
                   'Could not decode hello.\n${e.toString()}');
               return;
             }
-            if (_hello.service != 'passy') {
-              _logExceptionAndDisconnect('Remote service is not Passy.');
-              return;
-            }
-            if (passyVersion != _hello.version) {
-              _logExceptionAndDisconnect(
-                  'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
-              return;
-            }
             try {
-              _random = decrypt(_hello.random, encrypter: _encrypter);
+              _data = decrypt(decrypt(_data, encrypter: _encrypter),
+                  encrypter: getEncrypter(_credentials.value.username));
             } catch (e) {
               _logExceptionAndDisconnect(
-                  'Could not decrypt random. Make sure that local and remote username and password are the same.\n${e.toString()}');
+                  'Could not decrypt hello. Make sure that local and remote username and password are the same.\n${e.toString()}');
               return;
             }
-            if (random != _random) {
+            if (_data != _hello) {
               _logExceptionAndDisconnect(
-                  'Local and remote randoms are different. Make sure that local and remote username and password are the same.');
+                  'Hello is incorrect. Expected "$_hello", received "$_data".');
               return;
             }
             _sendHistoryHash();
           }
 
-          void _sendHello() {
-            _log += 'done.\nSending hello... ';
-            String _random = random.nextInt(1000).toRadixString(36);
-            _sub.onData((data) => _receiveHello(data, _random));
-            socket.add(utf8.encode(jsonEncode(_Hello(
-                service: 'passy',
-                version: passyVersion,
-                random: encrypt(
-                    encrypt(_random,
-                        encrypter: getEncrypter(_credentials.value.username)),
-                    encrypter: _encrypter)))));
+          void _sendServiceInfo() {
+            _syncLog += 'done.\nSending service info... ';
+            _sub.onData(_receiveHello);
+            socket.add(utf8.encode('Passy v$passyVersion'));
             socket.flush();
           }
 
           Navigator.pushNamedAndRemoveUntil(
               context, SplashScreen.routeName, (r) => false);
-          _sendHello();
+          _sendServiceInfo();
         },
-        onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
-            prefix: 'Remote exception has occurred: '),
-        onDone: () => _server!.close(),
       );
       return _address;
     } catch (e) {
-      _logException('Failed to host.\n${e.toString()}');
+      _logSyncException('Failed to host.\n${e.toString()}', context: context);
     }
     return null;
   }
 
   Future<void> connect(HostAddress address, BuildContext context) {
     String _log = 'Connecting... ';
-    void _logException(String message,
-        {String prefix = 'Local exception has occurred: '}) {
-      String _exception = '\n' + prefix + message;
-      _log += _exception;
-      print(_log);
-    }
 
+    bool _complete = false;
     return Socket.connect(address.ip, address.port).then((socket) {
-      void _logExceptionAndDisconnect(String message,
-          {String prefix = 'Local exception has occurred: '}) {
-        _logException(message, prefix: prefix);
+      void _logExceptionAndDisconnect(String message) {
+        _complete = true;
+        _logSyncException(message, context: context);
         socket.destroy();
       }
 
       StreamSubscription<Uint8List> _sub = socket.listen(
         null,
-        onError: (e) => _logExceptionAndDisconnect(utf8.decode(e),
-            prefix: 'SYNC: Local exception has occurred: '),
+        onDone: () {
+          if (!_complete) {
+            _logSyncException('Remote disconnected unexpectedly.',
+                context: context);
+          }
+        },
       );
 
       void _receiveData(Uint8List data) {
         //TODO: receive data from server
         Navigator.pushNamedAndRemoveUntil(
             context, MainScreen.routeName, (r) => false);
+        _complete = true;
         socket.destroy();
       }
 
@@ -627,54 +629,50 @@ class LoadedAccount {
         _sendHistory(_historyJson);
       }
 
-      void _sendHello(_Hello hello) {
+      void _sendHello(String hello) {
         _log += 'done.\nSending hello... ';
-
-        socket.add(utf8.encode(jsonEncode(hello)));
+        socket.add(utf8.encode(hello));
         socket.flush();
       }
 
-      void _receiveHello(Uint8List data) {
-        _log += 'done.\nReceiving hello... ';
-        _Hello _hello;
-        String _random = '';
+      void _receiveServiceInfo(Uint8List data) {
+        _log += 'done.\nReceiving service info... ';
+        List<String> _info = [];
         try {
-          _hello = _Hello.fromJson(jsonDecode(utf8.decode(data)));
+          _info = utf8.decode(data).split(' ');
         } catch (e) {
           _logExceptionAndDisconnect(
               'Could not decode hello.\n${e.toString()}');
           return;
         }
-        if (_hello.service != 'passy') {
-          _logExceptionAndDisconnect('Remote service is not Passy.');
+        if (_info.length < 2) {
+          _logExceptionAndDisconnect(
+              'Service info is less than 2 parts long. Info length: ${_info.length}');
           return;
         }
-        if (passyVersion != _hello.version) {
+        if (_info[0] != 'Passy') {
           _logExceptionAndDisconnect(
-              'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_hello.version}.');
+              'Remote service is not Passy. Service name: ${_hello[0]}');
           return;
         }
-        try {
-          _random = decrypt(
-            decrypt(_hello.random, encrypter: _encrypter),
-            encrypter: getEncrypter(_credentials.value.username),
-          );
-        } catch (e) {
+        if (_info[1] != 'v$passyVersion') {
           _logExceptionAndDisconnect(
-              'Could not decrypt random. Make sure that username and password are the same for both local and remote.\n${e.toString()}');
+              'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_info[1]}.');
           return;
         }
         _sub.onData(_receiveHistoryHash);
-        _sendHello(_Hello(
-            service: 'passy',
-            version: passyVersion,
-            random: encrypt(_random, encrypter: _encrypter)));
+        _sendHello(encrypt(
+            encrypt(_hello,
+                encrypter: getEncrypter(_credentials.value.username)),
+            encrypter: _encrypter));
       }
 
-      _sub.onData(_receiveHello);
       Navigator.pushNamedAndRemoveUntil(
           context, SplashScreen.routeName, (r) => false);
-    }, onError: (e) => _logException('Failed to connect. ${e.toString()}'));
+      _sub.onData(_receiveServiceInfo);
+    },
+        onError: (e) => _logSyncException('Failed to connect.\n${e.toString()}',
+            context: context));
     // Ask server for data hashes, if they are not the same, exchange data
   }
 

@@ -27,8 +27,11 @@ class _LoginScreen extends State<LoginScreen> {
   void login() {
     if (getHash(_password).toString() != data.getPasswordHash(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Incorrect password')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(children: const [
+        Icon(Icons.lock_rounded, color: Colors.white),
+        Text('Incorrect password'),
+      ])));
       return;
     }
     Navigator.popUntil(context, (route) => route.isFirst);
