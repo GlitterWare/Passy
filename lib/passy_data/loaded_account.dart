@@ -308,7 +308,7 @@ class LoadedAccount {
           void _receiveData(
             String data, {
             required Map<String, EntryType> entryTypes,
-            required History missingHistory,
+            required History remoteHistory,
           }) {
             _DataEntry _entry;
             try {
@@ -326,39 +326,39 @@ class LoadedAccount {
                   Password _decoded = Password.fromJson(_entry.value);
                   _passwords.value.addOrSetEntry(_decoded);
                   _history.value.passwords[_decoded.creationDate] =
-                      missingHistory.passwords[_decoded.creationDate]!;
+                      remoteHistory.passwords[_decoded.creationDate]!;
                   break;
                 case EntryType.passwordIcon:
                   _passwordIcons.setImage(
                       _entry.key, base64.decode(_entry.value as String));
                   _history.value.passwordIcons[_entry.key] =
-                      missingHistory.passwordIcons[_entry.key]!;
+                      remoteHistory.passwordIcons[_entry.key]!;
                   break;
                 case EntryType.paymentCard:
                   PaymentCard _decoded = PaymentCard.fromJson(_entry.value);
                   _paymentCards.value
                       .addOrSetEntry(PaymentCard.fromJson(_entry.value));
                   _history.value.paymentCards[_decoded.creationDate] =
-                      missingHistory.paymentCards[_decoded.creationDate]!;
+                      remoteHistory.paymentCards[_decoded.creationDate]!;
                   break;
                 case EntryType.note:
                   Note _decoded = Note.fromJson(_entry.value);
                   _notes.value.addOrSetEntry(Note.fromJson(_entry.value));
                   _history.value.notes[_decoded.creationDate] =
-                      missingHistory.notes[_decoded.creationDate]!;
+                      remoteHistory.notes[_decoded.creationDate]!;
                   break;
                 case EntryType.idCard:
                   IDCard _decoded = IDCard.fromJson(_entry.value);
                   _idCards.value.addOrSetEntry(IDCard.fromJson(_entry.value));
                   _history.value.idCards[_decoded.creationDate] =
-                      missingHistory.idCards[_decoded.creationDate]!;
+                      remoteHistory.idCards[_decoded.creationDate]!;
                   break;
                 case EntryType.identity:
                   Identity _decoded = Identity.fromJson(_entry.value);
                   _identities.value
                       .addOrSetEntry(Identity.fromJson(_entry.value));
                   _history.value.identities[_decoded.creationDate] =
-                      missingHistory.identities[_decoded.creationDate]!;
+                      remoteHistory.identities[_decoded.creationDate]!;
                   break;
               }
             } catch (e) {
@@ -479,7 +479,7 @@ class LoadedAccount {
                 for (String _data in _data) {
                   _toReceive--;
                   _receiveData(_data,
-                      entryTypes: _entryTypes, missingHistory: _remoteHistory);
+                      entryTypes: _entryTypes, remoteHistory: _remoteHistory);
                 }
                 if (_toReceive == 0) {
                   saveSync();
