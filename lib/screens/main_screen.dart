@@ -167,7 +167,8 @@ class _MainScreen extends State<MainScreen>
                       actions: [
                         TextButton(
                           child: const Text('Host'),
-                          onPressed: () => _account.host(context).then((value) {
+                          onPressed: () =>
+                              _account.host(context: context).then((value) {
                             if (value == null) return;
                             showDialog(
                               context: context,
@@ -204,8 +205,8 @@ class _MainScreen extends State<MainScreen>
                                           ScanMode.QR)
                                       .then((value) {
                                     try {
-                                      _account.connect(
-                                          HostAddress.parse(value), context);
+                                      _account.connect(HostAddress.parse(value),
+                                          context: context);
                                     } catch (e) {
                                       ScaffoldMessenger.of(context)
                                           .clearSnackBars();

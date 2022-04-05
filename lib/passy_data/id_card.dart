@@ -9,20 +9,20 @@ import 'dated_entries.dart';
 import 'dated_entry.dart';
 import 'encrypted_json_file.dart';
 
-class IDCardsFile extends EncryptedJsonFile<DatedEntries<IDCard>> {
-  IDCardsFile._(File file, Encrypter encrypter,
-      {required DatedEntries<IDCard> value})
+typedef IDCards = DatedEntries<IDCard>;
+
+class IDCardsFile extends EncryptedJsonFile<IDCards> {
+  IDCardsFile._(File file, Encrypter encrypter, {required IDCards value})
       : super(file, encrypter, value: value);
 
   factory IDCardsFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
       return IDCardsFile._(file, encrypter,
-          value: DatedEntries<IDCard>.fromJson(jsonDecode(
+          value: IDCards.fromJson(jsonDecode(
               decrypt(file.readAsStringSync(), encrypter: encrypter))));
     }
     file.createSync(recursive: true);
-    IDCardsFile _file =
-        IDCardsFile._(file, encrypter, value: DatedEntries<IDCard>());
+    IDCardsFile _file = IDCardsFile._(file, encrypter, value: IDCards());
     _file.saveSync();
     return _file;
   }
@@ -57,7 +57,7 @@ class IDCard extends DatedEntry<IDCard> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': creationDate.toIso8601String(),
+        'creationDate': creationDate,
       };
 
   factory IDCard.fromJson(Map<String, dynamic> json) => IDCard._(
@@ -81,7 +81,7 @@ class IDCard extends DatedEntry<IDCard> {
                 .toList() ??
             const [],
         creationDate:
-            DateTime.tryParse(json['creationDate']) ?? DateTime.now().toUtc(),
+            json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );
 
   IDCard._({
@@ -96,7 +96,7 @@ class IDCard extends DatedEntry<IDCard> {
     this.customFields = const [],
     required this.additionalInfo,
     this.tags = const [],
-    required DateTime creationDate,
+    required String creationDate,
   }) : super(creationDate);
 
   IDCard({
@@ -111,5 +111,5 @@ class IDCard extends DatedEntry<IDCard> {
     this.customFields = const [],
     required this.additionalInfo,
     this.tags = const [],
-  }) : super(DateTime.now().toUtc());
+  }) : super(DateTime.now().toUtc().toIso8601String());
 }

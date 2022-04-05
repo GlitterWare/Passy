@@ -9,20 +9,22 @@ import 'dated_entries.dart';
 import 'dated_entry.dart';
 import 'encrypted_json_file.dart';
 
-class PaymentCardsFile extends EncryptedJsonFile<DatedEntries<PaymentCard>> {
+typedef PaymentCards = DatedEntries<PaymentCard>;
+
+class PaymentCardsFile extends EncryptedJsonFile<PaymentCards> {
   PaymentCardsFile._(File file, Encrypter encrypter,
-      {required DatedEntries<PaymentCard> value})
+      {required PaymentCards value})
       : super(file, encrypter, value: value);
 
   factory PaymentCardsFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
       return PaymentCardsFile._(file, encrypter,
-          value: DatedEntries<PaymentCard>.fromJson(jsonDecode(
+          value: PaymentCards.fromJson(jsonDecode(
               decrypt(file.readAsStringSync(), encrypter: encrypter))));
     }
     file.createSync(recursive: true);
     PaymentCardsFile _file =
-        PaymentCardsFile._(file, encrypter, value: DatedEntries<PaymentCard>());
+        PaymentCardsFile._(file, encrypter, value: PaymentCards());
     _file.saveSync();
     return _file;
   }
@@ -57,7 +59,7 @@ class PaymentCard extends DatedEntry<PaymentCard> {
                 .toList() ??
             const [],
         creationDate:
-            DateTime.tryParse(json['creationDate']) ?? DateTime.now().toUtc(),
+            json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );
 
   @override
@@ -70,7 +72,7 @@ class PaymentCard extends DatedEntry<PaymentCard> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': creationDate.toIso8601String(),
+        'creationDate': creationDate,
       };
 
   PaymentCard._({
@@ -82,7 +84,7 @@ class PaymentCard extends DatedEntry<PaymentCard> {
     this.customFields = const [],
     required this.additionalInfo,
     this.tags = const [],
-    required DateTime creationDate,
+    required String creationDate,
   }) : super(creationDate);
 
   PaymentCard({
@@ -94,5 +96,5 @@ class PaymentCard extends DatedEntry<PaymentCard> {
     this.customFields = const [],
     required this.additionalInfo,
     this.tags = const [],
-  }) : super(DateTime.now().toUtc());
+  }) : super(DateTime.now().toUtc().toIso8601String());
 }

@@ -28,61 +28,67 @@ class HistoryFile extends EncryptedJsonFile<History> {
 }
 
 class History implements JsonConvertable {
-  final Map<DateTime, EntryEvent> passwords;
+  final Map<String, EntryEvent> passwords;
   final Map<String, EntryEvent> passwordIcons;
-  final Map<DateTime, EntryEvent> notes;
-  final Map<DateTime, EntryEvent> paymentCards;
-  final Map<DateTime, EntryEvent> idCards;
-  final Map<DateTime, EntryEvent> identities;
-
-  @override
-  Map<String, dynamic> toJson() => {
-        'passwords': passwords.map<String, dynamic>(
-            (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'passwordIcons': passwordIcons.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-        'notes': notes.map<String, dynamic>(
-            (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'paymentCards': paymentCards.map<String, dynamic>(
-            (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'idCards': idCards.map<String, dynamic>(
-            (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-        'identities': identities.map<String, dynamic>(
-            (key, value) => MapEntry(key.toIso8601String(), value.toJson())),
-      };
-
-  factory History.fromJson(Map<String, dynamic> json) => History(
-        passwords: (json['passwords'] as Map<String, dynamic>).map(
-            (key, value) =>
-                MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-        passwordIcons: (json['passwordIcons'] as Map<String, dynamic>)
-            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
-        notes: (json['notes'] as Map<String, dynamic>).map((key, value) =>
-            MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-        paymentCards: (json['paymentCards'] as Map<String, dynamic>).map(
-            (key, value) =>
-                MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-        idCards: (json['idCards'] as Map<String, dynamic>).map((key, value) =>
-            MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-        identities: (json['identities'] as Map<String, dynamic>).map(
-            (key, value) =>
-                MapEntry(DateTime.parse(key), EntryEvent.fromJson(value))),
-      );
-
-  factory History.fromFile(File file, Encrypter encrypter) => History.fromJson(
-      jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
+  final Map<String, EntryEvent> notes;
+  final Map<String, EntryEvent> paymentCards;
+  final Map<String, EntryEvent> idCards;
+  final Map<String, EntryEvent> identities;
 
   History({
-    Map<DateTime, EntryEvent>? passwords,
+    Map<String, EntryEvent>? passwords,
     Map<String, EntryEvent>? passwordIcons,
-    Map<DateTime, EntryEvent>? notes,
-    Map<DateTime, EntryEvent>? paymentCards,
-    Map<DateTime, EntryEvent>? idCards,
-    Map<DateTime, EntryEvent>? identities,
+    Map<String, EntryEvent>? notes,
+    Map<String, EntryEvent>? paymentCards,
+    Map<String, EntryEvent>? idCards,
+    Map<String, EntryEvent>? identities,
   })  : passwords = passwords ?? {},
         passwordIcons = passwordIcons ?? {},
         notes = notes ?? {},
         paymentCards = paymentCards ?? {},
         idCards = idCards ?? {},
         identities = identities ?? {};
+
+  factory History.fromJson(Map<String, dynamic> json) => History(
+        passwords: (json['passwords'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        passwordIcons: (json['passwordIcons'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        notes: (json['notes'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        paymentCards: (json['paymentCards'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        idCards: (json['idCards'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        identities: (json['identities'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+      );
+
+  factory History.fromFile(File file, Encrypter encrypter) => History.fromJson(
+      jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
+
+  Map<String, Map<String, EntryEvent>> toMap() => {
+        'passwords': passwords,
+        'passwordIcons': passwordIcons,
+        'notes': notes,
+        'paymentCards': paymentCards,
+        'idCards': idCards,
+        'identities': identities,
+      };
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'passwords': passwords.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'passwordIcons': passwordIcons.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'notes': notes.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'paymentCards': paymentCards.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'idCards': idCards.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'identities': identities.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+      };
 }

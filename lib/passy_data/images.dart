@@ -9,8 +9,8 @@ import 'common.dart';
 class Images {
   final Map<String, Uint8List> _images;
 
-  final Map<String, String> _imageIndexes;
-  final List<String> _freeimageIndexes;
+  final Map<String, String> _imageKeys;
+  final List<String> _freeimageKeys;
 
   final String _path;
   final File _file;
@@ -18,15 +18,15 @@ class Images {
   Encrypter _encrypter;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
 
-  Uint8List? getImage(String name) => _images[name];
+  Uint8List? getEntry(String name) => _images[name];
 
   void _setImage(String name, Uint8List image) {
     if (!_images.containsKey(name)) {
-      if (_freeimageIndexes.isEmpty) {
-        _imageIndexes[name] = _images.length.toRadixString(36);
+      if (_freeimageKeys.isEmpty) {
+        _imageKeys[name] = _images.length.toRadixString(36);
       } else {
-        _imageIndexes[name] = _freeimageIndexes.last;
-        _freeimageIndexes.removeAt(_freeimageIndexes.length - 1);
+        _imageKeys[name] = _freeimageKeys.last;
+        _freeimageKeys.removeAt(_freeimageKeys.length - 1);
       }
     }
     _images[name] = image;
@@ -34,10 +34,8 @@ class Images {
 
   Future<void> setImage(String name, Uint8List image) async {
     _setImage(name, image);
-    File _file = File(_path +
-        Platform.pathSeparator +
-        _imageIndexes[name].toString() +
-        '.enc');
+    File _file = File(
+        _path + Platform.pathSeparator + _imageKeys[name].toString() + '.enc');
     await _file.create();
     await _file
         .writeAsString(encrypt(base64Encode(image), encrypter: _encrypter));
@@ -45,10 +43,8 @@ class Images {
 
   void setImageSync(String name, Uint8List icon) {
     _setImage(name, icon);
-    File _file = File(_path +
-        Platform.pathSeparator +
-        _imageIndexes[name].toString() +
-        '.enc');
+    File _file = File(
+        _path + Platform.pathSeparator + _imageKeys[name].toString() + '.enc');
     _file.createSync();
     _file.writeAsStringSync(encrypt(base64Encode(icon), encrypter: _encrypter));
   }
@@ -68,8 +64,8 @@ class Images {
     required File file,
   })  : _encrypter = encrypter,
         _images = images,
-        _imageIndexes = imageIndexes,
-        _freeimageIndexes = freeImageIndexes,
+        _imageKeys = imageIndexes,
+        _freeimageKeys = freeImageIndexes,
         _file = file;
 
   factory Images(String path, {required Encrypter encrypter}) {
@@ -105,8 +101,8 @@ class Images {
   }
 
   Map<String, dynamic> toJson() => {
-        'imageIndexes': _imageIndexes.map((key, value) =>
+        'imageIndexes': _imageKeys.map((key, value) =>
             MapEntry(encrypt(key, encrypter: _encrypter), value)),
-        'freeImageIndexes': _freeimageIndexes,
+        'freeImageIndexes': _freeimageKeys,
       };
 }

@@ -9,20 +9,20 @@ import 'dated_entries.dart';
 import 'dated_entry.dart';
 import 'encrypted_json_file.dart';
 
-class PasswordsFile extends EncryptedJsonFile<DatedEntries<Password>> {
-  PasswordsFile._(File file, Encrypter encrypter,
-      {required DatedEntries<Password> value})
+typedef Passwords = DatedEntries<Password>;
+
+class PasswordsFile extends EncryptedJsonFile<Passwords> {
+  PasswordsFile._(File file, Encrypter encrypter, {required Passwords value})
       : super(file, encrypter, value: value);
 
   factory PasswordsFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
       return PasswordsFile._(file, encrypter,
-          value: DatedEntries<Password>.fromJson(jsonDecode(
+          value: Passwords.fromJson(jsonDecode(
               decrypt(file.readAsStringSync(), encrypter: encrypter))));
     }
     file.createSync(recursive: true);
-    PasswordsFile _file =
-        PasswordsFile._(file, encrypter, value: DatedEntries<Password>());
+    PasswordsFile _file = PasswordsFile._(file, encrypter, value: Passwords());
     _file.saveSync();
     return _file;
   }
@@ -59,7 +59,7 @@ class Password extends DatedEntry<Password> {
                 .toList() ??
             const [],
         creationDate:
-            DateTime.tryParse(json['creationDate']) ?? DateTime.now().toUtc(),
+            json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );
 
   @override
@@ -73,7 +73,7 @@ class Password extends DatedEntry<Password> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': creationDate.toIso8601String(),
+        'creationDate': creationDate,
       };
 
   Password._({
@@ -86,7 +86,7 @@ class Password extends DatedEntry<Password> {
     required this.customFields,
     required this.additionalInfo,
     required this.tags,
-    required DateTime creationDate,
+    required String creationDate,
   }) : super(creationDate);
 
   Password({
@@ -99,5 +99,5 @@ class Password extends DatedEntry<Password> {
     this.customFields = const [],
     this.additionalInfo = '',
     this.tags = const [],
-  }) : super(DateTime.now().toUtc());
+  }) : super(DateTime.now().toUtc().toIso8601String());
 }

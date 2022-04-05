@@ -10,19 +10,20 @@ import 'dated_entries.dart';
 import 'dated_entry.dart';
 import 'encrypted_json_file.dart';
 
-class IdentitiesFile extends EncryptedJsonFile<DatedEntries<Identity>> {
-  IdentitiesFile._(File file, Encrypter encrypter,
-      {required DatedEntries<Identity> value})
+typedef Identities = DatedEntries<Identity>;
+
+class IdentitiesFile extends EncryptedJsonFile<Identities> {
+  IdentitiesFile._(File file, Encrypter encrypter, {required Identities value})
       : super(file, encrypter, value: value);
 
   factory IdentitiesFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
       return IdentitiesFile._(file, encrypter,
-          value: DatedEntries<Identity>.fromJson(jsonDecode(
+          value: Identities.fromJson(jsonDecode(
               decrypt(file.readAsStringSync(), encrypter: encrypter))));
     }
     IdentitiesFile _file =
-        IdentitiesFile._(file, encrypter, value: DatedEntries<Identity>());
+        IdentitiesFile._(file, encrypter, value: Identities());
     _file.saveSync();
     return _file;
   }
@@ -89,7 +90,7 @@ class Identity extends DatedEntry<Identity> {
                 .toList() ??
             const [],
         creationDate:
-            DateTime.tryParse(json['creationDate']) ?? DateTime.now().toUtc(),
+            json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );
 
   @override
@@ -110,7 +111,7 @@ class Identity extends DatedEntry<Identity> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': creationDate.toIso8601String(),
+        'creationDate': creationDate,
       };
 
   Identity._({
@@ -130,7 +131,7 @@ class Identity extends DatedEntry<Identity> {
     this.customFields = const [],
     required this.additionalInfo,
     this.tags = const [],
-    required DateTime creationDate,
+    required String creationDate,
   }) : super(creationDate);
 
   Identity({
@@ -150,5 +151,5 @@ class Identity extends DatedEntry<Identity> {
     this.customFields = const [],
     required this.additionalInfo,
     this.tags = const [],
-  }) : super(DateTime.now().toUtc());
+  }) : super(DateTime.now().toUtc().toIso8601String());
 }
