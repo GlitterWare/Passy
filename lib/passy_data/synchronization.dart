@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/passy_stream_subscription.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:universal_io/io.dart';
@@ -54,15 +55,17 @@ class _Request implements JsonConvertable {
   final List<String> idCards;
   final List<String> identities;
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'passwords': passwords.map<String>((e) => e).toList(),
+  Map<String, List<String>> toMap() => {
+        'passwords': passwords,
         'passwordIcons': passwordIcons,
-        'notes': notes.map<String>((e) => e).toList(),
-        'paymentCards': paymentCards.map<String>((e) => e).toList(),
-        'idCards': idCards.map<String>((e) => e).toList(),
-        'identities': identities.map<String>((e) => e).toList(),
+        'notes': notes,
+        'paymentCards': paymentCards,
+        'idCards': idCards,
+        'identities': identities,
       };
+
+  @override
+  Map<String, dynamic> toJson() => toMap();
 
   factory _Request.fromJson(Map<String, dynamic> json) => _Request(
         passwords: (json['passwords'] as List<dynamic>).cast<String>(),
@@ -89,12 +92,12 @@ class _Request implements JsonConvertable {
 }
 
 class _ServerInfo implements JsonConvertable {
-  final History history;
+  final History relevantHistory;
   final _Request request;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'history': history.toJson(),
+        'history': relevantHistory.toJson(),
         'request': request.toJson(),
       };
 
@@ -106,7 +109,7 @@ class _ServerInfo implements JsonConvertable {
   _ServerInfo({
     History? history,
     _Request? request,
-  })  : history = history ?? History(),
+  })  : relevantHistory = history ?? History(),
         request = request ?? _Request();
 }
 
@@ -225,15 +228,29 @@ class Synchronization {
     return _data;
   }
 
+  Future<void> _sendData(_Request request) async {
+    _syncLog += 'done\nSending data... ';
+    List<List<int>> _data = _encodeData(request);
+    if (_data.isEmpty) {
+      _socket!.add(utf8.encode('ready\u0000'));
+      return _socket!.flush();
+    }
+    for (List<int> element in _data) {
+      _socket!.add(element);
+      await _socket!.flush();
+      if (_socket == null) return;
+    }
+  }
+
   void _receiveData(
-    String data, {
+    List<int> data, {
     required History remoteHistory,
     required Map<String, String> remoteEntryTypes,
   }) {
     _DataEntry _dataEntry;
     try {
-      _dataEntry =
-          _DataEntry.fromJson(jsonDecode(decrypt(data, encrypter: _encrypter)));
+      _dataEntry = _DataEntry.fromJson(
+          jsonDecode(decrypt(utf8.decode(data), encrypter: _encrypter)));
       switch (remoteEntryTypes[_dataEntry.key]) {
         case 'passwords':
           _passwords.setEntry(Password.fromJson(_dataEntry.value));
@@ -273,6 +290,7 @@ class Synchronization {
   }
 
   Future<HostAddress?> host() async {
+    _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '127.0.0.1';
     List<NetworkInterface> _interfaces =
@@ -298,7 +316,7 @@ class Synchronization {
           }
           _socket = socket;
 
-          StreamSubscription<Uint8List> _sub = socket.listen(
+          PassyStreamSubscription _sub = PassyStreamSubscription(socket.listen(
             null,
             onError: (e) =>
                 _handleException('Connection error.\n${e.toString()}'),
@@ -307,7 +325,7 @@ class Synchronization {
                 _handleException('Remote disconnected unexpectedly.');
               }
             },
-          );
+          ));
 
           void _sendData() {
             _syncLog += 'done.\nSending data...';
@@ -324,17 +342,20 @@ class Synchronization {
 
           void _sendInfo(_ServerInfo info) {
             _syncLog += 'done.\nSending info... ';
-            socket.add(
-                utf8.encode(encrypt(jsonEncode(info), encrypter: _encrypter)));
+            socket.add(utf8.encode(
+                encrypt(jsonEncode(info), encrypter: _encrypter) + '\u0000'));
             socket.flush();
           }
 
-          void _receiveHistory(Uint8List data) {
+          void _receiveHistory(List<int> data) {
             _syncLog += 'done.\nReceiving history... ';
             _ServerInfo _info = _ServerInfo();
             History _remoteHistory;
             Map<String, String> _remoteEntryTypes = {};
             Map<String, Map<String, EntryEvent>> _historyMap = _history.toMap();
+            Map<String, Map<String, EntryEvent>> _relevantHistoryMap =
+                _info.relevantHistory.toMap();
+            Map<String, List<String>> _requestMap = _info.request.toMap();
             int _toReceive;
 
             try {
@@ -356,39 +377,36 @@ class Synchronization {
 
             _remoteHistory.toMap().forEach((entryType, value) {
               value.forEach((key, event) {
+                DateTime _localLastModified;
+                EntryEvent _localEvent;
                 if (!_historyMap[entryType]!.containsKey(key)) {
                   _remoteEntryTypes[key] = entryType;
-                  _info.request.passwords.add(key);
+                  _requestMap[entryType]!.add(key);
                   return;
                 }
-                if (event.lastModified
-                    .isAfter(_historyMap[entryType]![key]!.lastModified)) {
+                _localEvent = _historyMap[entryType]![key]!;
+                _localLastModified = _localEvent.lastModified;
+                if (event.lastModified.isAfter(_localLastModified)) {
                   _remoteEntryTypes[key] = entryType;
-                  _info.request.passwords.add(entryType);
+                  _requestMap[entryType]!.add(entryType);
+                }
+                if (event.lastModified.isBefore(_localLastModified)) {
+                  _relevantHistoryMap[entryType]![key] = _localEvent;
                 }
               });
             });
 
             _toReceive = _remoteEntryTypes.length;
+
             if (_toReceive != 0) {
               _sub.onData((data) {
-                List<String> _data;
-                try {
-                  _data = utf8.decode(data).split('\u0000');
-                  if (_data.length != 1) _data.removeAt(_data.length - 1);
-                } catch (e) {
-                  _handleException('Could not decode data.\n${e.toString()}');
-                  return;
-                }
-                for (String _data in _data) {
-                  _toReceive--;
-                  _receiveData(
-                    _data,
-                    remoteHistory: _remoteHistory,
-                    remoteEntryTypes: _remoteEntryTypes,
-                  );
-                  if (_socket == null) return;
-                }
+                _receiveData(
+                  data,
+                  remoteHistory: _remoteHistory,
+                  remoteEntryTypes: _remoteEntryTypes,
+                );
+                if (_socket == null) return;
+                _toReceive--;
                 if (_toReceive == 0) {
                   _loadedAccount.saveSync();
                   _sendData();
@@ -407,12 +425,13 @@ class Synchronization {
           void _sendHistoryHash() {
             _syncLog += 'done.\nSending history hash... ';
             Map<String, dynamic> _localHistory = _history.toJson();
-            socket.add(getHash(jsonEncode(_localHistory)).bytes);
-            _sub.onData((data) => _receiveHistory(data));
+            socket.add(getHash(jsonEncode(_localHistory))
+                .bytes
+                .followedBy([0]).toList());
             socket.flush();
           }
 
-          void _receiveHello(Uint8List data) {
+          void _receiveHello(List<int> data) {
             _syncLog += 'done.\nReceiving hello... ';
             String _data;
             try {
@@ -434,18 +453,19 @@ class Synchronization {
                   'Hello is incorrect. Expected "$_hello", received "$_data".');
               return;
             }
+            _sub.onData((data) => _receiveHistory(data));
             _sendHistoryHash();
           }
 
           void _sendServiceInfo() {
             _syncLog += 'done.\nSending service info... ';
-            _sub.onData(_receiveHello);
-            socket.add(utf8.encode('Passy v$passyVersion'));
+            socket.add(utf8.encode('Passy v$passyVersion\u0000'));
             socket.flush();
           }
 
           Navigator.pushNamedAndRemoveUntil(
               _context, SplashScreen.routeName, (r) => false);
+          _sub.onData(_receiveHello);
           _sendServiceInfo();
         },
       );
@@ -457,11 +477,10 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) {
-    String _log = 'Connecting... ';
-
+    _syncLog = 'Connecting... ';
     return Socket.connect(address.ip, address.port).then((socket) {
       _socket = socket;
-      StreamSubscription<Uint8List> _sub = socket.listen(
+      PassyStreamSubscription _sub = PassyStreamSubscription(socket.listen(
         null,
         onError: (e) => _handleException('Connection error.\n${e.toString()}'),
         onDone: () {
@@ -469,9 +488,9 @@ class Synchronization {
             _handleException('Remote disconnected unexpectedly.');
           }
         },
-      );
+      ));
 
-      void _receiveData(Uint8List data) {
+      void _receiveData(List<int> data) {
         //TODO: receive data from server
         Navigator.pushNamedAndRemoveUntil(
             _context, MainScreen.routeName, (r) => false);
@@ -479,22 +498,8 @@ class Synchronization {
         socket.destroy();
       }
 
-      Future<void> _sendData(_Request request) async {
-        _log += 'done\nSending data... ';
-        List<List<int>> _data = _encodeData(request);
-        if (_data.isEmpty) {
-          socket.add(utf8.encode('ready'));
-          return socket.flush();
-        }
-        for (List<int> element in _data) {
-          socket.add(element);
-          await socket.flush();
-          if (_socket == null) return;
-        }
-      }
-
-      void _receiveInfo(Uint8List data) {
-        _log += 'done.\nReceiving info... ';
+      void _receiveInfo(List<int> data) {
+        _syncLog += 'done.\nReceiving info... ';
         _ServerInfo _info;
         try {
           _info = _ServerInfo.fromJson(
@@ -508,13 +513,14 @@ class Synchronization {
       }
 
       void _sendHistory(String historyJson) {
-        _log += 'done.\nSending history... ';
-        socket.add(utf8.encode(encrypt(historyJson, encrypter: _encrypter)));
+        _syncLog += 'done.\nSending history... ';
+        socket.add(utf8
+            .encode(encrypt(historyJson, encrypter: _encrypter) + '\u0000'));
         socket.flush();
       }
 
-      void _receiveHistoryHash(Uint8List data) {
-        _log += 'done.\nReceiving history hash... ';
+      void _receiveHistoryHash(List<int> data) {
+        _syncLog += 'done.\nReceiving history hash... ';
         String _historyJson = jsonEncode(_history);
         bool _same = true;
         try {
@@ -526,7 +532,7 @@ class Synchronization {
         if (_same) {
           _socket = null;
           Future.delayed(const Duration(seconds: 16), () => socket.destroy());
-          socket.add(utf8.encode(_sameHistoryHash));
+          socket.add(utf8.encode(_sameHistoryHash + '\u0000'));
           socket.flush();
           Navigator.pushNamedAndRemoveUntil(
               _context, MainScreen.routeName, (r) => false);
@@ -537,13 +543,13 @@ class Synchronization {
       }
 
       void _sendHello(String hello) {
-        _log += 'done.\nSending hello... ';
-        socket.add(utf8.encode(hello));
+        _syncLog += 'done.\nSending hello... ';
+        socket.add(utf8.encode(hello + '\u0000'));
         socket.flush();
       }
 
-      void _receiveServiceInfo(Uint8List data) {
-        _log += 'done.\nReceiving service info... ';
+      void _receiveServiceInfo(List<int> data) {
+        _syncLog += 'done.\nReceiving service info... ';
         List<String> _info = [];
         try {
           _info = utf8.decode(data).split(' ');
@@ -563,7 +569,7 @@ class Synchronization {
         }
         if (_info[1] != 'v$passyVersion') {
           _handleException(
-              'Local and remote versions are different. Local version: $passyVersion. Remote version: ${_info[1]}.');
+              'Local and remote versions are different. Local version: v$passyVersion. Remote version: ${_info[1]}.');
           return;
         }
         _sub.onData(_receiveHistoryHash);

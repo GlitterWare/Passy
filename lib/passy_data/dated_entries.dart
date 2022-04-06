@@ -16,9 +16,6 @@ class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
   void sort() => _entryList.sort((a, b) => a.compareTo(b));
 
   void addEntry(T entry) {
-    if (_entries.containsKey(entry.creationDate)) {
-      throw Exception('Can not add same entry twice.');
-    }
     _entries[entry.creationDate] = entry;
     _entryList.add(entry);
     sort();
