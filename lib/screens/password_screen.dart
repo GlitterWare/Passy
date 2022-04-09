@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:otp/otp.dart';
+
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/password.dart';
 
@@ -19,6 +21,8 @@ class _PasswordScreen extends State<PasswordScreen> {
     super.initState();
     _backButton = getBackButton(context);
   }
+
+  //TODO: implement OTP display
 
   @override
   Widget build(BuildContext context) {

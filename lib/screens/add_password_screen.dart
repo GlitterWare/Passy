@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/passwords_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
 class AddPasswordScreen extends StatefulWidget {
@@ -31,8 +31,8 @@ class _AddPasswordScreen extends State<AddPasswordScreen> {
           _account.addPassword(_password);
           Navigator.pushNamedAndRemoveUntil(
               context, SplashScreen.routeName, (r) => false);
-          _account.save().whenComplete(() =>
-              Navigator.pushReplacementNamed(context, MainScreen.routeName));
+          _account.save().whenComplete(() => Navigator.pushReplacementNamed(
+              context, PasswordsScreen.routeName));
         },
       ),
       body: Column(children: [
