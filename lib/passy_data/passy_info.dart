@@ -43,7 +43,7 @@ class PassyInfo implements JsonConvertable {
       };
 
   factory PassyInfo.fromJson(Map<String, dynamic> json) => PassyInfo(
-        version: json['version'] ?? '',
+        version: json['version'] ?? passyVersion,
         lastUsername: json['lastUsername'] ?? '',
         themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
             ThemeMode.system,
