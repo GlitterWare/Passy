@@ -34,6 +34,13 @@ class History implements JsonConvertable {
   final Map<String, EntryEvent> paymentCards;
   final Map<String, EntryEvent> idCards;
   final Map<String, EntryEvent> identities;
+  int get length =>
+      passwords.length +
+      passwordIcons.length +
+      notes.length +
+      paymentCards.length +
+      idCards.length +
+      identities.length;
 
   History({
     Map<String, EntryEvent>? passwords,
@@ -48,6 +55,15 @@ class History implements JsonConvertable {
         paymentCards = paymentCards ?? {},
         idCards = idCards ?? {},
         identities = identities ?? {};
+
+  factory History.from(History other) => History(
+        passwords: Map<String, EntryEvent>.from(other.passwords),
+        passwordIcons: Map<String, EntryEvent>.from(other.passwordIcons),
+        notes: Map<String, EntryEvent>.from(other.notes),
+        paymentCards: Map<String, EntryEvent>.from(other.paymentCards),
+        idCards: Map<String, EntryEvent>.from(other.idCards),
+        identities: Map<String, EntryEvent>.from(other.identities),
+      );
 
   factory History.fromJson(Map<String, dynamic> json) => History(
         passwords: (json['passwords'] as Map<String, dynamic>)

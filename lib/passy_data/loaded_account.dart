@@ -143,9 +143,7 @@ class LoadedAccount {
 
   void addPassword(Password password) {
     _history.value.passwords[password.creationDate] = EntryEvent(
-        entryType: EntryType.password,
-        status: EntryStatus.alive,
-        lastModified: DateTime.now().toUtc());
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwords.value.addEntry(password);
   }
 
@@ -169,9 +167,7 @@ class LoadedAccount {
 
   void setPasswordIcon(String name, Uint8List image) {
     _history.value.passwordIcons[name] = EntryEvent(
-        entryType: EntryType.password,
-        status: EntryStatus.alive,
-        lastModified: DateTime.now().toUtc());
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwordIcons.setImage(name, image);
   }
 
@@ -179,9 +175,7 @@ class LoadedAccount {
   Iterable<Note> get notes => _notes.value.entries;
   void addNote(Note note) {
     _history.value.notes[note.creationDate] = EntryEvent(
-        entryType: EntryType.note,
-        status: EntryStatus.alive,
-        lastModified: DateTime.now().toUtc());
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _notes.value.addEntry(note);
   }
 
@@ -203,9 +197,7 @@ class LoadedAccount {
   Iterable<PaymentCard> get paymentCards => _paymentCards.value.entries;
   void addPaymentCard(PaymentCard paymentCard) {
     _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
-        entryType: EntryType.paymentCard,
-        status: EntryStatus.alive,
-        lastModified: DateTime.now().toUtc());
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _paymentCards.value.addEntry(paymentCard);
   }
 
@@ -251,9 +243,7 @@ class LoadedAccount {
   Iterable<Identity> get identities => _identities.value.entries;
   void addIdentity(Identity identity) {
     _history.value.identities[identity.creationDate] = EntryEvent(
-        entryType: EntryType.identity,
-        status: EntryStatus.alive,
-        lastModified: DateTime.now().toUtc());
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _identities.value.addEntry(identity);
   }
 

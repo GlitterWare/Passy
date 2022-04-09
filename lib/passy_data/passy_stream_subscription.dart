@@ -8,7 +8,7 @@ import 'dart:typed_data';
 /// for the received byte sequence.
 class PassyStreamSubscription extends StreamSubscription<List<int>> {
   final StreamSubscription<Uint8List> _subscription;
-  final List<int> _data = [];
+  List<int> _data = [];
   void Function(List<int>)? _handleData;
 
   PassyStreamSubscription(this._subscription) {
@@ -20,7 +20,7 @@ class PassyStreamSubscription extends StreamSubscription<List<int>> {
           if (_handleData != null) {
             _handleData!(_data);
           }
-          _data.clear();
+          _data = [];
         }
       }
     });
