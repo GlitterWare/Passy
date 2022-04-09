@@ -651,7 +651,8 @@ class Synchronization {
               'Remote service is not Passy. Service name: ${_hello[0]}');
           return;
         }
-        if (_info[1] != 'v$passyVersion') {
+        if (_info[1].replaceFirst('v', '').split('.') !=
+            passyVersion.split('.')) {
           _handleException(
               'Local and remote versions are different. Local version: v$passyVersion. Remote version: ${_info[1]}.');
           return;
