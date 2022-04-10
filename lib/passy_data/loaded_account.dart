@@ -160,7 +160,7 @@ class LoadedAccount {
 
   void removePassword(Password password) {
     EntryEvent _event = _history.value.passwords[password.creationDate]!;
-    _event.status = EntryStatus.removed;
+    _event.status = EntryStatus.deleted;
     _event.lastModified = DateTime.now().toUtc();
     _passwords.value.remove(password);
   }
@@ -191,7 +191,7 @@ class LoadedAccount {
 
   void removeNote(Note note) {
     EntryEvent _event = _history.value.notes[note.creationDate]!;
-    _event.status = EntryStatus.removed;
+    _event.status = EntryStatus.deleted;
     _event.lastModified = DateTime.now().toUtc();
     _notes.value.remove(note);
   }
@@ -214,7 +214,7 @@ class LoadedAccount {
 
   void removePaymentCard(PaymentCard paymentCard) {
     EntryEvent _event = _history.value.paymentCards[paymentCard.creationDate]!;
-    _event.status = EntryStatus.removed;
+    _event.status = EntryStatus.deleted;
     _event.lastModified = DateTime.now().toUtc();
     _paymentCards.value.remove(paymentCard);
   }
@@ -223,7 +223,7 @@ class LoadedAccount {
   Iterable<IDCard> get idCards => _idCards.value.entries;
   void addIDCard(IDCard idCard) {
     EntryEvent _event = _history.value.passwords[idCard.creationDate]!;
-    _event.status = EntryStatus.removed;
+    _event.status = EntryStatus.deleted;
     _event.lastModified = DateTime.now().toUtc();
     _idCards.value.addEntry(idCard);
   }
@@ -237,7 +237,7 @@ class LoadedAccount {
 
   void removeIDCard(IDCard idCard) {
     EntryEvent _event = _history.value.idCards[idCard.creationDate]!;
-    _event.status = EntryStatus.removed;
+    _event.status = EntryStatus.deleted;
     _event.lastModified = DateTime.now().toUtc();
     _idCards.value.remove(idCard);
   }
@@ -260,7 +260,7 @@ class LoadedAccount {
 
   void removeIdentity(Identity identity) {
     EntryEvent _event = _history.value.identities[identity.creationDate]!;
-    _event.status = EntryStatus.removed;
+    _event.status = EntryStatus.deleted;
     _event.lastModified = DateTime.now().toUtc();
     _identities.value.remove(identity);
   }

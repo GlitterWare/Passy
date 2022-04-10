@@ -1,15 +1,15 @@
 import 'package:passy/passy_data/json_convertable.dart';
 
-enum EntryStatus { alive, removed }
+enum EntryStatus { alive, deleted }
 
 const entryStatusToJson = {
   EntryStatus.alive: 'alive',
-  EntryStatus.removed: 'removed',
+  EntryStatus.deleted: 'deleted',
 };
 
 const entryStatusFromJson = {
   'alive': EntryStatus.alive,
-  'removed': EntryStatus.removed,
+  'deleted': EntryStatus.deleted,
 };
 
 class EntryEvent implements JsonConvertable {

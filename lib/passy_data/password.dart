@@ -34,8 +34,8 @@ class Password extends DatedEntry<Password> {
   String username;
   String email;
   String password;
-  String website;
   String tfaSecret;
+  String website;
   List<CustomField> customFields;
   String additionalInfo;
   List<String> tags;
@@ -49,8 +49,8 @@ class Password extends DatedEntry<Password> {
         username: json['username'] ?? '',
         email: json['email'] ?? '',
         password: json['password'] ?? '',
-        website: json['website'] ?? '',
         tfaSecret: json['tfaSecret'] ?? '',
+        website: json['website'] ?? '',
         customFields: (json['customFields'] as List<dynamic>?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
@@ -70,8 +70,8 @@ class Password extends DatedEntry<Password> {
         'iconName': iconName,
         'username': username,
         'password': password,
-        'website': website,
         'tfaSecret': tfaSecret,
+        'website': website,
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
@@ -84,8 +84,8 @@ class Password extends DatedEntry<Password> {
     required this.username,
     required this.email,
     required this.password,
-    required this.website,
     required this.tfaSecret,
+    required this.website,
     required this.customFields,
     required this.additionalInfo,
     required this.tags,
@@ -98,8 +98,8 @@ class Password extends DatedEntry<Password> {
     this.username = '',
     this.email = '',
     this.password = '',
-    this.website = '',
     this.tfaSecret = '',
+    this.website = '',
     this.customFields = const [],
     this.additionalInfo = '',
     this.tags = const [],

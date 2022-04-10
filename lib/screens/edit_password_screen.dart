@@ -51,12 +51,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           onChanged: (value) => _password.password = value,
         ),
         TextField(
-          decoration: const InputDecoration(labelText: 'Website'),
-          onChanged: (value) => _password.website = value,
-        ),
-        TextField(
           decoration: const InputDecoration(labelText: '2FA Secret'),
           onChanged: (value) => _password.tfaSecret = value,
+        ),
+        TextField(
+          decoration: const InputDecoration(labelText: 'Website'),
+          onChanged: (value) => _password.website = value,
         ),
         TextField(
           decoration: const InputDecoration(labelText: 'Additional'),

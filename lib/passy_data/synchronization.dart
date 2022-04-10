@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
@@ -29,23 +28,29 @@ const String _sameHistoryHash = 'same';
 class _EntryData implements JsonConvertable {
   final String key;
   final String type;
+  final EntryEvent event;
 
-  /// Value can be Map<String, dynamic> if DatedEntry or String if image
+  /// Value can be Map<String, dynamic> if DatedEntry, String if image or null if deleted
   final dynamic value;
 
   @override
   Map<String, dynamic> toJson() => {
         'key': key,
         'type': type,
+        'event': event.toJson(),
         'entry': value,
       };
 
-  factory _EntryData.fromJson(Map<String, dynamic> json) =>
-      _EntryData(key: json['key'], type: json['type'], value: json['entry']);
+  factory _EntryData.fromJson(Map<String, dynamic> json) => _EntryData(
+      key: json['key'],
+      type: json['type'],
+      event: EntryEvent.fromJson(json['event']),
+      value: json['entry']);
 
   _EntryData({
     required this.key,
     required this.type,
+    required this.event,
     required this.value,
   });
 }
@@ -168,8 +173,7 @@ class Synchronization {
     String _exception = '\nLocal exception has occurred: ' + message;
     _syncLog += _exception;
     print(_syncLog);
-    Navigator.pushNamedAndRemoveUntil(
-        _context, MainScreen.routeName, (r) => false);
+    Navigator.pop(_context);
     ScaffoldMessenger.of(_context).clearSnackBars();
     ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
       content: Row(children: const [
@@ -188,11 +192,12 @@ class Synchronization {
   List<List<int>> _encodeData(_Request request) {
     List<List<int>> _data = [];
 
-    for (var element in request.passwords) {
+    for (String element in request.passwords) {
       _data.add(utf8.encode(encrypt(
               jsonEncode(_EntryData(
                   key: element,
                   type: 'passwords',
+                  event: _history.passwords[element]!,
                   value: _passwords.getEntry(element)!.toJson())),
               encrypter: _encrypter) +
           '\u0000'));
@@ -201,7 +206,8 @@ class Synchronization {
       _data.add(utf8.encode(encrypt(
               jsonEncode(_EntryData(
                   key: element,
-                  type: 'passwords',
+                  type: 'passwordIcons',
+                  event: _history.passwordIcons[element]!,
                   value: _passwordIcons.getEntry(element))),
               encrypter: _encrypter) +
           '\u0000'));
@@ -210,7 +216,8 @@ class Synchronization {
       _data.add(utf8.encode(encrypt(
               jsonEncode(_EntryData(
                   key: element,
-                  type: 'passwords',
+                  type: 'notes',
+                  event: _history.notes[element]!,
                   value: _notes.getEntry(element)!.toJson())),
               encrypter: _encrypter) +
           '\u0000'));
@@ -219,7 +226,8 @@ class Synchronization {
       _data.add(utf8.encode(encrypt(
               jsonEncode(_EntryData(
                   key: element,
-                  type: 'passwords',
+                  type: 'paymentCards',
+                  event: _history.paymentCards[element]!,
                   value: _paymentCards.getEntry(element)!.toJson())),
               encrypter: _encrypter) +
           '\u0000'));
@@ -228,7 +236,8 @@ class Synchronization {
       _data.add(utf8.encode(encrypt(
               jsonEncode(_EntryData(
                   key: element,
-                  type: 'passwords',
+                  type: 'idCards',
+                  event: _history.idCards[element]!,
                   value: _idCards.getEntry(element)!.toJson())),
               encrypter: _encrypter) +
           '\u0000'));
@@ -237,7 +246,8 @@ class Synchronization {
       _data.add(utf8.encode(encrypt(
               jsonEncode(_EntryData(
                   key: element,
-                  type: 'passwords',
+                  type: 'identities',
+                  event: _history.identities[element]!,
                   value: _identities.getEntry(element)!.toJson())),
               encrypter: _encrypter) +
           '\u0000'));
@@ -263,6 +273,7 @@ class Synchronization {
             jsonDecode(decrypt(utf8.decode(entry), encrypter: _encrypter)));
         switch (_entryData.type) {
           case 'passwords':
+            //TODO: catch error for history separately, remove entry on catch
             _passwords.setEntry(Password.fromJson(_entryData.value));
             _history.passwords[_entryData.key] =
                 history.passwords[_entryData.key]!;
@@ -394,8 +405,7 @@ class Synchronization {
                   _socket = null;
                   socket.destroy();
                   server.close();
-                  Navigator.pushNamedAndRemoveUntil(
-                      _context, MainScreen.routeName, (r) => false);
+                  Navigator.pop(_context);
                   return;
                 }
                 _remoteHistory = History.fromJson(
@@ -407,6 +417,7 @@ class Synchronization {
 
               /// Create Info
               {
+                //TODO: go through info history and check alive/removed entries
                 _info = _EntryInfo();
                 _remoteRequest = _Request();
                 Map<String, Map<String, EntryEvent>> _localHistoryMap =
@@ -481,8 +492,7 @@ class Synchronization {
                   server.close();
                   _server = null;
                   await _decryptEntriesFuture;
-                  Navigator.pushNamedAndRemoveUntil(
-                      _context, MainScreen.routeName, (r) => false);
+                  Navigator.pop(_context);
                 });
               }
             }
@@ -528,8 +538,9 @@ class Synchronization {
               return socket.flush();
             }
 
-            Navigator.pushNamedAndRemoveUntil(
-                _context, SplashScreen.routeName, (r) => false);
+            Navigator.popUntil(
+                _context, (r) => r.settings.name == MainScreen.routeName);
+            Navigator.pushNamed(_context, SplashScreen.routeName);
             _sub.onData(_handleHello);
             _sendServiceInfo();
           },
@@ -558,6 +569,7 @@ class Synchronization {
 
       Future<void> _handleInfo(List<int> data) async {
         _syncLog += 'done.\nReceiving info... ';
+        int _requestLength;
         _EntryInfo _info;
         Future<void> _decryptEntriesFuture;
         Future<void> _handleEntriesFuture;
@@ -571,11 +583,19 @@ class Synchronization {
           return;
         }
 
+        //TODO: go through info history and check alive/removed entries
+
+        _requestLength = _info.history.length;
         _decryptEntriesFuture = Future.value();
         _handleEntriesFuture = _handleEntries(
           _sub,
-          entryCount: _info.history.length,
+          entryCount: _requestLength,
         ).then((value) {
+          if (value.length < _requestLength) {
+            _handleException('Remote did not send all requested entries.');
+            Navigator.pop(_context);
+            return;
+          }
           _decryptEntriesFuture =
               _decryptEntries(entries: value, history: _info.history);
         });
@@ -591,8 +611,7 @@ class Synchronization {
           _socket!.destroy();
           _socket = null;
           await _decryptEntriesFuture;
-          Navigator.pushNamedAndRemoveUntil(
-              _context, MainScreen.routeName, (r) => false);
+          Navigator.pop(_context);
         });
       }
 
@@ -618,8 +637,7 @@ class Synchronization {
           Future.delayed(const Duration(seconds: 16), () => socket.destroy());
           socket.add(utf8.encode(_sameHistoryHash + '\u0000'));
           socket.flush();
-          Navigator.pushNamedAndRemoveUntil(
-              _context, MainScreen.routeName, (r) => false);
+          Navigator.pop(_context);
           return;
         }
         _sub.onData(_handleInfo);
@@ -651,8 +669,8 @@ class Synchronization {
               'Remote service is not Passy. Service name: ${_hello[0]}');
           return;
         }
-        if (_info[1].replaceFirst('v', '').split('.') !=
-            passyVersion.split('.')) {
+        if (_info[1].replaceFirst('v', '').split('.')[0] !=
+            passyVersion.split('.')[0]) {
           _handleException(
               'Local and remote versions are different. Local version: v$passyVersion. Remote version: ${_info[1]}.');
           return;
@@ -663,8 +681,9 @@ class Synchronization {
             encrypter: _encrypter));
       }
 
-      Navigator.pushNamedAndRemoveUntil(
-          _context, SplashScreen.routeName, (r) => false);
+      Navigator.popUntil(
+          _context, (r) => r.settings.name == MainScreen.routeName);
+      Navigator.pushNamed(_context, SplashScreen.routeName);
       _sub.onData(_handleServiceInfo);
     }, onError: (e) => _handleException('Failed to connect.\n${e.toString()}'));
     // Ask server for data hashes, if they are not the same, exchange data
