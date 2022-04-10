@@ -74,8 +74,9 @@ class Images {
       Map<String, dynamic> _json =
           jsonDecode(decrypt(_file.readAsStringSync(), encrypter: encrypter));
       Map<String, String> _imageIndexes =
-          (_json['imageIndexes'] as Map<String, dynamic>).map((key, value) =>
-              MapEntry(decrypt(key, encrypter: encrypter), value));
+          (_json['imageIndexes'] as Map<String, dynamic>?)?.map((key, value) =>
+                  MapEntry(decrypt(key, encrypter: encrypter), value)) ??
+              {};
       return Images._(path,
           encrypter: encrypter,
           images: _imageIndexes.map((key, value) => MapEntry(

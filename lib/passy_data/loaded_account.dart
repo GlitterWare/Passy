@@ -8,7 +8,7 @@ import 'package:passy/passy_data/synchronization.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
-import 'account_info.dart';
+import 'account_settings.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'history.dart';

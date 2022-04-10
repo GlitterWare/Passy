@@ -97,12 +97,12 @@ class Identity extends DatedEntry<Identity> {
         customFields: (json['customFields'] as List<dynamic>?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
-            const [],
-        additionalInfo: json['additionalInfo'] as String,
+            [],
+        additionalInfo: json['additionalInfo'] ?? '',
         tags: (json['tags'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
-            const [],
+            [],
         creationDate:
             json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );

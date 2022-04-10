@@ -32,9 +32,9 @@ class CustomField implements JsonConvertable {
 
   factory CustomField.fromJson(Map<String, dynamic> json) => CustomField(
         fieldType: fieldTypeFromJson[json['fieldType']] ?? FieldType.password,
-        title: json['title'] as String? ?? 'Custom Field',
-        value: json['value'] as String? ?? '',
-        private: json['private'] as bool? ?? false,
+        title: json['title'] ?? 'Custom Field',
+        value: json['value'] ?? '',
+        private: json['private'] ?? false,
       );
 
   CustomField(

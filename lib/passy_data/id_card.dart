@@ -61,25 +61,26 @@ class IDCard extends DatedEntry<IDCard> {
       };
 
   factory IDCard.fromJson(Map<String, dynamic> json) => IDCard._(
-        nickname: json['nickname'] as String,
-        pictures: (json['pictures'] as List<dynamic>)
-            .map((e) => e as String)
-            .toList(),
-        type: json['type'] as String,
-        idNumber: json['idNumber'] as String,
-        name: json['name'] as String,
-        issDate: json['issDate'] as String,
-        expDate: json['expDate'] as String,
-        country: json['country'] as String,
+        nickname: json['nickname'] ?? '',
+        pictures: (json['pictures'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        type: json['type'] ?? '',
+        idNumber: json['idNumber'] ?? '',
+        name: json['name'] ?? '',
+        issDate: json['issDate'] ?? '',
+        expDate: json['expDate'] ?? '',
+        country: json['country'] ?? '',
         customFields: (json['customFields'] as List<dynamic>?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
-            const [],
-        additionalInfo: json['additionalInfo'] as String,
+            [],
+        additionalInfo: json['additionalInfo'] ?? '',
         tags: (json['tags'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
-            const [],
+            [],
         creationDate:
             json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );

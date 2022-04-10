@@ -35,8 +35,8 @@ class Note extends DatedEntry<Note> {
   int compareTo(Note other) => title.compareTo(other.title);
 
   factory Note.fromJson(Map<String, dynamic> json) => Note._(
-        title: json['title'] as String,
-        note: json['note'] as String,
+        title: json['title'] ?? '',
+        note: json['note'] ?? '',
         creationDate:
             json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );

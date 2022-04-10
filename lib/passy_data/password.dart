@@ -32,6 +32,7 @@ class Password extends DatedEntry<Password> {
   String nickname;
   String iconName;
   String username;
+  String email;
   String password;
   String website;
   String tfaSecret;
@@ -43,21 +44,22 @@ class Password extends DatedEntry<Password> {
   int compareTo(Password other) => nickname.compareTo(other.nickname);
 
   factory Password.fromJson(Map<String, dynamic> json) => Password._(
-        nickname: json['nickname'] as String,
-        iconName: json['iconName'] as String,
-        username: json['username'] as String,
-        password: json['password'] as String,
-        website: json['website'] as String,
-        tfaSecret: json['tfaSecret'] as String,
+        nickname: json['nickname'] ?? '',
+        iconName: json['iconName'] ?? '',
+        username: json['username'] ?? '',
+        email: json['email'] ?? '',
+        password: json['password'] ?? '',
+        website: json['website'] ?? '',
+        tfaSecret: json['tfaSecret'] ?? '',
         customFields: (json['customFields'] as List<dynamic>?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
-            const [],
+            [],
         additionalInfo: json['additionalInfo'] as String,
         tags: (json['tags'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
-            const [],
+            [],
         creationDate:
             json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );
@@ -80,6 +82,7 @@ class Password extends DatedEntry<Password> {
     required this.nickname,
     required this.iconName,
     required this.username,
+    required this.email,
     required this.password,
     required this.website,
     required this.tfaSecret,
@@ -93,6 +96,7 @@ class Password extends DatedEntry<Password> {
     this.nickname = '',
     this.iconName = '',
     this.username = '',
+    this.email = '',
     this.password = '',
     this.website = '',
     this.tfaSecret = '',

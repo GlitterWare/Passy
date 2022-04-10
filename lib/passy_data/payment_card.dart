@@ -44,20 +44,20 @@ class PaymentCard extends DatedEntry<PaymentCard> {
   int compareTo(PaymentCard other) => nickname.compareTo(other.nickname);
 
   factory PaymentCard.fromJson(Map<String, dynamic> json) => PaymentCard._(
-        nickname: json['nickname'] as String,
-        cardNumber: json['cardNumber'] as String,
-        cardholderName: json['cardholderName'] as String,
-        cvv: json['cvv'] as String,
-        exp: json['exp'] as String,
+        nickname: json['nickname'] ?? '',
+        cardNumber: json['cardNumber'] ?? '',
+        cardholderName: json['cardholderName'] ?? '',
+        cvv: json['cvv'] ?? '',
+        exp: json['exp'] ?? '',
         customFields: (json['customFields'] as List<dynamic>?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
-            const [],
-        additionalInfo: json['additionalInfo'] as String,
+            [],
+        additionalInfo: json['additionalInfo'] ?? '',
         tags: (json['tags'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
-            const [],
+            [],
         creationDate:
             json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
       );

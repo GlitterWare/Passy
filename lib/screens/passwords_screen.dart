@@ -7,7 +7,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/widgets/entry_widget.dart';
+import 'package:passy/widgets/entry_button.dart';
 
 import 'add_password_screen.dart';
 import 'password_screen.dart';
@@ -44,13 +44,13 @@ class _PasswordsScreen extends State<PasswordsScreen> {
         return Image.memory(_icon);
       }
 
-      _passwords.add(EntryWidget(
+      _passwords.add(EntryButton(
         icon: _getIcon(password.iconName),
         onPressed: () {
           Navigator.pushNamed(context, PasswordScreen.routeName,
               arguments: password);
         },
-        child: Column(
+        body: Column(
           children: [
             Align(
               child: Text(
