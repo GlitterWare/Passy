@@ -7,6 +7,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/widgets/entry_widget.dart';
 
 import 'add_password_screen.dart';
 import 'password_screen.dart';
@@ -30,7 +31,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     LoadedAccount _account = data.loadedAccount!;
     _backButton = getBackButton(context);
 
-    for (Password p in _account.passwords) {
+    for (Password password in _account.passwords) {
       Widget _getIcon(String name) {
         Uint8List? _icon = _account.getPasswordIcon(name);
         if (_icon == null) {
@@ -43,47 +44,28 @@ class _PasswordsScreen extends State<PasswordsScreen> {
         return Image.memory(_icon);
       }
 
-      _passwords.add(Padding(
-        padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, PasswordScreen.routeName,
-                arguments: p);
-          },
-          child: Padding(
-            child: Row(
-              children: [
-                Padding(
-                  child: _getIcon(p.iconName),
-                  padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                ),
-                Flexible(
-                  child: Column(
-                    children: [
-                      Align(
-                        child: Text(
-                          p.nickname,
-                        ),
-                        alignment: Alignment.centerLeft,
-                      ),
-                      Align(
-                        child: Text(
-                          p.username,
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        alignment: Alignment.centerLeft,
-                      ),
-                    ],
-                  ),
-                  fit: FlexFit.tight,
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded)
-              ],
+      _passwords.add(EntryWidget(
+        icon: _getIcon(password.iconName),
+        onPressed: () {
+          Navigator.pushNamed(context, PasswordScreen.routeName,
+              arguments: password);
+        },
+        child: Column(
+          children: [
+            Align(
+              child: Text(
+                password.nickname,
+              ),
+              alignment: Alignment.centerLeft,
             ),
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          ),
-          style: ElevatedButton.styleFrom(
-              primary: Colors.white, onPrimary: Colors.black),
+            Align(
+              child: Text(
+                password.username,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              alignment: Alignment.centerLeft,
+            ),
+          ],
         ),
       ));
     }

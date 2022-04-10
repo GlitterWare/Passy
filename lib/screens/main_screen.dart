@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:passy/widgets/entry_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:passy/common/common.dart';
@@ -112,38 +113,15 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, PasswordsScreen.routeName);
-              },
-              child: Padding(
-                child: Row(
-                  children: [
-                    const Padding(
-                      child: Icon(Icons.lock_rounded),
-                      padding: EdgeInsets.fromLTRB(0, 0, 30, 0),
-                    ),
-                    Flexible(
-                      child: Column(
-                        children: const [
-                          Align(
-                            child: Text('Passwords'),
-                            alignment: Alignment.centerLeft,
-                          ),
-                        ],
-                      ),
-                      fit: FlexFit.tight,
-                    ),
-                    const Icon(Icons.arrow_forward_ios_rounded)
-                  ],
-                ),
-                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              ),
-              style: ElevatedButton.styleFrom(
-                  primary: Colors.white, onPrimary: Colors.black),
+          EntryWidget(
+            icon: const Icon(Icons.lock_rounded),
+            child: const Align(
+              child: Text('Passwords'),
+              alignment: Alignment.centerLeft,
             ),
+            onPressed: () {
+              Navigator.pushNamed(context, PasswordsScreen.routeName);
+            },
           ),
         ],
       ),
