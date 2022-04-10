@@ -35,6 +35,13 @@ class _PasswordScreen extends State<PasswordScreen> {
       appBar: AppBar(
         leading: _backButton,
         title: Center(child: Text(_password.nickname)),
+        actions: [
+          IconButton(
+              onPressed: () {
+                //TODO: show AddPasswordScreen
+              },
+              icon: const Icon(Icons.edit_rounded))
+        ],
       ),
       body: ListView(children: [
         EntryWidget(
