@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/passwords_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
@@ -15,6 +16,8 @@ class EditPasswordScreen extends StatefulWidget {
 }
 
 class _EditPasswordScreen extends State<EditPasswordScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
+
   @override
   Widget build(BuildContext context) {
     Object? _args = ModalRoute.of(context)!.settings.arguments;
@@ -27,12 +30,11 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         title: 'Password',
         isNew: _isNew,
         onSave: () {
-          LoadedAccount _account = data.loadedAccount!;
           _account.addPassword(_password);
-          Navigator.pushNamedAndRemoveUntil(
-              context, SplashScreen.routeName, (r) => false);
-          _account.save().whenComplete(() => Navigator.pushReplacementNamed(
-              context, PasswordsScreen.routeName));
+          Navigator.popUntil(
+              context, (r) => r.settings.name == MainScreen.routeName);
+          _account.save().whenComplete(
+              () => Navigator.pushNamed(context, PasswordsScreen.routeName));
         },
       ),
       body: ListView(children: [
