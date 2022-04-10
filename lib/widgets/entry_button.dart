@@ -4,18 +4,15 @@ class EntryButton extends StatelessWidget {
   final Widget _icon;
   final Widget _body;
   final VoidCallback? _onPressed;
-  final VoidCallback? _onIconPressed;
 
   const EntryButton({
     Key? key,
     required Widget icon,
     required Widget body,
     VoidCallback? onPressed,
-    VoidCallback? onIconPressed,
   })  : _icon = icon,
         _body = body,
         _onPressed = onPressed,
-        _onIconPressed = onIconPressed,
         super(key: key);
 
   @override
