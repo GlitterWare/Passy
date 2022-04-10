@@ -24,10 +24,16 @@ class PassyInfoFile extends JsonFile<PassyInfo> {
   }
 }
 
-const _$ThemeModeEnumMap = {
+const _themeModeToJson = {
   ThemeMode.system: 'system',
   ThemeMode.dark: 'dark',
   ThemeMode.light: 'light',
+};
+
+const _themeModeFromJson = {
+  'system': ThemeMode.system,
+  'dark': ThemeMode.dark,
+  'light': ThemeMode.light,
 };
 
 class PassyInfo implements JsonConvertable {
@@ -39,14 +45,13 @@ class PassyInfo implements JsonConvertable {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'version': version,
         'lastUsername': lastUsername,
-        'themeMode': _$ThemeModeEnumMap[themeMode],
+        'themeMode': _themeModeToJson[themeMode],
       };
 
   factory PassyInfo.fromJson(Map<String, dynamic> json) => PassyInfo(
         version: json['version'] ?? passyVersion,
         lastUsername: json['lastUsername'] ?? '',
-        themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
-            ThemeMode.system,
+        themeMode: _themeModeFromJson[json['themeMode']] ?? ThemeMode.system,
       );
 
   PassyInfo({

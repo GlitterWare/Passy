@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 import 'dated_entry.dart';
 import 'id_card.dart';
@@ -25,7 +24,9 @@ const Map<Type, DatedEntry Function(Map<String, dynamic> json)>
   Identity: Identity.fromJson,
 };
 
-const _$EntryTypeEnumMap = {
+enum EntryType { password, passwordIcon, paymentCard, note, idCard, identity }
+
+const entryTypeToJson = {
   EntryType.password: 'password',
   EntryType.passwordIcon: 'passwordIcon',
   EntryType.paymentCard: 'paymentCard',
@@ -34,11 +35,14 @@ const _$EntryTypeEnumMap = {
   EntryType.identity: 'identity',
 };
 
-enum EntryType { password, passwordIcon, paymentCard, note, idCard, identity }
-
-String entryTypeToJson(EntryType entryType) => _$EntryTypeEnumMap[entryType]!;
-EntryType entryTypeFromJson(String json) =>
-    $enumDecode(_$EntryTypeEnumMap, json);
+const entryTypeFromJson = {
+  'password': EntryType.password,
+  'passwordIcon': EntryType.passwordIcon,
+  'paymentCard': EntryType.paymentCard,
+  'note': EntryType.note,
+  'idCard': EntryType.idCard,
+  'identity': EntryType.identity,
+};
 
 Encrypter getEncrypter(String password) {
   if (password.length > 32) {

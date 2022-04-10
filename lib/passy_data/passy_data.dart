@@ -61,7 +61,7 @@ class PassyData {
         .deleteSync(recursive: true);
   }
 
-  loadAccount(String username, String password) =>
+  LoadedAccount loadAccount(String username, String password) =>
       _loadedAccount = LoadedAccount(_accounts[username]!,
           path: accountsPath + Platform.pathSeparator + username,
           encrypter: getEncrypter(password));

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/account_info.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -37,8 +40,10 @@ class _LoginScreen extends State<LoginScreen> {
     Navigator.popUntil(context, (route) => route.isFirst);
     data.info.value.lastUsername = _username;
     data.info.save().whenComplete(() {
-      data.loadAccount(data.info.value.lastUsername, _password);
-      Navigator.pushReplacementNamed(context, '/main');
+      LoadedAccount _account =
+          data.loadAccount(data.info.value.lastUsername, _password);
+      Navigator.pushReplacementNamed(
+          context, screenToRouteName[_account.defaultScreen]!);
     });
   }
 

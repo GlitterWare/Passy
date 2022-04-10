@@ -18,6 +18,7 @@ import 'images.dart';
 import 'note.dart';
 import 'password.dart';
 import 'payment_card.dart';
+import 'screen.dart';
 
 class LoadedAccount {
   final AccountCredentialsFile _credentials;
@@ -137,6 +138,8 @@ class LoadedAccount {
   set icon(String value) => _settings.value.icon = value;
   Color get color => _settings.value.color;
   set color(Color value) => _settings.value.color = color;
+  Screen get defaultScreen => _settings.value.defaultScreen;
+  set defaultScreen(Screen value) => _settings.value.defaultScreen = value;
 
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;

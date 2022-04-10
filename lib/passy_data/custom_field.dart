@@ -1,14 +1,20 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 
-const _$FieldTypeEnumMap = {
+enum FieldType { text, password, date, number }
+
+const fieldTypeToJson = {
   FieldType.text: 'text',
   FieldType.password: 'password',
   FieldType.date: 'date',
   FieldType.number: 'number',
 };
 
-enum FieldType { text, password, date, number }
+const fieldTypeFromJson = {
+  'text': FieldType.text,
+  'password': FieldType.password,
+  'date': FieldType.date,
+  'number': FieldType.number,
+};
 
 class CustomField implements JsonConvertable {
   FieldType fieldType;
@@ -18,15 +24,14 @@ class CustomField implements JsonConvertable {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'fieldType': _$FieldTypeEnumMap[fieldType],
+        'fieldType': fieldTypeToJson[fieldType],
         'title': title,
         'value': value,
         'private': private,
       };
 
   factory CustomField.fromJson(Map<String, dynamic> json) => CustomField(
-        fieldType: $enumDecodeNullable(_$FieldTypeEnumMap, json['fieldType']) ??
-            FieldType.password,
+        fieldType: fieldTypeFromJson[json['fieldType']] ?? FieldType.password,
         title: json['title'] as String? ?? 'Custom Field',
         value: json['value'] as String? ?? '',
         private: json['private'] as bool? ?? false,

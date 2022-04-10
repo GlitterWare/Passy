@@ -1,12 +1,15 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 
 enum EntryStatus { alive, removed }
 
-const _$EntryStatusEnumMap = {
+const entryStatusToJson = {
   EntryStatus.alive: 'alive',
   EntryStatus.removed: 'removed',
+};
+
+const entryStatusFromJson = {
+  'alive': EntryStatus.alive,
+  'removed': EntryStatus.removed,
 };
 
 class EntryEvent implements JsonConvertable {
@@ -19,13 +22,12 @@ class EntryEvent implements JsonConvertable {
   });
 
   factory EntryEvent.fromJson(Map<String, dynamic> json) => EntryEvent(
-      status: $enumDecodeNullable(_$EntryStatusEnumMap, json['status']) ??
-          EntryStatus.alive,
+      status: entryStatusFromJson[json['status']] ?? EntryStatus.alive,
       lastModified: DateTime.parse(json['lastModified']));
 
   @override
   Map<String, dynamic> toJson() => {
-        'status': _$EntryStatusEnumMap[status],
+        'status': entryStatusToJson[status],
         'lastModified': lastModified.toIso8601String(),
       };
 }

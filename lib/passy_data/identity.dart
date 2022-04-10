@@ -29,21 +29,35 @@ class IdentitiesFile extends EncryptedJsonFile<Identities> {
   }
 }
 
-const _$TitleEnumMap = {
+enum Title { mr, mrs, miss, other }
+
+const titleToJson = {
   Title.mr: 'mr',
   Title.mrs: 'mrs',
   Title.miss: 'miss',
   Title.other: 'other',
 };
 
-const _$GenderEnumMap = {
+const titleFromJson = {
+  'mr': Title.mr,
+  'mrs': Title.mrs,
+  'miss': Title.miss,
+  'other': Title.other,
+};
+
+enum Gender { male, female, other }
+
+const genderToJson = {
   Gender.male: 'male',
   Gender.female: 'female',
   Gender.other: 'other',
 };
 
-enum Title { mr, mrs, miss, other }
-enum Gender { male, female, other }
+const genderFromJson = {
+  'male': Gender.male,
+  'female': Gender.female,
+  'other': Gender.other,
+};
 
 class Identity extends DatedEntry<Identity> {
   String nickname;
@@ -67,19 +81,19 @@ class Identity extends DatedEntry<Identity> {
   int compareTo(Identity other) => nickname.compareTo(other.nickname);
 
   factory Identity.fromJson(Map<String, dynamic> json) => Identity._(
-        nickname: json['nickname'] as String,
-        title: $enumDecode(_$TitleEnumMap, json['title']),
-        firstName: json['firstName'] as String,
-        middleName: json['middleName'] as String,
-        lastName: json['lastName'] as String,
-        gender: $enumDecode(_$GenderEnumMap, json['gender']),
-        email: json['email'] as String,
-        number: json['number'] as String,
-        firstAddressLine: json['firstAddressLine'] as String,
-        secondAddressLine: json['secondAddressLine'] as String,
-        zipCode: json['zipCode'] as String,
-        city: json['city'] as String,
-        country: json['country'] as String,
+        nickname: json['nickname'] ?? '',
+        title: titleFromJson[json['title']] ?? Title.mr,
+        firstName: json['firstName'] ?? '',
+        middleName: json['middleName'] ?? '',
+        lastName: json['lastName'] ?? '',
+        gender: genderFromJson[json['gender']] ?? Gender.male,
+        email: json['email'] ?? '',
+        number: json['number'] ?? '',
+        firstAddressLine: json['firstAddressLine'] ?? '',
+        secondAddressLine: json['secondAddressLine'] ?? '',
+        zipCode: json['zipCode'] ?? '',
+        city: json['city'] ?? '',
+        country: json['country'] ?? '',
         customFields: (json['customFields'] as List<dynamic>?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
@@ -96,11 +110,11 @@ class Identity extends DatedEntry<Identity> {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'nickname': nickname,
-        'title': _$TitleEnumMap[title],
+        'title': titleToJson[title],
         'firstName': firstName,
         'middleName': middleName,
         'lastName': lastName,
-        'gender': _$GenderEnumMap[gender],
+        'gender': genderToJson[gender],
         'email': email,
         'number': number,
         'firstAddressLine': firstAddressLine,

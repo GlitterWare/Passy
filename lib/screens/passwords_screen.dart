@@ -14,7 +14,7 @@ import 'password_screen.dart';
 class PasswordsScreen extends StatefulWidget {
   const PasswordsScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/passwordsScreen';
+  static const routeName = '/main/passwords';
 
   @override
   State<StatefulWidget> createState() => _PasswordsScreen();
