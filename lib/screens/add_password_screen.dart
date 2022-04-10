@@ -35,7 +35,7 @@ class _AddPasswordScreen extends State<AddPasswordScreen> {
               context, PasswordsScreen.routeName));
         },
       ),
-      body: Column(children: [
+      body: ListView(children: [
         TextField(
           decoration: const InputDecoration(labelText: 'Nickname'),
           onChanged: (value) => _password.nickname = value,
