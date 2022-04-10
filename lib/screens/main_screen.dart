@@ -86,9 +86,14 @@ class _MainScreen extends State<MainScreen>
                                       ScaffoldMessenger.of(context)
                                           .clearSnackBars();
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content:
-                                                  Text('Connection failed')));
+                                          .showSnackBar(SnackBar(
+                                        content: Row(children: const [
+                                          Icon(Icons.sync_rounded,
+                                              color: Colors.white),
+                                          SizedBox(width: 20),
+                                          Text('Connection failed'),
+                                        ]),
+                                      ));
                                     }
                                   })
                               : () => Navigator.pushReplacementNamed(

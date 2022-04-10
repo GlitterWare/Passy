@@ -158,11 +158,11 @@ class LoadedAccount {
     _passwords.value.setEntry(password);
   }
 
-  void removePassword(Password password) {
-    EntryEvent _event = _history.value.passwords[password.creationDate]!;
-    _event.status = EntryStatus.deleted;
-    _event.lastModified = DateTime.now().toUtc();
-    _passwords.value.remove(password);
+  void removePassword(String key) {
+    _history.value.passwords[key]!
+      ..status = EntryStatus.deleted
+      ..lastModified = DateTime.now().toUtc();
+    _passwords.value.remove(key);
   }
 
   // Password Icons wrappers
@@ -189,11 +189,11 @@ class LoadedAccount {
     _notes.value.setEntry(note);
   }
 
-  void removeNote(Note note) {
-    EntryEvent _event = _history.value.notes[note.creationDate]!;
-    _event.status = EntryStatus.deleted;
-    _event.lastModified = DateTime.now().toUtc();
-    _notes.value.remove(note);
+  void removeNote(String key) {
+    _history.value.notes[key]!
+      ..status = EntryStatus.deleted
+      ..lastModified = DateTime.now().toUtc();
+    _notes.value.remove(key);
   }
 
   // Payment Cards wrappers
@@ -212,11 +212,11 @@ class LoadedAccount {
     _paymentCards.value.setEntry(paymentCard);
   }
 
-  void removePaymentCard(PaymentCard paymentCard) {
-    EntryEvent _event = _history.value.paymentCards[paymentCard.creationDate]!;
-    _event.status = EntryStatus.deleted;
-    _event.lastModified = DateTime.now().toUtc();
-    _paymentCards.value.remove(paymentCard);
+  void removePaymentCard(String key) {
+    _history.value.paymentCards[key]!
+      ..status = EntryStatus.deleted
+      ..lastModified = DateTime.now().toUtc();
+    _paymentCards.value.remove(key);
   }
 
   // ID Cards wrappers
@@ -235,11 +235,11 @@ class LoadedAccount {
     _idCards.value.setEntry(idCard);
   }
 
-  void removeIDCard(IDCard idCard) {
-    EntryEvent _event = _history.value.idCards[idCard.creationDate]!;
-    _event.status = EntryStatus.deleted;
-    _event.lastModified = DateTime.now().toUtc();
-    _idCards.value.remove(idCard);
+  void removeIDCard(String key) {
+    _history.value.idCards[key]!
+      ..status = EntryStatus.deleted
+      ..lastModified = DateTime.now().toUtc();
+    _idCards.value.remove(key);
   }
 
   // Identities wrappers
@@ -258,10 +258,10 @@ class LoadedAccount {
     _identities.value.setEntry(identity);
   }
 
-  void removeIdentity(Identity identity) {
-    EntryEvent _event = _history.value.identities[identity.creationDate]!;
-    _event.status = EntryStatus.deleted;
-    _event.lastModified = DateTime.now().toUtc();
-    _identities.value.remove(identity);
+  void removeIdentity(String key) {
+    _history.value.identities[key]!
+      ..status = EntryStatus.deleted
+      ..lastModified = DateTime.now().toUtc();
+    _identities.value.remove(key);
   }
 }

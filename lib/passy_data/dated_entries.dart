@@ -31,9 +31,10 @@ class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
     sort();
   }
 
-  void remove(T entry) {
-    _entries.remove(entry.creationDate);
-    _entryList.remove(entry);
+  void remove(String key) {
+    DatedEntry<T> _entry = _entries[key]!;
+    _entries.remove(key);
+    _entryList.remove(_entry);
   }
 
   @override

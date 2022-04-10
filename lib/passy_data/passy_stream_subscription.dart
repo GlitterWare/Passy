@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-/// A stream subscription delimited by 0 byte
-/// characters. When a 0 byte character is detected,
-/// the handler supplied through [onData] is fired
+/// A stream subscription delimited by 0 bytes.
+/// When a 0 byte character is detected, the handler supplied through [onData] is fired
 /// for the received byte sequence.
 class PassyStreamSubscription extends StreamSubscription<List<int>> {
   final StreamSubscription<Uint8List> _subscription;
