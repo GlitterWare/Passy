@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 
-class AddIdCardScreen extends StatefulWidget {
-  const AddIdCardScreen({Key? key}) : super(key: key);
+class EditIdCardScreen extends StatefulWidget {
+  const EditIdCardScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/addIdCard';
+  static const routeName = '/main/idCards/editIdCard';
 
   @override
-  State<StatefulWidget> createState() => _AddIdCardScreen();
+  State<StatefulWidget> createState() => _EditIdCardScreen();
 }
 
-class _AddIdCardScreen extends State<AddIdCardScreen> {
+class _EditIdCardScreen extends State<EditIdCardScreen> {
   late Widget _backButton;
 
   @override

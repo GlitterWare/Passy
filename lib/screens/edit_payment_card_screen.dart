@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 
-class AddPaymentCardScreen extends StatefulWidget {
-  const AddPaymentCardScreen({Key? key}) : super(key: key);
+class EditPaymentCardScreen extends StatefulWidget {
+  const EditPaymentCardScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/addPaymentCard';
+  static const routeName = '/main/paymentCards/editPaymentCard';
 
   @override
-  State<StatefulWidget> createState() => _AddPaymentCardScreen();
+  State<StatefulWidget> createState() => _EditPaymentCardScreen();
 }
 
-class _AddPaymentCardScreen extends State<AddPaymentCardScreen> {
+class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
   late Widget _backButton;
 
   @override

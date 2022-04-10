@@ -5,16 +5,16 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/passwords_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
-class AddPasswordScreen extends StatefulWidget {
-  const AddPasswordScreen({Key? key}) : super(key: key);
+class EditPasswordScreen extends StatefulWidget {
+  const EditPasswordScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/addPassword';
+  static const routeName = '${PasswordsScreen.routeName}/editPassword';
 
   @override
-  State<StatefulWidget> createState() => _AddPasswordScreen();
+  State<StatefulWidget> createState() => _EditPasswordScreen();
 }
 
-class _AddPasswordScreen extends State<AddPasswordScreen> {
+class _EditPasswordScreen extends State<EditPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     Object? _args = ModalRoute.of(context)!.settings.arguments;

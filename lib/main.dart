@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passy/screens/add_id_card_screen.dart';
-import 'package:passy/screens/add_identity_screen.dart';
-import 'package:passy/screens/add_password_screen.dart';
-import 'package:passy/screens/add_payment_card_screen.dart';
+import 'package:passy/screens/edit_id_card_screen.dart';
+import 'package:passy/screens/edit_identity_screen.dart';
+import 'package:passy/screens/edit_password_screen.dart';
+import 'package:passy/screens/edit_payment_card_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
@@ -32,12 +32,12 @@ class Passy extends StatelessWidget {
       theme: theme,
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
-        AddIdCardScreen.routeName: (context) => const AddIdCardScreen(),
-        AddIdentityScreen.routeName: (context) => const AddIdentityScreen(),
-        AddPasswordScreen.routeName: (context) => const AddPasswordScreen(),
-        AddPaymentCardScreen.routeName: (context) =>
-            const AddPaymentCardScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
+        EditIdCardScreen.routeName: (context) => const EditIdCardScreen(),
+        EditIdentityScreen.routeName: (context) => const EditIdentityScreen(),
+        EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
+        EditPaymentCardScreen.routeName: (context) =>
+            const EditPaymentCardScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),

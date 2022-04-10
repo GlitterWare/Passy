@@ -9,7 +9,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/widgets/entry_button.dart';
 
-import 'add_password_screen.dart';
+import 'edit_password_screen.dart';
 import 'password_screen.dart';
 
 class PasswordsScreen extends StatefulWidget {
@@ -85,7 +85,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           ),
           IconButton(
             onPressed: () =>
-                Navigator.pushNamed(context, AddPasswordScreen.routeName),
+                Navigator.pushNamed(context, EditPasswordScreen.routeName),
             icon: const Icon(Icons.add_rounded),
             splashRadius: 20,
           ),
