@@ -49,7 +49,8 @@ class PassyImages extends PassyEntries<PassyBytes> {
                           .readAsStringSync(),
                       encrypter: encrypter))))),
           indexes: _imageIndexes,
-          freeIndexes: (_json['freeIndexes'] as List<dynamic>).cast<String>(),
+          freeIndexes:
+              (_json['freeIndexes'] as List<dynamic>?)?.cast<String>() ?? [],
           file: _file);
     }
     _file.createSync(recursive: true);
