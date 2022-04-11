@@ -239,84 +239,29 @@ class Synchronization {
       try {
         _entryData = _EntryData.fromJson(
             jsonDecode(decrypt(utf8.decode(entry), encrypter: _encrypter)));
-        Map<String, EntryEvent> _events = _history.getEvents(_entryData.type);
-
-        if (_entryData.event.status == EntryStatus.deleted) {
-          switch (_entryData.type) {
-            case EntryType.password:
-              if (_history.passwords.containsKey(_entryData.key)) {
-                if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
-              }
-              _history.passwords[_entryData.key] = _entryData.event;
-              break;
-            case EntryType.passwordIcon:
-              if (_history.passwordIcons.containsKey(_entryData.key)) {
-                if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
-              }
-              _history.passwordIcons[_entryData.key] = _entryData.event;
-              break;
-            case EntryType.paymentCard:
-              if (_history.paymentCards.containsKey(_entryData.key)) {
-                if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
-              }
-              _history.paymentCards[_entryData.key] = _entryData.event;
-              break;
-            case EntryType.note:
-              if (_history.notes.containsKey(_entryData.key)) {
-                if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
-              }
-              _history.notes[_entryData.key] = _entryData.event;
-              break;
-            case EntryType.idCard:
-              if (_history.idCards.containsKey(_entryData.key)) {
-                if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
-              }
-              _history.idCards[_entryData.key] = _entryData.event;
-              break;
-            case EntryType.identity:
-              if (_history.identities.containsKey(_entryData.key)) {
-                if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
-              }
-              _history.identities[_entryData.key] = _entryData.event;
-              break;
-          }
-          continue;
-        }
-        switch (_entryData.type) {
-          case EntryType.password:
-            _passwords.setEntry(Password.fromJson(_entryData.value));
-            _history.passwords[_entryData.key] = _entryData.event;
-            break;
-          case EntryType.passwordIcon:
-            _passwordIcons.setEntry(PassyBytes.fromJson(_entryData.value));
-            _history.passwordIcons[_entryData.key] = _entryData.event;
-            break;
-          case EntryType.paymentCard:
-            _paymentCards.setEntry(PaymentCard.fromJson(_entryData.value));
-            _history.paymentCards[_entryData.key] = _entryData.event;
-            break;
-          case EntryType.note:
-            _notes.setEntry(Note.fromJson(_entryData.value));
-            _history.notes[_entryData.key] = _entryData.event;
-            break;
-          case EntryType.idCard:
-            _idCards.setEntry(IDCard.fromJson(_entryData.value));
-            _history.idCards[_entryData.key] = _entryData.event;
-            break;
-          case EntryType.identity:
-            _identities.setEntry(Identity.fromJson(_entryData.value));
-            _history.identities[_entryData.key] = _entryData.event;
-            break;
-        }
       } catch (e) {
         _handleException('Could not decode an entry.\n${e.toString()}');
         return;
+      }
+
+      try {
+        Map<String, EntryEvent> _events = _history.getEvents(_entryData.type);
+
+        if (_entryData.event.status == EntryStatus.deleted) {
+          if (_events.containsKey(_entryData.key)) {
+            if (_events[_entryData.key]!.status == EntryStatus.alive) {
+              _loadedAccount.removeEntry(_entryData.type, _entryData.key);
+            }
+          }
+          _events[_entryData.key] = _entryData.event;
+          continue;
+        }
+
+        _loadedAccount.setEntry(
+            _entryData.type, Password.fromJson(_entryData.value));
+        _events[_entryData.key] = _entryData.event;
+      } catch (e) {
+        _handleException('Could not save an entry\n${e.toString()}');
       }
     }
     return _loadedAccount.save();
@@ -341,19 +286,18 @@ class Synchronization {
       return _completer.future;
     }
     subscription.onData((data) {
-      void _handleEntries() {
+      void _handleEntries(List<int> data) {
         _entries.add(data);
         entryCount--;
-        if (entryCount == 0) {
-          _completer.complete(_entries);
-        }
+        if (entryCount == 0) _completer.complete(_entries);
       }
 
       if (onFirstReceive != null) {
         onFirstReceive!();
         onFirstReceive = null;
+        subscription.onData(_handleEntries);
       }
-      _handleEntries();
+      _handleEntries(data);
     });
     return _completer.future;
   }
@@ -428,6 +372,9 @@ class Synchronization {
               }
 
               /// Create Info
+              /// Iterate through local and remote events.
+              /// - If an event does not exist or is older on either end, add it
+              /// to an appropriate request.
               {
                 _info = _EntryInfo();
                 _remoteRequest = _Request();
@@ -445,66 +392,71 @@ class Synchronization {
                   List<String> _remoteRequestKeys =
                       _remoteRequest.getKeys(entryType);
 
-                  _remoteEvents.forEach((key, event) {
-                    DateTime _localLastModified;
-                    EntryEvent _localEvent;
+                  Map<String, EntryEvent>.from(_localEvents)
+                    ..addAll(_remoteEvents)
+                    ..forEach((key, event) {
+                      DateTime _localLastModified;
+                      EntryEvent _localEvent;
 
-                    if (!_localEvents.containsKey(key)) {
-                      _localRequestKeys.add(key);
-                      return;
-                    }
-                    _localEvent = _localEvents[key]!;
-                    _localLastModified = _localEvent.lastModified;
-                    if (_localLastModified.isBefore(event.lastModified)) {
-                      _localRequestKeys.add(key);
-                      return;
-                    }
-                    if (_localLastModified.isAfter(event.lastModified)) {
-                      _shortLocalEvents[key] = _localEvent;
-                      _remoteRequestKeys.add(key);
-                    }
-                  });
+                      if (!_localEvents.containsKey(key)) {
+                        _localRequestKeys.add(key);
+                        return;
+                      }
+                      if (!_remoteEvents.containsKey(key)) {
+                        _shortLocalEvents[key] = event;
+                        _remoteRequestKeys.add(key);
+                        return;
+                      }
 
-                  _localEvents.forEach((key, event) {
-                    if (_remoteEvents.containsKey(key)) {
-                      return;
-                    }
-                    _shortLocalEvents[key] = event;
-                    _remoteRequestKeys.add(key);
-                  });
+                      _localEvent = _localEvents[key]!;
+                      _localLastModified = _localEvent.lastModified;
+
+                      if (_localLastModified.isBefore(event.lastModified)) {
+                        _localRequestKeys.add(key);
+                        return;
+                      }
+                      if (_localLastModified.isAfter(event.lastModified)) {
+                        _shortLocalEvents[key] = _localEvent;
+                        _remoteRequestKeys.add(key);
+                      }
+                    });
                 }
               }
 
+              /// Exchange data
+              /// 1. Handle entries, if entry count is not 0, then decrypt them
+              /// when completed.
+              /// 2. When all entries are handled, wait for entries to be sent,
+              /// then close sockets.
+              /// 3. Wait for decryption to complete, then pop back to main
+              /// screen.
+              /// 4. Send info.
               {
-                Completer<void> _onFirstReceive = Completer();
-                Future<void> _decryptEntriesFuture = Future.value();
                 Future<void> _sendEntriesFuture = Future.value();
-                Future<void> _handleEntriesFuture = _handleEntries(_sub,
-                    entryCount: _info.request.length, onFirstReceive: () {
-                  _onFirstReceive.complete();
+                Future<List<List<int>>> _handleEntriesFuture =
+                    _handleEntries(_sub, entryCount: _info.request.length,
+                        onFirstReceive: () {
                   _sendEntriesFuture = _sendEntries(_remoteRequest);
-                }).then((value) {
-                  _decryptEntriesFuture = _decryptEntries(value);
                 });
-                _sendInfo(_info);
-                _syncLog += 'done.\nExchanging data... ';
+                Future<void> _decryptEntriesFuture = Future.value();
+                if (_info.request.length != 0) {
+                  _handleEntriesFuture.then((value) {
+                    _decryptEntriesFuture = _decryptEntries(value);
+                  });
+                }
                 _handleEntriesFuture.whenComplete(() async {
-                  await _onFirstReceive.future;
-                  try {
-                    await _sendEntriesFuture;
-                  } catch (e) {
-                    _handleException(
-                        'Could not send an entry.\n${e.toString()}');
-                    return;
-                  }
+                  await _sendEntriesFuture;
                   if (_socket == null) return;
                   _socket!.destroy();
                   _socket = null;
                   server.close();
                   _server = null;
                   await _decryptEntriesFuture;
+                  _syncLog += 'done.';
                   Navigator.pop(_context);
                 });
+                _sendInfo(_info);
+                _syncLog += 'done.\nExchanging data... ';
               }
             }
 
@@ -579,11 +531,7 @@ class Synchronization {
 
       Future<void> _handleInfo(List<int> data) async {
         _syncLog += 'done.\nReceiving info... ';
-        int _requestLength;
         _EntryInfo _info;
-        Future<void> _decryptEntriesFuture;
-        Future<void> _handleEntriesFuture;
-        Future<void> _sendEntriesFuture;
 
         try {
           _info = _EntryInfo.fromJson(
@@ -593,35 +541,43 @@ class Synchronization {
           return;
         }
 
-        //TODO: go through info history and check alive/removed entries
-
-        _requestLength = _info.history.length;
-        _decryptEntriesFuture = Future.value();
-        _handleEntriesFuture = _handleEntries(
-          _sub,
-          entryCount: _requestLength,
-        ).then((value) {
-          _decryptEntriesFuture = _decryptEntries(value);
-        });
-        _syncLog += 'done.\nExchanging data... ';
-        if (_info.request.length == 0) {
-          socket.add(utf8.encode('ready\u0000'));
-          await socket.flush();
-        }
-        _sendEntriesFuture = _sendEntries(_info.request);
-        _handleEntriesFuture.whenComplete(() async {
-          try {
+        /// Exchange data
+        /// 1. Handle entries, if entry count is not 0, then decrypt them
+        /// when completed.
+        /// 2. When all entries are handled, wait for entries to be sent,
+        /// then close sockets.
+        /// 3. Wait for decryption to complete, then pop back to main
+        /// screen.
+        /// 4. If request length is 0, send ready, otherwise send entries.
+        {
+          int _requestLength = _info.history.length;
+          Future<List<List<int>>> _handleEntriesFuture = _handleEntries(
+            _sub,
+            entryCount: _requestLength,
+          );
+          Future<void> _decryptEntriesFuture = Future.value();
+          Future<void> _sendEntriesFuture = Future.value();
+          if (_requestLength != 0) {
+            _handleEntriesFuture.then((value) {
+              _decryptEntriesFuture = _decryptEntries(value);
+            });
+          }
+          _handleEntriesFuture.whenComplete(() async {
             await _sendEntriesFuture;
-          } catch (e) {
-            _handleException('Could not send an entry.\n${e.toString()}');
+            _socket!.destroy();
+            _socket = null;
+            await _decryptEntriesFuture;
+            _syncLog += 'done.';
+            Navigator.pop(_context);
+          });
+          _syncLog += 'done.\nExchanging data... ';
+          if (_info.request.length == 0) {
+            socket.add(utf8.encode('ready\u0000'));
+            await socket.flush();
             return;
           }
-          _syncLog += 'done.';
-          _socket!.destroy();
-          _socket = null;
-          await _decryptEntriesFuture;
-          Navigator.pop(_context);
-        });
+          _sendEntriesFuture = _sendEntries(_info.request);
+        }
       }
 
       Future<void> _sendHistory(String historyJson) {
