@@ -3,46 +3,81 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/error_entry.dart';
+import 'package:passy/passy_data/payment_card.dart';
 
 import 'dated_entry.dart';
 import 'id_card.dart';
 import 'identity.dart';
 import 'note.dart';
 import 'password.dart';
-import 'payment_card.dart';
 
 const String passyVersion = '0.0.0';
 
 final Random random = Random.secure();
 
-const Map<Type, DatedEntry Function(Map<String, dynamic> json)>
-    fromJsonMethods = {
-  Password: Password.fromJson,
-  Note: Note.fromJson,
-  PaymentCard: PaymentCard.fromJson,
-  IDCard: IDCard.fromJson,
-  Identity: Identity.fromJson,
-};
+enum EntryType {
+  password,
+  passwordIcon,
+  paymentCard,
+  note,
+  idCard,
+  identity,
+  error
+}
 
-enum EntryType { password, passwordIcon, paymentCard, note, idCard, identity }
+EntryType entryTypeFromName(String name) {
+  switch (name) {
+    case 'password':
+      return EntryType.password;
+    case 'passwordIcon':
+      return EntryType.passwordIcon;
+    case 'paymentCard':
+      return EntryType.paymentCard;
+    case 'note':
+      return EntryType.note;
+    case 'idCard':
+      return EntryType.idCard;
+    case 'identity':
+      return EntryType.identity;
+    default:
+      return EntryType.error;
+  }
+}
 
-const entryTypeToJson = {
-  EntryType.password: 'password',
-  EntryType.passwordIcon: 'passwordIcon',
-  EntryType.paymentCard: 'paymentCard',
-  EntryType.note: 'note',
-  EntryType.idCard: 'idCard',
-  EntryType.identity: 'identity',
-};
+EntryType entryTypeFromType(Type type) {
+  switch (type) {
+    case Password:
+      return EntryType.password;
+    case PaymentCard:
+      return EntryType.paymentCard;
+    case Note:
+      return EntryType.note;
+    case IDCard:
+      return EntryType.idCard;
+    case Identity:
+      return EntryType.identity;
+    default:
+      return EntryType.error;
+  }
+}
 
-const entryTypeFromJson = {
-  'password': EntryType.password,
-  'passwordIcon': EntryType.passwordIcon,
-  'paymentCard': EntryType.paymentCard,
-  'note': EntryType.note,
-  'idCard': EntryType.idCard,
-  'identity': EntryType.identity,
-};
+DatedEntry fromJson(EntryType entryType, Map<String, dynamic> json) {
+  switch (entryType) {
+    case EntryType.password:
+      return Password.fromJson(json);
+    case EntryType.paymentCard:
+      return PaymentCard.fromJson(json);
+    case EntryType.note:
+      return Note.fromJson(json);
+    case EntryType.idCard:
+      return IDCard.fromJson(json);
+    case EntryType.identity:
+      return Identity.fromJson(json);
+    default:
+      return ErrorEntry();
+  }
+}
 
 Encrypter getEncrypter(String password) {
   if (password.length > 32) {

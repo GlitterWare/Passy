@@ -1,16 +1,17 @@
 import 'package:passy/passy_data/json_convertable.dart';
 
-enum EntryStatus { alive, deleted }
+enum EntryStatus { alive, deleted, error }
 
-const entryStatusToJson = {
-  EntryStatus.alive: 'alive',
-  EntryStatus.deleted: 'deleted',
-};
-
-const entryStatusFromJson = {
-  'alive': EntryStatus.alive,
-  'deleted': EntryStatus.deleted,
-};
+EntryStatus entryStatusFromText(String name) {
+  switch (name) {
+    case 'alive':
+      return EntryStatus.alive;
+    case 'deleted':
+      return EntryStatus.deleted;
+    default:
+      return EntryStatus.error;
+  }
+}
 
 class EntryEvent implements JsonConvertable {
   EntryStatus status;
@@ -22,12 +23,12 @@ class EntryEvent implements JsonConvertable {
   });
 
   factory EntryEvent.fromJson(Map<String, dynamic> json) => EntryEvent(
-      status: entryStatusFromJson[json['status']] ?? EntryStatus.alive,
+      status: entryStatusFromText(json['status'] ?? 'deleted'),
       lastModified: DateTime.parse(json['lastModified']));
 
   @override
   Map<String, dynamic> toJson() => {
-        'status': entryStatusToJson[status],
+        'status': status.name,
         'lastModified': lastModified.toIso8601String(),
       };
 }

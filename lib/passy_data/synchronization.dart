@@ -274,42 +274,42 @@ class Synchronization {
             case 'passwords':
               if (_history.passwords.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.remove(_entryData.key);
+                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.passwords[_entryData.key] = _entryData.event;
               break;
             case 'passwordIcons':
               if (_history.passwordIcons.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.remove(_entryData.key);
+                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.passwordIcons[_entryData.key] = _entryData.event;
               break;
             case 'paymentCards':
               if (_history.paymentCards.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.remove(_entryData.key);
+                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.paymentCards[_entryData.key] = _entryData.event;
               break;
             case 'notes':
               if (_history.notes.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.remove(_entryData.key);
+                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.notes[_entryData.key] = _entryData.event;
               break;
             case 'idCards':
               if (_history.idCards.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.remove(_entryData.key);
+                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.idCards[_entryData.key] = _entryData.event;
               break;
             case 'identities':
               if (_history.identities.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
-                    EntryStatus.alive) _passwords.remove(_entryData.key);
+                    EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.identities[_entryData.key] = _entryData.event;
               break;

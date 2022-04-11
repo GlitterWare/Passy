@@ -144,17 +144,11 @@ class LoadedAccount {
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
 
-  void addPassword(Password password) {
-    _history.value.passwords[password.creationDate] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _passwords.value.addEntry(password);
-  }
-
   Password? getPassword(String key) => _passwords.value.getEntry(key);
 
   void setPassword(Password password) {
-    _history.value.passwords[password.creationDate]!.lastModified =
-        DateTime.now();
+    _history.value.passwords[password.creationDate] = EntryEvent(
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwords.value.setEntry(password);
   }
 
@@ -162,7 +156,7 @@ class LoadedAccount {
     _history.value.passwords[key]!
       ..status = EntryStatus.deleted
       ..lastModified = DateTime.now().toUtc();
-    _passwords.value.remove(key);
+    _passwords.value.removeEntry(key);
   }
 
   // Password Icons wrappers
@@ -176,16 +170,12 @@ class LoadedAccount {
 
   // Notes wrappers
   Iterable<Note> get notes => _notes.value.entries;
-  void addNote(Note note) {
-    _history.value.notes[note.creationDate] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _notes.value.addEntry(note);
-  }
 
   Note? getNote(String key) => _notes.value.getEntry(key);
 
   void setNote(Note note) {
-    _history.value.notes[note.creationDate]!.lastModified = DateTime.now();
+    _history.value.notes[note.creationDate] = EntryEvent(
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _notes.value.setEntry(note);
   }
 
@@ -193,22 +183,17 @@ class LoadedAccount {
     _history.value.notes[key]!
       ..status = EntryStatus.deleted
       ..lastModified = DateTime.now().toUtc();
-    _notes.value.remove(key);
+    _notes.value.removeEntry(key);
   }
 
   // Payment Cards wrappers
   Iterable<PaymentCard> get paymentCards => _paymentCards.value.entries;
-  void addPaymentCard(PaymentCard paymentCard) {
-    _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _paymentCards.value.addEntry(paymentCard);
-  }
 
   PaymentCard? getPaymentCard(String key) => _paymentCards.value.getEntry(key);
 
   void setPaymentCard(PaymentCard paymentCard) {
-    _history.value.paymentCards[paymentCard.creationDate]!.lastModified =
-        DateTime.now();
+    _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _paymentCards.value.setEntry(paymentCard);
   }
 
@@ -216,22 +201,17 @@ class LoadedAccount {
     _history.value.paymentCards[key]!
       ..status = EntryStatus.deleted
       ..lastModified = DateTime.now().toUtc();
-    _paymentCards.value.remove(key);
+    _paymentCards.value.removeEntry(key);
   }
 
   // ID Cards wrappers
   Iterable<IDCard> get idCards => _idCards.value.entries;
-  void addIDCard(IDCard idCard) {
-    EntryEvent _event = _history.value.passwords[idCard.creationDate]!;
-    _event.status = EntryStatus.deleted;
-    _event.lastModified = DateTime.now().toUtc();
-    _idCards.value.addEntry(idCard);
-  }
 
   IDCard? getIDCard(String key) => _idCards.value.getEntry(key);
 
   void setIDCard(IDCard idCard) {
-    _history.value.idCards[idCard.creationDate]!.lastModified = DateTime.now();
+    _history.value.idCards[idCard.creationDate] = EntryEvent(
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _idCards.value.setEntry(idCard);
   }
 
@@ -239,22 +219,17 @@ class LoadedAccount {
     _history.value.idCards[key]!
       ..status = EntryStatus.deleted
       ..lastModified = DateTime.now().toUtc();
-    _idCards.value.remove(key);
+    _idCards.value.removeEntry(key);
   }
 
   // Identities wrappers
   Iterable<Identity> get identities => _identities.value.entries;
-  void addIdentity(Identity identity) {
-    _history.value.identities[identity.creationDate] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _identities.value.addEntry(identity);
-  }
 
   Identity? getIdentity(String key) => _identities.value.getEntry(key);
 
   void setIdentity(Identity identity) {
-    _history.value.identities[identity.creationDate]!.lastModified =
-        DateTime.now();
+    _history.value.identities[identity.creationDate] = EntryEvent(
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _identities.value.setEntry(identity);
   }
 
@@ -262,6 +237,6 @@ class LoadedAccount {
     _history.value.identities[key]!
       ..status = EntryStatus.deleted
       ..lastModified = DateTime.now().toUtc();
-    _identities.value.remove(key);
+    _identities.value.removeEntry(key);
   }
 }

@@ -1,20 +1,21 @@
 import 'package:passy/passy_data/json_convertable.dart';
 
-enum FieldType { text, password, date, number }
+enum FieldType { text, password, date, number, error }
 
-const fieldTypeToJson = {
-  FieldType.text: 'text',
-  FieldType.password: 'password',
-  FieldType.date: 'date',
-  FieldType.number: 'number',
-};
-
-const fieldTypeFromJson = {
-  'text': FieldType.text,
-  'password': FieldType.password,
-  'date': FieldType.date,
-  'number': FieldType.number,
-};
+FieldType fieldTypeFromName(String name) {
+  switch (name) {
+    case 'text':
+      return FieldType.text;
+    case 'password':
+      return FieldType.password;
+    case 'date':
+      return FieldType.date;
+    case 'number':
+      return FieldType.number;
+    default:
+      return FieldType.error;
+  }
+}
 
 class CustomField implements JsonConvertable {
   FieldType fieldType;
@@ -24,14 +25,14 @@ class CustomField implements JsonConvertable {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'fieldType': fieldTypeToJson[fieldType],
+        'fieldType': fieldType.name,
         'title': title,
         'value': value,
         'private': private,
       };
 
   factory CustomField.fromJson(Map<String, dynamic> json) => CustomField(
-        fieldType: fieldTypeFromJson[json['fieldType']] ?? FieldType.password,
+        fieldType: fieldTypeFromName(json['fieldType'] ?? 'text'),
         title: json['title'] ?? 'Custom Field',
         value: json['value'] ?? '',
         private: json['private'] ?? false,

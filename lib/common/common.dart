@@ -11,7 +11,7 @@ Widget getBackButton(BuildContext context) => IconButton(
       onPressed: () => Navigator.pop(context),
     );
 
-AppBar getAddScreenAppBar(
+AppBar getSetScreenAppBar(
   BuildContext context, {
   required String title,
   required VoidCallback onSave,

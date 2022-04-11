@@ -94,11 +94,13 @@ class IDCard extends DatedEntry<IDCard> {
     required this.issDate,
     required this.expDate,
     required this.country,
-    this.customFields = const [],
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    this.tags = const [],
+    List<String>? tags,
     required String creationDate,
-  }) : super(creationDate);
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(creationDate);
 
   IDCard({
     required this.nickname,
@@ -109,8 +111,10 @@ class IDCard extends DatedEntry<IDCard> {
     required this.issDate,
     required this.expDate,
     required this.country,
-    this.customFields = const [],
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    this.tags = const [],
-  }) : super(DateTime.now().toUtc().toIso8601String());
+    List<String>? tags,
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(DateTime.now().toUtc().toIso8601String());
 }

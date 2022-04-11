@@ -15,23 +15,17 @@ class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
 
   void sort() => _entryList.sort((a, b) => a.compareTo(b));
 
-  void addEntry(T entry) {
-    _entries[entry.creationDate] = entry;
-    _entryList.add(entry);
-    sort();
-  }
-
   T? getEntry(String key) => _entries[key];
 
   void setEntry(T entry) {
     if (!_entries.containsKey(entry.creationDate)) {
       _entryList.add(entry);
+      sort();
     }
     _entries[entry.creationDate] = entry;
-    sort();
   }
 
-  void remove(String key) {
+  void removeEntry(String key) {
     DatedEntry<T> _entry = _entries[key]!;
     _entries.remove(key);
     _entryList.remove(_entry);
@@ -42,16 +36,16 @@ class DatedEntries<T extends DatedEntry<T>> implements JsonConvertable {
       _entries.map((key, value) => MapEntry(key, value.toJson()));
 
   factory DatedEntries.fromJson(Map<String, dynamic> json) => DatedEntries(
-      entries: json.map((key, value) => MapEntry(
-          key, fromJsonMethods[T]!(value as Map<String, dynamic>) as T)));
+      entries: json.map((key, value) => MapEntry(key,
+          fromJson(entryTypeFromType(T), value as Map<String, dynamic>) as T)));
 
   factory DatedEntries.fromFile(File file, Encrypter encrypter) =>
       DatedEntries.fromJson(
           jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
 
-  DatedEntries({Map<String, T> entries = const {}})
-      : _entries = entries,
-        _entryList = entries.values.toList() {
+  DatedEntries({Map<String, T>? entries})
+      : _entries = entries ?? {},
+        _entryList = entries?.values.toList() ?? [] {
     sort();
   }
 }

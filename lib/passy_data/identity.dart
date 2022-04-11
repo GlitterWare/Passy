@@ -29,35 +29,37 @@ class IdentitiesFile extends EncryptedJsonFile<Identities> {
   }
 }
 
-enum Title { mr, mrs, miss, other }
+enum Title { mr, mrs, miss, other, error }
 
-const titleToJson = {
-  Title.mr: 'mr',
-  Title.mrs: 'mrs',
-  Title.miss: 'miss',
-  Title.other: 'other',
-};
+Title titleFromName(String name) {
+  switch (name) {
+    case 'mr':
+      return Title.mr;
+    case 'mrs':
+      return Title.mrs;
+    case 'miss':
+      return Title.miss;
+    case 'other':
+      return Title.other;
+    default:
+      return Title.error;
+  }
+}
 
-const titleFromJson = {
-  'mr': Title.mr,
-  'mrs': Title.mrs,
-  'miss': Title.miss,
-  'other': Title.other,
-};
+enum Gender { male, female, other, error }
 
-enum Gender { male, female, other }
-
-const genderToJson = {
-  Gender.male: 'male',
-  Gender.female: 'female',
-  Gender.other: 'other',
-};
-
-const genderFromJson = {
-  'male': Gender.male,
-  'female': Gender.female,
-  'other': Gender.other,
-};
+Gender genderFromName(String name) {
+  switch (name) {
+    case 'male':
+      return Gender.male;
+    case 'female':
+      return Gender.female;
+    case 'other':
+      return Gender.other;
+    default:
+      return Gender.error;
+  }
+}
 
 class Identity extends DatedEntry<Identity> {
   String nickname;
@@ -82,11 +84,11 @@ class Identity extends DatedEntry<Identity> {
 
   factory Identity.fromJson(Map<String, dynamic> json) => Identity._(
         nickname: json['nickname'] ?? '',
-        title: titleFromJson[json['title']] ?? Title.mr,
+        title: titleFromName(json['title'] ?? 'mr'),
         firstName: json['firstName'] ?? '',
         middleName: json['middleName'] ?? '',
         lastName: json['lastName'] ?? '',
-        gender: genderFromJson[json['gender']] ?? Gender.male,
+        gender: genderFromName(json['gender'] ?? 'male'),
         email: json['email'] ?? '',
         number: json['number'] ?? '',
         firstAddressLine: json['firstAddressLine'] ?? '',
@@ -110,11 +112,11 @@ class Identity extends DatedEntry<Identity> {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'nickname': nickname,
-        'title': titleToJson[title],
+        'title': title.name,
         'firstName': firstName,
         'middleName': middleName,
         'lastName': lastName,
-        'gender': genderToJson[gender],
+        'gender': gender.name,
         'email': email,
         'number': number,
         'firstAddressLine': firstAddressLine,
@@ -142,11 +144,13 @@ class Identity extends DatedEntry<Identity> {
     required this.zipCode,
     required this.city,
     required this.country,
-    this.customFields = const [],
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    this.tags = const [],
+    List<String>? tags,
     required String creationDate,
-  }) : super(creationDate);
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(creationDate);
 
   Identity({
     required this.nickname,
@@ -162,8 +166,10 @@ class Identity extends DatedEntry<Identity> {
     required this.zipCode,
     required this.city,
     required this.country,
-    this.customFields = const [],
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    this.tags = const [],
-  }) : super(DateTime.now().toUtc().toIso8601String());
+    List<String>? tags,
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(DateTime.now().toUtc().toIso8601String());
 }

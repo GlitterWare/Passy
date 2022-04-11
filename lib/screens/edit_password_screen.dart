@@ -25,12 +25,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
     final Password _password = _isNew ? Password() : _args as Password;
 
     return Scaffold(
-      appBar: getAddScreenAppBar(
+      appBar: getSetScreenAppBar(
         context,
         title: 'Password',
         isNew: _isNew,
         onSave: () {
-          _account.addPassword(_password);
+          _account.setPassword(_password);
           Navigator.popUntil(
               context, (r) => r.settings.name == MainScreen.routeName);
           _account.save().whenComplete(

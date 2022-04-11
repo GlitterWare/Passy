@@ -81,11 +81,13 @@ class PaymentCard extends DatedEntry<PaymentCard> {
     required this.cardholderName,
     required this.cvv,
     required this.exp,
-    this.customFields = const [],
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    this.tags = const [],
+    List<String>? tags,
     required String creationDate,
-  }) : super(creationDate);
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(creationDate);
 
   PaymentCard({
     required this.nickname,
@@ -93,8 +95,10 @@ class PaymentCard extends DatedEntry<PaymentCard> {
     required this.cardholderName,
     required this.cvv,
     required this.exp,
-    this.customFields = const [],
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    this.tags = const [],
-  }) : super(DateTime.now().toUtc().toIso8601String());
+    List<String>? tags,
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(DateTime.now().toUtc().toIso8601String());
 }

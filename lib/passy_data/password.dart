@@ -86,11 +86,13 @@ class Password extends DatedEntry<Password> {
     required this.password,
     required this.tfaSecret,
     required this.website,
-    required this.customFields,
+    List<CustomField>? customFields,
     required this.additionalInfo,
-    required this.tags,
+    List<String>? tags,
     required String creationDate,
-  }) : super(creationDate);
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(creationDate);
 
   Password({
     this.nickname = '',
@@ -100,8 +102,10 @@ class Password extends DatedEntry<Password> {
     this.password = '',
     this.tfaSecret = '',
     this.website = '',
-    this.customFields = const [],
+    List<CustomField>? customFields,
     this.additionalInfo = '',
-    this.tags = const [],
-  }) : super(DateTime.now().toUtc().toIso8601String());
+    List<String>? tags,
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(DateTime.now().toUtc().toIso8601String());
 }
