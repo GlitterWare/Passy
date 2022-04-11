@@ -9,7 +9,7 @@ class PassyBytes extends PassyEntry<PassyBytes> {
   PassyBytes(String key, {required this.value}) : super(key);
 
   PassyBytes.fromJson(Map<String, dynamic> json)
-      : value = base64Decode(json['value']) ?? Uint8List(0),
+      : value = base64Decode(json['value']),
         super(json['key']);
 
   @override
