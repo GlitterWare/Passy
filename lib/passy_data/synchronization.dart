@@ -94,14 +94,24 @@ class _Request implements JsonConvertable {
         idCards = (json['idCards'] as List<dynamic>).cast<String>(),
         identities = (json['identities'] as List<dynamic>).cast<String>();
 
-  Map<EntryType, List<String>> toMap() => {
-        EntryType.password: passwords,
-        EntryType.passwordIcon: passwordIcons,
-        EntryType.note: notes,
-        EntryType.paymentCard: paymentCards,
-        EntryType.idCard: idCards,
-        EntryType.identity: identities,
-      };
+  List<String> getKeys(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return passwords;
+      case EntryType.passwordIcon:
+        return passwordIcons;
+      case EntryType.paymentCard:
+        return paymentCards;
+      case EntryType.note:
+        return notes;
+      case EntryType.idCard:
+        return idCards;
+      case EntryType.identity:
+        return identities;
+      default:
+        return [];
+    }
+  }
 
   @override
   Map<String, dynamic> toJson() => {
@@ -198,20 +208,19 @@ class Synchronization {
 
   List<List<int>> _encodeData(_Request request) {
     List<List<int>> _data = [];
-    Map<EntryType, Map<String, EntryEvent>> _historyMap = _history.toMap();
 
-    request.toMap().forEach((entryType, keys) {
-      for (String key in keys) {
+    for (EntryType entryType in EntryType.values) {
+      for (String key in request.getKeys(entryType)) {
         _data.add(utf8.encode(encrypt(
                 jsonEncode(_EntryData(
                     key: key,
                     type: entryType,
-                    event: _historyMap[entryType]![key]!,
+                    event: _history.getEvents(entryType)[key]!,
                     value: _loadedAccount.getEntry(entryType, key)?.toJson())),
                 encrypter: _encrypter) +
             '\u0000'));
       }
-    });
+    }
 
     return _data;
   }
@@ -230,6 +239,8 @@ class Synchronization {
       try {
         _entryData = _EntryData.fromJson(
             jsonDecode(decrypt(utf8.decode(entry), encrypter: _encrypter)));
+        Map<String, EntryEvent> _events = _history.getEvents(_entryData.type);
+
         if (_entryData.event.status == EntryStatus.deleted) {
           switch (_entryData.type) {
             case EntryType.password:
@@ -420,50 +431,51 @@ class Synchronization {
               {
                 _info = _EntryInfo();
                 _remoteRequest = _Request();
-                Map<EntryType, Map<String, EntryEvent>> _localHistoryMap =
-                    _history.toMap();
-                Map<EntryType, Map<String, EntryEvent>> _remoteHistoryMap =
-                    _remoteHistory.toMap();
-                Map<EntryType, Map<String, EntryEvent>> _localShortHistoryMap =
-                    _info.history.toMap();
-                Map<EntryType, List<String>> _localRequestMap =
-                    _info.request.toMap();
-                Map<EntryType, List<String>> _remoteRequestMap =
-                    _remoteRequest.toMap();
 
                 //TODO: merge local/remote history iteration
-                _remoteHistoryMap.forEach((entryType, value) {
-                  value.forEach((key, event) {
+                for (EntryType entryType in EntryType.values) {
+                  Map<String, EntryEvent> _localEvents =
+                      _history.getEvents(entryType);
+                  Map<String, EntryEvent> _shortLocalEvents =
+                      _info.history.getEvents(entryType);
+                  List<String> _localRequestKeys =
+                      _info.request.getKeys(entryType);
+                  Map<String, EntryEvent> _remoteEvents =
+                      _remoteHistory.getEvents(entryType);
+                  List<String> _remoteRequestKeys =
+                      _remoteRequest.getKeys(entryType);
+
+                  _remoteEvents.forEach((key, event) {
                     DateTime _localLastModified;
                     EntryEvent _localEvent;
-                    if (!_localHistoryMap[entryType]!.containsKey(key)) {
-                      _localRequestMap[entryType]!.add(key);
+
+                    if (!_localEvents.containsKey(key)) {
+                      _localRequestKeys.add(key);
                       return;
                     }
-                    _localEvent = _localHistoryMap[entryType]![key]!;
+                    _localEvent = _localEvents[key]!;
                     _localLastModified = _localEvent.lastModified;
                     if (_localLastModified.isBefore(event.lastModified)) {
-                      _localRequestMap[entryType]!.add(key);
+                      _localRequestKeys.add(key);
                       return;
                     }
                     if (_localLastModified.isAfter(event.lastModified)) {
-                      _localShortHistoryMap[entryType]![key] = _localEvent;
-                      _remoteRequestMap[entryType]!.add(key);
+                      _shortLocalEvents[key] = _localEvent;
+                      _remoteRequestKeys.add(key);
                     }
                   });
-                });
 
-                _localHistoryMap.forEach((entryType, value) {
-                  value.forEach((key, event) {
-                    if (_remoteHistoryMap[entryType]!.containsKey(key)) return;
-                    _localShortHistoryMap[entryType]![key] = event;
-                    _remoteRequestMap[entryType]!.add(key);
+                  _localEvents.forEach((key, event) {
+                    if (_remoteEvents.containsKey(key)) {
+                      return;
+                    }
+                    _shortLocalEvents[key] = event;
+                    _remoteRequestKeys.add(key);
                   });
-                });
+                }
               }
 
               {
-                int _requestLength = _info.request.length;
                 Completer<void> _onFirstReceive = Completer();
                 Future<void> _decryptEntriesFuture = Future.value();
                 Future<void> _sendEntriesFuture = Future.value();
@@ -523,7 +535,7 @@ class Synchronization {
               }
               if (_data != _hello) {
                 _handleException(
-                    'Hello is incorrect. Expected "$_hello", received "$_data".');
+                    'Hello is incorrect. Expected \'$_hello\', received \'$_data\'.');
                 return;
               }
               _sub.onData((data) => _handleHistory(data));

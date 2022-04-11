@@ -99,6 +99,7 @@ class PassyImages extends PassyEntries<PassyBytes> {
     File(_path + Platform.pathSeparator + _indexes[key].toString() + '.enc')
         .deleteSync();
     _indexes.remove(key);
+    saveSync();
   }
 
   Future<void> save() =>

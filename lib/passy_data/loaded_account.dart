@@ -131,6 +131,25 @@ class LoadedAccount {
               context: context)
           .connect(address);
 
+  void setEntry(EntryType type, PassyEntry value) {
+    switch (type) {
+      case EntryType.password:
+        return setPassword(value as Password);
+      case EntryType.passwordIcon:
+        return setPasswordIcon(value as PassyBytes);
+      case EntryType.paymentCard:
+        return setPaymentCard(value as PaymentCard);
+      case EntryType.note:
+        return setNote(value as Note);
+      case EntryType.idCard:
+        return setIDCard(value as IDCard);
+      case EntryType.identity:
+        return setIdentity(value as Identity);
+      default:
+        throw Exception('Unsupported entry type \'${type.name}\'');
+    }
+  }
+
   PassyEntry? getEntry(EntryType type, String key) {
     switch (type) {
       case EntryType.password:
@@ -147,6 +166,25 @@ class LoadedAccount {
         return getIdentity(key);
       default:
         return ErrorEntry();
+    }
+  }
+
+  void removeEntry(EntryType type, String key) {
+    switch (type) {
+      case EntryType.password:
+        return removePassword(key);
+      case EntryType.passwordIcon:
+        return removePasswordIcon(key);
+      case EntryType.paymentCard:
+        return removePaymentCard(key);
+      case EntryType.note:
+        return removeNote(key);
+      case EntryType.idCard:
+        return removeIDCard(key);
+      case EntryType.identity:
+        return removeIdentity(key);
+      default:
+        throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
@@ -188,6 +226,13 @@ class LoadedAccount {
     _history.value.passwordIcons[passwordIcon.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwordIcons.setEntry(passwordIcon);
+  }
+
+  void removePasswordIcon(String key) {
+    _history.value.passwordIcons[key]!
+      ..status = EntryStatus.deleted
+      ..lastModified = DateTime.now().toUtc();
+    _passwordIcons.removeEntry(key);
   }
 
   // Notes wrappers
