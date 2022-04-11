@@ -24,20 +24,19 @@ class AccountCredentials implements JsonConvertable {
 
   String _passwordHash;
 
+  AccountCredentials(this.username, String password)
+      : _passwordHash = getHash(password).toString();
+
+  AccountCredentials.fromJson(Map<String, dynamic> json)
+      : username = json['username'] ?? '',
+        _passwordHash = json['passwordHash'] ?? '';
+
+  factory AccountCredentials.fromFile(File file) =>
+      AccountCredentials.fromJson(jsonDecode(file.readAsStringSync()));
+
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'username': username,
         'passwordHash': _passwordHash,
       };
-
-  factory AccountCredentials.fromJson(Map<String, dynamic> json) =>
-      AccountCredentials._(json['username'], json['passwordHash']);
-
-  factory AccountCredentials.fromFile(File file) =>
-      AccountCredentials.fromJson(jsonDecode(file.readAsStringSync()));
-
-  AccountCredentials._(this.username, this._passwordHash);
-
-  AccountCredentials(this.username, String password)
-      : _passwordHash = getHash(password).toString();
 }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/host_address.dart';
+import 'package:passy/passy_data/passy_bytes.dart';
 import 'package:passy/passy_data/synchronization.dart';
 import 'package:universal_io/io.dart';
 
@@ -25,7 +26,7 @@ class LoadedAccount {
   final AccountSettingsFile _settings;
   final HistoryFile _history;
   final PasswordsFile _passwords;
-  final Images _passwordIcons;
+  final PassyImages _passwordIcons;
   final NotesFile _notes;
   final PaymentCardsFile _paymentCards;
   final IDCardsFile _idCards;
@@ -44,7 +45,7 @@ class LoadedAccount {
             File(path + Platform.pathSeparator + 'history.enc'), encrypter),
         _passwords = PasswordsFile(
             File(path + Platform.pathSeparator + 'passwords.enc'), encrypter),
-        _passwordIcons = Images(
+        _passwordIcons = PassyImages(
             path + Platform.pathSeparator + 'password_icons',
             encrypter: encrypter),
         _notes = NotesFile(
@@ -147,7 +148,7 @@ class LoadedAccount {
   Password? getPassword(String key) => _passwords.value.getEntry(key);
 
   void setPassword(Password password) {
-    _history.value.passwords[password.creationDate] = EntryEvent(
+    _history.value.passwords[password.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwords.value.setEntry(password);
   }
@@ -160,12 +161,12 @@ class LoadedAccount {
   }
 
   // Password Icons wrappers
-  Uint8List? getPasswordIcon(String name) => _passwordIcons.getEntry(name);
+  PassyBytes? getPasswordIcon(String name) => _passwordIcons.getEntry(name);
 
-  void setPasswordIcon(String name, Uint8List image) {
-    _history.value.passwordIcons[name] = EntryEvent(
+  void setPasswordIcon(PassyBytes passwordIcon) {
+    _history.value.passwordIcons[passwordIcon.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _passwordIcons.setImage(name, image);
+    _passwordIcons.setEntry(passwordIcon);
   }
 
   // Notes wrappers
@@ -174,7 +175,7 @@ class LoadedAccount {
   Note? getNote(String key) => _notes.value.getEntry(key);
 
   void setNote(Note note) {
-    _history.value.notes[note.creationDate] = EntryEvent(
+    _history.value.notes[note.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _notes.value.setEntry(note);
   }
@@ -192,7 +193,7 @@ class LoadedAccount {
   PaymentCard? getPaymentCard(String key) => _paymentCards.value.getEntry(key);
 
   void setPaymentCard(PaymentCard paymentCard) {
-    _history.value.paymentCards[paymentCard.creationDate] = EntryEvent(
+    _history.value.paymentCards[paymentCard.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _paymentCards.value.setEntry(paymentCard);
   }
@@ -210,7 +211,7 @@ class LoadedAccount {
   IDCard? getIDCard(String key) => _idCards.value.getEntry(key);
 
   void setIDCard(IDCard idCard) {
-    _history.value.idCards[idCard.creationDate] = EntryEvent(
+    _history.value.idCards[idCard.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _idCards.value.setEntry(idCard);
   }
@@ -228,7 +229,7 @@ class LoadedAccount {
   Identity? getIdentity(String key) => _identities.value.getEntry(key);
 
   void setIdentity(Identity identity) {
-    _history.value.identities[identity.creationDate] = EntryEvent(
+    _history.value.identities[identity.key] = EntryEvent(
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _identities.value.setEntry(identity);
   }

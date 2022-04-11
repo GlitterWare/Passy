@@ -33,7 +33,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
     for (Password password in _account.passwords) {
       Widget _getIcon(String name) {
-        Uint8List? _icon = _account.getPasswordIcon(name);
+        Uint8List? _icon = _account.getPasswordIcon(name)?.value;
         if (_icon == null) {
           return SvgPicture.asset(
             logoCircleSvg,

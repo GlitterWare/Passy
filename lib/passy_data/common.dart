@@ -6,7 +6,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/error_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
 
-import 'dated_entry.dart';
+import 'passy_entry.dart';
 import 'id_card.dart';
 import 'identity.dart';
 import 'note.dart';
@@ -62,7 +62,7 @@ EntryType entryTypeFromType(Type type) {
   }
 }
 
-DatedEntry fromJson(EntryType entryType, Map<String, dynamic> json) {
+PassyEntry fromJson(EntryType entryType, Map<String, dynamic> json) {
   switch (entryType) {
     case EntryType.password:
       return Password.fromJson(json);

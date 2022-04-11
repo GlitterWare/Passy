@@ -1,16 +1,15 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:universal_io/io.dart';
 
 import 'common.dart';
+import 'passy_bytes.dart';
+import 'passy_entries.dart';
 
-class Images {
-  final Map<String, Uint8List> _images;
-
-  final Map<String, String> _imageKeys;
-  final List<String> _freeimageKeys;
+class PassyImages extends PassyEntries<PassyBytes> {
+  final Map<String, String> _indexes;
+  final List<String> _freeIndexes;
 
   final String _path;
   final File _file;
@@ -18,57 +17,20 @@ class Images {
   Encrypter _encrypter;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
 
-  Uint8List? getEntry(String name) => _images[name];
-
-  void _setImage(String name, Uint8List image) {
-    if (!_images.containsKey(name)) {
-      if (_freeimageKeys.isEmpty) {
-        _imageKeys[name] = _images.length.toRadixString(36);
-      } else {
-        _imageKeys[name] = _freeimageKeys.last;
-        _freeimageKeys.removeAt(_freeimageKeys.length - 1);
-      }
-    }
-    _images[name] = image;
-  }
-
-  Future<void> setImage(String name, Uint8List image) async {
-    _setImage(name, image);
-    File _file = File(
-        _path + Platform.pathSeparator + _imageKeys[name].toString() + '.enc');
-    await _file.create();
-    await _file
-        .writeAsString(encrypt(base64Encode(image), encrypter: _encrypter));
-  }
-
-  void setImageSync(String name, Uint8List icon) {
-    _setImage(name, icon);
-    File _file = File(
-        _path + Platform.pathSeparator + _imageKeys[name].toString() + '.enc');
-    _file.createSync();
-    _file.writeAsStringSync(encrypt(base64Encode(icon), encrypter: _encrypter));
-  }
-
-  Future<void> save() =>
-      _file.writeAsString(encrypt(jsonEncode(this), encrypter: _encrypter));
-
-  void saveSync() =>
-      _file.writeAsStringSync(encrypt(jsonEncode(this), encrypter: _encrypter));
-
-  Images._(
+  PassyImages._(
     this._path, {
     required Encrypter encrypter,
-    required Map<String, Uint8List> images,
-    required Map<String, String> imageIndexes,
-    required List<String> freeImageIndexes,
+    required Map<String, PassyBytes> entries,
+    required Map<String, String> indexes,
+    required List<String> freeIndexes,
     required File file,
   })  : _encrypter = encrypter,
-        _images = images,
-        _imageKeys = imageIndexes,
-        _freeimageKeys = freeImageIndexes,
-        _file = file;
+        _indexes = indexes,
+        _freeIndexes = freeIndexes,
+        _file = file,
+        super(entries: entries);
 
-  factory Images(String path, {required Encrypter encrypter}) {
+  factory PassyImages(String path, {required Encrypter encrypter}) {
     File _file = File(path + Platform.pathSeparator + 'images.json');
     if (_file.existsSync()) {
       Map<String, dynamic> _json =
@@ -77,33 +39,70 @@ class Images {
           (_json['imageIndexes'] as Map<String, dynamic>?)?.map((key, value) =>
                   MapEntry(decrypt(key, encrypter: encrypter), value)) ??
               {};
-      return Images._(path,
+      return PassyImages._(path,
           encrypter: encrypter,
-          images: _imageIndexes.map((key, value) => MapEntry(
+          entries: _imageIndexes.map((key, value) => MapEntry(
               key,
-              base64Decode(decrypt(
-                  File(path + Platform.pathSeparator + value.toString())
-                      .readAsStringSync(),
-                  encrypter: encrypter)))),
-          imageIndexes: _imageIndexes,
-          freeImageIndexes:
-              (_json['freeImageIndexes'] as List<dynamic>).cast<String>(),
+              PassyBytes(key,
+                  value: base64Decode(decrypt(
+                      File(path + Platform.pathSeparator + value.toString())
+                          .readAsStringSync(),
+                      encrypter: encrypter))))),
+          indexes: _imageIndexes,
+          freeIndexes: (_json['freeIndexes'] as List<dynamic>).cast<String>(),
           file: _file);
     }
     _file.createSync(recursive: true);
-    Images _images = Images._(path,
+    PassyImages _images = PassyImages._(path,
         encrypter: encrypter,
-        images: {},
-        imageIndexes: {},
-        freeImageIndexes: [],
+        entries: {},
+        indexes: {},
+        freeIndexes: [],
         file: _file);
     _images.saveSync();
     return _images;
   }
 
+  @override
   Map<String, dynamic> toJson() => {
-        'imageIndexes': _imageKeys.map((key, value) =>
+        'imageIndexes': _indexes.map((key, value) =>
             MapEntry(encrypt(key, encrypter: _encrypter), value)),
-        'freeImageIndexes': _freeimageKeys,
+        'freeImageIndexes': _freeIndexes,
       };
+
+  @override
+  void setEntry(PassyBytes entry) {
+    super.setEntry(entry);
+
+    if (!_indexes.containsKey(entry.key)) {
+      if (_freeIndexes.isEmpty) {
+        _indexes[entry.key] = _indexes.length.toRadixString(36);
+      } else {
+        _indexes[entry.key] = _freeIndexes.last;
+        _freeIndexes.removeAt(_freeIndexes.length - 1);
+      }
+    }
+
+    File(_path +
+        Platform.pathSeparator +
+        _indexes[entry.key].toString() +
+        '.enc')
+      ..createSync()
+      ..writeAsStringSync(
+          encrypt(base64Encode(entry.value), encrypter: _encrypter));
+  }
+
+  @override
+  void removeEntry(String key) {
+    super.removeEntry(key);
+    File(_path + Platform.pathSeparator + _indexes[key].toString() + '.enc')
+        .deleteSync();
+    _indexes.remove(key);
+  }
+
+  Future<void> save() =>
+      _file.writeAsString(encrypt(jsonEncode(this), encrypter: _encrypter));
+
+  void saveSync() =>
+      _file.writeAsStringSync(encrypt(jsonEncode(this), encrypter: _encrypter));
 }

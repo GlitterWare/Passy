@@ -1,6 +1,6 @@
-import 'package:passy/passy_data/dated_entry.dart';
+import 'package:passy/passy_data/passy_entry.dart';
 
-class ErrorEntry extends DatedEntry<ErrorEntry> {
+class ErrorEntry extends PassyEntry<ErrorEntry> {
   String details;
 
   ErrorEntry({this.details = ''}) : super('0');

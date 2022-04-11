@@ -61,7 +61,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                         TextButton(
                           child: const Text('Yes'),
                           onPressed: () {
-                            _account.removePassword(_password.creationDate);
+                            _account.removePassword(_password.key);
                             Navigator.popUntil(context,
                                 (r) => r.settings.name == MainScreen.routeName);
                             _account.save().whenComplete(() =>

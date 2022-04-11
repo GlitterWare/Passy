@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/passy_bytes.dart';
 import 'package:passy/passy_data/passy_stream_subscription.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
@@ -33,6 +34,19 @@ class _EntryData implements JsonConvertable {
   /// Value can be Map<String, dynamic> if DatedEntry, String if image or null if deleted
   final dynamic value;
 
+  _EntryData({
+    required this.key,
+    required this.type,
+    required this.event,
+    this.value,
+  });
+
+  _EntryData.fromJson(Map<String, dynamic> json)
+      : key = json['key'],
+        type = json['type'],
+        event = EntryEvent.fromJson(json['event']),
+        value = json['entry'];
+
   @override
   Map<String, dynamic> toJson() => {
         'key': key,
@@ -40,19 +54,6 @@ class _EntryData implements JsonConvertable {
         'event': event.toJson(),
         'entry': value,
       };
-
-  factory _EntryData.fromJson(Map<String, dynamic> json) => _EntryData(
-      key: json['key'],
-      type: json['type'],
-      event: EntryEvent.fromJson(json['event']),
-      value: json['entry']);
-
-  _EntryData({
-    required this.key,
-    required this.type,
-    required this.event,
-    this.value,
-  });
 }
 
 class _Request implements JsonConvertable {
@@ -69,6 +70,28 @@ class _Request implements JsonConvertable {
       paymentCards.length +
       idCards.length +
       identities.length;
+
+  _Request({
+    List<String>? passwords,
+    List<String>? passwordIcons,
+    List<String>? notes,
+    List<String>? paymentCards,
+    List<String>? idCards,
+    List<String>? identities,
+  })  : passwords = passwords ?? [],
+        passwordIcons = passwordIcons ?? [],
+        notes = notes ?? [],
+        paymentCards = paymentCards ?? [],
+        idCards = idCards ?? [],
+        identities = identities ?? [];
+
+  _Request.fromJson(Map<String, dynamic> json)
+      : passwords = (json['passwords'] as List<dynamic>).cast<String>(),
+        passwordIcons = (json['passwordIcons'] as List<dynamic>).cast<String>(),
+        notes = (json['notes'] as List<dynamic>).cast<String>(),
+        paymentCards = (json['paymentCards'] as List<dynamic>).cast<String>(),
+        idCards = (json['idCards'] as List<dynamic>).cast<String>(),
+        identities = (json['identities'] as List<dynamic>).cast<String>();
 
   Map<EntryType, List<String>> toMap() => {
         EntryType.password: passwords,
@@ -88,58 +111,34 @@ class _Request implements JsonConvertable {
         'idCards': idCards,
         'identities': identities,
       };
-
-  factory _Request.fromJson(Map<String, dynamic> json) => _Request(
-        passwords: (json['passwords'] as List<dynamic>).cast<String>(),
-        passwordIcons: (json['passwordIcons'] as List<dynamic>).cast<String>(),
-        notes: (json['notes'] as List<dynamic>).cast<String>(),
-        paymentCards: (json['paymentCards'] as List<dynamic>).cast<String>(),
-        idCards: (json['idCards'] as List<dynamic>).cast<String>(),
-        identities: (json['identities'] as List<dynamic>).cast<String>(),
-      );
-
-  _Request({
-    List<String>? passwords,
-    List<String>? passwordIcons,
-    List<String>? notes,
-    List<String>? paymentCards,
-    List<String>? idCards,
-    List<String>? identities,
-  })  : passwords = passwords ?? [],
-        passwordIcons = passwordIcons ?? [],
-        notes = notes ?? [],
-        paymentCards = paymentCards ?? [],
-        idCards = idCards ?? [],
-        identities = identities ?? [];
 }
 
 class _EntryInfo implements JsonConvertable {
   final History history;
   final _Request request;
 
-  @override
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'history': history.toJson(),
-        'request': request.toJson(),
-      };
-
-  factory _EntryInfo.fromJson(Map<String, dynamic> json) => _EntryInfo(
-        history: History.fromJson(json['history']),
-        request: _Request.fromJson(json['request']),
-      );
-
   _EntryInfo({
     History? history,
     _Request? request,
   })  : history = history ?? History(),
         request = request ?? _Request();
+
+  _EntryInfo.fromJson(Map<String, dynamic> json)
+      : history = History.fromJson(json['history']),
+        request = _Request.fromJson(json['request']);
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'history': history.toJson(),
+        'request': request.toJson(),
+      };
 }
 
 class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
   final Passwords _passwords;
-  final Images _passwordIcons;
+  final PassyImages _passwordIcons;
   final Notes _notes;
   final PaymentCards _paymentCards;
   final IDCards _idCards;
@@ -153,7 +152,7 @@ class Synchronization {
   Synchronization(this._loadedAccount,
       {required History history,
       required Passwords passwords,
-      required Images passwordIcons,
+      required PassyImages passwordIcons,
       required Notes notes,
       required PaymentCards paymentCards,
       required IDCards idCards,
@@ -329,8 +328,7 @@ class Synchronization {
             _history.passwords[_entryData.key] = _entryData.event;
             break;
           case 'passwordIcons':
-            _passwordIcons.setImage(
-                _entryData.key, base64Decode(_entryData.value));
+            _passwordIcons.setEntry(PassyBytes.fromJson(_entryData.value));
             _history.passwordIcons[_entryData.key] = _entryData.event;
             break;
           case 'paymentCards':

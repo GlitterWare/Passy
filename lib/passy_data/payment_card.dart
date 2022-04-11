@@ -5,11 +5,11 @@ import 'package:encrypt/encrypt.dart';
 
 import 'common.dart';
 import 'custom_field.dart';
-import 'dated_entries.dart';
-import 'dated_entry.dart';
+import 'passy_entries.dart';
+import 'passy_entry.dart';
 import 'encrypted_json_file.dart';
 
-typedef PaymentCards = DatedEntries<PaymentCard>;
+typedef PaymentCards = PassyEntries<PaymentCard>;
 
 class PaymentCardsFile extends EncryptedJsonFile<PaymentCards> {
   PaymentCardsFile._(File file, Encrypter encrypter,
@@ -30,7 +30,7 @@ class PaymentCardsFile extends EncryptedJsonFile<PaymentCards> {
   }
 }
 
-class PaymentCard extends DatedEntry<PaymentCard> {
+class PaymentCard extends PassyEntry<PaymentCard> {
   String nickname;
   String cardNumber;
   String cardholderName;
@@ -39,55 +39,6 @@ class PaymentCard extends DatedEntry<PaymentCard> {
   List<CustomField> customFields;
   String additionalInfo;
   List<String> tags;
-
-  @override
-  int compareTo(PaymentCard other) => nickname.compareTo(other.nickname);
-
-  factory PaymentCard.fromJson(Map<String, dynamic> json) => PaymentCard._(
-        nickname: json['nickname'] ?? '',
-        cardNumber: json['cardNumber'] ?? '',
-        cardholderName: json['cardholderName'] ?? '',
-        cvv: json['cvv'] ?? '',
-        exp: json['exp'] ?? '',
-        customFields: (json['customFields'] as List<dynamic>?)
-                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        additionalInfo: json['additionalInfo'] ?? '',
-        tags: (json['tags'] as List<dynamic>?)
-                ?.map((e) => e as String)
-                .toList() ??
-            [],
-        creationDate:
-            json['creationDate'] ?? DateTime.now().toUtc().toIso8601String(),
-      );
-
-  @override
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'nickname': nickname,
-        'cardNumber': cardNumber,
-        'cardholderName': cardholderName,
-        'cvv': cvv,
-        'exp': exp,
-        'customFields': customFields.map((e) => e.toJson()).toList(),
-        'additionalInfo': additionalInfo,
-        'tags': tags,
-        'creationDate': creationDate,
-      };
-
-  PaymentCard._({
-    required this.nickname,
-    required this.cardNumber,
-    required this.cardholderName,
-    required this.cvv,
-    required this.exp,
-    List<CustomField>? customFields,
-    required this.additionalInfo,
-    List<String>? tags,
-    required String creationDate,
-  })  : customFields = customFields ?? [],
-        tags = tags ?? [],
-        super(creationDate);
 
   PaymentCard({
     required this.nickname,
@@ -101,4 +52,37 @@ class PaymentCard extends DatedEntry<PaymentCard> {
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
         super(DateTime.now().toUtc().toIso8601String());
+
+  PaymentCard.fromJson(Map<String, dynamic> json)
+      : nickname = json['nickname'] ?? '',
+        cardNumber = json['cardNumber'] ?? '',
+        cardholderName = json['cardholderName'] ?? '',
+        cvv = json['cvv'] ?? '',
+        exp = json['exp'] ?? '',
+        customFields = (json['customFields'] as List<dynamic>?)
+                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
+        additionalInfo = json['additionalInfo'] ?? '',
+        tags = (json['tags'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'nickname': nickname,
+        'cardNumber': cardNumber,
+        'cardholderName': cardholderName,
+        'cvv': cvv,
+        'exp': exp,
+        'customFields': customFields.map((e) => e.toJson()).toList(),
+        'additionalInfo': additionalInfo,
+        'tags': tags,
+        'creationDate': key,
+      };
+
+  @override
+  int compareTo(PaymentCard other) => nickname.compareTo(other.nickname);
 }

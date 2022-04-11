@@ -38,12 +38,10 @@ class AccountSettings implements JsonConvertable {
         'defaultScreen': screenToJson[defaultScreen],
       };
 
-  factory AccountSettings.fromJson(Map<String, dynamic> json) =>
-      AccountSettings(
-        icon: json['icon'] ?? 'assets/images/logo_circle.svg',
-        color: Color(json['color'] ?? 0xFF9C27B0),
-        defaultScreen: screenFromJson[json['defaultScreen']] ?? Screen.main,
-      );
+  AccountSettings.fromJson(Map<String, dynamic> json)
+      : icon = json['icon'] ?? 'assets/images/logo_circle.svg',
+        color = Color(json['color'] ?? 0xFF9C27B0),
+        defaultScreen = screenFromJson[json['defaultScreen']] ?? Screen.main;
 
   factory AccountSettings.fromFile(File file, Encrypter encrypter) =>
       AccountSettings.fromJson(

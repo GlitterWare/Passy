@@ -22,9 +22,9 @@ class EntryEvent implements JsonConvertable {
     required this.lastModified,
   });
 
-  factory EntryEvent.fromJson(Map<String, dynamic> json) => EntryEvent(
-      status: entryStatusFromText(json['status'] ?? 'deleted'),
-      lastModified: DateTime.parse(json['lastModified']));
+  EntryEvent.fromJson(Map<String, dynamic> json)
+      : status = entryStatusFromText(json['status'] ?? 'deleted'),
+        lastModified = DateTime.parse(json['lastModified']);
 
   @override
   Map<String, dynamic> toJson() => {

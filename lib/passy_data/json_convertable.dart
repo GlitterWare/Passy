@@ -1,3 +1,3 @@
 mixin JsonConvertable {
-  Map<String, dynamic> toJson();
+  dynamic toJson();
 }
