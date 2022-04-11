@@ -1,25 +1,27 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
-import 'package:passy/passy_data/host_address.dart';
-import 'package:passy/passy_data/passy_bytes.dart';
-import 'package:passy/passy_data/synchronization.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
 import 'account_settings.dart';
 import 'common.dart';
 import 'entry_event.dart';
+import 'entry_type.dart';
+import 'error_entry.dart';
 import 'history.dart';
+import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
 import 'images.dart';
 import 'note.dart';
 import 'password.dart';
+import 'passy_bytes.dart';
+import 'passy_entry.dart';
 import 'payment_card.dart';
 import 'screen.dart';
+import 'synchronization.dart';
 
 class LoadedAccount {
   final AccountCredentialsFile _credentials;
@@ -128,6 +130,25 @@ class LoadedAccount {
               encrypter: _encrypter,
               context: context)
           .connect(address);
+
+  PassyEntry? getEntry(EntryType type, String key) {
+    switch (type) {
+      case EntryType.password:
+        return getPassword(key);
+      case EntryType.passwordIcon:
+        return getPasswordIcon(key);
+      case EntryType.paymentCard:
+        return getPaymentCard(key);
+      case EntryType.note:
+        return getNote(key);
+      case EntryType.idCard:
+        return getIDCard(key);
+      case EntryType.identity:
+        return getIdentity(key);
+      default:
+        return ErrorEntry();
+    }
+  }
 
   // Account Credentials wrappers
   String get username => _credentials.value.username;

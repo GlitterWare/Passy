@@ -4,6 +4,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:universal_io/io.dart';
 
+import 'entry_type.dart';
 import 'passy_entry.dart';
 
 import 'common.dart';
@@ -17,8 +18,8 @@ class PassyEntries<T extends PassyEntry<T>> implements JsonConvertable {
   factory PassyEntries.fromJson(Map<String, dynamic> json) {
     EntryType _type = entryTypeFromType(T);
     return PassyEntries(
-        entries: json.map((key, value) => MapEntry(
-            key, fromJson(_type, value as Map<String, dynamic>) as T)));
+        entries: json.map((key, value) => MapEntry(key,
+            PassyEntry.fromJson(_type, value as Map<String, dynamic>) as T)));
   }
 
   factory PassyEntries.fromFile(File file, Encrypter encrypter) =>

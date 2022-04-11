@@ -10,6 +10,7 @@ import 'package:passy/passy_data/json_convertable.dart';
 import 'common.dart';
 import 'encrypted_json_file.dart';
 import 'entry_event.dart';
+import 'entry_type.dart';
 
 class HistoryFile extends EncryptedJsonFile<History> {
   HistoryFile._(File file, Encrypter encrypter, {required History value})

@@ -13,6 +13,7 @@ import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:universal_io/io.dart';
 
+import 'entry_type.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
@@ -28,10 +29,10 @@ const String _sameHistoryHash = 'same';
 
 class _EntryData implements JsonConvertable {
   final String key;
-  final String type;
+  final EntryType type;
   final EntryEvent event;
 
-  /// Value can be Map<String, dynamic> if DatedEntry, String if image or null if deleted
+  /// Value can be Map<String, dynamic> if exists or null if deleted
   final dynamic value;
 
   _EntryData({
@@ -43,14 +44,14 @@ class _EntryData implements JsonConvertable {
 
   _EntryData.fromJson(Map<String, dynamic> json)
       : key = json['key'],
-        type = json['type'],
+        type = entryTypeFromName(json['type']),
         event = EntryEvent.fromJson(json['event']),
         value = json['entry'];
 
   @override
   Map<String, dynamic> toJson() => {
         'key': key,
-        'type': type,
+        'type': type.name,
         'event': event.toJson(),
         'entry': value,
       };
@@ -197,67 +198,21 @@ class Synchronization {
 
   List<List<int>> _encodeData(_Request request) {
     List<List<int>> _data = [];
+    Map<EntryType, Map<String, EntryEvent>> _historyMap = _history.toMap();
 
-    for (String element in request.passwords) {
-      _data.add(utf8.encode(encrypt(
-              jsonEncode(_EntryData(
-                  key: element,
-                  type: 'passwords',
-                  event: _history.passwords[element]!,
-                  value: _passwords.getEntry(element)?.toJson())),
-              encrypter: _encrypter) +
-          '\u0000'));
-    }
-    for (var element in request.passwordIcons) {
-      _data.add(utf8.encode(encrypt(
-              jsonEncode(_EntryData(
-                  key: element,
-                  type: 'passwordIcons',
-                  event: _history.passwordIcons[element]!,
-                  value: _passwordIcons.getEntry(element))),
-              encrypter: _encrypter) +
-          '\u0000'));
-    }
-    for (var element in request.notes) {
-      _data.add(utf8.encode(encrypt(
-              jsonEncode(_EntryData(
-                  key: element,
-                  type: 'notes',
-                  event: _history.notes[element]!,
-                  value: _notes.getEntry(element)?.toJson())),
-              encrypter: _encrypter) +
-          '\u0000'));
-    }
-    for (var element in request.paymentCards) {
-      _data.add(utf8.encode(encrypt(
-              jsonEncode(_EntryData(
-                  key: element,
-                  type: 'paymentCards',
-                  event: _history.paymentCards[element]!,
-                  value: _paymentCards.getEntry(element)?.toJson())),
-              encrypter: _encrypter) +
-          '\u0000'));
-    }
-    for (var element in request.idCards) {
-      _data.add(utf8.encode(encrypt(
-              jsonEncode(_EntryData(
-                  key: element,
-                  type: 'idCards',
-                  event: _history.idCards[element]!,
-                  value: _idCards.getEntry(element)?.toJson())),
-              encrypter: _encrypter) +
-          '\u0000'));
-    }
-    for (var element in request.identities) {
-      _data.add(utf8.encode(encrypt(
-              jsonEncode(_EntryData(
-                  key: element,
-                  type: 'identities',
-                  event: _history.identities[element]!,
-                  value: _identities.getEntry(element)?.toJson())),
-              encrypter: _encrypter) +
-          '\u0000'));
-    }
+    request.toMap().forEach((entryType, keys) {
+      for (String key in keys) {
+        _data.add(utf8.encode(encrypt(
+                jsonEncode(_EntryData(
+                    key: key,
+                    type: entryType,
+                    event: _historyMap[entryType]![key]!,
+                    value: _loadedAccount.getEntry(entryType, key)?.toJson())),
+                encrypter: _encrypter) +
+            '\u0000'));
+      }
+    });
+
     return _data;
   }
 
@@ -277,42 +232,42 @@ class Synchronization {
             jsonDecode(decrypt(utf8.decode(entry), encrypter: _encrypter)));
         if (_entryData.event.status == EntryStatus.deleted) {
           switch (_entryData.type) {
-            case 'passwords':
+            case EntryType.password:
               if (_history.passwords.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
                     EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.passwords[_entryData.key] = _entryData.event;
               break;
-            case 'passwordIcons':
+            case EntryType.passwordIcon:
               if (_history.passwordIcons.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
                     EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.passwordIcons[_entryData.key] = _entryData.event;
               break;
-            case 'paymentCards':
+            case EntryType.paymentCard:
               if (_history.paymentCards.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
                     EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.paymentCards[_entryData.key] = _entryData.event;
               break;
-            case 'notes':
+            case EntryType.note:
               if (_history.notes.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
                     EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.notes[_entryData.key] = _entryData.event;
               break;
-            case 'idCards':
+            case EntryType.idCard:
               if (_history.idCards.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
                     EntryStatus.alive) _passwords.removeEntry(_entryData.key);
               }
               _history.idCards[_entryData.key] = _entryData.event;
               break;
-            case 'identities':
+            case EntryType.identity:
               if (_history.identities.containsKey(_entryData.key)) {
                 if (_history.passwords[_entryData.key]!.status ==
                     EntryStatus.alive) _passwords.removeEntry(_entryData.key);
@@ -323,27 +278,27 @@ class Synchronization {
           continue;
         }
         switch (_entryData.type) {
-          case 'passwords':
+          case EntryType.password:
             _passwords.setEntry(Password.fromJson(_entryData.value));
             _history.passwords[_entryData.key] = _entryData.event;
             break;
-          case 'passwordIcons':
+          case EntryType.passwordIcon:
             _passwordIcons.setEntry(PassyBytes.fromJson(_entryData.value));
             _history.passwordIcons[_entryData.key] = _entryData.event;
             break;
-          case 'paymentCards':
+          case EntryType.paymentCard:
             _paymentCards.setEntry(PaymentCard.fromJson(_entryData.value));
             _history.paymentCards[_entryData.key] = _entryData.event;
             break;
-          case 'notes':
+          case EntryType.note:
             _notes.setEntry(Note.fromJson(_entryData.value));
             _history.notes[_entryData.key] = _entryData.event;
             break;
-          case 'idCards':
+          case EntryType.idCard:
             _idCards.setEntry(IDCard.fromJson(_entryData.value));
             _history.idCards[_entryData.key] = _entryData.event;
             break;
-          case 'identities':
+          case EntryType.identity:
             _identities.setEntry(Identity.fromJson(_entryData.value));
             _history.identities[_entryData.key] = _entryData.event;
             break;
