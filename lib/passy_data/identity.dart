@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 import 'common.dart';
 import 'custom_field.dart';

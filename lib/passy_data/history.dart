@@ -83,13 +83,13 @@ class History implements JsonConvertable {
   factory History.fromFile(File file, Encrypter encrypter) => History.fromJson(
       jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
 
-  Map<String, Map<String, EntryEvent>> toMap() => {
-        'passwords': passwords,
-        'passwordIcons': passwordIcons,
-        'notes': notes,
-        'paymentCards': paymentCards,
-        'idCards': idCards,
-        'identities': identities,
+  Map<EntryType, Map<String, EntryEvent>> toMap() => {
+        EntryType.password: passwords,
+        EntryType.passwordIcon: passwordIcons,
+        EntryType.note: notes,
+        EntryType.paymentCard: paymentCards,
+        EntryType.idCard: idCards,
+        EntryType.identity: identities,
       };
 
   @override

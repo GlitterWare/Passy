@@ -70,7 +70,17 @@ class _Request implements JsonConvertable {
       idCards.length +
       identities.length;
 
-  Map<String, List<String>> toMap() => {
+  Map<EntryType, List<String>> toMap() => {
+        EntryType.password: passwords,
+        EntryType.passwordIcon: passwordIcons,
+        EntryType.note: notes,
+        EntryType.paymentCard: paymentCards,
+        EntryType.idCard: idCards,
+        EntryType.identity: identities,
+      };
+
+  @override
+  Map<String, dynamic> toJson() => {
         'passwords': passwords,
         'passwordIcons': passwordIcons,
         'notes': notes,
@@ -78,9 +88,6 @@ class _Request implements JsonConvertable {
         'idCards': idCards,
         'identities': identities,
       };
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
 
   factory _Request.fromJson(Map<String, dynamic> json) => _Request(
         passwords: (json['passwords'] as List<dynamic>).cast<String>(),
@@ -460,15 +467,15 @@ class Synchronization {
               {
                 _info = _EntryInfo();
                 _remoteRequest = _Request();
-                Map<String, Map<String, EntryEvent>> _localHistoryMap =
+                Map<EntryType, Map<String, EntryEvent>> _localHistoryMap =
                     _history.toMap();
-                Map<String, Map<String, EntryEvent>> _remoteHistoryMap =
+                Map<EntryType, Map<String, EntryEvent>> _remoteHistoryMap =
                     _remoteHistory.toMap();
-                Map<String, Map<String, EntryEvent>> _localShortHistoryMap =
+                Map<EntryType, Map<String, EntryEvent>> _localShortHistoryMap =
                     _info.history.toMap();
-                Map<String, List<String>> _localRequestMap =
+                Map<EntryType, List<String>> _localRequestMap =
                     _info.request.toMap();
-                Map<String, List<String>> _remoteRequestMap =
+                Map<EntryType, List<String>> _remoteRequestMap =
                     _remoteRequest.toMap();
 
                 //TODO: merge local/remote history iteration
