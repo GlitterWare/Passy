@@ -1,34 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:encrypt/encrypt.dart';
-
-import 'common.dart';
 import 'custom_field.dart';
 import 'passy_entries.dart';
+import 'passy_entries_file.dart';
 import 'passy_entry.dart';
-import 'encrypted_json_file.dart';
 
 typedef Passwords = PassyEntries<Password>;
 
-class PasswordsJsonFile extends EncryptedJsonFile<Passwords> {
-  PasswordsJsonFile._(File file, Encrypter encrypter,
-      {required Passwords value})
-      : super(file, encrypter, value: value);
-
-  factory PasswordsJsonFile(File file, Encrypter encrypter) {
-    if (file.existsSync()) {
-      return PasswordsJsonFile._(file, encrypter,
-          value: Passwords.fromJson(jsonDecode(
-              decrypt(file.readAsStringSync(), encrypter: encrypter))));
-    }
-    file.createSync(recursive: true);
-    PasswordsJsonFile _file =
-        PasswordsJsonFile._(file, encrypter, value: Passwords());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef PasswordsFile = PassyEntriesFile<Password>;
 
 class Password extends PassyEntry<Password> {
   static const csvTemplate = {

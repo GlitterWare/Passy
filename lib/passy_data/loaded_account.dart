@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
+import 'package:passy/passy_data/passy_entries_file.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -26,7 +27,7 @@ class LoadedAccount {
   final AccountCredentialsFile _credentials;
   final AccountSettingsFile _settings;
   final HistoryFile _history;
-  final PasswordsJsonFile _passwords;
+  final PasswordsFile _passwords;
   final PassyImages _passwordIcons;
   final NotesFile _notes;
   final PaymentCardsFile _paymentCards;
@@ -44,8 +45,9 @@ class LoadedAccount {
             File(path + Platform.pathSeparator + 'settings.enc'), encrypter),
         _history = HistoryFile(
             File(path + Platform.pathSeparator + 'history.enc'), encrypter),
-        _passwords = PasswordsJsonFile(
-            File(path + Platform.pathSeparator + 'passwords.enc'), encrypter),
+        _passwords = PasswordsFile(
+            File(path + Platform.pathSeparator + 'passwords.enc'),
+            encrypter: encrypter),
         _passwordIcons = PassyImages(
             path + Platform.pathSeparator + 'password_icons',
             encrypter: encrypter),
