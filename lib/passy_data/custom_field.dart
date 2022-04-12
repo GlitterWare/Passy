@@ -50,7 +50,7 @@ class CustomField implements JsonConvertable, CSVConvertable {
       : title = csv[template['title']!],
         fieldType = fieldTypeFromName(csv[template['title']!]),
         value = csv[template['value']!],
-        obscured = boolFromString(csv[template['obscured']!]);
+        obscured = csv[template['obscured']!];
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{

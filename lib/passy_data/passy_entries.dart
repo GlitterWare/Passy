@@ -1,4 +1,4 @@
-import 'package:csv/csv.dart';
+import 'package:passy/passy_data/common.dart';
 
 import 'csv_convertable.dart';
 import 'entry_type.dart';
@@ -19,10 +19,8 @@ class PassyEntries<T extends PassyEntry<T>>
             PassyEntry.fromJson(_type, value as Map<String, dynamic>) as T)));
   }
 
-  factory PassyEntries.fromCSV(String csv) {
+  factory PassyEntries.fromCSV(List<List<dynamic>> csv) {
     EntryType _type = entryTypeFromType(T);
-    List<List<dynamic>> _csv =
-        const CsvToListConverter(textDelimiter: '').convert(csv);
     List<List<dynamic>> _entryCSV = [];
     Map<String, T> _entries = {};
 
@@ -32,7 +30,7 @@ class PassyEntries<T extends PassyEntry<T>>
       _entries[_entry.key] = _entry;
     }
 
-    for (List<dynamic> line in _csv) {
+    for (List<dynamic> line in csv) {
       if (line.isEmpty) {
         _decodeEntry();
         _entryCSV = [];

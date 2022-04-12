@@ -1,4 +1,3 @@
-import 'package:csv/csv.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:universal_io/io.dart';
@@ -20,7 +19,7 @@ class PassyEntriesFile<T extends PassyEntry<T>> implements SaveableFileBase {
   factory PassyEntriesFile(File file, {required Encrypter encrypter}) {
     PassyEntries<T> _value;
     if (file.existsSync()) {
-      _value = PassyEntries<T>.fromCSV(file.readAsStringSync());
+      _value = PassyEntries<T>.fromCSV(csvDecode(file.readAsStringSync()));
     } else {
       _value = PassyEntries<T>();
     }
@@ -28,11 +27,9 @@ class PassyEntriesFile<T extends PassyEntry<T>> implements SaveableFileBase {
   }
 
   @override
-  Future<void> save() => _file.writeAsString(encrypt(
-      const ListToCsvConverter(textDelimiter: '').convert(value.toCSV()),
-      encrypter: _encrypter));
+  Future<void> save() => _file
+      .writeAsString(encrypt(csvEncode(value.toCSV()), encrypter: _encrypter));
   @override
-  void saveSync() => _file.writeAsStringSync(encrypt(
-      const ListToCsvConverter(textDelimiter: '').convert(value.toCSV()),
-      encrypter: _encrypter));
+  void saveSync() => _file.writeAsStringSync(
+      encrypt(csvEncode(value.toCSV()), encrypter: _encrypter));
 }

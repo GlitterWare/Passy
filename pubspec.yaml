@@ -45,7 +45,6 @@ dependencies:
   qr_flutter: ^4.0.0
   file_picker: ^4.5.1
   flutter_barcode_scanner: ^2.0.0
-  csv: ^5.0.1
 
 
 dev_dependencies:
