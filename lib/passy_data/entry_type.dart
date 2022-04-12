@@ -11,7 +11,6 @@ enum EntryType {
   note,
   idCard,
   identity,
-  error
 }
 
 EntryType entryTypeFromName(String name) {
@@ -29,7 +28,7 @@ EntryType entryTypeFromName(String name) {
     case 'identity':
       return EntryType.identity;
     default:
-      return EntryType.error;
+      throw Exception('Cannot convert String \'$name\' to EntryType');
   }
 }
 
@@ -46,6 +45,7 @@ EntryType entryTypeFromType(Type type) {
     case Identity:
       return EntryType.identity;
     default:
-      return EntryType.error;
+      throw Exception(
+          'Cannot convert Type \'${type.toString()}\' to EntryType');
   }
 }

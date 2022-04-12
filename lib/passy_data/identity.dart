@@ -28,7 +28,7 @@ class IdentitiesFile extends EncryptedJsonFile<Identities> {
   }
 }
 
-enum Title { mr, mrs, miss, other, error }
+enum Title { mr, mrs, miss, other }
 
 Title titleFromName(String name) {
   switch (name) {
@@ -41,7 +41,7 @@ Title titleFromName(String name) {
     case 'other':
       return Title.other;
     default:
-      return Title.error;
+      throw Exception('Cannot convert String \'$name\' to Title');
   }
 }
 
@@ -56,7 +56,7 @@ Gender genderFromName(String name) {
     case 'other':
       return Gender.other;
     default:
-      return Gender.error;
+      throw Exception('Cannot convert String \'$name\' to Gender');
   }
 }
 
@@ -124,6 +124,15 @@ class Identity extends PassyEntry<Identity> {
             [],
         super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
 
+  factory Identity.fromCSV(List<List<String>> csv,
+      {Map<String, Map<String, int>> templates = const {}}) {
+    // TODO: implement fromCSV
+    throw UnimplementedError();
+  }
+
+  @override
+  int compareTo(Identity other) => nickname.compareTo(other.nickname);
+
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'nickname': nickname,
@@ -146,5 +155,8 @@ class Identity extends PassyEntry<Identity> {
       };
 
   @override
-  int compareTo(Identity other) => nickname.compareTo(other.nickname);
+  toCSV() {
+    // TODO: implement toCSV
+    throw UnimplementedError();
+  }
 }

@@ -9,7 +9,6 @@ import 'account_settings.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
-import 'error_entry.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
@@ -165,7 +164,7 @@ class LoadedAccount {
       case EntryType.identity:
         return getIdentity(key);
       default:
-        return ErrorEntry();
+        throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 

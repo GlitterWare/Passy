@@ -80,6 +80,15 @@ class IDCard extends PassyEntry<IDCard> {
             [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
+  factory IDCard.fromCSV(List<List<String>> csv,
+      {Map<String, Map<String, int>> templates = const {}}) {
+    // TODO: implement fromCSV
+    throw UnimplementedError();
+  }
+
+  @override
+  int compareTo(IDCard other) => nickname.compareTo(other.nickname);
+
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'nickname': nickname,
@@ -97,5 +106,8 @@ class IDCard extends PassyEntry<IDCard> {
       };
 
   @override
-  int compareTo(IDCard other) => nickname.compareTo(other.nickname);
+  toCSV() {
+    // TODO: implement toCSV
+    throw UnimplementedError();
+  }
 }

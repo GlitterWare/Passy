@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_data/passy_bytes.dart';
 import 'package:passy/passy_data/passy_stream_subscription.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
@@ -392,34 +391,34 @@ class Synchronization {
                   List<String> _remoteRequestKeys =
                       _remoteRequest.getKeys(entryType);
 
-                  Map<String, EntryEvent>.from(_localEvents)
-                    ..addAll(_remoteEvents)
-                    ..forEach((key, event) {
-                      DateTime _localLastModified;
-                      EntryEvent _localEvent;
+                  for (String key in _localEvents.keys
+                      .followedBy(_remoteEvents.keys)
+                      .toSet()) {
+                    DateTime _localLastModified;
+                    EntryEvent _localEvent;
 
-                      if (!_localEvents.containsKey(key)) {
-                        _localRequestKeys.add(key);
-                        return;
-                      }
-                      if (!_remoteEvents.containsKey(key)) {
-                        _shortLocalEvents[key] = event;
-                        _remoteRequestKeys.add(key);
-                        return;
-                      }
+                    if (!_localEvents.containsKey(key)) {
+                      _localRequestKeys.add(key);
+                      return;
+                    }
+                    _localEvent = _localEvents[key]!;
+                    if (!_remoteEvents.containsKey(key)) {
+                      _shortLocalEvents[key] = _localEvent;
+                      _remoteRequestKeys.add(key);
+                      return;
+                    }
 
-                      _localEvent = _localEvents[key]!;
-                      _localLastModified = _localEvent.lastModified;
+                    _localLastModified = _localEvent.lastModified;
 
-                      if (_localLastModified.isBefore(event.lastModified)) {
-                        _localRequestKeys.add(key);
-                        return;
-                      }
-                      if (_localLastModified.isAfter(event.lastModified)) {
-                        _shortLocalEvents[key] = _localEvent;
-                        _remoteRequestKeys.add(key);
-                      }
-                    });
+                    if (_localLastModified.isBefore(_localEvent.lastModified)) {
+                      _localRequestKeys.add(key);
+                      return;
+                    }
+                    if (_localLastModified.isAfter(_localEvent.lastModified)) {
+                      _shortLocalEvents[key] = _localEvent;
+                      _remoteRequestKeys.add(key);
+                    }
+                  }
                 }
               }
 

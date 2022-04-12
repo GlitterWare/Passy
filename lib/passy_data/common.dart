@@ -8,6 +8,17 @@ const String passyVersion = '0.0.0';
 
 final Random random = Random.secure();
 
+bool boolFromString(String value) {
+  switch (value) {
+    case 'false':
+      return false;
+    case 'true':
+      return true;
+    default:
+      throw Exception('Can not convert String \'$value\' to bool');
+  }
+}
+
 Encrypter getEncrypter(String password) {
   if (password.length > 32) {
     throw Exception('Password is longer than 32 characters');

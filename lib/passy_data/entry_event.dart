@@ -1,6 +1,6 @@
 import 'package:passy/passy_data/json_convertable.dart';
 
-enum EntryStatus { alive, deleted, error }
+enum EntryStatus { alive, deleted }
 
 EntryStatus entryStatusFromText(String name) {
   switch (name) {
@@ -9,7 +9,7 @@ EntryStatus entryStatusFromText(String name) {
     case 'deleted':
       return EntryStatus.deleted;
     default:
-      return EntryStatus.error;
+      throw Exception('Cannot convert String \'$name\' to EntryStatus');
   }
 }
 

@@ -1,15 +1,16 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/json_convertable.dart';
 import 'package:universal_io/io.dart';
 
+import 'common.dart';
+import 'csv_convertable.dart';
 import 'entry_type.dart';
+import 'json_convertable.dart';
 import 'passy_entry.dart';
 
-import 'common.dart';
-
-class PassyEntries<T extends PassyEntry<T>> implements JsonConvertable {
+class PassyEntries<T extends PassyEntry<T>>
+    implements JsonConvertable, CSVConvertable {
   final Map<String, T> _entries;
   Iterable<T> get entries => _entries.values.toList();
 
@@ -37,4 +38,10 @@ class PassyEntries<T extends PassyEntry<T>> implements JsonConvertable {
   @override
   Map<String, dynamic> toJson() =>
       _entries.map((key, value) => MapEntry(key, value.toJson()));
+
+  @override
+  List<List<String>> toCSV() {
+    // TODO: implement toCSV
+    throw UnimplementedError();
+  }
 }

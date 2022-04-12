@@ -2,23 +2,23 @@ import 'package:passy/passy_data/passy_entries.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 
 class SortedPassyEntries<T extends PassyEntry<T>> extends PassyEntries<T> {
-  final List<T> _entryList;
+  final List<T> _entrySet;
 
   @override
-  Iterable<T> get entries => _entryList;
+  Iterable<T> get entries => _entrySet;
 
   SortedPassyEntries({Map<String, T>? entries})
-      : _entryList = entries?.values.toList() ?? [],
+      : _entrySet = entries?.values.toList() ?? [],
         super(entries: entries) {
     sort();
   }
 
-  void sort() => _entryList.sort((a, b) => a.compareTo(b));
+  void sort() => _entrySet.sort((a, b) => a.compareTo(b));
 
   @override
   void setEntry(T entry) {
-    if (!_entryList.contains(entry)) {
-      _entryList.add(entry);
+    if (!_entrySet.contains(entry)) {
+      _entrySet.add(entry);
       sort();
     }
     super.setEntry(entry);
@@ -27,6 +27,6 @@ class SortedPassyEntries<T extends PassyEntry<T>> extends PassyEntries<T> {
   @override
   void removeEntry(String key) {
     super.removeEntry(key);
-    _entryList.remove(getEntry(key)!);
+    _entrySet.remove(getEntry(key)!);
   }
 }

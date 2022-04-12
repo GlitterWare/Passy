@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:passy/passy_data/json_convertable.dart';
-import 'package:passy/passy_data/json_file_base.dart';
+import 'package:passy/passy_data/saveable_file_base.dart';
 import 'package:universal_io/io.dart';
 
 class JsonFile<T extends JsonConvertable> implements SaveableFileBase {

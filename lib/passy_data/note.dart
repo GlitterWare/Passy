@@ -41,6 +41,15 @@ class Note extends PassyEntry<Note> {
         note = json['note'] ?? '',
         super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
 
+  factory Note.fromCSV(List<List<String>> csv,
+      {Map<String, Map<String, int>> templates = const {}}) {
+    // TODO: implement fromCSV
+    throw UnimplementedError();
+  }
+
+  @override
+  int compareTo(Note other) => title.compareTo(other.title);
+
   @override
   Map<String, dynamic> toJson() => {
         'title': title,
@@ -49,5 +58,8 @@ class Note extends PassyEntry<Note> {
       };
 
   @override
-  int compareTo(Note other) => title.compareTo(other.title);
+  toCSV() {
+    // TODO: implement toCSV
+    throw UnimplementedError();
+  }
 }

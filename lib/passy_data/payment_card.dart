@@ -70,6 +70,15 @@ class PaymentCard extends PassyEntry<PaymentCard> {
             [],
         super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
 
+  factory PaymentCard.fromCSV(List<List<String>> csv,
+      {Map<String, Map<String, int>> templates = const {}}) {
+    // TODO: implement fromCSV
+    throw UnimplementedError();
+  }
+
+  @override
+  int compareTo(PaymentCard other) => nickname.compareTo(other.nickname);
+
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'nickname': nickname,
@@ -84,5 +93,8 @@ class PaymentCard extends PassyEntry<PaymentCard> {
       };
 
   @override
-  int compareTo(PaymentCard other) => nickname.compareTo(other.nickname);
+  toCSV() {
+    // TODO: implement toCSV
+    throw UnimplementedError();
+  }
 }
