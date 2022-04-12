@@ -91,6 +91,7 @@ class IDCard extends PassyEntry<IDCard> {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
+        'key': key,
         'nickname': nickname,
         'pictures': pictures,
         'type': type,
@@ -102,7 +103,6 @@ class IDCard extends PassyEntry<IDCard> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': key,
       };
 
   @override

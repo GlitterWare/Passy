@@ -39,7 +39,7 @@ class Note extends PassyEntry<Note> {
   Note.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? '',
         note = json['note'] ?? '',
-        super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
+        super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Note.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
@@ -52,9 +52,9 @@ class Note extends PassyEntry<Note> {
 
   @override
   Map<String, dynamic> toJson() => {
+        'key': key,
         'title': title,
         'note': note,
-        'creationDate': key,
       };
 
   @override

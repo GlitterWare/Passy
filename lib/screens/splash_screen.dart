@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:universal_io/io.dart';
+
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/passy_data.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_io/io.dart';
+
+import 'add_account_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -19,8 +23,8 @@ class SplashScreen extends StatelessWidget {
             Platform.pathSeparator +
             'Passy');
         data.noAccounts
-            ? Navigator.pushNamed(context, '/addAccount')
-            : Navigator.pushNamed(context, '/login');
+            ? Navigator.pushNamed(context, AddAccountScreen.routeName)
+            : Navigator.pushNamed(context, LoginScreen.routeName);
       });
       loaded = true;
     }

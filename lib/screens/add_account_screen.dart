@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/screens/login_screen.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/addAccount';
+  static const routeName = '/login/addAccount';
 
   @override
   State<StatefulWidget> createState() => _AddAccountScreen();
@@ -75,7 +76,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     );
     data.info.value.lastUsername = _username;
     data.info.save();
-    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
   }
 
   @override
@@ -85,7 +86,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
         ? null
         : Padding(
             padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-            child: getBackButton(context),
+            child: getBackButton(context,
+                onPressed: () => Navigator.pushReplacementNamed(
+                    context, LoginScreen.routeName)),
           );
   }
 

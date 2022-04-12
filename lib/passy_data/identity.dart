@@ -122,7 +122,7 @@ class Identity extends PassyEntry<Identity> {
                 ?.map((e) => e as String)
                 .toList() ??
             [],
-        super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
+        super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Identity.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
@@ -135,6 +135,7 @@ class Identity extends PassyEntry<Identity> {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
+        'key': key,
         'nickname': nickname,
         'title': title.name,
         'firstName': firstName,
@@ -151,7 +152,6 @@ class Identity extends PassyEntry<Identity> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': key,
       };
 
   @override

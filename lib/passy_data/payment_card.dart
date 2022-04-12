@@ -68,7 +68,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
                 ?.map((e) => e as String)
                 .toList() ??
             [],
-        super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
+        super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory PaymentCard.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
@@ -81,6 +81,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
+        'key': key,
         'nickname': nickname,
         'cardNumber': cardNumber,
         'cardholderName': cardholderName,
@@ -89,7 +90,6 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         'customFields': customFields.map((e) => e.toJson()).toList(),
         'additionalInfo': additionalInfo,
         'tags': tags,
-        'creationDate': key,
       };
 
   @override
