@@ -1,4 +1,3 @@
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 

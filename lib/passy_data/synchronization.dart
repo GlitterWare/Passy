@@ -4,14 +4,13 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
-import 'package:passy/passy_data/common.dart';
-import 'package:passy/passy_data/entry_event.dart';
-import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_data/passy_stream_subscription.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
 import 'package:universal_io/io.dart';
 
+import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/splash_screen.dart';
+
+import 'common.dart';
+import 'entry_event.dart';
 import 'entry_type.dart';
 import 'history.dart';
 import 'host_address.dart';
@@ -19,8 +18,10 @@ import 'id_card.dart';
 import 'identity.dart';
 import 'images.dart';
 import 'json_convertable.dart';
+import 'loaded_account.dart';
 import 'note.dart';
 import 'password.dart';
+import 'passy_stream_subscription.dart';
 import 'payment_card.dart';
 
 const String _hello = 'hello';

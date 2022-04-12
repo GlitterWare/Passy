@@ -31,6 +31,16 @@ class PaymentCardsFile extends EncryptedJsonFile<PaymentCards> {
 }
 
 class PaymentCard extends PassyEntry<PaymentCard> {
+  static const csvTemplate = {
+    'key': 1,
+    'nickname': 2,
+    'cardNumber': 3,
+    'cardholderName': 4,
+    'cvv': 5,
+    'exp': 6,
+    'additionalInfo': 7,
+  };
+
   String nickname;
   String cardNumber;
   String cardholderName;
@@ -40,14 +50,28 @@ class PaymentCard extends PassyEntry<PaymentCard> {
   String additionalInfo;
   List<String> tags;
 
-  PaymentCard({
-    required this.nickname,
-    required this.cardNumber,
-    required this.cardholderName,
-    required this.cvv,
-    required this.exp,
+  PaymentCard._({
+    required String key,
+    this.nickname = '',
+    this.cardNumber = '',
+    this.cardholderName = '',
+    this.cvv = '',
+    this.exp = '',
     List<CustomField>? customFields,
-    required this.additionalInfo,
+    this.additionalInfo = '',
+    List<String>? tags,
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(key);
+
+  PaymentCard({
+    this.nickname = '',
+    this.cardNumber = '',
+    this.cardholderName = '',
+    this.cvv = '',
+    this.exp = '',
+    List<CustomField>? customFields,
+    this.additionalInfo = '',
     List<String>? tags,
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
@@ -72,8 +96,40 @@ class PaymentCard extends PassyEntry<PaymentCard> {
 
   factory PaymentCard.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
-    // TODO: implement fromCSV
-    throw UnimplementedError();
+    Map<String, int> _passwordTemplate = templates['password'] ?? csvTemplate;
+    Map<String, int> _customFieldTemplate =
+        templates['customField'] ?? CustomField.csvTemplate;
+    PaymentCard? _paymentCard;
+    List<CustomField> _customFields = [];
+    List<String> _tags = [];
+
+    for (List<dynamic> entry in csv) {
+      switch (entry[0]) {
+        case 'password':
+          _paymentCard = PaymentCard._(
+            key: entry[_passwordTemplate['key']!],
+            cardNumber: entry[_passwordTemplate['cardNumber']!],
+            cardholderName: entry[_passwordTemplate['cardholderName']!],
+            cvv: entry[_passwordTemplate['cvv']!],
+            exp: entry[_passwordTemplate['exp']!],
+            additionalInfo: entry[_passwordTemplate['additionalInfo']!],
+          );
+          break;
+        case 'customFields':
+          _customFields
+              .add(CustomField.fromCSV(entry, template: _customFieldTemplate));
+          break;
+        case 'tags':
+          for (int i = 1; i != entry.length; i++) {
+            _tags.add(entry[i]);
+          }
+          break;
+      }
+    }
+
+    _paymentCard!.customFields = _customFields;
+    _paymentCard.tags = _tags;
+    return _paymentCard;
   }
 
   @override
@@ -93,7 +149,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
       };
 
   @override
-  toCSV() {
+  List<List<dynamic>> toCSV() {
     // TODO: implement toCSV
     throw UnimplementedError();
   }

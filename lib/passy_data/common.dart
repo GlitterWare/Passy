@@ -32,7 +32,7 @@ String decrypt(String data, {required Encrypter encrypter}) =>
       iv: IV.fromLength(16),
     );
 
-String csvEncode(List<List<dynamic>> object) {
+String csvEncode(List<List> object) {
   String _encoded = '';
   for (List<dynamic> line in object) {
     if (line.isEmpty) {
@@ -44,8 +44,8 @@ String csvEncode(List<List<dynamic>> object) {
   return _encoded;
 }
 
-List<List<dynamic>> csvDecode(String source) {
-  List<List<dynamic>> _object = [];
+List<List> csvDecode(String source) {
+  List<List> _object = [];
   List<String> _lines = source.split('\n');
   for (String line in _lines) {
     List<dynamic> _entry;
