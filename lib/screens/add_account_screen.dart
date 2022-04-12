@@ -75,7 +75,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     );
     data.info.value.lastUsername = _username;
     data.info.save();
-    loadApp(context);
+    Navigator.pop(context);
   }
 
   @override

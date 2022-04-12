@@ -37,7 +37,7 @@ class _LoginScreen extends State<LoginScreen> {
       ])));
       return;
     }
-    Navigator.popUntil(context, (route) => route.isFirst);
+    Navigator.pop(context);
     data.info.value.lastUsername = _username;
     data.info.save().whenComplete(() {
       LoadedAccount _account =

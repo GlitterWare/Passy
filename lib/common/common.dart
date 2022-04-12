@@ -31,7 +31,3 @@ AppBar getSetScreenAppBar(
         ),
       ],
     );
-
-void loadApp(BuildContext context) => data.noAccounts
-    ? Navigator.pushNamedAndRemoveUntil(context, '/addAccount', (r) => false)
-    : Navigator.pushNamedAndRemoveUntil(context, '/login', (r) => false);
