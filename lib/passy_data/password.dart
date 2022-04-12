@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/entry_type.dart';
 
 import 'common.dart';
 import 'custom_field.dart';
@@ -12,18 +11,20 @@ import 'encrypted_json_file.dart';
 
 typedef Passwords = PassyEntries<Password>;
 
-class PasswordsFile extends EncryptedJsonFile<Passwords> {
-  PasswordsFile._(File file, Encrypter encrypter, {required Passwords value})
+class PasswordsJsonFile extends EncryptedJsonFile<Passwords> {
+  PasswordsJsonFile._(File file, Encrypter encrypter,
+      {required Passwords value})
       : super(file, encrypter, value: value);
 
-  factory PasswordsFile(File file, Encrypter encrypter) {
+  factory PasswordsJsonFile(File file, Encrypter encrypter) {
     if (file.existsSync()) {
-      return PasswordsFile._(file, encrypter,
+      return PasswordsJsonFile._(file, encrypter,
           value: Passwords.fromJson(jsonDecode(
               decrypt(file.readAsStringSync(), encrypter: encrypter))));
     }
     file.createSync(recursive: true);
-    PasswordsFile _file = PasswordsFile._(file, encrypter, value: Passwords());
+    PasswordsJsonFile _file =
+        PasswordsJsonFile._(file, encrypter, value: Passwords());
     _file.saveSync();
     return _file;
   }
@@ -104,7 +105,7 @@ class Password extends PassyEntry<Password> {
         super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Password.fromCSV(
-    List<List<String>> csv, {
+    List<List<dynamic>> csv, {
     Map<String, Map<String, int>> templates = const {},
   }) {
     Map<String, int> _passwordTemplate = templates['password'] ?? csvTemplate;
@@ -114,7 +115,7 @@ class Password extends PassyEntry<Password> {
     List<CustomField> _customFields = [];
     List<String> _tags = [];
 
-    for (List<String> entry in csv) {
+    for (List<dynamic> entry in csv) {
       switch (entry[0]) {
         case 'password':
           _password = Password._(
@@ -164,16 +165,17 @@ class Password extends PassyEntry<Password> {
       };
 
   @override
-  List<List<String>> toCSV() {
-    List<List<String>> _csv = [
+  List<List<dynamic>> toCSV() {
+    List<List<dynamic>> _csv = [
       ['password']
     ];
-    List<String> _password = _csv[0];
+    Map<String, dynamic> _json = toJson();
+    List<dynamic> _password = _csv[0];
     for (String key in csvTemplate.keys) {
-      _password.add(key);
+      _password.add(_json[key]);
     }
     for (CustomField field in customFields) {
-      _csv.add(field.toCSV());
+      _csv.addAll(field.toCSV());
     }
     if (tags.isNotEmpty) {
       _csv.add(['tags'].followedBy(tags).toList());

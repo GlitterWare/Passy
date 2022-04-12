@@ -41,7 +41,7 @@ class Note extends PassyEntry<Note> {
         note = json['note'] ?? '',
         super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory Note.fromCSV(List<List<String>> csv,
+  factory Note.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();

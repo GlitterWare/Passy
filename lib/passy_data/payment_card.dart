@@ -70,7 +70,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
             [],
         super(json['creationDate'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory PaymentCard.fromCSV(List<List<String>> csv,
+  factory PaymentCard.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();

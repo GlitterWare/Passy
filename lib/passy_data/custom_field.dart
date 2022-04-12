@@ -45,7 +45,7 @@ class CustomField implements JsonConvertable, CSVConvertable {
         value = json['value'] ?? '',
         obscured = json['private'] ?? false;
 
-  CustomField.fromCSV(List<String> csv,
+  CustomField.fromCSV(List<dynamic> csv,
       {Map<String, int> template = csvTemplate})
       : title = csv[template['title']!],
         fieldType = fieldTypeFromName(csv[template['title']!]),
@@ -61,11 +61,12 @@ class CustomField implements JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<String> toCSV() {
+  List<List<dynamic>> toCSV() {
+    Map<String, dynamic> _json = toJson();
     List<String> _csv = ['customField'];
     for (String key in csvTemplate.keys) {
-      _csv.add(key);
+      _csv.add(_json[key]);
     }
-    return _csv;
+    return [_csv];
   }
 }

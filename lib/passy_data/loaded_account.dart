@@ -26,7 +26,7 @@ class LoadedAccount {
   final AccountCredentialsFile _credentials;
   final AccountSettingsFile _settings;
   final HistoryFile _history;
-  final PasswordsFile _passwords;
+  final PasswordsJsonFile _passwords;
   final PassyImages _passwordIcons;
   final NotesFile _notes;
   final PaymentCardsFile _paymentCards;
@@ -44,7 +44,7 @@ class LoadedAccount {
             File(path + Platform.pathSeparator + 'settings.enc'), encrypter),
         _history = HistoryFile(
             File(path + Platform.pathSeparator + 'history.enc'), encrypter),
-        _passwords = PasswordsFile(
+        _passwords = PasswordsJsonFile(
             File(path + Platform.pathSeparator + 'passwords.enc'), encrypter),
         _passwordIcons = PassyImages(
             path + Platform.pathSeparator + 'password_icons',

@@ -17,7 +17,7 @@ class PassyBytes extends PassyEntry<PassyBytes> {
       : value = base64Decode(json['value']),
         super(json['key']);
 
-  factory PassyBytes.fromCSV(List<List<String>> csv,
+  factory PassyBytes.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();

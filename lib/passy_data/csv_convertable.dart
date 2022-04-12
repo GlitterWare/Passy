@@ -1,3 +1,3 @@
 mixin CSVConvertable {
-  dynamic toCSV();
+  List<List<dynamic>> toCSV();
 }

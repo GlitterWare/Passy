@@ -35,7 +35,7 @@ abstract class PassyEntry<T> implements JsonConvertable, CSVConvertable {
 
   static PassyEntry fromCSV(
     EntryType entryType,
-    List<List<String>> csv, {
+    List<List<dynamic>> csv, {
     Map<String, Map<String, int>> templates = const {},
   }) {
     switch (entryType) {

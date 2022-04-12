@@ -1,9 +1,5 @@
-import 'dart:convert';
+import 'package:csv/csv.dart';
 
-import 'package:encrypt/encrypt.dart';
-import 'package:universal_io/io.dart';
-
-import 'common.dart';
 import 'csv_convertable.dart';
 import 'entry_type.dart';
 import 'json_convertable.dart';
@@ -12,7 +8,7 @@ import 'passy_entry.dart';
 class PassyEntries<T extends PassyEntry<T>>
     implements JsonConvertable, CSVConvertable {
   final Map<String, T> _entries;
-  Iterable<T> get entries => _entries.values.toList();
+  Iterable<T> get entries => _entries.values;
 
   PassyEntries({Map<String, T>? entries}) : _entries = entries ?? {};
 
@@ -23,9 +19,31 @@ class PassyEntries<T extends PassyEntry<T>>
             PassyEntry.fromJson(_type, value as Map<String, dynamic>) as T)));
   }
 
-  factory PassyEntries.fromFile(File file, Encrypter encrypter) =>
-      PassyEntries.fromJson(
-          jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
+  factory PassyEntries.fromCSV(String csv) {
+    EntryType _type = entryTypeFromType(T);
+    List<List<dynamic>> _csv =
+        const CsvToListConverter(textDelimiter: '').convert(csv);
+    List<List<dynamic>> _entryCSV = [];
+    Map<String, T> _entries = {};
+
+    void _decodeEntry() {
+      if (_entryCSV.isEmpty) return;
+      T _entry = PassyEntry.fromCSV(_type, _entryCSV) as T;
+      _entries[_entry.key] = _entry;
+    }
+
+    for (List<dynamic> line in _csv) {
+      if (line.isEmpty) {
+        _decodeEntry();
+        _entryCSV = [];
+        continue;
+      }
+      _entryCSV.add(line);
+    }
+    _decodeEntry();
+
+    return PassyEntries(entries: _entries);
+  }
 
   T? getEntry(String key) => _entries[key];
 
@@ -40,8 +58,13 @@ class PassyEntries<T extends PassyEntry<T>>
       _entries.map((key, value) => MapEntry(key, value.toJson()));
 
   @override
-  List<List<String>> toCSV() {
-    // TODO: implement toCSV
-    throw UnimplementedError();
+  List<List<dynamic>> toCSV() {
+    List<List<dynamic>> csv = [];
+    for (T entry in entries) {
+      csv.addAll(entry.toCSV());
+      csv.add([]);
+    }
+    if (csv.isNotEmpty) csv.removeLast();
+    return csv;
   }
 }

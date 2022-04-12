@@ -80,7 +80,7 @@ class IDCard extends PassyEntry<IDCard> {
             [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory IDCard.fromCSV(List<List<String>> csv,
+  factory IDCard.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> templates = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();
