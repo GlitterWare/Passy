@@ -42,18 +42,19 @@ class IDCard extends PassyEntry<IDCard> {
   List<String> tags;
 
   IDCard({
-    required this.nickname,
-    required this.pictures,
-    required this.type,
-    required this.idNumber,
-    required this.name,
-    required this.issDate,
-    required this.expDate,
-    required this.country,
+    this.nickname = '',
+    List<String>? pictures,
+    this.type = '',
+    this.idNumber = '',
+    this.name = '',
+    this.issDate = '',
+    this.expDate = '',
+    this.country = '',
     List<CustomField>? customFields,
-    required this.additionalInfo,
+    this.additionalInfo = '',
     List<String>? tags,
-  })  : customFields = customFields ?? [],
+  })  : pictures = pictures ?? [],
+        customFields = customFields ?? [],
         tags = tags ?? [],
         super(DateTime.now().toUtc().toIso8601String());
 
