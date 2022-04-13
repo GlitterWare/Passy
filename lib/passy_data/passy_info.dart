@@ -1,27 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:universal_io/io.dart';
 
 import 'common.dart';
 import 'json_convertable.dart';
 import 'json_file.dart';
 
-class PassyInfoFile extends JsonFile<PassyInfo> {
-  PassyInfoFile._(File file, {required PassyInfo value})
-      : super(file, value: value);
-
-  factory PassyInfoFile(File file) {
-    if (file.existsSync()) {
-      return PassyInfoFile._(file,
-          value: PassyInfo.fromJson(jsonDecode(file.readAsStringSync())));
-    }
-    file.createSync(recursive: true);
-    PassyInfoFile _file = PassyInfoFile._(file, value: PassyInfo());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef PassyInfoFile = JsonFile<PassyInfo>;
 
 const _themeModeToJson = {
   ThemeMode.system: 'system',
@@ -57,4 +41,7 @@ class PassyInfo implements JsonConvertable {
         'lastUsername': lastUsername,
         'themeMode': _themeModeToJson[themeMode],
       };
+
+  static PassyInfoFile fromFile(File file) => PassyInfoFile.fromFile(file,
+      constructor: () => PassyInfo(), fromJson: PassyInfo.fromJson);
 }
