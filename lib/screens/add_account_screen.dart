@@ -70,10 +70,26 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ])));
       return;
     }
-    data.createAccount(
-      _username,
-      _password,
-    );
+    try {
+      data.createAccount(
+        _username,
+        _password,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(
+          content: Row(children: const [
+            Icon(Icons.error_outline_rounded, color: Colors.white),
+            SizedBox(width: 20),
+            Expanded(child: Text('Couldn\'t add account')),
+          ]),
+          action: SnackBarAction(
+            label: 'Show',
+            onPressed: () {},
+          ),
+        ));
+    }
     data.info.value.lastUsername = _username;
     data.info.save();
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
@@ -86,7 +102,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
         ? null
         : Padding(
             padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-            child: getBackButton(context,
+            child: getBackButton(
                 onPressed: () => Navigator.pushReplacementNamed(
                     context, LoginScreen.routeName)),
           );

@@ -6,10 +6,9 @@ late PassyData data;
 
 final bool cameraSupported = Platform.isAndroid || Platform.isIOS;
 
-Widget getBackButton(BuildContext context, {VoidCallback? onPressed}) =>
-    IconButton(
+Widget getBackButton({VoidCallback? onPressed}) => IconButton(
       icon: const Icon(Icons.arrow_back_ios_new_rounded),
-      onPressed: onPressed ?? () => Navigator.pop(context),
+      onPressed: onPressed,
     );
 
 AppBar getSetScreenAppBar(
@@ -19,7 +18,7 @@ AppBar getSetScreenAppBar(
   bool isNew = false,
 }) =>
     AppBar(
-      leading: getBackButton(context),
+      leading: getBackButton(onPressed: () => Navigator.pop(context)),
       title: isNew
           ? Center(child: Text('Add $title'))
           : Center(child: Text('Edit $title')),

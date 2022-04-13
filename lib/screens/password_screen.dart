@@ -27,7 +27,9 @@ class _PasswordScreen extends State<PasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _backButton = getBackButton(context);
+    _backButton = getBackButton(
+      onPressed: () => Navigator.pop(context),
+    );
   }
 
   //TODO: implement OTP display

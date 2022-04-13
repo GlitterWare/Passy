@@ -21,7 +21,7 @@ class AccountSettings implements JsonConvertable {
   AccountSettings({
     this.icon = 'assets/images/logo_circle.svg',
     this.color = Colors.purple,
-    this.defaultScreen = Screen.main,
+    this.defaultScreen = Screen.passwords,
   });
 
   @override

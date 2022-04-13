@@ -41,10 +41,26 @@ class _LoginScreen extends State<LoginScreen> {
     Navigator.pop(context);
     data.info.value.lastUsername = _username;
     data.info.save().whenComplete(() {
-      LoadedAccount _account =
-          data.loadAccount(data.info.value.lastUsername, _password);
-      Navigator.pushReplacementNamed(
-          context, screenToRouteName[_account.defaultScreen]!);
+      try {
+        LoadedAccount _account =
+            data.loadAccount(data.info.value.lastUsername, _password);
+        Navigator.pushReplacementNamed(
+            context, screenToRouteName[_account.defaultScreen]!);
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(
+            content: Row(children: const [
+              Icon(Icons.error_outline_rounded, color: Colors.white),
+              SizedBox(width: 20),
+              Expanded(child: Text('Couldn\'t login')),
+            ]),
+            action: SnackBarAction(
+              label: 'Show',
+              onPressed: () {},
+            ),
+          ));
+      }
     });
   }
 

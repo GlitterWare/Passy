@@ -191,19 +191,20 @@ class Synchronization {
     _syncLog += _exception;
     print(_syncLog);
     Navigator.pop(_context);
-    ScaffoldMessenger.of(_context).clearSnackBars();
-    ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
-      content: Row(children: const [
-        Icon(Icons.sync_rounded, color: Colors.white),
-        SizedBox(width: 20),
-        Expanded(child: Text('Sync error')),
-      ]),
-      action: SnackBarAction(
-          label: 'Show',
-          onPressed: () => {
-                //TODO: show error log
-              }),
-    ));
+    ScaffoldMessenger.of(_context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
+        content: Row(children: const [
+          Icon(Icons.sync_rounded, color: Colors.white),
+          SizedBox(width: 20),
+          Expanded(child: Text('Sync error')),
+        ]),
+        action: SnackBarAction(
+            label: 'Show',
+            onPressed: () => {
+                  //TODO: show error log
+                }),
+      ));
   }
 
   List<List<int>> _encodeData(_Request request) {

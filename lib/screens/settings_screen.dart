@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/screens/main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -16,7 +17,10 @@ class _SettingsScreen extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _backButton = getBackButton(context);
+    _backButton = getBackButton(
+      onPressed: () =>
+          Navigator.pushReplacementNamed(context, MainScreen.routeName),
+    );
   }
 
   @override

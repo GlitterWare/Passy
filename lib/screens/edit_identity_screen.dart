@@ -16,7 +16,9 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
   @override
   void initState() {
     super.initState();
-    _backButton = getBackButton(context);
+    _backButton = getBackButton(
+      onPressed: () => Navigator.pop(context),
+    );
   }
 
   @override

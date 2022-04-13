@@ -96,8 +96,15 @@ class _MainScreen extends State<MainScreen>
                                       ));
                                     }
                                   })
-                              : () => Navigator.pushReplacementNamed(
-                                  context, ConnectScreen.routeName),
+                              : () {
+                                  Navigator.popUntil(
+                                      context,
+                                      (route) =>
+                                          route.settings.name ==
+                                          MainScreen.routeName);
+                                  Navigator.pushReplacementNamed(
+                                      context, ConnectScreen.routeName);
+                                },
                         ),
                       ],
                     ),
@@ -107,8 +114,8 @@ class _MainScreen extends State<MainScreen>
                 splashRadius: 20,
               ),
               IconButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, SettingsScreen.routeName),
+                onPressed: () => Navigator.pushReplacementNamed(
+                    context, SettingsScreen.routeName),
                 icon: const Icon(Icons.settings),
                 splashRadius: 20,
               ),
@@ -125,7 +132,8 @@ class _MainScreen extends State<MainScreen>
               alignment: Alignment.centerLeft,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, PasswordsScreen.routeName);
+              Navigator.pushReplacementNamed(
+                  context, PasswordsScreen.routeName);
             },
           ),
         ],

@@ -7,6 +7,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:passy/widgets/entry_button.dart';
 
 import 'edit_password_screen.dart';
@@ -29,7 +30,9 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   void initState() {
     super.initState();
     LoadedAccount _account = data.loadedAccount!;
-    _backButton = getBackButton(context);
+    _backButton = getBackButton(
+        onPressed: () =>
+            Navigator.pushReplacementNamed(context, MainScreen.routeName));
 
     for (Password password in _account.passwords) {
       Widget _getIcon(String name) {
