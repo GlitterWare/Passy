@@ -126,14 +126,12 @@ List<List> csvDecode(String source, {bool recursive = false}) {
 
 /// Convert a Json map to a CSV list
 /// May not correctly convert json maps that contain maps with map values.
-List<List> jsonToCSV(String rootName, Map<String, dynamic> json) {
+List<List> jsonToCSV(Map<String, dynamic> json) {
   List<List> _csv = [];
 
-  void _convert({
-    required name,
-    required Map<String, dynamic> json,
-  }) {
-    _csv.add([name]);
+  void _convert(
+    Map<String, dynamic> json,
+  ) {
     int _index = _csv.length - 1;
     json.forEach((key, value) {
       switch (value.runtimeType) {
@@ -143,12 +141,12 @@ List<List> jsonToCSV(String rootName, Map<String, dynamic> json) {
           _csv.add(_list);
           break;
         case Map<String, dynamic>:
-          _convert(name: key, json: value);
+          _convert(value);
           break;
         case List<Map<String, dynamic>>:
           for (Map<String, dynamic> map
               in value as List<Map<String, dynamic>>) {
-            _convert(name: key, json: map);
+            _convert(map);
           }
           break;
         case Enum:
@@ -161,7 +159,7 @@ List<List> jsonToCSV(String rootName, Map<String, dynamic> json) {
     });
   }
 
-  _convert(name: rootName, json: json);
+  _convert(json);
 
   return _csv;
 }

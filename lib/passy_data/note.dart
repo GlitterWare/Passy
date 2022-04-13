@@ -50,5 +50,5 @@ class Note extends PassyEntry<Note> {
       };
 
   @override
-  List<List> toCSV() => jsonToCSV('note', toJson());
+  List<List> toCSV() => jsonToCSV(toJson());
 }

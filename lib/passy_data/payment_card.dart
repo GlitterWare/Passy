@@ -133,5 +133,5 @@ class PaymentCard extends PassyEntry<PaymentCard> {
       };
 
   @override
-  List<List<dynamic>> toCSV() => jsonToCSV('paymentCard', toJson());
+  List<List<dynamic>> toCSV() => jsonToCSV(toJson());
 }

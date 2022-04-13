@@ -148,5 +148,5 @@ class Password extends PassyEntry<Password> {
       };
 
   @override
-  List<List> toCSV() => jsonToCSV('password', toJson());
+  List<List> toCSV() => jsonToCSV(toJson());
 }

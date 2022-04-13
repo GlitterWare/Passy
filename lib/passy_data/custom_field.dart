@@ -61,5 +61,5 @@ class CustomField implements JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<List<dynamic>> toCSV() => jsonToCSV('customField', toJson());
+  List<List<dynamic>> toCSV() => jsonToCSV(toJson());
 }

@@ -216,5 +216,5 @@ class Identity extends PassyEntry<Identity> {
       };
 
   @override
-  List<List> toCSV() => jsonToCSV('identity', toJson());
+  List<List> toCSV() => jsonToCSV(toJson());
 }

@@ -165,5 +165,5 @@ class IDCard extends PassyEntry<IDCard> {
       };
 
   @override
-  List<List<dynamic>> toCSV() => jsonToCSV('idCard', toJson());
+  List<List<dynamic>> toCSV() => jsonToCSV(toJson());
 }

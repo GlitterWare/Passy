@@ -41,5 +41,5 @@ class PassyBytes extends PassyEntry<PassyBytes> {
       };
 
   @override
-  List<List> toCSV() => jsonToCSV('passyBytes', toJson());
+  List<List> toCSV() => jsonToCSV(toJson());
 }
