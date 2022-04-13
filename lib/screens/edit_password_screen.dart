@@ -4,7 +4,6 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/passwords_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
 
 class EditPasswordScreen extends StatefulWidget {
   const EditPasswordScreen({Key? key}) : super(key: key);

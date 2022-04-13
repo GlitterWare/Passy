@@ -8,7 +8,6 @@ import 'package:passy/widgets/entry_widget.dart';
 
 import 'main_screen.dart';
 import 'passwords_screen.dart';
-import 'splash_screen.dart';
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({Key? key}) : super(key: key);
