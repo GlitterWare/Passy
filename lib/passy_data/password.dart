@@ -1,5 +1,4 @@
-import 'package:passy/passy_data/common.dart';
-
+import 'common.dart';
 import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_file.dart';

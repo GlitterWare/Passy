@@ -1,9 +1,9 @@
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/passy_entry.dart';
 import 'package:universal_io/io.dart';
 
 import 'common.dart';
 import 'passy_entries.dart';
+import 'passy_entry.dart';
 import 'saveable_file_base.dart';
 
 class PassyEntriesFile<T extends PassyEntry<T>> implements SaveableFileBase {

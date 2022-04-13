@@ -1,10 +1,8 @@
-import 'package:passy/passy_data/passy_entries_file.dart';
-
 import 'common.dart';
 import 'custom_field.dart';
 import 'passy_entries.dart';
+import 'passy_entries_file.dart';
 import 'passy_entry.dart';
-import 'encrypted_json_file.dart';
 
 typedef PaymentCards = PassyEntries<PaymentCard>;
 

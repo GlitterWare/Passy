@@ -1,5 +1,5 @@
-import 'package:passy/passy_data/passy_entries.dart';
-import 'package:passy/passy_data/passy_entry.dart';
+import 'passy_entries.dart';
+import 'passy_entry.dart';
 
 class SortedPassyEntries<T extends PassyEntry<T>> extends PassyEntries<T> {
   final List<T> _entrySet;

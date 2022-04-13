@@ -1,9 +1,7 @@
-import 'dart:convert';
-
-import 'package:passy/passy_data/json_convertable.dart';
 import 'package:universal_io/io.dart';
 
 import 'common.dart';
+import 'json_convertable.dart';
 import 'json_file.dart';
 
 typedef AccountCredentialsFile = JsonFile<AccountCredentials>;

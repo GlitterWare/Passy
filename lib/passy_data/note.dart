@@ -1,7 +1,6 @@
-import 'package:passy/passy_data/passy_entries_file.dart';
-
 import 'common.dart';
 import 'passy_entries.dart';
+import 'passy_entries_file.dart';
 import 'passy_entry.dart';
 
 typedef Notes = PassyEntries<Note>;

@@ -1,16 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:universal_io/io.dart';
 
-import 'package:passy/passy_data/common.dart';
-import 'package:passy/passy_data/json_convertable.dart';
-
-import 'common.dart';
 import 'encrypted_json_file.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
+import 'json_convertable.dart';
 
 typedef HistoryFile = EncryptedJsonFile<History>;
 

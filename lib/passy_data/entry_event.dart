@@ -1,4 +1,4 @@
-import 'package:passy/passy_data/json_convertable.dart';
+import 'json_convertable.dart';
 
 enum EntryStatus { alive, deleted }
 
