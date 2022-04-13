@@ -84,7 +84,10 @@ class Password extends PassyEntry<Password> {
 
   factory Password.fromCSV(
     List<List<dynamic>> csv, {
-    Map<String, Map<String, int>> schemas = const {},
+    Map<String, Map<String, int>> schemas = const {
+      'password': csvSchema,
+      'customField': CustomField.csvSchema,
+    },
   }) {
     Map<String, int> _passwordSchema = schemas['password'] ?? csvSchema;
     Map<String, int> _customFieldSchema =

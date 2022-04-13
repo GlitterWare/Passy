@@ -48,7 +48,7 @@ abstract class PassyEntry<T extends PassyEntry<T>>
       case EntryType.passwordIcon:
         return PassyBytes.fromCSV(
           csv,
-          shemas: schemas,
+          schemas: schemas,
         );
       case EntryType.paymentCard:
         return PaymentCard.fromCSV(
@@ -63,7 +63,7 @@ abstract class PassyEntry<T extends PassyEntry<T>>
       case EntryType.idCard:
         return IDCard.fromCSV(
           csv,
-          shemas: schemas,
+          schemas: schemas,
         );
       case EntryType.identity:
         return Identity.fromCSV(

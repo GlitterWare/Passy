@@ -105,9 +105,9 @@ class Identity extends PassyEntry<Identity> {
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Identity.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> templates = const {}}) {
+      {Map<String, Map<String, int>> schemas = const {}}) {
     // TODO: implement fromCSV
-    throw UnimplementedError();
+    return Identity();
   }
 
   @override

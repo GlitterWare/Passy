@@ -19,9 +19,16 @@ class PassyBytes extends PassyEntry<PassyBytes> {
         super(json['key']);
 
   factory PassyBytes.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> shemas = const {}}) {
+      {Map<String, Map<String, int>> schemas = const {
+        'passyBytes': csvSchema
+      }}) {
     // TODO: implement fromCSV
-    throw UnimplementedError();
+    Map<String, int> _passyBytesSchema = schemas['passyBytes']!;
+    List<dynamic> _csv = csv[0];
+    return PassyBytes(
+      _csv[_passyBytesSchema['key']!],
+      value: base64Decode(_csv[_passyBytesSchema['key']!]),
+    );
   }
 
   @override

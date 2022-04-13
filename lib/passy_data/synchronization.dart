@@ -148,12 +148,6 @@ class _EntryInfo implements JsonConvertable {
 class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
-  final Passwords _passwords;
-  final PassyImages _passwordIcons;
-  final Notes _notes;
-  final PaymentCards _paymentCards;
-  final IDCards _idCards;
-  final Identities _identities;
   final Encrypter _encrypter;
   final BuildContext _context;
   static ServerSocket? _server;
@@ -162,21 +156,9 @@ class Synchronization {
 
   Synchronization(this._loadedAccount,
       {required History history,
-      required Passwords passwords,
-      required PassyImages passwordIcons,
-      required Notes notes,
-      required PaymentCards paymentCards,
-      required IDCards idCards,
-      required Identities identities,
       required Encrypter encrypter,
       required BuildContext context})
       : _history = history,
-        _passwords = passwords,
-        _passwordIcons = passwordIcons,
-        _notes = notes,
-        _paymentCards = paymentCards,
-        _idCards = idCards,
-        _identities = identities,
         _encrypter = encrypter,
         _context = context;
 

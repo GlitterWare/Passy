@@ -73,8 +73,11 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory PaymentCard.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> schemas = const {}}) {
-    Map<String, int> _paymentCardSchema = schemas['password'] ?? csvSchema;
+      {Map<String, Map<String, int>> schemas = const {
+        'paymentCard': csvSchema,
+        'customField': CustomField.csvSchema,
+      }}) {
+    Map<String, int> _paymentCardSchema = schemas['paymentCard'] ?? csvSchema;
     Map<String, int> _customFieldSchema =
         schemas['customField'] ?? CustomField.csvSchema;
     PaymentCard? _paymentCard;

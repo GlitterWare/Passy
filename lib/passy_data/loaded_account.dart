@@ -111,28 +111,12 @@ class LoadedAccount {
 
   Future<HostAddress?> host({required BuildContext context}) =>
       Synchronization(this,
-              history: _history.value,
-              passwords: _passwords.value,
-              passwordIcons: _passwordIcons,
-              notes: _notes.value,
-              paymentCards: _paymentCards.value,
-              idCards: _idCards.value,
-              identities: _identities.value,
-              encrypter: _encrypter,
-              context: context)
+              history: _history.value, encrypter: _encrypter, context: context)
           .host();
 
   Future<void> connect(HostAddress address, {required BuildContext context}) =>
       Synchronization(this,
-              history: _history.value,
-              passwords: _passwords.value,
-              passwordIcons: _passwordIcons,
-              notes: _notes.value,
-              paymentCards: _paymentCards.value,
-              idCards: _idCards.value,
-              identities: _identities.value,
-              encrypter: _encrypter,
-              context: context)
+              history: _history.value, encrypter: _encrypter, context: context)
           .connect(address);
 
   void setEntry(EntryType type, PassyEntry value) {
