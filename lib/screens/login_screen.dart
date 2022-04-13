@@ -34,7 +34,8 @@ class _LoginScreen extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: const [
         Icon(Icons.lock_rounded, color: Colors.white),
-        Text('Incorrect password'),
+        SizedBox(width: 20),
+        Expanded(child: Text('Incorrect password')),
       ])));
       return;
     }
@@ -51,7 +52,7 @@ class _LoginScreen extends State<LoginScreen> {
           ..clearSnackBars()
           ..showSnackBar(SnackBar(
             content: Row(children: const [
-              Icon(Icons.error_outline_rounded, color: Colors.white),
+              Icon(Icons.lock_rounded, color: Colors.white),
               SizedBox(width: 20),
               Expanded(child: Text('Couldn\'t login')),
             ]),
