@@ -7,4 +7,10 @@ final theme = ThemeData(
       borderRadius: BorderRadius.circular(100),
     ),
   ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ButtonStyle(
+      shadowColor:
+          MaterialStateProperty.resolveWith((states) => Colors.transparent),
+    ),
+  ),
 );
