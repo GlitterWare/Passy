@@ -23,7 +23,7 @@ class PassyBytes extends PassyEntry<PassyBytes> {
         'passyBytes': csvSchema
       }}) {
     // TODO: implement fromCSV
-    Map<String, int> _passyBytesSchema = schemas['passyBytes']!;
+    Map<String, int> _passyBytesSchema = schemas['passyBytes'] ?? csvSchema;
     List<dynamic> _csv = csv[0];
     return PassyBytes(
       _csv[_passyBytesSchema['key']!],

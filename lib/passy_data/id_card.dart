@@ -9,6 +9,19 @@ typedef IDCards = PassyEntries<IDCard>;
 typedef IDCardsFile = PassyEntriesFile<IDCard>;
 
 class IDCard extends PassyEntry<IDCard> {
+  static const csvSchema = {
+    'key': 1,
+    'nickname': 2,
+    'pictures': 3,
+    'type': 4,
+    'idNumber': 5,
+    'name': 6,
+    'issDate': 7,
+    'expDate': 8,
+    'country': 9,
+    'additionalInfo': 10,
+  };
+
   String nickname;
   List<String> pictures;
   String type;
@@ -20,6 +33,24 @@ class IDCard extends PassyEntry<IDCard> {
   List<CustomField> customFields;
   String additionalInfo;
   List<String> tags;
+
+  IDCard._({
+    required String key,
+    this.nickname = '',
+    List<String>? pictures,
+    this.type = '',
+    this.idNumber = '',
+    this.name = '',
+    this.issDate = '',
+    this.expDate = '',
+    this.country = '',
+    List<CustomField>? customFields,
+    this.additionalInfo = '',
+    List<String>? tags,
+  })  : pictures = pictures ?? [],
+        customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(key);
 
   IDCard({
     this.nickname = '',
@@ -61,10 +92,57 @@ class IDCard extends PassyEntry<IDCard> {
             [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory IDCard.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> schemas = const {}}) {
-    // TODO: implement fromCSV
-    return IDCard();
+  factory IDCard.fromCSV(
+    List<List<dynamic>> csv, {
+    Map<String, Map<String, int>> schemas = const {
+      'idCard': csvSchema,
+      'customField': CustomField.csvSchema,
+    },
+  }) {
+    Map<String, int> _objectSchema = schemas['idCard'] ?? csvSchema;
+    Map<String, int> _customFieldSchema =
+        schemas['customField'] ?? CustomField.csvSchema;
+
+    IDCard? _object;
+    List<String> _pictures = [];
+    List<CustomField> _customFields = [];
+    List<String> _tags = [];
+
+    for (List<dynamic> entry in csv) {
+      switch (entry[0]) {
+        case 'idCard':
+          _object = IDCard._(
+            key: entry[_objectSchema['key']!],
+            nickname: entry[_objectSchema['nickname']!],
+            type: entry[_objectSchema['type']!],
+            idNumber: entry[_objectSchema['idNumber']!],
+            name: entry[_objectSchema['name']!],
+            issDate: entry[_objectSchema['issDate']!],
+            expDate: entry[_objectSchema['expDate']!],
+            country: entry[_objectSchema['country']!],
+            additionalInfo: entry[_objectSchema['additionalInfo']!],
+          );
+          break;
+        case 'pictures':
+          List<String> _entry = (entry as List<String>).toList()..removeAt(0);
+          _pictures.addAll(_entry);
+          break;
+        case 'customFields':
+          _customFields
+              .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
+          break;
+        case 'tags':
+          List<String> _entry = (entry as List<String>).toList()..removeAt(0);
+          _tags.addAll(_entry);
+          break;
+      }
+    }
+
+    _object!
+      ..pictures = _pictures
+      ..customFields = _customFields
+      ..tags = _tags;
+    return _object;
   }
 
   @override

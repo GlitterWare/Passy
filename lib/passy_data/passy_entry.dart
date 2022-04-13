@@ -16,7 +16,8 @@ abstract class PassyEntry<T extends PassyEntry<T>>
 
   int compareTo(T other);
 
-  static PassyEntry fromJson(EntryType entryType, Map<String, dynamic> json) {
+  static PassyEntry<dynamic> fromJson(
+      EntryType entryType, Map<String, dynamic> json) {
     switch (entryType) {
       case EntryType.password:
         return Password.fromJson(json);
@@ -34,7 +35,7 @@ abstract class PassyEntry<T extends PassyEntry<T>>
     }
   }
 
-  static PassyEntry fromCSV(
+  static PassyEntry<dynamic> fromCSV(
     EntryType entryType,
     List<List<dynamic>> csv, {
     Map<String, Map<String, int>> schemas = const {},

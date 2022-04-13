@@ -27,13 +27,13 @@ class PassyInfo implements JsonConvertable {
   PassyInfo({
     this.version = passyVersion,
     this.lastUsername = '',
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.dark,
   });
 
   PassyInfo.fromJson(Map<String, dynamic> json)
       : version = json['version'] ?? passyVersion,
         lastUsername = json['lastUsername'] ?? '',
-        themeMode = _themeModeFromJson[json['themeMode']] ?? ThemeMode.system;
+        themeMode = _themeModeFromJson[json['themeMode']] ?? ThemeMode.dark;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{

@@ -8,8 +8,20 @@ typedef Notes = PassyEntries<Note>;
 typedef NotesFile = PassyEntriesFile<Note>;
 
 class Note extends PassyEntry<Note> {
+  static const csvSchema = {
+    'key': 1,
+    'title': 2,
+    'note': 3,
+  };
+
   String title;
   String note;
+
+  Note._({
+    required String key,
+    this.title = '',
+    this.note = '',
+  }) : super(key);
 
   Note({
     this.title = '',
@@ -21,11 +33,11 @@ class Note extends PassyEntry<Note> {
         note = json['note'] ?? '',
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory Note.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> schemas = const {}}) {
-    // TODO: implement fromCSV
-    throw Note();
-  }
+  Note.fromCSV(List<List<dynamic>> csv,
+      {Map<String, Map<String, int>> schemas = const {'note': csvSchema}})
+      : title = csv[0][schemas['note']!['title']!],
+        note = csv[0][schemas['note']!['note']!],
+        super(csv[0][schemas['note']!['key']!]);
 
   @override
   int compareTo(Note other) => title.compareTo(other.title);

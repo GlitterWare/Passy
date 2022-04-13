@@ -72,28 +72,31 @@ class PaymentCard extends PassyEntry<PaymentCard> {
             [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory PaymentCard.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> schemas = const {
-        'paymentCard': csvSchema,
-        'customField': CustomField.csvSchema,
-      }}) {
-    Map<String, int> _paymentCardSchema = schemas['paymentCard'] ?? csvSchema;
+  factory PaymentCard.fromCSV(
+    List<List<dynamic>> csv, {
+    Map<String, Map<String, int>> schemas = const {
+      'paymentCard': csvSchema,
+      'customField': CustomField.csvSchema,
+    },
+  }) {
+    Map<String, int> _objectSchema = schemas['paymentCard'] ?? csvSchema;
     Map<String, int> _customFieldSchema =
         schemas['customField'] ?? CustomField.csvSchema;
-    PaymentCard? _paymentCard;
+
+    PaymentCard? _object;
     List<CustomField> _customFields = [];
     List<String> _tags = [];
 
     for (List<dynamic> entry in csv) {
       switch (entry[0]) {
-        case 'password':
-          _paymentCard = PaymentCard._(
-            key: entry[_paymentCardSchema['key']!],
-            cardNumber: entry[_paymentCardSchema['cardNumber']!],
-            cardholderName: entry[_paymentCardSchema['cardholderName']!],
-            cvv: entry[_paymentCardSchema['cvv']!],
-            exp: entry[_paymentCardSchema['exp']!],
-            additionalInfo: entry[_paymentCardSchema['additionalInfo']!],
+        case 'paymentCard':
+          _object = PaymentCard._(
+            key: entry[_objectSchema['key']!],
+            cardNumber: entry[_objectSchema['cardNumber']!],
+            cardholderName: entry[_objectSchema['cardholderName']!],
+            cvv: entry[_objectSchema['cvv']!],
+            exp: entry[_objectSchema['exp']!],
+            additionalInfo: entry[_objectSchema['additionalInfo']!],
           );
           break;
         case 'customFields':
@@ -101,16 +104,16 @@ class PaymentCard extends PassyEntry<PaymentCard> {
               .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
           break;
         case 'tags':
-          for (int i = 1; i != entry.length; i++) {
-            _tags.add(entry[i]);
-          }
+          List<String> _entry = (entry as List<String>).toList()..removeAt(0);
+          _tags.addAll(_entry);
           break;
       }
     }
 
-    _paymentCard!.customFields = _customFields;
-    _paymentCard.tags = _tags;
-    return _paymentCard;
+    _object!
+      ..customFields = _customFields
+      ..tags = _tags;
+    return _object;
   }
 
   @override

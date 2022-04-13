@@ -41,6 +41,23 @@ Gender genderFromName(String name) {
 }
 
 class Identity extends PassyEntry<Identity> {
+  static const csvSchema = {
+    'nickname': 1,
+    'title': 2,
+    'firstName': 3,
+    'middleName': 4,
+    'lastName': 5,
+    'gender': 6,
+    'email': 7,
+    'number': 8,
+    'firstAddressLine': 9,
+    'secondAddressLine': 10,
+    'zipCode': 11,
+    'city': 12,
+    'country': 13,
+    'additionalInfo': 14,
+  };
+
   String nickname;
   Title title;
   String firstName;
@@ -57,6 +74,28 @@ class Identity extends PassyEntry<Identity> {
   List<CustomField> customFields;
   String additionalInfo;
   List<String> tags;
+
+  Identity._({
+    required String key,
+    this.nickname = '',
+    this.title = Title.mr,
+    this.firstName = '',
+    this.middleName = '',
+    this.lastName = '',
+    this.gender = Gender.male,
+    this.email = '',
+    this.number = '',
+    this.firstAddressLine = '',
+    this.secondAddressLine = '',
+    this.zipCode = '',
+    this.city = '',
+    this.country = '',
+    List<CustomField>? customFields,
+    this.additionalInfo = '',
+    List<String>? tags,
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(key);
 
   Identity({
     this.nickname = '',
@@ -106,8 +145,50 @@ class Identity extends PassyEntry<Identity> {
 
   factory Identity.fromCSV(List<List<dynamic>> csv,
       {Map<String, Map<String, int>> schemas = const {}}) {
-    // TODO: implement fromCSV
-    return Identity();
+    Map<String, int> _objectSchema = schemas['idCard'] ?? csvSchema;
+    Map<String, int> _customFieldSchema =
+        schemas['customField'] ?? CustomField.csvSchema;
+
+    Identity? _object;
+    List<CustomField> _customFields = [];
+    List<String> _tags = [];
+
+    for (List<dynamic> entry in csv) {
+      switch (entry[0]) {
+        case 'idCard':
+          _object = Identity._(
+            key: entry[_objectSchema['key']!],
+            nickname: entry[_objectSchema['nickname']!],
+            title: titleFromName(entry[_objectSchema['title']!]),
+            firstName: entry[_objectSchema['firstName']!],
+            middleName: entry[_objectSchema['middleName']!],
+            lastName: entry[_objectSchema['lastName']!],
+            gender: genderFromName(entry[_objectSchema['gender']!]),
+            email: entry[_objectSchema['email']!],
+            number: entry[_objectSchema['number']!],
+            firstAddressLine: entry[_objectSchema['firstAddressLine']!],
+            secondAddressLine: entry[_objectSchema['secondAddressLine']!],
+            zipCode: entry[_objectSchema['zipCode']!],
+            city: entry[_objectSchema['city']!],
+            country: entry[_objectSchema['country']!],
+            additionalInfo: entry[_objectSchema['additionalInfo']!],
+          );
+          break;
+        case 'customFields':
+          _customFields
+              .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
+          break;
+        case 'tags':
+          List<String> _entry = (entry as List<String>).toList()..removeAt(0);
+          _tags.addAll(_entry);
+          break;
+      }
+    }
+
+    _object!
+      ..customFields = _customFields
+      ..tags = _tags;
+    return _object;
   }
 
   @override

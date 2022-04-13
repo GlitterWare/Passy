@@ -22,6 +22,8 @@ class PassyEntries<T extends PassyEntry<T>>
     List<List<dynamic>> _entryCSV = [];
     Map<String, T> _entries = {};
 
+    // TODO: read schemas at the start of the csv
+
     void _decodeEntry() {
       if (_entryCSV.isEmpty) return;
       T _entry = PassyEntry.fromCSV(_type, _entryCSV) as T;
@@ -55,6 +57,8 @@ class PassyEntries<T extends PassyEntry<T>>
 
   @override
   List<List<dynamic>> toCSV() {
+    // TODO: write schemas at the start of the csv
+
     List<List<dynamic>> csv = [];
     for (T entry in entries) {
       csv.addAll(entry.toCSV());

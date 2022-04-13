@@ -89,26 +89,27 @@ class Password extends PassyEntry<Password> {
       'customField': CustomField.csvSchema,
     },
   }) {
-    Map<String, int> _passwordSchema = schemas['password'] ?? csvSchema;
+    Map<String, int> _objectSchema = schemas['password'] ?? csvSchema;
     Map<String, int> _customFieldSchema =
         schemas['customField'] ?? CustomField.csvSchema;
-    Password? _password;
+
+    Password? _object;
     List<CustomField> _customFields = [];
     List<String> _tags = [];
 
     for (List<dynamic> entry in csv) {
       switch (entry[0]) {
         case 'password':
-          _password = Password._(
-            key: entry[_passwordSchema['key']!],
-            nickname: entry[_passwordSchema['nickname']!],
-            iconName: entry[_passwordSchema['iconName']!],
-            username: entry[_passwordSchema['username']!],
-            email: entry[_passwordSchema['email']!],
-            password: entry[_passwordSchema['password']!],
-            tfaSecret: entry[_passwordSchema['tfaSecret']!],
-            website: entry[_passwordSchema['website']!],
-            additionalInfo: entry[_passwordSchema['additionalInfo']!],
+          _object = Password._(
+            key: entry[_objectSchema['key']!],
+            nickname: entry[_objectSchema['nickname']!],
+            iconName: entry[_objectSchema['iconName']!],
+            username: entry[_objectSchema['username']!],
+            email: entry[_objectSchema['email']!],
+            password: entry[_objectSchema['password']!],
+            tfaSecret: entry[_objectSchema['tfaSecret']!],
+            website: entry[_objectSchema['website']!],
+            additionalInfo: entry[_objectSchema['additionalInfo']!],
           );
           break;
         case 'customFields':
@@ -116,16 +117,16 @@ class Password extends PassyEntry<Password> {
               .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
           break;
         case 'tags':
-          for (int i = 1; i != entry.length; i++) {
-            _tags.add(entry[i]);
-          }
+          List<String> _entry = (entry as List<String>).toList()..removeAt(0);
+          _tags.addAll(_entry);
           break;
       }
     }
 
-    _password!.customFields = _customFields;
-    _password.tags = _tags;
-    return _password;
+    _object!
+      ..customFields = _customFields
+      ..tags = _tags;
+    return _object;
   }
 
   @override
