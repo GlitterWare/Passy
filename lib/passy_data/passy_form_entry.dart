@@ -16,13 +16,13 @@ abstract class PassyFormEntry<T> extends PassyEntry<T> {
 }
 
 List<List> passyFormEntryToCSV<T extends PassyFormEntry>(
-    T entry, Map<String, int> csvTemplate) {
+    T entry, {required Map<String, int> template}) {
   List<List> _csv = [
     [entryTypeFromType(entry.runtimeType).name]
   ];
   Map<String, dynamic> _json = entry.toJson();
   List<dynamic> _password = _csv[0];
-  for (String key in csvTemplate.keys) {
+  for (String key in template.keys) {
     _password.add(_json[key]);
   }
   for (CustomField field in entry.customFields) {

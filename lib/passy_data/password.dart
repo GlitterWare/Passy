@@ -145,5 +145,6 @@ class Password extends PassyFormEntry<Password> {
       };
 
   @override
-  List<List<dynamic>> toCSV() => passyFormEntryToCSV(this, csvTemplate);
+  List<List<dynamic>> toCSV() =>
+      passyFormEntryToCSV(this, template: csvTemplate);
 }
