@@ -5,7 +5,7 @@ import 'common.dart';
 import 'passy_entry.dart';
 
 class PassyBytes extends PassyEntry<PassyBytes> {
-  static const csvTemplate = {
+  static const csvSchema = {
     'key': 1,
     'value': 2,
   };
@@ -19,7 +19,7 @@ class PassyBytes extends PassyEntry<PassyBytes> {
         super(json['key']);
 
   factory PassyBytes.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> templates = const {}}) {
+      {Map<String, Map<String, int>> shemas = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();
   }

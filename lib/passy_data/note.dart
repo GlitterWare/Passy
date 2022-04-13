@@ -22,7 +22,7 @@ class Note extends PassyEntry<Note> {
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Note.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> templates = const {}}) {
+      {Map<String, Map<String, int>> schemas = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();
   }

@@ -20,7 +20,7 @@ FieldType fieldTypeFromName(String name) {
 }
 
 class CustomField implements JsonConvertable, CSVConvertable {
-  static const csvTemplate = {
+  static const csvSchema = {
     'fieldType': 1,
     'title': 2,
     'value': 3,
@@ -46,11 +46,11 @@ class CustomField implements JsonConvertable, CSVConvertable {
         obscured = json['private'] ?? false;
 
   CustomField.fromCSV(List<dynamic> csv,
-      {Map<String, int> template = csvTemplate})
-      : title = csv[template['title']!],
-        fieldType = fieldTypeFromName(csv[template['title']!]),
-        value = csv[template['value']!],
-        obscured = csv[template['obscured']!];
+      {Map<String, int> csvSchema = csvSchema})
+      : title = csv[csvSchema['title']!],
+        fieldType = fieldTypeFromName(csv[csvSchema['title']!]),
+        value = csv[csvSchema['value']!],
+        obscured = csv[csvSchema['obscured']!];
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{

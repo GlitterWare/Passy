@@ -9,7 +9,7 @@ typedef PaymentCards = PassyEntries<PaymentCard>;
 typedef PaymentCardsFile = PassyEntriesFile<PaymentCard>;
 
 class PaymentCard extends PassyEntry<PaymentCard> {
-  static const csvTemplate = {
+  static const csvSchema = {
     'key': 1,
     'nickname': 2,
     'cardNumber': 3,
@@ -73,10 +73,10 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory PaymentCard.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> templates = const {}}) {
-    Map<String, int> _passwordTemplate = templates['password'] ?? csvTemplate;
-    Map<String, int> _customFieldTemplate =
-        templates['customField'] ?? CustomField.csvTemplate;
+      {Map<String, Map<String, int>> schemas = const {}}) {
+    Map<String, int> _paymentCardSchema = schemas['password'] ?? csvSchema;
+    Map<String, int> _customFieldSchema =
+        schemas['customField'] ?? CustomField.csvSchema;
     PaymentCard? _paymentCard;
     List<CustomField> _customFields = [];
     List<String> _tags = [];
@@ -85,17 +85,17 @@ class PaymentCard extends PassyEntry<PaymentCard> {
       switch (entry[0]) {
         case 'password':
           _paymentCard = PaymentCard._(
-            key: entry[_passwordTemplate['key']!],
-            cardNumber: entry[_passwordTemplate['cardNumber']!],
-            cardholderName: entry[_passwordTemplate['cardholderName']!],
-            cvv: entry[_passwordTemplate['cvv']!],
-            exp: entry[_passwordTemplate['exp']!],
-            additionalInfo: entry[_passwordTemplate['additionalInfo']!],
+            key: entry[_paymentCardSchema['key']!],
+            cardNumber: entry[_paymentCardSchema['cardNumber']!],
+            cardholderName: entry[_paymentCardSchema['cardholderName']!],
+            cvv: entry[_paymentCardSchema['cvv']!],
+            exp: entry[_paymentCardSchema['exp']!],
+            additionalInfo: entry[_paymentCardSchema['additionalInfo']!],
           );
           break;
         case 'customFields':
           _customFields
-              .add(CustomField.fromCSV(entry, template: _customFieldTemplate));
+              .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
           break;
         case 'tags':
           for (int i = 1; i != entry.length; i++) {

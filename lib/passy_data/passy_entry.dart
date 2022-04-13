@@ -37,38 +37,38 @@ abstract class PassyEntry<T extends PassyEntry<T>>
   static PassyEntry fromCSV(
     EntryType entryType,
     List<List<dynamic>> csv, {
-    Map<String, Map<String, int>> templates = const {},
+    Map<String, Map<String, int>> schemas = const {},
   }) {
     switch (entryType) {
       case EntryType.password:
         return Password.fromCSV(
           csv,
-          templates: templates,
+          schemas: schemas,
         );
       case EntryType.passwordIcon:
         return PassyBytes.fromCSV(
           csv,
-          templates: templates,
+          shemas: schemas,
         );
       case EntryType.paymentCard:
         return PaymentCard.fromCSV(
           csv,
-          templates: templates,
+          schemas: schemas,
         );
       case EntryType.note:
         return Note.fromCSV(
           csv,
-          templates: templates,
+          schemas: schemas,
         );
       case EntryType.idCard:
         return IDCard.fromCSV(
           csv,
-          templates: templates,
+          shemas: schemas,
         );
       case EntryType.identity:
         return Identity.fromCSV(
           csv,
-          templates: templates,
+          schemas: schemas,
         );
       default:
         throw Exception(

@@ -9,7 +9,7 @@ typedef Passwords = PassyEntries<Password>;
 typedef PasswordsFile = PassyEntriesFile<Password>;
 
 class Password extends PassyEntry<Password> {
-  static const csvTemplate = {
+  static const csvSchema = {
     'key': 1,
     'nickname': 2,
     'iconName': 3,
@@ -84,11 +84,11 @@ class Password extends PassyEntry<Password> {
 
   factory Password.fromCSV(
     List<List<dynamic>> csv, {
-    Map<String, Map<String, int>> templates = const {},
+    Map<String, Map<String, int>> schemas = const {},
   }) {
-    Map<String, int> _passwordTemplate = templates['password'] ?? csvTemplate;
-    Map<String, int> _customFieldTemplate =
-        templates['customField'] ?? CustomField.csvTemplate;
+    Map<String, int> _passwordSchema = schemas['password'] ?? csvSchema;
+    Map<String, int> _customFieldSchema =
+        schemas['customField'] ?? CustomField.csvSchema;
     Password? _password;
     List<CustomField> _customFields = [];
     List<String> _tags = [];
@@ -97,20 +97,20 @@ class Password extends PassyEntry<Password> {
       switch (entry[0]) {
         case 'password':
           _password = Password._(
-            key: entry[_passwordTemplate['key']!],
-            nickname: entry[_passwordTemplate['nickname']!],
-            iconName: entry[_passwordTemplate['iconName']!],
-            username: entry[_passwordTemplate['username']!],
-            email: entry[_passwordTemplate['email']!],
-            password: entry[_passwordTemplate['password']!],
-            tfaSecret: entry[_passwordTemplate['tfaSecret']!],
-            website: entry[_passwordTemplate['website']!],
-            additionalInfo: entry[_passwordTemplate['additionalInfo']!],
+            key: entry[_passwordSchema['key']!],
+            nickname: entry[_passwordSchema['nickname']!],
+            iconName: entry[_passwordSchema['iconName']!],
+            username: entry[_passwordSchema['username']!],
+            email: entry[_passwordSchema['email']!],
+            password: entry[_passwordSchema['password']!],
+            tfaSecret: entry[_passwordSchema['tfaSecret']!],
+            website: entry[_passwordSchema['website']!],
+            additionalInfo: entry[_passwordSchema['additionalInfo']!],
           );
           break;
         case 'customFields':
           _customFields
-              .add(CustomField.fromCSV(entry, template: _customFieldTemplate));
+              .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
           break;
         case 'tags':
           for (int i = 1; i != entry.length; i++) {

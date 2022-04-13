@@ -62,7 +62,7 @@ class IDCard extends PassyEntry<IDCard> {
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory IDCard.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> templates = const {}}) {
+      {Map<String, Map<String, int>> shemas = const {}}) {
     // TODO: implement fromCSV
     throw UnimplementedError();
   }
