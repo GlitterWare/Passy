@@ -29,11 +29,13 @@ String encrypt(String data, {required Encrypter encrypter}) {
       .base64;
 }
 
-String decrypt(String data, {required Encrypter encrypter}) =>
-    encrypter.decrypt64(
-      data,
-      iv: IV.fromLength(16),
-    );
+String decrypt(String data, {required Encrypter encrypter}) {
+  if (data.isEmpty) return '';
+  return encrypter.decrypt64(
+    data,
+    iv: IV.fromLength(16),
+  );
+}
 
 String csvEncode(List<List> object) {
   String _encoded = '';

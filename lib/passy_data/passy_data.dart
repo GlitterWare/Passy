@@ -26,7 +26,7 @@ class PassyData {
 
   void createAccount(String username, String password) {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
-    AccountCredentialsFile _file = AccountCredentialsFile.create(
+    AccountCredentialsFile _file = AccountCredentials.fromFile(
         File(_accountPath + Platform.pathSeparator + 'credentials.json'),
         value: AccountCredentials(username, password));
     _accounts[username] = _file;
@@ -70,8 +70,8 @@ class PassyData {
 
   PassyData(String path)
       : accountsPath = path + Platform.pathSeparator + 'accounts',
-        info =
-            PassyInfoFile(File(path + Platform.pathSeparator + 'passy.json')) {
+        info = PassyInfo.fromFile(
+            File(path + Platform.pathSeparator + 'passy.json')) {
     if (info.value.version != passyVersion) {
       info.value.version = passyVersion;
       info.saveSync();
@@ -82,13 +82,14 @@ class PassyData {
     List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
     for (FileSystemEntity d in _accountDirectories) {
       String _username = d.path.split(Platform.pathSeparator).last;
-      File _credentialsFile = File(accountsPath +
-          Platform.pathSeparator +
-          _username +
-          Platform.pathSeparator +
-          'credentials.json');
-      _credentialsFile.createSync();
-      _accounts[_username] = AccountCredentialsFile.read(_credentialsFile);
+      _accounts[_username] = AccountCredentials.fromFile(
+        File(accountsPath +
+            Platform.pathSeparator +
+            _username +
+            Platform.pathSeparator +
+            'credentials.json'),
+        value: AccountCredentials(_username, 'corrupted'),
+      );
     }
     if (!_accounts.containsKey(info.value.lastUsername)) {
       if (_accounts.isEmpty) {

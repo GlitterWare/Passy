@@ -6,16 +6,7 @@ import 'package:universal_io/io.dart';
 import 'common.dart';
 import 'json_file.dart';
 
-class AccountCredentialsFile extends JsonFile<AccountCredentials> {
-  AccountCredentialsFile.create(File file, {required AccountCredentials value})
-      : super(file, value: value) {
-    file.createSync(recursive: true);
-    saveSync();
-  }
-
-  AccountCredentialsFile.read(File file)
-      : super(file, value: AccountCredentials.fromFile(file));
-}
+typedef AccountCredentialsFile = JsonFile<AccountCredentials>;
 
 class AccountCredentials implements JsonConvertable {
   String username;
@@ -31,12 +22,14 @@ class AccountCredentials implements JsonConvertable {
       : username = json['username'] ?? '',
         _passwordHash = json['passwordHash'] ?? '';
 
-  factory AccountCredentials.fromFile(File file) =>
-      AccountCredentials.fromJson(jsonDecode(file.readAsStringSync()));
-
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'username': username,
         'passwordHash': _passwordHash,
       };
+
+  static AccountCredentialsFile fromFile(File file,
+          {AccountCredentials? value}) =>
+      AccountCredentialsFile.fromFile(file,
+          constructor: () => value!, fromJson: AccountCredentials.fromJson);
 }
