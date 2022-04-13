@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/passy_entries_file.dart';
 
 import 'common.dart';
 import 'custom_field.dart';
@@ -11,24 +8,7 @@ import 'encrypted_json_file.dart';
 
 typedef PaymentCards = PassyEntries<PaymentCard>;
 
-class PaymentCardsFile extends EncryptedJsonFile<PaymentCards> {
-  PaymentCardsFile._(File file, Encrypter encrypter,
-      {required PaymentCards value})
-      : super(file, encrypter, value: value);
-
-  factory PaymentCardsFile(File file, Encrypter encrypter) {
-    if (file.existsSync()) {
-      return PaymentCardsFile._(file, encrypter,
-          value: PaymentCards.fromJson(jsonDecode(
-              decrypt(file.readAsStringSync(), encrypter: encrypter))));
-    }
-    file.createSync(recursive: true);
-    PaymentCardsFile _file =
-        PaymentCardsFile._(file, encrypter, value: PaymentCards());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef PaymentCardsFile = PassyEntriesFile<PaymentCard>;
 
 class PaymentCard extends PassyEntry<PaymentCard> {
   static const csvTemplate = {

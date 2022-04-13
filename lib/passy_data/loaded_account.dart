@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
-import 'package:passy/passy_data/passy_entries_file.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -41,25 +40,29 @@ class LoadedAccount {
     required Encrypter encrypter,
   })  : _encrypter = encrypter,
         _credentials = credentials,
-        _settings = AccountSettingsFile(
-            File(path + Platform.pathSeparator + 'settings.enc'), encrypter),
-        _history = HistoryFile(
-            File(path + Platform.pathSeparator + 'history.enc'), encrypter),
+        _settings = AccountSettings.fromFile(
+            File(path + Platform.pathSeparator + 'settings.enc'),
+            encrypter: encrypter),
+        _history = History.fromFile(
+            File(path + Platform.pathSeparator + 'history.enc'),
+            encrypter: encrypter),
         _passwords = PasswordsFile(
             File(path + Platform.pathSeparator + 'passwords.enc'),
             encrypter: encrypter),
         _passwordIcons = PassyImages(
             path + Platform.pathSeparator + 'password_icons',
             encrypter: encrypter),
-        _notes = NotesFile(
-            File(path + Platform.pathSeparator + 'notes.enc'), encrypter),
+        _notes = NotesFile(File(path + Platform.pathSeparator + 'notes.enc'),
+            encrypter: encrypter),
         _paymentCards = PaymentCardsFile(
             File(path + Platform.pathSeparator + 'payment_cards.enc'),
-            encrypter),
+            encrypter: encrypter),
         _idCards = IDCardsFile(
-            File(path + Platform.pathSeparator + 'id_cards.enc'), encrypter),
+            File(path + Platform.pathSeparator + 'id_cards.enc'),
+            encrypter: encrypter),
         _identities = IdentitiesFile(
-            File(path + Platform.pathSeparator + 'identities.enc'), encrypter);
+            File(path + Platform.pathSeparator + 'identities.enc'),
+            encrypter: encrypter);
 
   void _setAccountPassword(String password) {
     _credentials.value.password = password;

@@ -1,31 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/passy_entries_file.dart';
 
 import 'common.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
-import 'encrypted_json_file.dart';
 
 typedef Notes = PassyEntries<Note>;
 
-class NotesFile extends EncryptedJsonFile<Notes> {
-  NotesFile._(File file, Encrypter encrypter, {required Notes value})
-      : super(file, encrypter, value: value);
-
-  factory NotesFile(File file, Encrypter encrypter) {
-    if (file.existsSync()) {
-      return NotesFile._(file, encrypter,
-          value: Notes.fromJson(jsonDecode(
-              decrypt(file.readAsStringSync(), encrypter: encrypter))));
-    }
-    file.createSync(recursive: true);
-    NotesFile _file = NotesFile._(file, encrypter, value: Notes());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef NotesFile = PassyEntriesFile<Note>;
 
 class Note extends PassyEntry<Note> {
   String title;

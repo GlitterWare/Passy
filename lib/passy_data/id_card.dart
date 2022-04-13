@@ -1,32 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:encrypt/encrypt.dart';
-
 import 'common.dart';
 import 'custom_field.dart';
 import 'passy_entries.dart';
+import 'passy_entries_file.dart';
 import 'passy_entry.dart';
-import 'encrypted_json_file.dart';
 
 typedef IDCards = PassyEntries<IDCard>;
 
-class IDCardsFile extends EncryptedJsonFile<IDCards> {
-  IDCardsFile._(File file, Encrypter encrypter, {required IDCards value})
-      : super(file, encrypter, value: value);
-
-  factory IDCardsFile(File file, Encrypter encrypter) {
-    if (file.existsSync()) {
-      return IDCardsFile._(file, encrypter,
-          value: IDCards.fromJson(jsonDecode(
-              decrypt(file.readAsStringSync(), encrypter: encrypter))));
-    }
-    file.createSync(recursive: true);
-    IDCardsFile _file = IDCardsFile._(file, encrypter, value: IDCards());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef IDCardsFile = PassyEntriesFile<IDCard>;
 
 class IDCard extends PassyEntry<IDCard> {
   String nickname;

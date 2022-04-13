@@ -12,21 +12,7 @@ import 'encrypted_json_file.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 
-class HistoryFile extends EncryptedJsonFile<History> {
-  HistoryFile._(File file, Encrypter encrypter, {required History value})
-      : super(file, encrypter, value: value);
-
-  factory HistoryFile(File file, Encrypter encrypter) {
-    if (file.existsSync()) {
-      return HistoryFile._(file, encrypter,
-          value: History.fromFile(file, encrypter));
-    }
-    file.createSync(recursive: true);
-    HistoryFile _file = HistoryFile._(file, encrypter, value: History());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef HistoryFile = EncryptedJsonFile<History>;
 
 class History implements JsonConvertable {
   final Map<String, EntryEvent> passwords;
@@ -79,8 +65,21 @@ class History implements JsonConvertable {
         identities = (json['identities'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value)));
 
-  factory History.fromFile(File file, Encrypter encrypter) => History.fromJson(
-      jsonDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
+  @override
+  Map<String, dynamic> toJson() => {
+        'passwords': passwords.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'passwordIcons': passwordIcons.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'notes': notes.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'paymentCards': paymentCards.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'idCards': idCards.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'identities': identities.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+      };
 
   Map<String, EntryEvent> getEvents(EntryType type) {
     switch (type) {
@@ -101,19 +100,9 @@ class History implements JsonConvertable {
     }
   }
 
-  @override
-  Map<String, dynamic> toJson() => {
-        'passwords': passwords.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-        'passwordIcons': passwordIcons.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-        'notes': notes.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-        'paymentCards': paymentCards.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-        'idCards': idCards.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-        'identities': identities.map<String, dynamic>(
-            (key, value) => MapEntry(key, value.toJson())),
-      };
+  static HistoryFile fromFile(File file, {required Encrypter encrypter}) =>
+      HistoryFile.fromFile(file,
+          encrypter: encrypter,
+          constructor: () => History(),
+          fromJson: History.fromJson);
 }

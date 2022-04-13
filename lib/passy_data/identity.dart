@@ -1,32 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:encrypt/encrypt.dart';
-
 import 'common.dart';
 import 'custom_field.dart';
 import 'passy_entries.dart';
+import 'passy_entries_file.dart';
 import 'passy_entry.dart';
-import 'encrypted_json_file.dart';
 
 typedef Identities = PassyEntries<Identity>;
 
-class IdentitiesFile extends EncryptedJsonFile<Identities> {
-  IdentitiesFile._(File file, Encrypter encrypter, {required Identities value})
-      : super(file, encrypter, value: value);
-
-  factory IdentitiesFile(File file, Encrypter encrypter) {
-    if (file.existsSync()) {
-      return IdentitiesFile._(file, encrypter,
-          value: Identities.fromJson(jsonDecode(
-              decrypt(file.readAsStringSync(), encrypter: encrypter))));
-    }
-    IdentitiesFile _file =
-        IdentitiesFile._(file, encrypter, value: Identities());
-    _file.saveSync();
-    return _file;
-  }
-}
+typedef IdentitiesFile = PassyEntriesFile<Identity>;
 
 enum Title { mr, mrs, miss, other }
 
