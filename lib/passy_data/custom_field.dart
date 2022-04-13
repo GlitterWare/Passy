@@ -1,3 +1,4 @@
+import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 
@@ -60,12 +61,5 @@ class CustomField implements JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<List<dynamic>> toCSV() {
-    Map<String, dynamic> _json = toJson();
-    List<String> _csv = ['customField'];
-    for (String key in csvTemplate.keys) {
-      _csv.add(_json[key]);
-    }
-    return [_csv];
-  }
+  List<List<dynamic>> toCSV() => jsonToCSV('customField', toJson());
 }

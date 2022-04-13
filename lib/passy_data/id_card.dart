@@ -106,8 +106,5 @@ class IDCard extends PassyEntry<IDCard> {
       };
 
   @override
-  toCSV() {
-    // TODO: implement toCSV
-    throw UnimplementedError();
-  }
+  List<List<dynamic>> toCSV() => jsonToCSV('idCard', toJson());
 }

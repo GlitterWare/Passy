@@ -74,3 +74,45 @@ List<List> csvDecode(String source) {
   _object.removeLast();
   return _object;
 }
+
+/// Convert a Json map to a CSV list
+/// May not correctly convert json maps that contain maps with map values.
+List<List> jsonToCSV(String rootName, Map<String, dynamic> json) {
+  List<List> _csv = [];
+
+  void _convert({
+    required name,
+    required Map<String, dynamic> json,
+  }) {
+    _csv.add([name]);
+    int _index = _csv.length - 1;
+    json.forEach((key, value) {
+      switch (value.runtimeType) {
+        case List<String>:
+          List<String> _list = value;
+          _list.insert(0, key);
+          _csv.add(_list);
+          break;
+        case Map<String, dynamic>:
+          _convert(name: key, json: value);
+          break;
+        case List<Map<String, dynamic>>:
+          for (Map<String, dynamic> map
+              in value as List<Map<String, dynamic>>) {
+            _convert(name: key, json: map);
+          }
+          break;
+        case Enum:
+          _csv[_index].add((value as Enum).name);
+          break;
+        default:
+          _csv[_index].add(value);
+          break;
+      }
+    });
+  }
+
+  _convert(name: rootName, json: json);
+
+  return _csv;
+}

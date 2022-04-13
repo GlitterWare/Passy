@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'common.dart';
 import 'passy_entry.dart';
 
 class PassyBytes extends PassyEntry<PassyBytes> {
@@ -33,8 +34,5 @@ class PassyBytes extends PassyEntry<PassyBytes> {
       };
 
   @override
-  toCSV() {
-    // TODO: implement toCSV
-    throw UnimplementedError();
-  }
+  List<List> toCSV() => jsonToCSV('passyBytes', toJson());
 }

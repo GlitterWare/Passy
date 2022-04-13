@@ -8,7 +8,8 @@ import 'password.dart';
 import 'passy_bytes.dart';
 import 'payment_card.dart';
 
-abstract class PassyEntry<T> implements JsonConvertable, CSVConvertable {
+abstract class PassyEntry<T extends PassyEntry<T>>
+    implements JsonConvertable, CSVConvertable {
   final String key;
 
   PassyEntry(this.key);

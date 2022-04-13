@@ -155,8 +155,5 @@ class Identity extends PassyEntry<Identity> {
       };
 
   @override
-  toCSV() {
-    // TODO: implement toCSV
-    throw UnimplementedError();
-  }
+  List<List> toCSV() => jsonToCSV('identity', toJson());
 }

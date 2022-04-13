@@ -1,13 +1,15 @@
+import 'package:passy/passy_data/common.dart';
+
 import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_file.dart';
-import 'passy_form_entry.dart';
+import 'passy_entry.dart';
 
 typedef Passwords = PassyEntries<Password>;
 
 typedef PasswordsFile = PassyEntriesFile<Password>;
 
-class Password extends PassyFormEntry<Password> {
+class Password extends PassyEntry<Password> {
   static const csvTemplate = {
     'key': 1,
     'nickname': 2,
@@ -27,7 +29,9 @@ class Password extends PassyFormEntry<Password> {
   String password;
   String tfaSecret;
   String website;
+  List<CustomField> customFields;
   String additionalInfo;
+  List<String> tags;
 
   Password._({
     required String key,
@@ -41,11 +45,9 @@ class Password extends PassyFormEntry<Password> {
     List<CustomField>? customFields,
     this.additionalInfo = '',
     List<String>? tags,
-  }) : super(
-          key: key,
-          customFields: customFields,
-          tags: tags,
-        );
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(key);
 
   Password({
     this.nickname = '',
@@ -58,11 +60,9 @@ class Password extends PassyFormEntry<Password> {
     List<CustomField>? customFields,
     this.additionalInfo = '',
     List<String>? tags,
-  }) : super(
-          key: DateTime.now().toUtc().toIso8601String(),
-          customFields: customFields,
-          tags: tags,
-        );
+  })  : customFields = customFields ?? [],
+        tags = tags ?? [],
+        super(DateTime.now().toUtc().toIso8601String());
 
   Password.fromJson(Map<String, dynamic> json)
       : nickname = json['nickname'] ?? '',
@@ -72,16 +72,16 @@ class Password extends PassyFormEntry<Password> {
         password = json['password'] ?? '',
         tfaSecret = json['tfaSecret'] ?? '',
         website = json['website'] ?? '',
+        customFields = (json['customFields'] as List<dynamic>?)
+                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
         additionalInfo = json['additionalInfo'] as String,
-        super(
-          key: json['key'] ?? DateTime.now().toUtc().toIso8601String(),
-          customFields: (json['customFields'] as List<dynamic>?)
-              ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
-              .toList(),
-          tags: (json['tags'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList(),
-        );
+        tags = (json['tags'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Password.fromCSV(
     List<List<dynamic>> csv, {
@@ -145,6 +145,5 @@ class Password extends PassyFormEntry<Password> {
       };
 
   @override
-  List<List<dynamic>> toCSV() =>
-      passyFormEntryToCSV(this, template: csvTemplate);
+  List<List> toCSV() => jsonToCSV('password', toJson());
 }
