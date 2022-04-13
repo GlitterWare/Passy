@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
@@ -39,39 +40,85 @@ String decrypt(String data, {required Encrypter encrypter}) {
 
 String csvEncode(List<List> object) {
   String _encoded = '';
-  for (List<dynamic> line in object) {
-    if (line.isEmpty) {
-      _encoded += '\n';
-      continue;
+
+  void _encode(List<List> entry, {String separator = '\n'}) {
+    for (List line in entry) {
+      if (line.isEmpty) {
+        _encoded += separator;
+        continue;
+      }
+      _encoded += line.join(',').replaceAll(', ', ',') + separator;
     }
-    _encoded += line.join(',') + '\n';
   }
+
+  _encode(object);
   return _encoded;
 }
 
-List<List> csvDecode(String source) {
+List<List> csvDecode(String source, {bool recursive = false}) {
+  List<dynamic> _decode(String source) {
+    List<dynamic> _entry = [''];
+    int v = 0;
+    int _depth = 0;
+    bool _isString = true;
+    Iterator<String> _characters = source.characters.iterator;
+
+    while (_characters.moveNext()) {
+      if (_characters.current == '[') {
+        _entry[v] += '[';
+        _depth++;
+        while (_characters.moveNext()) {
+          _entry[v] += _characters.current;
+          if (_characters.current == ']') {
+            _depth--;
+            if (_depth == 0) break;
+          }
+          if (_characters.current == '[') {
+            _depth++;
+          }
+        }
+        if (recursive) {
+          String _entryString = (_entry[v] as String);
+          _isString = false;
+          _entry[v] =
+              _decode(_entryString.substring(1, _entryString.length - 1));
+        }
+        continue;
+      }
+
+      if (_characters.current == ',') {
+        if (_entry[v] == 'false') {
+          _entry[v] = false;
+        }
+
+        if (_entry[v] == 'true') {
+          _entry[v] = true;
+        }
+
+        v++;
+        _entry.add('');
+        _isString = true;
+        continue;
+      }
+
+      if (_isString) {
+        _entry[v] += _characters.current;
+        continue;
+      }
+      (_entry[v] as List<dynamic>).add(_characters.current);
+    }
+
+    return _entry;
+  }
+
   List<List> _object = [];
-  List<String> _lines = source.split('\n');
-  for (String line in _lines) {
-    List<dynamic> _entry;
+
+  for (String line in source.split('\n')) {
     if (line.isEmpty) {
       _object.add([]);
       continue;
     }
-    _entry = [];
-    for (String value in line.split(',')) {
-      switch (value) {
-        case 'false':
-          _entry.add(false);
-          break;
-        case 'true':
-          _entry.add(true);
-          break;
-        default:
-          _entry.add(value);
-      }
-    }
-    _object.add(_entry);
+    _object.add(_decode(line));
   }
   _object.removeLast();
   return _object;
