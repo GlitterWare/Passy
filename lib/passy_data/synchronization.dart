@@ -165,7 +165,6 @@ class Synchronization {
     }
     String _exception = '\nLocal exception has occurred: ' + message;
     _syncLog += _exception;
-    print(_syncLog);
     Navigator.pop(_context);
     ScaffoldMessenger.of(_context)
       ..clearSnackBars()
@@ -355,7 +354,6 @@ class Synchronization {
                 _info = _EntryInfo();
                 _remoteRequest = _Request();
 
-                //TODO: merge local/remote history iteration
                 for (EntryType entryType in EntryType.values) {
                   Map<String, EntryEvent> _localEvents =
                       _history.getEvents(entryType);

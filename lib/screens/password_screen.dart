@@ -4,6 +4,7 @@ import 'package:otp/otp.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/screens/edit_password_screen.dart';
 import 'package:passy/widgets/entry_widget.dart';
 
 import 'main_screen.dart';
@@ -31,7 +32,6 @@ class _PasswordScreen extends State<PasswordScreen> {
     );
   }
 
-  //TODO: implement OTP display
   //TODO: implement tags
   //TODO: implement customFields
 
@@ -78,7 +78,8 @@ class _PasswordScreen extends State<PasswordScreen> {
           IconButton(
             icon: const Icon(Icons.edit_rounded),
             onPressed: () {
-              //TODO: show AddPasswordScreen
+              Navigator.pushNamed(context, EditPasswordScreen.routeName,
+                  arguments: _password);
             },
           ),
         ],
@@ -125,6 +126,22 @@ class _PasswordScreen extends State<PasswordScreen> {
                 style: TextStyle(color: Colors.grey),
               ),
               Text(_password.password),
+            ],
+          ),
+        ),
+        EntryWidget(
+          body: Column(
+            children: [
+              const Text(
+                '2FA Code',
+                style: TextStyle(color: Colors.grey),
+              ),
+              Text(OTP.generateTOTPCodeString(
+                _password.tfaSecret,
+                DateTime.now().millisecondsSinceEpoch,
+                algorithm: Algorithm.SHA1,
+                isGoogle: true,
+              )),
             ],
           ),
         ),

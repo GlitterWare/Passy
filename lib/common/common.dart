@@ -11,7 +11,7 @@ Widget getBackButton({VoidCallback? onPressed}) => IconButton(
       onPressed: onPressed,
     );
 
-AppBar getSetScreenAppBar(
+AppBar getEditScreenAppBar(
   BuildContext context, {
   required String title,
   required VoidCallback onSave,

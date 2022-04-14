@@ -23,8 +23,10 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
     bool _isNew = _args == null;
     final Password _password = _isNew ? Password() : _args as Password;
 
+    _args = null;
+
     return Scaffold(
-      appBar: getSetScreenAppBar(
+      appBar: getEditScreenAppBar(
         context,
         title: 'Password',
         isNew: _isNew,
@@ -37,27 +39,33 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
-        TextField(
+        TextFormField(
+          initialValue: _password.nickname,
           decoration: const InputDecoration(labelText: 'Nickname'),
           onChanged: (value) => _password.nickname = value,
         ),
-        TextField(
+        TextFormField(
+          initialValue: _password.username,
           decoration: const InputDecoration(labelText: 'Username'),
           onChanged: (value) => _password.username = value,
         ),
-        TextField(
+        TextFormField(
+          initialValue: _password.password,
           decoration: const InputDecoration(labelText: 'Password'),
           onChanged: (value) => _password.password = value,
         ),
-        TextField(
+        TextFormField(
+          initialValue: _password.tfaSecret,
           decoration: const InputDecoration(labelText: '2FA Secret'),
           onChanged: (value) => _password.tfaSecret = value,
         ),
-        TextField(
+        TextFormField(
+          initialValue: _password.website,
           decoration: const InputDecoration(labelText: 'Website'),
           onChanged: (value) => _password.website = value,
         ),
-        TextField(
+        TextFormField(
+          initialValue: _password.additionalInfo,
           decoration: const InputDecoration(labelText: 'Additional'),
           onChanged: (value) => _password.additionalInfo = value,
         ),
