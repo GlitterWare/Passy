@@ -23,7 +23,7 @@ import 'passy_stream_subscription.dart';
 const String _hello = 'hello';
 const String _sameHistoryHash = 'same';
 
-class _EntryData implements JsonConvertable {
+class _EntryData with JsonConvertable {
   final String key;
   final EntryType type;
   final EntryEvent event;
@@ -51,7 +51,7 @@ class _EntryData implements JsonConvertable {
       };
 }
 
-class _Request implements JsonConvertable {
+class _Request with JsonConvertable {
   final List<String> passwords;
   final List<String> passwordIcons;
   final List<String> notes;
@@ -118,7 +118,7 @@ class _Request implements JsonConvertable {
       };
 }
 
-class _EntryInfo implements JsonConvertable {
+class _EntryInfo with JsonConvertable {
   final History history;
   final _Request request;
 

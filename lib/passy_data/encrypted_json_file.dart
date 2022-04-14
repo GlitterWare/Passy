@@ -7,7 +7,7 @@ import 'common.dart';
 import 'json_convertable.dart';
 import 'saveable_file_base.dart';
 
-class EncryptedJsonFile<T extends JsonConvertable> implements SaveableFileBase {
+class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
   final T value;
   final File _file;
   Encrypter _encrypter;

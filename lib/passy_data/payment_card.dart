@@ -44,7 +44,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  PaymentCard.fromCSV(List<dynamic> csv)
+  PaymentCard.fromCSV(List csv)
       : nickname = csv[1] ?? '',
         cardNumber = csv[2] ?? '',
         cardholderName = csv[3] ?? '',
@@ -74,7 +74,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
       };
 
   @override
-  List<dynamic> toCSV() => [
+  List toCSV() => [
         key,
         nickname,
         cardNumber,

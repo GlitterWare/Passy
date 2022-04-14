@@ -50,7 +50,7 @@ class Password extends PassyEntry<Password> {
         tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  Password.fromCSV(List<dynamic> csv)
+  Password.fromCSV(List csv)
       : nickname = csv[1] ?? '',
         iconName = csv[2] ?? '',
         username = csv[3] ?? '',
@@ -85,7 +85,7 @@ class Password extends PassyEntry<Password> {
       };
 
   @override
-  List<dynamic> toCSV() => [
+  List toCSV() => [
         key,
         nickname,
         iconName,

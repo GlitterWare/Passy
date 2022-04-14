@@ -5,7 +5,7 @@ import 'package:universal_io/io.dart';
 import 'json_convertable.dart';
 import 'saveable_file_base.dart';
 
-class JsonFile<T extends JsonConvertable> implements SaveableFileBase {
+class JsonFile<T extends JsonConvertable> with SaveableFileBase {
   final T value;
   final File _file;
 

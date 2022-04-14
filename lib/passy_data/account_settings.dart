@@ -8,7 +8,7 @@ import 'screen.dart';
 
 typedef AccountSettingsFile = EncryptedJsonFile<AccountSettings>;
 
-class AccountSettings implements JsonConvertable {
+class AccountSettings with JsonConvertable {
   String icon;
   Color color;
   Screen defaultScreen;

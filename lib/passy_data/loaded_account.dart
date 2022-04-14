@@ -122,17 +122,17 @@ class LoadedAccount {
   void Function(PassyEntry value) setEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
-        return setPassword as void Function(PassyEntry<dynamic> value);
+        return setPassword as void Function(PassyEntry value);
       case EntryType.passwordIcon:
-        return setPasswordIcon as void Function(PassyEntry<dynamic> value);
+        return setPasswordIcon as void Function(PassyEntry value);
       case EntryType.paymentCard:
-        return setPaymentCard as void Function(PassyEntry<dynamic> value);
+        return setPaymentCard as void Function(PassyEntry value);
       case EntryType.note:
-        return setNote as void Function(PassyEntry<dynamic> value);
+        return setNote as void Function(PassyEntry value);
       case EntryType.idCard:
-        return setIDCard as void Function(PassyEntry<dynamic> value);
+        return setIDCard as void Function(PassyEntry value);
       case EntryType.identity:
-        return setIdentity as void Function(PassyEntry<dynamic> value);
+        return setIdentity as void Function(PassyEntry value);
       default:
         throw Exception('Unsupported entry type \'${type.name}\'');
     }

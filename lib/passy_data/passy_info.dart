@@ -19,7 +19,7 @@ const _themeModeFromJson = {
   'light': ThemeMode.light,
 };
 
-class PassyInfo implements JsonConvertable {
+class PassyInfo with JsonConvertable {
   String version;
   String lastUsername;
   ThemeMode themeMode;

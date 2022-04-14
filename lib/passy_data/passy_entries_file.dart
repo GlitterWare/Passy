@@ -6,7 +6,7 @@ import 'passy_entries.dart';
 import 'passy_entry.dart';
 import 'saveable_file_base.dart';
 
-class PassyEntriesFile<T extends PassyEntry<T>> implements SaveableFileBase {
+class PassyEntriesFile<T extends PassyEntry<T>> with SaveableFileBase {
   final PassyEntries<T> value;
   final File _file;
   Encrypter _encrypter;

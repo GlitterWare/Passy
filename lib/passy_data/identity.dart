@@ -98,7 +98,7 @@ class Identity extends PassyEntry<Identity> {
         tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  Identity.fromCSV(List<dynamic> csv)
+  Identity.fromCSV(List csv)
       : nickname = csv[1] ?? '',
         title = titleFromName(csv[2]) ?? Title.mr,
         firstName = csv[3] ?? '',
@@ -144,7 +144,7 @@ class Identity extends PassyEntry<Identity> {
       };
 
   @override
-  List<dynamic> toCSV() => [
+  List toCSV() => [
         key,
         nickname,
         title.name,

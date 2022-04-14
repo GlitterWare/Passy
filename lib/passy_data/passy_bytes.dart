@@ -12,7 +12,7 @@ class PassyBytes extends PassyEntry<PassyBytes> {
       : value = base64Decode(json['value']),
         super(json['key']);
 
-  PassyBytes.fromCSV(List<dynamic> csv)
+  PassyBytes.fromCSV(List csv)
       : value = base64Decode(csv[1]),
         super(csv[0]);
 
@@ -26,7 +26,7 @@ class PassyBytes extends PassyEntry<PassyBytes> {
       };
 
   @override
-  List<dynamic> toCSV() => [
+  List toCSV() => [
         key,
         base64Encode(value),
       ];

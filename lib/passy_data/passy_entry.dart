@@ -8,14 +8,14 @@ import 'password.dart';
 import 'passy_bytes.dart';
 import 'payment_card.dart';
 
-abstract class PassyEntry<T> implements JsonConvertable, CSVConvertable {
+abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
   final String key;
 
   PassyEntry(this.key);
 
   int compareTo(T other);
 
-  static PassyEntry<dynamic> Function(Map<String, dynamic> json) fromJson(
+  static PassyEntry Function(Map<String, dynamic> json) fromJson(
       EntryType entryType) {
     switch (entryType) {
       case EntryType.password:
@@ -34,8 +34,7 @@ abstract class PassyEntry<T> implements JsonConvertable, CSVConvertable {
     }
   }
 
-  static PassyEntry<dynamic> Function(List<dynamic> csv) fromCSV(
-      EntryType entryType) {
+  static PassyEntry Function(List csv) fromCSV(EntryType entryType) {
     switch (entryType) {
       case EntryType.password:
         return Password.fromCSV;

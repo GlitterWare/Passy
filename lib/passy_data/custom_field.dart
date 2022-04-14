@@ -17,7 +17,7 @@ FieldType? fieldTypeFromName(String name) {
   return null;
 }
 
-class CustomField implements JsonConvertable, CSVConvertable {
+class CustomField with JsonConvertable, CSVConvertable {
   String title;
   FieldType fieldType;
   String value;
@@ -36,7 +36,7 @@ class CustomField implements JsonConvertable, CSVConvertable {
         value = json['value'] ?? '',
         obscured = json['private'] ?? false;
 
-  CustomField.fromCSV(List<dynamic> csv)
+  CustomField.fromCSV(List csv)
       : title = csv[0] ?? 'Custom Field',
         fieldType = fieldTypeFromName(csv[1]) ?? FieldType.text,
         value = csv[2] ?? '',
@@ -51,7 +51,7 @@ class CustomField implements JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<dynamic> toCSV() => [
+  List toCSV() => [
         title,
         fieldType.name,
         value,

@@ -6,7 +6,7 @@ import 'json_file.dart';
 
 typedef AccountCredentialsFile = JsonFile<AccountCredentials>;
 
-class AccountCredentials implements JsonConvertable {
+class AccountCredentials with JsonConvertable {
   String username;
   set password(String value) => _passwordHash = getHash(value).toString();
   String get passwordHash => _passwordHash;

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:universal_io/io.dart';
 
 import 'encrypted_json_file.dart';
@@ -10,7 +11,7 @@ import 'json_convertable.dart';
 
 typedef HistoryFile = EncryptedJsonFile<History>;
 
-class History implements JsonConvertable {
+class History with JsonConvertable {
   final Map<String, EntryEvent> passwords;
   final Map<String, EntryEvent> passwordIcons;
   final Map<String, EntryEvent> notes;

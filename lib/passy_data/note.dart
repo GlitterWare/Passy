@@ -20,7 +20,7 @@ class Note extends PassyEntry<Note> {
         note = json['note'] ?? '',
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  Note.fromCSV(List<dynamic> csv)
+  Note.fromCSV(List csv)
       : title = csv[1] ?? '',
         note = csv[2] ?? '',
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
@@ -36,7 +36,7 @@ class Note extends PassyEntry<Note> {
       };
 
   @override
-  List<dynamic> toCSV() => [
+  List toCSV() => [
         key,
         title,
         note,

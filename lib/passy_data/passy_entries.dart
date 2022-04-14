@@ -4,7 +4,7 @@ import 'json_convertable.dart';
 import 'passy_entry.dart';
 
 class PassyEntries<T extends PassyEntry<T>>
-    implements JsonConvertable, CSVConvertable {
+    with JsonConvertable, CSVConvertable {
   final Map<String, T> _entries;
   Iterable<T> get entries => _entries.values;
 
