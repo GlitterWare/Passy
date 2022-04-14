@@ -119,58 +119,58 @@ class LoadedAccount {
               history: _history.value, encrypter: _encrypter, context: context)
           .connect(address);
 
-  void setEntry(EntryType type, PassyEntry value) {
+  void Function(PassyEntry value) setEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
-        return setPassword(value as Password);
+        return setPassword as void Function(PassyEntry<dynamic> value);
       case EntryType.passwordIcon:
-        return setPasswordIcon(value as PassyBytes);
+        return setPasswordIcon as void Function(PassyEntry<dynamic> value);
       case EntryType.paymentCard:
-        return setPaymentCard(value as PaymentCard);
+        return setPaymentCard as void Function(PassyEntry<dynamic> value);
       case EntryType.note:
-        return setNote(value as Note);
+        return setNote as void Function(PassyEntry<dynamic> value);
       case EntryType.idCard:
-        return setIDCard(value as IDCard);
+        return setIDCard as void Function(PassyEntry<dynamic> value);
       case EntryType.identity:
-        return setIdentity(value as Identity);
+        return setIdentity as void Function(PassyEntry<dynamic> value);
       default:
         throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
-  PassyEntry? getEntry(EntryType type, String key) {
+  PassyEntry? Function(String key) getEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
-        return getPassword(key);
+        return getPassword;
       case EntryType.passwordIcon:
-        return getPasswordIcon(key);
+        return getPasswordIcon;
       case EntryType.paymentCard:
-        return getPaymentCard(key);
+        return getPaymentCard;
       case EntryType.note:
-        return getNote(key);
+        return getNote;
       case EntryType.idCard:
-        return getIDCard(key);
+        return getIDCard;
       case EntryType.identity:
-        return getIdentity(key);
+        return getIdentity;
       default:
         throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
-  void removeEntry(EntryType type, String key) {
+  void Function(String key) removeEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
-        return removePassword(key);
+        return removePassword;
       case EntryType.passwordIcon:
-        return removePasswordIcon(key);
+        return removePasswordIcon;
       case EntryType.paymentCard:
-        return removePaymentCard(key);
+        return removePaymentCard;
       case EntryType.note:
-        return removeNote(key);
+        return removeNote;
       case EntryType.idCard:
-        return removeIDCard(key);
+        return removeIDCard;
       case EntryType.identity:
-        return removeIdentity(key);
+        return removeIdentity;
       default:
         throw Exception('Unsupported entry type \'${type.name}\'');
     }

@@ -4,6 +4,8 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/screens/login_screen.dart';
 
+import 'log_screen.dart';
+
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
 
@@ -85,8 +87,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
             Expanded(child: Text('Couldn\'t add account')),
           ]),
           action: SnackBarAction(
-            label: 'Show',
-            onPressed: () {},
+            label: 'Details',
+            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                arguments: e.toString()),
           ),
         ));
     }

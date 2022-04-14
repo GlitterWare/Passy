@@ -1,4 +1,3 @@
-import 'common.dart';
 import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_file.dart';
@@ -10,7 +9,7 @@ typedef IdentitiesFile = PassyEntriesFile<Identity>;
 
 enum Title { mr, mrs, miss, other }
 
-Title titleFromName(String name) {
+Title? titleFromName(String name) {
   switch (name) {
     case 'mr':
       return Title.mr;
@@ -20,14 +19,13 @@ Title titleFromName(String name) {
       return Title.miss;
     case 'other':
       return Title.other;
-    default:
-      throw Exception('Cannot convert String \'$name\' to Title');
   }
+  return null;
 }
 
 enum Gender { male, female, other, error }
 
-Gender genderFromName(String name) {
+Gender? genderFromName(String name) {
   switch (name) {
     case 'male':
       return Gender.male;
@@ -35,29 +33,11 @@ Gender genderFromName(String name) {
       return Gender.female;
     case 'other':
       return Gender.other;
-    default:
-      throw Exception('Cannot convert String \'$name\' to Gender');
   }
+  return null;
 }
 
 class Identity extends PassyEntry<Identity> {
-  static const csvSchema = {
-    'nickname': 1,
-    'title': 2,
-    'firstName': 3,
-    'middleName': 4,
-    'lastName': 5,
-    'gender': 6,
-    'email': 7,
-    'number': 8,
-    'firstAddressLine': 9,
-    'secondAddressLine': 10,
-    'zipCode': 11,
-    'city': 12,
-    'country': 13,
-    'additionalInfo': 14,
-  };
-
   String nickname;
   Title title;
   String firstName;
@@ -74,28 +54,6 @@ class Identity extends PassyEntry<Identity> {
   List<CustomField> customFields;
   String additionalInfo;
   List<String> tags;
-
-  Identity._({
-    required String key,
-    this.nickname = '',
-    this.title = Title.mr,
-    this.firstName = '',
-    this.middleName = '',
-    this.lastName = '',
-    this.gender = Gender.male,
-    this.email = '',
-    this.number = '',
-    this.firstAddressLine = '',
-    this.secondAddressLine = '',
-    this.zipCode = '',
-    this.city = '',
-    this.country = '',
-    List<CustomField>? customFields,
-    this.additionalInfo = '',
-    List<String>? tags,
-  })  : customFields = customFields ?? [],
-        tags = tags ?? [],
-        super(key);
 
   Identity({
     this.nickname = '',
@@ -120,11 +78,11 @@ class Identity extends PassyEntry<Identity> {
 
   Identity.fromJson(Map<String, dynamic> json)
       : nickname = json['nickname'] ?? '',
-        title = titleFromName(json['title'] ?? 'mr'),
+        title = titleFromName(json['title']) ?? Title.mr,
         firstName = json['firstName'] ?? '',
         middleName = json['middleName'] ?? '',
         lastName = json['lastName'] ?? '',
-        gender = genderFromName(json['gender'] ?? 'male'),
+        gender = genderFromName(json['gender']) ?? Gender.male,
         email = json['email'] ?? '',
         number = json['number'] ?? '',
         firstAddressLine = json['firstAddressLine'] ?? '',
@@ -132,64 +90,34 @@ class Identity extends PassyEntry<Identity> {
         zipCode = json['zipCode'] ?? '',
         city = json['city'] ?? '',
         country = json['country'] ?? '',
-        customFields = (json['customFields'] as List<dynamic>?)
+        customFields = (json['customFields'] as List?)
                 ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
                 .toList() ??
             [],
         additionalInfo = json['additionalInfo'] ?? '',
-        tags = (json['tags'] as List<dynamic>?)
-                ?.map((e) => e as String)
-                .toList() ??
-            [],
+        tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  factory Identity.fromCSV(List<List<dynamic>> csv,
-      {Map<String, Map<String, int>> schemas = const {}}) {
-    Map<String, int> _objectSchema = schemas['idCard'] ?? csvSchema;
-    Map<String, int> _customFieldSchema =
-        schemas['customField'] ?? CustomField.csvSchema;
-
-    Identity? _object;
-    List<CustomField> _customFields = [];
-    List<String> _tags = [];
-
-    for (List<dynamic> entry in csv) {
-      switch (entry[0]) {
-        case 'idCard':
-          _object = Identity._(
-            key: entry[_objectSchema['key']!],
-            nickname: entry[_objectSchema['nickname']!],
-            title: titleFromName(entry[_objectSchema['title']!]),
-            firstName: entry[_objectSchema['firstName']!],
-            middleName: entry[_objectSchema['middleName']!],
-            lastName: entry[_objectSchema['lastName']!],
-            gender: genderFromName(entry[_objectSchema['gender']!]),
-            email: entry[_objectSchema['email']!],
-            number: entry[_objectSchema['number']!],
-            firstAddressLine: entry[_objectSchema['firstAddressLine']!],
-            secondAddressLine: entry[_objectSchema['secondAddressLine']!],
-            zipCode: entry[_objectSchema['zipCode']!],
-            city: entry[_objectSchema['city']!],
-            country: entry[_objectSchema['country']!],
-            additionalInfo: entry[_objectSchema['additionalInfo']!],
-          );
-          break;
-        case 'customFields':
-          _customFields
-              .add(CustomField.fromCSV(entry, csvSchema: _customFieldSchema));
-          break;
-        case 'tags':
-          List<String> _entry = (entry as List<String>).toList()..removeAt(0);
-          _tags.addAll(_entry);
-          break;
-      }
-    }
-
-    _object!
-      ..customFields = _customFields
-      ..tags = _tags;
-    return _object;
-  }
+  Identity.fromCSV(List<dynamic> csv)
+      : nickname = csv[1] ?? '',
+        title = titleFromName(csv[2]) ?? Title.mr,
+        firstName = csv[3] ?? '',
+        middleName = csv[4] ?? '',
+        lastName = csv[5] ?? '',
+        gender = genderFromName(csv[6]) ?? Gender.male,
+        email = csv[7] ?? '',
+        number = csv[8] ?? '',
+        firstAddressLine = csv[9] ?? '',
+        secondAddressLine = csv[10] ?? '',
+        zipCode = csv[11] ?? '',
+        city = csv[12] ?? '',
+        country = csv[13] ?? '',
+        customFields =
+            (csv[14] as List?)?.map((e) => CustomField.fromCSV(e)).toList() ??
+                [],
+        additionalInfo = csv[15] ?? '',
+        tags = (csv[16] as List?)?.map((e) => e as String).toList() ?? [],
+        super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
   @override
   int compareTo(Identity other) => nickname.compareTo(other.nickname);
@@ -216,5 +144,23 @@ class Identity extends PassyEntry<Identity> {
       };
 
   @override
-  List<List> toCSV() => jsonToCSV(toJson());
+  List<dynamic> toCSV() => [
+        key,
+        nickname,
+        title.name,
+        firstName,
+        middleName,
+        lastName,
+        gender.name,
+        email,
+        number,
+        firstAddressLine,
+        secondAddressLine,
+        zipCode,
+        city,
+        country,
+        customFields.map((e) => e.toCSV()),
+        additionalInfo,
+        tags,
+      ];
 }

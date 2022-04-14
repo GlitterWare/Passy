@@ -60,8 +60,17 @@ List<List> csvDecode(String source, {bool recursive = false}) {
     List<dynamic> _entry = [''];
     int v = 0;
     int _depth = 0;
-    bool _isString = true;
     Iterator<String> _characters = source.characters.iterator;
+
+    void _convert() {
+      if (_entry[v] == 'false') {
+        _entry[v] = false;
+      }
+
+      if (_entry[v] == 'true') {
+        _entry[v] = true;
+      }
+    }
 
     while (_characters.moveNext()) {
       if (_characters.current == '[') {
@@ -78,8 +87,11 @@ List<List> csvDecode(String source, {bool recursive = false}) {
           }
         }
         if (recursive) {
-          String _entryString = (_entry[v] as String);
-          _isString = false;
+          if (_entry[v] == '[]') {
+            _entry[v] = [];
+            continue;
+          }
+          String _entryString = _entry[v];
           _entry[v] =
               _decode(_entryString.substring(1, _entryString.length - 1));
         }
@@ -87,26 +99,16 @@ List<List> csvDecode(String source, {bool recursive = false}) {
       }
 
       if (_characters.current == ',') {
-        if (_entry[v] == 'false') {
-          _entry[v] = false;
-        }
-
-        if (_entry[v] == 'true') {
-          _entry[v] = true;
-        }
-
+        _convert();
         v++;
         _entry.add('');
-        _isString = true;
         continue;
       }
 
-      if (_isString) {
-        _entry[v] += _characters.current;
-        continue;
-      }
-      (_entry[v] as List<dynamic>).add(_characters.current);
+      _entry[v] += _characters.current;
+      continue;
     }
+    _convert();
 
     return _entry;
   }
@@ -122,44 +124,4 @@ List<List> csvDecode(String source, {bool recursive = false}) {
   }
   _object.removeLast();
   return _object;
-}
-
-/// Convert a Json map to a CSV list
-/// May not correctly convert json maps that contain maps with map values.
-List<List> jsonToCSV(Map<String, dynamic> json) {
-  List<List> _csv = [];
-
-  void _convert(
-    Map<String, dynamic> json,
-  ) {
-    int _index = _csv.length - 1;
-    json.forEach((key, value) {
-      switch (value.runtimeType) {
-        case List<String>:
-          List<String> _list = value;
-          _list.insert(0, key);
-          _csv.add(_list);
-          break;
-        case Map<String, dynamic>:
-          _convert(value);
-          break;
-        case List<Map<String, dynamic>>:
-          for (Map<String, dynamic> map
-              in value as List<Map<String, dynamic>>) {
-            _convert(map);
-          }
-          break;
-        case Enum:
-          _csv[_index].add((value as Enum).name);
-          break;
-        default:
-          _csv[_index].add(value);
-          break;
-      }
-    });
-  }
-
-  _convert(json);
-
-  return _csv;
 }

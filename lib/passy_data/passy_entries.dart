@@ -10,38 +10,11 @@ class PassyEntries<T extends PassyEntry<T>>
 
   PassyEntries({Map<String, T>? entries}) : _entries = entries ?? {};
 
-  factory PassyEntries.fromJson(Map<String, dynamic> json) {
-    EntryType _type = entryTypeFromType(T);
-    return PassyEntries(
-        entries: json.map((key, value) => MapEntry(key,
-            PassyEntry.fromJson(_type, value as Map<String, dynamic>) as T)));
-  }
+  PassyEntries.fromJson(Map<String, dynamic> json)
+      : _entries = entriesFromJson(json);
 
-  factory PassyEntries.fromCSV(List<List<dynamic>> csv) {
-    EntryType _type = entryTypeFromType(T);
-    List<List<dynamic>> _entryCSV = [];
-    Map<String, T> _entries = {};
-
-    // TODO: read schemas at the start of the csv
-
-    void _decodeEntry() {
-      if (_entryCSV.isEmpty) return;
-      T _entry = PassyEntry.fromCSV(_type, _entryCSV) as T;
-      _entries[_entry.key] = _entry;
-    }
-
-    for (List<dynamic> line in csv) {
-      if (line.isEmpty) {
-        _decodeEntry();
-        _entryCSV = [];
-        continue;
-      }
-      _entryCSV.add(line);
-    }
-    _decodeEntry();
-
-    return PassyEntries(entries: _entries);
-  }
+  PassyEntries.fromCSV(List<List<dynamic>> csv)
+      : _entries = entriesFromCSV(csv);
 
   T? getEntry(String key) => _entries[key];
 
@@ -57,14 +30,28 @@ class PassyEntries<T extends PassyEntry<T>>
 
   @override
   List<List<dynamic>> toCSV() {
-    // TODO: write schemas at the start of the csv
-
     List<List<dynamic>> csv = [];
     for (T entry in entries) {
-      csv.addAll(entry.toCSV());
-      csv.add([]);
+      csv.add(entry.toCSV());
     }
-    if (csv.isNotEmpty) csv.removeLast();
     return csv;
+  }
+
+  static Map<String, T> entriesFromJson<T>(Map<String, dynamic> json) {
+    T Function(Map<String, dynamic>) _fromJson =
+        PassyEntry.fromJson(entryTypeFromType(T)!) as T Function(
+            Map<String, dynamic>);
+    return json.map<String, T>((key, value) =>
+        MapEntry(key, _fromJson(value as Map<String, dynamic>)));
+  }
+
+  static Map<String, T> entriesFromCSV<T>(List<List<dynamic>> csv) {
+    T Function(List<dynamic>) _fromCSV =
+        PassyEntry.fromCSV(entryTypeFromType(T)!) as T Function(List<dynamic>);
+    Map<String, T> _entries = {};
+    for (List<dynamic> entry in csv) {
+      _entries[entry[0]] = _fromCSV(entry);
+    }
+    return _entries;
   }
 }

@@ -19,8 +19,9 @@ class PassyEntriesFile<T extends PassyEntry<T>> implements SaveableFileBase {
   factory PassyEntriesFile(File file, {required Encrypter encrypter}) {
     PassyEntries<T> _value;
     if (file.existsSync()) {
-      _value = PassyEntries<T>.fromCSV(
-          csvDecode(decrypt(file.readAsStringSync(), encrypter: encrypter)));
+      _value = PassyEntries<T>.fromCSV(csvDecode(
+          decrypt(file.readAsStringSync(), encrypter: encrypter),
+          recursive: true));
     } else {
       _value = PassyEntries<T>();
     }

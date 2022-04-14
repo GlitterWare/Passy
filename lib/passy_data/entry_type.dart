@@ -13,7 +13,7 @@ enum EntryType {
   identity,
 }
 
-EntryType entryTypeFromName(String name) {
+EntryType? entryTypeFromName(String name) {
   switch (name) {
     case 'password':
       return EntryType.password;
@@ -27,12 +27,11 @@ EntryType entryTypeFromName(String name) {
       return EntryType.idCard;
     case 'identity':
       return EntryType.identity;
-    default:
-      throw Exception('Cannot convert String \'$name\' to EntryType');
   }
+  return null;
 }
 
-EntryType entryTypeFromType(Type type) {
+EntryType? entryTypeFromType(Type type) {
   switch (type) {
     case Password:
       return EntryType.password;
@@ -44,8 +43,6 @@ EntryType entryTypeFromType(Type type) {
       return EntryType.idCard;
     case Identity:
       return EntryType.identity;
-    default:
-      throw Exception(
-          'Cannot convert Type \'${type.toString()}\' to EntryType');
   }
+  return null;
 }

@@ -8,69 +8,47 @@ import 'password.dart';
 import 'passy_bytes.dart';
 import 'payment_card.dart';
 
-abstract class PassyEntry<T extends PassyEntry<T>>
-    implements JsonConvertable, CSVConvertable {
+abstract class PassyEntry<T> implements JsonConvertable, CSVConvertable {
   final String key;
 
   PassyEntry(this.key);
 
   int compareTo(T other);
 
-  static PassyEntry<dynamic> fromJson(
-      EntryType entryType, Map<String, dynamic> json) {
+  static PassyEntry<dynamic> Function(Map<String, dynamic> json) fromJson(
+      EntryType entryType) {
     switch (entryType) {
       case EntryType.password:
-        return Password.fromJson(json);
+        return Password.fromJson;
       case EntryType.paymentCard:
-        return PaymentCard.fromJson(json);
+        return PaymentCard.fromJson;
       case EntryType.note:
-        return Note.fromJson(json);
+        return Note.fromJson;
       case EntryType.idCard:
-        return IDCard.fromJson(json);
+        return IDCard.fromJson;
       case EntryType.identity:
-        return Identity.fromJson(json);
+        return Identity.fromJson;
       default:
         throw Exception(
             'Json conversion not supported for EntryType \'${entryType.name}\'');
     }
   }
 
-  static PassyEntry<dynamic> fromCSV(
-    EntryType entryType,
-    List<List<dynamic>> csv, {
-    Map<String, Map<String, int>> schemas = const {},
-  }) {
+  static PassyEntry<dynamic> Function(List<dynamic> csv) fromCSV(
+      EntryType entryType) {
     switch (entryType) {
       case EntryType.password:
-        return Password.fromCSV(
-          csv,
-          schemas: schemas,
-        );
+        return Password.fromCSV;
       case EntryType.passwordIcon:
-        return PassyBytes.fromCSV(
-          csv,
-          schemas: schemas,
-        );
+        return PassyBytes.fromCSV;
       case EntryType.paymentCard:
-        return PaymentCard.fromCSV(
-          csv,
-          schemas: schemas,
-        );
+        return PaymentCard.fromCSV;
       case EntryType.note:
-        return Note.fromCSV(
-          csv,
-          schemas: schemas,
-        );
+        return Note.fromCSV;
       case EntryType.idCard:
-        return IDCard.fromCSV(
-          csv,
-          schemas: schemas,
-        );
+        return IDCard.fromCSV;
       case EntryType.identity:
-        return Identity.fromCSV(
-          csv,
-          schemas: schemas,
-        );
+        return Identity.fromCSV;
       default:
         throw Exception(
             'CSV conversion not supported for EntryType \'${entryType.name}\'');

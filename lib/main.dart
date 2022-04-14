@@ -3,6 +3,7 @@ import 'package:passy/screens/edit_id_card_screen.dart';
 import 'package:passy/screens/edit_identity_screen.dart';
 import 'package:passy/screens/edit_password_screen.dart';
 import 'package:passy/screens/edit_payment_card_screen.dart';
+import 'package:passy/screens/log_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
@@ -41,6 +42,7 @@ class Passy extends StatelessWidget {
         IDCardScreen.routeName: (context) => const IDCardScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
+        LogScreen.routeName: (context) => const LogScreen(),
         MainScreen.routeName: (context) => const MainScreen(),
         NoteScreen.routeName: (context) => const NoteScreen(),
         PasswordsScreen.routeName: (context) => const PasswordsScreen(),

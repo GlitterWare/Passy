@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
+import 'package:passy/screens/log_screen.dart';
 import 'package:universal_io/io.dart';
 
 import 'package:passy/screens/main_screen.dart';
@@ -16,7 +17,7 @@ import 'history.dart';
 import 'host_address.dart';
 import 'json_convertable.dart';
 import 'loaded_account.dart';
-import 'password.dart';
+import 'passy_entry.dart';
 import 'passy_stream_subscription.dart';
 
 const String _hello = 'hello';
@@ -26,9 +27,7 @@ class _EntryData implements JsonConvertable {
   final String key;
   final EntryType type;
   final EntryEvent event;
-
-  /// Value can be Map<String, dynamic> if exists or null if deleted
-  final dynamic value;
+  final List<dynamic>? value;
 
   _EntryData({
     required this.key,
@@ -39,7 +38,7 @@ class _EntryData implements JsonConvertable {
 
   _EntryData.fromJson(Map<String, dynamic> json)
       : key = json['key'],
-        type = entryTypeFromName(json['type']),
+        type = entryTypeFromName(json['type'])!,
         event = EntryEvent.fromJson(json['event']),
         value = json['entry'];
 
@@ -177,10 +176,9 @@ class Synchronization {
           Expanded(child: Text('Sync error')),
         ]),
         action: SnackBarAction(
-            label: 'Show',
-            onPressed: () => {
-                  //TODO: show error log
-                }),
+            label: 'Details',
+            onPressed: () => Navigator.pushNamed(_context, LogScreen.routeName,
+                arguments: _syncLog)),
       ));
   }
 
@@ -194,7 +192,7 @@ class Synchronization {
                     key: key,
                     type: entryType,
                     event: _history.getEvents(entryType)[key]!,
-                    value: _loadedAccount.getEntry(entryType, key)?.toJson())),
+                    value: _loadedAccount.getEntry(entryType)(key)?.toCSV())),
                 encrypter: _encrypter) +
             '\u0000'));
       }
@@ -228,15 +226,15 @@ class Synchronization {
         if (_entryData.event.status == EntryStatus.deleted) {
           if (_events.containsKey(_entryData.key)) {
             if (_events[_entryData.key]!.status == EntryStatus.alive) {
-              _loadedAccount.removeEntry(_entryData.type, _entryData.key);
+              _loadedAccount.removeEntry(_entryData.type)(_entryData.key);
             }
           }
           _events[_entryData.key] = _entryData.event;
           continue;
         }
 
-        _loadedAccount.setEntry(
-            _entryData.type, Password.fromJson(_entryData.value));
+        _loadedAccount.setEntry(_entryData.type)(
+            PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
         _events[_entryData.key] = _entryData.event;
       } catch (e) {
         _handleException('Could not save an entry\n${e.toString()}');

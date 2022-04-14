@@ -7,6 +7,8 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/screens/add_account_screen.dart';
 
+import 'log_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -38,7 +40,6 @@ class _LoginScreen extends State<LoginScreen> {
       ])));
       return;
     }
-    Navigator.pop(context);
     data.info.value.lastUsername = _username;
     data.info.save().whenComplete(() {
       try {
@@ -56,8 +57,9 @@ class _LoginScreen extends State<LoginScreen> {
               Expanded(child: Text('Couldn\'t login')),
             ]),
             action: SnackBarAction(
-              label: 'Show',
-              onPressed: () {},
+              label: 'Details',
+              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                  arguments: e.toString()),
             ),
           ));
       }

@@ -1,10 +1,9 @@
-import 'common.dart';
 import 'csv_convertable.dart';
 import 'json_convertable.dart';
 
 enum FieldType { text, password, date, number }
 
-FieldType fieldTypeFromName(String name) {
+FieldType? fieldTypeFromName(String name) {
   switch (name) {
     case 'text':
       return FieldType.text;
@@ -14,19 +13,11 @@ FieldType fieldTypeFromName(String name) {
       return FieldType.date;
     case 'number':
       return FieldType.number;
-    default:
-      throw Exception('Cannot convert String \'$name\' to FieldType');
   }
+  return null;
 }
 
 class CustomField implements JsonConvertable, CSVConvertable {
-  static const csvSchema = {
-    'fieldType': 1,
-    'title': 2,
-    'value': 3,
-    'obscured': 4
-  };
-
   String title;
   FieldType fieldType;
   String value;
@@ -41,16 +32,15 @@ class CustomField implements JsonConvertable, CSVConvertable {
 
   CustomField.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? 'Custom Field',
-        fieldType = fieldTypeFromName(json['fieldType'] ?? 'text'),
+        fieldType = fieldTypeFromName(json['fieldType']) ?? FieldType.text,
         value = json['value'] ?? '',
         obscured = json['private'] ?? false;
 
-  CustomField.fromCSV(List<dynamic> csv,
-      {Map<String, int> csvSchema = csvSchema})
-      : title = csv[csvSchema['title']!],
-        fieldType = fieldTypeFromName(csv[csvSchema['title']!]),
-        value = csv[csvSchema['value']!],
-        obscured = csv[csvSchema['obscured']!];
+  CustomField.fromCSV(List<dynamic> csv)
+      : title = csv[0] ?? 'Custom Field',
+        fieldType = fieldTypeFromName(csv[1]) ?? FieldType.text,
+        value = csv[2] ?? '',
+        obscured = csv[3] ?? false;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -61,5 +51,10 @@ class CustomField implements JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<List<dynamic>> toCSV() => jsonToCSV(toJson());
+  List<dynamic> toCSV() => [
+        title,
+        fieldType.name,
+        value,
+        obscured,
+      ];
 }
