@@ -84,13 +84,11 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.search_rounded),
-            splashRadius: 20,
           ),
           IconButton(
             onPressed: () =>
                 Navigator.pushNamed(context, EditPasswordScreen.routeName),
             icon: const Icon(Icons.add_rounded),
-            splashRadius: 20,
           ),
         ],
       ),

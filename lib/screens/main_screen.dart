@@ -30,96 +30,87 @@ class _MainScreen extends State<MainScreen>
       appBar: AppBar(
         title: const Text('Passy'),
         actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Center(child: Text('Synchronize')),
-                      actionsAlignment: MainAxisAlignment.center,
-                      actions: [
-                        TextButton(
-                          child: const Text('Host'),
-                          onPressed: () =>
-                              _account.host(context: context).then((value) {
-                            if (value == null) return;
-                            showDialog(
-                              context: context,
-                              builder: (_) => SimpleDialog(children: [
-                                Center(
-                                  child: SizedBox(
-                                    width: 300,
-                                    height: 350,
-                                    child: Column(
-                                      children: [
-                                        QrImage(
-                                          data: value.toString(),
-                                        ),
-                                        Expanded(
-                                          child: Center(
-                                            child: Text(value.toString()),
-                                          ),
-                                        ),
-                                      ],
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Center(child: Text('Synchronize')),
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    TextButton(
+                      child: const Text('Host'),
+                      onPressed: () =>
+                          _account.host(context: context).then((value) {
+                        if (value == null) return;
+                        showDialog(
+                          context: context,
+                          builder: (_) => SimpleDialog(children: [
+                            Center(
+                              child: SizedBox(
+                                width: 300,
+                                height: 350,
+                                child: Column(
+                                  children: [
+                                    QrImage(
+                                      data: value.toString(),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(value.toString()),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ]),
-                            );
-                          }),
-                        ),
-                        TextButton(
-                          child: const Text('Connect'),
-                          onPressed: cameraSupported
-                              ? () => FlutterBarcodeScanner.scanBarcode(
-                                          '#9C27B0',
-                                          'Cancel',
-                                          false,
-                                          ScanMode.QR)
-                                      .then((value) {
-                                    try {
-                                      _account.connect(HostAddress.parse(value),
-                                          context: context);
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .clearSnackBars();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                        content: Row(children: const [
-                                          Icon(Icons.sync_rounded,
-                                              color: Colors.white),
-                                          SizedBox(width: 20),
-                                          Text('Connection failed'),
-                                        ]),
-                                      ));
-                                    }
-                                  })
-                              : () {
-                                  Navigator.popUntil(
-                                      context,
-                                      (route) =>
-                                          route.settings.name ==
-                                          MainScreen.routeName);
-                                  Navigator.pushReplacementNamed(
-                                      context, ConnectScreen.routeName);
-                                },
-                        ),
-                      ],
+                              ),
+                            ),
+                          ]),
+                        );
+                      }),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.sync_rounded),
-                splashRadius: 20,
-              ),
-              IconButton(
-                onPressed: () => Navigator.pushReplacementNamed(
-                    context, SettingsScreen.routeName),
-                icon: const Icon(Icons.settings),
-                splashRadius: 20,
-              ),
-            ],
+                    TextButton(
+                      child: const Text('Connect'),
+                      onPressed: cameraSupported
+                          ? () => FlutterBarcodeScanner.scanBarcode(
+                                      '#9C27B0', 'Cancel', false, ScanMode.QR)
+                                  .then((value) {
+                                try {
+                                  _account.connect(HostAddress.parse(value),
+                                      context: context);
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context)
+                                      .clearSnackBars();
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Row(children: const [
+                                      Icon(Icons.sync_rounded,
+                                          color: Colors.white),
+                                      SizedBox(width: 20),
+                                      Text('Connection failed'),
+                                    ]),
+                                  ));
+                                }
+                              })
+                          : () {
+                              Navigator.popUntil(
+                                  context,
+                                  (route) =>
+                                      route.settings.name ==
+                                      MainScreen.routeName);
+                              Navigator.pushReplacementNamed(
+                                  context, ConnectScreen.routeName);
+                            },
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.sync_rounded),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pushReplacementNamed(
+                context, SettingsScreen.routeName),
+            icon: const Icon(Icons.settings),
           ),
         ],
       ),
