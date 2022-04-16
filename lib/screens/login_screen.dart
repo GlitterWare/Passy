@@ -47,7 +47,7 @@ class _LoginScreen extends State<LoginScreen> {
             data.loadAccount(data.info.value.lastUsername, _password);
         Navigator.pushReplacementNamed(
             context, screenToRouteName[_account.defaultScreen]!);
-      } catch (e) {
+      } catch (e, s) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(SnackBar(
@@ -59,7 +59,7 @@ class _LoginScreen extends State<LoginScreen> {
             action: SnackBarAction(
               label: 'Details',
               onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                  arguments: e.toString()),
+                  arguments: e.toString() + '\n' + s.toString()),
             ),
           ));
       }

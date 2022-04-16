@@ -1,4 +1,8 @@
+import 'package:encrypt/encrypt.dart';
+import 'package:universal_io/io.dart';
+
 import 'csv_convertable.dart';
+import 'encrypted_csv_file.dart';
 import 'entry_type.dart';
 import 'json_convertable.dart';
 import 'passy_entry.dart';
@@ -32,7 +36,7 @@ class PassyEntries<T extends PassyEntry<T>>
   List<List<dynamic>> toCSV() {
     List<List<dynamic>> csv = [];
     for (T entry in entries) {
-      csv.add(entry.toCSV());
+      csv.add(entry.toCSV()[0]);
     }
     return csv;
   }
@@ -54,4 +58,15 @@ class PassyEntries<T extends PassyEntry<T>>
     }
     return _entries;
   }
+
+  static EncryptedCSVFile<PassyEntries<T>> fromFile<T extends PassyEntry<T>>(
+    File file, {
+    required Encrypter encrypter,
+  }) =>
+      EncryptedCSVFile<PassyEntries<T>>(
+        file,
+        encrypter: encrypter,
+        constructor: () => PassyEntries<T>(),
+        fromCSV: PassyEntries<T>.fromCSV,
+      );
 }

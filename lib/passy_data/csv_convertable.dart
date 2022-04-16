@@ -1,3 +1,3 @@
 mixin CSVConvertable {
-  List toCSV();
+  List<List> toCSV();
 }

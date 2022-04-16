@@ -15,33 +15,41 @@ EntryStatus? entryStatusFromText(String name) {
 }
 
 class EntryEvent with JsonConvertable, CSVConvertable {
+  String key;
   EntryStatus status;
   DateTime lastModified;
 
-  EntryEvent({
+  EntryEvent(
+    this.key, {
     required this.status,
     required this.lastModified,
   });
 
   EntryEvent.fromJson(Map<String, dynamic> json)
-      : status = entryStatusFromText(json['status']) ?? EntryStatus.deleted,
+      : key = json['key'],
+        status = entryStatusFromText(json['status']) ?? EntryStatus.deleted,
         lastModified = DateTime.tryParse(json['lastModified']) ??
             DateTime.fromMillisecondsSinceEpoch(0);
 
   EntryEvent.fromCSV(List csv)
-      : status = entryStatusFromText(csv[0]) ?? EntryStatus.deleted,
+      : key = csv[0],
+        status = entryStatusFromText(csv[1]) ?? EntryStatus.deleted,
         lastModified =
-            DateTime.tryParse(csv[1]) ?? DateTime.fromMillisecondsSinceEpoch(0);
+            DateTime.tryParse(csv[2]) ?? DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   Map<String, dynamic> toJson() => {
+        'key': key,
         'status': status.name,
         'lastModified': lastModified.toIso8601String(),
       };
 
   @override
-  List toCSV() => [
-        status.name,
-        lastModified.toIso8601String(),
+  List<List> toCSV() => [
+        [
+          key,
+          status.name,
+          lastModified.toIso8601String(),
+        ]
       ];
 }

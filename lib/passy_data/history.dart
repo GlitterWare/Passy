@@ -1,16 +1,15 @@
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
+import 'package:passy/passy_data/encrypted_csv_file.dart';
 import 'package:universal_io/io.dart';
 
-import 'encrypted_json_file.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'json_convertable.dart';
 
-typedef HistoryFile = EncryptedJsonFile<History>;
+typedef HistoryFile = EncryptedCSVFile<History>;
 
 class History with JsonConvertable, CSVConvertable {
   final Map<String, EntryEvent> passwords;
@@ -19,6 +18,7 @@ class History with JsonConvertable, CSVConvertable {
   final Map<String, EntryEvent> notes;
   final Map<String, EntryEvent> idCards;
   final Map<String, EntryEvent> identities;
+
   int get length =>
       passwords.length +
       passwordIcons.length +
@@ -96,22 +96,20 @@ class History with JsonConvertable, CSVConvertable {
   List<List<List>> toCSV() {
     List<List<List>> _csv = [];
 
-    void _addEntries(Iterable<MapEntry<String, EntryEvent>> entries) {
+    void _addEntries(Iterable<EntryEvent> entries) {
       List<List> _entries = [];
-      for (MapEntry<String, EntryEvent> _entry in entries) {
-        List _csvEntry = [_entry.key];
-        _csvEntry.add(_entry.value.toCSV());
-        _entries.add(_csvEntry);
+      for (EntryEvent _entry in entries) {
+        _entries.add(_entry.toCSV()[0]);
       }
       _csv.add(_entries);
     }
 
-    _addEntries(passwords.entries);
-    _addEntries(passwordIcons.entries);
-    _addEntries(paymentCards.entries);
-    _addEntries(notes.entries);
-    _addEntries(idCards.entries);
-    _addEntries(identities.entries);
+    _addEntries(passwords.values);
+    _addEntries(passwordIcons.values);
+    _addEntries(paymentCards.values);
+    _addEntries(notes.values);
+    _addEntries(idCards.values);
+    _addEntries(identities.values);
 
     return _csv;
   }
@@ -138,14 +136,14 @@ class History with JsonConvertable, CSVConvertable {
   static Map<String, EntryEvent> _entriesFromCSV(List<List> csv) {
     Map<String, EntryEvent> _entries = {};
     for (List<dynamic> _entry in csv) {
-      _entries[_entry[0]] = EntryEvent.fromCSV(_entry[1]);
+      _entries[_entry[0]] = EntryEvent.fromCSV(_entry);
     }
     return _entries;
   }
 
   static HistoryFile fromFile(File file, {required Encrypter encrypter}) =>
-      HistoryFile.fromFile(file,
+      HistoryFile(file,
           encrypter: encrypter,
           constructor: () => History(),
-          fromJson: History.fromJson);
+          fromCSV: History.fromCSV);
 }

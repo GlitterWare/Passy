@@ -51,10 +51,12 @@ class CustomField with JsonConvertable, CSVConvertable {
       };
 
   @override
-  List toCSV() => [
-        title,
-        fieldType.name,
-        value,
-        obscured,
+  List<List> toCSV() => [
+        [
+          title,
+          fieldType.name,
+          value,
+          obscured,
+        ]
       ];
 }

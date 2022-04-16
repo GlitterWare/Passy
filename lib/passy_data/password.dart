@@ -1,13 +1,16 @@
 import 'custom_field.dart';
+import 'encrypted_csv_file.dart';
 import 'passy_entries.dart';
-import 'passy_entries_file.dart';
 import 'passy_entry.dart';
 
 typedef Passwords = PassyEntries<Password>;
 
-typedef PasswordsFile = PassyEntriesFile<Password>;
+typedef PasswordsFile = EncryptedCSVFile<Passwords>;
 
 class Password extends PassyEntry<Password> {
+  List<CustomField> customFields;
+  String additionalInfo;
+  List<String> tags;
   String nickname;
   String iconName;
   String username;
@@ -15,11 +18,11 @@ class Password extends PassyEntry<Password> {
   String password;
   String tfaSecret;
   String website;
-  List<CustomField> customFields;
-  String additionalInfo;
-  List<String> tags;
 
   Password({
+    List<CustomField>? customFields,
+    this.additionalInfo = '',
+    List<String>? tags,
     this.nickname = '',
     this.iconName = '',
     this.username = '',
@@ -27,43 +30,40 @@ class Password extends PassyEntry<Password> {
     this.password = '',
     this.tfaSecret = '',
     this.website = '',
-    List<CustomField>? customFields,
-    this.additionalInfo = '',
-    List<String>? tags,
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
         super(DateTime.now().toUtc().toIso8601String());
 
   Password.fromJson(Map<String, dynamic> json)
-      : nickname = json['nickname'] ?? '',
+      : customFields = (json['customFields'] as List?)
+                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
+        additionalInfo = json['additionalInfo'] as String,
+        tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
+        nickname = json['nickname'] ?? '',
         iconName = json['iconName'] ?? '',
         username = json['username'] ?? '',
         email = json['email'] ?? '',
         password = json['password'] ?? '',
         tfaSecret = json['tfaSecret'] ?? '',
         website = json['website'] ?? '',
-        customFields = (json['customFields'] as List?)
-                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        additionalInfo = json['additionalInfo'] as String,
-        tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   Password.fromCSV(List csv)
-      : nickname = csv[1] ?? '',
-        iconName = csv[2] ?? '',
-        username = csv[3] ?? '',
-        email = csv[4] ?? '',
-        password = csv[5] ?? '',
-        tfaSecret = csv[6] ?? '',
-        website = csv[7] ?? '',
-        customFields = (csv[8] as List<dynamic>?)
+      : customFields = (csv[1] as List<dynamic>?)
                 ?.map((e) => CustomField.fromCSV(e))
                 .toList() ??
             [],
-        additionalInfo = csv[9] as String,
-        tags = (csv[10] as List?)?.map((e) => e as String).toList() ?? [],
+        additionalInfo = csv[2] as String,
+        tags = (csv[3] as List?)?.map((e) => e as String).toList() ?? [],
+        nickname = csv[4] ?? '',
+        iconName = csv[5] ?? '',
+        username = csv[6] ?? '',
+        email = csv[7] ?? '',
+        password = csv[8] ?? '',
+        tfaSecret = csv[9] ?? '',
+        website = csv[10] ?? '',
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
   @override
@@ -72,6 +72,9 @@ class Password extends PassyEntry<Password> {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'key': key,
+        'customFields': customFields.map((e) => e.toJson()).toList(),
+        'additionalInfo': additionalInfo,
+        'tags': tags,
         'nickname': nickname,
         'iconName': iconName,
         'username': username,
@@ -79,23 +82,22 @@ class Password extends PassyEntry<Password> {
         'password': password,
         'tfaSecret': tfaSecret,
         'website': website,
-        'customFields': customFields.map((e) => e.toJson()).toList(),
-        'additionalInfo': additionalInfo,
-        'tags': tags,
       };
 
   @override
-  List toCSV() => [
-        key,
-        nickname,
-        iconName,
-        username,
-        email,
-        password,
-        tfaSecret,
-        website,
-        customFields.map((e) => e.toCSV()).toList(),
-        additionalInfo,
-        tags,
+  List<List> toCSV() => [
+        [
+          key,
+          customFields.map((e) => e.toCSV()).toList(),
+          additionalInfo,
+          tags,
+          nickname,
+          iconName,
+          username,
+          email,
+          password,
+          tfaSecret,
+          website,
+        ]
       ];
 }

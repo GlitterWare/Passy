@@ -46,21 +46,22 @@ class LoadedAccount {
         _history = History.fromFile(
             File(path + Platform.pathSeparator + 'history.enc'),
             encrypter: encrypter),
-        _passwords = PasswordsFile(
+        _passwords = Passwords.fromFile(
             File(path + Platform.pathSeparator + 'passwords.enc'),
             encrypter: encrypter),
         _passwordIcons = PassyImages(
             path + Platform.pathSeparator + 'password_icons',
             encrypter: encrypter),
-        _notes = NotesFile(File(path + Platform.pathSeparator + 'notes.enc'),
+        _notes = Notes.fromFile(
+            File(path + Platform.pathSeparator + 'notes.enc'),
             encrypter: encrypter),
-        _paymentCards = PaymentCardsFile(
+        _paymentCards = PaymentCards.fromFile(
             File(path + Platform.pathSeparator + 'payment_cards.enc'),
             encrypter: encrypter),
-        _idCards = IDCardsFile(
+        _idCards = IDCards.fromFile(
             File(path + Platform.pathSeparator + 'id_cards.enc'),
             encrypter: encrypter),
-        _identities = IdentitiesFile(
+        _identities = Identities.fromFile(
             File(path + Platform.pathSeparator + 'identities.enc'),
             encrypter: encrypter);
 
@@ -195,7 +196,7 @@ class LoadedAccount {
   Password? getPassword(String key) => _passwords.value.getEntry(key);
 
   void setPassword(Password password) {
-    _history.value.passwords[password.key] = EntryEvent(
+    _history.value.passwords[password.key] = EntryEvent(password.key,
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     _passwords.value.setEntry(password);
   }
@@ -212,7 +213,9 @@ class LoadedAccount {
 
   void setPasswordIcon(PassyBytes passwordIcon) {
     _history.value.passwordIcons[passwordIcon.key] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        passwordIcon.key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc());
     _passwordIcons.setEntry(passwordIcon);
   }
 
@@ -230,7 +233,10 @@ class LoadedAccount {
 
   void setNote(Note note) {
     _history.value.notes[note.key] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+      note.key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
     _notes.value.setEntry(note);
   }
 
@@ -248,7 +254,10 @@ class LoadedAccount {
 
   void setPaymentCard(PaymentCard paymentCard) {
     _history.value.paymentCards[paymentCard.key] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+      paymentCard.key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
     _paymentCards.value.setEntry(paymentCard);
   }
 
@@ -266,7 +275,10 @@ class LoadedAccount {
 
   void setIDCard(IDCard idCard) {
     _history.value.idCards[idCard.key] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+      idCard.key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
     _idCards.value.setEntry(idCard);
   }
 
@@ -284,7 +296,10 @@ class LoadedAccount {
 
   void setIdentity(Identity identity) {
     _history.value.identities[identity.key] = EntryEvent(
-        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+      identity.key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
     _identities.value.setEntry(identity);
   }
 

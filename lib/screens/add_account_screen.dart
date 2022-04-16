@@ -77,7 +77,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
         _username,
         _password,
       );
-    } catch (e) {
+    } catch (e, s) {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
@@ -89,7 +89,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
           action: SnackBarAction(
             label: 'Details',
             onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                arguments: e.toString()),
+                arguments: e.toString() + '\n' + s.toString()),
           ),
         ));
     }

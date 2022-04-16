@@ -1,13 +1,17 @@
+import 'package:passy/passy_data/encrypted_csv_file.dart';
+
 import 'custom_field.dart';
 import 'passy_entries.dart';
-import 'passy_entries_file.dart';
 import 'passy_entry.dart';
 
 typedef IDCards = PassyEntries<IDCard>;
 
-typedef IDCardsFile = PassyEntriesFile<IDCard>;
+typedef IDCardsFile = EncryptedCSVFile<IDCards>;
 
 class IDCard extends PassyEntry<IDCard> {
+  List<CustomField> customFields;
+  String additionalInfo;
+  List<String> tags;
   String nickname;
   List<String> pictures;
   String type;
@@ -16,11 +20,11 @@ class IDCard extends PassyEntry<IDCard> {
   String issDate;
   String expDate;
   String country;
-  List<CustomField> customFields;
-  String additionalInfo;
-  List<String> tags;
 
   IDCard({
+    List<CustomField>? customFields,
+    this.additionalInfo = '',
+    List<String>? tags,
     this.nickname = '',
     List<String>? pictures,
     this.type = '',
@@ -29,16 +33,19 @@ class IDCard extends PassyEntry<IDCard> {
     this.issDate = '',
     this.expDate = '',
     this.country = '',
-    List<CustomField>? customFields,
-    this.additionalInfo = '',
-    List<String>? tags,
   })  : pictures = pictures ?? [],
         customFields = customFields ?? [],
         tags = tags ?? [],
         super(DateTime.now().toUtc().toIso8601String());
 
   IDCard.fromJson(Map<String, dynamic> json)
-      : nickname = json['nickname'] ?? '',
+      : customFields = (json['customFields'] as List?)
+                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
+        additionalInfo = json['additionalInfo'] ?? '',
+        tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
+        nickname = json['nickname'] ?? '',
         pictures = (json['pictures'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
@@ -49,29 +56,23 @@ class IDCard extends PassyEntry<IDCard> {
         issDate = json['issDate'] ?? '',
         expDate = json['expDate'] ?? '',
         country = json['country'] ?? '',
-        customFields = (json['customFields'] as List?)
-                ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        additionalInfo = json['additionalInfo'] ?? '',
-        tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   IDCard.fromCSV(List csv)
-      : nickname = csv[1] ?? '',
-        pictures = (csv[2] as List?)?.map((e) => e as String).toList() ?? [],
-        type = csv[3] ?? '',
-        idNumber = csv[4] ?? '',
-        name = csv[5] ?? '',
-        issDate = csv[6] ?? '',
-        expDate = csv[7] ?? '',
-        country = csv[8] ?? '',
-        customFields =
-            (csv[9] as List?)?.map((e) => CustomField.fromCSV(e)).toList() ??
+      : customFields =
+            (csv[1] as List?)?.map((e) => CustomField.fromCSV(e)).toList() ??
                 [],
-        additionalInfo = csv[10] ?? '',
+        additionalInfo = csv[2] ?? '',
         tags =
-            (csv[11] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+            (csv[3] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+        nickname = csv[4] ?? '',
+        pictures = (csv[5] as List?)?.map((e) => e as String).toList() ?? [],
+        type = csv[6] ?? '',
+        idNumber = csv[7] ?? '',
+        name = csv[8] ?? '',
+        issDate = csv[9] ?? '',
+        expDate = csv[10] ?? '',
+        country = csv[11] ?? '',
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
   @override
@@ -80,6 +81,9 @@ class IDCard extends PassyEntry<IDCard> {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'key': key,
+        'customFields': customFields.map((e) => e.toJson()).toList(),
+        'additionalInfo': additionalInfo,
+        'tags': tags,
         'nickname': nickname,
         'pictures': pictures,
         'type': type,
@@ -88,24 +92,23 @@ class IDCard extends PassyEntry<IDCard> {
         'issDate': issDate,
         'expDate': expDate,
         'country': country,
-        'customFields': customFields.map((e) => e.toJson()).toList(),
-        'additionalInfo': additionalInfo,
-        'tags': tags,
       };
 
   @override
-  List toCSV() => [
-        key,
-        nickname,
-        pictures,
-        type,
-        idNumber,
-        name,
-        issDate,
-        expDate,
-        country,
-        customFields.map((e) => e.toCSV()),
-        additionalInfo,
-        tags,
+  List<List> toCSV() => [
+        [
+          key,
+          customFields.map((e) => e.toCSV()),
+          additionalInfo,
+          tags,
+          nickname,
+          pictures,
+          type,
+          idNumber,
+          name,
+          issDate,
+          expDate,
+          country,
+        ]
       ];
 }

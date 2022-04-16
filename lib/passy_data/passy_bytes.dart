@@ -26,8 +26,10 @@ class PassyBytes extends PassyEntry<PassyBytes> {
       };
 
   @override
-  List toCSV() => [
-        key,
-        base64Encode(value),
+  List<List> toCSV() => [
+        [
+          key,
+          base64Encode(value),
+        ]
       ];
 }

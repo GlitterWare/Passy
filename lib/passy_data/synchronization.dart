@@ -214,8 +214,9 @@ class Synchronization {
       try {
         _entryData = _EntryData.fromJson(
             jsonDecode(decrypt(utf8.decode(entry), encrypter: _encrypter)));
-      } catch (e) {
-        _handleException('Could not decode an entry.\n${e.toString()}');
+      } catch (e, s) {
+        _handleException(
+            'Could not decode an entry.\n${e.toString()}\n${s.toString()}');
         return;
       }
 
@@ -235,8 +236,9 @@ class Synchronization {
         _loadedAccount.setEntry(_entryData.type)(
             PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
         _events[_entryData.key] = _entryData.event;
-      } catch (e) {
-        _handleException('Could not save an entry\n${e.toString()}');
+      } catch (e, s) {
+        _handleException(
+            'Could not save an entry\n${e.toString()}\n${s.toString()}');
       }
     }
     return _loadedAccount.save();
@@ -308,8 +310,8 @@ class Synchronization {
             PassyStreamSubscription _sub =
                 PassyStreamSubscription(socket.listen(
               null,
-              onError: (e) =>
-                  _handleException('Connection error.\n${e.toString()}'),
+              onError: (e, s) => _handleException(
+                  'Connection error.\n${e.toString()}\n${s.toString()}'),
               onDone: () {
                 if (_socket != null) {
                   _handleException('Remote disconnected unexpectedly.');
@@ -341,8 +343,9 @@ class Synchronization {
                 }
                 _remoteHistory = History.fromJson(
                     jsonDecode(decrypt(_data, encrypter: _encrypter)));
-              } catch (e) {
-                _handleException('Could not decode history.\n${e.toString()}');
+              } catch (e, s) {
+                _handleException(
+                    'Could not decode history.\n${e.toString()}\n${s.toString()}');
                 return;
               }
 
@@ -447,16 +450,17 @@ class Synchronization {
               String _data;
               try {
                 _data = utf8.decode(data);
-              } catch (e) {
-                _handleException('Could not decode hello.\n${e.toString()}');
+              } catch (e, s) {
+                _handleException(
+                    'Could not decode hello.\n${e.toString()}\n${s.toString()}');
                 return;
               }
               try {
                 _data = decrypt(decrypt(_data, encrypter: _encrypter),
                     encrypter: getEncrypter(_loadedAccount.username));
-              } catch (e) {
+              } catch (e, s) {
                 _handleException(
-                    'Could not decrypt hello. Make sure that local and remote username and password are the same.\n${e.toString()}');
+                    'Could not decrypt hello. Make sure that local and remote username and password are the same.\n${e.toString()}\n${s.toString()}');
                 return;
               }
               if (_data != _hello) {
@@ -483,8 +487,8 @@ class Synchronization {
         );
       });
       return _address;
-    } catch (e) {
-      _handleException('Failed to host.\n${e.toString()}');
+    } catch (e, s) {
+      _handleException('Failed to host.\n${e.toString()}\n${s.toString()}');
     }
     return null;
   }
@@ -495,7 +499,8 @@ class Synchronization {
       _socket = socket;
       PassyStreamSubscription _sub = PassyStreamSubscription(socket.listen(
         null,
-        onError: (e) => _handleException('Connection error.\n${e.toString()}'),
+        onError: (e, s) => _handleException(
+            'Connection error.\n${e.toString()}\n${s.toString()}'),
         onDone: () {
           if (_socket != null) {
             _handleException('Remote disconnected unexpectedly.');
@@ -510,8 +515,9 @@ class Synchronization {
         try {
           _info = _EntryInfo.fromJson(
               jsonDecode(decrypt(utf8.decode(data), encrypter: _encrypter)));
-        } catch (e) {
-          _handleException('Could not decode info.\n${e.toString()}');
+        } catch (e, s) {
+          _handleException(
+              'Could not decode info.\n${e.toString()}\n${s.toString()}');
           return;
         }
 
@@ -567,8 +573,8 @@ class Synchronization {
         bool _same = true;
         try {
           _same = getHash(_historyJson) == Digest(data);
-        } catch (e) {
-          _handleException('Could not read history hash.');
+        } catch (e, s) {
+          _handleException('Could not read history hash.\n${s.toString()}');
           return;
         }
         if (_same) {
@@ -594,8 +600,9 @@ class Synchronization {
         List<String> _info = [];
         try {
           _info = utf8.decode(data).split(' ');
-        } catch (e) {
-          _handleException('Could not decode hello.\n${e.toString()}');
+        } catch (e, s) {
+          _handleException(
+              'Could not decode hello.\n${e.toString()}\n${s.toString()}');
           return;
         }
         if (_info.length < 2) {
@@ -624,7 +631,9 @@ class Synchronization {
           _context, (r) => r.settings.name == MainScreen.routeName);
       Navigator.pushNamed(_context, SplashScreen.routeName);
       _sub.onData(_handleServiceInfo);
-    }, onError: (e) => _handleException('Failed to connect.\n${e.toString()}'));
+    },
+        onError: (e, s) => _handleException(
+            'Failed to connect.\n${e.toString()}\n${s.toString()}'));
     // Ask server for data hashes, if they are not the same, exchange data
   }
 }
