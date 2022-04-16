@@ -88,56 +88,56 @@ class _PasswordScreen extends State<PasswordScreen> {
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 'Nickname',
                 style: TextStyle(color: Colors.grey),
               ),
-              Text(_password.nickname),
+              SelectableText(_password.nickname),
             ],
           ),
         ),
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 'Username',
                 style: TextStyle(color: Colors.grey),
               ),
-              Text(_password.username),
+              SelectableText(_password.username),
             ],
           ),
         ),
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 'Email',
                 style: TextStyle(color: Colors.grey),
               ),
-              Text(_password.email),
+              SelectableText(_password.email),
             ],
           ),
         ),
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 'Password',
                 style: TextStyle(color: Colors.grey),
               ),
-              Text(_password.password),
+              SelectableText(_password.password),
             ],
           ),
         ),
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 '2FA Code',
                 style: TextStyle(color: Colors.grey),
               ),
               _password.tfa != null
-                  ? Text(OTP.generateTOTPCodeString(
+                  ? SelectableText(OTP.generateTOTPCodeString(
                       _password.tfa!.secret,
                       DateTime.now().millisecondsSinceEpoch,
                       length: _password.tfa!.length,
@@ -152,7 +152,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 'Website',
                 style: TextStyle(color: Colors.grey),
               ),
@@ -163,7 +163,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         EntryWidget(
           body: Column(
             children: [
-              const Text(
+              const SelectableText(
                 'Additional Info',
                 style: TextStyle(color: Colors.grey),
               ),
