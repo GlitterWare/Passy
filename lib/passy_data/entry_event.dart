@@ -2,14 +2,14 @@ import 'package:passy/passy_data/csv_convertable.dart';
 
 import 'json_convertable.dart';
 
-enum EntryStatus { alive, deleted }
+enum EntryStatus { alive, removed }
 
 EntryStatus? entryStatusFromText(String name) {
   switch (name) {
     case 'alive':
       return EntryStatus.alive;
-    case 'deleted':
-      return EntryStatus.deleted;
+    case 'removed':
+      return EntryStatus.removed;
   }
   return null;
 }
@@ -27,13 +27,13 @@ class EntryEvent with JsonConvertable, CSVConvertable {
 
   EntryEvent.fromJson(Map<String, dynamic> json)
       : key = json['key'],
-        status = entryStatusFromText(json['status']) ?? EntryStatus.deleted,
+        status = entryStatusFromText(json['status']) ?? EntryStatus.removed,
         lastModified = DateTime.tryParse(json['lastModified']) ??
             DateTime.fromMillisecondsSinceEpoch(0);
 
   EntryEvent.fromCSV(List csv)
       : key = csv[0],
-        status = entryStatusFromText(csv[1]) ?? EntryStatus.deleted,
+        status = entryStatusFromText(csv[1]) ?? EntryStatus.removed,
         lastModified =
             DateTime.tryParse(csv[2]) ?? DateTime.fromMillisecondsSinceEpoch(0);
 

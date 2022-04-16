@@ -123,17 +123,17 @@ class LoadedAccount {
   void Function(PassyEntry value) setEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
-        return setPassword as void Function(PassyEntry value);
+        return (PassyEntry value) => setPassword(value as Password);
       case EntryType.passwordIcon:
-        return setPasswordIcon as void Function(PassyEntry value);
+        return (PassyEntry value) => setPasswordIcon(value as PassyBytes);
       case EntryType.paymentCard:
-        return setPaymentCard as void Function(PassyEntry value);
+        return (PassyEntry value) => setPaymentCard(value as PaymentCard);
       case EntryType.note:
-        return setNote as void Function(PassyEntry value);
+        return (PassyEntry value) => setNote(value as Note);
       case EntryType.idCard:
-        return setIDCard as void Function(PassyEntry value);
+        return (PassyEntry value) => setIDCard(value as IDCard);
       case EntryType.identity:
-        return setIdentity as void Function(PassyEntry value);
+        return (PassyEntry value) => setIdentity(value as Identity);
       default:
         throw Exception('Unsupported entry type \'${type.name}\'');
     }
@@ -203,7 +203,7 @@ class LoadedAccount {
 
   void removePassword(String key) {
     _history.value.passwords[key]!
-      ..status = EntryStatus.deleted
+      ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     _passwords.value.removeEntry(key);
   }
@@ -221,7 +221,7 @@ class LoadedAccount {
 
   void removePasswordIcon(String key) {
     _history.value.passwordIcons[key]!
-      ..status = EntryStatus.deleted
+      ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     _passwordIcons.removeEntry(key);
   }
@@ -242,7 +242,7 @@ class LoadedAccount {
 
   void removeNote(String key) {
     _history.value.notes[key]!
-      ..status = EntryStatus.deleted
+      ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     _notes.value.removeEntry(key);
   }
@@ -263,7 +263,7 @@ class LoadedAccount {
 
   void removePaymentCard(String key) {
     _history.value.paymentCards[key]!
-      ..status = EntryStatus.deleted
+      ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     _paymentCards.value.removeEntry(key);
   }
@@ -284,7 +284,7 @@ class LoadedAccount {
 
   void removeIDCard(String key) {
     _history.value.idCards[key]!
-      ..status = EntryStatus.deleted
+      ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     _idCards.value.removeEntry(key);
   }
@@ -305,7 +305,7 @@ class LoadedAccount {
 
   void removeIdentity(String key) {
     _history.value.identities[key]!
-      ..status = EntryStatus.deleted
+      ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     _identities.value.removeEntry(key);
   }

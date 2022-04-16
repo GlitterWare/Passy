@@ -12,6 +12,7 @@ import 'json_convertable.dart';
 typedef HistoryFile = EncryptedCSVFile<History>;
 
 class History with JsonConvertable, CSVConvertable {
+  int version;
   final Map<String, EntryEvent> passwords;
   final Map<String, EntryEvent> passwordIcons;
   final Map<String, EntryEvent> paymentCards;
@@ -34,7 +35,8 @@ class History with JsonConvertable, CSVConvertable {
     Map<String, EntryEvent>? notes,
     Map<String, EntryEvent>? idCards,
     Map<String, EntryEvent>? identities,
-  })  : passwords = passwords ?? {},
+  })  : version = 0,
+        passwords = passwords ?? {},
         passwordIcons = passwordIcons ?? {},
         notes = notes ?? {},
         paymentCards = paymentCards ?? {},
@@ -42,7 +44,8 @@ class History with JsonConvertable, CSVConvertable {
         identities = identities ?? {};
 
   History.from(History other)
-      : passwords = Map<String, EntryEvent>.from(other.passwords),
+      : version = other.version,
+        passwords = Map<String, EntryEvent>.from(other.passwords),
         passwordIcons = Map<String, EntryEvent>.from(other.passwordIcons),
         paymentCards = Map<String, EntryEvent>.from(other.paymentCards),
         notes = Map<String, EntryEvent>.from(other.notes),
@@ -50,7 +53,8 @@ class History with JsonConvertable, CSVConvertable {
         identities = Map<String, EntryEvent>.from(other.identities);
 
   History.fromJson(Map<String, dynamic> json)
-      : passwords = (json['passwords'] as Map<String, dynamic>)
+      : version = json['version'],
+        passwords = (json['passwords'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
         passwordIcons = (json['passwordIcons'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
@@ -63,21 +67,23 @@ class History with JsonConvertable, CSVConvertable {
         identities = (json['identities'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value)));
 
-  History.fromCSV(List<List> csv)
-      : passwords =
-            _entriesFromCSV(csv[0].map((e) => e as List<dynamic>).toList()),
-        passwordIcons =
+  History.fromCSV(List<List<dynamic>> csv)
+      : version = int.parse(csv[0][0][0]),
+        passwords =
             _entriesFromCSV(csv[1].map((e) => e as List<dynamic>).toList()),
-        paymentCards =
+        passwordIcons =
             _entriesFromCSV(csv[2].map((e) => e as List<dynamic>).toList()),
-        notes = _entriesFromCSV(csv[3].map((e) => e as List<dynamic>).toList()),
+        paymentCards =
+            _entriesFromCSV(csv[3].map((e) => e as List<dynamic>).toList()),
+        notes = _entriesFromCSV(csv[4].map((e) => e as List<dynamic>).toList()),
         idCards =
-            _entriesFromCSV(csv[4].map((e) => e as List<dynamic>).toList()),
+            _entriesFromCSV(csv[5].map((e) => e as List<dynamic>).toList()),
         identities =
-            _entriesFromCSV(csv[5].map((e) => e as List<dynamic>).toList());
+            _entriesFromCSV(csv[6].map((e) => e as List<dynamic>).toList());
 
   @override
   Map<String, dynamic> toJson() => {
+        'version': version.toString(),
         'passwords': passwords.map<String, dynamic>(
             (key, value) => MapEntry(key, value.toJson())),
         'passwordIcons': passwordIcons.map<String, dynamic>(
@@ -94,7 +100,11 @@ class History with JsonConvertable, CSVConvertable {
 
   @override
   List<List<List>> toCSV() {
-    List<List<List>> _csv = [];
+    List<List<List>> _csv = [
+      [
+        [version.toString()]
+      ]
+    ];
 
     void _addEntries(Iterable<EntryEvent> entries) {
       List<List> _entries = [];

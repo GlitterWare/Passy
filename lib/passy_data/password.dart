@@ -2,6 +2,7 @@ import 'custom_field.dart';
 import 'encrypted_csv_file.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
+import 'tfa.dart';
 
 typedef Passwords = PassyEntries<Password>;
 
@@ -16,7 +17,7 @@ class Password extends PassyEntry<Password> {
   String username;
   String email;
   String password;
-  String tfaSecret;
+  TFA? tfa;
   String website;
 
   Password({
@@ -28,7 +29,7 @@ class Password extends PassyEntry<Password> {
     this.username = '',
     this.email = '',
     this.password = '',
-    this.tfaSecret = '',
+    this.tfa,
     this.website = '',
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
@@ -46,7 +47,7 @@ class Password extends PassyEntry<Password> {
         username = json['username'] ?? '',
         email = json['email'] ?? '',
         password = json['password'] ?? '',
-        tfaSecret = json['tfaSecret'] ?? '',
+        tfa = json['tfa'] != null ? TFA.fromJson(json['tfa']) : null,
         website = json['website'] ?? '',
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
@@ -62,7 +63,7 @@ class Password extends PassyEntry<Password> {
         username = csv[6] ?? '',
         email = csv[7] ?? '',
         password = csv[8] ?? '',
-        tfaSecret = csv[9] ?? '',
+        tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9][0]) : null,
         website = csv[10] ?? '',
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
@@ -80,7 +81,7 @@ class Password extends PassyEntry<Password> {
         'username': username,
         'email': email,
         'password': password,
-        'tfaSecret': tfaSecret,
+        'tfa': tfa?.toJson(),
         'website': website,
       };
 
@@ -96,7 +97,7 @@ class Password extends PassyEntry<Password> {
           username,
           email,
           password,
-          tfaSecret,
+          tfa?.toCSV() ?? [],
           website,
         ]
       ];

@@ -129,12 +129,13 @@ class _EntryInfo with JsonConvertable {
         request = request ?? _Request();
 
   _EntryInfo.fromJson(Map<String, dynamic> json)
-      : history = History.fromJson(json['history']),
+      : history = History.fromCSV(
+            (json['history'] as List).map((e) => e as List).toList()),
         request = _Request.fromJson(json['request']);
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'history': history.toJson(),
+        'history': history.toCSV(),
         'request': request.toJson(),
       };
 }
@@ -157,10 +158,10 @@ class Synchronization {
         _context = context;
 
   void _handleException(String message) {
-    _socket!.destroy();
+    _socket?.destroy();
     _socket = null;
     if (_server != null) {
-      _server!.close();
+      _server?.close();
       _server = null;
     }
     String _exception = '\nLocal exception has occurred: ' + message;
@@ -203,8 +204,8 @@ class Synchronization {
   Future<void> _sendEntries(_Request request) async {
     List<List<int>> _data = _encodeData(request);
     for (List<int> element in _data) {
-      _socket!.add(element);
-      await _socket!.flush();
+      _socket?.add(element);
+      await _socket?.flush();
     }
   }
 
@@ -223,7 +224,7 @@ class Synchronization {
       try {
         Map<String, EntryEvent> _events = _history.getEvents(_entryData.type);
 
-        if (_entryData.event.status == EntryStatus.deleted) {
+        if (_entryData.event.status == EntryStatus.removed) {
           if (_events.containsKey(_entryData.key)) {
             if (_events[_entryData.key]!.status == EntryStatus.alive) {
               _loadedAccount.removeEntry(_entryData.type)(_entryData.key);
@@ -234,7 +235,7 @@ class Synchronization {
         }
 
         _loadedAccount.setEntry(_entryData.type)(
-            PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
+            PassyEntry.fromCSV(_entryData.type)(_entryData.value![0]!));
         _events[_entryData.key] = _entryData.event;
       } catch (e, s) {
         _handleException(
@@ -244,7 +245,6 @@ class Synchronization {
     return _loadedAccount.save();
   }
 
-//TODO: remove entrycount
   Future<List<List<int>>> _handleEntries(
     PassyStreamSubscription subscription, {
     required int entryCount,
@@ -252,9 +252,17 @@ class Synchronization {
   }) {
     List<List<int>> _entries = [];
     Completer<List<List<int>>> _completer = Completer<List<List<int>>>();
+
+    void _handleEntries(List<int> data) {
+      _entries.add(data);
+      entryCount--;
+      if (entryCount == 0) _completer.complete(_entries);
+    }
+
     subscription.onDone(() {
       if (!_completer.isCompleted) _completer.complete(_entries);
     });
+
     if (entryCount == 0) {
       subscription.onData((data) {
         if (onFirstReceive != null) onFirstReceive!();
@@ -262,20 +270,18 @@ class Synchronization {
       _completer.complete(_entries);
       return _completer.future;
     }
-    subscription.onData((data) {
-      void _handleEntries(List<int> data) {
-        _entries.add(data);
-        entryCount--;
-        if (entryCount == 0) _completer.complete(_entries);
-      }
 
-      if (onFirstReceive != null) {
+    if (onFirstReceive != null) {
+      subscription.onData((data) {
         onFirstReceive!();
         onFirstReceive = null;
         subscription.onData(_handleEntries);
-      }
-      _handleEntries(data);
-    });
+        _handleEntries(data);
+      });
+    } else {
+      subscription.onData(_handleEntries);
+    }
+
     return _completer.future;
   }
 
@@ -293,7 +299,7 @@ class Synchronization {
     }
 
     try {
-      if (_server != null) await _server!.close();
+      if (_server != null) await _server?.close();
       _syncLog += 'done. \nListening... ';
 
       await ServerSocket.bind(_ip, 0).then((server) {
@@ -302,7 +308,7 @@ class Synchronization {
         server.listen(
           (socket) {
             if (_socket != null) {
-              _socket!.destroy();
+              _socket?.destroy();
               return;
             }
             _socket = socket;
@@ -341,12 +347,23 @@ class Synchronization {
                   Navigator.pop(_context);
                   return;
                 }
-                _remoteHistory = History.fromJson(
-                    jsonDecode(decrypt(_data, encrypter: _encrypter)));
+                _remoteHistory = History.fromCSV(csvDecode(
+                    decrypt(_data, encrypter: _encrypter),
+                    recursive: true));
               } catch (e, s) {
                 _handleException(
                     'Could not decode history.\n${e.toString()}\n${s.toString()}');
                 return;
+              }
+
+              // TODO: V1.0.0 handle different history versions
+              if (_remoteHistory.version < _history.version) {
+                _handleException(
+                    'Passy ${passyVersion} cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
+              }
+              if (_remoteHistory.version > _history.version) {
+                _handleException(
+                    'Passy ${passyVersion} cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
               }
 
               /// Create Info
@@ -374,25 +391,28 @@ class Synchronization {
                       .toSet()) {
                     DateTime _localLastModified;
                     EntryEvent _localEvent;
+                    EntryEvent _remoteEvent;
 
                     if (!_localEvents.containsKey(key)) {
                       _localRequestKeys.add(key);
-                      return;
+                      continue;
                     }
                     _localEvent = _localEvents[key]!;
                     if (!_remoteEvents.containsKey(key)) {
                       _shortLocalEvents[key] = _localEvent;
                       _remoteRequestKeys.add(key);
-                      return;
+                      continue;
                     }
+                    _remoteEvent = _remoteEvents[key]!;
 
                     _localLastModified = _localEvent.lastModified;
 
-                    if (_localLastModified.isBefore(_localEvent.lastModified)) {
+                    if (_localLastModified
+                        .isBefore(_remoteEvent.lastModified)) {
                       _localRequestKeys.add(key);
-                      return;
+                      continue;
                     }
-                    if (_localLastModified.isAfter(_localEvent.lastModified)) {
+                    if (_localLastModified.isAfter(_remoteEvent.lastModified)) {
                       _shortLocalEvents[key] = _localEvent;
                       _remoteRequestKeys.add(key);
                     }
@@ -424,13 +444,14 @@ class Synchronization {
                 _handleEntriesFuture.whenComplete(() async {
                   await _sendEntriesFuture;
                   if (_socket == null) return;
-                  _socket!.destroy();
+                  _socket?.destroy();
                   _socket = null;
                   server.close();
                   _server = null;
                   await _decryptEntriesFuture;
                   _syncLog += 'done.';
-                  Navigator.pop(_context);
+                  Navigator.popUntil(
+                      _context, (r) => r.settings.name == MainScreen.routeName);
                 });
                 _sendInfo(_info);
                 _syncLog += 'done.\nExchanging data... ';
@@ -439,9 +460,9 @@ class Synchronization {
 
             Future<void> _sendHistoryHash() {
               _syncLog += 'done.\nSending history hash... ';
-              Map<String, dynamic> _localHistory = _history.toJson();
+              List<List> _localHistory = _history.toCSV();
               socket.add(utf8.encode(
-                  getHash(jsonEncode(_localHistory)).toString() + '\u0000'));
+                  getHash(csvEncode(_localHistory)).toString() + '\u0000'));
               return socket.flush();
             }
 
@@ -544,11 +565,12 @@ class Synchronization {
           }
           _handleEntriesFuture.whenComplete(() async {
             await _sendEntriesFuture;
-            _socket!.destroy();
+            _socket?.destroy();
             _socket = null;
             await _decryptEntriesFuture;
             _syncLog += 'done.';
-            Navigator.pop(_context);
+            Navigator.popUntil(
+                _context, (r) => r.settings.name == MainScreen.routeName);
           });
           _syncLog += 'done.\nExchanging data... ';
           if (_info.request.length == 0) {
@@ -560,19 +582,19 @@ class Synchronization {
         }
       }
 
-      Future<void> _sendHistory(String historyJson) {
+      Future<void> _sendHistory(String historyCSV) {
         _syncLog += 'done.\nSending history... ';
-        socket.add(utf8
-            .encode(encrypt(historyJson, encrypter: _encrypter) + '\u0000'));
+        socket.add(
+            utf8.encode(encrypt(historyCSV, encrypter: _encrypter) + '\u0000'));
         return socket.flush();
       }
 
       void _handleHistoryHash(List<int> data) {
         _syncLog += 'done.\nReceiving history hash... ';
-        String _historyJson = jsonEncode(_history);
+        String _historyCSV = csvEncode(_history.toCSV());
         bool _same = true;
         try {
-          _same = getHash(_historyJson) == Digest(data);
+          _same = getHash(_historyCSV) == Digest(data);
         } catch (e, s) {
           _handleException('Could not read history hash.\n${s.toString()}');
           return;
@@ -586,7 +608,7 @@ class Synchronization {
           return;
         }
         _sub.onData(_handleInfo);
-        _sendHistory(_historyJson);
+        _sendHistory(_historyCSV);
       }
 
       Future<void> _sendHello(String hello) {

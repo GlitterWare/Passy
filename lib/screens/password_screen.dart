@@ -51,7 +51,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   context: context,
                   builder: (_) {
                     return AlertDialog(
-                      title: const Text('Delete Password'),
+                      title: const Text('Remove password'),
                       content: const Text(
                           'Password can only be restored from a backup.'),
                       actions: [
@@ -136,12 +136,16 @@ class _PasswordScreen extends State<PasswordScreen> {
                 '2FA Code',
                 style: TextStyle(color: Colors.grey),
               ),
-              Text(OTP.generateTOTPCodeString(
-                _password.tfaSecret,
-                DateTime.now().millisecondsSinceEpoch,
-                algorithm: Algorithm.SHA1,
-                isGoogle: true,
-              )),
+              _password.tfa != null
+                  ? Text(OTP.generateTOTPCodeString(
+                      _password.tfa!.secret,
+                      DateTime.now().millisecondsSinceEpoch,
+                      length: _password.tfa!.length,
+                      interval: _password.tfa!.interval,
+                      algorithm: _password.tfa!.algorithm,
+                      isGoogle: _password.tfa!.isGoogle,
+                    ))
+                  : const Text(''),
             ],
           ),
         ),
