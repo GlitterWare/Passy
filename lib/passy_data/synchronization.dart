@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/material.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:universal_io/io.dart';
 
@@ -144,7 +144,8 @@ class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
   final Encrypter _encrypter;
-  final BuildContext _context;
+  final VoidCallback onComplete;
+  final Function(String log) onError;
   static ServerSocket? _server;
   static Socket? _socket;
   String _syncLog = '';
@@ -152,10 +153,10 @@ class Synchronization {
   Synchronization(this._loadedAccount,
       {required History history,
       required Encrypter encrypter,
-      required BuildContext context})
+      required this.onComplete,
+      required this.onError})
       : _history = history,
-        _encrypter = encrypter,
-        _context = context;
+        _encrypter = encrypter;
 
   void _handleException(String message) {
     _socket?.destroy();
@@ -166,20 +167,8 @@ class Synchronization {
     }
     String _exception = '\nLocal exception has occurred: ' + message;
     _syncLog += _exception;
-    Navigator.pop(_context);
-    ScaffoldMessenger.of(_context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Row(children: const [
-          Icon(Icons.sync_rounded, color: Colors.white),
-          SizedBox(width: 20),
-          Expanded(child: Text('Sync error')),
-        ]),
-        action: SnackBarAction(
-            label: 'Details',
-            onPressed: () => Navigator.pushNamed(_context, LogScreen.routeName,
-                arguments: _syncLog)),
-      ));
+    onComplete();
+    onError(_syncLog);
   }
 
   List<List<int>> _encodeData(_Request request) {
@@ -344,7 +333,7 @@ class Synchronization {
                   _socket = null;
                   socket.destroy();
                   server.close();
-                  Navigator.pop(_context);
+                  onComplete();
                   return;
                 }
                 _remoteHistory = History.fromCSV(csvDecode(
@@ -450,8 +439,7 @@ class Synchronization {
                   _server = null;
                   await _decryptEntriesFuture;
                   _syncLog += 'done.';
-                  Navigator.popUntil(
-                      _context, (r) => r.settings.name == MainScreen.routeName);
+                  onComplete();
                 });
                 _sendInfo(_info);
                 _syncLog += 'done.\nExchanging data... ';
@@ -499,9 +487,6 @@ class Synchronization {
               return socket.flush();
             }
 
-            Navigator.popUntil(
-                _context, (r) => r.settings.name == MainScreen.routeName);
-            Navigator.pushNamed(_context, SplashScreen.routeName);
             _sub.onData(_handleHello);
             _sendServiceInfo();
           },
@@ -569,8 +554,6 @@ class Synchronization {
             _socket = null;
             await _decryptEntriesFuture;
             _syncLog += 'done.';
-            Navigator.popUntil(
-                _context, (r) => r.settings.name == MainScreen.routeName);
           });
           _syncLog += 'done.\nExchanging data... ';
           if (_info.request.length == 0) {
@@ -604,7 +587,6 @@ class Synchronization {
           Future.delayed(const Duration(seconds: 16), () => socket.destroy());
           socket.add(utf8.encode(_sameHistoryHash + '\u0000'));
           socket.flush();
-          Navigator.pop(_context);
           return;
         }
         _sub.onData(_handleInfo);
@@ -649,9 +631,6 @@ class Synchronization {
             encrypter: _encrypter));
       }
 
-      Navigator.popUntil(
-          _context, (r) => r.settings.name == MainScreen.routeName);
-      Navigator.pushNamed(_context, SplashScreen.routeName);
       _sub.onData(_handleServiceInfo);
     },
         onError: (e, s) => _handleException(
