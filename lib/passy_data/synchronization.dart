@@ -1,14 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/screens/log_screen.dart';
 import 'package:universal_io/io.dart';
-
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
 
 import 'common.dart';
 import 'entry_event.dart';
@@ -144,7 +139,7 @@ class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
   final Encrypter _encrypter;
-  final VoidCallback onComplete;
+  final Function onComplete;
   final Function(String log) onError;
   static ServerSocket? _server;
   static Socket? _socket;
@@ -237,7 +232,7 @@ class Synchronization {
   Future<List<List<int>>> _handleEntries(
     PassyStreamSubscription subscription, {
     required int entryCount,
-    VoidCallback? onFirstReceive,
+    Function? onFirstReceive,
   }) {
     List<List<int>> _entries = [];
     Completer<List<List<int>>> _completer = Completer<List<List<int>>>();
