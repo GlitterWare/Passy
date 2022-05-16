@@ -35,22 +35,19 @@ class _PasswordScreen extends State<PasswordScreen> {
 
   Widget _buildRecord(String title, String value,
           {bool obscureValue = false}) =>
-      Padding(
-        padding: entryRecordPadding,
-        child: DoubleActionButton(
-          child: Column(
-            children: [
-              Text(
-                title,
-                style: TextStyle(color: lightContentSecondaryColor),
-              ),
-              Text(obscureValue ? '\u2022' * 6 : value),
-            ],
-          ),
-          icon: const Icon(Icons.copy),
-          onButtonPressed: () {},
-          onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
+      DoubleActionButton(
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: lightContentSecondaryColor),
+            ),
+            Text(obscureValue ? '\u2022' * 6 : value),
+          ],
         ),
+        icon: const Icon(Icons.copy),
+        onButtonPressed: () {},
+        onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
       );
 
   //TODO: implement tags

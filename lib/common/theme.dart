@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const entryRecordPadding = EdgeInsets.symmetric(vertical: 10, horizontal: 10);
+const entryPadding = EdgeInsets.symmetric(vertical: 10, horizontal: 10);
 
 final darkContentColor = Colors.blueGrey[900]!;
 final lightContentColor = Colors.blue[50]!;

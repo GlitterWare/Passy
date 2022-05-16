@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/theme.dart';
 
 class DoubleActionButton extends StatelessWidget {
   final Widget _child;
@@ -19,27 +20,29 @@ class DoubleActionButton extends StatelessWidget {
         super(key: key);
 
   @override
-  Widget build(BuildContext context) => ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-      ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-      onPressed: _onButtonPressed,
-      child: Row(
-        children: [
-          Flexible(
-            fit: FlexFit.tight,
-            child: _child,
-          ),
-          IconButton(
-            onPressed: _onActionPressed,
-            padding:
-                const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
-            icon: _icon,
-            splashRadius: 27,
-          ),
-        ],
-      ));
+  Widget build(BuildContext context) => Padding(
+      padding: entryPadding,
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+          ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
+          onPressed: _onButtonPressed,
+          child: Row(
+            children: [
+              Flexible(
+                fit: FlexFit.tight,
+                child: _child,
+              ),
+              IconButton(
+                onPressed: _onActionPressed,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 15.0),
+                icon: _icon,
+                splashRadius: 27,
+              ),
+            ],
+          )));
 }

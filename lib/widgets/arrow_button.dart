@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/theme.dart';
 
 class ArrowButton extends StatelessWidget {
   final Widget _icon;
@@ -17,9 +18,14 @@ class ArrowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
+        padding: entryPadding,
         child: ElevatedButton(
             onPressed: _onPressed,
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+            ),
             child: Padding(
               child: Row(
                 children: [
