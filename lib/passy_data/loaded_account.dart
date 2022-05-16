@@ -113,7 +113,7 @@ class LoadedAccount {
     _identities.saveSync();
   }
 
-  void _onSync({required BuildContext context}) {
+  void _onConnected({required BuildContext context}) {
     Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
     Navigator.pushNamed(context, SplashScreen.routeName);
   }
@@ -136,22 +136,23 @@ class LoadedAccount {
                   arguments: log)),
         ));
 
-  Future<HostAddress?> host({required BuildContext context}) {
-    _onSync(context: context);
-    return Synchronization(this,
-        history: _history.value,
-        encrypter: _encrypter,
-        onComplete: () => _onSyncComplete(context: context),
-        onError: (log) => _onSyncError(log, context: context)).host();
-  }
+  Future<HostAddress?> host({required BuildContext context}) =>
+      Synchronization(this,
+              history: _history.value,
+              encrypter: _encrypter,
+              onComplete: () => _onSyncComplete(context: context),
+              onError: (log) => _onSyncError(log, context: context))
+          .host(onConnected: () => _onConnected(context: context));
 
   Future<void> connect(HostAddress address, {required BuildContext context}) {
-    _onSync(context: context);
+    _onConnected(context: context);
     return Synchronization(this,
-        history: _history.value,
-        encrypter: _encrypter,
-        onComplete: () => _onSyncComplete(context: context),
-        onError: (log) => _onSyncError(log, context: context)).connect(address);
+            history: _history.value,
+            encrypter: _encrypter,
+            onComplete: () => _onSyncComplete(context: context),
+            onError: (log) => _onSyncError(log, context: context))
+        .connect(address)
+        .whenComplete(() => _onConnected(context: context));
   }
 
   void Function(PassyEntry value) setEntry(EntryType type) {

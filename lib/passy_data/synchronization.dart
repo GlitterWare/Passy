@@ -270,7 +270,7 @@ class Synchronization {
     return _completer.future;
   }
 
-  Future<HostAddress?> host() async {
+  Future<HostAddress?> host({void Function()? onConnected}) async {
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '127.0.0.1';
@@ -296,6 +296,7 @@ class Synchronization {
               _socket?.destroy();
               return;
             }
+            if (onConnected != null) onConnected();
             _socket = socket;
 
             PassyStreamSubscription _sub =
@@ -550,6 +551,7 @@ class Synchronization {
             _socket = null;
             await _decryptEntriesFuture;
             _syncLog += 'done.';
+            onComplete();
           });
           _syncLog += 'done.\nExchanging data... ';
           if (_info.request.length == 0) {

@@ -24,7 +24,7 @@ class PasswordsScreen extends StatefulWidget {
 
 class _PasswordsScreen extends State<PasswordsScreen> {
   Widget? _backButton;
-  final List<Widget> _passwords = [];
+  final List<Widget> _passwordWidgets = [];
 
   @override
   void initState() {
@@ -33,8 +33,16 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     _backButton = getBackButton(
         onPressed: () =>
             Navigator.pushReplacementNamed(context, MainScreen.routeName));
+    List<Password> _passwords = _account.passwords.toList();
+    _passwords.sort((a, b) {
+      int _nickComp = a.nickname.compareTo(b.nickname);
+      if (_nickComp == 0) {
+        return a.username.compareTo(b.username);
+      }
+      return _nickComp;
+    });
 
-    for (Password password in _account.passwords) {
+    for (Password password in _passwords) {
       Widget _getIcon(String name) {
         Uint8List? _icon = _account.getPasswordIcon(name)?.value;
         if (_icon == null) {
@@ -47,7 +55,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
         return Image.memory(_icon);
       }
 
-      _passwords.add(ArrowButton(
+      _passwordWidgets.add(ArrowButton(
         icon: _getIcon(password.iconName),
         onPressed: () {
           Navigator.pushNamed(context, PasswordScreen.routeName,
@@ -92,7 +100,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           ),
         ],
       ),
-      body: ListView(children: _passwords),
+      body: ListView(children: _passwordWidgets),
     );
   }
 }

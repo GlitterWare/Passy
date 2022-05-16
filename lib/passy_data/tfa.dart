@@ -1,4 +1,5 @@
 import 'package:otp/otp.dart';
+import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 
@@ -41,7 +42,7 @@ class TFA with JsonConvertable, CSVConvertable {
         length = int.tryParse(csv[1]) ?? 6,
         interval = int.tryParse(csv[2]) ?? 30,
         algorithm = algorithmFromName(csv[3]) ?? Algorithm.SHA1,
-        isGoogle = csv[4] ?? true;
+        isGoogle = boolFromString(csv[4]) ?? true;
 
   @override
   Map<String, dynamic> toJson() => {
@@ -56,10 +57,10 @@ class TFA with JsonConvertable, CSVConvertable {
   List<List> toCSV() => [
         [
           secret,
-          length,
-          interval,
+          length.toString(),
+          interval.toString(),
           algorithm.name,
-          isGoogle,
+          isGoogle.toString(),
         ]
       ];
 }

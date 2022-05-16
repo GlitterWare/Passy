@@ -54,6 +54,7 @@ class _MainScreen extends State<MainScreen>
                                   children: [
                                     QrImage(
                                       data: value.toString(),
+                                      foregroundColor: Colors.blue[50],
                                     ),
                                     Expanded(
                                       child: Center(

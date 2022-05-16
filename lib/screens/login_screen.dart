@@ -75,17 +75,8 @@ class _LoginScreen extends State<LoginScreen> {
             hasScrollBody: false,
             child: Column(
               children: [
-                const Spacer(),
+                const Spacer(flex: 2),
                 purpleLogo,
-                const Spacer(),
-                const Text(
-                  'Log in',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                  ),
-                ),
                 const Spacer(),
                 Expanded(
                   child: Row(
@@ -144,7 +135,6 @@ class _LoginScreen extends State<LoginScreen> {
                                 ),
                               ],
                             ),
-                            const Spacer(flex: 2),
                           ],
                         ),
                         flex: 10,

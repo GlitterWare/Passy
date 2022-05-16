@@ -9,6 +9,12 @@ const String passyVersion = '0.0.0';
 
 final Random random = Random.secure();
 
+bool? boolFromString(String value) {
+  if (value == 'true') return true;
+  if (value == 'false') return false;
+  return null;
+}
+
 Encrypter getEncrypter(String password) {
   if (password.length > 32) {
     throw Exception('Password is longer than 32 characters');
@@ -55,7 +61,8 @@ String csvEncode(List<List> object) {
   return _encoded;
 }
 
-List<List> csvDecode(String source, {bool recursive = false}) {
+List<List> csvDecode(String source,
+    {bool recursive = false, bool convertBools = false}) {
   List<dynamic> _decode(String source) {
     List<dynamic> _entry = [''];
     int v = 0;
@@ -63,6 +70,7 @@ List<List> csvDecode(String source, {bool recursive = false}) {
     Iterator<String> _characters = source.characters.iterator;
 
     void _convert() {
+      if (!convertBools) return;
       if (_entry[v] == 'false') {
         _entry[v] = false;
       }
