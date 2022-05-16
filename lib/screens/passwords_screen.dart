@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/main_screen.dart';
@@ -49,7 +50,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           return SvgPicture.asset(
             logoCircleSvg,
             width: 50,
-            color: Colors.white,
+            color: lightContentColor,
           );
         }
         return Image.memory(_icon);

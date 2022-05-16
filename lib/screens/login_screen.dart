@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
@@ -33,10 +34,13 @@ class _LoginScreen extends State<LoginScreen> {
     if (getHash(_password).toString() != data.getPasswordHash(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.lock_rounded, color: Colors.white),
-        SizedBox(width: 20),
-        Expanded(child: Text('Incorrect password')),
+          content: Row(children: [
+        Icon(
+          Icons.lock_rounded,
+          color: darkContentColor,
+        ),
+        const SizedBox(width: 20),
+        const Expanded(child: Text('Incorrect password')),
       ])));
       return;
     }
@@ -51,10 +55,8 @@ class _LoginScreen extends State<LoginScreen> {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(SnackBar(
-            content: Row(children: const [
-              Icon(Icons.lock_rounded, color: Colors.white),
-              SizedBox(width: 20),
-              Expanded(child: Text('Couldn\'t login')),
+            content: Row(children: [
+              Icon(Icons.lock_rounded, color: lightContentColor),
             ]),
             action: SnackBarAction(
               label: 'Details',

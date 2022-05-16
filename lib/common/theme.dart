@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 
 const entryRecordPadding = EdgeInsets.symmetric(vertical: 10, horizontal: 10);
 
+final darkContentColor = Colors.blueGrey[900]!;
+final lightContentColor = Colors.blue[50]!;
+
 final theme = ThemeData(
   colorScheme: ColorScheme.dark(
     primary: Colors.purple[900]!,
-    onPrimary: Colors.blue[50]!,
+    onPrimary: lightContentColor,
     secondary: Colors.purple[700]!,
-    onSecondary: Colors.blue[50]!,
-    onSurface: Colors.blue[50]!,
+    onSecondary: lightContentColor,
+    onSurface: lightContentColor,
   ),
-  scaffoldBackgroundColor: Colors.blueGrey[900],
+  snackBarTheme: SnackBarThemeData(actionTextColor: Colors.blueGrey[900]),
+  scaffoldBackgroundColor: darkContentColor,
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(100),

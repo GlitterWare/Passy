@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
@@ -125,10 +126,10 @@ class LoadedAccount {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
-          content: Row(children: const [
-            Icon(Icons.sync_rounded, color: Colors.white),
-            SizedBox(width: 20),
-            Expanded(child: Text('Sync error')),
+          content: Row(children: [
+            Icon(Icons.sync_rounded, color: darkContentColor),
+            const SizedBox(width: 20),
+            const Expanded(child: Text('Sync error')),
           ]),
           action: SnackBarAction(
               label: 'Details',

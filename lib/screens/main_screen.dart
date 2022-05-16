@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/widgets/arrow_button.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -83,11 +84,11 @@ class _MainScreen extends State<MainScreen>
                                       .clearSnackBars();
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(SnackBar(
-                                    content: Row(children: const [
+                                    content: Row(children: [
                                       Icon(Icons.sync_rounded,
-                                          color: Colors.white),
-                                      SizedBox(width: 20),
-                                      Text('Connection failed'),
+                                          color: lightContentColor),
+                                      const SizedBox(width: 20),
+                                      const Text('Connection failed'),
                                     ]),
                                   ));
                                 }
