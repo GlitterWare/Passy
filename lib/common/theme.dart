@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
+const entryRecordPadding = EdgeInsets.symmetric(vertical: 10, horizontal: 10);
+
 final theme = ThemeData(
-  primarySwatch: Colors.purple,
+  colorScheme: ColorScheme.dark(
+    primary: Colors.purple[900]!,
+    onPrimary: Colors.blue[50]!,
+    onSecondary: Colors.purpleAccent,
+    onSurface: Colors.blue[50]!,
+    secondary: Colors.purple[700]!,
+  ),
+  scaffoldBackgroundColor: Colors.blueGrey[900],
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(100),

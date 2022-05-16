@@ -140,7 +140,7 @@ class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
   final Encrypter _encrypter;
-  final VoidCallback onComplete;
+  final void Function() onComplete;
   final Function(String log) onError;
   static ServerSocket? _server;
   static Socket? _socket;

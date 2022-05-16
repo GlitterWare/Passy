@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:passy/widgets/entry_button.dart';
+import 'package:passy/widgets/arrow_button.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:passy/common/common.dart';
@@ -116,7 +116,7 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          EntryButton(
+          ArrowButton(
             icon: const Icon(Icons.lock_rounded),
             body: const Align(
               child: Text('Passwords'),

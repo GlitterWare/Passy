@@ -56,6 +56,11 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           onChanged: (value) => _password.username = value,
         ),
         TextFormField(
+          initialValue: _password.email,
+          decoration: const InputDecoration(labelText: 'Email'),
+          onChanged: (value) => _password.email = value,
+        ),
+        TextFormField(
           initialValue: _password.password,
           decoration: const InputDecoration(labelText: 'Password'),
           onChanged: (value) => _password.password = value,

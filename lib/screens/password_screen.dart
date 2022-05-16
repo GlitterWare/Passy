@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/edit_password_screen.dart';
-import 'package:passy/widgets/entry_widget.dart';
+import 'package:passy/widgets/double_action_button.dart';
 
 import 'main_screen.dart';
 import 'passwords_screen.dart';
@@ -84,94 +86,157 @@ class _PasswordScreen extends State<PasswordScreen> {
           ),
         ],
       ),
-      body: ListView(children: [
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                'Nickname',
-                style: TextStyle(color: Colors.grey),
+      body: ListView(
+        padding: entryRecordPadding,
+        children: [
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    'Nickname',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  Text(_password.nickname),
+                ],
               ),
-              SelectableText(_password.nickname),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () =>
+                  Clipboard.setData(ClipboardData(text: _password.nickname)),
+            ),
           ),
-        ),
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                'Username',
-                style: TextStyle(color: Colors.grey),
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    'Username',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  Text(_password.username),
+                ],
               ),
-              SelectableText(_password.username),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () =>
+                  Clipboard.setData(ClipboardData(text: _password.username)),
+            ),
           ),
-        ),
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                'Email',
-                style: TextStyle(color: Colors.grey),
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    'Email',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  Text(_password.email),
+                ],
               ),
-              SelectableText(_password.email),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () =>
+                  Clipboard.setData(ClipboardData(text: _password.email)),
+            ),
           ),
-        ),
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                'Password',
-                style: TextStyle(color: Colors.grey),
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    'Password',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  Text(_password.password),
+                ],
               ),
-              SelectableText(_password.password),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () =>
+                  Clipboard.setData(ClipboardData(text: _password.password)),
+            ),
           ),
-        ),
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                '2FA Code',
-                style: TextStyle(color: Colors.grey),
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    '2FA Code',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  _password.tfa != null
+                      ? Text(OTP.generateTOTPCodeString(
+                          _password.tfa!.secret,
+                          DateTime.now().millisecondsSinceEpoch,
+                          length: _password.tfa!.length,
+                          interval: _password.tfa!.interval,
+                          algorithm: _password.tfa!.algorithm,
+                          isGoogle: _password.tfa!.isGoogle,
+                        ))
+                      : const Text(''),
+                ],
               ),
-              _password.tfa != null
-                  ? SelectableText(OTP.generateTOTPCodeString(
-                      _password.tfa!.secret,
-                      DateTime.now().millisecondsSinceEpoch,
-                      length: _password.tfa!.length,
-                      interval: _password.tfa!.interval,
-                      algorithm: _password.tfa!.algorithm,
-                      isGoogle: _password.tfa!.isGoogle,
-                    ))
-                  : const Text(''),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () {
+                if (_password.tfa == null) return;
+                Clipboard.setData(ClipboardData(
+                  text: OTP.generateTOTPCodeString(
+                    _password.tfa!.secret,
+                    DateTime.now().millisecondsSinceEpoch,
+                    length: _password.tfa!.length,
+                    interval: _password.tfa!.interval,
+                    algorithm: _password.tfa!.algorithm,
+                    isGoogle: _password.tfa!.isGoogle,
+                  ),
+                ));
+              },
+            ),
           ),
-        ),
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                'Website',
-                style: TextStyle(color: Colors.grey),
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    'Website',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  Text(_password.website),
+                ],
               ),
-              Text(_password.website),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () =>
+                  Clipboard.setData(ClipboardData(text: _password.website)),
+            ),
           ),
-        ),
-        EntryWidget(
-          body: Column(
-            children: [
-              const SelectableText(
-                'Additional Info',
-                style: TextStyle(color: Colors.grey),
+          Padding(
+            padding: entryRecordPadding,
+            child: DoubleActionButton(
+              child: Column(
+                children: [
+                  Text(
+                    'Additional Info',
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                  Text(_password.additionalInfo),
+                ],
               ),
-              Text(_password.additionalInfo),
-            ],
+              icon: const Icon(Icons.copy),
+              onButtonPressed: () {},
+              onActionPressed: () => Clipboard.setData(
+                  ClipboardData(text: _password.additionalInfo)),
+            ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }

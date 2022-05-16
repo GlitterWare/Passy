@@ -8,7 +8,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/main_screen.dart';
-import 'package:passy/widgets/entry_button.dart';
+import 'package:passy/widgets/arrow_button.dart';
 
 import 'edit_password_screen.dart';
 import 'password_screen.dart';
@@ -41,13 +41,13 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           return SvgPicture.asset(
             logoCircleSvg,
             width: 50,
-            color: Colors.purple,
+            color: Colors.white,
           );
         }
         return Image.memory(_icon);
       }
 
-      _passwords.add(EntryButton(
+      _passwords.add(ArrowButton(
         icon: _getIcon(password.iconName),
         onPressed: () {
           Navigator.pushNamed(context, PasswordScreen.routeName,

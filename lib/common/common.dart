@@ -6,7 +6,7 @@ late PassyData data;
 
 final bool cameraSupported = Platform.isAndroid || Platform.isIOS;
 
-Widget getBackButton({VoidCallback? onPressed}) => IconButton(
+Widget getBackButton({void Function()? onPressed}) => IconButton(
       icon: const Icon(Icons.arrow_back_ios_new_rounded),
       onPressed: onPressed,
     );
@@ -14,7 +14,7 @@ Widget getBackButton({VoidCallback? onPressed}) => IconButton(
 AppBar getEditScreenAppBar(
   BuildContext context, {
   required String title,
-  required VoidCallback onSave,
+  required void Function()? onSave,
   bool isNew = false,
 }) =>
     AppBar(
