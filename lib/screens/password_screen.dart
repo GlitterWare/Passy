@@ -60,6 +60,45 @@ class _PasswordScreen extends State<PasswordScreen> {
   Widget build(BuildContext context) {
     final Password _password =
         ModalRoute.of(context)!.settings.arguments as Password;
+
+    List<Widget> _buildRecords() {
+      List<Widget> _records = [];
+      if (_password.nickname != '') {
+        _records.add(_buildRecord('Nickname', _password.nickname));
+      }
+      if (_password.username != '') {
+        _records.add(_buildRecord('Username', _password.username));
+      }
+      if (_password.email != '') {
+        _records.add(_buildRecord('Email', _password.email));
+      }
+      if (_password.password != '') {
+        _records.add(
+            _buildRecord('Password', _password.password, obscureValue: true));
+      }
+      if (_password.tfa != null) {
+        _records.add(_buildRecord(
+            '2FA Code',
+            _password.tfa != null
+                ? OTP.generateTOTPCodeString(
+                    _password.tfa!.secret,
+                    DateTime.now().millisecondsSinceEpoch,
+                    length: _password.tfa!.length,
+                    interval: _password.tfa!.interval,
+                    algorithm: _password.tfa!.algorithm,
+                    isGoogle: _password.tfa!.isGoogle,
+                  )
+                : ''));
+      }
+      if (_password.website != '') {
+        _records.add(_buildRecord('Website', _password.website));
+      }
+      if (_password.additionalInfo != '') {
+        _records.add(_buildRecord('Additional Info', _password.additionalInfo));
+      }
+      return _records;
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: _backButton,
@@ -107,26 +146,7 @@ class _PasswordScreen extends State<PasswordScreen> {
       ),
       body: ListView(
         padding: entryRecordPadding,
-        children: [
-          _buildRecord('Nickname', _password.nickname),
-          _buildRecord('Username', _password.username),
-          _buildRecord('Email', _password.email),
-          _buildRecord('Password', _password.password, obscureValue: true),
-          _buildRecord(
-              '2FA Code',
-              _password.tfa != null
-                  ? OTP.generateTOTPCodeString(
-                      _password.tfa!.secret,
-                      DateTime.now().millisecondsSinceEpoch,
-                      length: _password.tfa!.length,
-                      interval: _password.tfa!.interval,
-                      algorithm: _password.tfa!.algorithm,
-                      isGoogle: _password.tfa!.isGoogle,
-                    )
-                  : ''),
-          _buildRecord('Website', _password.website),
-          _buildRecord('Additional Info', _password.additionalInfo),
-        ],
+        children: _buildRecords(),
       ),
     );
   }
