@@ -23,7 +23,6 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreen extends State<PasswordScreen> {
   final LoadedAccount _account = data.loadedAccount!;
-
   Widget? _backButton;
 
   @override
@@ -33,6 +32,26 @@ class _PasswordScreen extends State<PasswordScreen> {
       onPressed: () => Navigator.pop(context),
     );
   }
+
+  Widget _buildRecord(String title, String value,
+          {bool obscureValue = false}) =>
+      Padding(
+        padding: entryRecordPadding,
+        child: DoubleActionButton(
+          child: Column(
+            children: [
+              Text(
+                title,
+                style: TextStyle(color: lightContentSecondaryColor),
+              ),
+              Text(obscureValue ? '\u2022' * 6 : value),
+            ],
+          ),
+          icon: const Icon(Icons.copy),
+          onButtonPressed: () {},
+          onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
+        ),
+      );
 
   //TODO: implement tags
   //TODO: implement customFields
@@ -89,152 +108,24 @@ class _PasswordScreen extends State<PasswordScreen> {
       body: ListView(
         padding: entryRecordPadding,
         children: [
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    'Nickname',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  Text(_password.nickname),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () =>
-                  Clipboard.setData(ClipboardData(text: _password.nickname)),
-            ),
-          ),
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    'Username',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  Text(_password.username),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () =>
-                  Clipboard.setData(ClipboardData(text: _password.username)),
-            ),
-          ),
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    'Email',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  Text(_password.email),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () =>
-                  Clipboard.setData(ClipboardData(text: _password.email)),
-            ),
-          ),
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    'Password',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  Text(_password.password),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () =>
-                  Clipboard.setData(ClipboardData(text: _password.password)),
-            ),
-          ),
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    '2FA Code',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  _password.tfa != null
-                      ? Text(OTP.generateTOTPCodeString(
-                          _password.tfa!.secret,
-                          DateTime.now().millisecondsSinceEpoch,
-                          length: _password.tfa!.length,
-                          interval: _password.tfa!.interval,
-                          algorithm: _password.tfa!.algorithm,
-                          isGoogle: _password.tfa!.isGoogle,
-                        ))
-                      : const Text(''),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () {
-                if (_password.tfa == null) return;
-                Clipboard.setData(ClipboardData(
-                  text: OTP.generateTOTPCodeString(
-                    _password.tfa!.secret,
-                    DateTime.now().millisecondsSinceEpoch,
-                    length: _password.tfa!.length,
-                    interval: _password.tfa!.interval,
-                    algorithm: _password.tfa!.algorithm,
-                    isGoogle: _password.tfa!.isGoogle,
-                  ),
-                ));
-              },
-            ),
-          ),
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    'Website',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  Text(_password.website),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () =>
-                  Clipboard.setData(ClipboardData(text: _password.website)),
-            ),
-          ),
-          Padding(
-            padding: entryRecordPadding,
-            child: DoubleActionButton(
-              child: Column(
-                children: [
-                  Text(
-                    'Additional Info',
-                    style: TextStyle(color: Colors.blue[200]),
-                  ),
-                  Text(_password.additionalInfo),
-                ],
-              ),
-              icon: const Icon(Icons.copy),
-              onButtonPressed: () {},
-              onActionPressed: () => Clipboard.setData(
-                  ClipboardData(text: _password.additionalInfo)),
-            ),
-          ),
+          _buildRecord('Nickname', _password.nickname),
+          _buildRecord('Username', _password.username),
+          _buildRecord('Email', _password.email),
+          _buildRecord('Password', _password.password, obscureValue: true),
+          _buildRecord(
+              '2FA Code',
+              _password.tfa != null
+                  ? OTP.generateTOTPCodeString(
+                      _password.tfa!.secret,
+                      DateTime.now().millisecondsSinceEpoch,
+                      length: _password.tfa!.length,
+                      interval: _password.tfa!.interval,
+                      algorithm: _password.tfa!.algorithm,
+                      isGoogle: _password.tfa!.isGoogle,
+                    )
+                  : ''),
+          _buildRecord('Website', _password.website),
+          _buildRecord('Additional Info', _password.additionalInfo),
         ],
       ),
     );

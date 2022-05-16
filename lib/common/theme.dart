@@ -4,6 +4,7 @@ const entryRecordPadding = EdgeInsets.symmetric(vertical: 10, horizontal: 10);
 
 final darkContentColor = Colors.blueGrey[900]!;
 final lightContentColor = Colors.blue[50]!;
+final lightContentSecondaryColor = Colors.blue[200]!;
 
 final theme = ThemeData(
   colorScheme: ColorScheme.dark(
