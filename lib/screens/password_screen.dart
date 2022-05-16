@@ -145,7 +145,6 @@ class _PasswordScreen extends State<PasswordScreen> {
         ],
       ),
       body: ListView(
-        padding: entryRecordPadding,
         children: _buildRecords(),
       ),
     );
