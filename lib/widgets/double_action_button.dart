@@ -38,6 +38,7 @@ class DoubleActionButton extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
             icon: _icon,
+            splashRadius: 27,
           ),
         ],
       ));
