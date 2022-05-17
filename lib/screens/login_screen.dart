@@ -7,6 +7,7 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/screens/add_account_screen.dart';
+import 'package:passy/screens/remove_account_screen.dart';
 
 import 'log_screen.dart';
 
@@ -22,21 +23,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreen extends State<LoginScreen> {
   String _password = '';
   String _username = data.info.value.lastUsername;
-
-  List<DropdownMenuItem<String>> usernames = data.usernames
-      .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
-            child: Row(children: [
-              Expanded(child: Text(e)),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.delete_outline_rounded),
-                splashRadius: appBarButtonSplashRadius,
-                padding: appBarButtonPadding,
-              ),
-            ]),
-            value: e,
-          ))
-      .toList();
 
   void login() {
     if (getHash(_password).toString() != data.getPasswordHash(_username)) {
@@ -78,6 +64,24 @@ class _LoginScreen extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<DropdownMenuItem<String>> usernames = data.usernames
+        .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
+              child: Row(children: [
+                Expanded(child: Text(e)),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, RemoveAccountScreen.routeName,
+                        arguments: _username);
+                  },
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  splashRadius: appBarButtonSplashRadius,
+                  padding: appBarButtonPadding,
+                ),
+              ]),
+              value: e,
+            ))
+        .toList();
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [

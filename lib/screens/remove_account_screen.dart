@@ -18,7 +18,8 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
         leading: PassyBackButton(
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Center(child: Text('Remove account')),
+        title: const Text('Remove account'),
+        centerTitle: true,
       ),
     );
   }
