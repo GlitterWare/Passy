@@ -82,7 +82,10 @@ class _PasswordScreen extends State<PasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _onPasswordLoaded.future.then((p) => _generateTFA(p.tfa!));
+    _onPasswordLoaded.future.then((p) {
+      if (p.tfa == null) return;
+      _generateTFA(p.tfa!);
+    });
   }
 
   @override

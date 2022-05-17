@@ -25,7 +25,15 @@ class _LoginScreen extends State<LoginScreen> {
 
   List<DropdownMenuItem<String>> usernames = data.usernames
       .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
-            child: Text(e),
+            child: Row(children: [
+              Expanded(child: Text(e)),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.delete_outline_rounded),
+                splashRadius: appBarButtonSplashRadius,
+                padding: appBarButtonPadding,
+              ),
+            ]),
             value: e,
           ))
       .toList();
@@ -100,13 +108,13 @@ class _LoginScreen extends State<LoginScreen> {
                                   child: DropdownButtonFormField<String>(
                                     value: _username,
                                     items: usernames,
+                                    selectedItemBuilder: (context) {
+                                      return usernames.map<Widget>((item) {
+                                        return Text(item.value!);
+                                      }).toList();
+                                    },
                                     onChanged: (a) {
-                                      if (a! == 'addAccount') {
-                                        Navigator.pushReplacementNamed(context,
-                                            AddAccountScreen.routeName);
-                                        return;
-                                      }
-                                      _username = a;
+                                      _username = a!;
                                     },
                                   ),
                                 ),
