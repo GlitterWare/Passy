@@ -156,14 +156,20 @@ class _PasswordScreen extends State<PasswordScreen> {
                     return AlertDialog(
                       title: const Text('Remove password'),
                       content: const Text(
-                          'Password can only be restored from a backup.'),
+                          'Passwords can only be restored from a backup.'),
                       actions: [
                         TextButton(
-                          child: const Text('No'),
+                          child: Text(
+                            'No',
+                            style: TextStyle(color: lightContentSecondaryColor),
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                         TextButton(
-                          child: const Text('Yes'),
+                          child: Text(
+                            'Yes',
+                            style: TextStyle(color: lightContentSecondaryColor),
+                          ),
                           onPressed: () {
                             _account.removePassword(_password.key);
                             Navigator.popUntil(context,

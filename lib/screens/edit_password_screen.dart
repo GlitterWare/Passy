@@ -6,6 +6,8 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
+import 'package:passy/screens/password_screen.dart';
+import 'package:passy/screens/splash_screen.dart';
 
 import 'main_screen.dart';
 import 'passwords_screen.dart';
@@ -39,10 +41,14 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         onSave: () {
           _tfa.secret != '' ? _password.tfa = _tfa : _password.tfa = null;
           _account.setPassword(_password);
-          Navigator.popUntil(
-              context, (r) => r.settings.name == MainScreen.routeName);
-          _account.save().whenComplete(
-              () => Navigator.pushNamed(context, PasswordsScreen.routeName));
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          _account.save().whenComplete(() {
+            Navigator.popUntil(
+                context, (r) => r.settings.name == MainScreen.routeName);
+            Navigator.pushNamed(context, PasswordsScreen.routeName);
+            Navigator.pushNamed(context, PasswordScreen.routeName,
+                arguments: _password);
+          });
         },
       ),
       body: ListView(children: [
