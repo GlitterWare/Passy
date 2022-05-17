@@ -11,7 +11,7 @@ import 'log_screen.dart';
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/login/addAccount';
+  static const routeName = '/addAccount';
 
   @override
   State<StatefulWidget> createState() => _AddAccountScreen();
@@ -102,15 +102,15 @@ class _AddAccountScreen extends State<StatefulWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: data.noAccounts
-          ? null
-          : AppBar(
-              leading: PassyBackButton(
-                  onPressed: () => Navigator.pushReplacementNamed(
-                      context, LoginScreen.routeName)),
-              title: const Text('Add account'),
-              centerTitle: true,
-            ),
+      appBar: AppBar(
+        leading: data.noAccounts
+            ? null
+            : PassyBackButton(
+                onPressed: () => Navigator.pushReplacementNamed(
+                    context, LoginScreen.routeName)),
+        title: const Text('Add account'),
+        centerTitle: true,
+      ),
       body: CustomScrollView(slivers: [
         SliverFillRemaining(
           hasScrollBody: false,
