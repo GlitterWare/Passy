@@ -7,6 +7,7 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/screens/add_account_screen.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 
 import 'log_screen.dart';
@@ -43,7 +44,9 @@ class _LoginScreen extends State<LoginScreen> {
       try {
         LoadedAccount _account =
             data.loadAccount(data.info.value.lastUsername, _password);
-        Navigator.pushReplacementNamed(
+        Navigator.pushReplacementNamed(context, MainScreen.routeName);
+        if (_account.defaultScreen == Screen.main) return;
+        Navigator.pushNamed(
             context, screenToRouteName[_account.defaultScreen]!);
       } catch (e, s) {
         ScaffoldMessenger.of(context)
@@ -72,6 +75,7 @@ class _LoginScreen extends State<LoginScreen> {
                 Expanded(child: Text(e)),
                 IconButton(
                   onPressed: () {
+                    Navigator.pop(context);
                     Navigator.pushReplacementNamed(
                         context, RemoveAccountScreen.routeName,
                         arguments: e);

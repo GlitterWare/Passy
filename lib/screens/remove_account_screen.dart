@@ -34,7 +34,6 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
           ));
         return;
       }
-      Navigator.pop(context);
       Navigator.pushReplacementNamed(context, SplashScreen.routeName);
       data.removeAccount(_username).then((value) =>
           Navigator.pushReplacementNamed(context, LoginScreen.routeName));
