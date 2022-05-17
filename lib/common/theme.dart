@@ -5,6 +5,7 @@ const appBarButtonSplashRadius = 28.0;
 const appBarButtonPadding = EdgeInsets.all(16.0);
 
 final darkContentColor = Colors.blueGrey[900]!;
+final darkContentSecondaryColor = Colors.blueGrey[600]!;
 final lightContentColor = Colors.blue[50]!;
 final lightContentSecondaryColor = Colors.blue[200]!;
 
@@ -22,11 +23,25 @@ final theme = ThemeData(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(100),
     ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(100),
+      borderSide: BorderSide(
+        color: darkContentSecondaryColor,
+      ),
+    ),
+    focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(100),
+        borderSide: BorderSide(color: lightContentColor)),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
       shadowColor:
           MaterialStateProperty.resolveWith((states) => Colors.transparent),
     ),
+  ),
+  textSelectionTheme: TextSelectionThemeData(
+    cursorColor: lightContentColor,
+    selectionColor: lightContentSecondaryColor,
+    selectionHandleColor: lightContentColor,
   ),
 );
