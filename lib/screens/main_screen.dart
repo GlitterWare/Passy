@@ -38,11 +38,18 @@ class _MainScreen extends State<MainScreen>
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                  title: const Center(child: Text('Synchronize')),
+                  title: Center(
+                      child: Text(
+                    'Synchronize',
+                    style: TextStyle(color: lightContentColor),
+                  )),
                   actionsAlignment: MainAxisAlignment.center,
                   actions: [
                     TextButton(
-                      child: const Text('Host'),
+                      child: Text(
+                        'Host',
+                        style: TextStyle(color: lightContentSecondaryColor),
+                      ),
                       onPressed: () =>
                           _account.host(context: context).then((value) {
                         if (value == null) return;
@@ -73,7 +80,10 @@ class _MainScreen extends State<MainScreen>
                       }),
                     ),
                     TextButton(
-                      child: const Text('Connect'),
+                      child: Text(
+                        'Connect',
+                        style: TextStyle(color: lightContentSecondaryColor),
+                      ),
                       onPressed: cameraSupported
                           ? () => FlutterBarcodeScanner.scanBarcode(
                                       '#9C27B0', 'Cancel', false, ScanMode.QR)
