@@ -16,7 +16,8 @@ class _SettingsScreen extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
-        title: const Center(child: Text('Settings')),
+        title: const Text('Settings'),
+        centerTitle: true,
       ),
     );
   }
