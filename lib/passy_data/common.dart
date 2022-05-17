@@ -5,7 +5,7 @@ import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
-const String passyVersion = '0.0.0';
+const String passyVersion = '0.1.0';
 
 final Random random = Random.secure();
 

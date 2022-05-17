@@ -43,7 +43,8 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () =>
+              Navigator.pushReplacementNamed(context, LoginScreen.routeName),
         ),
         title: const Text('Remove account'),
         centerTitle: true,
@@ -53,27 +54,33 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
           SliverFillRemaining(
             child: Column(children: [
               const Spacer(),
-              RichText(
-                text: TextSpan(
-                    text: 'Confirm the removal of account ',
-                    children: [
-                      TextSpan(
-                        text: '\'$_username\' ',
-                        style: TextStyle(color: lightContentSecondaryColor),
-                      ),
-                      const TextSpan(text: 'by typing in its username.'),
-                    ]),
-                textAlign: TextAlign.center,
+              Padding(
+                padding: entryPadding,
+                child: RichText(
+                  text: TextSpan(
+                      text: 'Confirm the removal of account ',
+                      children: [
+                        TextSpan(
+                          text: '\'$_username\' ',
+                          style: TextStyle(color: lightContentSecondaryColor),
+                        ),
+                        const TextSpan(text: 'by typing in its username.'),
+                      ]),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              RichText(
-                text: TextSpan(text: 'This action is ', children: [
-                  TextSpan(
-                    text: 'irreversible',
-                    style: TextStyle(color: lightContentSecondaryColor),
-                  ),
-                  const TextSpan(text: '.'),
-                ]),
-                textAlign: TextAlign.center,
+              Padding(
+                padding: entryPadding,
+                child: RichText(
+                  text: TextSpan(text: 'This action is ', children: [
+                    TextSpan(
+                      text: 'irreversible',
+                      style: TextStyle(color: lightContentSecondaryColor),
+                    ),
+                    const TextSpan(text: '.'),
+                  ]),
+                  textAlign: TextAlign.center,
+                ),
               ),
               Row(children: [
                 Flexible(

@@ -50,7 +50,9 @@ class _LoginScreen extends State<LoginScreen> {
           ..clearSnackBars()
           ..showSnackBar(SnackBar(
             content: Row(children: [
-              Icon(Icons.lock_rounded, color: lightContentColor),
+              Icon(Icons.lock_rounded, color: darkContentColor),
+              const SizedBox(width: 20),
+              const Text('Could not login'),
             ]),
             action: SnackBarAction(
               label: 'Details',
@@ -70,8 +72,9 @@ class _LoginScreen extends State<LoginScreen> {
                 Expanded(child: Text(e)),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, RemoveAccountScreen.routeName,
-                        arguments: _username);
+                    Navigator.pushReplacementNamed(
+                        context, RemoveAccountScreen.routeName,
+                        arguments: e);
                   },
                   icon: const Icon(Icons.delete_outline_rounded),
                   splashRadius: appBarButtonSplashRadius,
