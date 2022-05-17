@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/common.dart';
+import 'package:passy/widgets/back_button.dart';
 
 class EditIdentityScreen extends StatefulWidget {
   const EditIdentityScreen({Key? key}) : super(key: key);
@@ -11,21 +11,13 @@ class EditIdentityScreen extends StatefulWidget {
 }
 
 class _EditIdentityScreen extends State<EditIdentityScreen> {
-  late Widget _backButton;
-
-  @override
-  void initState() {
-    super.initState();
-    _backButton = getBackButton(
-      onPressed: () => Navigator.pop(context),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          leading: _backButton,
+          leading: PassyBackButton(
+            onPressed: () => Navigator.pop(context),
+          ),
           title: const Center(child: Text('Add Identity'))),
     );
   }

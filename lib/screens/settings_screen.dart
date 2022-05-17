@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/common.dart';
-import 'package:passy/screens/main_screen.dart';
+import 'package:passy/widgets/back_button.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -12,19 +11,11 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
-  Widget? _backButton;
-
-  @override
-  void initState() {
-    super.initState();
-    _backButton = getBackButton(onPressed: () => Navigator.pop(context));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: _backButton,
+        leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
         title: const Center(child: Text('Settings')),
       ),
     );

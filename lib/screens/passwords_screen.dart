@@ -9,6 +9,7 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/widgets/arrow_button.dart';
+import 'package:passy/widgets/back_button.dart';
 
 import 'edit_password_screen.dart';
 import 'password_screen.dart';
@@ -23,14 +24,12 @@ class PasswordsScreen extends StatefulWidget {
 }
 
 class _PasswordsScreen extends State<PasswordsScreen> {
-  Widget? _backButton;
   final List<Widget> _passwordWidgets = [];
 
   @override
   void initState() {
     super.initState();
     LoadedAccount _account = data.loadedAccount!;
-    _backButton = getBackButton(onPressed: () => Navigator.pop(context));
     List<Password> _passwords = _account.passwords.toList();
     _passwords.sort((a, b) {
       int _nickComp = a.nickname.compareTo(b.nickname);
@@ -84,14 +83,18 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: _backButton,
+        leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
         title: const Center(child: Text('Passwords')),
         actions: [
           IconButton(
+            padding: appBarButtonPadding,
+            splashRadius: appBarButtonSplashRadius,
             onPressed: () {},
             icon: const Icon(Icons.search_rounded),
           ),
           IconButton(
+            padding: appBarButtonPadding,
+            splashRadius: appBarButtonSplashRadius,
             onPressed: () =>
                 Navigator.pushNamed(context, EditPasswordScreen.routeName),
             icon: const Icon(Icons.add_rounded),

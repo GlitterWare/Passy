@@ -4,6 +4,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/screens/login_screen.dart';
+import 'package:passy/widgets/back_button.dart';
 
 import 'log_screen.dart';
 
@@ -20,7 +21,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
-  Widget? _floatingBackButton;
 
   void _addAccount() {
     if (_username.isEmpty) {
@@ -100,23 +100,17 @@ class _AddAccountScreen extends State<StatefulWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _floatingBackButton = data.noAccounts
-        ? null
-        : Padding(
-            padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-            child: getBackButton(
-                onPressed: () => Navigator.pushReplacementNamed(
-                    context, LoginScreen.routeName)),
-          );
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _floatingBackButton,
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      appBar: data.noAccounts
+          ? null
+          : AppBar(
+              leading: PassyBackButton(
+                  onPressed: () => Navigator.pushReplacementNamed(
+                      context, LoginScreen.routeName)),
+              title: const Text('Add an account'),
+              centerTitle: true,
+            ),
       body: CustomScrollView(slivers: [
         SliverFillRemaining(
           hasScrollBody: false,
@@ -124,15 +118,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
             children: [
               const Spacer(),
               purpleLogo,
-              const Spacer(),
-              Text(
-                'Add an account',
-                style: TextStyle(
-                  color: lightContentColor,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 20,
-                ),
-              ),
               const Spacer(),
               Expanded(
                 child: Row(

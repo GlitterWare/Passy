@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/theme.dart';
+import 'package:passy/widgets/back_button.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:passy/common/common.dart';
 
 class LogScreen extends StatelessWidget {
   const LogScreen({Key? key}) : super(key: key);
@@ -19,7 +18,7 @@ class LogScreen extends StatelessWidget {
         appBar: AppBar(
             title: const Text('Log'),
             centerTitle: true,
-            leading: getBackButton(
+            leading: PassyBackButton(
               onPressed: () => Navigator.pop(context),
             ),
             actions: [

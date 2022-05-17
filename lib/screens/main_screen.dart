@@ -32,6 +32,8 @@ class _MainScreen extends State<MainScreen>
         title: const Text('Passy'),
         actions: [
           IconButton(
+            splashRadius: appBarButtonSplashRadius,
+            padding: appBarButtonPadding,
             onPressed: () {
               showDialog(
                 context: context,
@@ -99,7 +101,7 @@ class _MainScreen extends State<MainScreen>
                                   (route) =>
                                       route.settings.name ==
                                       MainScreen.routeName);
-                              Navigator.pushReplacementNamed(
+                              Navigator.pushNamed(
                                   context, ConnectScreen.routeName);
                             },
                     ),
@@ -110,9 +112,11 @@ class _MainScreen extends State<MainScreen>
             icon: const Icon(Icons.sync_rounded),
           ),
           IconButton(
+            padding: appBarButtonPadding,
             onPressed: () =>
                 Navigator.pushNamed(context, SettingsScreen.routeName),
             icon: const Icon(Icons.settings),
+            splashRadius: appBarButtonSplashRadius,
           ),
         ],
       ),

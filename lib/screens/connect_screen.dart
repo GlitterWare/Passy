@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/common.dart';
-
-import 'main_screen.dart';
+import 'package:passy/widgets/back_button.dart';
 
 class ConnectScreen extends StatelessWidget {
   static const routeName = '/connect';
@@ -10,12 +8,9 @@ class ConnectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget? _backButton = getBackButton(
-        onPressed: () =>
-            Navigator.pushReplacementNamed(context, MainScreen.routeName));
     return Scaffold(
       appBar: AppBar(
-        leading: _backButton,
+        leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
         title: const Center(child: Text('Connect')),
       ),
     );

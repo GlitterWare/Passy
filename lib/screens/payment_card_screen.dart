@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/payment_card.dart';
+import 'package:passy/widgets/back_button.dart';
 
 class PaymentCardScreen extends StatefulWidget {
   const PaymentCardScreen({Key? key}) : super(key: key);
@@ -12,23 +12,15 @@ class PaymentCardScreen extends StatefulWidget {
 }
 
 class _PaymentCardScreen extends State<PaymentCardScreen> {
-  Widget? _backButton;
-
-  @override
-  void initState() {
-    super.initState();
-    _backButton = getBackButton(
-      onPressed: () => Navigator.pop(context),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final PaymentCard _paymentCard =
         ModalRoute.of(context)!.settings.arguments as PaymentCard;
     return Scaffold(
       appBar: AppBar(
-        leading: _backButton,
+        leading: PassyBackButton(
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Center(child: Text('Payment Card')),
       ),
     );
