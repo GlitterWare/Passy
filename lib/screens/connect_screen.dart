@@ -11,7 +11,8 @@ class ConnectScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
-        title: const Center(child: Text('Connect')),
+        title: const Text('Connect'),
+        centerTitle: true,
       ),
     );
   }
