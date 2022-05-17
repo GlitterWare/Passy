@@ -20,6 +20,7 @@ final theme = ThemeData(
   snackBarTheme: SnackBarThemeData(actionTextColor: Colors.blueGrey[900]),
   scaffoldBackgroundColor: darkContentColor,
   inputDecorationTheme: InputDecorationTheme(
+    floatingLabelStyle: TextStyle(color: lightContentSecondaryColor),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(100),
     ),

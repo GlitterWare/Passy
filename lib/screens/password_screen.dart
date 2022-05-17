@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
@@ -6,6 +8,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/screens/edit_password_screen.dart';
 import 'package:passy/widgets/back_button.dart';
 import 'package:passy/widgets/double_action_button.dart';
@@ -23,7 +26,38 @@ class PasswordScreen extends StatefulWidget {
 }
 
 class _PasswordScreen extends State<PasswordScreen> {
+  final Completer<void> _onClosed = Completer<void>();
+  final Completer<Password> _onPasswordLoaded = Completer<Password>();
   final LoadedAccount _account = data.loadedAccount!;
+  String _tfaCode = '';
+  double _tfaProgress = 0;
+
+  Future<void> _generateTFA(TFA tfa) async {
+    double _tfaProgressLast = 1.0;
+
+    while (true) {
+      if (_onClosed.isCompleted) return;
+      double _tfaCycles =
+          (DateTime.now().millisecondsSinceEpoch / 1000) / tfa.interval;
+      setState(() {
+        _tfaProgress = _tfaCycles - _tfaCycles.floor();
+      });
+      if (_tfaProgress < _tfaProgressLast) {
+        setState(() {
+          _tfaCode = OTP.generateTOTPCodeString(
+            tfa.secret,
+            DateTime.now().millisecondsSinceEpoch,
+            length: tfa.length,
+            interval: tfa.interval,
+            algorithm: tfa.algorithm,
+            isGoogle: tfa.isGoogle,
+          );
+        });
+      }
+      _tfaProgressLast = _tfaProgress;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
 
   Widget _buildRecord(String title, String value,
           {bool obscureValue = false}) =>
@@ -46,10 +80,16 @@ class _PasswordScreen extends State<PasswordScreen> {
   //TODO: implement customFields
 
   @override
+  void initState() {
+    super.initState();
+    _onPasswordLoaded.future.then((p) => _generateTFA(p.tfa!));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Password _password =
         ModalRoute.of(context)!.settings.arguments as Password;
-
+    if (!_onPasswordLoaded.isCompleted) _onPasswordLoaded.complete(_password);
     List<Widget> _buildRecords() {
       List<Widget> _records = [];
       if (_password.nickname != '') {
@@ -66,18 +106,22 @@ class _PasswordScreen extends State<PasswordScreen> {
             _buildRecord('Password', _password.password, obscureValue: true));
       }
       if (_password.tfa != null) {
-        _records.add(_buildRecord(
-            '2FA Code',
-            _password.tfa != null
-                ? OTP.generateTOTPCodeString(
-                    _password.tfa!.secret,
-                    DateTime.now().millisecondsSinceEpoch,
-                    length: _password.tfa!.length,
-                    interval: _password.tfa!.interval,
-                    algorithm: _password.tfa!.algorithm,
-                    isGoogle: _password.tfa!.isGoogle,
-                  )
-                : ''));
+        _records.add(Row(
+          children: [
+            SizedBox(
+              width: entryPadding.left * 2,
+            ),
+            SizedBox(
+              child: CircularProgressIndicator(
+                value: _tfaProgress,
+                color: lightContentSecondaryColor,
+              ),
+            ),
+            Flexible(
+              child: _buildRecord('2FA Code', _tfaCode),
+            ),
+          ],
+        ));
       }
       if (_password.website != '') {
         _records.add(_buildRecord('Website', _password.website));
@@ -91,7 +135,10 @@ class _PasswordScreen extends State<PasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            _onClosed.complete();
+            Navigator.pop(context);
+          },
         ),
         title: Center(child: Text(_password.nickname)),
         actions: [

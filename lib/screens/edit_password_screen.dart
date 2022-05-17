@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
@@ -45,77 +46,109 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
-        TextFormField(
-          initialValue: _password.nickname,
-          decoration: const InputDecoration(labelText: 'Nickname'),
-          onChanged: (value) => _password.nickname = value,
-        ),
-        TextFormField(
-          initialValue: _password.username,
-          decoration: const InputDecoration(labelText: 'Username'),
-          onChanged: (value) => _password.username = value,
-        ),
-        TextFormField(
-          initialValue: _password.email,
-          decoration: const InputDecoration(labelText: 'Email'),
-          onChanged: (value) => _password.email = value,
-        ),
-        TextFormField(
-          initialValue: _password.password,
-          decoration: const InputDecoration(labelText: 'Password'),
-          onChanged: (value) => _password.password = value,
-        ),
-        TextFormField(
-          initialValue: _tfa.secret.replaceFirst('=', ''),
-          decoration: const InputDecoration(labelText: '2FA Secret'),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'([a-z]|[A-Z]|[2-7])')),
-          ],
-          onChanged: (value) {
-            String _secret = value.toUpperCase();
-            if (_secret.length.isOdd) _secret += '=';
-            _tfa.secret = _secret;
-          },
-        ),
-        TextFormField(
-          initialValue: _tfa.length.toString(),
-          decoration: const InputDecoration(labelText: '2FA Length'),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: (value) => _tfa.length = int.parse(value),
-        ),
-        TextFormField(
-          initialValue: _tfa.interval.toString(),
-          decoration: const InputDecoration(labelText: '2FA Interval'),
-          onChanged: (value) => _tfa.interval = int.parse(value),
-        ),
-        DropdownButtonFormField(
-          items: [
-            DropdownMenuItem(
-              child: Text(Algorithm.SHA1.name),
-              value: Algorithm.SHA1,
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _password.nickname,
+            decoration: const InputDecoration(
+              labelText: 'Nickname',
             ),
-            DropdownMenuItem(
-              child: Text(Algorithm.SHA256.name),
-              value: Algorithm.SHA256,
-            ),
-            DropdownMenuItem(
-              child: Text(Algorithm.SHA512.name),
-              value: Algorithm.SHA512,
-            ),
-          ],
-          value: _tfa.algorithm,
-          decoration: const InputDecoration(labelText: '2FA Algorithm'),
-          onChanged: (value) => _tfa.algorithm = value as Algorithm,
+            onChanged: (value) => _password.nickname = value,
+          ),
         ),
-        TextFormField(
-          initialValue: _password.website,
-          decoration: const InputDecoration(labelText: 'Website'),
-          onChanged: (value) => _password.website = value,
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _password.username,
+            decoration: const InputDecoration(labelText: 'Username'),
+            onChanged: (value) => _password.username = value,
+          ),
         ),
-        TextFormField(
-          initialValue: _password.additionalInfo,
-          decoration: const InputDecoration(labelText: 'Additional Info'),
-          onChanged: (value) => _password.additionalInfo = value,
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _password.email,
+            decoration: const InputDecoration(labelText: 'Email'),
+            onChanged: (value) => _password.email = value,
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _password.password,
+            decoration: const InputDecoration(labelText: 'Password'),
+            onChanged: (value) => _password.password = value,
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _tfa.secret.replaceFirst('=', ''),
+            decoration: const InputDecoration(labelText: '2FA Secret'),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'([a-z]|[A-Z]|[2-7])')),
+            ],
+            onChanged: (value) {
+              String _secret = value.toUpperCase();
+              if (_secret.length.isOdd) _secret += '=';
+              _tfa.secret = _secret;
+            },
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _tfa.length.toString(),
+            decoration: const InputDecoration(labelText: '2FA Length'),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: (value) => _tfa.length = int.parse(value),
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _tfa.interval.toString(),
+            decoration: const InputDecoration(labelText: '2FA Interval'),
+            onChanged: (value) => _tfa.interval = int.parse(value),
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: DropdownButtonFormField(
+            items: [
+              DropdownMenuItem(
+                child: Text(Algorithm.SHA1.name),
+                value: Algorithm.SHA1,
+              ),
+              DropdownMenuItem(
+                child: Text(Algorithm.SHA256.name),
+                value: Algorithm.SHA256,
+              ),
+              DropdownMenuItem(
+                child: Text(Algorithm.SHA512.name),
+                value: Algorithm.SHA512,
+              ),
+            ],
+            value: _tfa.algorithm,
+            decoration: const InputDecoration(labelText: '2FA Algorithm'),
+            onChanged: (value) => _tfa.algorithm = value as Algorithm,
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _password.website,
+            decoration: const InputDecoration(labelText: 'Website'),
+            onChanged: (value) => _password.website = value,
+          ),
+        ),
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+            initialValue: _password.additionalInfo,
+            decoration: const InputDecoration(labelText: 'Additional Info'),
+            onChanged: (value) => _password.additionalInfo = value,
+          ),
         ),
       ]),
     );
