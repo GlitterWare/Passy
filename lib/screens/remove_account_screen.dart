@@ -90,6 +90,7 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
                         top: entryPadding.top,
                         bottom: entryPadding.bottom),
                     child: TextFormField(
+                      controller: TextEditingController(),
                       decoration: const InputDecoration(
                         labelText: 'Confirm username',
                       ),

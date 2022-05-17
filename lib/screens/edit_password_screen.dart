@@ -55,7 +55,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _password.nickname,
+            controller: TextEditingController(text: _password.nickname),
             decoration: const InputDecoration(
               labelText: 'Nickname',
             ),
@@ -65,7 +65,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _password.username,
+            controller: TextEditingController(text: _password.username),
             decoration: const InputDecoration(labelText: 'Username'),
             onChanged: (value) => _password.username = value,
           ),
@@ -73,7 +73,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _password.email,
+            controller: TextEditingController(text: _password.email),
             decoration: const InputDecoration(labelText: 'Email'),
             onChanged: (value) => _password.email = value,
           ),
@@ -81,7 +81,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _password.password,
+            controller: TextEditingController(text: _password.password),
             decoration: const InputDecoration(labelText: 'Password'),
             onChanged: (value) => _password.password = value,
           ),
@@ -89,7 +89,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _tfa.secret.replaceFirst('=', ''),
+            controller:
+                TextEditingController(text: _tfa.secret.replaceFirst('=', '')),
             decoration: const InputDecoration(labelText: '2FA Secret'),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'([a-z]|[A-Z]|[2-7])')),
@@ -104,7 +105,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _tfa.length.toString(),
+            controller: TextEditingController(text: _tfa.length.toString()),
             decoration: const InputDecoration(labelText: '2FA Length'),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             onChanged: (value) => _tfa.length = int.parse(value),
@@ -113,7 +114,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _tfa.interval.toString(),
+            controller: TextEditingController(text: _tfa.interval.toString()),
             decoration: const InputDecoration(labelText: '2FA Interval'),
             onChanged: (value) => _tfa.interval = int.parse(value),
           ),
@@ -143,7 +144,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _password.website,
+            controller: TextEditingController(text: _password.website),
             decoration: const InputDecoration(labelText: 'Website'),
             onChanged: (value) => _password.website = value,
           ),
@@ -151,7 +152,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            initialValue: _password.additionalInfo,
+            controller: TextEditingController(text: _password.additionalInfo),
             decoration: const InputDecoration(labelText: 'Additional Info'),
             onChanged: (value) => _password.additionalInfo = value,
           ),
