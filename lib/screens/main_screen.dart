@@ -110,8 +110,8 @@ class _MainScreen extends State<MainScreen>
             icon: const Icon(Icons.sync_rounded),
           ),
           IconButton(
-            onPressed: () => Navigator.pushReplacementNamed(
-                context, SettingsScreen.routeName),
+            onPressed: () =>
+                Navigator.pushNamed(context, SettingsScreen.routeName),
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -125,8 +125,7 @@ class _MainScreen extends State<MainScreen>
               alignment: Alignment.centerLeft,
             ),
             onPressed: () {
-              Navigator.pushReplacementNamed(
-                  context, PasswordsScreen.routeName);
+              Navigator.pushNamed(context, PasswordsScreen.routeName);
             },
           ),
         ],

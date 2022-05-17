@@ -8,7 +8,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/screens/main_screen.dart';
 import 'package:passy/widgets/arrow_button.dart';
 
 import 'edit_password_screen.dart';
@@ -31,9 +30,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   void initState() {
     super.initState();
     LoadedAccount _account = data.loadedAccount!;
-    _backButton = getBackButton(
-        onPressed: () =>
-            Navigator.pushReplacementNamed(context, MainScreen.routeName));
+    _backButton = getBackButton(onPressed: () => Navigator.pop(context));
     List<Password> _passwords = _account.passwords.toList();
     _passwords.sort((a, b) {
       int _nickComp = a.nickname.compareTo(b.nickname);

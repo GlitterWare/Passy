@@ -125,10 +125,10 @@ class _AddAccountScreen extends State<StatefulWidget> {
               const Spacer(),
               purpleLogo,
               const Spacer(),
-              const Text(
+              Text(
                 'Add an account',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: lightContentColor,
                   fontWeight: FontWeight.w900,
                   fontSize: 20,
                 ),

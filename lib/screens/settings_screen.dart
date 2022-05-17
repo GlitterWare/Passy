@@ -17,10 +17,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _backButton = getBackButton(
-      onPressed: () =>
-          Navigator.pushReplacementNamed(context, MainScreen.routeName),
-    );
+    _backButton = getBackButton(onPressed: () => Navigator.pop(context));
   }
 
   @override
