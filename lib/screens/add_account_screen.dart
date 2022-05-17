@@ -108,7 +108,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
               leading: PassyBackButton(
                   onPressed: () => Navigator.pushReplacementNamed(
                       context, LoginScreen.routeName)),
-              title: const Text('Add an account'),
+              title: const Text('Add account'),
               centerTitle: true,
             ),
       body: CustomScrollView(slivers: [
@@ -116,7 +116,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
           hasScrollBody: false,
           child: Column(
             children: [
-              const Spacer(),
+              const Spacer(flex: 2),
               purpleLogo,
               const Spacer(),
               Expanded(
