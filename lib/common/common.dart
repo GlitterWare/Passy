@@ -69,7 +69,7 @@ void connect(LoadedAccount account,
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Row(children: [
-        Icon(Icons.sync_problem_rounded, color: lightContentColor),
+        Icon(Icons.sync_problem_rounded, color: darkContentColor),
         const SizedBox(width: 20),
         const Text('Invalid address format'),
       ]),
@@ -88,7 +88,7 @@ void connect(LoadedAccount account,
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Row(children: [
-        Icon(Icons.sync_problem_rounded, color: lightContentColor),
+        Icon(Icons.sync_problem_rounded, color: darkContentColor),
         const SizedBox(width: 20),
         const Text('Connection failed'),
       ]),
