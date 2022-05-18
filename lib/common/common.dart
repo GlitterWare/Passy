@@ -3,6 +3,7 @@ import 'package:passy/main.dart';
 import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/passy_data.dart';
+import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
@@ -41,6 +42,7 @@ AppBar getEditScreenAppBar(
 
 class SynchronizationWrapper {
   final BuildContext _context;
+  Synchronization? _sync;
 
   SynchronizationWrapper({required BuildContext context}) : _context = context;
 
@@ -111,13 +113,12 @@ class SynchronizationWrapper {
   }
 
   void host(LoadedAccount account) {
-    account
-        .host(
+    _sync = account.getSynchronization(
       onConnected: _onConnected,
       onComplete: _onSyncComplete,
       onError: _onSyncError,
-    )
-        .then((value) {
+    );
+    _sync!.host(onConnected: _onConnected).then((value) {
       if (value == null) return;
       showDialog(
         context: _context,
@@ -145,7 +146,11 @@ class SynchronizationWrapper {
             ),
           ],
         ),
-      );
+      ).whenComplete(() {
+        try {
+          _sync!.close();
+        } catch (e) {}
+      });
     });
   }
 }

@@ -81,7 +81,7 @@ class _MainScreen extends State<MainScreen>
                     ),
                   ],
                 ),
-              );
+              ).then((value) => null);
             },
             icon: const Icon(Icons.sync_rounded),
           ),

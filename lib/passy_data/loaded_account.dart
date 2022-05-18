@@ -110,14 +110,24 @@ class LoadedAccount {
     _identities.saveSync();
   }
 
-  Future<HostAddress?> host({
+  Synchronization getSynchronization({
     void Function()? onConnected,
     void Function()? onComplete,
     void Function(String log)? onError,
   }) =>
       Synchronization(this,
-              history: _history.value,
-              encrypter: _encrypter,
+          history: _history.value,
+          encrypter: _encrypter,
+          onComplete: onComplete,
+          onError: onError);
+
+  Future<HostAddress?> host({
+    void Function()? onConnected,
+    void Function()? onComplete,
+    void Function(String log)? onError,
+  }) =>
+      getSynchronization(
+              onConnected: onConnected,
               onComplete: onComplete,
               onError: onError)
           .host(onConnected: onConnected);
@@ -129,12 +139,9 @@ class LoadedAccount {
     void Function(String log)? onError,
   }) {
     onConnected?.call();
-    Future<void> _connectFuture = Synchronization(this,
-        history: _history.value,
-        encrypter: _encrypter,
-        onComplete: () => onComplete?.call(),
-        onError: (log) => onError?.call(log)).connect(address);
-    return _connectFuture;
+    return getSynchronization(
+            onConnected: onConnected, onComplete: onComplete, onError: onError)
+        .connect(address);
   }
 
   void Function(PassyEntry value) setEntry(EntryType type) {
