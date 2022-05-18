@@ -88,31 +88,9 @@ class _MainScreen extends State<MainScreen>
                       onPressed: cameraSupported
                           ? () => FlutterBarcodeScanner.scanBarcode(
                                       '#9C27B0', 'Cancel', false, ScanMode.QR)
-                                  .then((value) {
-                                _account
-                                    .connect(HostAddress.parse(value),
-                                        context: context)
-                                    .onError((error, stackTrace) {
-                                  ScaffoldMessenger.of(context)
-                                      .clearSnackBars();
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Row(children: [
-                                      Icon(Icons.sync_problem_rounded,
-                                          color: lightContentColor),
-                                      const SizedBox(width: 20),
-                                      const Text('Connection failed'),
-                                    ]),
-                                    action: SnackBarAction(
-                                      label: 'Details',
-                                      onPressed: () => Navigator.pushNamed(
-                                          context, LogScreen.routeName,
-                                          arguments: error.toString() +
-                                              '\n' +
-                                              stackTrace.toString()),
-                                    ),
-                                  ));
-                                });
+                                  .then((address) {
+                                connect(_account,
+                                    context: context, address: address);
                               })
                           : () {
                               Navigator.popUntil(

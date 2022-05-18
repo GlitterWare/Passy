@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -16,41 +17,6 @@ class ConnectScreen extends StatelessWidget {
     LoadedAccount _account =
         ModalRoute.of(context)!.settings.arguments as LoadedAccount;
     String _address = '';
-
-    void _connect() {
-      HostAddress _hostAddress;
-      try {
-        _hostAddress = HostAddress.parse(_address);
-      } catch (e) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
-            Icon(Icons.sync_problem_rounded, color: lightContentColor),
-            const SizedBox(width: 20),
-            const Text('Invalid address format'),
-          ]),
-        ));
-        return;
-      }
-
-      _account
-          .connect(_hostAddress, context: context)
-          .onError((error, stackTrace) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
-            Icon(Icons.sync_problem_rounded, color: lightContentColor),
-            const SizedBox(width: 20),
-            const Text('Connection failed'),
-          ]),
-          action: SnackBarAction(
-            label: 'Details',
-            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                arguments: error.toString() + '\n' + stackTrace.toString()),
-          ),
-        ));
-      });
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +50,8 @@ class ConnectScreen extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(right: entryPadding.right),
                     child: FloatingActionButton(
-                      onPressed: _connect,
+                      onPressed: () => connect(_account,
+                          context: context, address: _address),
                       child: const Icon(Icons.sync_rounded),
                     ),
                   ),
