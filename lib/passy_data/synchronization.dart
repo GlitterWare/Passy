@@ -345,11 +345,11 @@ class Synchronization {
               // TODO: V1.0.0 handle different history versions
               if (_remoteHistory.version < _history.version) {
                 _handleException(
-                    'Passy ${passyVersion} cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
+                    'Passy $passyVersion cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
               }
               if (_remoteHistory.version > _history.version) {
                 _handleException(
-                    'Passy ${passyVersion} cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
+                    'Passy $passyVersion cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
               }
 
               /// Create Info

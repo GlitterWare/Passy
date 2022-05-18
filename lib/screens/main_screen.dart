@@ -9,6 +9,7 @@ import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
 import 'connect_screen.dart';
+import 'log_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
 
@@ -88,22 +89,30 @@ class _MainScreen extends State<MainScreen>
                           ? () => FlutterBarcodeScanner.scanBarcode(
                                       '#9C27B0', 'Cancel', false, ScanMode.QR)
                                   .then((value) {
-                                try {
-                                  _account.connect(HostAddress.parse(value),
-                                      context: context);
-                                } catch (e) {
+                                _account
+                                    .connect(HostAddress.parse(value),
+                                        context: context)
+                                    .onError((error, stackTrace) {
                                   ScaffoldMessenger.of(context)
                                       .clearSnackBars();
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(SnackBar(
                                     content: Row(children: [
-                                      Icon(Icons.sync_rounded,
+                                      Icon(Icons.sync_problem_rounded,
                                           color: lightContentColor),
                                       const SizedBox(width: 20),
                                       const Text('Connection failed'),
                                     ]),
+                                    action: SnackBarAction(
+                                      label: 'Details',
+                                      onPressed: () => Navigator.pushNamed(
+                                          context, LogScreen.routeName,
+                                          arguments: error.toString() +
+                                              '\n' +
+                                              stackTrace.toString()),
+                                    ),
                                   ));
-                                }
+                                });
                               })
                           : () {
                               Navigator.popUntil(
@@ -112,7 +121,8 @@ class _MainScreen extends State<MainScreen>
                                       route.settings.name ==
                                       MainScreen.routeName);
                               Navigator.pushNamed(
-                                  context, ConnectScreen.routeName);
+                                  context, ConnectScreen.routeName,
+                                  arguments: _account);
                             },
                     ),
                   ],

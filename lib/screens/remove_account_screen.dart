@@ -103,7 +103,6 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
                     child: FloatingActionButton(
                       onPressed: _removeAccount,
                       child: const Icon(Icons.delete_outline_rounded),
-                      heroTag: 'addAccountBtn',
                     ),
                   ),
                 )

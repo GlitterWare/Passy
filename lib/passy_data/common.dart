@@ -49,7 +49,6 @@ String csvEncode(List<List> object) {
 
   String _encodeRecord(dynamic record) {
     if (record is String) {
-      print(record);
       return record
           .replaceAll('\\', '\\\\')
           .replaceAll(',', '\\,')
@@ -145,7 +144,6 @@ List<List> csvDecode(String source,
           }
           continue;
         } else if (_characters.current == '\\') {
-          print(0);
           _escapeDetected = true;
           continue;
         }

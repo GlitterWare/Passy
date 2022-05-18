@@ -127,7 +127,7 @@ class LoadedAccount {
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
           content: Row(children: [
-            Icon(Icons.sync_rounded, color: darkContentColor),
+            Icon(Icons.sync_problem_rounded, color: darkContentColor),
             const SizedBox(width: 20),
             const Expanded(child: Text('Sync error')),
           ]),
@@ -147,13 +147,13 @@ class LoadedAccount {
 
   Future<void> connect(HostAddress address, {required BuildContext context}) {
     _onConnected(context: context);
-    return Synchronization(this,
-            history: _history.value,
-            encrypter: _encrypter,
-            onComplete: () => _onSyncComplete(context: context),
-            onError: (log) => _onSyncError(log, context: context))
-        .connect(address)
-        .whenComplete(() => _onConnected(context: context));
+    Future<void> _connectFuture = Synchronization(this,
+        history: _history.value,
+        encrypter: _encrypter,
+        onComplete: () => _onSyncComplete(context: context),
+        onError: (log) => _onSyncError(log, context: context)).connect(address);
+    _connectFuture.whenComplete(() => _onConnected(context: context));
+    return _connectFuture;
   }
 
   void Function(PassyEntry value) setEntry(EntryType type) {
