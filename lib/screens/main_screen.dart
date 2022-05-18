@@ -39,6 +39,7 @@ class _MainScreen extends State<MainScreen>
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
+                  shape: dialogShape,
                   title: Center(
                       child: Text(
                     'Synchronize',
@@ -47,39 +48,11 @@ class _MainScreen extends State<MainScreen>
                   actionsAlignment: MainAxisAlignment.center,
                   actions: [
                     TextButton(
-                      child: Text(
-                        'Host',
-                        style: TextStyle(color: lightContentSecondaryColor),
-                      ),
-                      onPressed: () =>
-                          _account.host(context: context).then((value) {
-                        if (value == null) return;
-                        showDialog(
-                          context: context,
-                          builder: (_) => SimpleDialog(children: [
-                            Center(
-                              child: SizedBox(
-                                width: 300,
-                                height: 350,
-                                child: Column(
-                                  children: [
-                                    QrImage(
-                                      data: value.toString(),
-                                      foregroundColor: Colors.blue[50],
-                                    ),
-                                    Expanded(
-                                      child: Center(
-                                        child: Text(value.toString()),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ]),
-                        );
-                      }),
-                    ),
+                        child: Text(
+                          'Host',
+                          style: TextStyle(color: lightContentSecondaryColor),
+                        ),
+                        onPressed: () => host(_account, context: context)),
                     TextButton(
                       child: Text(
                         'Connect',

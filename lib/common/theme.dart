@@ -4,6 +4,9 @@ const entryPadding = EdgeInsets.symmetric(vertical: 8, horizontal: 8);
 const appBarButtonSplashRadius = 28.0;
 const appBarButtonPadding = EdgeInsets.all(16.0);
 
+final ShapeBorder dialogShape = RoundedRectangleBorder(
+  borderRadius: BorderRadius.circular(12.0),
+);
 final darkContentColor = Colors.blueGrey[900]!;
 final darkContentSecondaryColor = Colors.blueGrey[600]!;
 final lightContentColor = Colors.blue[50]!;

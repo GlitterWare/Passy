@@ -3,7 +3,10 @@ import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/screens/log_screen.dart';
+import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/back_button.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:universal_io/io.dart';
 
 import 'theme.dart';
@@ -35,6 +38,28 @@ AppBar getEditScreenAppBar(
       ],
     );
 
+void _onConnected({required BuildContext context}) {
+  Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
+  Navigator.pushNamed(context, SplashScreen.routeName);
+}
+
+void _onSyncComplete({required BuildContext context}) => Navigator.pop(context);
+
+void _onSyncError(String log, {required BuildContext context}) =>
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
+        content: Row(children: [
+          Icon(Icons.sync_problem_rounded, color: darkContentColor),
+          const SizedBox(width: 20),
+          const Expanded(child: Text('Sync error')),
+        ]),
+        action: SnackBarAction(
+            label: 'Details',
+            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                arguments: log)),
+      ));
+
 void connect(LoadedAccount account,
     {required BuildContext context, required String address}) {
   HostAddress _hostAddress;
@@ -52,7 +77,14 @@ void connect(LoadedAccount account,
     return;
   }
 
-  account.connect(_hostAddress, context: context).onError((error, stackTrace) {
+  account
+      .connect(
+    _hostAddress,
+    onConnected: () => _onConnected(context: context),
+    onComplete: () => _onSyncComplete(context: context),
+    onError: (log) => _onSyncError(log, context: context),
+  )
+      .onError((error, stackTrace) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Row(children: [
@@ -69,4 +101,41 @@ void connect(LoadedAccount account,
   });
 }
 
-void host(LoadedAccount account, {required BuildContext context}) {}
+void host(LoadedAccount account, {required BuildContext context}) {
+  account
+      .host(
+    onConnected: () => _onConnected(context: context),
+    onComplete: () => _onSyncComplete(context: context),
+    onError: (log) => _onSyncError(log, context: context),
+  )
+      .then((value) {
+    if (value == null) return;
+    showDialog(
+      context: context,
+      builder: (_) => SimpleDialog(
+        shape: dialogShape,
+        children: [
+          Center(
+            child: SizedBox(
+              width: 300,
+              height: 350,
+              child: Column(
+                children: [
+                  QrImage(
+                    data: value.toString(),
+                    foregroundColor: Colors.blue[50],
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(value.toString()),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  });
+}

@@ -140,8 +140,8 @@ class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
   final Encrypter _encrypter;
-  final void Function() onComplete;
-  final Function(String log) onError;
+  final void Function()? _onComplete;
+  final void Function(String log)? _onError;
   static ServerSocket? _server;
   static Socket? _socket;
   String _syncLog = '';
@@ -149,10 +149,12 @@ class Synchronization {
   Synchronization(this._loadedAccount,
       {required History history,
       required Encrypter encrypter,
-      required this.onComplete,
-      required this.onError})
+      void Function()? onComplete,
+      void Function(String log)? onError})
       : _history = history,
-        _encrypter = encrypter;
+        _encrypter = encrypter,
+        _onComplete = onComplete,
+        _onError = onError;
 
   void _handleException(String message) {
     _socket?.destroy();
@@ -163,8 +165,8 @@ class Synchronization {
     }
     String _exception = '\nLocal exception has occurred: ' + message;
     _syncLog += _exception;
-    onComplete();
-    onError(_syncLog);
+    _onComplete?.call();
+    _onError?.call(_syncLog);
   }
 
   List<List<int>> _encodeData(_Request request) {
@@ -330,7 +332,7 @@ class Synchronization {
                   _socket = null;
                   socket.destroy();
                   server.close();
-                  onComplete();
+                  _onComplete?.call();
                   return;
                 }
                 _remoteHistory = History.fromCSV(csvDecode(
@@ -436,7 +438,7 @@ class Synchronization {
                   _server = null;
                   await _decryptEntriesFuture;
                   _syncLog += 'done.';
-                  onComplete();
+                  _onComplete?.call();
                 });
                 _sendInfo(_info);
                 _syncLog += 'done.\nExchanging data... ';
@@ -551,7 +553,7 @@ class Synchronization {
             _socket = null;
             await _decryptEntriesFuture;
             _syncLog += 'done.';
-            onComplete();
+            _onComplete?.call();
           });
           _syncLog += 'done.\nExchanging data... ';
           if (_info.request.length == 0) {

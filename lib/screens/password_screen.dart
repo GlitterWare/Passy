@@ -154,6 +154,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   context: context,
                   builder: (_) {
                     return AlertDialog(
+                      shape: dialogShape,
                       title: const Text('Remove password'),
                       content: const Text(
                           'Passwords can only be restored from a backup.'),

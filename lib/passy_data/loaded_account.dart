@@ -1,11 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/material.dart';
-import 'package:passy/common/theme.dart';
-import 'package:passy/screens/log_screen.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -114,45 +110,30 @@ class LoadedAccount {
     _identities.saveSync();
   }
 
-  void _onConnected({required BuildContext context}) {
-    Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
-    Navigator.pushNamed(context, SplashScreen.routeName);
-  }
-
-  void _onSyncComplete({required BuildContext context}) =>
-      Navigator.pop(context);
-
-  void _onSyncError(String log, {required BuildContext context}) =>
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Row(children: [
-            Icon(Icons.sync_problem_rounded, color: darkContentColor),
-            const SizedBox(width: 20),
-            const Expanded(child: Text('Sync error')),
-          ]),
-          action: SnackBarAction(
-              label: 'Details',
-              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                  arguments: log)),
-        ));
-
-  Future<HostAddress?> host({required BuildContext context}) =>
+  Future<HostAddress?> host({
+    void Function()? onConnected,
+    void Function()? onComplete,
+    void Function(String log)? onError,
+  }) =>
       Synchronization(this,
               history: _history.value,
               encrypter: _encrypter,
-              onComplete: () => _onSyncComplete(context: context),
-              onError: (log) => _onSyncError(log, context: context))
-          .host(onConnected: () => _onConnected(context: context));
+              onComplete: onComplete,
+              onError: onError)
+          .host(onConnected: onConnected);
 
-  Future<void> connect(HostAddress address, {required BuildContext context}) {
-    _onConnected(context: context);
+  Future<void> connect(
+    HostAddress address, {
+    void Function()? onConnected,
+    void Function()? onComplete,
+    void Function(String log)? onError,
+  }) {
     Future<void> _connectFuture = Synchronization(this,
         history: _history.value,
         encrypter: _encrypter,
-        onComplete: () => _onSyncComplete(context: context),
-        onError: (log) => _onSyncError(log, context: context)).connect(address);
-    _connectFuture.whenComplete(() => _onConnected(context: context));
+        onComplete: () => onComplete,
+        onError: (log) => onError).connect(address);
+    _connectFuture.then((v) => onConnected?.call());
     return _connectFuture;
   }
 
