@@ -500,6 +500,7 @@ class Synchronization {
 
   Future<void> connect(HostAddress address) {
     void _connect(Socket socket) {
+      bool _serviceInfoHandled = false;
       _socket = socket;
       PassyStreamSubscription _sub = PassyStreamSubscription(socket.listen(
         null,
@@ -599,6 +600,8 @@ class Synchronization {
       }
 
       void _handleServiceInfo(List<int> data) {
+        if (_serviceInfoHandled) return;
+        _serviceInfoHandled = true;
         _syncLog += 'done.\nReceiving service info... ';
         List<String> _info = [];
         try {
