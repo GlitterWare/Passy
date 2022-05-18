@@ -165,8 +165,8 @@ class Synchronization {
     }
     String _exception = '\nLocal exception has occurred: ' + message;
     _syncLog += _exception;
-    _onComplete?.call();
     _onError?.call(_syncLog);
+    _onComplete?.call();
   }
 
   List<List<int>> _encodeData(_Request request) {
@@ -499,8 +499,7 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) {
-    _syncLog = 'Connecting... ';
-    return Socket.connect(address.ip, address.port).then((socket) {
+    void _connect(Socket socket) {
       _socket = socket;
       PassyStreamSubscription _sub = PassyStreamSubscription(socket.listen(
         null,
@@ -632,9 +631,14 @@ class Synchronization {
       }
 
       _sub.onData(_handleServiceInfo);
-    },
-        onError: (e, s) => _handleException(
-            'Failed to connect.\n${e.toString()}\n${s.toString()}'));
+    }
+
+    _syncLog = 'Connecting... ';
+    return Socket.connect(address.ip, address.port,
+            timeout: const Duration(seconds: 8))
+        .then((socket) => _connect(socket),
+            onError: (e, s) => _handleException(
+                'Failed to connect.\n${e.toString()}\n${s.toString()}'));
     // Ask server for data hashes, if they are not the same, exchange data
   }
 }

@@ -47,8 +47,8 @@ class ConnectScreen extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(right: entryPadding.right),
                     child: FloatingActionButton(
-                      onPressed: () => connect(_account,
-                          context: context, address: _address),
+                      onPressed: () => SynchronizationWrapper(context: context)
+                          .connect(_account, address: _address),
                       child: const Icon(Icons.sync_rounded),
                     ),
                   ),

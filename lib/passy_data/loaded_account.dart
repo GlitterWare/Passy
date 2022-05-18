@@ -128,12 +128,12 @@ class LoadedAccount {
     void Function()? onComplete,
     void Function(String log)? onError,
   }) {
+    onConnected?.call();
     Future<void> _connectFuture = Synchronization(this,
         history: _history.value,
         encrypter: _encrypter,
-        onComplete: () => onComplete,
-        onError: (log) => onError).connect(address);
-    _connectFuture.then((v) => onConnected?.call());
+        onComplete: () => onComplete?.call(),
+        onError: (log) => onError?.call(log)).connect(address);
     return _connectFuture;
   }
 

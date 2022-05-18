@@ -24,6 +24,8 @@ const String version = '0.0.0';
 
 void main() => runApp(const Passy());
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class Passy extends StatelessWidget {
   const Passy({Key? key}) : super(key: key);
 
@@ -32,6 +34,7 @@ class Passy extends StatelessWidget {
     return MaterialApp(
       title: 'Passy',
       theme: theme,
+      navigatorKey: navigatorKey,
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),

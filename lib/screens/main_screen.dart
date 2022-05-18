@@ -30,6 +30,7 @@ class _MainScreen extends State<MainScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Passy'),
         actions: [
           IconButton(
@@ -52,7 +53,9 @@ class _MainScreen extends State<MainScreen>
                           'Host',
                           style: TextStyle(color: lightContentSecondaryColor),
                         ),
-                        onPressed: () => host(_account, context: context)),
+                        onPressed: () =>
+                            SynchronizationWrapper(context: context)
+                                .host(_account)),
                     TextButton(
                       child: Text(
                         'Connect',
@@ -62,8 +65,8 @@ class _MainScreen extends State<MainScreen>
                           ? () => FlutterBarcodeScanner.scanBarcode(
                                       '#9C27B0', 'Cancel', false, ScanMode.QR)
                                   .then((address) {
-                                connect(_account,
-                                    context: context, address: address);
+                                SynchronizationWrapper(context: context)
+                                    .connect(_account, address: address);
                               })
                           : () {
                               Navigator.popUntil(
