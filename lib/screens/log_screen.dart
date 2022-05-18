@@ -23,10 +23,14 @@ class LogScreen extends StatelessWidget {
             ),
             actions: [
               IconButton(
+                padding: appBarButtonPadding,
+                splashRadius: appBarButtonSplashRadius,
                 icon: const Icon(Icons.copy_rounded),
                 onPressed: () => Clipboard.setData(ClipboardData(text: _log)),
               ),
               IconButton(
+                padding: appBarButtonPadding,
+                splashRadius: appBarButtonSplashRadius,
                 icon: SvgPicture.asset(
                   'assets/images/github_icon.svg',
                   color: lightContentColor,
