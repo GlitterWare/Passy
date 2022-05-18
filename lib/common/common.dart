@@ -3,6 +3,8 @@ import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/widgets/back_button.dart';
 import 'package:universal_io/io.dart';
 
+import 'theme.dart';
+
 late PassyData data;
 
 final bool cameraSupported = Platform.isAndroid || Platform.isIOS;
@@ -20,6 +22,8 @@ AppBar getEditScreenAppBar(
           : Center(child: Text('Edit $title')),
       actions: [
         IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           onPressed: onSave,
           icon: isNew
               ? const Icon(Icons.add_rounded)
