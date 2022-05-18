@@ -149,7 +149,9 @@ class SynchronizationWrapper {
       ).whenComplete(() {
         try {
           _sync!.close();
-        } catch (e) {}
+        } catch (e) {
+          // Ignore exceptions if synchronization is running
+        }
       });
     });
   }
