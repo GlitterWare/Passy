@@ -145,6 +145,7 @@ class Synchronization {
   static ServerSocket? _server;
   static Socket? _socket;
   String _syncLog = '';
+  bool _isConnected = false;
 
   Synchronization(this._loadedAccount,
       {required History history,
@@ -300,6 +301,7 @@ class Synchronization {
             }
             if (onConnected != null) onConnected();
             _socket = socket;
+            _isConnected = true;
 
             PassyStreamSubscription _sub =
                 PassyStreamSubscription(socket.listen(
@@ -438,6 +440,7 @@ class Synchronization {
                   _server = null;
                   await _decryptEntriesFuture;
                   _syncLog += 'done.';
+                  _isConnected = false;
                   _onComplete?.call();
                 });
                 _sendInfo(_info);
@@ -499,7 +502,8 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) {
-    void _connect(Socket socket) {
+    void _onConnected(Socket socket) {
+      _isConnected = true;
       bool _serviceInfoHandled = false;
       _socket = socket;
       PassyStreamSubscription _sub = PassyStreamSubscription(socket.listen(
@@ -613,12 +617,12 @@ class Synchronization {
         }
         if (_info.length < 2) {
           _handleException(
-              'Service info is less than 2 parts long. Info length: ${_info.length}');
+              'Service info is less than 2 parts long. Info length: ${_info.length}.');
           return;
         }
         if (_info[0] != 'Passy') {
           _handleException(
-              'Remote service is not Passy. Service name: ${_hello[0]}');
+              'Remote service is not Passy. Service name: ${_hello[0]}.');
           return;
         }
         if (_info[1].replaceFirst('v', '').split('.')[0] !=
@@ -639,9 +643,19 @@ class Synchronization {
     _syncLog = 'Connecting... ';
     return Socket.connect(address.ip, address.port,
             timeout: const Duration(seconds: 8))
-        .then((socket) => _connect(socket),
+        .then((socket) => _onConnected(socket),
             onError: (e, s) => _handleException(
                 'Failed to connect.\n${e.toString()}\n${s.toString()}'));
     // Ask server for data hashes, if they are not the same, exchange data
+  }
+
+  void close() {
+    if (!_isConnected) {
+      _server?.close();
+      _socket?.destroy();
+      _onComplete?.call();
+    } else {
+      _handleException('Synchronization requested to close while connected.');
+    }
   }
 }
