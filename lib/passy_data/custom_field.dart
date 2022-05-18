@@ -56,7 +56,7 @@ class CustomField with JsonConvertable, CSVConvertable {
           title,
           fieldType.name,
           value,
-          obscured,
+          obscured.toString(),
         ]
       ];
 }
