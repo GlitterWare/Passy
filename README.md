@@ -5,4 +5,4 @@ Built with Flutter and available for these platforms: Windows, Android, iOS, Lin
 
 Prebuilt binaries available for Windows and Android.
 
-Building for iOS and macOS was not tested, so please make any issues known.
+Building for Linux, iOS and macOS was not tested, so please make any issues known.
