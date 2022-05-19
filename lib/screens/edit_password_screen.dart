@@ -94,11 +94,14 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             decoration: const InputDecoration(labelText: '2FA Secret'),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'([a-z]|[A-Z]|[2-7])')),
+              TextInputFormatter.withFunction((oldValue, newValue) =>
+                  TextEditingValue(
+                      text: newValue.text.toUpperCase(),
+                      selection: newValue.selection)),
             ],
             onChanged: (value) {
-              String _secret = value.toUpperCase();
-              if (_secret.length.isOdd) _secret += '=';
-              _tfa.secret = _secret;
+              if (value.length.isOdd) value += '=';
+              _tfa.secret = value;
             },
           ),
         ),
@@ -116,6 +119,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           child: TextFormField(
             controller: TextEditingController(text: _tfa.interval.toString()),
             decoration: const InputDecoration(labelText: '2FA Interval'),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             onChanged: (value) => _tfa.interval = int.parse(value),
           ),
         ),

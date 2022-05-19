@@ -89,6 +89,12 @@ class _PasswordScreen extends State<PasswordScreen> {
   }
 
   @override
+  void deactivate() {
+    super.deactivate();
+    _onClosed.complete();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Password _password =
         ModalRoute.of(context)!.settings.arguments as Password;
@@ -138,10 +144,7 @@ class _PasswordScreen extends State<PasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(
-          onPressed: () {
-            _onClosed.complete();
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: Center(child: Text(_password.nickname)),
         actions: [
