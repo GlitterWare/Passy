@@ -79,6 +79,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+    - family: FiraCode
+      fonts:
+        - asset: assets/fonts/FiraCode-Bold.ttf
+
   assets:
     - assets/images/github_icon.svg
     - assets/images/icon.ico

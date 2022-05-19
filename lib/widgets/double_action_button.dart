@@ -4,15 +4,15 @@ import 'package:passy/common/theme.dart';
 class DoubleActionButton extends StatelessWidget {
   final Widget _child;
   final Widget _icon;
-  final void Function() _onButtonPressed;
-  final void Function() _onActionPressed;
+  final void Function()? _onButtonPressed;
+  final void Function()? _onActionPressed;
 
   const DoubleActionButton(
       {Key? key,
       required Widget child,
       required Widget icon,
-      required void Function() onButtonPressed,
-      required void Function() onActionPressed})
+      void Function()? onButtonPressed,
+      void Function()? onActionPressed})
       : _child = child,
         _icon = icon,
         _onButtonPressed = onButtonPressed,

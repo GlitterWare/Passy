@@ -60,7 +60,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   }
 
   Widget _buildRecord(String title, String value,
-          {bool obscureValue = false}) =>
+          {bool obscureValue = false, bool isPassword = false}) =>
       DoubleActionButton(
         child: Column(
           children: [
@@ -72,7 +72,11 @@ class _PasswordScreen extends State<PasswordScreen> {
           ],
         ),
         icon: const Icon(Icons.copy),
-        onButtonPressed: () {},
+        onButtonPressed: () => showDialog(
+          context: context,
+          builder: (_) =>
+              getRecordDialog(value: value, highlightSpecial: isPassword),
+        ),
         onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
       );
 
@@ -111,8 +115,12 @@ class _PasswordScreen extends State<PasswordScreen> {
         _records.add(_buildRecord('Email', _password.email));
       }
       if (_password.password != '') {
-        _records.add(
-            _buildRecord('Password', _password.password, obscureValue: true));
+        _records.add(_buildRecord(
+          'Password',
+          _password.password,
+          obscureValue: true,
+          isPassword: true,
+        ));
       }
       if (_password.tfa != null) {
         _records.add(Row(
