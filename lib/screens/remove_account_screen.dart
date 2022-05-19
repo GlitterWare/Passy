@@ -4,6 +4,7 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/text_form_field_buttoned.dart';
 
 class RemoveAccountScreen extends StatefulWidget {
   const RemoveAccountScreen({Key? key}) : super(key: key);
@@ -81,32 +82,11 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              Row(children: [
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: entryPadding.right,
-                        top: entryPadding.top,
-                        bottom: entryPadding.bottom),
-                    child: TextFormField(
-                      controller: TextEditingController(),
-                      decoration: const InputDecoration(
-                        labelText: 'Confirm username',
-                      ),
-                      onChanged: (s) => _confirmation = s,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: entryPadding.right),
-                    child: FloatingActionButton(
-                      onPressed: _removeAccount,
-                      child: const Icon(Icons.delete_outline_rounded),
-                    ),
-                  ),
-                )
-              ]),
+              TextFormFieldButtoned(
+                labelText: 'Confirm username',
+                onChanged: (s) => _confirmation = s,
+                onPressed: _removeAccount,
+              ),
               const Spacer(),
             ]),
           ),
