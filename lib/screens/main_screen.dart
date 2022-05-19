@@ -5,7 +5,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/widgets/arrow_button.dart';
+import 'package:passy/widgets/elevated_iconed_button.dart';
 
 import 'connect_screen.dart';
 import 'passwords_screen.dart';
@@ -94,8 +94,8 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          ArrowButton(
-            icon: const Icon(Icons.lock_rounded),
+          ElevatedIconedButton(
+            leftIcon: const Icon(Icons.lock_rounded),
             body: const Align(
               child: Text('Passwords'),
               alignment: Alignment.centerLeft,

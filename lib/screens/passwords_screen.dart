@@ -8,7 +8,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/widgets/arrow_button.dart';
+import 'package:passy/widgets/elevated_iconed_button.dart';
 import 'package:passy/widgets/back_button.dart';
 
 import 'edit_password_screen.dart';
@@ -52,8 +52,8 @@ class _PasswordsScreen extends State<PasswordsScreen> {
         return Image.memory(_icon);
       }
 
-      _passwordWidgets.add(ArrowButton(
-        icon: _getIcon(password.iconName),
+      _passwordWidgets.add(ElevatedIconedButton(
+        leftIcon: _getIcon(password.iconName),
         onPressed: () {
           Navigator.pushNamed(context, PasswordScreen.routeName,
               arguments: password);
