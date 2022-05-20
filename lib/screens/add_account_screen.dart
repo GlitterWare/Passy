@@ -107,8 +107,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
         leading: data.noAccounts
             ? null
             : PassyBackButton(
-                onPressed: () => Navigator.pushReplacementNamed(
-                    context, LoginScreen.routeName)),
+                onPressed: () =>
+                    Navigator.pushNamed(context, LoginScreen.routeName)),
         title: const Text('Add account'),
         centerTitle: true,
       ),

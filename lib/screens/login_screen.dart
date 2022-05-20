@@ -6,7 +6,6 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
-import 'package:passy/screens/add_account_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 
@@ -15,7 +14,7 @@ import 'log_screen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/login';
+  static const routeName = '/addAccount/login';
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
@@ -109,9 +108,7 @@ class _LoginScreen extends State<LoginScreen> {
                             Row(
                               children: [
                                 FloatingActionButton(
-                                  onPressed: () =>
-                                      Navigator.pushReplacementNamed(
-                                          context, AddAccountScreen.routeName),
+                                  onPressed: () => Navigator.pop(context),
                                   child: const Icon(Icons.add_rounded),
                                   heroTag: 'addAccountBtn',
                                 ),

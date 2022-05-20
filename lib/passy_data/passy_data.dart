@@ -37,26 +37,32 @@ class PassyData {
     );
   }
 
-  Future<void> removeAccount(String username) {
+  void _removeAccount(String username) {
     if (_loadedAccount != null) {
       if (_loadedAccount!.username == username) {
         _loadedAccount = null;
       }
     }
     _accounts.remove(username);
+    if (_accounts.isEmpty) {
+      info.value.lastUsername = '';
+      return;
+    }
     info.value.lastUsername = _accounts.keys.first;
-    return Directory(accountsPath + Platform.pathSeparator + username)
-        .delete(recursive: true);
+  }
+
+  Future<void> removeAccount(String username) {
+    _removeAccount(username);
+    return Future.wait([
+      info.save(),
+      Directory(accountsPath + Platform.pathSeparator + username)
+          .delete(recursive: true),
+    ]);
   }
 
   void removeAccountSync(String username) {
-    if (_loadedAccount != null) {
-      if (_loadedAccount!.username == username) {
-        _loadedAccount = null;
-      }
-    }
-    _accounts.remove(username);
-    info.value.lastUsername = _accounts.keys.first;
+    _removeAccount(username);
+    info.saveSync();
     Directory(accountsPath + Platform.pathSeparator + username)
         .deleteSync(recursive: true);
   }

@@ -22,9 +22,10 @@ class SplashScreen extends StatelessWidget {
         data = PassyData((await getApplicationDocumentsDirectory()).path +
             Platform.pathSeparator +
             'Passy');
-        data.noAccounts
-            ? Navigator.pushNamed(context, AddAccountScreen.routeName)
-            : Navigator.pushNamed(context, LoginScreen.routeName);
+        Navigator.pushNamed(context, AddAccountScreen.routeName);
+        if (!data.noAccounts) {
+          Navigator.pushNamed(context, LoginScreen.routeName);
+        }
       });
       loaded = true;
     }

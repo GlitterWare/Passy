@@ -9,7 +9,7 @@ import 'package:passy/widgets/text_form_field_buttoned.dart';
 class RemoveAccountScreen extends StatefulWidget {
   const RemoveAccountScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/login/removeAccount';
+  static const routeName = '/removeAccount';
 
   @override
   State<StatefulWidget> createState() => _RemoveAccountScreen();
@@ -36,8 +36,12 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
         return;
       }
       Navigator.pushReplacementNamed(context, SplashScreen.routeName);
-      data.removeAccount(_username).then((value) =>
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName));
+      data.removeAccount(_username).then((value) {
+        Navigator.pop(context);
+        if (!data.noAccounts) {
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        }
+      });
     }
 
     return Scaffold(
