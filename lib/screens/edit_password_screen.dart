@@ -78,6 +78,9 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         title: 'password',
         isNew: _isNew,
         onSave: () {
+          for (int i = 0; i != _customFields.length + 1; i++) {
+            if (_customFields[i].value == '') _customFields.removeAt(i);
+          }
           Password _passwordArgs = Password(
             key: _key,
             customFields: _customFields,
@@ -227,6 +230,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           itemBuilder: (context, index) => TextFormFieldButtoned(
             controller: TextEditingController(text: _customFields[index].value),
             labelText: _customFields[index].title,
+            buttonIcon: const Icon(Icons.remove_rounded),
             onChanged: (value) => _customFields[index].value = value,
             onPressed: () => setState(() => _customFields.removeAt(index)),
             inputFormatters: [

@@ -86,6 +86,7 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
                 labelText: 'Confirm username',
                 onChanged: (s) => _confirmation = s,
                 onPressed: _removeAccount,
+                buttonIcon: const Icon(Icons.delete_outline_rounded),
               ),
               const Spacer(),
             ]),

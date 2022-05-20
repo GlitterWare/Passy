@@ -5,6 +5,7 @@ import 'package:passy/common/theme.dart';
 class TextFormFieldButtoned extends StatefulWidget {
   final TextEditingController? _controller;
   final String? _labelText;
+  final Widget? _buttonIcon;
   final void Function(String)? _onChanged;
   final void Function()? _onPressed;
   final List<TextInputFormatter>? _inputFormatters;
@@ -13,10 +14,12 @@ class TextFormFieldButtoned extends StatefulWidget {
     TextEditingController? controller,
     Key? key,
     String? labelText,
+    Widget? buttonIcon,
     void Function(String)? onChanged,
     void Function()? onPressed,
     List<TextInputFormatter>? inputFormatters,
-  })  : _controller = controller,
+  })  : _buttonIcon = buttonIcon,
+        _controller = controller,
         _labelText = labelText,
         _onChanged = onChanged,
         _onPressed = onPressed,
@@ -29,6 +32,7 @@ class TextFormFieldButtoned extends StatefulWidget {
       _TextFormFieldButtoned(
         controller: _controller,
         labelText: _labelText,
+        buttonIcon: _buttonIcon,
         onChanged: _onChanged,
         onPressed: _onPressed,
         inputFormatters: _inputFormatters,
@@ -38,6 +42,7 @@ class TextFormFieldButtoned extends StatefulWidget {
 class _TextFormFieldButtoned extends State<TextFormFieldButtoned> {
   final TextEditingController? _controller;
   final String? _labelText;
+  final Widget? _buttonIcon;
   final void Function(String)? _onChanged;
   final void Function()? _onPressed;
   final List<TextInputFormatter>? _inputFormatters;
@@ -45,11 +50,13 @@ class _TextFormFieldButtoned extends State<TextFormFieldButtoned> {
   _TextFormFieldButtoned({
     TextEditingController? controller,
     String? labelText,
+    Widget? buttonIcon,
     void Function(String)? onChanged,
     void Function()? onPressed,
     List<TextInputFormatter>? inputFormatters,
   })  : _controller = controller,
         _labelText = labelText,
+        _buttonIcon = buttonIcon,
         _onChanged = onChanged,
         _onPressed = onPressed,
         _inputFormatters = inputFormatters;
@@ -76,7 +83,7 @@ class _TextFormFieldButtoned extends State<TextFormFieldButtoned> {
             child: FloatingActionButton(
               heroTag: null,
               onPressed: _onPressed,
-              child: const Icon(Icons.delete_outline_rounded),
+              child: _buttonIcon,
             ),
           ),
         )
