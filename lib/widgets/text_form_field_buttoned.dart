@@ -19,7 +19,8 @@ class TextFormFieldButtoned extends StatefulWidget {
   @override
   State<StatefulWidget> createState() =>
       // ignore: no_logic_in_create_state
-      _TextFormFieldButtoned(onChanged: _onChanged, onPressed: _onPressed);
+      _TextFormFieldButtoned(
+          labelText: _labelText, onChanged: _onChanged, onPressed: _onPressed);
 }
 
 class _TextFormFieldButtoned extends State<TextFormFieldButtoned> {
