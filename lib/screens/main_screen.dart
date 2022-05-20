@@ -96,10 +96,8 @@ class _MainScreen extends State<MainScreen>
         children: [
           ElevatedIconedButton(
             leftIcon: const Icon(Icons.lock_rounded),
-            body: const Align(
-              child: Text('Passwords'),
-              alignment: Alignment.centerLeft,
-            ),
+            rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
+            body: const Text('Passwords'),
             onPressed: () {
               Navigator.pushNamed(context, PasswordsScreen.routeName);
             },

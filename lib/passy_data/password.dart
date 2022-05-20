@@ -21,6 +21,7 @@ class Password extends PassyEntry<Password> {
   String website;
 
   Password({
+    String? key,
     List<CustomField>? customFields,
     this.additionalInfo = '',
     List<String>? tags,
@@ -33,7 +34,7 @@ class Password extends PassyEntry<Password> {
     this.website = '',
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
-        super(DateTime.now().toUtc().toIso8601String());
+        super(key ?? DateTime.now().toUtc().toIso8601String());
 
   Password.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

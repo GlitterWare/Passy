@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:passy/screens/edit_id_card_screen.dart';
-import 'package:passy/screens/edit_identity_screen.dart';
-import 'package:passy/screens/edit_password_screen.dart';
-import 'package:passy/screens/edit_payment_card_screen.dart';
-import 'package:passy/screens/log_screen.dart';
-import 'package:passy/screens/password_screen.dart';
-import 'package:passy/screens/id_card_screen.dart';
-import 'package:passy/screens/identity_screen.dart';
-import 'package:passy/screens/note_screen.dart';
-import 'package:passy/screens/passwords_screen.dart';
-import 'package:passy/screens/payment_card_screen.dart';
-import 'package:passy/screens/connect_screen.dart';
-import 'package:passy/screens/remove_account_screen.dart';
-import 'package:passy/screens/settings_screen.dart';
 
 import 'common/theme.dart';
 import 'screens/add_account_screen.dart';
-import 'screens/splash_screen.dart';
+import 'screens/connect_screen.dart';
+import 'screens/edit_custom_field_screen.dart';
+import 'screens/edit_id_card_screen.dart';
+import 'screens/edit_identity_screen.dart';
+import 'screens/edit_password_screen.dart';
+import 'screens/edit_payment_card_screen.dart';
+import 'screens/id_card_screen.dart';
+import 'screens/identity_screen.dart';
+import 'screens/log_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
+import 'screens/note_screen.dart';
+import 'screens/password_screen.dart';
+import 'screens/passwords_screen.dart';
+import 'screens/payment_card_screen.dart';
+import 'screens/remove_account_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/splash_screen.dart';
 
 const String version = '0.0.0';
 
@@ -38,6 +39,8 @@ class Passy extends StatelessWidget {
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
+        EditCustomFieldScreen.routeName: (context) =>
+            const EditCustomFieldScreen(),
         EditIdCardScreen.routeName: (context) => const EditIdCardScreen(),
         EditIdentityScreen.routeName: (context) => const EditIdentityScreen(),
         EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),

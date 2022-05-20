@@ -58,7 +58,11 @@ AlertDialog getRecordDialog(
       text: TextSpan(text: '', children: _children),
     );
   } else {
-    content = Text(value, textAlign: TextAlign.center);
+    content = Text(
+      value,
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontFamily: 'FiraCode'),
+    );
   }
   return AlertDialog(shape: dialogShape, content: content);
 }

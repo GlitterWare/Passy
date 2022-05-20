@@ -6,6 +6,7 @@ import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
+import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
@@ -81,7 +82,6 @@ class _PasswordScreen extends State<PasswordScreen> {
       );
 
   //TODO: implement tags
-  //TODO: implement customFields
 
   @override
   void initState() {
@@ -142,6 +142,11 @@ class _PasswordScreen extends State<PasswordScreen> {
       }
       if (_password.website != '') {
         _records.add(_buildRecord('Website', _password.website));
+      }
+      for (CustomField _customField in _password.customFields) {
+        _records.add(_buildRecord(_customField.title, _customField.value,
+            obscureValue: _customField.obscured,
+            isPassword: _customField.fieldType == FieldType.password));
       }
       if (_password.additionalInfo != '') {
         _records.add(_buildRecord('Additional Info', _password.additionalInfo));

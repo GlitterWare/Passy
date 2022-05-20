@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/theme.dart';
 
 class ElevatedIconedButton extends StatelessWidget {
-  final Widget _icon;
+  final Widget? _leftIcon;
   final Widget _body;
   final Widget? _rightIcon;
   final void Function()? _onPressed;
 
   const ElevatedIconedButton({
     Key? key,
-    required Widget leftIcon,
+    Widget? leftIcon,
     required Widget body,
     Widget? rightIcon,
     void Function()? onPressed,
-  })  : _icon = leftIcon,
+  })  : _leftIcon = leftIcon,
         _body = body,
         _rightIcon = rightIcon,
         _onPressed = onPressed,
@@ -32,17 +32,16 @@ class ElevatedIconedButton extends StatelessWidget {
             child: Padding(
               child: Row(
                 children: [
-                  Padding(
-                    child: _icon,
-                    padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                  ),
+                  if (_leftIcon != null)
+                    Padding(
+                      child: _leftIcon,
+                      padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                    ),
                   Flexible(
                     child: _body,
                     fit: FlexFit.tight,
                   ),
-                  _rightIcon == null
-                      ? const Icon(Icons.arrow_forward_ios_rounded)
-                      : _rightIcon!,
+                  if (_rightIcon != null) _rightIcon!,
                 ],
               ),
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),

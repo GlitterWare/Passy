@@ -1,3 +1,5 @@
+import 'package:passy/passy_data/common.dart';
+
 import 'csv_convertable.dart';
 import 'json_convertable.dart';
 
@@ -7,12 +9,12 @@ FieldType? fieldTypeFromName(String name) {
   switch (name) {
     case 'text':
       return FieldType.text;
+    case 'number':
+      return FieldType.number;
     case 'password':
       return FieldType.password;
     case 'date':
       return FieldType.date;
-    case 'number':
-      return FieldType.number;
   }
   return null;
 }
@@ -37,10 +39,10 @@ class CustomField with JsonConvertable, CSVConvertable {
         obscured = json['private'] ?? false;
 
   CustomField.fromCSV(List csv)
-      : title = csv[0] ?? 'Custom Field',
-        fieldType = fieldTypeFromName(csv[1]) ?? FieldType.text,
-        value = csv[2] ?? '',
-        obscured = csv[3] ?? false;
+      : title = csv[0][0] ?? 'Custom Field',
+        fieldType = fieldTypeFromName(csv[0][1]) ?? FieldType.text,
+        value = csv[0][2] ?? '',
+        obscured = boolFromString(csv[0][3]) ?? false;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{

@@ -54,6 +54,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
       _passwordWidgets.add(ElevatedIconedButton(
         leftIcon: _getIcon(password.iconName),
+        rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
         onPressed: () {
           Navigator.pushNamed(context, PasswordScreen.routeName,
               arguments: password);
