@@ -79,8 +79,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         title: 'password',
         isNew: _isNew,
         onSave: () {
-          for (int i = 0; i != _customFields.length; i++) {
-            if (_customFields[i].value == '') _customFields.removeAt(i);
+          int _removed = 0;
+          for (int i = 0; i < _customFields.length - _removed; i++) {
+            if (_customFields[i].value == '') {
+              _customFields.removeAt(i);
+              _removed++;
+            }
           }
           Password _passwordArgs = Password(
             key: _key,
