@@ -103,6 +103,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: data.noAccounts
             ? null
             : PassyBackButton(
