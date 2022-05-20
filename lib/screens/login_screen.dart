@@ -14,7 +14,7 @@ import 'log_screen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/addAccount/login';
+  static const routeName = '/login';
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
@@ -74,7 +74,6 @@ class _LoginScreen extends State<LoginScreen> {
                 Expanded(child: Text(e)),
                 IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
                     Navigator.pushReplacementNamed(
                         context, RemoveAccountScreen.routeName,
                         arguments: e);

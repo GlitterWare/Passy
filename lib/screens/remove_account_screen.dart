@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
+import 'package:passy/screens/add_account_screen.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/back_button.dart';
@@ -37,10 +38,11 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
       }
       Navigator.pushReplacementNamed(context, SplashScreen.routeName);
       data.removeAccount(_username).then((value) {
-        Navigator.pop(context);
-        if (!data.noAccounts) {
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        if (data.noAccounts) {
+          Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
+          return;
         }
+        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       });
     }
 
