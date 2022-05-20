@@ -271,7 +271,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                       ).then((value) {
                         if (value == null) return;
                         setState(() => _customField.value =
-                            value!.day.toString() +
+                            value.day.toString() +
                                 '/' +
                                 value.month.toString() +
                                 '/' +
