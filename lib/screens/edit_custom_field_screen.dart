@@ -64,13 +64,11 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
                     FieldType.password.name.substring(1)),
                 value: FieldType.password,
               ),
-              /*
               DropdownMenuItem(
                 child: Text(FieldType.date.name[0].toUpperCase() +
                     FieldType.date.name.substring(1)),
                 value: FieldType.date,
               ),
-              */
             ],
             value: _customField.fieldType,
             decoration: const InputDecoration(labelText: 'Type'),

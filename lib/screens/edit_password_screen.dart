@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
+import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
@@ -78,7 +79,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         title: 'password',
         isNew: _isNew,
         onSave: () {
-          for (int i = 0; i != _customFields.length + 1; i++) {
+          for (int i = 0; i != _customFields.length; i++) {
             if (_customFields[i].value == '') _customFields.removeAt(i);
           }
           Password _passwordArgs = Password(
@@ -227,17 +228,62 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         ),
         ListView.builder(
           shrinkWrap: true,
-          itemBuilder: (context, index) => TextFormFieldButtoned(
-            controller: TextEditingController(text: _customFields[index].value),
-            labelText: _customFields[index].title,
-            buttonIcon: const Icon(Icons.remove_rounded),
-            onChanged: (value) => _customFields[index].value = value,
-            onPressed: () => setState(() => _customFields.removeAt(index)),
-            inputFormatters: [
-              if (_customFields[index].fieldType == FieldType.number)
-                FilteringTextInputFormatter.digitsOnly,
-            ],
-          ),
+          itemBuilder: (context, index) {
+            CustomField _customField = _customFields[index];
+            TextEditingController _controller =
+                TextEditingController(text: _customField.value);
+            bool _isDate = _customField.fieldType == FieldType.date;
+            DateTime? _date;
+            if (_isDate) {
+              if (_customField.value == '') {
+                _date = DateTime.now();
+              } else {
+                List<String> _dateSplit = _customField.value.split('/');
+                _date = DateTime(
+                  int.parse(_dateSplit[2]),
+                  int.parse(_dateSplit[1]),
+                  int.parse(_dateSplit[0]),
+                );
+              }
+            }
+            return TextFormFieldButtoned(
+              controller: _controller,
+              focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
+              labelText: _customField.title,
+              buttonIcon: const Icon(Icons.remove_rounded),
+              onChanged: (value) => _customField.value = value,
+              onTap: _isDate
+                  ? () => showDatePicker(
+                        context: context,
+                        initialDate:
+                            _customField.value == '' ? DateTime.now() : _date!,
+                        firstDate: DateTime.utc(0, 04, 20),
+                        lastDate: DateTime.utc(275760, 09, 13),
+                        builder: (context, widget) => Theme(
+                          data: ThemeData(
+                            colorScheme: ColorScheme.dark(
+                              primary: lightContentSecondaryColor,
+                              onPrimary: lightContentColor,
+                            ),
+                          ),
+                          child: widget!,
+                        ),
+                      ).then((value) {
+                        setState(() => _customField.value =
+                            value!.day.toString() +
+                                '/' +
+                                value.month.toString() +
+                                '/' +
+                                value.year.toString());
+                      })
+                  : null,
+              onPressed: () => setState(() => _customFields.removeAt(index)),
+              inputFormatters: [
+                if (_customField.fieldType == FieldType.number)
+                  FilteringTextInputFormatter.digitsOnly,
+              ],
+            );
+          },
           itemCount: _customFields.length,
         ),
         ElevatedIconedButton(

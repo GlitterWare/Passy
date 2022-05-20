@@ -63,7 +63,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   Widget _buildRecord(String title, String value,
           {bool obscureValue = false, bool isPassword = false}) =>
       DoubleActionButton(
-        child: Column(
+        body: Column(
           children: [
             Text(
               title,

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/theme.dart';
 
 class DoubleActionButton extends StatelessWidget {
-  final Widget _child;
+  final Widget _body;
   final Widget _icon;
   final void Function()? _onButtonPressed;
   final void Function()? _onActionPressed;
 
   const DoubleActionButton(
       {Key? key,
-      required Widget child,
+      required Widget body,
       required Widget icon,
       void Function()? onButtonPressed,
       void Function()? onActionPressed})
-      : _child = child,
+      : _body = body,
         _icon = icon,
         _onButtonPressed = onButtonPressed,
         _onActionPressed = onActionPressed,
@@ -34,7 +34,7 @@ class DoubleActionButton extends StatelessWidget {
             children: [
               Flexible(
                 fit: FlexFit.tight,
-                child: _child,
+                child: _body,
               ),
               IconButton(
                 onPressed: _onActionPressed,

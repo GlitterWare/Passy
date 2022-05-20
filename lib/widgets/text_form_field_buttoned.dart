@@ -2,64 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/theme.dart';
 
-class TextFormFieldButtoned extends StatefulWidget {
+class TextFormFieldButtoned extends StatelessWidget {
   final TextEditingController? _controller;
   final String? _labelText;
   final Widget? _buttonIcon;
+  final void Function()? _onTap;
   final void Function(String)? _onChanged;
   final void Function()? _onPressed;
+  final FocusNode? _focusNode;
   final List<TextInputFormatter>? _inputFormatters;
 
   const TextFormFieldButtoned({
-    TextEditingController? controller,
     Key? key,
+    TextEditingController? controller,
     String? labelText,
     Widget? buttonIcon,
+    void Function()? onTap,
     void Function(String)? onChanged,
     void Function()? onPressed,
+    FocusNode? focusNode,
     List<TextInputFormatter>? inputFormatters,
   })  : _buttonIcon = buttonIcon,
         _controller = controller,
         _labelText = labelText,
+        _onTap = onTap,
         _onChanged = onChanged,
         _onPressed = onPressed,
+        _focusNode = focusNode,
         _inputFormatters = inputFormatters,
         super(key: key);
-
-  @override
-  State<StatefulWidget> createState() =>
-      // ignore: no_logic_in_create_state
-      _TextFormFieldButtoned(
-        controller: _controller,
-        labelText: _labelText,
-        buttonIcon: _buttonIcon,
-        onChanged: _onChanged,
-        onPressed: _onPressed,
-        inputFormatters: _inputFormatters,
-      );
-}
-
-class _TextFormFieldButtoned extends State<TextFormFieldButtoned> {
-  final TextEditingController? _controller;
-  final String? _labelText;
-  final Widget? _buttonIcon;
-  final void Function(String)? _onChanged;
-  final void Function()? _onPressed;
-  final List<TextInputFormatter>? _inputFormatters;
-
-  _TextFormFieldButtoned({
-    TextEditingController? controller,
-    String? labelText,
-    Widget? buttonIcon,
-    void Function(String)? onChanged,
-    void Function()? onPressed,
-    List<TextInputFormatter>? inputFormatters,
-  })  : _controller = controller,
-        _labelText = labelText,
-        _buttonIcon = buttonIcon,
-        _onChanged = onChanged,
-        _onPressed = onPressed,
-        _inputFormatters = inputFormatters;
 
   @override
   Widget build(BuildContext context) => Row(children: [
@@ -72,7 +43,9 @@ class _TextFormFieldButtoned extends State<TextFormFieldButtoned> {
             child: TextFormField(
               controller: _controller ?? TextEditingController(),
               decoration: InputDecoration(labelText: _labelText),
+              onTap: _onTap,
               onChanged: _onChanged,
+              focusNode: _focusNode,
               inputFormatters: _inputFormatters,
             ),
           ),
