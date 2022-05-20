@@ -269,6 +269,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                           child: widget!,
                         ),
                       ).then((value) {
+                        if (value == null) return;
                         setState(() => _customField.value =
                             value!.day.toString() +
                                 '/' +
