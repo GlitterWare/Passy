@@ -7,8 +7,8 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 
-import 'main_screen.dart';
 import 'add_account_screen.dart';
+import 'main_screen.dart';
 import 'remove_account_screen.dart';
 import 'log_screen.dart';
 
@@ -75,6 +75,7 @@ class _LoginScreen extends State<LoginScreen> {
                 Expanded(child: Text(e)),
                 IconButton(
                   onPressed: () {
+                    Navigator.pop(context);
                     Navigator.pushReplacementNamed(
                         context, RemoveAccountScreen.routeName,
                         arguments: e);

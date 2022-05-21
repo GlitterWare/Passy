@@ -18,7 +18,6 @@ class AddAccountScreen extends StatefulWidget {
 }
 
 class _AddAccountScreen extends State<StatefulWidget> {
-  bool _noAccounts = data.noAccounts;
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
@@ -94,6 +93,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                 arguments: e.toString() + '\n' + s.toString()),
           ),
         ));
+      return;
     }
     data.info.value.lastUsername = _username;
     data.info.save().then((value) {
@@ -106,11 +106,11 @@ class _AddAccountScreen extends State<StatefulWidget> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: _noAccounts
+        leading: data.noAccounts
             ? null
             : PassyBackButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, LoginScreen.routeName)),
+                onPressed: () => Navigator.pushReplacementNamed(
+                    context, LoginScreen.routeName)),
         title: const Text('Add account'),
         centerTitle: true,
       ),
