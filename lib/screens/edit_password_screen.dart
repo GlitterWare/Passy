@@ -56,6 +56,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         TFA? _tfa = _passwordArgs.tfa;
         _key = _passwordArgs.key;
         _customFields = _passwordArgs.customFields.toList();
+        _additionalInfo = _passwordArgs.additionalInfo;
         _tags = _passwordArgs.tags;
         _nickname = _passwordArgs.nickname;
         _username = _passwordArgs.username;
@@ -314,6 +315,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
             controller: TextEditingController(text: _additionalInfo),
             decoration: const InputDecoration(labelText: 'Additional info'),
             onChanged: (value) => _additionalInfo = value,

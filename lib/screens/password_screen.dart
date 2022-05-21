@@ -69,7 +69,10 @@ class _PasswordScreen extends State<PasswordScreen> {
               title,
               style: TextStyle(color: lightContentSecondaryColor),
             ),
-            Text(obscureValue ? '\u2022' * 6 : value),
+            Text(
+              obscureValue ? '\u2022' * 6 : value,
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
         icon: const Icon(Icons.copy),
