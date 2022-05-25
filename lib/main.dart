@@ -16,6 +16,7 @@ import 'screens/main_screen.dart';
 import 'screens/note_screen.dart';
 import 'screens/password_screen.dart';
 import 'screens/passwords_screen.dart';
+import 'screens/passwords_search_screen.dart';
 import 'screens/payment_card_screen.dart';
 import 'screens/remove_account_screen.dart';
 import 'screens/settings_screen.dart';
@@ -53,6 +54,8 @@ class Passy extends StatelessWidget {
         MainScreen.routeName: (context) => const MainScreen(),
         NoteScreen.routeName: (context) => const NoteScreen(),
         PasswordsScreen.routeName: (context) => const PasswordsScreen(),
+        PasswordsSearchScreen.routeName: (context) =>
+            const PasswordsSearchScreen(),
         PasswordScreen.routeName: (context) => const PasswordScreen(),
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),

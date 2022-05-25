@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 class PaymentCardScreen extends StatefulWidget {
   const PaymentCardScreen({Key? key}) : super(key: key);

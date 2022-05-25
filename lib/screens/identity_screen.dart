@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 class IdentityScreen extends StatefulWidget {
   const IdentityScreen({Key? key}) : super(key: key);

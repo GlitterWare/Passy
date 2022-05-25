@@ -4,7 +4,7 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/screens/add_account_screen.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 import 'package:passy/widgets/text_form_field_buttoned.dart';
 
 class RemoveAccountScreen extends StatefulWidget {

@@ -11,7 +11,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/screens/edit_password_screen.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 import 'package:passy/widgets/double_action_button.dart';
 
 import 'main_screen.dart';

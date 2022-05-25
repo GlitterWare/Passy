@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 class EditIdCardScreen extends StatefulWidget {
   const EditIdCardScreen({Key? key}) : super(key: key);

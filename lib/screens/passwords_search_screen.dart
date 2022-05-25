@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:passy/passy_data/note.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
-class NoteScreen extends StatefulWidget {
-  const NoteScreen({Key? key}) : super(key: key);
+class PasswordsSearchScreen extends StatefulWidget {
+  const PasswordsSearchScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/note';
+  static const routeName = '/main/passwords/search';
 
   @override
-  State<StatefulWidget> createState() => _NoteScreen();
+  State<StatefulWidget> createState() => _PasswordsSearchScreen();
 }
 
-class _NoteScreen extends State<NoteScreen> {
+class _PasswordsSearchScreen extends State<PasswordsSearchScreen> {
   @override
   Widget build(BuildContext context) {
-    final Note? _note = ModalRoute.of(context)!.settings.arguments as Note?;
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(

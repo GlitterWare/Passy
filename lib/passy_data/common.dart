@@ -51,6 +51,7 @@ String csvEncode(List<List> object) {
     if (record is String) {
       return record
           .replaceAll('\\', '\\\\')
+          .replaceAll('\n', '\\n')
           .replaceAll(',', '\\,')
           .replaceAll('[', '\\[');
     }
@@ -107,6 +108,8 @@ List<List> csvDecode(String source,
     }
 
     while (_characters.moveNext()) {
+      String _currentCharacter = _characters.current;
+
       if (!_escapeDetected) {
         if (_characters.current == ',') {
           _convert();
@@ -147,9 +150,13 @@ List<List> csvDecode(String source,
           _escapeDetected = true;
           continue;
         }
+      } else {
+        if (_characters.current == 'n') {
+          _currentCharacter = '\n';
+        }
       }
 
-      _entry[v] += _characters.current;
+      _entry[v] += _currentCharacter;
       _escapeDetected = false;
     }
 

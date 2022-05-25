@@ -9,7 +9,7 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/widgets/elevated_iconed_button.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 import 'edit_password_screen.dart';
 import 'password_screen.dart';

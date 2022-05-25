@@ -4,7 +4,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/screens/login_screen.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 import 'log_screen.dart';
 

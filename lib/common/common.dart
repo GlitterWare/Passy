@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:universal_io/io.dart';
 
 import 'package:passy/passy_data/passy_data.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 import 'theme.dart';
 

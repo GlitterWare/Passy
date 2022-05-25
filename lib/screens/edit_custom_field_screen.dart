@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/widgets/back_button.dart';
+import 'package:passy/widgets/passy_back_button.dart';
 
 import 'edit_password_screen.dart';
 
