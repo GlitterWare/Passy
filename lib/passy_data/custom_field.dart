@@ -39,10 +39,10 @@ class CustomField with JsonConvertable, CSVConvertable {
         obscured = json['private'] ?? false;
 
   CustomField.fromCSV(List csv)
-      : title = csv[0][0] ?? 'Custom Field',
-        fieldType = fieldTypeFromName(csv[0][1]) ?? FieldType.text,
-        value = csv[0][2] ?? '',
-        obscured = boolFromString(csv[0][3]) ?? false;
+      : title = csv[0] ?? 'Custom Field',
+        fieldType = fieldTypeFromName(csv[1]) ?? FieldType.text,
+        value = csv[2] ?? '',
+        obscured = boolFromString(csv[3]) ?? false;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -53,12 +53,10 @@ class CustomField with JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<List> toCSV() => [
-        [
-          title,
-          fieldType.name,
-          value,
-          obscured.toString(),
-        ]
+  List toCSV() => [
+        title,
+        fieldType.name,
+        value,
+        obscured.toString(),
       ];
 }

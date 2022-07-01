@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';

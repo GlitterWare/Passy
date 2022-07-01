@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:passy/passy_data/passy_legacy.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -31,9 +32,9 @@ class PassyData {
         value: AccountCredentials(username, password));
     _accounts[username] = _file;
     LoadedAccount(
-      _file,
       path: _accountPath,
-      encrypter: getEncrypter(password),
+      credentials: _file,
+      encrypter: getPassyEncrypter(password),
     );
   }
 
@@ -67,10 +68,13 @@ class PassyData {
         .deleteSync(recursive: true);
   }
 
-  LoadedAccount loadAccount(String username, String password) =>
-      _loadedAccount = LoadedAccount(_accounts[username]!,
-          path: accountsPath + Platform.pathSeparator + username,
-          encrypter: getEncrypter(password));
+  LoadedAccount loadAccount(String username, String password) {
+    _loadedAccount = convertLegacyAccount(
+      path: accountsPath + Platform.pathSeparator + username,
+      encrypter: getPassyEncrypter(password),
+    );
+    return _loadedAccount!;
+  }
 
   void unloadAccount() => _loadedAccount = null;
 

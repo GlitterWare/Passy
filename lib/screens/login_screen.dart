@@ -26,7 +26,7 @@ class _LoginScreen extends State<LoginScreen> {
   String _username = data.info.value.lastUsername;
 
   void login() {
-    if (getHash(_password).toString() != data.getPasswordHash(_username)) {
+    if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: [
@@ -142,7 +142,6 @@ class _LoginScreen extends State<LoginScreen> {
                                       hintText: 'Password',
                                     ),
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.deny(' '),
                                       LengthLimitingTextInputFormatter(32),
                                     ],
                                     autofocus: true,

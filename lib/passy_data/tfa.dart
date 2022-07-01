@@ -54,13 +54,11 @@ class TFA with JsonConvertable, CSVConvertable {
       };
 
   @override
-  List<List> toCSV() => [
-        [
-          secret,
-          length.toString(),
-          interval.toString(),
-          algorithm.name,
-          isGoogle.toString(),
-        ]
+  List toCSV() => [
+        secret,
+        length.toString(),
+        interval.toString(),
+        algorithm.name,
+        isGoogle.toString(),
       ];
 }

@@ -1,11 +1,11 @@
 import 'custom_field.dart';
-import 'encrypted_csv_file.dart';
 import 'passy_entries.dart';
+import 'passy_entries_encrypted_csv_file.dart';
 import 'passy_entry.dart';
 
 typedef Identities = PassyEntries<Identity>;
 
-typedef IdentitiesFile = EncryptedCSVFile<Identities>;
+typedef IdentitiesFile = PassyEntriesEncryptedCSVFile<Identity>;
 
 enum Title { mr, mrs, miss, other }
 
@@ -144,25 +144,23 @@ class Identity extends PassyEntry<Identity> {
       };
 
   @override
-  List<List> toCSV() => [
-        [
-          key,
-          customFields.map((e) => e.toCSV()),
-          additionalInfo,
-          tags,
-          nickname,
-          title.name,
-          firstName,
-          middleName,
-          lastName,
-          gender.name,
-          email,
-          number,
-          firstAddressLine,
-          secondAddressLine,
-          zipCode,
-          city,
-          country,
-        ]
+  List toCSV() => [
+        key,
+        customFields.map((e) => e.toCSV()),
+        additionalInfo,
+        tags,
+        nickname,
+        title.name,
+        firstName,
+        middleName,
+        lastName,
+        gender.name,
+        email,
+        number,
+        firstAddressLine,
+        secondAddressLine,
+        zipCode,
+        city,
+        country,
       ];
 }

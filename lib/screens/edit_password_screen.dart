@@ -318,7 +318,21 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             keyboardType: TextInputType.multiline,
             maxLines: null,
             controller: TextEditingController(text: _additionalInfo),
-            decoration: const InputDecoration(labelText: 'Additional info'),
+            decoration: InputDecoration(
+              labelText: 'Additional info',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(color: lightContentColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(color: darkContentSecondaryColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(color: lightContentColor),
+              ),
+            ),
             onChanged: (value) => _additionalInfo = value,
           ),
         ),

@@ -5,7 +5,7 @@ import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
-const String passyVersion = '0.1.1';
+const String passyVersion = '0.3.0';
 
 final Random random = Random.secure();
 
@@ -15,7 +15,7 @@ bool? boolFromString(String value) {
   return null;
 }
 
-Encrypter getEncrypter(String password) {
+Encrypter getPassyEncrypter(String password) {
   if (password.length > 32) {
     throw Exception('Password is longer than 32 characters');
   }
@@ -24,7 +24,7 @@ Encrypter getEncrypter(String password) {
   return Encrypter(AES(Key.fromUtf8(password)));
 }
 
-Digest getHash(String value) => sha512.convert(utf8.encode(value));
+Digest getPassyHash(String value) => sha512.convert(utf8.encode(value));
 
 String encrypt(String data, {required Encrypter encrypter}) {
   if (data.isEmpty) return '';
@@ -44,10 +44,8 @@ String decrypt(String data, {required Encrypter encrypter}) {
   );
 }
 
-String csvEncode(List<List> object) {
-  String _encoded = '';
-
-  String _encodeRecord(dynamic record) {
+String csvEncode(List object) {
+  String _encode(dynamic record) {
     if (record is String) {
       return record
           .replaceAll('\\', '\\\\')
@@ -59,9 +57,9 @@ String csvEncode(List<List> object) {
       String _encoded = '[';
       if (record.isNotEmpty) {
         for (int i = 0; i < record.length - 1; i++) {
-          _encoded += _encodeRecord(record[i]) + ',';
+          _encoded += _encode(record[i]) + ',';
         }
-        _encoded += _encodeRecord(record[record.length - 1]);
+        _encoded += _encode(record[record.length - 1]);
       }
       _encoded += ']';
       return _encoded;
@@ -69,27 +67,21 @@ String csvEncode(List<List> object) {
     return record.toString();
   }
 
-  void _encode(List<List> entry, {String separator = '\n'}) {
-    for (List line in entry) {
-      List<String> _encodedLine = [];
-      if (line.isEmpty) {
-        _encoded += separator;
-        continue;
-      }
-      for (dynamic _record in line) {
-        _encodedLine.add(_encodeRecord(_record));
-      }
-      _encoded += _encodedLine.join(',') + separator;
+  String _result = '';
+  if (object.isNotEmpty) {
+    for (int i = 0; i < object.length - 1; i++) {
+      _result += _encode(object[i]) + ',';
     }
+    _result += _encode(object[object.length - 1]);
   }
-
-  _encode(object);
-  return _encoded;
+  return _result;
 }
 
-List<List> csvDecode(String source,
+List csvDecode(String source,
     {bool recursive = false, bool decodeBools = false}) {
-  List<dynamic> _decode(String source) {
+  List _decode(String source) {
+    if (source == '') return [];
+
     List<dynamic> _entry = [''];
     int v = 0;
     int _depth = 0;
@@ -165,15 +157,5 @@ List<List> csvDecode(String source,
     return _entry;
   }
 
-  List<List> _object = [];
-
-  for (String line in source.split('\n')) {
-    if (line.isEmpty) {
-      _object.add([]);
-      continue;
-    }
-    _object.add(_decode(line));
-  }
-  _object.removeLast();
-  return _object;
+  return _decode(source);
 }

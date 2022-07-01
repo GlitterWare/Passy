@@ -1,12 +1,12 @@
 import 'custom_field.dart';
-import 'encrypted_csv_file.dart';
 import 'passy_entries.dart';
+import 'passy_entries_encrypted_csv_file.dart';
 import 'passy_entry.dart';
 import 'tfa.dart';
 
 typedef Passwords = PassyEntries<Password>;
 
-typedef PasswordsFile = EncryptedCSVFile<Passwords>;
+typedef PasswordsFile = PassyEntriesEncryptedCSVFile<Password>;
 
 class Password extends PassyEntry<Password> {
   List<CustomField> customFields;
@@ -64,7 +64,7 @@ class Password extends PassyEntry<Password> {
         username = csv[6] ?? '',
         email = csv[7] ?? '',
         password = csv[8] ?? '',
-        tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9][0]) : null,
+        tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9]) : null,
         website = csv[10] ?? '',
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
@@ -87,19 +87,17 @@ class Password extends PassyEntry<Password> {
       };
 
   @override
-  List<List> toCSV() => [
-        [
-          key,
-          customFields.map((e) => e.toCSV()).toList(),
-          additionalInfo,
-          tags,
-          nickname,
-          iconName,
-          username,
-          email,
-          password,
-          tfa?.toCSV() ?? [],
-          website,
-        ]
+  List toCSV() => [
+        key,
+        customFields.map((e) => e.toCSV()).toList(),
+        additionalInfo,
+        tags,
+        nickname,
+        iconName,
+        username,
+        email,
+        password,
+        tfa?.toCSV() ?? [],
+        website,
       ];
 }

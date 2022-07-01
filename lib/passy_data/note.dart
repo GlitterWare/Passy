@@ -1,10 +1,10 @@
-import 'encrypted_csv_file.dart';
 import 'passy_entries.dart';
+import 'passy_entries_encrypted_csv_file.dart';
 import 'passy_entry.dart';
 
 typedef Notes = PassyEntries<Note>;
 
-typedef NotesFile = EncryptedCSVFile<Notes>;
+typedef NotesFile = PassyEntriesEncryptedCSVFile<Note>;
 
 class Note extends PassyEntry<Note> {
   String title;
@@ -36,11 +36,9 @@ class Note extends PassyEntry<Note> {
       };
 
   @override
-  List<List> toCSV() => [
-        [
-          key,
-          title,
-          note,
-        ]
+  List toCSV() => [
+        key,
+        title,
+        note,
       ];
 }

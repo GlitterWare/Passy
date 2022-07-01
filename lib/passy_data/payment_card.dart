@@ -1,11 +1,12 @@
+import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
+
 import 'custom_field.dart';
-import 'encrypted_csv_file.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
 
 typedef PaymentCards = PassyEntries<PaymentCard>;
 
-typedef PaymentCardsFile = EncryptedCSVFile<PaymentCards>;
+typedef PaymentCardsFile = PassyEntriesEncryptedCSVFile<PaymentCard>;
 
 class PaymentCard extends PassyEntry<PaymentCard> {
   List<CustomField> customFields;
@@ -74,17 +75,15 @@ class PaymentCard extends PassyEntry<PaymentCard> {
       };
 
   @override
-  List<List> toCSV() => [
-        [
-          customFields.map((e) => e.toCSV()),
-          additionalInfo,
-          tags,
-          key,
-          nickname,
-          cardNumber,
-          cardholderName,
-          cvv,
-          exp,
-        ]
+  List toCSV() => [
+        customFields.map((e) => e.toCSV()),
+        additionalInfo,
+        tags,
+        key,
+        nickname,
+        cardNumber,
+        cardholderName,
+        cvv,
+        exp,
       ];
 }

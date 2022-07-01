@@ -34,40 +34,56 @@ class LoadedAccount {
   final IdentitiesFile _identities;
   Encrypter _encrypter;
 
-  LoadedAccount(
-    AccountCredentialsFile credentials, {
+  LoadedAccount({
     required String path,
     required Encrypter encrypter,
+    AccountCredentialsFile? credentials,
+    AccountSettingsFile? settings,
+    HistoryFile? history,
+    PasswordsFile? passwords,
+    PassyImages? passwordIcons,
+    NotesFile? notes,
+    PaymentCardsFile? paymentCards,
+    IDCardsFile? idCards,
+    IdentitiesFile? identities,
   })  : _encrypter = encrypter,
-        _credentials = credentials,
-        _settings = AccountSettings.fromFile(
-            File(path + Platform.pathSeparator + 'settings.enc'),
-            encrypter: encrypter),
-        _history = History.fromFile(
-            File(path + Platform.pathSeparator + 'history.enc'),
-            encrypter: encrypter),
-        _passwords = Passwords.fromFile(
-            File(path + Platform.pathSeparator + 'passwords.enc'),
-            encrypter: encrypter),
-        _passwordIcons = PassyImages(
-            path + Platform.pathSeparator + 'password_icons',
-            encrypter: encrypter),
-        _notes = Notes.fromFile(
-            File(path + Platform.pathSeparator + 'notes.enc'),
-            encrypter: encrypter),
-        _paymentCards = PaymentCards.fromFile(
-            File(path + Platform.pathSeparator + 'payment_cards.enc'),
-            encrypter: encrypter),
-        _idCards = IDCards.fromFile(
-            File(path + Platform.pathSeparator + 'id_cards.enc'),
-            encrypter: encrypter),
-        _identities = Identities.fromFile(
-            File(path + Platform.pathSeparator + 'identities.enc'),
-            encrypter: encrypter);
+        _credentials = credentials ??
+            AccountCredentials.fromFile(
+                File(path + Platform.pathSeparator + 'credentials.json')),
+        _settings = settings ??
+            AccountSettings.fromFile(
+                File(path + Platform.pathSeparator + 'settings.enc'),
+                encrypter: encrypter),
+        _history = history ??
+            History.fromFile(
+                File(path + Platform.pathSeparator + 'history.enc'),
+                encrypter: encrypter),
+        _passwords = passwords ??
+            Passwords.fromFile(
+                File(path + Platform.pathSeparator + 'passwords.enc'),
+                encrypter: encrypter),
+        _passwordIcons = passwordIcons ??
+            PassyImages(path + Platform.pathSeparator + 'password_icons',
+                encrypter: encrypter),
+        _notes = notes ??
+            Notes.fromFile(File(path + Platform.pathSeparator + 'notes.enc'),
+                encrypter: encrypter),
+        _paymentCards = paymentCards ??
+            PaymentCards.fromFile(
+                File(path + Platform.pathSeparator + 'payment_cards.enc'),
+                encrypter: encrypter),
+        _idCards = idCards ??
+            IDCards.fromFile(
+                File(path + Platform.pathSeparator + 'id_cards.enc'),
+                encrypter: encrypter),
+        _identities = identities ??
+            Identities.fromFile(
+                File(path + Platform.pathSeparator + 'identities.enc'),
+                encrypter: encrypter);
 
   void _setAccountPassword(String password) {
     _credentials.value.password = password;
-    _encrypter = getEncrypter(password);
+    _encrypter = getPassyEncrypter(password);
     _settings.encrypter = _encrypter;
     _history.encrypter = _encrypter;
     _passwords.encrypter = _encrypter;

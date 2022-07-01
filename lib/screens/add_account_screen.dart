@@ -138,9 +138,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   decoration: const InputDecoration(
                                     hintText: 'Username',
                                   ),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.deny(' ')
-                                  ],
                                   autofocus: true,
                                 ),
                               )
@@ -157,7 +154,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     hintText: 'Password',
                                   ),
                                   inputFormatters: [
-                                    FilteringTextInputFormatter.deny(' '),
                                     LengthLimitingTextInputFormatter(32),
                                   ],
                                 ),
@@ -175,7 +171,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   ),
                                   onChanged: (a) => _confirmPassword = a,
                                   inputFormatters: [
-                                    FilteringTextInputFormatter.deny(' '),
                                     LengthLimitingTextInputFormatter(32),
                                   ],
                                 ),

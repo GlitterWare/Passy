@@ -8,13 +8,13 @@ typedef AccountCredentialsFile = JsonFile<AccountCredentials>;
 
 class AccountCredentials with JsonConvertable {
   String username;
-  set password(String value) => _passwordHash = getHash(value).toString();
+  set password(String value) => _passwordHash = getPassyHash(value).toString();
   String get passwordHash => _passwordHash;
 
   String _passwordHash;
 
   AccountCredentials(this.username, String password)
-      : _passwordHash = getHash(password).toString();
+      : _passwordHash = getPassyHash(password).toString();
 
   AccountCredentials.fromJson(Map<String, dynamic> json)
       : username = json['username'] ?? '',

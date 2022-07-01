@@ -125,13 +125,12 @@ class _EntryInfo with JsonConvertable {
         request = request ?? _Request();
 
   _EntryInfo.fromJson(Map<String, dynamic> json)
-      : history = History.fromCSV(
-            (json['history'] as List).map((e) => e as List).toList()),
+      : history = History.fromJson((json['history'] as Map<String, dynamic>)),
         request = _Request.fromJson(json['request']);
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'history': history.toCSV(),
+        'history': history.toJson(),
         'request': request.toJson(),
       };
 }
@@ -337,16 +336,15 @@ class Synchronization {
                   _onComplete?.call();
                   return;
                 }
-                _remoteHistory = History.fromCSV(csvDecode(
-                    decrypt(_data, encrypter: _encrypter),
-                    recursive: true));
+                _remoteHistory = History.fromJson(
+                    jsonDecode(decrypt(_data, encrypter: _encrypter)));
               } catch (e, s) {
                 _handleException(
                     'Could not decode history.\n${e.toString()}\n${s.toString()}');
                 return;
               }
 
-              // TODO: V1.0.0 handle different history versions
+              // TODO: V0.3.0 handle different history versions
               if (_remoteHistory.version < _history.version) {
                 _handleException(
                     'Passy $passyVersion cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
@@ -450,9 +448,10 @@ class Synchronization {
 
             Future<void> _sendHistoryHash() {
               _syncLog += 'done.\nSending history hash... ';
-              List<List> _localHistory = _history.toCSV();
+              Map<String, dynamic> _localHistory = _history.toJson();
               socket.add(utf8.encode(
-                  getHash(csvEncode(_localHistory)).toString() + '\u0000'));
+                  getPassyHash(jsonEncode(_localHistory)).toString() +
+                      '\u0000'));
               return socket.flush();
             }
 
@@ -468,7 +467,7 @@ class Synchronization {
               }
               try {
                 _data = decrypt(decrypt(_data, encrypter: _encrypter),
-                    encrypter: getEncrypter(_loadedAccount.username));
+                    encrypter: getPassyEncrypter(_loadedAccount.username));
               } catch (e, s) {
                 _handleException(
                     'Could not decrypt hello. Make sure that local and remote username and password are the same.\n${e.toString()}\n${s.toString()}');
@@ -578,10 +577,10 @@ class Synchronization {
 
       void _handleHistoryHash(List<int> data) {
         _syncLog += 'done.\nReceiving history hash... ';
-        String _historyCSV = csvEncode(_history.toCSV());
+        String _historyJson = jsonEncode(_history.toJson());
         bool _same = true;
         try {
-          _same = getHash(_historyCSV) == Digest(data);
+          _same = getPassyHash(_historyJson) == Digest(data);
         } catch (e, s) {
           _handleException('Could not read history hash.\n${s.toString()}');
           return;
@@ -594,7 +593,7 @@ class Synchronization {
           return;
         }
         _sub.onData(_handleInfo);
-        _sendHistory(_historyCSV);
+        _sendHistory(_historyJson);
       }
 
       Future<void> _sendHello(String hello) {
@@ -633,7 +632,8 @@ class Synchronization {
         }
         _sub.onData(_handleHistoryHash);
         _sendHello(encrypt(
-            encrypt(_hello, encrypter: getEncrypter(_loadedAccount.username)),
+            encrypt(_hello,
+                encrypter: getPassyEncrypter(_loadedAccount.username)),
             encrypter: _encrypter));
       }
 
