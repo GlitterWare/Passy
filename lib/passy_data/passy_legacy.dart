@@ -19,27 +19,37 @@ import 'payment_card.dart';
 LoadedAccount convertLegacyAccount(
     {required String path, required Encrypter encrypter}) {
   String _version;
-  List<String> _versionSplit;
   File _versionFile = File(path + Platform.pathSeparator + 'version.txt');
   if (_versionFile.existsSync()) {
     _version = _versionFile.readAsStringSync();
-    _versionSplit = _version.split('.');
   } else {
     _version = '0.0.0';
-    _versionSplit = ['0', '0', '0'];
   }
-  if (_version != passyVersion) {
-    if (_versionSplit[0] == '0') {
-      if (int.parse(_versionSplit[1]) < 3) {
-        LoadedAccount _account =
-            convertPre0_3_0Account(path: path, encrypter: encrypter);
-        _account.saveSync();
+  if (_version == passyVersion) {
+    return LoadedAccount(path: path, encrypter: encrypter);
+  }
+  if (int.parse(_version[0]) <= int.parse(passyVersion[0])) {
+    int _accV2 = int.parse(_version[2]);
+    if (_accV2 <= int.parse(passyVersion[2])) {
+      // 0.3.0 conversion
+      if (_version[0] == '0') {
+        if (_accV2 < 3) {
+          LoadedAccount _account =
+              convertPre0_3_0Account(path: path, encrypter: encrypter);
+          _account.saveSync();
+          _versionFile.writeAsStringSync(passyVersion);
+          return _account;
+        }
+      }
+      // No conversion
+      if (int.parse(_version[4]) <= int.parse(passyVersion[4])) {
         _versionFile.writeAsStringSync(passyVersion);
-        return _account;
+        return LoadedAccount(path: path, encrypter: encrypter);
       }
     }
   }
-  return LoadedAccount(path: path, encrypter: encrypter);
+  throw Exception(
+      'Account version is higher than manager version. Please make sure that you are using the latest Passy version before loading this account');
 }
 
 LoadedAccount convertPre0_3_0Account({
