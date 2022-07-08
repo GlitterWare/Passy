@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:archive/archive_io.dart';
 
 import 'package:passy/passy_data/passy_legacy.dart';
 import 'package:universal_io/io.dart';
@@ -24,6 +25,39 @@ class PassyData {
   String getPasswordHash(String username) =>
       _accounts[username]!.value.passwordHash;
   bool hasAccount(String username) => _accounts.containsKey(username);
+
+  PassyData(String path)
+      : accountsPath = path + Platform.pathSeparator + 'accounts',
+        info = PassyInfo.fromFile(
+            File(path + Platform.pathSeparator + 'passy.json')) {
+    if (info.value.version != passyVersion) {
+      info.value.version = passyVersion;
+      info.saveSync();
+    }
+    Directory _accountsDirectory =
+        Directory(path + Platform.pathSeparator + 'accounts');
+    _accountsDirectory.createSync(recursive: true);
+    List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
+    for (FileSystemEntity d in _accountDirectories) {
+      String _username = d.path.split(Platform.pathSeparator).last;
+      _accounts[_username] = AccountCredentials.fromFile(
+        File(accountsPath +
+            Platform.pathSeparator +
+            _username +
+            Platform.pathSeparator +
+            'credentials.json'),
+        value: AccountCredentials(_username, 'corrupted'),
+      );
+    }
+    if (!_accounts.containsKey(info.value.lastUsername)) {
+      if (_accounts.isEmpty) {
+        info.value.lastUsername = '';
+      } else {
+        info.value.lastUsername = _accounts.keys.first;
+      }
+      info.saveSync();
+    }
+  }
 
   void createAccount(String username, String password) {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
@@ -78,36 +112,13 @@ class PassyData {
 
   void unloadAccount() => _loadedAccount = null;
 
-  PassyData(String path)
-      : accountsPath = path + Platform.pathSeparator + 'accounts',
-        info = PassyInfo.fromFile(
-            File(path + Platform.pathSeparator + 'passy.json')) {
-    if (info.value.version != passyVersion) {
-      info.value.version = passyVersion;
-      info.saveSync();
-    }
-    Directory _accountsDirectory =
-        Directory(path + Platform.pathSeparator + 'accounts');
-    _accountsDirectory.createSync();
-    List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
-    for (FileSystemEntity d in _accountDirectories) {
-      String _username = d.path.split(Platform.pathSeparator).last;
-      _accounts[_username] = AccountCredentials.fromFile(
-        File(accountsPath +
-            Platform.pathSeparator +
-            _username +
-            Platform.pathSeparator +
-            'credentials.json'),
-        value: AccountCredentials(_username, 'corrupted'),
-      );
-    }
-    if (!_accounts.containsKey(info.value.lastUsername)) {
-      if (_accounts.isEmpty) {
-        info.value.lastUsername = '';
-      } else {
-        info.value.lastUsername = _accounts.keys.first;
-      }
-      info.saveSync();
-    }
+  void backupAccount(String username, String outputDirectoryPath) {
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.zipDirectory(
+        Directory(accountsPath + Platform.pathSeparator + username),
+        filename:
+            'passy-backup-${DateTime.now().toIso8601String().replaceAll(':', ';')}');
   }
+
+  void restoreAccount(String filePath) {}
 }
