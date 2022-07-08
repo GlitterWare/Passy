@@ -117,7 +117,7 @@ class PassyData {
     _encoder.zipDirectory(
         Directory(accountsPath + Platform.pathSeparator + username),
         filename:
-            'passy-backup-${DateTime.now().toIso8601String().replaceAll(':', ';')}');
+            'passy-$username-backup-${DateTime.now().toIso8601String().replaceAll(':', ';')}');
     _encoder.close();
   }
 
