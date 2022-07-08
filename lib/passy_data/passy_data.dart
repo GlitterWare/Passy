@@ -118,7 +118,23 @@ class PassyData {
         Directory(accountsPath + Platform.pathSeparator + username),
         filename:
             'passy-backup-${DateTime.now().toIso8601String().replaceAll(':', ';')}');
+    _encoder.close();
   }
 
-  void restoreAccount(String filePath) {}
+  void restoreAccount(String filePath, {String username = ''}) {
+    ZipDecoder _decoder = ZipDecoder();
+    Archive _archive = _decoder.decodeBytes(File(filePath).readAsBytesSync());
+    for (final file in _archive) {
+      final filename = file.name;
+      if (file.isFile) {
+        final data = file.content as List<int>;
+        File(accountsPath + Platform.pathSeparator + filename)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(data);
+      } else {
+        Directory(accountsPath + Platform.pathSeparator + filename)
+            .create(recursive: true);
+      }
+    }
+  }
 }
