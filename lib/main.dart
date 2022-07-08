@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/screens/backup_and_restore_screen.dart';
+import 'package:passy/screens/backup_screen.dart';
+import 'package:passy/screens/restore_screen.dart';
 
 import 'common/theme.dart';
 import 'screens/add_account_screen.dart';
@@ -42,6 +44,7 @@ class Passy extends StatelessWidget {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
             const BackupAndRestoreScreen(),
+        BackupScreen.routeName: (context) => const BackupScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
         EditCustomFieldScreen.routeName: (context) =>
             const EditCustomFieldScreen(),
@@ -62,6 +65,7 @@ class Passy extends StatelessWidget {
         PasswordScreen.routeName: (context) => const PasswordScreen(),
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),
+        RestoreScreen.routeName: (context) => const RestoreScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
       },

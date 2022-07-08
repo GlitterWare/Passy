@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/backup_screen.dart';
+import 'package:passy/screens/restore_screen.dart';
 import 'package:passy/widgets/elevated_iconed_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
@@ -25,13 +27,14 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
           body: const Text('Backup'),
           leftIcon: const Icon(Icons.ios_share_rounded),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () {},
+          onPressed: () => Navigator.pushNamed(context, BackupScreen.routeName),
         ),
         ElevatedIconedButton(
           body: const Text('Restore'),
           leftIcon: const Icon(Icons.downloading_rounded),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () {},
+          onPressed: () =>
+              Navigator.pushNamed(context, RestoreScreen.routeName),
         ),
       ]),
     );
