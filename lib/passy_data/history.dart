@@ -11,7 +11,7 @@ import 'json_convertable.dart';
 typedef HistoryFile = EncryptedJsonFile<History>;
 
 class History with JsonConvertable {
-  int version;
+  //int version;
   final Map<String, EntryEvent> passwords;
   final Map<String, EntryEvent> passwordIcons;
   final Map<String, EntryEvent> paymentCards;
@@ -28,7 +28,7 @@ class History with JsonConvertable {
       identities.length;
 
   History({
-    this.version = 0,
+    //this.version = 0,
     Map<String, EntryEvent>? passwords,
     Map<String, EntryEvent>? passwordIcons,
     Map<String, EntryEvent>? paymentCards,
@@ -43,7 +43,7 @@ class History with JsonConvertable {
         identities = identities ?? {};
 
   History.from(History other)
-      : version = other.version,
+      : //version = other.version,
         passwords = Map<String, EntryEvent>.from(other.passwords),
         passwordIcons = Map<String, EntryEvent>.from(other.passwordIcons),
         paymentCards = Map<String, EntryEvent>.from(other.paymentCards),
@@ -52,7 +52,7 @@ class History with JsonConvertable {
         identities = Map<String, EntryEvent>.from(other.identities);
 
   History.fromJson(Map<String, dynamic> json)
-      : version = int.tryParse(json['version']) ?? 0,
+      : //version = int.tryParse(json['version']) ?? 0,
         passwords = (json['passwords'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
         passwordIcons = (json['passwordIcons'] as Map<String, dynamic>)
@@ -68,7 +68,7 @@ class History with JsonConvertable {
 
   @override
   Map<String, dynamic> toJson() => {
-        'version': version.toString(),
+        //'version': version.toString(),
         'passwords': passwords.map<String, dynamic>(
             (key, value) => MapEntry(key, value.toJson())),
         'passwordIcons': passwordIcons.map<String, dynamic>(

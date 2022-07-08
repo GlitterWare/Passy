@@ -344,16 +344,6 @@ class Synchronization {
                 return;
               }
 
-              // TODO: V0.3.0 handle different history versions
-              if (_remoteHistory.version < _history.version) {
-                _handleException(
-                    'Passy $passyVersion cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
-              }
-              if (_remoteHistory.version > _history.version) {
-                _handleException(
-                    'Passy $passyVersion cannot manage different history versions. Feature will be available in releases starting with v1.0.0');
-              }
-
               /// Create Info
               /// Iterate through local and remote events.
               /// - If an event does not exist or is older on either end, add it
@@ -624,11 +614,20 @@ class Synchronization {
               'Remote service is not Passy. Service name: ${_hello[0]}.');
           return;
         }
-        if (_info[1].replaceFirst('v', '').split('.')[0] !=
-            passyVersion.split('.')[0]) {
-          _handleException(
-              'Local and remote versions are different. Local version: v$passyVersion. Remote version: ${_info[1]}.');
-          return;
+        {
+          String _errMsg =
+              'Local and remote versions are different. Local version: v$passyVersion. Remote version: ${_info[1]}.';
+          List<String> _remVersionSplit =
+              _info[1].replaceFirst('v', '').split('.');
+          List<String> _locVersionSplit = passyVersion.split('.');
+          if (_remVersionSplit[0] != _locVersionSplit[0]) {
+            _handleException(_errMsg);
+            return;
+          }
+          if (_remVersionSplit[1] != _locVersionSplit[1]) {
+            _handleException(_errMsg);
+            return;
+          }
         }
         _sub.onData(_handleHistoryHash);
         _sendHello(encrypt(

@@ -36,7 +36,6 @@ LoadedAccount convertLegacyAccount(
         if (_accV2 < 3) {
           LoadedAccount _account =
               convertPre0_3_0Account(path: path, encrypter: encrypter);
-          _account.saveSync();
           _versionFile.writeAsStringSync(passyVersion);
           return _account;
         }
@@ -159,8 +158,8 @@ LoadedAccount convertPre0_3_0Account({
     _loadedHistory = HistoryFile(_historyFile,
         encrypter: encrypter,
         value: History(
-          version:
-              int.parse(csvDecode(_historyLines[0], recursive: true)[0][0]),
+          //version:
+          //int.parse(csvDecode(_historyLines[0], recursive: true)[0][0]),
           passwords: _entriesFromCSV(
               csvDecode(_historyLines[1], recursive: true)
                   .map((e) => e as List<dynamic>)
@@ -208,6 +207,8 @@ LoadedAccount convertPre0_3_0Account({
       File(path + Platform.pathSeparator + 'identities.enc'),
     ),
   );
+
+  _account.saveSync();
 
   return _account;
 }
