@@ -30,7 +30,7 @@ class _BackupScreen extends State<BackupScreen> {
       ),
       body: ListView(children: [
         ElevatedIconedButton(
-          body: const Text('Passy Backup'),
+          body: const Text('Passy backup'),
           leftIcon: SvgPicture.asset(
             logoCircleSvg,
             width: 25,
@@ -38,7 +38,7 @@ class _BackupScreen extends State<BackupScreen> {
           ),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () => FilePicker.platform
-              .getDirectoryPath(dialogTitle: 'Passy Backup')
+              .getDirectoryPath(dialogTitle: 'Backup passy')
               .then((buDir) {
             if (buDir == null) return;
             data.backupAccount(_username, buDir);

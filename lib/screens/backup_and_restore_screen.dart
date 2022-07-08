@@ -34,10 +34,10 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
         ),
         ElevatedIconedButton(
           body: const Text('Restore'),
-          leftIcon: const Icon(Icons.downloading_rounded),
+          leftIcon: const Icon(Icons.settings_backup_restore_rounded),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () => Navigator.pushNamed(context, RestoreScreen.routeName,
-              arguments: _username),
+          onPressed: () =>
+              Navigator.pushNamed(context, RestoreScreen.routeName),
         ),
       ]),
     );

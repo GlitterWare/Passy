@@ -9,8 +9,9 @@ import 'package:passy/passy_data/screen.dart';
 
 import 'add_account_screen.dart';
 import 'main_screen.dart';
-import 'remove_account_screen.dart';
+import 'confirm_string_screen.dart';
 import 'log_screen.dart';
+import 'splash_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -42,8 +43,8 @@ class _LoginScreen extends State<LoginScreen> {
     data.info.value.lastUsername = _username;
     data.info.save().whenComplete(() {
       try {
-        LoadedAccount _account =
-            data.loadAccount(data.info.value.lastUsername, _password);
+        LoadedAccount _account = data.loadAccount(
+            data.info.value.lastUsername, getPassyEncrypter(_password));
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
         if (_account.defaultScreen == Screen.main) return;
         Navigator.pushNamed(
@@ -70,22 +71,81 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final List<DropdownMenuItem<String>> usernames = data.usernames
-        .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
+        .map<DropdownMenuItem<String>>((_username) => DropdownMenuItem(
               child: Row(children: [
-                Expanded(child: Text(e)),
+                Expanded(child: Text(_username)),
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
                     Navigator.pushReplacementNamed(
-                        context, RemoveAccountScreen.routeName,
-                        arguments: e);
+                        context, ConfirmStringScreen.routeName,
+                        arguments: ConfirmStringScreenArguments(
+                            title: const Text('Remove account'),
+                            message: Padding(
+                              padding: entryPadding,
+                              child: RichText(
+                                text: TextSpan(
+                                    text: 'Confirm the removal of account ',
+                                    children: [
+                                      TextSpan(
+                                        text: '\'$_username\' ',
+                                        style: TextStyle(
+                                            color: lightContentSecondaryColor),
+                                      ),
+                                      const TextSpan(
+                                          text:
+                                              'by typing in its username.\n\nThis action is '),
+                                      TextSpan(
+                                        text: 'irreversible',
+                                        style: TextStyle(
+                                            color: lightContentSecondaryColor),
+                                      ),
+                                      const TextSpan(text: '.'),
+                                    ]),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            labelText: 'Confirm username',
+                            confirmIcon:
+                                const Icon(Icons.delete_outline_rounded),
+                            onBackPressed: (context) =>
+                                Navigator.pushReplacementNamed(
+                                    context, LoginScreen.routeName),
+                            onConfirmPressed: (context, value) {
+                              if (value != _username) {
+                                ScaffoldMessenger.of(context)
+                                  ..clearSnackBars()
+                                  ..showSnackBar(SnackBar(
+                                    content: Row(children: [
+                                      Icon(Icons.error_outline_rounded,
+                                          color: darkContentColor),
+                                      const SizedBox(width: 20),
+                                      const Expanded(
+                                          child:
+                                              Text('Usernames do not match')),
+                                    ]),
+                                  ));
+                                return;
+                              }
+                              Navigator.pushReplacementNamed(
+                                  context, SplashScreen.routeName);
+                              data.removeAccount(_username).then((value) {
+                                if (data.noAccounts) {
+                                  Navigator.pushReplacementNamed(
+                                      context, AddAccountScreen.routeName);
+                                  return;
+                                }
+                                Navigator.pushReplacementNamed(
+                                    context, LoginScreen.routeName);
+                              });
+                            }));
                   },
                   icon: const Icon(Icons.delete_outline_rounded),
                   splashRadius: appBarButtonSplashRadius,
                   padding: appBarButtonPadding,
                 ),
               ]),
-              value: e,
+              value: _username,
             ))
         .toList();
 

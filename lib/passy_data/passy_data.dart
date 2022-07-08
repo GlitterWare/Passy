@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
+import 'package:encrypt/encrypt.dart';
 
 import 'package:passy/passy_data/passy_legacy.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -18,6 +20,7 @@ class PassyData {
       _accounts.map((key, value) => MapEntry(key, value.value.passwordHash));
   LoadedAccount? get loadedAccount => _loadedAccount;
 
+  final String passyPath;
   final String accountsPath;
   final Map<String, AccountCredentialsFile> _accounts = {};
   LoadedAccount? _loadedAccount;
@@ -27,7 +30,8 @@ class PassyData {
   bool hasAccount(String username) => _accounts.containsKey(username);
 
   PassyData(String path)
-      : accountsPath = path + Platform.pathSeparator + 'accounts',
+      : passyPath = path,
+        accountsPath = path + Platform.pathSeparator + 'accounts',
         info = PassyInfo.fromFile(
             File(path + Platform.pathSeparator + 'passy.json')) {
     if (info.value.version != passyVersion) {
@@ -64,6 +68,9 @@ class PassyData {
     AccountCredentialsFile _file = AccountCredentials.fromFile(
         File(_accountPath + Platform.pathSeparator + 'credentials.json'),
         value: AccountCredentials(username, password));
+    File(_accountPath + Platform.pathSeparator + 'version.txt')
+      ..createSync()
+      ..writeAsStringSync(passyVersion);
     _accounts[username] = _file;
     LoadedAccount(
       path: _accountPath,
@@ -102,10 +109,10 @@ class PassyData {
         .deleteSync(recursive: true);
   }
 
-  LoadedAccount loadAccount(String username, String password) {
+  LoadedAccount loadAccount(String username, Encrypter encrypter) {
     _loadedAccount = convertLegacyAccount(
       path: accountsPath + Platform.pathSeparator + username,
-      encrypter: getPassyEncrypter(password),
+      encrypter: encrypter,
     );
     return _loadedAccount!;
   }
@@ -114,27 +121,62 @@ class PassyData {
 
   void backupAccount(String username, String outputDirectoryPath) {
     ZipFileEncoder _encoder = ZipFileEncoder();
-    _encoder.zipDirectory(
-        Directory(accountsPath + Platform.pathSeparator + username),
-        filename: outputDirectoryPath +
-            Platform.pathSeparator +
-            'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip');
+    String _accountPath = accountsPath + Platform.pathSeparator + username;
+    _encoder.create(outputDirectoryPath +
+        Platform.pathSeparator +
+        'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip');
+    _encoder.addDirectory(Directory(_accountPath));
+    _encoder.close();
   }
 
-  void restoreAccount(String filePath, {String username = ''}) {
+  Future<LoadedAccount> restoreAccount(String backupPath,
+      {required Encrypter encrypter}) async {
+    String _tempPath = (await getTemporaryDirectory()).path +
+        Platform.pathSeparator +
+        'passy-restore-' +
+        DateTime.now().toIso8601String().replaceAll(':', ';');
+    Directory _tempPathDir = Directory(_tempPath);
+    if (await _tempPathDir.exists()) {
+      await _tempPathDir.delete(recursive: true);
+    }
+    await _tempPathDir.create(recursive: true);
+    String _username;
+    String _tempAccountPath;
+    String _newAccountPath;
+    Directory _newAccountDir;
     ZipDecoder _decoder = ZipDecoder();
-    Archive _archive = _decoder.decodeBytes(File(filePath).readAsBytesSync());
+    Archive _archive =
+        _decoder.decodeBytes(await File(backupPath).readAsBytes());
     for (final file in _archive) {
       final filename = file.name;
       if (file.isFile) {
         final data = file.content as List<int>;
-        File(accountsPath + Platform.pathSeparator + filename)
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(data);
+        await File(_tempPath + Platform.pathSeparator + filename)
+            .create(recursive: true)
+            .then((value) => value.writeAsBytes(data));
       } else {
-        Directory(accountsPath + Platform.pathSeparator + filename)
+        await Directory(_tempPath + Platform.pathSeparator + filename)
             .create(recursive: true);
       }
     }
+    _username = _archive.first.name.split('/')[0];
+    _tempAccountPath = _tempPath + Platform.pathSeparator + _username;
+    LoadedAccount(path: _tempAccountPath, encrypter: encrypter);
+    // Able to load the account, safe to replace
+    _newAccountPath = accountsPath + Platform.pathSeparator + _username;
+    _newAccountDir = Directory(_newAccountPath);
+    unloadAccount();
+    if (await _newAccountDir.exists()) {
+      await _newAccountDir.delete(recursive: true);
+    }
+    await _newAccountDir.create(recursive: true);
+    await copyDirectory(
+      Directory(_tempAccountPath),
+      _newAccountDir,
+    );
+    _accounts[_archive.first.name] = AccountCredentials.fromFile(
+        File(_newAccountPath + Platform.pathSeparator + 'credentials.json'));
+    await _tempPathDir.delete(recursive: true);
+    return LoadedAccount(path: _newAccountPath, encrypter: encrypter);
   }
 }

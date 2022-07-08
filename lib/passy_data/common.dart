@@ -4,10 +4,41 @@ import 'dart:math';
 import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:path/path.dart' as path;
+import 'package:universal_io/io.dart';
 
 const String passyVersion = '0.3.0';
 
 final Random random = Random.secure();
+
+void copyDirectorySync(Directory source, Directory destination) {
+  destination.createSync(recursive: true);
+  source.listSync(recursive: false).forEach((var entity) {
+    if (entity is Directory) {
+      var newDirectory = Directory(
+          path.join(destination.absolute.path, path.basename(entity.path)));
+      newDirectory.createSync();
+
+      copyDirectorySync(entity.absolute, newDirectory);
+    } else if (entity is File) {
+      entity.copySync(path.join(destination.path, path.basename(entity.path)));
+    }
+  });
+}
+
+Future<void> copyDirectory(Directory source, Directory destination) async {
+  await for (var entity in source.list(recursive: false)) {
+    if (entity is Directory) {
+      var newDirectory = Directory(
+          path.join(destination.absolute.path, path.basename(entity.path)));
+      await newDirectory.create();
+      await copyDirectory(entity.absolute, newDirectory);
+    } else if (entity is File) {
+      await entity
+          .copy(path.join(destination.path, path.basename(entity.path)));
+    }
+  }
+}
 
 bool? boolFromString(String value) {
   if (value == 'true') return true;
