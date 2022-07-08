@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/assets.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/widgets/elevated_iconed_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
@@ -19,6 +20,8 @@ class BackupScreen extends StatefulWidget {
 class _BackupScreen extends State<BackupScreen> {
   @override
   Widget build(BuildContext context) {
+    final String _username =
+        ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
@@ -34,7 +37,12 @@ class _BackupScreen extends State<BackupScreen> {
             color: lightContentColor,
           ),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () {},
+          onPressed: () => FilePicker.platform
+              .getDirectoryPath(dialogTitle: 'Passy Backup')
+              .then((buDir) {
+            if (buDir == null) return;
+            data.backupAccount(_username, buDir);
+          }),
         ),
       ]),
     );

@@ -16,6 +16,8 @@ class BackupAndRestoreScreen extends StatefulWidget {
 class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
   @override
   Widget build(BuildContext context) {
+    final String _username =
+        ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
@@ -27,14 +29,15 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
           body: const Text('Backup'),
           leftIcon: const Icon(Icons.ios_share_rounded),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () => Navigator.pushNamed(context, BackupScreen.routeName),
+          onPressed: () => Navigator.pushNamed(context, BackupScreen.routeName,
+              arguments: _username),
         ),
         ElevatedIconedButton(
           body: const Text('Restore'),
           leftIcon: const Icon(Icons.downloading_rounded),
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () =>
-              Navigator.pushNamed(context, RestoreScreen.routeName),
+          onPressed: () => Navigator.pushNamed(context, RestoreScreen.routeName,
+              arguments: _username),
         ),
       ]),
     );

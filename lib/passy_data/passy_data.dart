@@ -116,9 +116,9 @@ class PassyData {
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.zipDirectory(
         Directory(accountsPath + Platform.pathSeparator + username),
-        filename:
-            'passy-$username-backup-${DateTime.now().toIso8601String().replaceAll(':', ';')}');
-    _encoder.close();
+        filename: outputDirectoryPath +
+            Platform.pathSeparator +
+            'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip');
   }
 
   void restoreAccount(String filePath, {String username = ''}) {

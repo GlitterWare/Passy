@@ -17,6 +17,8 @@ class RestoreScreen extends StatefulWidget {
 class _RestoreScreen extends State<RestoreScreen> {
   @override
   Widget build(BuildContext context) {
+    final String _username =
+        ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
