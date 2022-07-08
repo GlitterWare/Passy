@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/backup_and_restore_screen.dart';
 
 import 'common/theme.dart';
 import 'screens/add_account_screen.dart';
@@ -39,6 +40,8 @@ class Passy extends StatelessWidget {
       navigatorKey: navigatorKey,
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
+        BackupAndRestoreScreen.routeName: (context) =>
+            const BackupAndRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
         EditCustomFieldScreen.routeName: (context) =>
             const EditCustomFieldScreen(),
