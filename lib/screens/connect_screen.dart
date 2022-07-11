@@ -26,7 +26,26 @@ class ConnectScreen extends StatelessWidget {
           SliverFillRemaining(
             child: Column(children: [
               const Spacer(),
-              const Text('Enter host address as shown below the QR code'),
+              RichText(
+                text: TextSpan(
+                  text: 'You have to be on the ',
+                  children: [
+                    TextSpan(
+                      text: 'same network ',
+                      style: TextStyle(color: lightContentSecondaryColor),
+                    ),
+                    const TextSpan(
+                        text:
+                            'as the host to connect.\n\nEnter host address as shown '),
+                    TextSpan(
+                      text: 'below the QR code',
+                      style: TextStyle(color: lightContentSecondaryColor),
+                    ),
+                    const TextSpan(text: ':\n'),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
               Row(children: [
                 Flexible(
                   child: Padding(

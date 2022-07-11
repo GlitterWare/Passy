@@ -222,7 +222,7 @@ class Synchronization {
         }
 
         _loadedAccount.setEntry(_entryData.type)(
-            PassyEntry.fromCSV(_entryData.type)(_entryData.value![0]!));
+            PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
         _events[_entryData.key] = _entryData.event;
       } catch (e, s) {
         _handleException(
@@ -407,26 +407,33 @@ class Synchronization {
               /// screen.
               /// 4. Send info.
               {
-                Future<void> _sendEntriesFuture = Future.value();
+                Completer<void> _sendEntriesCompleter = Completer();
                 Future<List<List<int>>> _handleEntriesFuture =
                     _handleEntries(_sub, entryCount: _info.request.length,
                         onFirstReceive: () {
-                  _sendEntriesFuture = _sendEntries(_remoteRequest);
+                  _sendEntries(_remoteRequest)
+                      .then((value) => _sendEntriesCompleter.complete());
                 });
-                Future<void> _decryptEntriesFuture = Future.value();
+                Completer<void> _decryptEntriesCompleter = Completer();
+
                 if (_info.request.length != 0) {
                   _handleEntriesFuture.then((value) {
-                    _decryptEntriesFuture = _decryptEntries(value);
+                    _decryptEntries(value)
+                        .then((value) => _decryptEntriesCompleter.complete());
                   });
+                } else {
+                  _decryptEntriesCompleter.complete();
                 }
-                _handleEntriesFuture.whenComplete(() async {
-                  await _sendEntriesFuture;
-                  if (_socket == null) return;
+
+                _handleEntriesFuture.then((value) async {
+                  await _sendEntriesCompleter.future;
+                  // Disconnect
                   _socket?.destroy();
                   _socket = null;
                   server.close();
                   _server = null;
-                  await _decryptEntriesFuture;
+                  await _decryptEntriesCompleter.future;
+                  // Cleanup
                   _syncLog += 'done.';
                   _isConnected = false;
                   _onComplete?.call();
@@ -533,28 +540,38 @@ class Synchronization {
             _sub,
             entryCount: _requestLength,
           );
-          Future<void> _decryptEntriesFuture = Future.value();
-          Future<void> _sendEntriesFuture = Future.value();
+          Completer<void> _decryptEntriesCompleter = Completer();
+          Completer<void> _sendEntriesCompleter = Completer();
+
+          // If there's no request, the decryption will never complete, so
+          // complete its completer
           if (_requestLength != 0) {
             _handleEntriesFuture.then((value) {
-              _decryptEntriesFuture = _decryptEntries(value);
+              _decryptEntries(value)
+                  .then((value) => _decryptEntriesCompleter.complete());
             });
+          } else {
+            _decryptEntriesCompleter.complete();
           }
-          _handleEntriesFuture.whenComplete(() async {
-            await _sendEntriesFuture;
-            _socket?.destroy();
-            _socket = null;
-            await _decryptEntriesFuture;
-            _syncLog += 'done.';
-            _onComplete?.call();
-          });
+
           _syncLog += 'done.\nExchanging data... ';
           if (_info.request.length == 0) {
             socket.add(utf8.encode('ready\u0000'));
             await socket.flush();
-            return;
+            _sendEntriesCompleter.complete();
+          } else {
+            _sendEntries(_info.request)
+                .then((value) => _sendEntriesCompleter.complete());
           }
-          _sendEntriesFuture = _sendEntries(_info.request);
+
+          _handleEntriesFuture.then((value) async {
+            await _sendEntriesCompleter.future;
+            _socket?.destroy();
+            _socket = null;
+            await _decryptEntriesCompleter.future;
+            _syncLog += 'done.';
+            _onComplete?.call();
+          });
         }
       }
 

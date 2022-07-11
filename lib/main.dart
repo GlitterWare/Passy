@@ -25,8 +25,6 @@ import 'screens/confirm_string_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 
-const String version = '0.0.0';
-
 void main() => runApp(const Passy());
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
