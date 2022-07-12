@@ -7,7 +7,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'package:universal_io/io.dart';
 
-const String passyVersion = '0.3.0';
+const String passyVersion = '0.3.1';
 
 final Random random = Random.secure();
 
