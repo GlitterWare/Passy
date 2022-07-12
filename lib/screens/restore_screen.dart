@@ -42,8 +42,10 @@ class _RestoreScreen extends State<RestoreScreen> {
           rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () {
             FilePicker.platform.pickFiles(
-                dialogTitle: 'Restore passy backup',
-                allowedExtensions: ['zip']).then(
+              dialogTitle: 'Restore passy backup',
+              type: FileType.custom,
+              allowedExtensions: ['zip'],
+            ).then(
               (_pick) {
                 if (_pick == null) return;
                 Navigator.pushNamed(
