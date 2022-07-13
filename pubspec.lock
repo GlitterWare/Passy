@@ -50,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
+  biometric_storage:
+    dependency: "direct main"
+    description:
+      name: biometric_storage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.3"
   boolean_selector:
     dependency: transitive
     description:
