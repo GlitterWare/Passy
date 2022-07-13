@@ -5,6 +5,9 @@ class BiometricStorageData with JsonConvertable {
 
   BiometricStorageData({this.password = ''});
 
+  BiometricStorageData.fromJson(Map<String, dynamic> json)
+      : password = json['password'] ?? '';
+
   @override
   Map<String, dynamic> toJson() => {
         'password': password,
