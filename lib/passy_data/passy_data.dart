@@ -73,7 +73,7 @@ class PassyData {
         value: AccountCredentials(username, password));
     File(_accountPath + Platform.pathSeparator + 'version.txt')
       ..createSync()
-      ..writeAsStringSync(passyVersion);
+      ..writeAsStringSync(accountVersion);
     _accounts[username] = _file;
     LoadedAccount(
       path: _accountPath,

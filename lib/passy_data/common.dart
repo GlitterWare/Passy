@@ -8,6 +8,9 @@ import 'package:path/path.dart' as path;
 import 'package:universal_io/io.dart';
 
 const String passyVersion = '0.3.1';
+//TODO: split versions after v1.0.0
+const String syncVersion = passyVersion;
+const String accountVersion = passyVersion;
 
 final Random random = Random.secure();
 

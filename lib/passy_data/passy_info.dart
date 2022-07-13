@@ -31,7 +31,7 @@ class PassyInfo with JsonConvertable {
   });
 
   PassyInfo.fromJson(Map<String, dynamic> json)
-      : version = json['version'] ?? passyVersion,
+      : version = json['version'] ?? '0.0.0',
         lastUsername = json['lastUsername'] ?? '',
         themeMode = _themeModeFromJson[json['themeMode']] ?? ThemeMode.dark;
 

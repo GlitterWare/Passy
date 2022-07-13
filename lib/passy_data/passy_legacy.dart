@@ -25,24 +25,24 @@ LoadedAccount convertLegacyAccount(
   } else {
     _version = '0.0.0';
   }
-  if (_version == passyVersion) {
+  if (_version == accountVersion) {
     return LoadedAccount(path: path, encrypter: encrypter);
   }
-  if (int.parse(_version[0]) <= int.parse(passyVersion[0])) {
+  if (int.parse(_version[0]) <= int.parse(accountVersion[0])) {
     int _accV2 = int.parse(_version[2]);
-    if (_accV2 <= int.parse(passyVersion[2])) {
+    if (_accV2 <= int.parse(accountVersion[2])) {
       // 0.3.0 conversion
       if (_version[0] == '0') {
         if (_accV2 < 3) {
           LoadedAccount _account =
               convertPre0_3_0Account(path: path, encrypter: encrypter);
-          _versionFile.writeAsStringSync(passyVersion);
+          _versionFile.writeAsStringSync(accountVersion);
           return _account;
         }
       }
       // No conversion
-      if (int.parse(_version[4]) <= int.parse(passyVersion[4])) {
-        _versionFile.writeAsStringSync(passyVersion);
+      if (int.parse(_version[4]) <= int.parse(accountVersion[4])) {
+        _versionFile.writeAsStringSync(accountVersion);
         return LoadedAccount(path: path, encrypter: encrypter);
       }
     }
