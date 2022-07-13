@@ -5,7 +5,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/widgets/elevated_iconed_button.dart';
+import 'package:passy/widgets/three_widget_button.dart';
 
 import 'connect_screen.dart';
 import 'passwords_screen.dart';
@@ -94,10 +94,10 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          ElevatedIconedButton(
-            leftIcon: const Icon(Icons.lock_rounded),
-            rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
-            body: const Text('Passwords'),
+          ThreeWidgetButton(
+            left: const Icon(Icons.lock_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('Passwords'),
             onPressed: () {
               Navigator.pushNamed(context, PasswordsScreen.routeName);
             },

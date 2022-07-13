@@ -6,7 +6,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/screens/login_screen.dart';
-import 'package:passy/widgets/elevated_iconed_button.dart';
+import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
 import 'log_screen.dart';
@@ -32,14 +32,14 @@ class _RestoreScreen extends State<RestoreScreen> {
         centerTitle: true,
       ),
       body: ListView(children: [
-        ElevatedIconedButton(
-          body: const Text('Passy restore'),
-          leftIcon: SvgPicture.asset(
+        ThreeWidgetButton(
+          center: const Text('Passy restore'),
+          left: SvgPicture.asset(
             logoCircleSvg,
             width: 25,
             color: lightContentColor,
           ),
-          rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () {
             FilePicker.platform.pickFiles(
               dialogTitle: 'Restore passy backup',

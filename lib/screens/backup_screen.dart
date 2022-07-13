@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/widgets/elevated_iconed_button.dart';
+import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
 class BackupScreen extends StatefulWidget {
@@ -29,14 +29,14 @@ class _BackupScreen extends State<BackupScreen> {
         centerTitle: true,
       ),
       body: ListView(children: [
-        ElevatedIconedButton(
-          body: const Text('Passy backup'),
-          leftIcon: SvgPicture.asset(
+        ThreeWidgetButton(
+          center: const Text('Passy backup'),
+          left: SvgPicture.asset(
             logoCircleSvg,
             width: 25,
             color: lightContentColor,
           ),
-          rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () => FilePicker.platform
               .getDirectoryPath(dialogTitle: 'Backup passy')
               .then((buDir) {

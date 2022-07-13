@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/theme.dart';
 
-class ElevatedIconedButton extends StatelessWidget {
+class ThreeWidgetButton extends StatelessWidget {
   final Widget? _leftIcon;
   final Widget _body;
   final Widget? _rightIcon;
   final void Function()? _onPressed;
 
-  const ElevatedIconedButton({
+  const ThreeWidgetButton({
     Key? key,
-    Widget? leftIcon,
-    required Widget body,
-    Widget? rightIcon,
+    Widget? left,
+    required Widget center,
+    Widget? right,
     void Function()? onPressed,
-  })  : _leftIcon = leftIcon,
-        _body = body,
-        _rightIcon = rightIcon,
+  })  : _leftIcon = left,
+        _body = center,
+        _rightIcon = right,
         _onPressed = onPressed,
         super(key: key);
 

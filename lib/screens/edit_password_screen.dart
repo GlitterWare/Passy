@@ -11,7 +11,7 @@ import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/screens/edit_custom_field_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
-import 'package:passy/widgets/elevated_iconed_button.dart';
+import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/text_form_field_buttoned.dart';
 
 import 'main_screen.dart';
@@ -292,9 +292,9 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           },
           itemCount: _customFields.length,
         ),
-        ElevatedIconedButton(
-          leftIcon: const Icon(Icons.add_rounded),
-          body: const Text('Add custom field'),
+        ThreeWidgetButton(
+          left: const Icon(Icons.add_rounded),
+          center: const Text('Add custom field'),
           onPressed: () => Navigator.pushNamed(
             context,
             EditCustomFieldScreen.routeName,

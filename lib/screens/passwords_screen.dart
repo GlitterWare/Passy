@@ -8,7 +8,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/widgets/elevated_iconed_button.dart';
+import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
 import 'edit_password_screen.dart';
@@ -52,14 +52,14 @@ class _PasswordsScreen extends State<PasswordsScreen> {
         return Image.memory(_icon);
       }
 
-      _passwordWidgets.add(ElevatedIconedButton(
-        leftIcon: _getIcon(password.iconName),
-        rightIcon: const Icon(Icons.arrow_forward_ios_rounded),
+      _passwordWidgets.add(ThreeWidgetButton(
+        left: _getIcon(password.iconName),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
         onPressed: () {
           Navigator.pushNamed(context, PasswordScreen.routeName,
               arguments: password);
         },
-        body: Column(
+        center: Column(
           children: [
             Align(
               child: Text(
