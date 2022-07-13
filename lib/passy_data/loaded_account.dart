@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -229,6 +231,9 @@ class LoadedAccount {
   set color(Color value) => _settings.value.color = color;
   Screen get defaultScreen => _settings.value.defaultScreen;
   set defaultScreen(Screen value) => _settings.value.defaultScreen = value;
+
+  Future<BiometricStorageData> get biometricStorageData =>
+      data.getAccountBiometricStorageData(_credentials.value.username);
 
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
