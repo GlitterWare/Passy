@@ -9,6 +9,7 @@ import 'theme.dart';
 late PassyData data;
 
 final bool cameraSupported = Platform.isAndroid || Platform.isIOS;
+final bool biometricStorageSupported = Platform.isAndroid || Platform.isIOS;
 
 AppBar getEditScreenAppBar(
   BuildContext context, {

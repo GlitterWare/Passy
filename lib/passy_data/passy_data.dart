@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:archive/archive_io.dart';
-import 'package:biometric_storage/biometric_storage.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 
@@ -181,15 +179,5 @@ class PassyData {
         File(_newAccountPath + Platform.pathSeparator + 'credentials.json'));
     await _tempPathDir.delete(recursive: true);
     return LoadedAccount(path: _newAccountPath, encrypter: encrypter);
-  }
-
-  Future<BiometricStorageData> getAccountBiometricStorageData(
-      String username) async {
-    BiometricStorageFile _file = await BiometricStorage().getStorage(username);
-    String _fileRead = (await _file.read())!;
-    if (_fileRead.isNotEmpty) {
-      return BiometricStorageData.fromJson(jsonDecode(_fileRead));
-    }
-    return BiometricStorageData();
   }
 }

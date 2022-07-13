@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/screens/backup_and_restore_screen.dart';
+import 'package:passy/screens/biometric_auth_screen.dart';
+import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
@@ -31,6 +33,18 @@ class _SettingsScreen extends State<SettingsScreen> {
               context, BackupAndRestoreScreen.routeName,
               arguments: data.loadedAccount!.username),
         ),
+        if (biometricStorageSupported)
+          ThreeWidgetButton(
+            center: const Text('Biometric Authentication'),
+            left: const Icon(Icons.fingerprint_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () async {
+              Navigator.pushNamed(context, SplashScreen.routeName);
+              Navigator.pushReplacementNamed(
+                  context, BiometricAuthScreen.routeName,
+                  arguments: await data.loadedAccount!.biometricStorageData);
+            },
+          )
       ]),
     );
   }

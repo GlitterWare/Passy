@@ -233,7 +233,7 @@ class LoadedAccount {
   set defaultScreen(Screen value) => _settings.value.defaultScreen = value;
 
   Future<BiometricStorageData> get biometricStorageData =>
-      data.getAccountBiometricStorageData(_credentials.value.username);
+      BiometricStorageData.fromLocker(_credentials.value.username);
 
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
