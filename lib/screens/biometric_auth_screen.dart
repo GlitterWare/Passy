@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locker/flutter_locker.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
@@ -22,8 +23,9 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
   Widget build(BuildContext context) {
     String _password = '';
 
-    void setBioAuthEnabled(bool value) {
+    void setBioAuthEnabled(bool value) async {
       BiometricStorageData _bioData;
+      String _username = data.loadedAccount!.username;
       if (value == true) {
         if (getPassyHash(_password).toString() !=
             data.loadedAccount!.passwordHash) {
@@ -38,9 +40,23 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
             ));
           return;
         }
-        _bioData = BiometricStorageData(
-            key: data.loadedAccount!.username, password: _password);
-        _bioData.save();
+        _bioData = BiometricStorageData(key: _username, password: _password);
+        try {
+          await _bioData.save();
+        } catch (e) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(SnackBar(
+              content: Row(children: [
+                Icon(Icons.fingerprint_rounded, color: darkContentColor),
+                const SizedBox(width: 20),
+                const Expanded(child: Text('Couldn\'t authenticate')),
+              ]),
+            ));
+          return;
+        }
+      } else {
+        await FlutterLocker.delete(_username);
       }
       setState(() => data.loadedAccount!.bioAuthEnabled = value);
       data.loadedAccount!.saveSync();

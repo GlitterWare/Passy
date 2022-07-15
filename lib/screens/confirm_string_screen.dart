@@ -6,6 +6,7 @@ class ConfirmStringScreenArguments {
   final Widget title;
   final Widget message;
   final String? labelText;
+  final bool obscureText;
   final Widget confirmIcon;
   final void Function(BuildContext context)? onBackPressed;
   final void Function(BuildContext context, String value)? onConfirmPressed;
@@ -14,6 +15,7 @@ class ConfirmStringScreenArguments {
     this.title = const Text('Confirm string'),
     this.message = const Text('Enter string to confirm'),
     this.labelText,
+    this.obscureText = false,
     this.confirmIcon = const Icon(Icons.arrow_forward_ios_rounded),
     this.onBackPressed,
     this.onConfirmPressed,
@@ -55,6 +57,7 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
               _args.message,
               TextFormFieldButtoned(
                 labelText: _args.labelText,
+                obscureText: _args.obscureText,
                 onChanged: (s) => _input = s,
                 onPressed: _args.onConfirmPressed == null
                     ? null

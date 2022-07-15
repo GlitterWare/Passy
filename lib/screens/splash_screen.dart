@@ -24,7 +24,6 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!loaded) {
       Future(() async {
-        String username;
         data = PassyData((await getApplicationDocumentsDirectory()).path +
             Platform.pathSeparator +
             'Passy');
@@ -32,22 +31,29 @@ class SplashScreen extends StatelessWidget {
           Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
           return;
         }
-        username = data.info.value.lastUsername;
-        if (data.getBioAuthEnabled(username) ?? false) {
-          BiometricStorageData _bioData = await BiometricStorageData.fromLocker(
-              data.info.value.lastUsername);
-          if (getPassyHash(_bioData.password).toString() ==
-              data.getPasswordHash(username)) {
-            LoadedAccount _account = data.loadAccount(
-                data.info.value.lastUsername,
-                getPassyEncrypter(_bioData.password));
-            Navigator.pushReplacementNamed(context, MainScreen.routeName);
-            if (_account.defaultScreen == Screen.main) return;
-            Navigator.pushNamed(
-                context, screenToRouteName[_account.defaultScreen]!);
-            return;
+        if (biometricStorageSupported) {
+          String username = data.info.value.lastUsername;
+          if (data.getBioAuthEnabled(username) ?? false) {
+            BiometricStorageData _bioData;
+            try {
+              _bioData = await BiometricStorageData.fromLocker(
+                  data.info.value.lastUsername);
+            } catch (e) {
+              return;
+            }
+            if (getPassyHash(_bioData.password).toString() ==
+                data.getPasswordHash(username)) {
+              LoadedAccount _account = data.loadAccount(
+                  data.info.value.lastUsername,
+                  getPassyEncrypter(_bioData.password));
+              Navigator.pushReplacementNamed(context, MainScreen.routeName);
+              if (_account.defaultScreen == Screen.main) return;
+              Navigator.pushNamed(
+                  context, screenToRouteName[_account.defaultScreen]!);
+              return;
+            }
+            data.setBioAuthEnabledSync(username, true);
           }
-          data.setBioAuthEnabledSync(username, true);
         }
 
         Navigator.pushReplacementNamed(context, LoginScreen.routeName);

@@ -74,6 +74,7 @@ class _RestoreScreen extends State<RestoreScreen> {
                       ),
                     ),
                     labelText: 'Enter password',
+                    obscureText: true,
                     confirmIcon:
                         const Icon(Icons.settings_backup_restore_rounded),
                     onBackPressed: (context) => Navigator.pop(context),

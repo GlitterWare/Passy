@@ -168,7 +168,12 @@ class PassyData {
     }
     _username = _archive.first.name.split('/')[0];
     _tempAccountPath = _tempPath + Platform.pathSeparator + _username;
-    LoadedAccount(path: _tempAccountPath, encrypter: encrypter);
+    {
+      LoadedAccount _account =
+          LoadedAccount(path: _tempAccountPath, encrypter: encrypter);
+      _account.bioAuthEnabled = false;
+      _account.saveSync();
+    }
     // Able to load the account, safe to replace
     _newAccountPath = accountsPath + Platform.pathSeparator + _username;
     _newAccountDir = Directory(_newAccountPath);

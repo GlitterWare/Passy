@@ -5,6 +5,7 @@ import 'package:passy/common/theme.dart';
 class TextFormFieldButtoned extends StatelessWidget {
   final TextEditingController? _controller;
   final String? _labelText;
+  final bool _obscureText;
   final Widget? _buttonIcon;
   final void Function()? _onTap;
   final void Function(String)? _onChanged;
@@ -16,16 +17,18 @@ class TextFormFieldButtoned extends StatelessWidget {
     Key? key,
     TextEditingController? controller,
     String? labelText,
+    bool obscureText = false,
     Widget? buttonIcon,
     void Function()? onTap,
     void Function(String)? onChanged,
     void Function()? onPressed,
     FocusNode? focusNode,
     List<TextInputFormatter>? inputFormatters,
-  })  : _buttonIcon = buttonIcon,
-        _controller = controller,
+  })  : _controller = controller,
         _labelText = labelText,
+        _obscureText = obscureText,
         _onTap = onTap,
+        _buttonIcon = buttonIcon,
         _onChanged = onChanged,
         _onPressed = onPressed,
         _focusNode = focusNode,
@@ -42,6 +45,7 @@ class TextFormFieldButtoned extends StatelessWidget {
                 bottom: entryPadding.bottom),
             child: TextFormField(
               controller: _controller ?? TextEditingController(),
+              obscureText: _obscureText,
               decoration: InputDecoration(labelText: _labelText),
               onTap: _onTap,
               onChanged: _onChanged,
