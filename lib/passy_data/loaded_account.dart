@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:universal_io/io.dart';
 
@@ -106,18 +105,20 @@ class LoadedAccount {
     saveSync();
   }
 
-  Future<void> save() async {
-    await _settings.save();
-    await _history.save();
-    await _passwords.save();
-    await _passwordIcons.save();
-    await _notes.save();
-    await _paymentCards.save();
-    await _idCards.save();
-    await _identities.save();
-  }
+  Future<void> save() => Future.wait([
+        _credentials.save(),
+        _settings.save(),
+        _history.save(),
+        _passwords.save(),
+        _passwordIcons.save(),
+        _notes.save(),
+        _paymentCards.save(),
+        _idCards.save(),
+        _identities.save(),
+      ]);
 
   void saveSync() {
+    _credentials.saveSync();
     _settings.saveSync();
     _history.saveSync();
     _passwords.saveSync();
@@ -223,8 +224,10 @@ class LoadedAccount {
   String get username => _credentials.value.username;
   set username(String value) => _credentials.value.username = value;
   String get passwordHash => _credentials.value.passwordHash;
+  bool get bioAuthEnabled => _credentials.value.bioAuthEnabled;
+  set bioAuthEnabled(bool value) => _credentials.value.bioAuthEnabled = value;
 
-  // Account Info wrappers
+  // Account Settings wrappers
   String get icon => _settings.value.icon;
   set icon(String value) => _settings.value.icon = value;
   Color get color => _settings.value.color;

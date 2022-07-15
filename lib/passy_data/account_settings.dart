@@ -16,7 +16,8 @@ class AccountSettings with JsonConvertable {
   AccountSettings.fromJson(Map<String, dynamic> json)
       : icon = json['icon'] ?? 'assets/images/logo_circle.svg',
         color = Color(json['color'] ?? 0xFF9C27B0),
-        defaultScreen = screenFromJson[json['defaultScreen']] ?? Screen.main;
+        defaultScreen =
+            screenFromJson[json['defaultScreen'] ?? ''] ?? Screen.main;
 
   AccountSettings({
     this.icon = 'assets/images/logo_circle.svg',
@@ -35,8 +36,10 @@ class AccountSettings with JsonConvertable {
     File file, {
     required Encrypter encrypter,
   }) =>
-      AccountSettingsFile.fromFile(file,
-          encrypter: encrypter,
-          constructor: () => AccountSettings(),
-          fromJson: AccountSettings.fromJson);
+      AccountSettingsFile.fromFile(
+        file,
+        encrypter: encrypter,
+        constructor: () => AccountSettings(),
+        fromJson: AccountSettings.fromJson,
+      );
 }

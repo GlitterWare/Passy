@@ -35,14 +35,13 @@ class _SettingsScreen extends State<SettingsScreen> {
         ),
         if (biometricStorageSupported)
           ThreeWidgetButton(
-            center: const Text('Biometric Authentication'),
+            center: const Text('Biometric authentication'),
             left: const Icon(Icons.fingerprint_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
               Navigator.pushNamed(context, SplashScreen.routeName);
               Navigator.pushReplacementNamed(
-                  context, BiometricAuthScreen.routeName,
-                  arguments: await data.loadedAccount!.biometricStorageData);
+                  context, BiometricAuthScreen.routeName);
             },
           )
       ]),

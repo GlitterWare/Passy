@@ -5,29 +5,20 @@ import 'package:flutter_locker/flutter_locker.dart';
 
 class BiometricStorageData with JsonConvertable {
   final String key;
-  String _password;
-
-  String get password => _password;
-  Future<void> setPassword(String value) {
-    _password = value;
-    return FlutterLocker.save(SaveSecretRequest(
-        key: key,
-        secret: jsonEncode(toJson()),
-        androidPrompt: AndroidPrompt(
-            title: 'Enable biometric authentication', cancelLabel: 'Cancel')));
-  }
+  String password;
 
   BiometricStorageData({
     required this.key,
-    password = '',
-  }) : _password = password;
+    this.password = '',
+  });
 
   BiometricStorageData.fromJson(
       {required this.key, required Map<String, dynamic> json})
-      : _password = json['password'];
+      : password = json['password'] ?? '';
 
-  static Future<BiometricStorageData> fromLocker(String key) async =>
-      BiometricStorageData(
+  static Future<BiometricStorageData> fromLocker(String key) async {
+    try {
+      return BiometricStorageData(
           key: key,
           password: jsonDecode(await FlutterLocker.retrieve(
                   RetrieveSecretRequest(
@@ -37,9 +28,19 @@ class BiometricStorageData with JsonConvertable {
                       iOsPrompt: IOsPrompt(
                           touchIdText: 'Authenticate'))))['password'] ??
               '');
+    } catch (e) {
+      return BiometricStorageData(key: key);
+    }
+  }
 
   @override
   Map<String, dynamic> toJson() => {
-        'password': _password,
+        'password': password,
       };
+
+  Future<void> save() => FlutterLocker.save(SaveSecretRequest(
+      key: key,
+      secret: jsonEncode(toJson()),
+      androidPrompt: AndroidPrompt(
+          title: 'Enable biometric authentication', cancelLabel: 'Cancel')));
 }

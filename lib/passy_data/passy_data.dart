@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/biometric_storage_data.dart';
 
 import 'package:passy/passy_data/passy_legacy.dart';
 import 'package:path_provider/path_provider.dart';
@@ -26,8 +25,15 @@ class PassyData {
   final Map<String, AccountCredentialsFile> _accounts = {};
   LoadedAccount? _loadedAccount;
 
-  String getPasswordHash(String username) =>
-      _accounts[username]!.value.passwordHash;
+  String? getPasswordHash(String username) =>
+      _accounts[username]?.value.passwordHash;
+  bool? getBioAuthEnabled(String username) =>
+      _accounts[username]?.value.bioAuthEnabled;
+  void setBioAuthEnabledSync(String username, bool value) {
+    _accounts[username]?.value.bioAuthEnabled = value;
+    _accounts[username]?.saveSync();
+  }
+
   bool hasAccount(String username) => _accounts.containsKey(username);
 
   PassyData(String path)
@@ -51,7 +57,7 @@ class PassyData {
             _username +
             Platform.pathSeparator +
             'credentials.json'),
-        value: AccountCredentials(_username, 'corrupted'),
+        value: AccountCredentials(username: _username, password: 'corrupted'),
       );
     }
     if (!_accounts.containsKey(info.value.lastUsername)) {
@@ -68,7 +74,7 @@ class PassyData {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
     AccountCredentialsFile _file = AccountCredentials.fromFile(
         File(_accountPath + Platform.pathSeparator + 'credentials.json'),
-        value: AccountCredentials(username, password));
+        value: AccountCredentials(username: username, password: password));
     File(_accountPath + Platform.pathSeparator + 'version.txt')
       ..createSync()
       ..writeAsStringSync(accountVersion);
