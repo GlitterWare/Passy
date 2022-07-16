@@ -127,7 +127,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             decoration: const InputDecoration(
               labelText: 'Nickname',
             ),
-            onChanged: (value) => _nickname = value,
+            onChanged: (value) => _nickname = value.trim(),
           ),
         ),
         Padding(
@@ -135,7 +135,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           child: TextFormField(
             controller: TextEditingController(text: _username),
             decoration: const InputDecoration(labelText: 'Username'),
-            onChanged: (value) => _username = value,
+            onChanged: (value) => _username = value.trim(),
           ),
         ),
         Padding(
@@ -143,7 +143,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           child: TextFormField(
             controller: TextEditingController(text: _email),
             decoration: const InputDecoration(labelText: 'Email'),
-            onChanged: (value) => _email = value,
+            onChanged: (value) => _email = value.trim(),
           ),
         ),
         Padding(

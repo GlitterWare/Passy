@@ -8,6 +8,8 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/screens/common.dart';
+import 'package:passy/screens/passwords_search_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
@@ -29,55 +31,9 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   @override
   void initState() {
     super.initState();
-    LoadedAccount _account = data.loadedAccount!;
-    List<Password> _passwords = _account.passwords.toList();
-    _passwords.sort((a, b) {
-      int _nickComp = a.nickname.compareTo(b.nickname);
-      if (_nickComp == 0) {
-        return a.username.compareTo(b.username);
-      }
-      return _nickComp;
-    });
-
-    for (Password password in _passwords) {
-      Widget _getIcon(String name) {
-        Uint8List? _icon = _account.getPasswordIcon(name)?.value;
-        if (_icon == null) {
-          return SvgPicture.asset(
-            logoCircleSvg,
-            width: 50,
-            color: lightContentColor,
-          );
-        }
-        return Image.memory(_icon);
-      }
-
-      _passwordWidgets.add(ThreeWidgetButton(
-        left: _getIcon(password.iconName),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        onPressed: () {
-          Navigator.pushNamed(context, PasswordScreen.routeName,
-              arguments: password);
-        },
-        center: Column(
-          children: [
-            Align(
-              child: Text(
-                password.nickname,
-              ),
-              alignment: Alignment.centerLeft,
-            ),
-            Align(
-              child: Text(
-                password.username,
-                style: const TextStyle(color: Colors.grey),
-              ),
-              alignment: Alignment.centerLeft,
-            ),
-          ],
-        ),
-      ));
-    }
+    List<Widget> _widgets =
+        buildPasswordWidgets(context: context, account: data.loadedAccount!);
+    _passwordWidgets.addAll(_widgets);
   }
 
   @override
@@ -90,7 +46,8 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           IconButton(
             padding: appBarButtonPadding,
             splashRadius: appBarButtonSplashRadius,
-            onPressed: () {},
+            onPressed: () =>
+                Navigator.pushNamed(context, PasswordsSearchScreen.routeName),
             icon: const Icon(Icons.search_rounded),
           ),
           IconButton(
