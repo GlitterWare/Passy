@@ -1,0 +1,99 @@
+#! /bin/bash
+
+# downloaded from https://gist.github.com/naveenadi/8dbe75c04cae7739f5cce0a260eb3e08
+
+if [ ! -d ../build ]; then
+  echo 'ERROR: current directory is not contained within a flutter project';
+  exit 0;
+fi
+
+export ARCH=$(uname -m)
+
+echo "INFO:Generator:Searching AppDir" 
+export appId='com.teampassy.passy'
+#read -p "? ID [Eg: com.example.app]: " appId
+export appName='Passy'
+#read -p "? Application Name: " appName
+export appIcon='logo'
+#read -p "? Icon: " appIcon
+export appExec='passy'
+#read -p "? Executable path relative to AppDir [usr/bin/app]: " appExec
+# read -p "? Arguments [Default: $@]: " appExec_args
+read -p "? Version [Eg: 1.0.0]: " appVersion
+# read -p "? Update Information [Default: guess]: " guess
+# read -p "? Architecture: " x86_64
+
+function download_appimagetool() {
+  if [ ! -d ../build ]; then mkdir ../build; fi
+  if [ ! -d ../build/appimage ]; then mkdir ../build/appimage; fi
+  if [ ! -d ../build/appimage/appimage-build ]; then mkdir ../build/appimage/appimage-build; fi
+  if [ ! -x ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage ]; then
+    curl -L -o ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$ARCH.AppImage
+    chmod a+x ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage 
+  fi
+}
+
+function create_appdir() {
+  if [ -d "../build/appimage/$appName.AppDir" ]; then rm -rf ../build/appimage/$appName.AppDir; fi
+  mkdir ../build/appimage/$appName.AppDir
+}
+
+function after_bundle() {
+  cp ../build/linux/x64/release/bundle/assistant ../build/appimage/$appName.AppDir
+  cp -r ../build/linux/x64/release/bundle/lib/ ../build/appimage/$appName.AppDir/lib
+  cp -r ../build/linux/x64/release/bundle/data ../build/appimage/$appName.AppDir
+  cp -r ../build/linux/x64/release/bundle/passy ../build/appimage/$appName.AppDir
+  # cp $appIcon AppDir/usr/share/icons/
+
+  # cp -r build/linux/*/release/bundle/ $appName.AppDir
+
+  # if [[ $(file -b "$appIcon.[ps]*g") =~  ]];
+
+  if [ ! -b "$appIcon.[ps]*g" ]; then 
+    cp $appIcon.[ps]*g ../build/appimage/$appName.AppDir
+    # mkdir -p $appName.AppDir/usr/share/icons/
+    # cp $appIcon.[ps]*g $appName.AppDir/usr/share/icons/
+  fi
+}
+
+function create_apprun() {
+  touch ../build/appimage/$appName.AppDir/AppRun
+  echo -e '#!/bin/sh\n\ncd "$(dirname "$0")"\nexec ./'$appExec'' > ../build/appimage/$appName.AppDir/AppRun
+  chmod +x ../build/appimage/$appName.AppDir/AppRun
+}
+
+function create_desktop() {
+  local de="[Desktop Entry]"
+  local xaa="X-AppImage-Arch=$ARCH"
+  local xav="X-AppImage-Version=$appVersion"
+  local xan="X-AppImage-Name=$appName"
+  local v="Version=1.0"
+  local ty="Type=Application"
+  local te="Terminal=false"
+  local n="Name=$appName"
+  local e="Exec=$appExec %u"
+  local i="Icon=$appIcon"
+  local ca="Categories=Utility;"
+  local co="Comment=Cross-Platform Password Manager"
+
+  touch ../build/appimage/$appName.AppDir/$appId.desktop
+  echo -e "$de\n$xaa\n$xav\n$xan\n$v\n$ty\n$te\n$n\n$e\n$i\n$ca\n$co" > ../build/appimage/$appName.AppDir/$appId.desktop
+}
+
+function build_appimage() {
+  # the build command itself:
+  ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage ../build/appimage/$appName.AppDir 
+
+  # move result in build folder
+
+  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-$appVersion-$ARCH.AppImage
+    
+}
+
+
+download_appimagetool
+create_appdir
+after_bundle
+create_apprun
+create_desktop
+build_appimage
