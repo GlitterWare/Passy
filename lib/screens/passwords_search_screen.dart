@@ -43,7 +43,9 @@ class _PasswordsSearchScreen extends State<PasswordsSearchScreen> {
         continue;
       }
     }
-    setState(() {});
+    setState(() {
+      sortPasswords(_found);
+    });
   }
 
   @override
