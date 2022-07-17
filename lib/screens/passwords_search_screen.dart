@@ -30,17 +30,21 @@ class _PasswordsSearchScreen extends State<PasswordsSearchScreen> {
 
         if (_found.any(testPassword)) continue;
       }
-      bool testNick(String value) =>
-          _password.nickname.toLowerCase().contains(value);
-      bool testUsrnm(String value) =>
-          _password.username.toLowerCase().contains(value);
-      if (_terms.any(testUsrnm)) {
-        _found.add(_password);
-        continue;
-      }
-      if (_terms.any(testNick)) {
-        _found.add(_password);
-        continue;
+      {
+        int _positiveCount = 0;
+        for (String _term in _terms) {
+          if (_password.username.toLowerCase().contains(_term)) {
+            _positiveCount++;
+            continue;
+          }
+          if (_password.nickname.toLowerCase().contains(_term)) {
+            _positiveCount++;
+            continue;
+          }
+        }
+        if (_positiveCount == _terms.length) {
+          _found.add(_password);
+        }
       }
     }
     setState(() {
