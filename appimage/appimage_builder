@@ -2,8 +2,17 @@
 
 # downloaded from https://gist.github.com/naveenadi/8dbe75c04cae7739f5cce0a260eb3e08
 
+if [ -d ./build ]; then
+  if [ ! -d ./appimage ]; then    
+    mkdir ./appimage;
+    echo 'INFO:AppImage working directory created in ./appimage';
+  fi
+  cd ./appimage;
+  echo 'INFO:Working directory changed to ./appimage';
+fi
+
 if [ ! -d ../build ]; then
-  echo 'ERROR: current directory is not contained within a flutter project';
+  echo 'ERROR:Current directory is not contained within a flutter project';
   exit 0;
 fi
 
