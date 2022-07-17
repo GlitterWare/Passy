@@ -10,7 +10,7 @@ import 'entry_event.dart';
 import 'history.dart';
 import 'id_card.dart';
 import 'identity.dart';
-import 'images.dart';
+import 'passy_images.dart';
 import 'loaded_account.dart';
 import 'note.dart';
 import 'password.dart';

@@ -1,9 +1,6 @@
-import 'dart:typed_data';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:passy/common/assets.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/password_screen.dart';
@@ -19,17 +16,20 @@ void sortPasswords(List<Password> passwords) {
   });
 }
 
-Widget getPasswordIcon(
-    {required LoadedAccount account, required String iconName}) {
-  Uint8List? _icon = account.getPasswordIcon(iconName)?.value;
-  if (_icon == null) {
-    return SvgPicture.asset(
-      logoCircleSvg,
-      width: 50,
-      color: lightContentColor,
-    );
+CachedNetworkImage getFavIcon(String website) {
+  if (!website.contains(RegExp(r'https://|http://'))) {
+    website = 'http://$website';
   }
-  return Image.memory(_icon);
+  String _request =
+      'https://s2.googleusercontent.com/s2/favicons?sz=32&domain=$website';
+  CachedNetworkImage _image = CachedNetworkImage(
+    imageUrl: _request,
+    placeholder: (context, url) => logoCircle50White,
+    errorWidget: (ctx, obj, s) => logoCircle50White,
+    width: 50,
+    fit: BoxFit.fill,
+  );
+  return _image;
 }
 
 Widget buildPasswordWidget(
@@ -37,7 +37,9 @@ Widget buildPasswordWidget(
     required LoadedAccount account,
     required Password password}) {
   return ThreeWidgetButton(
-    left: getPasswordIcon(account: account, iconName: password.iconName),
+    left: password.website == ''
+        ? logoCircle50White
+        : getFavIcon(password.website),
     right: const Icon(Icons.arrow_forward_ios_rounded),
     onPressed: () {
       Navigator.pushNamed(context, PasswordScreen.routeName,

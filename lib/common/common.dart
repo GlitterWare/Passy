@@ -41,7 +41,7 @@ AlertDialog getRecordDialog(
     List<InlineSpan> _children = [];
     Iterator<String> _iterator = value.characters.iterator;
     while (_iterator.moveNext()) {
-      if (_iterator.current.contains(RegExp(r'([a-z]|[A-Z])'))) {
+      if (_iterator.current.contains(RegExp(r'[a-z]|[A-Z]'))) {
         _children.add(TextSpan(
             text: _iterator.current,
             style: const TextStyle(fontFamily: 'FiraCode')));

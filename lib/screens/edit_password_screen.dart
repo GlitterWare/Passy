@@ -1,19 +1,28 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
+import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_bytes.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/screens/edit_custom_field_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/text_form_field_buttoned.dart';
+import 'package:universal_io/io.dart';
 
+import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 
@@ -59,6 +68,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         _additionalInfo = _passwordArgs.additionalInfo;
         _tags = _passwordArgs.tags;
         _nickname = _passwordArgs.nickname;
+        _iconName = _passwordArgs.nickname;
         _username = _passwordArgs.username;
         _email = _passwordArgs.email;
         _password = _passwordArgs.password;
@@ -93,7 +103,6 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             additionalInfo: _additionalInfo,
             tags: _tags,
             nickname: _nickname,
-            iconName: _iconName,
             username: _username,
             email: _email,
             password: _password,
@@ -161,7 +170,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                 TextEditingController(text: _tfaSecret.replaceFirst('=', '')),
             decoration: const InputDecoration(labelText: '2FA secret'),
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'([a-z]|[A-Z]|[2-7])')),
+              FilteringTextInputFormatter.allow(RegExp(r'[a-z]|[A-Z]|[2-7]')),
               TextInputFormatter.withFunction((oldValue, newValue) =>
                   TextEditingValue(
                       text: newValue.text.toUpperCase(),
@@ -307,10 +316,9 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Padding(
           padding: entryPadding,
           child: TextFormField(
-            controller: TextEditingController(text: _website),
-            decoration: const InputDecoration(labelText: 'Website'),
-            onChanged: (value) => _website = value,
-          ),
+              controller: TextEditingController(text: _website),
+              decoration: const InputDecoration(labelText: 'Website'),
+              onChanged: (value) => _website = value),
         ),
         Padding(
           padding: entryPadding,

@@ -14,7 +14,7 @@ import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
-import 'images.dart';
+import 'passy_images.dart';
 import 'note.dart';
 import 'password.dart';
 import 'passy_bytes.dart';

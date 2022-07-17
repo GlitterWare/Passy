@@ -120,7 +120,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              purpleLogo,
+              logo60Purple,
               const Spacer(),
               Expanded(
                 child: Row(

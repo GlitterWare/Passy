@@ -62,7 +62,7 @@ class SplashScreen extends StatelessWidget {
     }
     return Scaffold(
       body: Center(
-        child: purpleLogo,
+        child: logo60Purple,
       ),
     );
   }

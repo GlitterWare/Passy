@@ -157,7 +157,7 @@ class _LoginScreen extends State<LoginScreen> {
             child: Column(
               children: [
                 const Spacer(flex: 2),
-                purpleLogo,
+                logo60Purple,
                 const Spacer(),
                 Expanded(
                   child: Row(

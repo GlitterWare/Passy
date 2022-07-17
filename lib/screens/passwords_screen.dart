@@ -1,20 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/passwords_search_screen.dart';
-import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
 import 'edit_password_screen.dart';
-import 'password_screen.dart';
 
 class PasswordsScreen extends StatefulWidget {
   const PasswordsScreen({Key? key}) : super(key: key);
