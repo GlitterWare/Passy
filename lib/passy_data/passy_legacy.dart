@@ -48,7 +48,7 @@ LoadedAccount convertLegacyAccount(
     }
   }
   throw Exception(
-      'Account version is higher than the manager version. Please make sure that you are using the latest release of Passy before loading this account');
+      'Account version is higher than the supported account version. Please make sure that you are using the latest release of Passy before loading this account. Account version: $_version, Supported account version: $accountVersion');
 }
 
 LoadedAccount convertPre0_3_0Account({
