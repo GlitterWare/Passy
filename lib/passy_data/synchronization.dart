@@ -481,7 +481,7 @@ class Synchronization {
 
             Future<void> _sendServiceInfo() {
               _syncLog += 'done.\nSending service info... ';
-              socket.add(utf8.encode('Passy v$syncVersion\u0000'));
+              socket.add(utf8.encode('Passy $syncVersion\u0000'));
               return socket.flush();
             }
 
@@ -633,7 +633,7 @@ class Synchronization {
         }
         if (syncVersion != _info[1]) {
           _handleException(
-              'Local and remote versions are different. Local version: v$syncVersion. Remote version: ${_info[1]}.');
+              'Local and remote versions are different. Local version: $syncVersion. Remote version: ${_info[1]}.');
           return;
         }
         _sub.onData(_handleHistoryHash);
