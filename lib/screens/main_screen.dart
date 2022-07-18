@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
@@ -22,6 +22,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreen extends State<MainScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
 
   @override
@@ -60,12 +61,39 @@ class _MainScreen extends State<MainScreen>
                         style: TextStyle(color: lightContentSecondaryColor),
                       ),
                       onPressed: cameraSupported
-                          ? () => FlutterBarcodeScanner.scanBarcode(
-                                      '#9C27B0', 'Cancel', false, ScanMode.QR)
-                                  .then((address) {
-                                SynchronizationWrapper(context: context)
-                                    .connect(_account, address: address);
-                              })
+                          ? () => showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                    title: const Text(
+                                      'Scan QR code',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    content: QRView(
+                                      key: qrKey,
+                                      onQRViewCreated: (controller) =>
+                                          controller.scannedDataStream
+                                              .listen((event) {
+                                        if (event.code == null) return;
+                                        Navigator.pop(context);
+                                        final GlobalKey qrKey =
+                                            GlobalKey(debugLabel: 'QR');
+                                        SynchronizationWrapper(context: context)
+                                            .connect(_account,
+                                                address: event.code!);
+                                      }),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            color: lightContentSecondaryColor,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ))
                           : () {
                               Navigator.popUntil(
                                   context,

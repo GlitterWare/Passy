@@ -1,28 +1,19 @@
-import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:ui';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/passy_data/passy_bytes.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/screens/edit_custom_field_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/text_form_field_buttoned.dart';
-import 'package:universal_io/io.dart';
 
-import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 

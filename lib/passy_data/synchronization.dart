@@ -631,20 +631,10 @@ class Synchronization {
               'Remote service is not Passy. Service name: ${_hello[0]}.');
           return;
         }
-        {
-          String _errMsg =
-              'Local and remote versions are different. Local version: v$syncVersion. Remote version: ${_info[1]}.';
-          List<String> _remVersionSplit =
-              _info[1].replaceFirst('v', '').split('.');
-          List<String> _locVersionSplit = syncVersion.split('.');
-          if (_remVersionSplit[0] != _locVersionSplit[0]) {
-            _handleException(_errMsg);
-            return;
-          }
-          if (_remVersionSplit[1] != _locVersionSplit[1]) {
-            _handleException(_errMsg);
-            return;
-          }
+        if (syncVersion != _info[1]) {
+          _handleException(
+              'Local and remote versions are different. Local version: v$syncVersion. Remote version: ${_info[1]}.');
+          return;
         }
         _sub.onData(_handleHistoryHash);
         _sendHello(encrypt(

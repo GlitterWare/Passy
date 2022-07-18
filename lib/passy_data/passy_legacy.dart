@@ -28,10 +28,22 @@ LoadedAccount convertLegacyAccount(
   if (_version == accountVersion) {
     return LoadedAccount(path: path, encrypter: encrypter);
   }
-  if (int.parse(_version[0]) <= int.parse(accountVersion[0])) {
-    int _accV2 = int.parse(_version[2]);
-    if (_accV2 <= int.parse(accountVersion[2])) {
-      // 0.3.0 conversion
+  {
+    String _exception =
+        'Account version is higher than the supported account version. Please make sure that you are using the latest release of Passy before loading this account. Account version: $_version, Supported account version: $accountVersion';
+    {
+      if (int.parse(_version[0]) > int.parse(accountVersion[0])) {
+        throw Exception(_exception);
+      }
+      // Major releases (1st version number)
+    }
+    {
+      int _accV2 = int.parse(_version[2]);
+      if (_accV2 > int.parse(accountVersion[2])) {
+        throw Exception(_exception);
+      }
+      // Minor releases (2nd version number)
+      // Pre-0.3.0 conversion
       if (_version[0] == '0') {
         if (_accV2 < 3) {
           LoadedAccount _account =
@@ -40,15 +52,17 @@ LoadedAccount convertLegacyAccount(
           return _account;
         }
       }
-      // No conversion
-      if (int.parse(_version[4]) <= int.parse(accountVersion[4])) {
-        _versionFile.writeAsStringSync(accountVersion);
-        return LoadedAccount(path: path, encrypter: encrypter);
-      }
     }
+    {
+      if (int.parse(_version[4]) > int.parse(accountVersion[4])) {
+        throw Exception(_exception);
+      }
+      // Bugfixes (3rd version number)
+    }
+    // No conversion
+    _versionFile.writeAsStringSync(accountVersion);
+    return LoadedAccount(path: path, encrypter: encrypter);
   }
-  throw Exception(
-      'Account version is higher than the supported account version. Please make sure that you are using the latest release of Passy before loading this account. Account version: $_version, Supported account version: $accountVersion');
 }
 
 LoadedAccount convertPre0_3_0Account({
