@@ -70,17 +70,19 @@ class _MainScreen extends State<MainScreen>
                                     ),
                                     content: QRView(
                                       key: qrKey,
-                                      onQRViewCreated: (controller) =>
-                                          controller.scannedDataStream
-                                              .listen((event) {
-                                        if (event.code == null) return;
-                                        Navigator.pop(context);
-                                        final GlobalKey qrKey =
-                                            GlobalKey(debugLabel: 'QR');
-                                        SynchronizationWrapper(context: context)
-                                            .connect(_account,
-                                                address: event.code!);
-                                      }),
+                                      onQRViewCreated: (controller) {
+                                        bool _scanned = false;
+                                        controller.scannedDataStream
+                                            .listen((event) {
+                                          if (_scanned) return;
+                                          if (event.code == null) return;
+                                          _scanned = true;
+                                          SynchronizationWrapper(
+                                                  context: context)
+                                              .connect(_account,
+                                                  address: event.code!);
+                                        });
+                                      },
                                     ),
                                     actions: [
                                       TextButton(
