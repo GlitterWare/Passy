@@ -232,6 +232,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           ),
         ),
         ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, index) {
             CustomField _customField = _customFields[index];
