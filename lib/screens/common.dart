@@ -124,32 +124,35 @@ Widget buildPaymentCardWidget({
   return Center(
     child: Stack(
       children: [
-        CreditCardWidget(
-          glassmorphismConfig: Glassmorphism.defaultConfig(),
-          width: 350,
-          height: 200,
-          cardNumber: beautifyCardNumber(paymentCard.cardNumber),
-          expiryDate: paymentCard.exp,
-          cardHolderName: paymentCard.cardholderName,
-          customCardTypeIcons: [
-            CustomCardTypeIcon(
-                cardType: CardType.otherBrand,
-                cardImage: SvgPicture.asset(
-                  'assets/images/logo_circle.svg',
-                  color: Colors.purple,
-                  width: 50,
-                ))
-          ],
-          cvvCode: paymentCard.cvv,
-          showBackView: false,
-          obscureCardNumber: obscureCardNumber,
-          obscureCardCvv: obscureCardCvv,
-          isHolderNameVisible: true,
-          cardBgColor: Colors.red,
-          backgroundImage: 'assets/images/payment_card_bg.png',
-          cardType: CardType.otherBrand,
-          isSwipeGestureEnabled: isSwipeGestureEnabled,
-          onCreditCardWidgetChange: (brand) {},
+        TextButton(
+          onPressed: onPressed == null ? null : () => onPressed(paymentCard),
+          child: CreditCardWidget(
+            glassmorphismConfig: Glassmorphism.defaultConfig(),
+            width: 350,
+            height: 200,
+            cardNumber: beautifyCardNumber(paymentCard.cardNumber),
+            expiryDate: paymentCard.exp,
+            cardHolderName: paymentCard.cardholderName,
+            customCardTypeIcons: [
+              CustomCardTypeIcon(
+                  cardType: CardType.otherBrand,
+                  cardImage: SvgPicture.asset(
+                    'assets/images/logo_circle.svg',
+                    color: Colors.purple,
+                    width: 50,
+                  ))
+            ],
+            cvvCode: paymentCard.cvv,
+            showBackView: false,
+            obscureCardNumber: obscureCardNumber,
+            obscureCardCvv: obscureCardCvv,
+            isHolderNameVisible: true,
+            cardBgColor: Colors.red,
+            backgroundImage: 'assets/images/payment_card_bg.png',
+            cardType: CardType.otherBrand,
+            isSwipeGestureEnabled: isSwipeGestureEnabled,
+            onCreditCardWidgetChange: (brand) {},
+          ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(35, 32, 0, 0),
@@ -158,17 +161,6 @@ Widget buildPaymentCardWidget({
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
-        if (onPressed != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 16, 0, 0),
-            child: TextButton(
-              onPressed: () => onPressed(paymentCard),
-              child: const SizedBox(
-                width: 335,
-                height: 200,
-              ),
-            ),
-          ),
       ],
     ),
   );

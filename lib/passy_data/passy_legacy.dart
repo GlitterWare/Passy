@@ -16,53 +16,53 @@ import 'note.dart';
 import 'password.dart';
 import 'payment_card.dart';
 
+bool canLoadAccountVersion(String accVersion) {
+  List<int> _accVersion =
+      accVersion.split('.').map((e) => int.parse(e)).toList();
+  List<int> _appVersion =
+      accountVersion.split('.').map((e) => int.parse(e)).toList();
+  if (_appVersion[0] > _accVersion[0]) return true;
+  if (_appVersion[0] < _accVersion[0]) return false;
+  if (_appVersion[1] > _accVersion[1]) return true;
+  if (_appVersion[1] < _accVersion[1]) return false;
+  if (_appVersion[2] > _accVersion[2]) return true;
+  if (_appVersion[2] < _accVersion[2]) return false;
+  return true;
+}
+
 LoadedAccount convertLegacyAccount(
     {required String path, required Encrypter encrypter}) {
-  String _version;
+  List<int> _accountVersion;
   File _versionFile = File(path + Platform.pathSeparator + 'version.txt');
   if (_versionFile.existsSync()) {
-    _version = _versionFile.readAsStringSync();
+    _accountVersion = _versionFile
+        .readAsStringSync()
+        .split('.')
+        .map((e) => int.parse(e))
+        .toList();
   } else {
-    _version = '0.0.0';
+    _accountVersion = [0, 0, 0];
   }
-  if (_version == accountVersion) {
+  if (_accountVersion.join('.') == accountVersion) {
     return LoadedAccount(path: path, encrypter: encrypter);
   }
   {
     String _exception =
-        'Account version is higher than the supported account version. Please make sure that you are using the latest release of Passy before loading this account. Account version: $_version, Supported account version: $accountVersion';
-    {
-      if (int.parse(_version[0]) > int.parse(accountVersion[0])) {
-        throw Exception(_exception);
-      }
-      // Major releases (1st version number)
-    }
-    {
-      int _accV2 = int.parse(_version[2]);
-      if (_accV2 > int.parse(accountVersion[2])) {
-        throw Exception(_exception);
-      }
-      // Minor releases (2nd version number)
-      // Pre-0.3.0 conversion
-      if (_version[0] == '0') {
-        if (_accV2 < 3) {
-          LoadedAccount _account =
-              convertPre0_3_0Account(path: path, encrypter: encrypter);
-          _versionFile.writeAsStringSync(accountVersion);
-          return _account;
-        }
-      }
-    }
-    {
-      if (int.parse(_version[4]) > int.parse(accountVersion[4])) {
-        throw Exception(_exception);
-      }
-      // Bugfixes (3rd version number)
-    }
-    // No conversion
-    _versionFile.writeAsStringSync(accountVersion);
-    return LoadedAccount(path: path, encrypter: encrypter);
+        'Account version is higher than the supported account version. Please make sure that you are using the latest release of Passy before loading this account. Account version: ${_accountVersion.join('.')}, Supported account version: $accountVersion';
+    if (!canLoadAccountVersion(_accountVersion.join('.'))) throw (_exception);
   }
+  if (_accountVersion[0] == 0) {
+    if (_accountVersion[1] < 3) {
+      // Pre-0.3.0 conversion
+      LoadedAccount _account =
+          convertPre0_3_0Account(path: path, encrypter: encrypter);
+      _versionFile.writeAsStringSync(accountVersion);
+      return _account;
+    }
+  }
+  // No conversion
+  _versionFile.writeAsStringSync(accountVersion);
+  return LoadedAccount(path: path, encrypter: encrypter);
 }
 
 LoadedAccount convertPre0_3_0Account({
