@@ -87,6 +87,24 @@ class _MainScreen extends State<MainScreen>
                                     ),
                                     actions: [
                                       TextButton(
+                                        onPressed: () {
+                                          Navigator.popUntil(
+                                              context,
+                                              (route) =>
+                                                  route.settings.name ==
+                                                  MainScreen.routeName);
+                                          Navigator.pushNamed(
+                                              context, ConnectScreen.routeName,
+                                              arguments: _account);
+                                        },
+                                        child: Text(
+                                          'Can\'t scan?',
+                                          style: TextStyle(
+                                            color: lightContentSecondaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
                                         onPressed: () => Navigator.pop(ctx),
                                         child: Text(
                                           'Cancel',
