@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/payment_cards_screen.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
@@ -130,6 +131,14 @@ class _MainScreen extends State<MainScreen>
             center: const Text('Passwords'),
             onPressed: () {
               Navigator.pushNamed(context, PasswordsScreen.routeName);
+            },
+          ),
+          ThreeWidgetButton(
+            left: const Icon(Icons.payment_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('Payment cards'),
+            onPressed: () {
+              Navigator.pushNamed(context, PaymentCardsScreen.routeName);
             },
           ),
         ],

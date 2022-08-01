@@ -27,7 +27,7 @@ class CustomField with JsonConvertable, CSVConvertable {
 
   CustomField({
     this.title = 'Custom Field',
-    this.fieldType = FieldType.password,
+    this.fieldType = FieldType.text,
     this.value = '',
     this.obscured = false,
   });

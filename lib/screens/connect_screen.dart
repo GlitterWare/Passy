@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
 class ConnectScreen extends StatelessWidget {
-  static const routeName = '/connect';
+  static const routeName = '${MainScreen.routeName}/connect';
 
   const ConnectScreen({Key? key}) : super(key: key);
 

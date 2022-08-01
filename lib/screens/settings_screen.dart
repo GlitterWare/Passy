@@ -6,6 +6,7 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/screens/backup_and_restore_screen.dart';
 import 'package:passy/screens/biometric_auth_screen.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
@@ -14,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/settings';
+  static const routeName = '${MainScreen.routeName}/settings';
 
   @override
   State<StatefulWidget> createState() => _SettingsScreen();

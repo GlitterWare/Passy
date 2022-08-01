@@ -14,7 +14,7 @@ final bool biometricStorageSupported = Platform.isAndroid || Platform.isIOS;
 AppBar getEditScreenAppBar(
   BuildContext context, {
   required String title,
-  required void Function()? onSave,
+  void Function()? onSave,
   bool isNew = false,
 }) =>
     AppBar(

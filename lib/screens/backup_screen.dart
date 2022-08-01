@@ -8,10 +8,12 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
 
+import 'backup_and_restore_screen.dart';
+
 class BackupScreen extends StatefulWidget {
   const BackupScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/backupAndRestore/backup';
+  static const routeName = '${BackupAndRestoreScreen.routeName}/backup';
 
   @override
   State<StatefulWidget> createState() => _BackupScreen();

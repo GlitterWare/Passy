@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
-import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/edit_custom_field_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
-import 'package:passy/widgets/text_form_field_buttoned.dart';
 
 import 'main_screen.dart';
 import 'passwords_screen.dart';
@@ -20,22 +19,21 @@ import 'passwords_screen.dart';
 class EditPasswordScreen extends StatefulWidget {
   const EditPasswordScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/editPassword';
+  static const routeName = '${PasswordScreen.routeName}/edit';
 
   @override
   State<StatefulWidget> createState() => _EditPasswordScreen();
 }
 
 class _EditPasswordScreen extends State<EditPasswordScreen> {
-  final LoadedAccount _account = data.loadedAccount!;
   bool _isLoaded = false;
   bool _isNew = true;
+
   String? _key;
   List<CustomField> _customFields = [];
   String _additionalInfo = '';
   List<String> _tags = [];
   String _nickname = '';
-  String _iconName = '';
   String _username = '';
   String _email = '';
   String _password = '';
@@ -55,11 +53,10 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Password _passwordArgs = _args as Password;
         TFA? _tfa = _passwordArgs.tfa;
         _key = _passwordArgs.key;
-        _customFields = _passwordArgs.customFields.toList();
+        _customFields = List<CustomField>.from(_passwordArgs.customFields);
         _additionalInfo = _passwordArgs.additionalInfo;
         _tags = _passwordArgs.tags;
         _nickname = _passwordArgs.nickname;
-        _iconName = _passwordArgs.nickname;
         _username = _passwordArgs.username;
         _email = _passwordArgs.email;
         _password = _passwordArgs.password;
@@ -81,13 +78,9 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         title: 'password',
         isNew: _isNew,
         onSave: () {
+          final LoadedAccount _account = data.loadedAccount!;
           int _removed = 0;
-          for (int i = 0; i < _customFields.length - _removed; i++) {
-            if (_customFields[i].value == '') {
-              _customFields.removeAt(i);
-              _removed++;
-            }
-          }
+          _customFields.removeWhere((element) => element.value == '');
           Password _passwordArgs = Password(
             key: _key,
             customFields: _customFields,
@@ -231,67 +224,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             onChanged: (value) => _tfaIsGoogle = value as bool,
           ),
         ),
-        ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            CustomField _customField = _customFields[index];
-            TextEditingController _controller =
-                TextEditingController(text: _customField.value);
-            bool _isDate = _customField.fieldType == FieldType.date;
-            DateTime? _date;
-            if (_isDate) {
-              if (_customField.value == '') {
-                _date = DateTime.now();
-              } else {
-                List<String> _dateSplit = _customField.value.split('/');
-                _date = DateTime(
-                  int.parse(_dateSplit[2]),
-                  int.parse(_dateSplit[1]),
-                  int.parse(_dateSplit[0]),
-                );
-              }
-            }
-            return TextFormFieldButtoned(
-              controller: _controller,
-              focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
-              labelText: _customField.title,
-              buttonIcon: const Icon(Icons.remove_rounded),
-              onChanged: (value) => _customField.value = value,
-              onTap: _isDate
-                  ? () => showDatePicker(
-                        context: context,
-                        initialDate:
-                            _customField.value == '' ? DateTime.now() : _date!,
-                        firstDate: DateTime.utc(0, 04, 20),
-                        lastDate: DateTime.utc(275760, 09, 13),
-                        builder: (context, widget) => Theme(
-                          data: ThemeData(
-                            colorScheme: ColorScheme.dark(
-                              primary: lightContentSecondaryColor,
-                              onPrimary: lightContentColor,
-                            ),
-                          ),
-                          child: widget!,
-                        ),
-                      ).then((value) {
-                        if (value == null) return;
-                        setState(() => _customField.value =
-                            value.day.toString() +
-                                '/' +
-                                value.month.toString() +
-                                '/' +
-                                value.year.toString());
-                      })
-                  : null,
-              onPressed: () => setState(() => _customFields.removeAt(index)),
-              inputFormatters: [
-                if (_customField.fieldType == FieldType.number)
-                  FilteringTextInputFormatter.digitsOnly,
-              ],
-            );
-          },
-          itemCount: _customFields.length,
+        Padding(
+          padding: entryPadding,
+          child: TextFormField(
+              controller: TextEditingController(text: _website),
+              decoration: const InputDecoration(labelText: 'Website'),
+              onChanged: (value) => _website = value),
         ),
         ThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
@@ -305,13 +243,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             }
           }),
         ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-              controller: TextEditingController(text: _website),
-              decoration: const InputDecoration(labelText: 'Website'),
-              onChanged: (value) => _website = value),
-        ),
+        buildCustomFields(_customFields),
         Padding(
           padding: entryPadding,
           child: TextFormField(
@@ -321,15 +253,15 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             decoration: InputDecoration(
               labelText: 'Additional info',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(28.0),
                 borderSide: BorderSide(color: lightContentColor),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(28.0),
                 borderSide: BorderSide(color: darkContentSecondaryColor),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(28.0),
                 borderSide: BorderSide(color: lightContentColor),
               ),
             ),

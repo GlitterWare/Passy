@@ -19,6 +19,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
   String exp;
 
   PaymentCard({
+    String? key,
     List<CustomField>? customFields,
     this.additionalInfo = '',
     List<String>? tags,
@@ -29,7 +30,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
     this.exp = '',
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
-        super(DateTime.now().toUtc().toIso8601String());
+        super(key ?? DateTime.now().toUtc().toIso8601String());
 
   PaymentCard.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)
@@ -76,10 +77,10 @@ class PaymentCard extends PassyEntry<PaymentCard> {
 
   @override
   List toCSV() => [
-        customFields.map((e) => e.toCSV()),
+        key,
+        customFields.map((e) => e.toCSV()).toList(),
         additionalInfo,
         tags,
-        key,
         nickname,
         cardNumber,
         cardholderName,

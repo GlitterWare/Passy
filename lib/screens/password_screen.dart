@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
@@ -12,15 +11,15 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/screens/edit_password_screen.dart';
 import 'package:passy/widgets/passy_back_button.dart';
-import 'package:passy/widgets/double_action_button.dart';
 
+import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/password';
+  static const routeName = '${PasswordsScreen.routeName}/view';
 
   @override
   State<StatefulWidget> createState() => _PasswordScreen();
@@ -60,30 +59,6 @@ class _PasswordScreen extends State<PasswordScreen> {
     }
   }
 
-  Widget _buildRecord(String title, String value,
-          {bool obscureValue = false, bool isPassword = false}) =>
-      DoubleActionButton(
-        body: Column(
-          children: [
-            Text(
-              title,
-              style: TextStyle(color: lightContentSecondaryColor),
-            ),
-            Text(
-              obscureValue ? '\u2022' * 6 : value,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        icon: const Icon(Icons.copy),
-        onButtonPressed: () => showDialog(
-          context: context,
-          builder: (_) =>
-              getRecordDialog(value: value, highlightSpecial: isPassword),
-        ),
-        onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
-      );
-
   //TODO: implement tags
 
   @override
@@ -106,56 +81,6 @@ class _PasswordScreen extends State<PasswordScreen> {
     final Password _password =
         ModalRoute.of(context)!.settings.arguments as Password;
     if (!_onPasswordLoaded.isCompleted) _onPasswordLoaded.complete(_password);
-    List<Widget> _buildRecords() {
-      List<Widget> _records = [];
-      if (_password.nickname != '') {
-        _records.add(_buildRecord('Nickname', _password.nickname));
-      }
-      if (_password.username != '') {
-        _records.add(_buildRecord('Username', _password.username));
-      }
-      if (_password.email != '') {
-        _records.add(_buildRecord('Email', _password.email));
-      }
-      if (_password.password != '') {
-        _records.add(_buildRecord(
-          'Password',
-          _password.password,
-          obscureValue: true,
-          isPassword: true,
-        ));
-      }
-      if (_password.tfa != null) {
-        _records.add(Row(
-          children: [
-            SizedBox(
-              width: entryPadding.left * 2,
-            ),
-            SizedBox(
-              child: CircularProgressIndicator(
-                value: _tfaProgress,
-                color: lightContentSecondaryColor,
-              ),
-            ),
-            Flexible(
-              child: _buildRecord('2FA Code', _tfaCode),
-            ),
-          ],
-        ));
-      }
-      if (_password.website != '') {
-        _records.add(_buildRecord('Website', _password.website));
-      }
-      for (CustomField _customField in _password.customFields) {
-        _records.add(_buildRecord(_customField.title, _customField.value,
-            obscureValue: _customField.obscured,
-            isPassword: _customField.fieldType == FieldType.password));
-      }
-      if (_password.additionalInfo != '') {
-        _records.add(_buildRecord('Additional Info', _password.additionalInfo));
-      }
-      return _records;
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -180,14 +105,14 @@ class _PasswordScreen extends State<PasswordScreen> {
                       actions: [
                         TextButton(
                           child: Text(
-                            'No',
+                            'Cancel',
                             style: TextStyle(color: lightContentSecondaryColor),
                           ),
                           onPressed: () => Navigator.pop(context),
                         ),
                         TextButton(
                           child: Text(
-                            'Yes',
+                            'Remove',
                             style: TextStyle(color: lightContentSecondaryColor),
                           ),
                           onPressed: () {
@@ -209,14 +134,62 @@ class _PasswordScreen extends State<PasswordScreen> {
             splashRadius: appBarButtonSplashRadius,
             icon: const Icon(Icons.edit_rounded),
             onPressed: () {
-              Navigator.pushNamed(context, EditPasswordScreen.routeName,
-                  arguments: _password);
+              Navigator.pushNamed(
+                context,
+                EditPasswordScreen.routeName,
+                arguments: _password,
+              );
             },
           ),
         ],
       ),
       body: ListView(
-        children: _buildRecords(),
+        children: [
+          if (_password.nickname != '')
+            buildRecord(context, 'Nickname', _password.nickname),
+          if (_password.username != '')
+            buildRecord(context, 'Username', _password.username),
+          if (_password.email != '')
+            buildRecord(context, 'Email', _password.email),
+          if (_password.password != '')
+            buildRecord(
+              context,
+              'Password',
+              _password.password,
+              obscureValue: true,
+              isPassword: true,
+            ),
+          if (_password.tfa != null)
+            Row(
+              children: [
+                SizedBox(
+                  width: entryPadding.left * 2,
+                ),
+                SizedBox(
+                  child: CircularProgressIndicator(
+                    value: _tfaProgress,
+                    color: lightContentSecondaryColor,
+                  ),
+                ),
+                Flexible(
+                  child: buildRecord(context, '2FA code', _tfaCode),
+                ),
+              ],
+            ),
+          if (_password.website != '')
+            Stack(children: [
+              buildRecord(context, 'Website', _password.website),
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(23, 18, 0, 0),
+                  child: getFavIcon(_password.website, width: 35)),
+            ]),
+          for (CustomField _customField in _password.customFields)
+            buildRecord(context, _customField.title, _customField.value,
+                obscureValue: _customField.obscured,
+                isPassword: _customField.fieldType == FieldType.password),
+          if (_password.additionalInfo != '')
+            buildRecord(context, 'Additional info', _password.additionalInfo),
+        ],
       ),
     );
   }

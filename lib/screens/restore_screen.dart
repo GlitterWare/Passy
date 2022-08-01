@@ -5,6 +5,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/screens/backup_and_restore_screen.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/widgets/three_widget_button.dart';
 import 'package:passy/widgets/passy_back_button.dart';
@@ -16,7 +17,7 @@ import 'confirm_string_screen.dart';
 class RestoreScreen extends StatefulWidget {
   const RestoreScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/backupAndRestore/restore';
+  static const routeName = '${BackupAndRestoreScreen.routeName}/restore';
 
   @override
   State<StatefulWidget> createState() => _RestoreScreen();
