@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'common/theme.dart';
+import 'screens/theme.dart';
 import 'screens/backup_and_restore_screen.dart';
 import 'screens/backup_screen.dart';
 import 'screens/biometric_auth_screen.dart';

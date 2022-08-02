@@ -1,12 +1,11 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
-import 'package:passy/widgets/three_widget_button.dart';
-import 'package:passy/widgets/passy_back_button.dart';
+
+import 'assets.dart';
+import 'common.dart';
+import 'theme.dart';
 
 import 'backup_and_restore_screen.dart';
 
@@ -26,25 +25,28 @@ class _BackupScreen extends State<BackupScreen> {
         ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
+        leading: getBackButton(onPressed: () => Navigator.pop(context)),
         title: const Text('Backup'),
         centerTitle: true,
       ),
       body: ListView(children: [
-        ThreeWidgetButton(
-          center: const Text('Passy backup'),
-          left: SvgPicture.asset(
-            logoCircleSvg,
-            width: 25,
-            color: lightContentColor,
+        Padding(
+          padding: entryPadding,
+          child: getThreeWidgetButton(
+            center: const Text('Passy backup'),
+            left: SvgPicture.asset(
+              logoCircleSvg,
+              width: 25,
+              color: lightContentColor,
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => FilePicker.platform
+                .getDirectoryPath(dialogTitle: 'Backup passy')
+                .then((buDir) {
+              if (buDir == null) return;
+              data.backupAccount(_username, buDir);
+            }),
           ),
-          right: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () => FilePicker.platform
-              .getDirectoryPath(dialogTitle: 'Backup passy')
-              .then((buDir) {
-            if (buDir == null) return;
-            data.backupAccount(_username, buDir);
-          }),
         ),
       ]),
     );

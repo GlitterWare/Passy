@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:passy/widgets/passy_back_button.dart';
-import 'package:passy/widgets/text_form_field_buttoned.dart';
+
+import 'common.dart';
 
 class ConfirmStringScreenArguments {
   final Widget title;
@@ -42,7 +42,7 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(
+        leading: getBackButton(
             onPressed: _args.onBackPressed == null
                 ? null
                 : () => _args.onBackPressed!(context)),
@@ -55,7 +55,7 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
             child: Column(children: [
               const Spacer(),
               _args.message,
-              TextFormFieldButtoned(
+              getTextFormFieldButtoned(
                 labelText: _args.labelText,
                 obscureText: _args.obscureText,
                 onChanged: (s) => _input = s,

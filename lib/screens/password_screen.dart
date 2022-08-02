@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
-import 'package:passy/screens/edit_password_screen.dart';
-import 'package:passy/widgets/passy_back_button.dart';
 
+import 'theme.dart';
+import 'edit_password_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
@@ -84,7 +83,7 @@ class _PasswordScreen extends State<PasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(
+        leading: getBackButton(
           onPressed: () => Navigator.pop(context),
         ),
         title: Center(child: Text(_password.nickname)),

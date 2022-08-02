@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/note.dart';
-import 'package:passy/widgets/passy_back_button.dart';
+
+import 'common.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class _NoteScreen extends State<NoteScreen> {
     final Note? _note = ModalRoute.of(context)!.settings.arguments as Note?;
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(
+        leading: getBackButton(
           onPressed: () => Navigator.pop(context),
         ),
         title: const Center(child: Text('Note')),

@@ -4,18 +4,167 @@ import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/screens/password_screen.dart';
-import 'package:passy/widgets/double_action_button.dart';
-import 'package:passy/widgets/text_form_field_buttoned.dart';
-import 'package:passy/widgets/three_widget_button.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+
+import 'assets.dart';
+import 'password_screen.dart';
+import 'theme.dart';
+
+Widget getBackButton({
+  Key? key,
+  double splashRadius = appBarButtonSplashRadius,
+  EdgeInsetsGeometry padding = appBarButtonPadding,
+  Widget icon = const Icon(Icons.arrow_back_ios_new_rounded),
+  void Function()? onPressed,
+}) =>
+    IconButton(
+      key: key,
+      splashRadius: splashRadius,
+      padding: padding,
+      icon: icon,
+      onPressed: onPressed,
+    );
+
+Widget getDoubleActionButton({
+  Key? key,
+  required Widget body,
+  required Widget icon,
+  void Function()? onButtonPressed,
+  void Function()? onActionPressed,
+}) =>
+    ElevatedButton(
+      key: key,
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+      ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
+      onPressed: onButtonPressed,
+      child: Row(
+        children: [
+          Flexible(
+            fit: FlexFit.tight,
+            child: body,
+          ),
+          IconButton(
+            onPressed: onActionPressed,
+            padding:
+                const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+            icon: icon,
+            splashRadius: 27,
+          ),
+        ],
+      ),
+    );
+
+Widget getTextFormFieldButtoned({
+  Key? key,
+  TextEditingController? controller,
+  String? labelText,
+  bool obscureText = false,
+  Widget? buttonIcon,
+  void Function()? onTap,
+  void Function(String)? onChanged,
+  void Function()? onPressed,
+  FocusNode? focusNode,
+  List<TextInputFormatter>? inputFormatters,
+}) =>
+    Row(
+      key: key,
+      children: [
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.only(
+                left: entryPadding.right,
+                top: entryPadding.top,
+                bottom: entryPadding.bottom),
+            child: TextFormField(
+              controller: controller,
+              obscureText: obscureText,
+              decoration: InputDecoration(labelText: labelText),
+              onTap: onTap,
+              onChanged: onChanged,
+              focusNode: focusNode,
+              inputFormatters: inputFormatters,
+            ),
+          ),
+        ),
+        SizedBox(
+          child: Padding(
+            padding: EdgeInsets.only(right: entryPadding.right),
+            child: FloatingActionButton(
+              heroTag: null,
+              onPressed: onPressed,
+              child: buttonIcon,
+            ),
+          ),
+        )
+      ],
+    );
+
+Widget getThreeWidgetButton({
+  Key? key,
+  Widget? left,
+  required Widget center,
+  Widget? right,
+  void Function()? onPressed,
+}) =>
+    ElevatedButton(
+        key: key,
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+        ),
+        child: Padding(
+          child: Row(
+            children: [
+              if (left != null)
+                Padding(
+                  child: left,
+                  padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                ),
+              Flexible(
+                child: center,
+                fit: FlexFit.tight,
+              ),
+              if (right != null) right!,
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        ));
+
+AppBar getEditScreenAppBar(
+  BuildContext context, {
+  Key? key,
+  required String title,
+  void Function()? onSave,
+  bool isNew = false,
+}) =>
+    AppBar(
+      key: key,
+      leading: getBackButton(onPressed: () => Navigator.pop(context)),
+      title: isNew
+          ? Center(child: Text('Add $title'))
+          : Center(child: Text('Edit $title')),
+      actions: [
+        IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
+          onPressed: onSave,
+          icon: isNew
+              ? const Icon(Icons.add_rounded)
+              : const Icon(Icons.check_rounded),
+        ),
+      ],
+    );
 
 void sortPasswords(List<Password> passwords) {
   passwords.sort((a, b) {
@@ -55,7 +204,7 @@ Widget getFavIcon(String website, {double width = 50}) {
 
 Widget buildPasswordWidget(
     {required BuildContext context, required Password password}) {
-  return ThreeWidgetButton(
+  return getThreeWidgetButton(
     left: password.website == ''
         ? logoCircle50White
         : getFavIcon(password.website),
@@ -95,8 +244,15 @@ List<Widget> buildPasswordWidgets({
     sortPasswords(passwords);
   }
   for (Password password in passwords) {
-    _passwordWidgets
-        .add(buildPasswordWidget(context: context, password: password));
+    _passwordWidgets.add(
+      Padding(
+        padding: entryPadding,
+        child: buildPasswordWidget(
+          context: context,
+          password: password,
+        ),
+      ),
+    );
   }
   return _passwordWidgets;
 }
@@ -201,26 +357,29 @@ List<Widget> buildPaymentCardWidgets(
 
 Widget buildRecord(BuildContext context, String title, String value,
         {bool obscureValue = false, bool isPassword = false}) =>
-    DoubleActionButton(
-      body: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(color: lightContentSecondaryColor),
-          ),
-          Text(
-            obscureValue ? '\u2022' * 6 : value,
-            textAlign: TextAlign.center,
-          ),
-        ],
+    Padding(
+      padding: entryPadding,
+      child: getDoubleActionButton(
+        body: Column(
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: lightContentSecondaryColor),
+            ),
+            Text(
+              obscureValue ? '\u2022' * 6 : value,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        icon: const Icon(Icons.copy),
+        onButtonPressed: () => showDialog(
+          context: context,
+          builder: (_) =>
+              getRecordDialog(value: value, highlightSpecial: isPassword),
+        ),
+        onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
       ),
-      icon: const Icon(Icons.copy),
-      onButtonPressed: () => showDialog(
-        context: context,
-        builder: (_) =>
-            getRecordDialog(value: value, highlightSpecial: isPassword),
-      ),
-      onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
     );
 
 Widget buildCustomFields(List<CustomField> customFields) => StatefulBuilder(
@@ -245,7 +404,7 @@ Widget buildCustomFields(List<CustomField> customFields) => StatefulBuilder(
                 );
               }
             }
-            return TextFormFieldButtoned(
+            return getTextFormFieldButtoned(
               controller: _controller,
               focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
               labelText: _customField.title,

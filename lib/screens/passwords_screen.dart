@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/screens/common.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/search_screen.dart';
-import 'package:passy/widgets/passy_back_button.dart';
 
+import 'common.dart';
+import 'theme.dart';
 import 'edit_password_screen.dart';
+import 'main_screen.dart';
+import 'search_screen.dart';
 
 class PasswordsScreen extends StatefulWidget {
   const PasswordsScreen({Key? key}) : super(key: key);
@@ -34,7 +33,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
+        leading: getBackButton(onPressed: () => Navigator.pop(context)),
         title: const Center(child: Text('Passwords')),
         actions: [
           IconButton(
@@ -75,8 +74,15 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                 sortPasswords(_found);
                 widgets.clear();
                 for (Password _password in _found) {
-                  widgets.add(buildPasswordWidget(
-                      context: context, password: _password));
+                  widgets.add(
+                    Padding(
+                      padding: entryPadding,
+                      child: buildPasswordWidget(
+                        context: context,
+                        password: _password,
+                      ),
+                    ),
+                  );
                 }
               },
             ),

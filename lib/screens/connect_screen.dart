@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/widgets/passy_back_button.dart';
+
+import 'main_screen.dart';
+import 'common.dart';
+import 'theme.dart';
 
 class ConnectScreen extends StatelessWidget {
   static const routeName = '${MainScreen.routeName}/connect';
@@ -18,7 +19,7 @@ class ConnectScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(onPressed: () => Navigator.pop(context)),
+        leading: getBackButton(onPressed: () => Navigator.pop(context)),
         title: const Text('Connect'),
         centerTitle: true,
       ),

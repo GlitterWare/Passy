@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 
+import 'assets.dart';
 import 'add_account_screen.dart';
 import 'main_screen.dart';
 import 'confirm_string_screen.dart';
 import 'log_screen.dart';
 import 'splash_screen.dart';
+import 'theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

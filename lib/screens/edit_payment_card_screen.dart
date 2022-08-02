@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/screens/common.dart';
-import 'package:passy/screens/edit_custom_field_screen.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/payment_card_screen.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
-import 'package:passy/screens/splash_screen.dart';
-import 'package:passy/widgets/three_widget_button.dart';
 
+import 'theme.dart';
+import 'common.dart';
+import 'edit_custom_field_screen.dart';
+import 'main_screen.dart';
+import 'payment_card_screen.dart';
+import 'splash_screen.dart';
 import 'payment_cards_screen.dart';
 
 class EditPaymentCardScreen extends StatefulWidget {
@@ -236,17 +235,22 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
-          ThreeWidgetButton(
-            left: const Icon(Icons.add_rounded),
-            center: const Text('Add custom field'),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              EditCustomFieldScreen.routeName,
-            ).then((value) {
-              if (value != null) {
-                setState(() => _customFields.add(value as CustomField));
-              }
-            }),
+          Padding(
+            padding: entryPadding,
+            child: getThreeWidgetButton(
+              left: const Icon(Icons.add_rounded),
+              center: const Text('Add custom field'),
+              onPressed: () => Navigator.pushNamed(
+                context,
+                EditCustomFieldScreen.routeName,
+              ).then(
+                (value) {
+                  if (value != null) {
+                    setState(() => _customFields.add(value as CustomField));
+                  }
+                },
+              ),
+            ),
           ),
           buildCustomFields(_customFields),
           Padding(

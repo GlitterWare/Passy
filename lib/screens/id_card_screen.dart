@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:passy/widgets/passy_back_button.dart';
+
+import 'common.dart';
 
 class IDCardScreen extends StatefulWidget {
   const IDCardScreen({Key? key}) : super(key: key);
@@ -15,7 +16,7 @@ class _IDCardScreen extends State<IDCardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(
+        leading: getBackButton(
           onPressed: () => Navigator.pop(context),
         ),
         title: const Center(child: Text('ID Card')),

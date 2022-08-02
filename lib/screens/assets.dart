@@ -8,6 +8,7 @@ SvgPicture logoCircle50White = SvgPicture.asset(
   logoCircleSvg,
   color: Colors.white,
   width: 50,
+  fit: BoxFit.fill,
 );
 
 SvgPicture logo60Purple = SvgPicture.asset(

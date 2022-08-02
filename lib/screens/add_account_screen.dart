@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
-import 'package:passy/screens/login_screen.dart';
-import 'package:passy/widgets/passy_back_button.dart';
 
+import 'assets.dart';
+import 'theme.dart';
+import 'common.dart';
+import 'login_screen.dart';
 import 'log_screen.dart';
 
 class AddAccountScreen extends StatefulWidget {
@@ -108,7 +108,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
         automaticallyImplyLeading: false,
         leading: data.noAccounts
             ? null
-            : PassyBackButton(
+            : getBackButton(
                 onPressed: () => Navigator.pushReplacementNamed(
                     context, LoginScreen.routeName)),
         title: const Text('Add account'),

@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
-import 'package:passy/screens/common.dart';
-import 'package:passy/screens/edit_custom_field_screen.dart';
-import 'package:passy/screens/password_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
-import 'package:passy/widgets/three_widget_button.dart';
 
+import 'common.dart';
+import 'edit_custom_field_screen.dart';
+import 'password_screen.dart';
+import 'splash_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
+import 'theme.dart';
 
 class EditPasswordScreen extends StatefulWidget {
   const EditPasswordScreen({Key? key}) : super(key: key);
@@ -231,17 +230,20 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
               decoration: const InputDecoration(labelText: 'Website'),
               onChanged: (value) => _website = value),
         ),
-        ThreeWidgetButton(
-          left: const Icon(Icons.add_rounded),
-          center: const Text('Add custom field'),
-          onPressed: () => Navigator.pushNamed(
-            context,
-            EditCustomFieldScreen.routeName,
-          ).then((value) {
-            if (value != null) {
-              setState(() => _customFields.add(value as CustomField));
-            }
-          }),
+        Padding(
+          padding: entryPadding,
+          child: getThreeWidgetButton(
+            left: const Icon(Icons.add_rounded),
+            center: const Text('Add custom field'),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              EditCustomFieldScreen.routeName,
+            ).then((value) {
+              if (value != null) {
+                setState(() => _customFields.add(value as CustomField));
+              }
+            }),
+          ),
         ),
         buildCustomFields(_customFields),
         Padding(

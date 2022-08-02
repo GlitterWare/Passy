@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/theme.dart';
-import 'package:passy/widgets/passy_back_button.dart';
+
+import 'theme.dart';
+import 'common.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class _SearchScreen extends State<SearchScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(
+        leading: getBackButton(
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Search'),

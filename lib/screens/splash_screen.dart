@@ -5,11 +5,10 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_io/io.dart';
-
-import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/passy_data.dart';
 
+import 'assets.dart';
 import 'add_account_screen.dart';
 import 'login_screen.dart';
 import 'main_screen.dart';
@@ -31,7 +30,7 @@ class SplashScreen extends StatelessWidget {
           Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
           return;
         }
-        if (biometricStorageSupported) {
+        if (isBiometricStorageSupported) {
           String username = data.info.value.lastUsername;
           if (data.getBioAuthEnabled(username) ?? false) {
             BiometricStorageData _bioData;

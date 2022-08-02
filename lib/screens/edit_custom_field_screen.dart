@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/screens/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/widgets/passy_back_button.dart';
 
+import 'common.dart';
 import 'edit_password_screen.dart';
 
 class EditCustomFieldScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
     CustomField _customField = CustomField();
     return Scaffold(
       appBar: AppBar(
-        leading: PassyBackButton(
+        leading: getBackButton(
           onPressed: () => Navigator.pop(context),
         ),
         title: const Center(

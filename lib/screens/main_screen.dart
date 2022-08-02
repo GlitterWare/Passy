@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:passy/screens/payment_cards_screen.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/screens/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/widgets/three_widget_button.dart';
 
+import 'payment_cards_screen.dart';
+import 'common.dart';
 import 'connect_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
@@ -61,7 +61,7 @@ class _MainScreen extends State<MainScreen>
                         'Connect',
                         style: TextStyle(color: lightContentSecondaryColor),
                       ),
-                      onPressed: cameraSupported
+                      onPressed: isCameraSupported
                           ? () => showDialog(
                               context: context,
                               builder: (ctx) => AlertDialog(
@@ -143,21 +143,27 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          ThreeWidgetButton(
-            left: const Icon(Icons.lock_rounded),
-            right: const Icon(Icons.arrow_forward_ios_rounded),
-            center: const Text('Passwords'),
-            onPressed: () {
-              Navigator.pushNamed(context, PasswordsScreen.routeName);
-            },
+          Padding(
+            padding: entryPadding,
+            child: getThreeWidgetButton(
+              left: const Icon(Icons.lock_rounded),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              center: const Text('Passwords'),
+              onPressed: () {
+                Navigator.pushNamed(context, PasswordsScreen.routeName);
+              },
+            ),
           ),
-          ThreeWidgetButton(
-            left: const Icon(Icons.payment_rounded),
-            right: const Icon(Icons.arrow_forward_ios_rounded),
-            center: const Text('Payment cards'),
-            onPressed: () {
-              Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-            },
+          Padding(
+            padding: entryPadding,
+            child: getThreeWidgetButton(
+              left: const Icon(Icons.payment_rounded),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              center: const Text('Payment cards'),
+              onPressed: () {
+                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+              },
+            ),
           ),
         ],
       ),
