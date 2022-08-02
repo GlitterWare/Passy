@@ -187,6 +187,12 @@ void sortPaymentCards(List<PaymentCard> paymentCards) {
 }
 
 Widget getFavIcon(String website, {double width = 50}) {
+  SvgPicture _placeholder = SvgPicture.asset(
+    logoCircleSvg,
+    color: Colors.white,
+    width: 50,
+    alignment: Alignment.topCenter,
+  );
   if (!website.contains(RegExp(r'https://|http://'))) {
     website = 'http://$website';
   }
@@ -195,8 +201,8 @@ Widget getFavIcon(String website, {double width = 50}) {
 
   return CachedNetworkImage(
     imageUrl: _request,
-    placeholder: (context, url) => logoCircle50White,
-    errorWidget: (ctx, obj, s) => logoCircle50White,
+    placeholder: (context, url) => _placeholder,
+    errorWidget: (ctx, obj, s) => _placeholder,
     width: width,
     fit: BoxFit.fill,
   );
