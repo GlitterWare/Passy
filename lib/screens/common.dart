@@ -12,10 +12,10 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/screens/password_screen.dart';
-import 'package:passy/screens/payment_card_screen.dart';
 import 'package:passy/widgets/double_action_button.dart';
 import 'package:passy/widgets/text_form_field_buttoned.dart';
 import 'package:passy/widgets/three_widget_button.dart';
+import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 
 void sortPasswords(List<Password> passwords) {
   passwords.sort((a, b) {
@@ -101,6 +101,24 @@ List<Widget> buildPasswordWidgets({
   return _passwordWidgets;
 }
 
+CardType cardTypeFromCreditCardType(CreditCardType cardType) {
+  switch (cardType) {
+    case CreditCardType.visa:
+      return CardType.visa;
+    case CreditCardType.mastercard:
+      return CardType.mastercard;
+    case CreditCardType.amex:
+      return CardType.americanExpress;
+    case CreditCardType.discover:
+      return CardType.discover;
+    default:
+      return CardType.otherBrand;
+  }
+}
+
+CardType cardTypeFromNumber(String number) =>
+    cardTypeFromCreditCardType(detectCCType(number));
+
 Widget buildPaymentCardWidget({
   required PaymentCard paymentCard,
   bool obscureCardNumber = true,
@@ -149,7 +167,7 @@ Widget buildPaymentCardWidget({
             isHolderNameVisible: true,
             cardBgColor: Colors.red,
             backgroundImage: 'assets/images/payment_card_bg.png',
-            cardType: CardType.otherBrand,
+            cardType: cardTypeFromNumber(paymentCard.cardNumber),
             isSwipeGestureEnabled: isSwipeGestureEnabled,
             onCreditCardWidgetChange: (brand) {},
           ),

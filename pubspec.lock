@@ -190,6 +190,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  credit_card_type_detector:
+    dependency: "direct main"
+    description:
+      name: credit_card_type_detector
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   crypto:
     dependency: "direct main"
     description:
