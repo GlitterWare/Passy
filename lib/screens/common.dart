@@ -129,17 +129,43 @@ Widget getThreeWidgetButton({
               if (left != null)
                 Padding(
                   child: left,
-                  padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                  padding: const EdgeInsets.only(right: 30),
                 ),
               Flexible(
                 child: center,
                 fit: FlexFit.tight,
               ),
-              if (right != null) right!,
+              if (right != null) right,
             ],
           ),
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         ));
+
+AppBar getEntriesScreenAppBar(
+  BuildContext context, {
+  Key? key,
+  required Widget title,
+  required void Function()? onSearchPressed,
+  required void Function()? onAddPressed,
+}) =>
+    AppBar(
+      leading: getBackButton(onPressed: () => Navigator.pop(context)),
+      title: title,
+      actions: [
+        IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
+          onPressed: onSearchPressed,
+          icon: const Icon(Icons.search_rounded),
+        ),
+        IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
+          onPressed: onAddPressed,
+          icon: const Icon(Icons.add_rounded),
+        ),
+      ],
+    );
 
 AppBar getEditScreenAppBar(
   BuildContext context, {
