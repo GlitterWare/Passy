@@ -23,8 +23,8 @@ flutter build linux
 echo 'INFO:Building Linux AppImage'
 echo 'v'$version | ./appimage/appimage_builder
 echo ''
-echo 'INFO:Finished Building'
+echo 'INFO:Finished building version '$version
 echo 'Results:'
 echo '- Android Apk - ./build/app/outputs/flutter-apk/app-release.apk'
 echo '- Linux Bundle - ./build/linux/release/bundle'
-echo '- Linux AppImage - ./build/appimage/Passy-v'$version'x86_64.AppImage'
+echo '- Linux AppImage - ./build/appimage/Passy-v'$version'-x86_64.AppImage'
