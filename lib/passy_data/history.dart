@@ -107,4 +107,35 @@ class History with JsonConvertable {
           encrypter: encrypter,
           constructor: () => History(),
           fromJson: History.fromJson);
+
+  void clearRemoved() {
+    passwords.forEach((key, value) {
+      if (value.status == EntryStatus.removed) passwords.remove(key);
+    });
+    passwordIcons.forEach((key, value) {
+      if (value.status == EntryStatus.removed) passwords.remove(key);
+    });
+    paymentCards.forEach((key, value) {
+      if (value.status == EntryStatus.removed) passwords.remove(key);
+    });
+    notes.forEach((key, value) {
+      if (value.status == EntryStatus.removed) passwords.remove(key);
+    });
+    idCards.forEach((key, value) {
+      if (value.status == EntryStatus.removed) passwords.remove(key);
+    });
+    identities.forEach((key, value) {
+      if (value.status == EntryStatus.removed) passwords.remove(key);
+    });
+  }
+
+  void renew() {
+    DateTime _time = DateTime.now().toUtc();
+    passwords.forEach((key, value) {});
+    passwordIcons.forEach((key, value) => value.lastModified = _time);
+    paymentCards.forEach((key, value) => value.lastModified = _time);
+    notes.forEach((key, value) => value.lastModified = _time);
+    idCards.forEach((key, value) => value.lastModified = _time);
+    identities.forEach((key, value) => value.lastModified = _time);
+  }
 }

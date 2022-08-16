@@ -172,6 +172,8 @@ class PassyData {
       LoadedAccount _account =
           LoadedAccount(path: _tempAccountPath, encrypter: encrypter);
       _account.bioAuthEnabled = false;
+      _account.clearRemovedHistory();
+      _account.renewHistory();
       _account.saveSync();
     }
     // Able to load the account, safe to replace

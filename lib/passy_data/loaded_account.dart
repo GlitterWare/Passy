@@ -238,6 +238,10 @@ class LoadedAccount {
   Future<BiometricStorageData> get biometricStorageData =>
       BiometricStorageData.fromLocker(_credentials.value.username);
 
+  // History wrappers
+  void clearRemovedHistory() => _history.value.clearRemoved();
+  void renewHistory() => _history.value.renew();
+
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
 
