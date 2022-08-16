@@ -3,12 +3,11 @@ import 'package:passy/screens/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 
 import 'common.dart';
-import 'edit_password_screen.dart';
 
 class EditCustomFieldScreen extends StatefulWidget {
   const EditCustomFieldScreen({Key? key}) : super(key: key);
 
-  static const routeName = '${EditPasswordScreen.routeName}/editCustomField';
+  static const routeName = '/editCustomField';
 
   @override
   State<StatefulWidget> createState() => _EditCustomFieldScreen();
@@ -19,22 +18,11 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
   Widget build(BuildContext context) {
     CustomField _customField = CustomField();
     return Scaffold(
-      appBar: AppBar(
-        leading: getBackButton(
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Center(
-          child: Text('Add custom field'),
-        ),
-        actions: [
-          IconButton(
-              padding: appBarButtonPadding,
-              splashRadius: appBarButtonSplashRadius,
-              onPressed: () {
-                Navigator.pop(context, _customField);
-              },
-              icon: const Icon(Icons.add_rounded)),
-        ],
+      appBar: getEditScreenAppBar(
+        context,
+        title: 'custom field',
+        onSave: () => Navigator.pop(context, _customField),
+        isNew: true,
       ),
       body: ListView(children: [
         Padding(

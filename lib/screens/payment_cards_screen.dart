@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/payment_card.dart';
 
-import 'theme.dart';
 import 'common.dart';
 import 'edit_payment_card_screen.dart';
 import 'main_screen.dart';
@@ -24,13 +23,12 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   @override
   void initState() {
     super.initState();
-    List<Widget> _widgets = buildPaymentCardWidgets(
-      context,
-      paymentCards: data.loadedAccount!.paymentCards,
-      onPressed: (paymentCard) => Navigator.pushNamed(
-          context, PaymentCardScreen.routeName,
-          arguments: paymentCard),
-    );
+    List<Widget> _widgets = buildPaymentCardWidgets(context,
+        paymentCards: data.loadedAccount!.paymentCards,
+        onPressed: (paymentCard) => {
+              Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                  arguments: paymentCard),
+            });
     _paymentCardWidgets.addAll(_widgets);
   }
 

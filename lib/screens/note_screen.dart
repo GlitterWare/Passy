@@ -12,7 +12,7 @@ import 'main_screen.dart';
 class NoteScreen extends StatefulWidget {
   const NoteScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/note';
+  static const routeName = '/note';
 
   @override
   State<StatefulWidget> createState() => _NoteScreen();

@@ -4,7 +4,7 @@ import 'common.dart';
 class IdentityScreen extends StatefulWidget {
   const IdentityScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/identity';
+  static const routeName = '/identity';
 
   @override
   State<StatefulWidget> createState() => _IdentityScreen();

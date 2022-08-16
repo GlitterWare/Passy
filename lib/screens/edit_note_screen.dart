@@ -13,7 +13,7 @@ import 'theme.dart';
 class EditNoteScreen extends StatefulWidget {
   const EditNoteScreen({Key? key}) : super(key: key);
 
-  static const routeName = '${NotesScreen.routeName}/edit';
+  static const routeName = '${NoteScreen.routeName}/edit';
 
   @override
   State<StatefulWidget> createState() => _EditNoteScreen();

@@ -10,7 +10,6 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 
 import 'theme.dart';
-import 'edit_password_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
@@ -18,7 +17,7 @@ import 'passwords_screen.dart';
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({Key? key}) : super(key: key);
 
-  static const routeName = '${PasswordsScreen.routeName}/view';
+  static const routeName = '/password';
 
   @override
   State<StatefulWidget> createState() => _PasswordScreen();

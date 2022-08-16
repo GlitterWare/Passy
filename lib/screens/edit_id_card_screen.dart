@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/id_card_screen.dart';
 
 import 'common.dart';
 
 class EditIdCardScreen extends StatefulWidget {
   const EditIdCardScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/idCards/editIdCard';
+  static const routeName = '${IDCardScreen.routeName}/editIdCard';
 
   @override
   State<StatefulWidget> createState() => _EditIdCardScreen();

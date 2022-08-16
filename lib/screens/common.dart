@@ -246,10 +246,8 @@ Widget buildPasswordWidget(
         ? logoCircle50White
         : getFavIcon(password.website),
     right: const Icon(Icons.arrow_forward_ios_rounded),
-    onPressed: () {
-      Navigator.pushNamed(context, PasswordScreen.routeName,
-          arguments: password);
-    },
+    onPressed: () => Navigator.pushNamed(context, PasswordScreen.routeName,
+        arguments: password),
     center: Column(
       children: [
         Align(
@@ -317,7 +315,7 @@ Widget buildPaymentCardWidget({
   bool obscureCardNumber = true,
   bool obscureCardCvv = true,
   bool isSwipeGestureEnabled = false,
-  void Function(PaymentCard paymentCard)? onPressed,
+  void Function()? onPressed,
 }) {
   String beautifyCardNumber(String cardNumber) {
     if (cardNumber.isEmpty) {
@@ -336,7 +334,7 @@ Widget buildPaymentCardWidget({
     child: Stack(
       children: [
         TextButton(
-          onPressed: onPressed == null ? null : () => onPressed(paymentCard),
+          onPressed: onPressed,
           child: CreditCardWidget(
             glassmorphismConfig: Glassmorphism.defaultConfig(),
             width: 350,
@@ -386,8 +384,9 @@ List<Widget> buildPaymentCardWidgets(
   sortPaymentCards(_paymentCards);
   final List<Widget> _paymentCardWidgets = [];
   for (PaymentCard paymentCard in paymentCards) {
-    _paymentCardWidgets.add(
-        buildPaymentCardWidget(paymentCard: paymentCard, onPressed: onPressed));
+    _paymentCardWidgets.add(buildPaymentCardWidget(
+        paymentCard: paymentCard,
+        onPressed: onPressed == null ? null : () => onPressed(paymentCard)));
   }
   return _paymentCardWidgets;
 }

@@ -5,7 +5,7 @@ import 'common.dart';
 class IDCardScreen extends StatefulWidget {
   const IDCardScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/main/idCard';
+  static const routeName = '/idCard';
 
   @override
   State<StatefulWidget> createState() => _IDCardScreen();
