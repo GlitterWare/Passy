@@ -10,6 +10,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 
 import 'theme.dart';
+import 'edit_password_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
@@ -121,6 +122,26 @@ class _PasswordScreen extends State<PasswordScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Center(child: Text(_password.nickname)),
+        actions: [
+          IconButton(
+            padding: appBarButtonPadding,
+            splashRadius: appBarButtonSplashRadius,
+            icon: const Icon(Icons.delete_outline_rounded),
+            onPressed: () => _onRemovePressed(_password),
+          ),
+          IconButton(
+            padding: appBarButtonPadding,
+            splashRadius: appBarButtonSplashRadius,
+            icon: const Icon(Icons.edit_rounded),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                EditPasswordScreen.routeName,
+                arguments: _password,
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [
