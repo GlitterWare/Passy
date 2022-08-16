@@ -34,74 +34,64 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
     _paymentCardWidgets.addAll(_widgets);
   }
 
+  void _onSearchPressed() {
+    Navigator.pushNamed(
+      context,
+      SearchScreen.routeName,
+      arguments: (String terms) {
+        final List<PaymentCard> _found = [];
+        final List<String> _terms = terms.trim().toLowerCase().split(' ');
+        for (PaymentCard _paymentCard in data.loadedAccount!.paymentCards) {
+          {
+            bool testPaymentCard(PaymentCard value) =>
+                _paymentCard.key == value.key;
+
+            if (_found.any(testPaymentCard)) continue;
+          }
+          {
+            int _positiveCount = 0;
+            for (String _term in _terms) {
+              if (_paymentCard.cardholderName.toLowerCase().contains(_term)) {
+                _positiveCount++;
+                continue;
+              }
+              if (_paymentCard.nickname.toLowerCase().contains(_term)) {
+                _positiveCount++;
+                continue;
+              }
+              if (_paymentCard.exp.toLowerCase().contains(_term)) {
+                _positiveCount++;
+                continue;
+              }
+            }
+            if (_positiveCount == _terms.length) {
+              _found.add(_paymentCard);
+            }
+          }
+        }
+        List<Widget> _widgets = buildPaymentCardWidgets(
+          context,
+          paymentCards: _found,
+          onPressed: (paymentCard) => Navigator.pushNamed(
+              context, PaymentCardScreen.routeName,
+              arguments: paymentCard),
+        );
+        return _widgets;
+      },
+    );
+  }
+
+  void _onAddPressed() =>
+      Navigator.pushNamed(context, EditPaymentCardScreen.routeName);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: getBackButton(onPressed: () => Navigator.pop(context)),
-        title: const Center(child: Text('Payment cards')),
-        actions: [
-          IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
-            onPressed: () => Navigator.pushNamed(
-              context,
-              SearchScreen.routeName,
-              arguments: (String terms) {
-                final List<PaymentCard> _found = [];
-                final List<String> _terms =
-                    terms.trim().toLowerCase().split(' ');
-                for (PaymentCard _paymentCard
-                    in data.loadedAccount!.paymentCards) {
-                  {
-                    bool testPaymentCard(PaymentCard value) =>
-                        _paymentCard.key == value.key;
-
-                    if (_found.any(testPaymentCard)) continue;
-                  }
-                  {
-                    int _positiveCount = 0;
-                    for (String _term in _terms) {
-                      if (_paymentCard.cardholderName
-                          .toLowerCase()
-                          .contains(_term)) {
-                        _positiveCount++;
-                        continue;
-                      }
-                      if (_paymentCard.nickname.toLowerCase().contains(_term)) {
-                        _positiveCount++;
-                        continue;
-                      }
-                      if (_paymentCard.exp.toLowerCase().contains(_term)) {
-                        _positiveCount++;
-                        continue;
-                      }
-                    }
-                    if (_positiveCount == _terms.length) {
-                      _found.add(_paymentCard);
-                    }
-                  }
-                }
-                List<Widget> _widgets = buildPaymentCardWidgets(
-                  context,
-                  paymentCards: _found,
-                  onPressed: (paymentCard) => Navigator.pushNamed(
-                      context, PaymentCardScreen.routeName,
-                      arguments: paymentCard),
-                );
-                return _widgets;
-              },
-            ),
-            icon: const Icon(Icons.search_rounded),
-          ),
-          IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
-            onPressed: () =>
-                Navigator.pushNamed(context, EditPaymentCardScreen.routeName),
-            icon: const Icon(Icons.add_rounded),
-          ),
-        ],
+      appBar: getEntriesScreenAppBar(
+        context,
+        title: const Text('Payment cards'),
+        onAddPressed: _onAddPressed,
+        onSearchPressed: _onSearchPressed,
       ),
       body: ListView(children: _paymentCardWidgets),
     );

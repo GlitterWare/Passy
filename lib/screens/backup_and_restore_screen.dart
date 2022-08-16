@@ -16,6 +16,13 @@ class BackupAndRestoreScreen extends StatefulWidget {
 }
 
 class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
+  void _onBackupPressed(String username) {
+    Navigator.pushNamed(context, BackupScreen.routeName, arguments: username);
+  }
+
+  void _onRestorePressed() =>
+      Navigator.pushNamed(context, RestoreScreen.routeName);
+
   @override
   Widget build(BuildContext context) {
     final String _username =
@@ -34,9 +41,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
               center: const Text('Backup'),
               left: const Icon(Icons.ios_share_rounded),
               right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () => Navigator.pushNamed(
-                  context, BackupScreen.routeName,
-                  arguments: _username),
+              onPressed: () => _onBackupPressed(_username),
             ),
           ),
           Padding(
@@ -45,8 +50,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
               center: const Text('Restore'),
               left: const Icon(Icons.settings_backup_restore_rounded),
               right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, RestoreScreen.routeName),
+              onPressed: _onRestorePressed,
             ),
           ),
         ],

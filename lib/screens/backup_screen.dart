@@ -19,6 +19,15 @@ class BackupScreen extends StatefulWidget {
 }
 
 class _BackupScreen extends State<BackupScreen> {
+  void _onPassyBackup(String username) {
+    FilePicker.platform
+        .getDirectoryPath(dialogTitle: 'Backup Passy')
+        .then((buDir) {
+      if (buDir == null) return;
+      data.backupAccount(username, buDir);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final String _username =
@@ -40,12 +49,7 @@ class _BackupScreen extends State<BackupScreen> {
               color: lightContentColor,
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => FilePicker.platform
-                .getDirectoryPath(dialogTitle: 'Backup passy')
-                .then((buDir) {
-              if (buDir == null) return;
-              data.backupAccount(_username, buDir);
-            }),
+            onPressed: () => _onPassyBackup(_username),
           ),
         ),
       ]),

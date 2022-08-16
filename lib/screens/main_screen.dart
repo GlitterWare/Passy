@@ -165,6 +165,17 @@ class _MainScreen extends State<MainScreen>
               },
             ),
           ),
+          Padding(
+            padding: entryPadding,
+            child: getThreeWidgetButton(
+              left: const Icon(Icons.note_rounded),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              center: const Text('Notes'),
+              onPressed: () {
+                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -29,56 +29,56 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     _passwordWidgets.addAll(_widgets);
   }
 
+  void _onAddPressed() =>
+      Navigator.pushNamed(context, EditPasswordScreen.routeName);
+
+  void _onSearchPressed() {
+    Navigator.pushNamed(context, SearchScreen.routeName,
+        arguments: (String terms) {
+      final List<Password> _found = [];
+      final List<String> _terms = terms.trim().toLowerCase().split(' ');
+      for (Password _password in data.loadedAccount!.passwords) {
+        {
+          bool testPassword(Password value) => _password.key == value.key;
+
+          if (_found.any(testPassword)) continue;
+        }
+        {
+          int _positiveCount = 0;
+          for (String _term in _terms) {
+            if (_password.username.toLowerCase().contains(_term)) {
+              _positiveCount++;
+              continue;
+            }
+            if (_password.nickname.toLowerCase().contains(_term)) {
+              _positiveCount++;
+              continue;
+            }
+          }
+          if (_positiveCount == _terms.length) {
+            _found.add(_password);
+          }
+        }
+      }
+      sortPasswords(_found);
+      List<Widget> _widgets = [];
+      for (Password _password in _found) {
+        _widgets.add(
+          Padding(
+            padding: entryPadding,
+            child: buildPasswordWidget(
+              context: context,
+              password: _password,
+            ),
+          ),
+        );
+      }
+      return _widgets;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    void _onSearchPressed() {
-      Navigator.pushNamed(context, SearchScreen.routeName,
-          arguments: (String terms) {
-        final List<Password> _found = [];
-        final List<String> _terms = terms.trim().toLowerCase().split(' ');
-        for (Password _password in data.loadedAccount!.passwords) {
-          {
-            bool testPassword(Password value) => _password.key == value.key;
-
-            if (_found.any(testPassword)) continue;
-          }
-          {
-            int _positiveCount = 0;
-            for (String _term in _terms) {
-              if (_password.username.toLowerCase().contains(_term)) {
-                _positiveCount++;
-                continue;
-              }
-              if (_password.nickname.toLowerCase().contains(_term)) {
-                _positiveCount++;
-                continue;
-              }
-            }
-            if (_positiveCount == _terms.length) {
-              _found.add(_password);
-            }
-          }
-        }
-        sortPasswords(_found);
-        List<Widget> _widgets = [];
-        for (Password _password in _found) {
-          _widgets.add(
-            Padding(
-              padding: entryPadding,
-              child: buildPasswordWidget(
-                context: context,
-                password: _password,
-              ),
-            ),
-          );
-        }
-        return _widgets;
-      });
-    }
-
-    void _onAddPressed() =>
-        Navigator.pushNamed(context, EditPasswordScreen.routeName);
-
     return Scaffold(
       appBar: getEntriesScreenAppBar(context,
           title: const Center(child: Text('Passwords')),
