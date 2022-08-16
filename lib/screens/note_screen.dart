@@ -27,9 +27,8 @@ class _NoteScreen extends State<NoteScreen> {
         builder: (_) {
           return AlertDialog(
             shape: dialogShape,
-            title: const Text('Remove password'),
-            content:
-                const Text('Passwords can only be restored from a backup.'),
+            title: const Text('Remove note'),
+            content: const Text('Notes can only be restored from a backup.'),
             actions: [
               TextButton(
                 child: Text(
