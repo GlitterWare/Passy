@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/edit_note_screen.dart';
+import 'package:passy/screens/notes_screen.dart';
 
 import 'screens/theme.dart';
 import 'screens/backup_and_restore_screen.dart';
@@ -52,6 +54,7 @@ class Passy extends StatelessWidget {
             const EditCustomFieldScreen(),
         EditIdCardScreen.routeName: (context) => const EditIdCardScreen(),
         EditIdentityScreen.routeName: (context) => const EditIdentityScreen(),
+        EditNoteScreen.routeName: (context) => const EditNoteScreen(),
         EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
         EditPaymentCardScreen.routeName: (context) =>
             const EditPaymentCardScreen(),
@@ -61,10 +64,11 @@ class Passy extends StatelessWidget {
         LoginScreen.routeName: (context) => const LoginScreen(),
         MainScreen.routeName: (context) => const MainScreen(),
         NoteScreen.routeName: (context) => const NoteScreen(),
-        PasswordsScreen.routeName: (context) => const PasswordsScreen(),
+        NotesScreen.routeName: (context) => const NotesScreen(),
         PasswordScreen.routeName: (context) => const PasswordScreen(),
-        PaymentCardsScreen.routeName: (context) => const PaymentCardsScreen(),
+        PasswordsScreen.routeName: (context) => const PasswordsScreen(),
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
+        PaymentCardsScreen.routeName: (context) => const PaymentCardsScreen(),
         RestoreScreen.routeName: (context) => const RestoreScreen(),
         SearchScreen.routeName: (context) => const SearchScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),

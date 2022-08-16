@@ -7,11 +7,13 @@ import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 
 import 'assets.dart';
+import 'note_screen.dart';
 import 'password_screen.dart';
 import 'theme.dart';
 
@@ -212,6 +214,9 @@ void sortPaymentCards(List<PaymentCard> paymentCards) {
   });
 }
 
+void sortNotes(List<Note> notes) =>
+    notes.sort((a, b) => a.title.compareTo(b.title));
+
 Widget getFavIcon(String website, {double width = 50}) {
   SvgPicture _placeholder = SvgPicture.asset(
     logoCircleSvg,
@@ -387,8 +392,54 @@ List<Widget> buildPaymentCardWidgets(
   return _paymentCardWidgets;
 }
 
+Widget buildNoteWidget({required BuildContext context, required Note note}) {
+  return getThreeWidgetButton(
+    left: const Icon(Icons.note_rounded),
+    right: const Icon(Icons.arrow_forward_ios_rounded),
+    onPressed: () {
+      Navigator.pushNamed(context, NoteScreen.routeName, arguments: note);
+    },
+    center: Column(
+      children: [
+        Align(
+          child: Text(
+            note.title,
+          ),
+          alignment: Alignment.centerLeft,
+        ),
+      ],
+    ),
+  );
+}
+
+List<Widget> buildNoteWidgets({
+  required BuildContext context,
+  required LoadedAccount account,
+  List<Note>? notes,
+}) {
+  final List<Widget> _noteWidgets = [];
+  if (notes == null) {
+    notes = account.notes.toList();
+    (notes);
+  }
+  for (Note note in notes) {
+    _noteWidgets.add(
+      Padding(
+        padding: entryPadding,
+        child: buildNoteWidget(
+          context: context,
+          note: note,
+        ),
+      ),
+    );
+  }
+  return _noteWidgets;
+}
+
 Widget buildRecord(BuildContext context, String title, String value,
-        {bool obscureValue = false, bool isPassword = false}) =>
+        {bool obscureValue = false,
+        bool isPassword = false,
+        TextAlign valueAlign = TextAlign.center}) =>
     Padding(
       padding: entryPadding,
       child: getDoubleActionButton(
@@ -398,17 +449,21 @@ Widget buildRecord(BuildContext context, String title, String value,
               title,
               style: TextStyle(color: lightContentSecondaryColor),
             ),
-            Text(
-              obscureValue ? '\u2022' * 6 : value,
-              textAlign: TextAlign.center,
+            FittedBox(
+              child: Text(
+                obscureValue ? '\u2022' * 6 : value,
+                textAlign: valueAlign,
+              ),
             ),
           ],
         ),
         icon: const Icon(Icons.copy),
         onButtonPressed: () => showDialog(
           context: context,
-          builder: (_) =>
-              getRecordDialog(value: value, highlightSpecial: isPassword),
+          builder: (_) => getRecordDialog(
+              value: value,
+              highlightSpecial: isPassword,
+              textAlign: valueAlign),
         ),
         onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
       ),

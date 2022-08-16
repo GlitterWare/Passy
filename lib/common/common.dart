@@ -11,7 +11,9 @@ final bool isCameraSupported = isPlatformMobile;
 final bool isBiometricStorageSupported = isPlatformMobile;
 
 AlertDialog getRecordDialog(
-    {required String value, bool highlightSpecial = false}) {
+    {required String value,
+    bool highlightSpecial = false,
+    TextAlign textAlign = TextAlign.center}) {
   Widget content;
   if (highlightSpecial) {
     List<InlineSpan> _children = [];
@@ -30,14 +32,14 @@ AlertDialog getRecordDialog(
             )));
       }
     }
-    content = RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(text: '', children: _children),
+    content = SelectableText.rich(
+      TextSpan(text: '', children: _children),
+      textAlign: textAlign,
     );
   } else {
-    content = Text(
+    content = SelectableText(
       value,
-      textAlign: TextAlign.center,
+      textAlign: textAlign,
       style: const TextStyle(fontFamily: 'FiraCode'),
     );
   }

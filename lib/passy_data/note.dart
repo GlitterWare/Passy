@@ -11,9 +11,10 @@ class Note extends PassyEntry<Note> {
   String note;
 
   Note({
+    String? key,
     this.title = '',
     this.note = '',
-  }) : super(DateTime.now().toUtc().toIso8601String());
+  }) : super(key ?? DateTime.now().toUtc().toIso8601String());
 
   Note.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? '',

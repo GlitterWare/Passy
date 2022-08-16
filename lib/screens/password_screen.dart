@@ -75,6 +75,41 @@ class _PasswordScreen extends State<PasswordScreen> {
     _onClosed.complete();
   }
 
+  void _onRemovePressed(Password password) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            shape: dialogShape,
+            title: const Text('Remove password'),
+            content:
+                const Text('Passwords can only be restored from a backup.'),
+            actions: [
+              TextButton(
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: lightContentSecondaryColor),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                child: Text(
+                  'Remove',
+                  style: TextStyle(color: lightContentSecondaryColor),
+                ),
+                onPressed: () {
+                  _account.removePassword(password.key);
+                  Navigator.popUntil(
+                      context, (r) => r.settings.name == MainScreen.routeName);
+                  _account.save().whenComplete(() =>
+                      Navigator.pushNamed(context, PasswordsScreen.routeName));
+                },
+              )
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Password _password =
@@ -87,60 +122,6 @@ class _PasswordScreen extends State<PasswordScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Center(child: Text(_password.nickname)),
-        actions: [
-          IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
-            icon: const Icon(Icons.delete_outline_rounded),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (_) {
-                    return AlertDialog(
-                      shape: dialogShape,
-                      title: const Text('Remove password'),
-                      content: const Text(
-                          'Passwords can only be restored from a backup.'),
-                      actions: [
-                        TextButton(
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: lightContentSecondaryColor),
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        TextButton(
-                          child: Text(
-                            'Remove',
-                            style: TextStyle(color: lightContentSecondaryColor),
-                          ),
-                          onPressed: () {
-                            _account.removePassword(_password.key);
-                            Navigator.popUntil(context,
-                                (r) => r.settings.name == MainScreen.routeName);
-                            _account.save().whenComplete(() =>
-                                Navigator.pushNamed(
-                                    context, PasswordsScreen.routeName));
-                          },
-                        )
-                      ],
-                    );
-                  });
-            },
-          ),
-          IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
-            icon: const Icon(Icons.edit_rounded),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                EditPasswordScreen.routeName,
-                arguments: _password,
-              );
-            },
-          ),
-        ],
       ),
       body: ListView(
         children: [

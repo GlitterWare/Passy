@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/notes_screen.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
@@ -149,9 +150,8 @@ class _MainScreen extends State<MainScreen>
               left: const Icon(Icons.lock_rounded),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Passwords'),
-              onPressed: () {
-                Navigator.pushNamed(context, PasswordsScreen.routeName);
-              },
+              onPressed: () =>
+                  Navigator.pushNamed(context, PasswordsScreen.routeName),
             ),
           ),
           Padding(
@@ -160,9 +160,8 @@ class _MainScreen extends State<MainScreen>
               left: const Icon(Icons.payment_rounded),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Payment cards'),
-              onPressed: () {
-                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-              },
+              onPressed: () =>
+                  Navigator.pushNamed(context, PaymentCardsScreen.routeName),
             ),
           ),
           Padding(
@@ -171,9 +170,8 @@ class _MainScreen extends State<MainScreen>
               left: const Icon(Icons.note_rounded),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Notes'),
-              onPressed: () {
-                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-              },
+              onPressed: () =>
+                  Navigator.pushNamed(context, NotesScreen.routeName),
             ),
           ),
         ],

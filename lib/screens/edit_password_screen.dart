@@ -78,7 +78,6 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         isNew: _isNew,
         onSave: () {
           final LoadedAccount _account = data.loadedAccount!;
-          int _removed = 0;
           _customFields.removeWhere((element) => element.value == '');
           Password _passwordArgs = Password(
             key: _key,
