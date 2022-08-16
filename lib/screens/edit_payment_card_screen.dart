@@ -68,7 +68,12 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
       if (!_isNew) {
         PaymentCard _paymentCardArgs = _args as PaymentCard;
         _key = _paymentCardArgs.key;
-        _customFields = List<CustomField>.from(_paymentCardArgs.customFields);
+        _customFields = List<CustomField>.from(_paymentCardArgs.customFields
+            .map((e) => CustomField(
+                title: e.title,
+                fieldType: e.fieldType,
+                value: e.value,
+                obscured: e.obscured)));
         _additionalInfo = _paymentCardArgs.additionalInfo;
         _tags = _paymentCardArgs.tags;
         _nickname = _paymentCardArgs.nickname;
