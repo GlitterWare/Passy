@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'backup_screen.dart';
 import 'common.dart';
 import 'restore_screen.dart';
-import 'theme.dart';
 import 'settings_screen.dart';
 
 class BackupAndRestoreScreen extends StatefulWidget {
@@ -35,24 +35,18 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              center: const Text('Backup'),
-              left: const Icon(Icons.ios_share_rounded),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () => _onBackupPressed(_username),
-            ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              center: const Text('Restore'),
-              left: const Icon(Icons.settings_backup_restore_rounded),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: _onRestorePressed,
-            ),
-          ),
+          PassyPadding(getThreeWidgetButton(
+            center: const Text('Backup'),
+            left: const Icon(Icons.ios_share_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => _onBackupPressed(_username),
+          )),
+          PassyPadding(getThreeWidgetButton(
+            center: const Text('Restore'),
+            left: const Icon(Icons.settings_backup_restore_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: _onRestorePressed,
+          )),
         ],
       ),
     );

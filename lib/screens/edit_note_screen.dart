@@ -3,12 +3,13 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/screens/note_screen.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';
 import 'notes_screen.dart';
 import 'splash_screen.dart';
 import 'main_screen.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 class EditNoteScreen extends StatefulWidget {
   const EditNoteScreen({Key? key}) : super(key: key);
@@ -65,39 +66,33 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _title),
-            decoration: const InputDecoration(
-              labelText: 'Title',
-            ),
-            onChanged: (value) => _title = value.trim(),
+        PassyTextFormField(
+          controller: TextEditingController(text: _title),
+          decoration: const InputDecoration(
+            labelText: 'Title',
           ),
+          onChanged: (value) => _title = value.trim(),
         ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            controller: TextEditingController(text: _note),
-            decoration: InputDecoration(
-              labelText: 'Note',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: lightContentColor),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: darkContentSecondaryColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: lightContentColor),
-              ),
+        PassyTextFormField(
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          controller: TextEditingController(text: _note),
+          decoration: InputDecoration(
+            labelText: 'Note',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28.0),
+              borderSide: BorderSide(color: lightContentColor),
             ),
-            onChanged: (value) => _note = value,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28.0),
+              borderSide: BorderSide(color: darkContentSecondaryColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28.0),
+              borderSide: BorderSide(color: lightContentColor),
+            ),
           ),
+          onChanged: (value) => _note = value,
         ),
       ]),
     );

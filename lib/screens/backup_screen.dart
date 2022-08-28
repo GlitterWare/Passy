@@ -2,10 +2,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'assets.dart';
 import 'common.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 import 'backup_and_restore_screen.dart';
 
@@ -39,19 +40,16 @@ class _BackupScreen extends State<BackupScreen> {
         centerTitle: true,
       ),
       body: ListView(children: [
-        Padding(
-          padding: entryPadding,
-          child: getThreeWidgetButton(
-            center: const Text('Passy backup'),
-            left: SvgPicture.asset(
-              logoCircleSvg,
-              width: 25,
-              color: lightContentColor,
-            ),
-            right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => _onPassyBackup(_username),
+        PassyPadding(getThreeWidgetButton(
+          center: const Text('Passy backup'),
+          left: SvgPicture.asset(
+            logoCircleSvg,
+            width: 25,
+            color: lightContentColor,
           ),
-        ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () => _onPassyBackup(_username),
+        )),
       ]),
     );
   }

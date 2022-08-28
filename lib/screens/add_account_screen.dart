@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 
 import 'assets.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 import 'common.dart';
 import 'login_screen.dart';
 import 'log_screen.dart';

@@ -4,7 +4,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 
 import 'main_screen.dart';
 import 'common.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 class ConnectScreen extends StatelessWidget {
   static const routeName = '${MainScreen.routeName}/connect';

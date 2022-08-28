@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/id_cards_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
+import 'package:passy/widgets/widgets.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
-import 'package:passy/screens/theme.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
 import 'payment_cards_screen.dart';
@@ -144,36 +146,34 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              left: const Icon(Icons.lock_rounded),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Passwords'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, PasswordsScreen.routeName),
-            ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              left: const Icon(Icons.payment_rounded),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Payment cards'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, PaymentCardsScreen.routeName),
-            ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              left: const Icon(Icons.note_rounded),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Notes'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, NotesScreen.routeName),
-            ),
-          ),
+          PassyPadding(getThreeWidgetButton(
+            left: const Icon(Icons.lock_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('Passwords'),
+            onPressed: () =>
+                Navigator.pushNamed(context, PasswordsScreen.routeName),
+          )),
+          PassyPadding(getThreeWidgetButton(
+            left: const Icon(Icons.payment_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('Payment cards'),
+            onPressed: () =>
+                Navigator.pushNamed(context, PaymentCardsScreen.routeName),
+          )),
+          PassyPadding(getThreeWidgetButton(
+            left: const Icon(Icons.note_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('Notes'),
+            onPressed: () =>
+                Navigator.pushNamed(context, NotesScreen.routeName),
+          )),
+          PassyPadding(getThreeWidgetButton(
+            left: const Icon(Icons.perm_identity_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('ID Cards'),
+            onPressed: () =>
+                Navigator.pushNamed(context, IDCardsScreen.routeName),
+          )),
         ],
       ),
     );

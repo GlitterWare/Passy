@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:passy/screens/edit_note_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 
-import 'screens/theme.dart';
+import 'screens/id_cards_screen.dart';
+import 'common/theme.dart';
 import 'screens/backup_and_restore_screen.dart';
 import 'screens/backup_screen.dart';
 import 'screens/biometric_auth_screen.dart';
@@ -52,13 +53,14 @@ class Passy extends StatelessWidget {
         ConnectScreen.routeName: (context) => const ConnectScreen(),
         EditCustomFieldScreen.routeName: (context) =>
             const EditCustomFieldScreen(),
-        EditIdCardScreen.routeName: (context) => const EditIdCardScreen(),
+        EditIDCardScreen.routeName: (context) => const EditIDCardScreen(),
         EditIdentityScreen.routeName: (context) => const EditIdentityScreen(),
         EditNoteScreen.routeName: (context) => const EditNoteScreen(),
         EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
         EditPaymentCardScreen.routeName: (context) =>
             const EditPaymentCardScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
+        IDCardsScreen.routeName: (context) => const IDCardsScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         LogScreen.routeName: (context) => const LogScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),

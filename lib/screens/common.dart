@@ -2,20 +2,23 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 Widget getBackButton({
   Key? key,
@@ -169,6 +172,34 @@ AppBar getEntriesScreenAppBar(
       ],
     );
 
+AppBar getEntryScreenAppBar(
+  BuildContext context, {
+  Key? key,
+  required Widget title,
+  required void Function()? onRemovePressed,
+  required void Function()? onEditPressed,
+}) =>
+    AppBar(
+      leading: getBackButton(
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: title,
+      actions: [
+        IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
+          icon: const Icon(Icons.delete_outline_rounded),
+          onPressed: onRemovePressed,
+        ),
+        IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
+          icon: const Icon(Icons.edit_rounded),
+          onPressed: onEditPressed,
+        ),
+      ],
+    );
+
 AppBar getEditScreenAppBar(
   BuildContext context, {
   Key? key,
@@ -194,6 +225,63 @@ AppBar getEditScreenAppBar(
       ],
     );
 
+Widget buildMonthPicker(
+  BuildContext context, {
+  TextEditingController? controller,
+  Widget? title,
+  DateTime Function()? getSelectedDate,
+  Function(DateTime)? onChanged,
+}) {
+  return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(labelText: 'Expiration date'),
+      focusNode: AlwaysDisabledFocusNode(),
+      onTap: () => showDialog(
+            context: context,
+            builder: (ctx) {
+              DateTime _selectedDate = getSelectedDate == null
+                  ? DateTime.now().toUtc()
+                  : getSelectedDate();
+              return AlertDialog(
+                title: title,
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: lightContentSecondaryColor),
+                      )),
+                  TextButton(
+                      onPressed: () => Navigator.pop(ctx, _selectedDate),
+                      child: Text(
+                        'Confirm',
+                        style: TextStyle(color: lightContentSecondaryColor),
+                      )),
+                ],
+                content: StatefulBuilder(
+                  builder: (ctx, setState) {
+                    return MonthPicker.single(
+                      selectedDate: _selectedDate,
+                      firstDate: DateTime.utc(-4294967296),
+                      lastDate: DateTime.utc(4294967296),
+                      onChanged: (date) {
+                        setState(() => _selectedDate = date);
+                      },
+                      datePickerStyles: DatePickerStyles(
+                          currentDateStyle:
+                              TextStyle(color: lightContentSecondaryColor),
+                          selectedDateStyle:
+                              TextStyle(color: lightContentSecondaryColor)),
+                    );
+                  },
+                ),
+              );
+            },
+          ).then((value) {
+            if (onChanged != null) onChanged(value);
+          }));
+}
+
 void sortPasswords(List<Password> passwords) {
   passwords.sort((a, b) {
     int _nickComp = a.nickname.compareTo(b.nickname);
@@ -216,6 +304,16 @@ void sortPaymentCards(List<PaymentCard> paymentCards) {
 
 void sortNotes(List<Note> notes) =>
     notes.sort((a, b) => a.title.compareTo(b.title));
+
+void sortIDCards(List<IDCard> idCards) {
+  idCards.sort((a, b) {
+    int _nickComp = a.nickname.compareTo(b.nickname);
+    if (_nickComp == 0) {
+      return a.name.compareTo(b.name);
+    }
+    return _nickComp;
+  });
+}
 
 Widget getFavIcon(String website, {double width = 50}) {
   SvgPicture _placeholder = SvgPicture.asset(
@@ -280,13 +378,10 @@ List<Widget> buildPasswordWidgets({
   }
   for (Password password in passwords) {
     _passwordWidgets.add(
-      Padding(
-        padding: entryPadding,
-        child: buildPasswordWidget(
-          context: context,
-          password: password,
-        ),
-      ),
+      PassyPadding(buildPasswordWidget(
+        context: context,
+        password: password,
+      )),
     );
   }
   return _passwordWidgets;
@@ -423,13 +518,10 @@ List<Widget> buildNoteWidgets({
   }
   for (Note note in notes) {
     _noteWidgets.add(
-      Padding(
-        padding: entryPadding,
-        child: buildNoteWidget(
-          context: context,
-          note: note,
-        ),
-      ),
+      PassyPadding(buildNoteWidget(
+        context: context,
+        note: note,
+      )),
     );
   }
   return _noteWidgets;
@@ -439,34 +531,29 @@ Widget buildRecord(BuildContext context, String title, String value,
         {bool obscureValue = false,
         bool isPassword = false,
         TextAlign valueAlign = TextAlign.center}) =>
-    Padding(
-      padding: entryPadding,
-      child: getDoubleActionButton(
-        body: Column(
-          children: [
-            Text(
-              title,
-              style: TextStyle(color: lightContentSecondaryColor),
+    PassyPadding(getDoubleActionButton(
+      body: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(color: lightContentSecondaryColor),
+          ),
+          FittedBox(
+            child: Text(
+              obscureValue ? '\u2022' * 6 : value,
+              textAlign: valueAlign,
             ),
-            FittedBox(
-              child: Text(
-                obscureValue ? '\u2022' * 6 : value,
-                textAlign: valueAlign,
-              ),
-            ),
-          ],
-        ),
-        icon: const Icon(Icons.copy),
-        onButtonPressed: () => showDialog(
-          context: context,
-          builder: (_) => getRecordDialog(
-              value: value,
-              highlightSpecial: isPassword,
-              textAlign: valueAlign),
-        ),
-        onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
+          ),
+        ],
       ),
-    );
+      icon: const Icon(Icons.copy),
+      onButtonPressed: () => showDialog(
+        context: context,
+        builder: (_) => getRecordDialog(
+            value: value, highlightSpecial: isPassword, textAlign: valueAlign),
+      ),
+      onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
+    ));
 
 Widget buildCustomFields(List<CustomField> customFields) => StatefulBuilder(
     builder: (ctx, setState) => ListView.builder(

@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'common.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 class LogScreen extends StatelessWidget {
   const LogScreen({Key? key}) : super(key: key);

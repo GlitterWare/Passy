@@ -21,6 +21,7 @@ class IDCard extends PassyEntry<IDCard> {
   String country;
 
   IDCard({
+    String? key,
     List<CustomField>? customFields,
     this.additionalInfo = '',
     List<String>? tags,
@@ -35,7 +36,7 @@ class IDCard extends PassyEntry<IDCard> {
   })  : pictures = pictures ?? [],
         customFields = customFields ?? [],
         tags = tags ?? [],
-        super(DateTime.now().toUtc().toIso8601String());
+        super(key ?? DateTime.now().toUtc().toIso8601String());
 
   IDCard.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)
@@ -96,7 +97,7 @@ class IDCard extends PassyEntry<IDCard> {
   @override
   List toCSV() => [
         key,
-        customFields.map((e) => e.toCSV()),
+        customFields.map((e) => e.toCSV()).toList(),
         additionalInfo,
         tags,
         nickname,

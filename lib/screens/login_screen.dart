@@ -4,6 +4,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'assets.dart';
 import 'add_account_screen.dart';
@@ -11,7 +12,7 @@ import 'main_screen.dart';
 import 'confirm_string_screen.dart';
 import 'log_screen.dart';
 import 'splash_screen.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -81,30 +82,27 @@ class _LoginScreen extends State<LoginScreen> {
                         context, ConfirmStringScreen.routeName,
                         arguments: ConfirmStringScreenArguments(
                             title: const Text('Remove account'),
-                            message: Padding(
-                              padding: entryPadding,
-                              child: RichText(
-                                text: TextSpan(
-                                    text: 'Confirm the removal of account ',
-                                    children: [
-                                      TextSpan(
-                                        text: '\'$_username\' ',
-                                        style: TextStyle(
-                                            color: lightContentSecondaryColor),
-                                      ),
-                                      const TextSpan(
-                                          text:
-                                              'by typing in its username.\n\nThis action is '),
-                                      TextSpan(
-                                        text: 'irreversible',
-                                        style: TextStyle(
-                                            color: lightContentSecondaryColor),
-                                      ),
-                                      const TextSpan(text: '.'),
-                                    ]),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
+                            message: PassyPadding(RichText(
+                              text: TextSpan(
+                                  text: 'Confirm the removal of account ',
+                                  children: [
+                                    TextSpan(
+                                      text: '\'$_username\' ',
+                                      style: TextStyle(
+                                          color: lightContentSecondaryColor),
+                                    ),
+                                    const TextSpan(
+                                        text:
+                                            'by typing in its username.\n\nThis action is '),
+                                    TextSpan(
+                                      text: 'irreversible',
+                                      style: TextStyle(
+                                          color: lightContentSecondaryColor),
+                                    ),
+                                    const TextSpan(text: '.'),
+                                  ]),
+                              textAlign: TextAlign.center,
+                            )),
                             labelText: 'Confirm username',
                             confirmIcon:
                                 const Icon(Icons.delete_outline_rounded),

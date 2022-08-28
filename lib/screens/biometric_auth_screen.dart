@@ -3,10 +3,11 @@ import 'package:flutter_locker/flutter_locker.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';
 import 'settings_screen.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 class BiometricAuthScreen extends StatefulWidget {
   static const routeName = '${SettingsScreen.routeName}/bioAuth';
@@ -71,31 +72,25 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              center: const Text('Biometric authentication'),
-              left: const Icon(Icons.fingerprint_rounded),
-              right: Switch(
-                value: data.loadedAccount!.bioAuthEnabled,
-                onChanged: (value) => setBioAuthEnabled(value),
-              ),
-              onPressed: () =>
-                  setBioAuthEnabled(!data.loadedAccount!.bioAuthEnabled),
+          PassyPadding(getThreeWidgetButton(
+            center: const Text('Biometric authentication'),
+            left: const Icon(Icons.fingerprint_rounded),
+            right: Switch(
+              value: data.loadedAccount!.bioAuthEnabled,
+              onChanged: (value) => setBioAuthEnabled(value),
             ),
-          ),
+            onPressed: () =>
+                setBioAuthEnabled(!data.loadedAccount!.bioAuthEnabled),
+          )),
           if (!data.loadedAccount!.bioAuthEnabled)
-            Padding(
-              padding: entryPadding,
-              child: TextFormField(
-                controller: TextEditingController(text: _password),
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Account password',
-                ),
-                onChanged: (value) => _password = value,
+            PassyPadding(TextFormField(
+              controller: TextEditingController(text: _password),
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Account password',
               ),
-            ),
+              onChanged: (value) => _password = value,
+            )),
         ],
       ),
     );

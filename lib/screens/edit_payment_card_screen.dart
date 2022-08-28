@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:passy/widgets/widgets.dart';
 
-import 'theme.dart';
+import '../common/theme.dart';
 import 'common.dart';
 import 'edit_custom_field_screen.dart';
 import 'main_screen.dart';
@@ -135,152 +134,83 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             obscureCardCvv: false,
             isSwipeGestureEnabled: false,
           ),
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-              controller: _nicknameController,
-              decoration: const InputDecoration(labelText: 'Nickname'),
-              onChanged: (value) => setState(() => _nickname = value.trim()),
+          PassyTextFormField(
+            controller: _nicknameController,
+            decoration: const InputDecoration(labelText: 'Nickname'),
+            onChanged: (value) => setState(() => _nickname = value.trim()),
+          ),
+          PassyTextFormField(
+            controller: _cardNumberController,
+            decoration: const InputDecoration(labelText: 'Card number'),
+            onChanged: (value) => setState(() => _cardNumber = value),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          PassyTextFormField(
+            controller: _cardHolderNameController,
+            decoration: const InputDecoration(labelText: 'Card holder name'),
+            onChanged: (value) =>
+                setState(() => _cardholderName = value.trim()),
+          ),
+          PassyPadding(buildMonthPicker(context,
+              controller: _expController,
+              title: const Text('Expiration date'), getSelectedDate: () {
+            List<String> _date = _exp.split('/');
+            String _month = _date[0];
+            String _year = _date[1];
+            if (_month[0] == '0') {
+              _month = _month[1];
+            }
+            return DateTime.utc(int.parse(_year), int.parse(_month));
+          }, onChanged: (selectedDate) {
+            String _month = selectedDate.month.toString();
+            String _year = selectedDate.year.toString();
+            if (_month.length == 1) _month = '0' + _month;
+            setState(() {
+              _exp = _month + '/' + _year;
+              _expController.text = _exp;
+            });
+          })),
+          PassyTextFormField(
+            controller: _cvvController,
+            decoration: const InputDecoration(labelText: 'CVV'),
+            onChanged: (value) => setState(() => _cvv = value),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          PassyPadding(getThreeWidgetButton(
+            left: const Icon(Icons.add_rounded),
+            center: const Text('Add custom field'),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              EditCustomFieldScreen.routeName,
+            ).then(
+              (value) {
+                if (value != null) {
+                  setState(() => _customFields.add(value as CustomField));
+                }
+              },
             ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-              controller: _cardNumberController,
-              decoration: const InputDecoration(labelText: 'Card number'),
-              onChanged: (value) => setState(() => _cardNumber = value),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-              controller: _cardHolderNameController,
-              decoration: const InputDecoration(labelText: 'Card holder name'),
-              onChanged: (value) =>
-                  setState(() => _cardholderName = value.trim()),
-            ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-                controller: _expController,
-                decoration: const InputDecoration(labelText: 'Expiration date'),
-                focusNode: AlwaysDisabledFocusNode(),
-                onChanged: (value) => setState(() => _exp = value.trim()),
-                onTap: () => showDialog(
-                      context: context,
-                      builder: (ctx) {
-                        DateTime _selectedDate;
-                        {
-                          List<String> _date = _exp.split('/');
-                          String _month = _date[0];
-                          String _year = _date[1];
-                          if (_month[0] == '0') {
-                            _month = _month[1];
-                          }
-                          _selectedDate =
-                              DateTime.utc(int.parse(_year), int.parse(_month));
-                        }
-                        return AlertDialog(
-                          title: const Text('Expiration date'),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: Text(
-                                  'Cancel',
-                                  style: TextStyle(
-                                      color: lightContentSecondaryColor),
-                                )),
-                            TextButton(
-                                onPressed: () {
-                                  String _month =
-                                      _selectedDate.month.toString();
-                                  String _year = _selectedDate.year.toString();
-                                  if (_month.length == 1) _month = '0' + _month;
-                                  setState(() {
-                                    _exp = _month + '/' + _year;
-                                    _expController.text = _exp;
-                                  });
-                                  Navigator.pop(ctx);
-                                },
-                                child: Text(
-                                  'Confirm',
-                                  style: TextStyle(
-                                      color: lightContentSecondaryColor),
-                                ))
-                          ],
-                          content: StatefulBuilder(
-                            builder: (ctx, setState) {
-                              return MonthPicker.single(
-                                selectedDate: _selectedDate,
-                                firstDate: DateTime.utc(-4294967296),
-                                lastDate: DateTime.utc(4294967296),
-                                onChanged: (date) {
-                                  setState(() => _selectedDate = date);
-                                },
-                                datePickerStyles: DatePickerStyles(
-                                    currentDateStyle: TextStyle(
-                                        color: lightContentSecondaryColor),
-                                    selectedDateStyle: TextStyle(
-                                        color: lightContentSecondaryColor)),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    )),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-              controller: _cvvController,
-              decoration: const InputDecoration(labelText: 'CVV'),
-              onChanged: (value) => setState(() => _cvv = value),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ),
-          ),
-          Padding(
-            padding: entryPadding,
-            child: getThreeWidgetButton(
-              left: const Icon(Icons.add_rounded),
-              center: const Text('Add custom field'),
-              onPressed: () => Navigator.pushNamed(
-                context,
-                EditCustomFieldScreen.routeName,
-              ).then(
-                (value) {
-                  if (value != null) {
-                    setState(() => _customFields.add(value as CustomField));
-                  }
-                },
-              ),
-            ),
-          ),
+          )),
           buildCustomFields(_customFields),
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              controller: TextEditingController(text: _additionalInfo),
-              decoration: InputDecoration(
-                labelText: 'Additional info',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28.0),
-                  borderSide: BorderSide(color: lightContentColor),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28.0),
-                  borderSide: BorderSide(color: darkContentSecondaryColor),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28.0),
-                  borderSide: BorderSide(color: lightContentColor),
-                ),
+          PassyTextFormField(
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            controller: TextEditingController(text: _additionalInfo),
+            decoration: InputDecoration(
+              labelText: 'Additional info',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28.0),
+                borderSide: BorderSide(color: lightContentColor),
               ),
-              onChanged: (value) => _additionalInfo = value,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28.0),
+                borderSide: BorderSide(color: darkContentSecondaryColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28.0),
+                borderSide: BorderSide(color: lightContentColor),
+              ),
             ),
+            onChanged: (value) => _additionalInfo = value,
           ),
         ],
       ),

@@ -4,7 +4,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/screens/edit_note_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
-import 'package:passy/screens/theme.dart';
+import 'package:passy/common/theme.dart';
 
 import 'common.dart';
 import 'main_screen.dart';
@@ -55,35 +55,23 @@ class _NoteScreen extends State<NoteScreen> {
         });
   }
 
+  void _onEditPressed(Note note) {
+    Navigator.pushNamed(
+      context,
+      EditNoteScreen.routeName,
+      arguments: note,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Note _note = ModalRoute.of(context)!.settings.arguments as Note;
     return Scaffold(
-      appBar: AppBar(
-        leading: getBackButton(
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
-            icon: const Icon(Icons.delete_outline_rounded),
-            onPressed: () => _onRemovePressed(_note),
-          ),
-          IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
-            icon: const Icon(Icons.edit_rounded),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                EditNoteScreen.routeName,
-                arguments: _note,
-              );
-            },
-          ),
-        ],
+      appBar: getEntryScreenAppBar(
+        context,
         title: const Center(child: Text('Note')),
+        onRemovePressed: () => _onRemovePressed(_note),
+        onEditPressed: () => _onEditPressed(_note),
       ),
       body: ListView(children: [
         if (_note.title != '') buildRecord(context, 'Title', _note.title),

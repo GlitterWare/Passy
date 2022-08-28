@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:passy/widgets/widgets.dart';
 
-import 'theme.dart';
 import 'common.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -40,19 +40,16 @@ class _SearchScreen extends State<SearchScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: entryPadding,
-            child: TextFormField(
-                decoration: const InputDecoration(
-                  label: Text('Search'),
-                  hintText: 'github human@example.com',
-                ),
-                onChanged: (s) {
-                  setState(() {
-                    _widgets = _builder(s);
-                  });
-                }),
-          ),
+          PassyPadding(TextFormField(
+              decoration: const InputDecoration(
+                label: Text('Search'),
+                hintText: 'github human@example.com',
+              ),
+              onChanged: (s) {
+                setState(() {
+                  _widgets = _builder(s);
+                });
+              })),
           Expanded(
             child: ListView.builder(
               itemCount: _widgets.length,

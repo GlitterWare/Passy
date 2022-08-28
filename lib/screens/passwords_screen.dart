@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';
-import 'theme.dart';
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
 import 'search_screen.dart';
@@ -64,13 +64,10 @@ class _PasswordsScreen extends State<PasswordsScreen> {
       List<Widget> _widgets = [];
       for (Password _password in _found) {
         _widgets.add(
-          Padding(
-            padding: entryPadding,
-            child: buildPasswordWidget(
-              context: context,
-              password: _password,
-            ),
-          ),
+          PassyPadding(buildPasswordWidget(
+            context: context,
+            password: _password,
+          )),
         );
       }
       return _widgets;

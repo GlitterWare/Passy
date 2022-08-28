@@ -6,6 +6,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';
 import 'edit_custom_field_screen.dart';
@@ -13,7 +14,7 @@ import 'password_screen.dart';
 import 'splash_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
-import 'theme.dart';
+import '../common/theme.dart';
 
 class EditPasswordScreen extends StatefulWidget {
   const EditPasswordScreen({Key? key}) : super(key: key);
@@ -116,163 +117,127 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _nickname),
-            decoration: const InputDecoration(
-              labelText: 'Nickname',
+        PassyTextFormField(
+          controller: TextEditingController(text: _nickname),
+          decoration: const InputDecoration(
+            labelText: 'Nickname',
+          ),
+          onChanged: (value) => _nickname = value.trim(),
+        ),
+        PassyTextFormField(
+          controller: TextEditingController(text: _username),
+          decoration: const InputDecoration(labelText: 'Username'),
+          onChanged: (value) => _username = value.trim(),
+        ),
+        PassyTextFormField(
+          controller: TextEditingController(text: _email),
+          decoration: const InputDecoration(labelText: 'Email'),
+          onChanged: (value) => _email = value.trim(),
+        ),
+        PassyTextFormField(
+          controller: TextEditingController(text: _password),
+          decoration: const InputDecoration(labelText: 'Password'),
+          onChanged: (value) => _password = value,
+        ),
+        PassyTextFormField(
+          controller:
+              TextEditingController(text: _tfaSecret.replaceFirst('=', '')),
+          decoration: const InputDecoration(labelText: '2FA secret'),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[a-z]|[A-Z]|[2-7]')),
+            TextInputFormatter.withFunction((oldValue, newValue) =>
+                TextEditingValue(
+                    text: newValue.text.toUpperCase(),
+                    selection: newValue.selection)),
+          ],
+          onChanged: (value) {
+            if (value.length.isOdd) value += '=';
+            _tfaSecret = value;
+          },
+        ),
+        PassyTextFormField(
+          controller: TextEditingController(text: _tfaLength.toString()),
+          decoration: const InputDecoration(labelText: '2FA length'),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) => _tfaLength = int.parse(value),
+        ),
+        PassyTextFormField(
+          controller: TextEditingController(text: _tfaInterval.toString()),
+          decoration: const InputDecoration(labelText: '2FA interval'),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) => _tfaInterval = int.parse(value),
+        ),
+        PassyPadding(DropdownButtonFormField(
+          items: [
+            DropdownMenuItem(
+              child: Text(Algorithm.SHA1.name),
+              value: Algorithm.SHA1,
             ),
-            onChanged: (value) => _nickname = value.trim(),
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _username),
-            decoration: const InputDecoration(labelText: 'Username'),
-            onChanged: (value) => _username = value.trim(),
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _email),
-            decoration: const InputDecoration(labelText: 'Email'),
-            onChanged: (value) => _email = value.trim(),
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _password),
-            decoration: const InputDecoration(labelText: 'Password'),
-            onChanged: (value) => _password = value,
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller:
-                TextEditingController(text: _tfaSecret.replaceFirst('=', '')),
-            decoration: const InputDecoration(labelText: '2FA secret'),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[a-z]|[A-Z]|[2-7]')),
-              TextInputFormatter.withFunction((oldValue, newValue) =>
-                  TextEditingValue(
-                      text: newValue.text.toUpperCase(),
-                      selection: newValue.selection)),
-            ],
-            onChanged: (value) {
-              if (value.length.isOdd) value += '=';
-              _tfaSecret = value;
-            },
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _tfaLength.toString()),
-            decoration: const InputDecoration(labelText: '2FA length'),
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onChanged: (value) => _tfaLength = int.parse(value),
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            controller: TextEditingController(text: _tfaInterval.toString()),
-            decoration: const InputDecoration(labelText: '2FA interval'),
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onChanged: (value) => _tfaInterval = int.parse(value),
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: DropdownButtonFormField(
-            items: [
-              DropdownMenuItem(
-                child: Text(Algorithm.SHA1.name),
-                value: Algorithm.SHA1,
-              ),
-              DropdownMenuItem(
-                child: Text(Algorithm.SHA256.name),
-                value: Algorithm.SHA256,
-              ),
-              DropdownMenuItem(
-                child: Text(Algorithm.SHA512.name),
-                value: Algorithm.SHA512,
-              ),
-            ],
-            value: _tfaAlgorithm,
-            decoration: const InputDecoration(labelText: '2FA algorithm'),
-            onChanged: (value) => _tfaAlgorithm = value as Algorithm,
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: DropdownButtonFormField(
-            items: const [
-              DropdownMenuItem(
-                child: Text('True (recommended)'),
-                value: true,
-              ),
-              DropdownMenuItem(
-                child: Text('False'),
-                value: false,
-              ),
-            ],
-            value: _tfaIsGoogle,
-            decoration: const InputDecoration(labelText: '2FA is Google'),
-            onChanged: (value) => _tfaIsGoogle = value as bool,
-          ),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-              controller: TextEditingController(text: _website),
-              decoration: const InputDecoration(labelText: 'Website'),
-              onChanged: (value) => _website = value),
-        ),
-        Padding(
-          padding: entryPadding,
-          child: getThreeWidgetButton(
-            left: const Icon(Icons.add_rounded),
-            center: const Text('Add custom field'),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              EditCustomFieldScreen.routeName,
-            ).then((value) {
-              if (value != null) {
-                setState(() => _customFields.add(value as CustomField));
-              }
-            }),
-          ),
-        ),
+            DropdownMenuItem(
+              child: Text(Algorithm.SHA256.name),
+              value: Algorithm.SHA256,
+            ),
+            DropdownMenuItem(
+              child: Text(Algorithm.SHA512.name),
+              value: Algorithm.SHA512,
+            ),
+          ],
+          value: _tfaAlgorithm,
+          decoration: const InputDecoration(labelText: '2FA algorithm'),
+          onChanged: (value) => _tfaAlgorithm = value as Algorithm,
+        )),
+        PassyPadding(DropdownButtonFormField(
+          items: const [
+            DropdownMenuItem(
+              child: Text('True (recommended)'),
+              value: true,
+            ),
+            DropdownMenuItem(
+              child: Text('False'),
+              value: false,
+            ),
+          ],
+          value: _tfaIsGoogle,
+          decoration: const InputDecoration(labelText: '2FA is Google'),
+          onChanged: (value) => _tfaIsGoogle = value as bool,
+        )),
+        PassyTextFormField(
+            controller: TextEditingController(text: _website),
+            decoration: const InputDecoration(labelText: 'Website'),
+            onChanged: (value) => _website = value),
+        PassyPadding(getThreeWidgetButton(
+          left: const Icon(Icons.add_rounded),
+          center: const Text('Add custom field'),
+          onPressed: () => Navigator.pushNamed(
+            context,
+            EditCustomFieldScreen.routeName,
+          ).then((value) {
+            if (value != null) {
+              setState(() => _customFields.add(value as CustomField));
+            }
+          }),
+        )),
         buildCustomFields(_customFields),
-        Padding(
-          padding: entryPadding,
-          child: TextFormField(
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            controller: TextEditingController(text: _additionalInfo),
-            decoration: InputDecoration(
-              labelText: 'Additional info',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: lightContentColor),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: darkContentSecondaryColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: lightContentColor),
-              ),
+        PassyTextFormField(
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          controller: TextEditingController(text: _additionalInfo),
+          decoration: InputDecoration(
+            labelText: 'Additional info',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28.0),
+              borderSide: BorderSide(color: lightContentColor),
             ),
-            onChanged: (value) => _additionalInfo = value,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28.0),
+              borderSide: BorderSide(color: darkContentSecondaryColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28.0),
+              borderSide: BorderSide(color: lightContentColor),
+            ),
           ),
+          onChanged: (value) => _additionalInfo = value,
         ),
       ]),
     );
