@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
+import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
-import 'package:passy/screens/edit_id_card_screen.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 
+import 'edit_id_card_screen.dart';
 import 'common.dart';
+import 'id_cards_screen.dart';
+import 'main_screen.dart';
 
 class IDCardScreen extends StatefulWidget {
   const IDCardScreen({Key? key}) : super(key: key);
@@ -15,13 +20,48 @@ class IDCardScreen extends StatefulWidget {
 }
 
 class _IDCardScreen extends State<IDCardScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
+
   @override
   Widget build(BuildContext context) {
     final IDCard _idCard = ModalRoute.of(context)!.settings.arguments as IDCard;
 
-    void _onRemovePressed(IDCard _idCard) {}
+    void _onRemovePressed() {
+      showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              shape: dialogShape,
+              title: const Text('Remove password'),
+              content:
+                  const Text('Passwords can only be restored from a backup.'),
+              actions: [
+                TextButton(
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: lightContentSecondaryColor),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                TextButton(
+                  child: Text(
+                    'Remove',
+                    style: TextStyle(color: lightContentSecondaryColor),
+                  ),
+                  onPressed: () {
+                    _account.removeIDCard(_idCard.key);
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    _account.save().whenComplete(() =>
+                        Navigator.pushNamed(context, IDCardsScreen.routeName));
+                  },
+                )
+              ],
+            );
+          });
+    }
 
-    void _onEditPressed(IDCard _idCard) {
+    void _onEditPressed() {
       Navigator.pushNamed(
         context,
         EditIDCardScreen.routeName,
@@ -33,8 +73,8 @@ class _IDCardScreen extends State<IDCardScreen> {
       appBar: getEntryScreenAppBar(
         context,
         title: const Center(child: Text('ID Card')),
-        onRemovePressed: () => _onRemovePressed(_idCard),
-        onEditPressed: () => _onEditPressed(_idCard),
+        onRemovePressed: () => _onRemovePressed(),
+        onEditPressed: () => _onEditPressed(),
       ),
       body: ListView(
         children: [
