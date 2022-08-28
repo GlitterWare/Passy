@@ -26,5 +26,5 @@ echo ''
 echo 'INFO:Finished building version '$version
 echo 'Results:'
 echo '- Android Apk - ./build/app/outputs/flutter-apk/app-release.apk'
-echo '- Linux Bundle - ./build/linux/release/bundle'
-echo '- Linux AppImage - ./build/appimage/Passy-v'$version'-x86_64.AppImage'
+echo '- Linux x86_64 Bundle - ./build/linux/x64/release/bundle'
+echo '- Linux x86_64 AppImage - ./build/appimage/Passy-v'$version'-x86_64.AppImage'
