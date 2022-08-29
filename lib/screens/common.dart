@@ -13,6 +13,7 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+import 'package:passy/widgets/custom_field_editor.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import 'assets.dart';
@@ -555,66 +556,20 @@ Widget buildRecord(BuildContext context, String title, String value,
       onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
     ));
 
-Widget buildCustomFields(List<CustomField> customFields) => StatefulBuilder(
-    builder: (ctx, setState) => ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            CustomField _customField = customFields[index];
-            TextEditingController _controller =
-                TextEditingController(text: _customField.value);
-            bool _isDate = _customField.fieldType == FieldType.date;
-            DateTime? _date;
-            if (_isDate) {
-              if (_customField.value == '') {
-                _date = DateTime.now();
-              } else {
-                List<String> _dateSplit = _customField.value.split('/');
-                _date = DateTime(
-                  int.parse(_dateSplit[2]),
-                  int.parse(_dateSplit[1]),
-                  int.parse(_dateSplit[0]),
+Widget buildCustomFieldEditors(List<CustomField> customFields) =>
+    StatefulBuilder(
+        builder: (ctx, setState) => ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                CustomField _customField = customFields[index];
+                return CustomFieldEditor(
+                  customField: _customField,
+                  onChanged: (value) =>
+                      setState(() => _customField.value = value),
+                  onRemovePressed: () =>
+                      setState(() => customFields.removeAt(index)),
                 );
-              }
-            }
-            return getTextFormFieldButtoned(
-              controller: _controller,
-              focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
-              labelText: _customField.title,
-              buttonIcon: const Icon(Icons.remove_rounded),
-              onChanged: (value) => _customField.value = value,
-              onTap: _isDate
-                  ? () => showDatePicker(
-                        context: context,
-                        initialDate:
-                            _customField.value == '' ? DateTime.now() : _date!,
-                        firstDate: DateTime.utc(0, 04, 20),
-                        lastDate: DateTime.utc(275760, 09, 13),
-                        builder: (context, widget) => Theme(
-                          data: ThemeData(
-                            colorScheme: ColorScheme.dark(
-                              primary: lightContentSecondaryColor,
-                              onPrimary: lightContentColor,
-                            ),
-                          ),
-                          child: widget!,
-                        ),
-                      ).then((value) {
-                        if (value == null) return;
-                        setState(() => _customField.value =
-                            value.day.toString() +
-                                '/' +
-                                value.month.toString() +
-                                '/' +
-                                value.year.toString());
-                      })
-                  : null,
-              onPressed: () => setState(() => customFields.removeAt(index)),
-              inputFormatters: [
-                if (_customField.fieldType == FieldType.number)
-                  FilteringTextInputFormatter.digitsOnly,
-              ],
-            );
-          },
-          itemCount: customFields.length,
-        ));
+              },
+              itemCount: customFields.length,
+            ));

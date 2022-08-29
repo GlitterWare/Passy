@@ -141,7 +141,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
             }
           }),
         )),
-        buildCustomFields(_customFields),
+        buildCustomFieldEditors(_customFields),
         PassyTextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
