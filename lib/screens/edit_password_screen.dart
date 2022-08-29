@@ -217,7 +217,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             }
           }),
         )),
-        buildCustomFieldEditors(_customFields),
+        buildCustomFieldEditors(customFields: _customFields),
         PassyTextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,

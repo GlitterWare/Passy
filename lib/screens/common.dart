@@ -283,6 +283,12 @@ Widget buildMonthPicker(
           }));
 }
 
+void sortCustomFields(List<CustomField> customFields) {
+  customFields.sort(
+    (a, b) => a.title.compareTo(b.title),
+  );
+}
+
 void sortPasswords(List<Password> passwords) {
   passwords.sort((a, b) {
     int _nickComp = a.nickname.compareTo(b.nickname);
@@ -556,20 +562,25 @@ Widget buildRecord(BuildContext context, String title, String value,
       onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
     ));
 
-Widget buildCustomFieldEditors(List<CustomField> customFields) =>
-    StatefulBuilder(
-        builder: (ctx, setState) => ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                CustomField _customField = customFields[index];
-                return CustomFieldEditor(
-                  customField: _customField,
-                  onChanged: (value) =>
-                      setState(() => _customField.value = value),
-                  onRemovePressed: () =>
-                      setState(() => customFields.removeAt(index)),
-                );
-              },
-              itemCount: customFields.length,
-            ));
+Widget buildCustomFieldEditors({
+  required List<CustomField> customFields,
+  bool shouldSort = true,
+}) {
+  if (shouldSort) sortCustomFields(customFields);
+  return StatefulBuilder(
+      builder: (ctx, setState) => ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              CustomField _customField = customFields[index];
+              return CustomFieldEditor(
+                customField: _customField,
+                onChanged: (value) =>
+                    setState(() => _customField.value = value),
+                onRemovePressed: () =>
+                    setState(() => customFields.removeAt(index)),
+              );
+            },
+            itemCount: customFields.length,
+          ));
+}
