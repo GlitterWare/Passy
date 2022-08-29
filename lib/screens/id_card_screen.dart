@@ -87,9 +87,7 @@ class _IDCardScreen extends State<IDCardScreen> {
           if (_idCard.country != '')
             buildRecord(context, 'Country', _idCard.country),
           for (CustomField _customField in _idCard.customFields)
-            buildRecord(context, _customField.title, _customField.value,
-                obscureValue: _customField.obscured,
-                isPassword: _customField.fieldType == FieldType.password),
+            buildCustomField(context, _customField),
           if (_idCard.additionalInfo != '')
             buildRecord(context, 'Additional info', _idCard.additionalInfo),
         ],

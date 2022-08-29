@@ -92,10 +92,8 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           buildRecord(context, 'Expiration date', _paymentCard.exp),
         if (_paymentCard.cvv != '')
           buildRecord(context, 'CVV', _paymentCard.cvv),
-        for (CustomField customField in _paymentCard.customFields)
-          buildRecord(context, customField.title, customField.value,
-              obscureValue: customField.obscured,
-              isPassword: customField.fieldType == FieldType.password),
+        for (CustomField _customField in _paymentCard.customFields)
+          buildCustomField(context, _customField),
         if (_paymentCard.additionalInfo != '')
           buildRecord(context, 'Additional info', _paymentCard.additionalInfo),
       ]),

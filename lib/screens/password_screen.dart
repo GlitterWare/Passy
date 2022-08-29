@@ -172,9 +172,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   child: getFavIcon(_password.website, width: 35)),
             ]),
           for (CustomField _customField in _password.customFields)
-            buildRecord(context, _customField.title, _customField.value,
-                obscureValue: _customField.obscured,
-                isPassword: _customField.fieldType == FieldType.password),
+            buildCustomField(context, _customField),
           if (_password.additionalInfo != '')
             buildRecord(context, 'Additional info', _password.additionalInfo),
         ],

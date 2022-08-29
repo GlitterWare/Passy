@@ -562,6 +562,11 @@ Widget buildRecord(BuildContext context, String title, String value,
       onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
     ));
 
+Widget buildCustomField(BuildContext context, CustomField customField) =>
+    buildRecord(context, customField.title, customField.value,
+        obscureValue: customField.obscured,
+        isPassword: customField.fieldType == FieldType.password);
+
 Widget buildCustomFieldEditors({
   required List<CustomField> customFields,
   bool shouldSort = true,
