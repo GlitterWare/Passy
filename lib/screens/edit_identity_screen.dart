@@ -8,7 +8,6 @@ import 'package:passy/screens/edit_custom_field_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/widgets/enum_dropdown_button_form_field.dart';
-import 'package:passy/widgets/passy_text_form_field.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';
