@@ -1,19 +1,26 @@
 #! /bin/bash
 
+user_interrupt(){
+  exit
+}
+
+trap user_interrupt SIGINT
+trap user_interrupt SIGTSTP
+
 export file='pubspec.yaml'
 export version=''
 
 while read -r line; do
-    if [[ $line == *'version: '* ]]; then
-        export version=${line:9:${#line}}
-        break
-    fi
+  if [[ $line == *'version: '* ]]; then
+    export version=${line:9:${#line}}
+    break
+  fi
 done <$file 
 
 if [[ ${#version} == 0 ]]; then
-    read -p "? Could not detect version. Enter version manually [Eg: 1.0.0]: " appVersion
+  read -p "? Could not detect version. Enter version manually [Eg: 1.0.0]: " appVersion
 else
-    echo 'INFO:Version detected:'$version
+  echo 'INFO:Version detected:'$version
 fi
 
 echo 'INFO:Building APK'
