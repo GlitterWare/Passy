@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/screens/id_cards_screen.dart';
+import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/widgets/widgets.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -173,6 +174,13 @@ class _MainScreen extends State<MainScreen>
             center: const Text('ID Cards'),
             onPressed: () =>
                 Navigator.pushNamed(context, IDCardsScreen.routeName),
+          )),
+          PassyPadding(getThreeWidgetButton(
+            left: const Icon(Icons.people_outline_rounded),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            center: const Text('Identities'),
+            onPressed: () =>
+                Navigator.pushNamed(context, IdentitiesScreen.routeName),
           )),
         ],
       ),

@@ -84,12 +84,12 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
           )),
           if (!data.loadedAccount!.bioAuthEnabled)
             PassyPadding(TextFormField(
-              controller: TextEditingController(text: _password),
+              initialValue: _password,
               obscureText: true,
               decoration: const InputDecoration(
                 labelText: 'Account password',
               ),
-              onChanged: (value) => _password = value,
+              onChanged: (value) => setState(() => _password = value),
             )),
         ],
       ),

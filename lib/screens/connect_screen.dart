@@ -4,18 +4,26 @@ import 'package:passy/passy_data/loaded_account.dart';
 
 import 'main_screen.dart';
 import 'common.dart';
-import '../common/theme.dart';
+import 'package:passy/common/theme.dart';
 
-class ConnectScreen extends StatelessWidget {
+class ConnectScreen extends StatefulWidget {
   static const routeName = '${MainScreen.routeName}/connect';
 
   const ConnectScreen({Key? key}) : super(key: key);
 
   @override
+  State<StatefulWidget> createState() => _ConnectScreen();
+}
+
+class _ConnectScreen extends State<ConnectScreen> {
+  String _address = '';
+
+  _ConnectScreen();
+
+  @override
   Widget build(BuildContext context) {
     LoadedAccount _account =
         ModalRoute.of(context)!.settings.arguments as LoadedAccount;
-    String _address = '';
 
     return Scaffold(
       appBar: AppBar(
@@ -56,11 +64,11 @@ class ConnectScreen extends StatelessWidget {
                         top: entryPadding.top,
                         bottom: entryPadding.bottom),
                     child: TextFormField(
-                      controller: TextEditingController(),
+                      initialValue: _address,
                       decoration: const InputDecoration(
                         labelText: 'Host address',
                       ),
-                      onChanged: (s) => _address = s,
+                      onChanged: (s) => setState(() => _address = s),
                     ),
                   ),
                 ),

@@ -105,29 +105,29 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
       ),
       body: ListView(children: [
         PassyTextFormField(
-          controller: TextEditingController(text: _nickname),
+          initialValue: _nickname,
           decoration: const InputDecoration(labelText: 'Nickname'),
-          onChanged: (value) => _nickname = value.trim(),
+          onChanged: (value) => setState(() => _nickname = value.trim()),
         ),
         PassyTextFormField(
-          controller: TextEditingController(text: _type),
+          initialValue: _type,
           decoration: const InputDecoration(labelText: 'Type'),
-          onChanged: (value) => _type = value.trim(),
+          onChanged: (value) => setState(() => _type = value.trim()),
         ),
         PassyTextFormField(
-          controller: TextEditingController(text: _idNumber),
+          initialValue: _idNumber,
           decoration: const InputDecoration(labelText: 'ID number'),
-          onChanged: (value) => _idNumber = value.trim(),
+          onChanged: (value) => setState(() => _idNumber = value.trim()),
         ),
         PassyTextFormField(
-          controller: TextEditingController(text: _name),
+          initialValue: _name,
           decoration: const InputDecoration(labelText: 'Name'),
-          onChanged: (value) => _name = value.trim(),
+          onChanged: (value) => setState(() => _name = value.trim()),
         ),
         PassyTextFormField(
-          controller: TextEditingController(text: _country),
+          initialValue: _country,
           decoration: const InputDecoration(labelText: 'Country'),
-          onChanged: (value) => _country = value.trim(),
+          onChanged: (value) => setState(() => _country = value.trim()),
         ),
         PassyPadding(getThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
@@ -145,7 +145,6 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
         PassyTextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
-          controller: TextEditingController(text: _additionalInfo),
           decoration: InputDecoration(
             labelText: 'Additional info',
             border: OutlineInputBorder(
@@ -161,7 +160,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
               borderSide: BorderSide(color: lightContentColor),
             ),
           ),
-          onChanged: (value) => _additionalInfo = value,
+          onChanged: (value) => setState(() => _additionalInfo = value),
         ),
       ]),
     );

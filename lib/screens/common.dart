@@ -8,12 +8,14 @@ import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:passy/widgets/custom_field_editor.dart';
+import 'package:passy/widgets/passy_identity.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import 'assets.dart';
@@ -72,6 +74,7 @@ Widget getDoubleActionButton({
 Widget getTextFormFieldButtoned({
   Key? key,
   TextEditingController? controller,
+  String? initialValue,
   String? labelText,
   bool obscureText = false,
   Widget? buttonIcon,
@@ -92,6 +95,7 @@ Widget getTextFormFieldButtoned({
                 bottom: entryPadding.bottom),
             child: TextFormField(
               controller: controller,
+              initialValue: initialValue,
               obscureText: obscureText,
               decoration: InputDecoration(labelText: labelText),
               onTap: onTap,
@@ -229,12 +233,14 @@ AppBar getEditScreenAppBar(
 Widget buildMonthPicker(
   BuildContext context, {
   TextEditingController? controller,
+  String? initialValue,
   Widget? title,
   DateTime Function()? getSelectedDate,
   Function(DateTime)? onChanged,
 }) {
   return TextFormField(
       controller: controller,
+      initialValue: initialValue,
       decoration: const InputDecoration(labelText: 'Expiration date'),
       focusNode: AlwaysDisabledFocusNode(),
       onTap: () => showDialog(
@@ -317,6 +323,16 @@ void sortIDCards(List<IDCard> idCards) {
     int _nickComp = a.nickname.compareTo(b.nickname);
     if (_nickComp == 0) {
       return a.name.compareTo(b.name);
+    }
+    return _nickComp;
+  });
+}
+
+void sortIdentities(List<Identity> identities) {
+  identities.sort((a, b) {
+    int _nickComp = a.nickname.compareTo(b.nickname);
+    if (_nickComp == 0) {
+      return a.firstAddressLine.compareTo(b.firstAddressLine);
     }
     return _nickComp;
   });
@@ -515,14 +531,10 @@ Widget buildNoteWidget({required BuildContext context, required Note note}) {
 
 List<Widget> buildNoteWidgets({
   required BuildContext context,
-  required LoadedAccount account,
-  List<Note>? notes,
+  required List<Note> notes,
 }) {
   final List<Widget> _noteWidgets = [];
-  if (notes == null) {
-    notes = account.notes.toList();
-    (notes);
-  }
+  sortNotes(notes);
   for (Note note in notes) {
     _noteWidgets.add(
       PassyPadding(buildNoteWidget(
@@ -532,6 +544,18 @@ List<Widget> buildNoteWidgets({
     );
   }
   return _noteWidgets;
+}
+
+List<Widget> buildIdentityWidgets({
+  required BuildContext context,
+  required List<Identity> identities,
+}) {
+  final List<Widget> _identityWidgets = [];
+  sortIdentities(identities);
+  for (Identity identity in identities) {
+    _identityWidgets.add(PassyPadding(PassyIdentity(identity: identity)));
+  }
+  return _identityWidgets;
 }
 
 Widget buildRecord(BuildContext context, String title, String value,

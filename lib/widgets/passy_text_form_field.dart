@@ -5,6 +5,7 @@ import 'passy_padding.dart';
 
 class PassyTextFormField extends StatelessWidget {
   final TextEditingController? _controller;
+  final String? _initialValue;
   final TextInputType? _keyboardType;
   final int? _maxLines;
   final InputDecoration? _decoration;
@@ -14,12 +15,14 @@ class PassyTextFormField extends StatelessWidget {
   const PassyTextFormField({
     Key? key,
     TextEditingController? controller,
+    String? initialValue,
     TextInputType? keyboardType,
     int? maxLines = 1,
     InputDecoration? decoration = const InputDecoration(),
     List<TextInputFormatter>? inputFormatters,
     void Function(String)? onChanged,
   })  : _controller = controller,
+        _initialValue = initialValue,
         _keyboardType = keyboardType,
         _maxLines = maxLines,
         _decoration = decoration,
@@ -31,6 +34,7 @@ class PassyTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return PassyPadding(TextFormField(
       controller: _controller,
+      initialValue: _initialValue,
       keyboardType: _keyboardType,
       maxLines: _maxLines,
       decoration: _decoration,

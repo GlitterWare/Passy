@@ -193,9 +193,9 @@ class _LoginScreen extends State<LoginScreen> {
                               children: [
                                 Expanded(
                                   child: TextField(
-                                    controller: TextEditingController(),
                                     obscureText: true,
-                                    onChanged: (a) => _password = a,
+                                    onChanged: (a) =>
+                                        setState(() => _password = a),
                                     decoration: const InputDecoration(
                                       hintText: 'Password',
                                     ),

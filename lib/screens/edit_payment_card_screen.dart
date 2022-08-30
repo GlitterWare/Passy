@@ -37,13 +37,6 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
   String _cvv = '';
   String _exp = '';
 
-  final TextEditingController _nicknameController = TextEditingController();
-  final TextEditingController _cardNumberController = TextEditingController();
-  final TextEditingController _cardHolderNameController =
-      TextEditingController();
-  final TextEditingController _cvvController = TextEditingController();
-  final TextEditingController _expController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -55,7 +48,6 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
         _month = '0' + _month;
       }
       _exp = _month + '/' + _year;
-      _expController.text = _exp;
     }
   }
 
@@ -80,12 +72,6 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
         _cardholderName = _paymentCardArgs.cardholderName;
         _cvv = _paymentCardArgs.cvv;
         _exp = _paymentCardArgs.exp;
-
-        _nicknameController.text = _nickname;
-        _cardNumberController.text = _cardNumber;
-        _cardHolderNameController.text = _cardholderName;
-        _cvvController.text = _cvv;
-        _expController.text = _exp;
       }
       _isLoaded = true;
     }
@@ -135,24 +121,24 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             isSwipeGestureEnabled: false,
           ),
           PassyTextFormField(
-            controller: _nicknameController,
+            initialValue: _nickname,
             decoration: const InputDecoration(labelText: 'Nickname'),
             onChanged: (value) => setState(() => _nickname = value.trim()),
           ),
           PassyTextFormField(
-            controller: _cardNumberController,
+            initialValue: _cardNumber,
             decoration: const InputDecoration(labelText: 'Card number'),
             onChanged: (value) => setState(() => _cardNumber = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
           PassyTextFormField(
-            controller: _cardHolderNameController,
+            initialValue: _cardholderName,
             decoration: const InputDecoration(labelText: 'Card holder name'),
             onChanged: (value) =>
                 setState(() => _cardholderName = value.trim()),
           ),
           PassyPadding(buildMonthPicker(context,
-              controller: _expController,
+              initialValue: _exp,
               title: const Text('Expiration date'), getSelectedDate: () {
             List<String> _date = _exp.split('/');
             String _month = _date[0];
@@ -167,11 +153,10 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             if (_month.length == 1) _month = '0' + _month;
             setState(() {
               _exp = _month + '/' + _year;
-              _expController.text = _exp;
             });
           })),
           PassyTextFormField(
-            controller: _cvvController,
+            initialValue: _cvv,
             decoration: const InputDecoration(labelText: 'CVV'),
             onChanged: (value) => setState(() => _cvv = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -194,7 +179,6 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
           PassyTextFormField(
             keyboardType: TextInputType.multiline,
             maxLines: null,
-            controller: TextEditingController(text: _additionalInfo),
             decoration: InputDecoration(
               labelText: 'Additional info',
               border: OutlineInputBorder(
@@ -210,7 +194,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
                 borderSide: BorderSide(color: lightContentColor),
               ),
             ),
-            onChanged: (value) => _additionalInfo = value,
+            onChanged: (value) => setState(() => _additionalInfo = value),
           ),
         ],
       ),

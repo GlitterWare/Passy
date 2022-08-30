@@ -127,7 +127,7 @@ class _PasswordScreen extends State<PasswordScreen> {
     return Scaffold(
       appBar: getEntryScreenAppBar(
         context,
-        title: Center(child: Text(_password.nickname)),
+        title: const Center(child: Text('Password')),
         onRemovePressed: () => _onRemovePressed(_password),
         onEditPressed: () => _onEditPressed(_password),
       ),

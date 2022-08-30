@@ -67,16 +67,14 @@ class _EditNoteScreen extends State<EditNoteScreen> {
       ),
       body: ListView(children: [
         PassyTextFormField(
-          controller: TextEditingController(text: _title),
-          decoration: const InputDecoration(
-            labelText: 'Title',
-          ),
-          onChanged: (value) => _title = value.trim(),
+          initialValue: _title,
+          decoration: const InputDecoration(labelText: 'Title'),
+          onChanged: (value) => setState(() => _title = value.trim()),
         ),
         PassyTextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
-          controller: TextEditingController(text: _note),
+          initialValue: _note,
           decoration: InputDecoration(
             labelText: 'Note',
             border: OutlineInputBorder(
@@ -92,7 +90,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
               borderSide: BorderSide(color: lightContentColor),
             ),
           ),
-          onChanged: (value) => _note = value,
+          onChanged: (value) => setState(() => _note = value),
         ),
       ]),
     );

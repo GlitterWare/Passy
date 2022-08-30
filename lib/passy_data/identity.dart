@@ -23,7 +23,7 @@ Title? titleFromName(String name) {
   return null;
 }
 
-enum Gender { male, female, other, error }
+enum Gender { male, female, other }
 
 Gender? genderFromName(String name) {
   switch (name) {
@@ -56,6 +56,7 @@ class Identity extends PassyEntry<Identity> {
   String country;
 
   Identity({
+    String? key,
     List<CustomField>? customFields,
     this.additionalInfo = '',
     List<String>? tags,
@@ -74,7 +75,7 @@ class Identity extends PassyEntry<Identity> {
     this.country = '',
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
-        super(DateTime.now().toUtc().toIso8601String());
+        super(key ?? DateTime.now().toUtc().toIso8601String());
 
   Identity.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)
@@ -146,7 +147,7 @@ class Identity extends PassyEntry<Identity> {
   @override
   List toCSV() => [
         key,
-        customFields.map((e) => e.toCSV()),
+        customFields.map((e) => e.toCSV()).toList(),
         additionalInfo,
         tags,
         nickname,

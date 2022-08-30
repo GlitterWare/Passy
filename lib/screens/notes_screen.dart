@@ -24,8 +24,8 @@ class _NotesScreen extends State<NotesScreen> {
   @override
   void initState() {
     super.initState();
-    List<Widget> _widgets =
-        buildNoteWidgets(context: context, account: data.loadedAccount!);
+    List<Widget> _widgets = buildNoteWidgets(
+        context: context, notes: data.loadedAccount!.notes.toList());
     _noteWidgets.addAll(_widgets);
   }
 

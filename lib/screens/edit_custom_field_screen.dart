@@ -26,9 +26,9 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
       ),
       body: ListView(children: [
         PassyTextFormField(
-          controller: TextEditingController(text: _customField.title),
+          initialValue: _customField.title,
           decoration: const InputDecoration(labelText: 'Title'),
-          onChanged: (value) => _customField.title = value,
+          onChanged: (value) => setState(() => _customField.title = value),
         ),
         PassyPadding(DropdownButtonFormField(
           items: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/screens/edit_note_screen.dart';
+import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 
 import 'screens/id_cards_screen.dart';
@@ -61,6 +62,7 @@ class Passy extends StatelessWidget {
             const EditPaymentCardScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
         IDCardsScreen.routeName: (context) => const IDCardsScreen(),
+        IdentitiesScreen.routeName: (context) => const IdentitiesScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         LogScreen.routeName: (context) => const LogScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),

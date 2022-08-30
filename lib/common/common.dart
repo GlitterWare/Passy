@@ -45,3 +45,10 @@ AlertDialog getRecordDialog(
   }
   return AlertDialog(shape: dialogShape, content: content);
 }
+
+String capitalize(String string) {
+  if (string.isEmpty) return '';
+  String _firstLetter = string[0].toUpperCase();
+  if (string.length == 1) return _firstLetter;
+  return '$_firstLetter${string.substring(1)}';
+}
