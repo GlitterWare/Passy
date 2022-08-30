@@ -3,7 +3,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/widgets/record_widget.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import '../common/theme.dart';

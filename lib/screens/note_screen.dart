@@ -5,7 +5,6 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/screens/edit_note_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/widgets/record_widget.dart';
 
 import '../widgets/widgets.dart';
 import 'common.dart';

@@ -6,8 +6,8 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
-import 'package:passy/widgets/enum_dropdown_button_form_field.dart';
 import 'package:passy/widgets/widgets.dart';
+import 'package:passy/common/theme.dart';
 
 import 'common.dart';
 import 'edit_custom_field_screen.dart';
@@ -15,7 +15,6 @@ import 'password_screen.dart';
 import 'splash_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
-import '../common/theme.dart';
 
 class EditPasswordScreen extends StatefulWidget {
   const EditPasswordScreen({Key? key}) : super(key: key);

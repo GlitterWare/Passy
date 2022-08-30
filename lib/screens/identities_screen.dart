@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/screens/edit_identity_screen.dart';
-import 'package:passy/widgets/identity_widget.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';

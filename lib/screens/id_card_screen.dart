@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/widgets/record_widget.dart';
+import 'package:passy/widgets/widgets.dart';
 
-import '../widgets/widgets.dart';
 import 'edit_id_card_screen.dart';
 import 'common.dart';
 import 'id_cards_screen.dart';

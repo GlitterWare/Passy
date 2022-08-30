@@ -14,48 +14,12 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/widgets/custom_field_editor.dart';
-import 'package:passy/widgets/identity_widget.dart';
-import 'package:passy/widgets/record_widget.dart';
 import 'package:passy/widgets/widgets.dart';
 import 'package:passy/common/theme.dart';
 
 import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
-
-Widget getDoubleActionButton({
-  Key? key,
-  required Widget body,
-  required Widget icon,
-  void Function()? onButtonPressed,
-  void Function()? onActionPressed,
-}) =>
-    ElevatedButton(
-      key: key,
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-      ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-      onPressed: onButtonPressed,
-      child: Row(
-        children: [
-          Flexible(
-            fit: FlexFit.tight,
-            child: body,
-          ),
-          IconButton(
-            onPressed: onActionPressed,
-            padding:
-                const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
-            icon: icon,
-            splashRadius: 27,
-          ),
-        ],
-      ),
-    );
 
 Widget getTextFormFieldButtoned({
   Key? key,

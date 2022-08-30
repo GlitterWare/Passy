@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/screens/common.dart';
+import 'package:passy/widgets/widgets.dart';
 
 class PassyRecord extends StatelessWidget {
   final String _title;
@@ -27,7 +27,7 @@ class PassyRecord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return getDoubleActionButton(
+    return DoubleActionButton(
       body: Column(
         children: [
           Text(

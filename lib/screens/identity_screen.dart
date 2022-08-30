@@ -6,7 +6,6 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/screens/edit_identity_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
-import 'package:passy/widgets/record_widget.dart';
 import '../widgets/widgets.dart';
 import 'common.dart';
 import 'main_screen.dart';
