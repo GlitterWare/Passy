@@ -4,7 +4,9 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/widgets/record_widget.dart';
 
+import '../widgets/widgets.dart';
 import 'edit_id_card_screen.dart';
 import 'common.dart';
 import 'id_cards_screen.dart';
@@ -79,17 +81,32 @@ class _IDCardScreen extends State<IDCardScreen> {
       body: ListView(
         children: [
           if (_idCard.nickname != '')
-            buildRecord(context, 'Nickname', _idCard.nickname),
-          if (_idCard.type != '') buildRecord(context, 'Type', _idCard.type),
+            PassyPadding(PassyRecord(
+              title: 'Nickname',
+              value: _idCard.nickname,
+            )),
+          if (_idCard.type != '')
+            PassyPadding(PassyRecord(
+              title: 'Type',
+              value: _idCard.type,
+            )),
           if (_idCard.idNumber != '')
-            buildRecord(context, 'ID Number', _idCard.idNumber),
-          if (_idCard.name != '') buildRecord(context, 'Name', _idCard.name),
+            PassyPadding(PassyRecord(
+              title: 'ID Number',
+              value: _idCard.idNumber,
+            )),
+          if (_idCard.name != '')
+            PassyPadding(PassyRecord(
+              title: 'Name',
+              value: _idCard.name,
+            )),
           if (_idCard.country != '')
-            buildRecord(context, 'Country', _idCard.country),
+            PassyPadding(PassyRecord(title: 'Country', value: _idCard.country)),
           for (CustomField _customField in _idCard.customFields)
             buildCustomField(context, _customField),
           if (_idCard.additionalInfo != '')
-            buildRecord(context, 'Additional info', _idCard.additionalInfo),
+            PassyPadding(PassyRecord(
+                title: 'Additional info', value: _idCard.additionalInfo)),
         ],
       ),
     );

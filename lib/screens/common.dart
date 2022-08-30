@@ -5,7 +5,6 @@ import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
-import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -15,7 +14,8 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:passy/widgets/custom_field_editor.dart';
-import 'package:passy/widgets/passy_identity.dart';
+import 'package:passy/widgets/identity_widget.dart';
+import 'package:passy/widgets/record_widget.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import 'assets.dart';
@@ -558,38 +558,13 @@ List<Widget> buildIdentityWidgets({
   return _identityWidgets;
 }
 
-Widget buildRecord(BuildContext context, String title, String value,
-        {bool obscureValue = false,
-        bool isPassword = false,
-        TextAlign valueAlign = TextAlign.center}) =>
-    PassyPadding(getDoubleActionButton(
-      body: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(color: lightContentSecondaryColor),
-          ),
-          FittedBox(
-            child: Text(
-              obscureValue ? '\u2022' * 6 : value,
-              textAlign: valueAlign,
-            ),
-          ),
-        ],
-      ),
-      icon: const Icon(Icons.copy),
-      onButtonPressed: () => showDialog(
-        context: context,
-        builder: (_) => getRecordDialog(
-            value: value, highlightSpecial: isPassword, textAlign: valueAlign),
-      ),
-      onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
-    ));
-
 Widget buildCustomField(BuildContext context, CustomField customField) =>
-    buildRecord(context, customField.title, customField.value,
-        obscureValue: customField.obscured,
-        isPassword: customField.fieldType == FieldType.password);
+    PassyPadding(PassyRecord(
+      title: customField.title,
+      value: customField.value,
+      obscureValue: customField.obscured,
+      isPassword: customField.fieldType == FieldType.password,
+    ));
 
 Widget buildCustomFieldEditors({
   required List<CustomField> customFields,

@@ -8,6 +8,8 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
+import 'package:passy/widgets/record_widget.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import '../common/theme.dart';
 import 'edit_password_screen.dart';
@@ -134,19 +136,24 @@ class _PasswordScreen extends State<PasswordScreen> {
       body: ListView(
         children: [
           if (_password.nickname != '')
-            buildRecord(context, 'Nickname', _password.nickname),
+            PassyPadding(PassyRecord(
+              title: 'Nickname',
+              value: _password.nickname,
+            )),
           if (_password.username != '')
-            buildRecord(context, 'Username', _password.username),
+            PassyPadding(PassyRecord(
+              title: 'Username',
+              value: _password.username,
+            )),
           if (_password.email != '')
-            buildRecord(context, 'Email', _password.email),
+            PassyPadding(PassyRecord(title: 'Email', value: _password.email)),
           if (_password.password != '')
-            buildRecord(
-              context,
-              'Password',
-              _password.password,
+            PassyPadding(PassyRecord(
+              title: 'Password',
+              value: _password.password,
               obscureValue: true,
               isPassword: true,
-            ),
+            )),
           if (_password.tfa != null)
             Row(
               children: [
@@ -160,13 +167,19 @@ class _PasswordScreen extends State<PasswordScreen> {
                   ),
                 ),
                 Flexible(
-                  child: buildRecord(context, '2FA code', _tfaCode),
+                  child: PassyPadding(PassyRecord(
+                    title: '2FA code',
+                    value: _tfaCode,
+                  )),
                 ),
               ],
             ),
           if (_password.website != '')
             Stack(children: [
-              buildRecord(context, 'Website', _password.website),
+              PassyPadding(PassyRecord(
+                title: 'Website',
+                value: _password.website,
+              )),
               Padding(
                   padding: const EdgeInsets.fromLTRB(23, 18, 0, 0),
                   child: getFavIcon(_password.website, width: 35)),
@@ -174,7 +187,8 @@ class _PasswordScreen extends State<PasswordScreen> {
           for (CustomField _customField in _password.customFields)
             buildCustomField(context, _customField),
           if (_password.additionalInfo != '')
-            buildRecord(context, 'Additional info', _password.additionalInfo),
+            PassyPadding(PassyRecord(
+                title: 'Additional info', value: _password.additionalInfo)),
         ],
       ),
     );

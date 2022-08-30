@@ -5,7 +5,9 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/screens/edit_note_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/common/theme.dart';
+import 'package:passy/widgets/record_widget.dart';
 
+import '../widgets/widgets.dart';
 import 'common.dart';
 import 'main_screen.dart';
 
@@ -74,9 +76,14 @@ class _NoteScreen extends State<NoteScreen> {
         onEditPressed: () => _onEditPressed(_note),
       ),
       body: ListView(children: [
-        if (_note.title != '') buildRecord(context, 'Title', _note.title),
+        if (_note.title != '')
+          PassyPadding(PassyRecord(title: 'Title', value: _note.title)),
         if (_note.note != '')
-          buildRecord(context, 'Note', _note.note, valueAlign: TextAlign.left),
+          PassyPadding(PassyRecord(
+            title: 'Note',
+            value: _note.note,
+            valueAlign: TextAlign.left,
+          )),
       ]),
     );
   }

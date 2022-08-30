@@ -6,6 +6,8 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/screens/edit_identity_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
+import 'package:passy/widgets/record_widget.dart';
+import '../widgets/widgets.dart';
 import 'common.dart';
 import 'main_screen.dart';
 
@@ -80,35 +82,69 @@ class _IdentityScreen extends State<IdentityScreen> {
       body: ListView(
         children: [
           if (_identity.nickname != '')
-            buildRecord(context, 'Nickname', _identity.nickname),
-          buildRecord(context, 'Title', capitalize(_identity.title.name)),
+            PassyPadding(PassyRecord(
+              title: 'Nickname',
+              value: _identity.nickname,
+            )),
+          PassyPadding(PassyRecord(
+              title: 'Title', value: capitalize(_identity.title.name))),
           if (_identity.firstName != '')
-            buildRecord(context, 'First name', _identity.firstName),
+            PassyPadding(PassyRecord(
+              title: 'First name',
+              value: _identity.firstName,
+            )),
           if (_identity.middleName != '')
-            buildRecord(context, 'Middle name', _identity.middleName),
+            PassyPadding(PassyRecord(
+              title: 'Middle name',
+              value: _identity.middleName,
+            )),
           if (_identity.lastName != '')
-            buildRecord(context, 'Last name', _identity.lastName),
-          buildRecord(context, 'Gender', capitalize(_identity.gender.name)),
+            PassyPadding(PassyRecord(
+              title: 'Last name',
+              value: _identity.lastName,
+            )),
+          PassyPadding(PassyRecord(
+            title: 'Gender',
+            value: capitalize(_identity.gender.name),
+          )),
           if (_identity.email != '')
-            buildRecord(context, 'Email', _identity.email),
+            PassyPadding(PassyRecord(
+              title: 'Email',
+              value: _identity.email,
+            )),
           if (_identity.number != '')
-            buildRecord(context, 'Number', _identity.number),
+            PassyPadding(PassyRecord(
+              title: 'Number',
+              value: _identity.number,
+            )),
           if (_identity.firstAddressLine != '')
-            buildRecord(
-                context, 'First address line', _identity.firstAddressLine),
+            PassyPadding(PassyRecord(
+                title: 'First address line',
+                value: _identity.firstAddressLine)),
           if (_identity.secondAddressLine != '')
-            buildRecord(
-                context, 'Second address line', _identity.secondAddressLine),
+            PassyPadding(PassyRecord(
+                title: 'Second address line',
+                value: _identity.secondAddressLine)),
           if (_identity.zipCode != '')
-            buildRecord(context, 'Zip code', _identity.zipCode),
+            PassyPadding(PassyRecord(
+              title: 'Zip code',
+              value: _identity.zipCode,
+            )),
           if (_identity.city != '')
-            buildRecord(context, 'City', _identity.city),
+            PassyPadding(PassyRecord(
+              title: 'City',
+              value: _identity.city,
+            )),
           if (_identity.country != '')
-            buildRecord(context, 'Country', _identity.country),
+            PassyPadding(PassyRecord(
+              title: 'Country',
+              value: _identity.country,
+            )),
           for (CustomField _customField in _identity.customFields)
             buildCustomField(context, _customField),
           if (_identity.additionalInfo != '')
-            buildRecord(context, 'Additional info', _identity.additionalInfo),
+            PassyPadding(PassyRecord(
+                title: 'Additional info', value: _identity.additionalInfo)),
         ],
       ),
     );
