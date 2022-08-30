@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+
 import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -12,31 +14,15 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:passy/widgets/custom_field_editor.dart';
 import 'package:passy/widgets/identity_widget.dart';
 import 'package:passy/widgets/record_widget.dart';
 import 'package:passy/widgets/widgets.dart';
+import 'package:passy/common/theme.dart';
 
 import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
-import '../common/theme.dart';
-
-Widget getBackButton({
-  Key? key,
-  double splashRadius = appBarButtonSplashRadius,
-  EdgeInsetsGeometry padding = appBarButtonPadding,
-  Widget icon = const Icon(Icons.arrow_back_ios_new_rounded),
-  void Function()? onPressed,
-}) =>
-    IconButton(
-      key: key,
-      splashRadius: splashRadius,
-      padding: padding,
-      icon: icon,
-      onPressed: onPressed,
-    );
 
 Widget getDoubleActionButton({
   Key? key,
@@ -159,7 +145,10 @@ AppBar getEntriesScreenAppBar(
   required void Function()? onAddPressed,
 }) =>
     AppBar(
-      leading: getBackButton(onPressed: () => Navigator.pop(context)),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        onPressed: () => Navigator.pop(context),
+      ),
       title: title,
       actions: [
         IconButton(
@@ -185,7 +174,8 @@ AppBar getEntryScreenAppBar(
   required void Function()? onEditPressed,
 }) =>
     AppBar(
-      leading: getBackButton(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
         onPressed: () => Navigator.pop(context),
       ),
       title: title,
@@ -214,7 +204,10 @@ AppBar getEditScreenAppBar(
 }) =>
     AppBar(
       key: key,
-      leading: getBackButton(onPressed: () => Navigator.pop(context)),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        onPressed: () => Navigator.pop(context),
+      ),
       title: isNew
           ? Center(child: Text('Add $title'))
           : Center(child: Text('Edit $title')),

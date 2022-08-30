@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/widgets/widgets.dart';
 
-import 'common.dart';
-
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
 
@@ -32,7 +30,8 @@ class _SearchScreen extends State<SearchScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        leading: getBackButton(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Search'),

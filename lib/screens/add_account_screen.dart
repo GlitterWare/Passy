@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:passy/common/common.dart';
+import 'package:passy/common/theme.dart';
 
 import 'assets.dart';
-import '../common/theme.dart';
-import 'common.dart';
 import 'login_screen.dart';
 import 'log_screen.dart';
 
@@ -108,9 +108,11 @@ class _AddAccountScreen extends State<StatefulWidget> {
         automaticallyImplyLeading: false,
         leading: data.noAccounts
             ? null
-            : getBackButton(
+            : IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 onPressed: () => Navigator.pushReplacementNamed(
-                    context, LoginScreen.routeName)),
+                    context, LoginScreen.routeName),
+              ),
         title: const Text('Add account'),
         centerTitle: true,
       ),

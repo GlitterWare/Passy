@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/common/theme.dart';
 
 import 'main_screen.dart';
-import 'common.dart';
-import 'package:passy/common/theme.dart';
 
 class ConnectScreen extends StatefulWidget {
   static const routeName = '${MainScreen.routeName}/connect';
@@ -27,7 +27,10 @@ class _ConnectScreen extends State<ConnectScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: getBackButton(onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text('Connect'),
         centerTitle: true,
       ),

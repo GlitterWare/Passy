@@ -64,7 +64,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: getBackButton(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Biometric authentication'),
