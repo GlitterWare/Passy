@@ -14,9 +14,10 @@ class EditCustomFieldScreen extends StatefulWidget {
 }
 
 class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
+  final CustomField _customField = CustomField();
+
   @override
   Widget build(BuildContext context) {
-    CustomField _customField = CustomField();
     return Scaffold(
       appBar: getEditScreenAppBar(
         context,
