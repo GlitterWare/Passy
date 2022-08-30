@@ -3,10 +3,10 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/identity_screen.dart';
 
-class PassyIdentity extends StatelessWidget {
+class IdentityWidget extends StatelessWidget {
   final Identity _identity;
 
-  const PassyIdentity({Key? key, required Identity identity})
+  const IdentityWidget({Key? key, required Identity identity})
       : _identity = identity,
         super(key: key);
 

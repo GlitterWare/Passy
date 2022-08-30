@@ -553,7 +553,7 @@ List<Widget> buildIdentityWidgets({
   final List<Widget> _identityWidgets = [];
   sortIdentities(identities);
   for (Identity identity in identities) {
-    _identityWidgets.add(PassyPadding(PassyIdentity(identity: identity)));
+    _identityWidgets.add(PassyPadding(IdentityWidget(identity: identity)));
   }
   return _identityWidgets;
 }
