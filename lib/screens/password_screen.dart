@@ -180,7 +180,7 @@ class _PasswordScreen extends State<PasswordScreen> {
               )),
               Padding(
                   padding: const EdgeInsets.fromLTRB(23, 18, 0, 0),
-                  child: getFavIcon(_password.website, width: 35)),
+                  child: FavIconImage(address: _password.website, width: 35)),
             ]),
           for (CustomField _customField in _password.customFields)
             buildCustomField(context, _customField),

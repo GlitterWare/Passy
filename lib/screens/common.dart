@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
@@ -67,34 +66,12 @@ void sortIdentities(List<Identity> identities) {
   });
 }
 
-Widget getFavIcon(String website, {double width = 50}) {
-  SvgPicture _placeholder = SvgPicture.asset(
-    logoCircleSvg,
-    color: Colors.white,
-    width: 50,
-    alignment: Alignment.topCenter,
-  );
-  if (!website.contains(RegExp(r'https://|http://'))) {
-    website = 'http://$website';
-  }
-  String _request =
-      'https://s2.googleusercontent.com/s2/favicons?sz=32&domain=$website';
-
-  return CachedNetworkImage(
-    imageUrl: _request,
-    placeholder: (context, url) => _placeholder,
-    errorWidget: (ctx, obj, s) => _placeholder,
-    width: width,
-    fit: BoxFit.fill,
-  );
-}
-
 Widget buildPasswordWidget(
     {required BuildContext context, required Password password}) {
   return ThreeWidgetButton(
     left: password.website == ''
         ? logoCircle50White
-        : getFavIcon(password.website),
+        : FavIconImage(address: password.website),
     right: const Icon(Icons.arrow_forward_ios_rounded),
     onPressed: () => Navigator.pushNamed(context, PasswordScreen.routeName,
         arguments: password),
