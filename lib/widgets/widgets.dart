@@ -1,6 +1,7 @@
 export 'buttoned_text_form_field.dart';
 export 'custom_field_editor.dart';
 export 'double_action_button.dart';
+export 'entries_screen_appbar.dart';
 export 'enum_dropdown_button_form_field.dart';
 export 'id_card_widget.dart';
 export 'identity_widget.dart';

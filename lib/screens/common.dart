@@ -20,35 +20,6 @@ import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
 
-AppBar getEntriesScreenAppBar(
-  BuildContext context, {
-  Key? key,
-  required Widget title,
-  required void Function()? onSearchPressed,
-  required void Function()? onAddPressed,
-}) =>
-    AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: title,
-      actions: [
-        IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
-          onPressed: onSearchPressed,
-          icon: const Icon(Icons.search_rounded),
-        ),
-        IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
-          onPressed: onAddPressed,
-          icon: const Icon(Icons.add_rounded),
-        ),
-      ],
-    );
-
 AppBar getEntryScreenAppBar(
   BuildContext context, {
   Key? key,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/payment_card.dart';
+import 'package:passy/widgets/widgets.dart';
 
 import 'common.dart';
 import 'edit_payment_card_screen.dart';
@@ -85,8 +86,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getEntriesScreenAppBar(
-        context,
+      appBar: EntriesScreenAppBar(
         title: const Text('Payment cards'),
         onAddPressed: _onAddPressed,
         onSearchPressed: _onSearchPressed,

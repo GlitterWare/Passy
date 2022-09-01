@@ -93,7 +93,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getEntriesScreenAppBar(context,
+      appBar: EntriesScreenAppBar(
           title: const Center(child: Text('ID Cards')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
