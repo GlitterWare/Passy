@@ -206,7 +206,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           }),
         )),
         buildCustomFieldEditors(
-            customFields: _customFields, padding: entryPadding),
+            customFields: _customFields, padding: passyPadding),
         PassyTextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const entryPadding = EdgeInsets.symmetric(vertical: 8, horizontal: 8);
+const passyPadding = EdgeInsets.symmetric(vertical: 8, horizontal: 8);
 const appBarButtonSplashRadius = 28.0;
 const appBarButtonPadding = EdgeInsets.all(16.0);
 

@@ -63,9 +63,9 @@ class _ConnectScreen extends State<ConnectScreen> {
                 Flexible(
                   child: Padding(
                     padding: EdgeInsets.only(
-                        left: entryPadding.right,
-                        top: entryPadding.top,
-                        bottom: entryPadding.bottom),
+                        left: passyPadding.right,
+                        top: passyPadding.top,
+                        bottom: passyPadding.bottom),
                     child: TextFormField(
                       initialValue: _address,
                       decoration: const InputDecoration(
@@ -77,7 +77,7 @@ class _ConnectScreen extends State<ConnectScreen> {
                 ),
                 SizedBox(
                   child: Padding(
-                    padding: EdgeInsets.only(right: entryPadding.right),
+                    padding: EdgeInsets.only(right: passyPadding.right),
                     child: FloatingActionButton(
                       onPressed: () => SynchronizationWrapper(context: context)
                           .connect(_account, address: _address),

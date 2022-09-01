@@ -176,7 +176,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             ),
           )),
           buildCustomFieldEditors(
-              customFields: _customFields, padding: entryPadding),
+              customFields: _customFields, padding: passyPadding),
           PassyTextFormField(
             keyboardType: TextInputType.multiline,
             maxLines: null,

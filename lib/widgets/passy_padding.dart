@@ -12,7 +12,7 @@ class PassyPadding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: entryPadding,
+        padding: passyPadding,
         child: _child,
       );
 }

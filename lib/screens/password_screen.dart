@@ -157,7 +157,7 @@ class _PasswordScreen extends State<PasswordScreen> {
             Row(
               children: [
                 SizedBox(
-                  width: entryPadding.left * 2,
+                  width: passyPadding.left * 2,
                 ),
                 SizedBox(
                   child: CircularProgressIndicator(
