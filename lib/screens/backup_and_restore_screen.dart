@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:passy/widgets/widgets.dart';
 
 import 'backup_screen.dart';
-import 'common.dart';
 import 'restore_screen.dart';
 import 'settings_screen.dart';
 
@@ -38,13 +37,13 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
       ),
       body: ListView(
         children: [
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             center: const Text('Backup'),
             left: const Icon(Icons.ios_share_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => _onBackupPressed(_username),
           )),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             center: const Text('Restore'),
             left: const Icon(Icons.settings_backup_restore_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),

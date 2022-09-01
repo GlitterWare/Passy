@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/widgets/widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:passy/common/theme.dart';
 
-import 'common.dart';
-import '../common/theme.dart';
 import 'assets.dart';
 import 'backup_and_restore_screen.dart';
 import 'biometric_auth_screen.dart';
@@ -36,7 +37,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       ),
       body: ListView(
         children: [
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             center: const Text('Backup & Restore'),
             left: const Icon(Icons.save_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
@@ -45,7 +46,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 arguments: data.loadedAccount!.username),
           )),
           if (isBiometricStorageSupported)
-            PassyPadding(getThreeWidgetButton(
+            PassyPadding(ThreeWidgetButton(
               center: const Text('Biometric authentication'),
               left: const Icon(Icons.fingerprint_rounded),
               right: const Icon(Icons.arrow_forward_ios_rounded),
@@ -55,7 +56,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     context, BiometricAuthScreen.routeName);
               },
             )),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             center: const Text('About'),
             left: const Icon(Icons.info_outline_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
@@ -109,7 +110,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            PassyPadding(getThreeWidgetButton(
+                            PassyPadding(ThreeWidgetButton(
                               left: SvgPicture.asset(
                                 'assets/images/github_icon.svg',
                                 width: 26,

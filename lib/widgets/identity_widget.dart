@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/identity.dart';
-import 'package:passy/screens/common.dart';
 import 'package:passy/screens/identity_screen.dart';
+import 'package:passy/widgets/widgets.dart';
 
 class IdentityWidget extends StatelessWidget {
   final Identity _identity;
@@ -12,7 +12,7 @@ class IdentityWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return getThreeWidgetButton(
+    return ThreeWidgetButton(
       right: const Icon(Icons.arrow_forward_ios_rounded),
       onPressed: () => Navigator.pushNamed(context, IdentityScreen.routeName,
           arguments: _identity),

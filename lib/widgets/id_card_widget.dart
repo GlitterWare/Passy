@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:passy/passy_data/id_card.dart';
-import 'package:passy/screens/common.dart';
+import 'package:passy/widgets/widgets.dart';
 
 class IDCardWidget extends StatelessWidget {
   final IDCard _idCard;
@@ -14,7 +15,7 @@ class IDCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return getThreeWidgetButton(
+    return ThreeWidgetButton(
       left: const Icon(Icons.perm_identity_outlined),
       right: const Icon(Icons.arrow_forward_ios_rounded),
       onPressed: _onPressed,

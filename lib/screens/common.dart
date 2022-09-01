@@ -20,39 +20,6 @@ import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
 
-Widget getThreeWidgetButton({
-  Key? key,
-  Widget? left,
-  required Widget center,
-  Widget? right,
-  void Function()? onPressed,
-}) =>
-    ElevatedButton(
-        key: key,
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.0),
-          ),
-        ),
-        child: Padding(
-          child: Row(
-            children: [
-              if (left != null)
-                Padding(
-                  child: left,
-                  padding: const EdgeInsets.only(right: 30),
-                ),
-              Flexible(
-                child: center,
-                fit: FlexFit.tight,
-              ),
-              if (right != null) right,
-            ],
-          ),
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-        ));
-
 AppBar getEntriesScreenAppBar(
   BuildContext context, {
   Key? key,
@@ -271,7 +238,7 @@ Widget getFavIcon(String website, {double width = 50}) {
 
 Widget buildPasswordWidget(
     {required BuildContext context, required Password password}) {
-  return getThreeWidgetButton(
+  return ThreeWidgetButton(
     left: password.website == ''
         ? logoCircle50White
         : getFavIcon(password.website),
@@ -419,7 +386,7 @@ List<Widget> buildPaymentCardWidgets(
 }
 
 Widget buildNoteWidget({required BuildContext context, required Note note}) {
-  return getThreeWidgetButton(
+  return ThreeWidgetButton(
     left: const Icon(Icons.note_rounded),
     right: const Icon(Icons.arrow_forward_ios_rounded),
     onPressed: () {

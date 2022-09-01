@@ -11,7 +11,6 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
 import 'payment_cards_screen.dart';
-import 'common.dart';
 import 'connect_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
@@ -147,35 +146,35 @@ class _MainScreen extends State<MainScreen>
       ),
       body: ListView(
         children: [
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.lock_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             center: const Text('Passwords'),
             onPressed: () =>
                 Navigator.pushNamed(context, PasswordsScreen.routeName),
           )),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.payment_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             center: const Text('Payment cards'),
             onPressed: () =>
                 Navigator.pushNamed(context, PaymentCardsScreen.routeName),
           )),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.note_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             center: const Text('Notes'),
             onPressed: () =>
                 Navigator.pushNamed(context, NotesScreen.routeName),
           )),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.perm_identity_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             center: const Text('ID Cards'),
             onPressed: () =>
                 Navigator.pushNamed(context, IDCardsScreen.routeName),
           )),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.people_outline_rounded),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             center: const Text('Identities'),

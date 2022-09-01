@@ -161,7 +161,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             onChanged: (value) => setState(() => _cvv = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.add_rounded),
             center: const Text('Add custom field'),
             onPressed: () => Navigator.pushNamed(

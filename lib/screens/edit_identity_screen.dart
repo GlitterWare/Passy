@@ -193,7 +193,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           decoration: const InputDecoration(labelText: 'Country'),
           onChanged: (value) => setState(() => _country = value.trim()),
         ),
-        PassyPadding(getThreeWidgetButton(
+        PassyPadding(ThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
           center: const Text('Add custom field'),
           onPressed: () => Navigator.pushNamed(

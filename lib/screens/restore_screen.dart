@@ -9,7 +9,6 @@ import 'assets.dart';
 import '../common/theme.dart';
 import 'backup_and_restore_screen.dart';
 import 'login_screen.dart';
-import 'common.dart';
 import 'log_screen.dart';
 import 'main_screen.dart';
 import 'confirm_string_screen.dart';
@@ -36,7 +35,7 @@ class _RestoreScreen extends State<RestoreScreen> {
         centerTitle: true,
       ),
       body: ListView(children: [
-        PassyPadding(getThreeWidgetButton(
+        PassyPadding(ThreeWidgetButton(
           center: const Text('Passy restore'),
           left: SvgPicture.asset(
             logoCircleSvg,

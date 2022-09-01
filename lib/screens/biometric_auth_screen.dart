@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_locker/flutter_locker.dart';
+
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/widgets/widgets.dart';
+import 'package:passy/common/theme.dart';
 
-import 'common.dart';
 import 'settings_screen.dart';
-import '../common/theme.dart';
 
 class BiometricAuthScreen extends StatefulWidget {
   static const routeName = '${SettingsScreen.routeName}/bioAuth';
@@ -73,7 +73,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
       ),
       body: ListView(
         children: [
-          PassyPadding(getThreeWidgetButton(
+          PassyPadding(ThreeWidgetButton(
             center: const Text('Biometric authentication'),
             left: const Icon(Icons.fingerprint_rounded),
             right: Switch(
