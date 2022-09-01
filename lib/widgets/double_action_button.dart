@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 
 class DoubleActionButton extends StatelessWidget {
-  final Widget _body;
-  final Widget _icon;
-  final void Function()? _onButtonPressed;
-  final void Function()? _onActionPressed;
+  final Widget body;
+  final Widget icon;
+  final void Function()? onButtonPressed;
+  final void Function()? onActionPressed;
 
   const DoubleActionButton({
     Key? key,
-    required Widget body,
-    required Widget icon,
-    void Function()? onButtonPressed,
-    void Function()? onActionPressed,
-  })  : _body = body,
-        _icon = icon,
-        _onButtonPressed = onButtonPressed,
-        _onActionPressed = onActionPressed,
-        super(key: key);
+    required this.body,
+    required this.icon,
+    this.onButtonPressed,
+    this.onActionPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +24,18 @@ class DoubleActionButton extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 0),
       ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-      onPressed: _onButtonPressed,
+      onPressed: onButtonPressed,
       child: Row(
         children: [
           Flexible(
             fit: FlexFit.tight,
-            child: _body,
+            child: body,
           ),
           IconButton(
-            onPressed: _onActionPressed,
+            onPressed: onActionPressed,
             padding:
                 const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
-            icon: _icon,
+            icon: icon,
             splashRadius: 27,
           ),
         ],

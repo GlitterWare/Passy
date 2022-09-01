@@ -6,31 +6,28 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/widgets/widgets.dart';
 
 class CustomFieldEditor extends StatelessWidget {
-  final CustomField _customField;
-  final void Function(String value)? _onChanged;
-  final void Function()? _onRemovePressed;
+  final CustomField customField;
+  final void Function(String value)? onChanged;
+  final void Function()? onRemovePressed;
 
   const CustomFieldEditor({
     Key? key,
-    required CustomField customField,
-    void Function(String value)? onChanged,
-    void Function()? onRemovePressed,
-  })  : _customField = customField,
-        _onChanged = onChanged,
-        _onRemovePressed = onRemovePressed,
-        super(key: key);
+    required this.customField,
+    this.onChanged,
+    this.onRemovePressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller =
-        TextEditingController(text: _customField.value);
-    bool _isDate = _customField.fieldType == FieldType.date;
+        TextEditingController(text: customField.value);
+    bool _isDate = customField.fieldType == FieldType.date;
     DateTime? _date;
     if (_isDate) {
-      if (_customField.value == '') {
+      if (customField.value == '') {
         _date = DateTime.now();
       } else {
-        List<String> _dateSplit = _customField.value.split('/');
+        List<String> _dateSplit = customField.value.split('/');
         _date = DateTime(
           int.parse(_dateSplit[2]),
           int.parse(_dateSplit[1]),
@@ -42,13 +39,13 @@ class CustomFieldEditor extends StatelessWidget {
     return ButtonedTextFormField(
       controller: _controller,
       focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
-      labelText: _customField.title,
+      labelText: customField.title,
       buttonIcon: const Icon(Icons.remove_rounded),
-      onChanged: (value) => _customField.value = value,
+      onChanged: (value) => customField.value = value,
       onTap: _isDate
           ? () => showDatePicker(
                 context: context,
-                initialDate: _customField.value == '' ? DateTime.now() : _date!,
+                initialDate: customField.value == '' ? DateTime.now() : _date!,
                 firstDate: DateTime.utc(0, 04, 20),
                 lastDate: DateTime.utc(275760, 09, 13),
                 builder: (context, widget) => Theme(
@@ -68,12 +65,12 @@ class CustomFieldEditor extends StatelessWidget {
                     '/' +
                     value.year.toString();
                 _controller.text = _value;
-                _onChanged?.call(_value);
+                onChanged?.call(_value);
               })
           : null,
-      onPressed: _onRemovePressed,
+      onPressed: onRemovePressed,
       inputFormatters: [
-        if (_customField.fieldType == FieldType.number)
+        if (customField.fieldType == FieldType.number)
           FilteringTextInputFormatter.digitsOnly,
       ],
     );

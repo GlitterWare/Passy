@@ -4,29 +4,30 @@ import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/widgets/widgets.dart';
 
 class IdentityWidget extends StatelessWidget {
-  final Identity _identity;
+  final Identity identity;
 
-  const IdentityWidget({Key? key, required Identity identity})
-      : _identity = identity,
-        super(key: key);
+  const IdentityWidget({
+    Key? key,
+    required this.identity,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ThreeWidgetButton(
       right: const Icon(Icons.arrow_forward_ios_rounded),
       onPressed: () => Navigator.pushNamed(context, IdentityScreen.routeName,
-          arguments: _identity),
+          arguments: identity),
       center: Column(
         children: [
           Align(
             child: Text(
-              _identity.nickname,
+              identity.nickname,
             ),
             alignment: Alignment.centerLeft,
           ),
           Align(
             child: Text(
-              _identity.firstAddressLine,
+              identity.firstAddressLine,
               style: const TextStyle(color: Colors.grey),
             ),
             alignment: Alignment.centerLeft,

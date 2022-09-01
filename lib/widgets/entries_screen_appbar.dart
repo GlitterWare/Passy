@@ -5,19 +5,17 @@ class EntriesScreenAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
-  final Widget _title;
-  final void Function()? _onSearchPressed;
-  final void Function()? _onAddPressed;
+
+  final Widget title;
+  final void Function()? onSearchPressed;
+  final void Function()? onAddPressed;
 
   const EntriesScreenAppBar({
     Key? key,
-    required Widget title,
-    void Function()? onSearchPressed,
-    void Function()? onAddPressed,
-  })  : _title = title,
-        _onSearchPressed = onSearchPressed,
-        _onAddPressed = onAddPressed,
-        super(key: key);
+    required this.title,
+    this.onSearchPressed,
+    this.onAddPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +24,18 @@ class EntriesScreenAppBar extends StatelessWidget
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         onPressed: () => Navigator.pop(context),
       ),
-      title: _title,
+      title: title,
       actions: [
         IconButton(
           padding: appBarButtonPadding,
           splashRadius: appBarButtonSplashRadius,
-          onPressed: _onSearchPressed,
+          onPressed: onSearchPressed,
           icon: const Icon(Icons.search_rounded),
         ),
         IconButton(
           padding: appBarButtonPadding,
           splashRadius: appBarButtonSplashRadius,
-          onPressed: _onAddPressed,
+          onPressed: onAddPressed,
           icon: const Icon(Icons.add_rounded),
         ),
       ],

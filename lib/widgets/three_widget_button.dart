@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 
 class ThreeWidgetButton extends StatelessWidget {
-  final Widget? _left;
-  final Widget _center;
-  final Widget? _right;
-  final void Function()? _onPressed;
+  final Widget? left;
+  final Widget center;
+  final Widget? right;
+  final void Function()? onPressed;
 
   const ThreeWidgetButton({
     Key? key,
-    Widget? left,
-    required Widget center,
-    Widget? right,
-    void Function()? onPressed,
-  })  : _left = left,
-        _center = center,
-        _right = right,
-        _onPressed = onPressed,
-        super(key: key);
+    this.left,
+    required this.center,
+    this.right,
+    this.onPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       key: key,
-      onPressed: _onPressed,
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50.0),
@@ -31,16 +27,16 @@ class ThreeWidgetButton extends StatelessWidget {
       child: Padding(
         child: Row(
           children: [
-            if (_left != null)
+            if (left != null)
               Padding(
-                child: _left,
+                child: left,
                 padding: const EdgeInsets.only(right: 30),
               ),
             Flexible(
-              child: _center,
+              child: center,
               fit: FlexFit.tight,
             ),
-            if (_right != null) _right!,
+            if (right != null) right!,
           ],
         ),
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),

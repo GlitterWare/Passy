@@ -5,25 +5,20 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/widgets/widgets.dart';
 
 class PassyRecord extends StatelessWidget {
-  final String _title;
-  final String _value;
-  final bool _obscureValue;
-  final bool _isPassword;
-  final TextAlign _valueAlign;
+  final String title;
+  final String value;
+  final bool obscureValue;
+  final bool isPassword;
+  final TextAlign valueAlign;
 
   const PassyRecord(
       {Key? key,
-      required String title,
-      required String value,
-      bool obscureValue = false,
-      bool isPassword = false,
-      TextAlign valueAlign = TextAlign.center})
-      : _title = title,
-        _value = value,
-        _obscureValue = obscureValue,
-        _isPassword = isPassword,
-        _valueAlign = valueAlign,
-        super(key: key);
+      required this.title,
+      required this.value,
+      this.obscureValue = false,
+      this.isPassword = false,
+      this.valueAlign = TextAlign.center})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +26,13 @@ class PassyRecord extends StatelessWidget {
       body: Column(
         children: [
           Text(
-            _title,
+            title,
             style: TextStyle(color: lightContentSecondaryColor),
           ),
           FittedBox(
             child: Text(
-              _obscureValue ? '\u2022' * 6 : _value,
-              textAlign: _valueAlign,
+              obscureValue ? '\u2022' * 6 : value,
+              textAlign: valueAlign,
             ),
           ),
         ],
@@ -46,11 +41,9 @@ class PassyRecord extends StatelessWidget {
       onButtonPressed: () => showDialog(
         context: context,
         builder: (_) => getRecordDialog(
-            value: _value,
-            highlightSpecial: _isPassword,
-            textAlign: _valueAlign),
+            value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
-      onActionPressed: () => Clipboard.setData(ClipboardData(text: _value)),
+      onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
     );
   }
 }

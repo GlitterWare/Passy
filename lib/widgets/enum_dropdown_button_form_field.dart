@@ -2,32 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 
 class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
-  final T _value;
-  final List<T> _values;
-  final InputDecoration? _decoration;
-  final TextCapitalization _textCapitalization;
-  final void Function(T? value)? _onChanged;
+  final T value;
+  final List<T> values;
+  final InputDecoration? decoration;
+  final TextCapitalization textCapitalization;
+  final void Function(T? value)? onChanged;
 
-  const EnumDropDownButtonFormField(
-      {Key? key,
-      required T value,
-      required List<T> values,
-      InputDecoration? decoration,
-      TextCapitalization textCapitalization = TextCapitalization.none,
-      void Function(T? value)? onChanged})
-      : _value = value,
-        _values = values,
-        _decoration = decoration,
-        _textCapitalization = textCapitalization,
-        _onChanged = onChanged,
-        super(key: key);
+  const EnumDropDownButtonFormField({
+    Key? key,
+    required this.value,
+    required this.values,
+    this.decoration,
+    this.textCapitalization = TextCapitalization.none,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem<T>> _menuItems = [];
-    for (T value in _values) {
+    for (T value in values) {
       String _name;
-      switch (_textCapitalization) {
+      switch (textCapitalization) {
         case (TextCapitalization.characters):
           _name = value.name.toUpperCase();
           break;
@@ -51,9 +46,9 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
     }
     return DropdownButtonFormField(
       items: _menuItems,
-      value: _value,
-      decoration: _decoration,
-      onChanged: _onChanged,
+      value: value,
+      decoration: decoration,
+      onChanged: onChanged,
     );
   }
 }
