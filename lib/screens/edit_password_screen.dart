@@ -78,8 +78,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
     }
 
     return Scaffold(
-      appBar: getEditScreenAppBar(
-        context,
+      appBar: EditScreenAppBar(
         title: 'password',
         isNew: _isNew,
         onSave: () {

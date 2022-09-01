@@ -77,8 +77,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
     }
 
     return Scaffold(
-      appBar: getEditScreenAppBar(
-        context,
+      appBar: EditScreenAppBar(
         title: 'payment card',
         onSave: () {
           final LoadedAccount _account = data.loadedAccount!;

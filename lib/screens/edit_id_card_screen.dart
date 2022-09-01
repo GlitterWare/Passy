@@ -97,8 +97,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
     }
 
     return Scaffold(
-      appBar: getEditScreenAppBar(
-        context,
+      appBar: EditScreenAppBar(
         title: 'ID card',
         onSave: _onSave,
         isNew: _isNew,

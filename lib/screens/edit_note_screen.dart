@@ -4,12 +4,11 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/screens/note_screen.dart';
 import 'package:passy/widgets/widgets.dart';
+import 'package:passy/common/theme.dart';
 
-import 'common.dart';
 import 'notes_screen.dart';
 import 'splash_screen.dart';
 import 'main_screen.dart';
-import '../common/theme.dart';
 
 class EditNoteScreen extends StatefulWidget {
   const EditNoteScreen({Key? key}) : super(key: key);
@@ -43,8 +42,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
     }
 
     return Scaffold(
-      appBar: getEditScreenAppBar(
-        context,
+      appBar: EditScreenAppBar(
         title: 'note',
         isNew: _isNew,
         onSave: () {

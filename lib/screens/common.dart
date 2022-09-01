@@ -20,34 +20,6 @@ import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
 
-AppBar getEditScreenAppBar(
-  BuildContext context, {
-  Key? key,
-  required String title,
-  void Function()? onSave,
-  bool isNew = false,
-}) =>
-    AppBar(
-      key: key,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: isNew
-          ? Center(child: Text('Add $title'))
-          : Center(child: Text('Edit $title')),
-      actions: [
-        IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
-          onPressed: onSave,
-          icon: isNew
-              ? const Icon(Icons.add_rounded)
-              : const Icon(Icons.check_rounded),
-        ),
-      ],
-    );
-
 Widget buildMonthPicker(
   BuildContext context, {
   TextEditingController? controller,

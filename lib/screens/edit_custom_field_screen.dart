@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/widgets/widgets.dart';
-
-import 'common.dart';
 
 class EditCustomFieldScreen extends StatefulWidget {
   const EditCustomFieldScreen({Key? key}) : super(key: key);
@@ -19,8 +18,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getEditScreenAppBar(
-        context,
+      appBar: EditScreenAppBar(
         title: 'custom field',
         onSave: () => Navigator.pop(context, _customField),
         isNew: true,

@@ -111,8 +111,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
     }
 
     return Scaffold(
-      appBar: getEditScreenAppBar(
-        context,
+      appBar: EditScreenAppBar(
         title: 'identity',
         isNew: _isNew,
         onSave: _onSave,
