@@ -126,8 +126,7 @@ class _PasswordScreen extends State<PasswordScreen> {
     if (!_onPasswordLoaded.isCompleted) _onPasswordLoaded.complete(_password);
 
     return Scaffold(
-      appBar: getEntryScreenAppBar(
-        context,
+      appBar: EntryScreenAppBar(
         title: const Center(child: Text('Password')),
         onRemovePressed: () => _onRemovePressed(_password),
         onEditPressed: () => _onEditPressed(_password),

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/theme.dart';
 
-class EntriesScreenAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
   final Widget _title;
-  final void Function()? _onSearchPressed;
-  final void Function()? _onAddPressed;
+  final void Function()? _onRemovePressed;
+  final void Function()? _onEditPressed;
 
-  const EntriesScreenAppBar({
+  const EntryScreenAppBar({
     Key? key,
     required Widget title,
-    void Function()? onSearchPressed,
-    void Function()? onAddPressed,
+    required void Function()? onRemovePressed,
+    required void Function()? onEditPressed,
   })  : _title = title,
-        _onSearchPressed = onSearchPressed,
-        _onAddPressed = onAddPressed,
+        _onRemovePressed = onRemovePressed,
+        _onEditPressed = onEditPressed,
         super(key: key);
 
   @override
@@ -31,14 +30,14 @@ class EntriesScreenAppBar extends StatelessWidget
         IconButton(
           padding: appBarButtonPadding,
           splashRadius: appBarButtonSplashRadius,
-          onPressed: _onSearchPressed,
-          icon: const Icon(Icons.search_rounded),
+          icon: const Icon(Icons.delete_outline_rounded),
+          onPressed: _onRemovePressed,
         ),
         IconButton(
           padding: appBarButtonPadding,
           splashRadius: appBarButtonSplashRadius,
-          onPressed: _onAddPressed,
-          icon: const Icon(Icons.add_rounded),
+          icon: const Icon(Icons.edit_rounded),
+          onPressed: _onEditPressed,
         ),
       ],
     );

@@ -72,8 +72,7 @@ class _IDCardScreen extends State<IDCardScreen> {
     }
 
     return Scaffold(
-      appBar: getEntryScreenAppBar(
-        context,
+      appBar: EntryScreenAppBar(
         title: const Center(child: Text('ID Card')),
         onRemovePressed: () => _onRemovePressed(),
         onEditPressed: () => _onEditPressed(),

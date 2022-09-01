@@ -77,7 +77,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getEntriesScreenAppBar(context,
+      appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Passwords')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),

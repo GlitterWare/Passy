@@ -70,8 +70,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
     final PaymentCard _paymentCard =
         ModalRoute.of(context)!.settings.arguments as PaymentCard;
     return Scaffold(
-      appBar: getEntryScreenAppBar(
-        context,
+      appBar: EntryScreenAppBar(
         title: const Center(child: Text('Payment Card')),
         onRemovePressed: () => _onRemovePressed(_paymentCard),
         onEditPressed: () => _onEditPressed(_paymentCard),

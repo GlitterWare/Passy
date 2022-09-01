@@ -5,9 +5,8 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/screens/edit_note_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/common/theme.dart';
+import 'package:passy/widgets/widgets.dart';
 
-import '../widgets/widgets.dart';
-import 'common.dart';
 import 'main_screen.dart';
 
 class NoteScreen extends StatefulWidget {
@@ -68,8 +67,7 @@ class _NoteScreen extends State<NoteScreen> {
   Widget build(BuildContext context) {
     final Note _note = ModalRoute.of(context)!.settings.arguments as Note;
     return Scaffold(
-      appBar: getEntryScreenAppBar(
-        context,
+      appBar: EntryScreenAppBar(
         title: const Center(child: Text('Note')),
         onRemovePressed: () => _onRemovePressed(_note),
         onEditPressed: () => _onEditPressed(_note),

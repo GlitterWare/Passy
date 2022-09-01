@@ -73,7 +73,7 @@ class _NotesScreen extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getEntriesScreenAppBar(context,
+      appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Notes')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),

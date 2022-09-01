@@ -74,7 +74,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getEntriesScreenAppBar(context,
+      appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Identities')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),

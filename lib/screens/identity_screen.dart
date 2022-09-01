@@ -72,8 +72,7 @@ class _IdentityScreen extends State<IdentityScreen> {
     }
 
     return Scaffold(
-      appBar: getEntryScreenAppBar(
-        context,
+      appBar: EntryScreenAppBar(
         title: const Center(child: Text('Identity')),
         onRemovePressed: _onRemovePressed,
         onEditPressed: _onEditPressed,
