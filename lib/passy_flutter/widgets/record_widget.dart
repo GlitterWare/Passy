@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/widgets/widgets.dart';
+
+import 'widgets.dart';
 
 class PassyRecord extends StatelessWidget {
   final String title;

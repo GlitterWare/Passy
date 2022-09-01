@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/passy_data/id_card.dart';
-import 'package:passy/widgets/widgets.dart';
+
+import 'widgets.dart';
 
 class IDCardWidget extends StatelessWidget {
   final IDCard idCard;

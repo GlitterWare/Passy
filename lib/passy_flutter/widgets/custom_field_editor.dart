@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/widgets/widgets.dart';
+
+import 'widgets.dart';
 
 class CustomFieldEditor extends StatelessWidget {
   final CustomField customField;
