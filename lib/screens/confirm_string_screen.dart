@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class ConfirmStringScreenArguments {
   final Widget title;

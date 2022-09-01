@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class EditCustomFieldScreen extends StatefulWidget {
   const EditCustomFieldScreen({Key? key}) : super(key: key);

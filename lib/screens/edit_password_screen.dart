@@ -6,7 +6,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/common/theme.dart';
 
 import 'common.dart';

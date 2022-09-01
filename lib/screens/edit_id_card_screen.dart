@@ -4,14 +4,14 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/screens/id_card_screen.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'common.dart';
 import 'edit_custom_field_screen.dart';
 import 'id_cards_screen.dart';
 import 'splash_screen.dart';
+import 'id_card_screen.dart';
+import 'main_screen.dart';
 
 class EditIDCardScreen extends StatefulWidget {
   const EditIDCardScreen({Key? key}) : super(key: key);

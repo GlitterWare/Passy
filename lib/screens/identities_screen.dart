@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/identity.dart';
-import 'package:passy/screens/edit_identity_screen.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'common.dart';
 import 'main_screen.dart';
 import 'search_screen.dart';
+import 'edit_identity_screen.dart';
 
 class IdentitiesScreen extends StatefulWidget {
   const IdentitiesScreen({Key? key}) : super(key: key);

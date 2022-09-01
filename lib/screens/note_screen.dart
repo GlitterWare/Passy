@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
-import 'package:passy/screens/edit_note_screen.dart';
-import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/common/theme.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'main_screen.dart';
+import 'edit_note_screen.dart';
+import 'notes_screen.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({Key? key}) : super(key: key);

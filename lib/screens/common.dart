@@ -11,9 +11,20 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_data/screen.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
+import 'main_screen.dart';
 import 'note_screen.dart';
+import 'passwords_screen.dart';
+
+const screenToRouteName = {
+  Screen.main: MainScreen.routeName,
+  Screen.passwords: PasswordsScreen.routeName,
+  Screen.notes: '',
+  Screen.idCards: '',
+  Screen.identities: '',
+};
 
 void sortCustomFields(List<CustomField> customFields) {
   customFields.sort(

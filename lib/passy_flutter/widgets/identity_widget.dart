@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/screens/identity_screen.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class IdentityWidget extends StatelessWidget {
   final Identity identity;

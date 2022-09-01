@@ -5,7 +5,7 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'edit_id_card_screen.dart';
 import 'common.dart';

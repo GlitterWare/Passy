@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
-import 'package:passy/screens/note_screen.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/common/theme.dart';
 
+import 'note_screen.dart';
 import 'notes_screen.dart';
 import 'splash_screen.dart';
 import 'main_screen.dart';

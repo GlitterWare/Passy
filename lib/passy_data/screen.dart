@@ -1,6 +1,3 @@
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/passwords_screen.dart';
-
 enum Screen {
   main,
   passwords,
@@ -9,14 +6,6 @@ enum Screen {
   idCards,
   identities,
 }
-
-const screenToRouteName = {
-  Screen.main: MainScreen.routeName,
-  Screen.passwords: PasswordsScreen.routeName,
-  Screen.notes: '',
-  Screen.idCards: '',
-  Screen.identities: '',
-};
 
 const screenToJson = {
   Screen.main: 'main',

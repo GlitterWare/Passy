@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passy/screens/edit_note_screen.dart';
-import 'package:passy/screens/identities_screen.dart';
-import 'package:passy/screens/notes_screen.dart';
 
+import 'screens/edit_note_screen.dart';
+import 'screens/identities_screen.dart';
+import 'screens/notes_screen.dart';
 import 'screens/id_cards_screen.dart';
 import 'common/theme.dart';
 import 'screens/backup_and_restore_screen.dart';

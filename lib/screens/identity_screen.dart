@@ -4,11 +4,12 @@ import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/screens/edit_identity_screen.dart';
-import 'package:passy/screens/identities_screen.dart';
-import '../widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
+
 import 'common.dart';
 import 'main_screen.dart';
+import 'edit_identity_screen.dart';
+import 'identities_screen.dart';
 
 class IdentityScreen extends StatefulWidget {
   const IdentityScreen({Key? key}) : super(key: key);

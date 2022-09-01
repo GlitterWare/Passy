@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'backup_screen.dart';
 import 'restore_screen.dart';

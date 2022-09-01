@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/screens/id_cards_screen.dart';
-import 'package:passy/screens/identities_screen.dart';
-import 'package:passy/screens/notes_screen.dart';
-import 'package:passy/widgets/widgets.dart';
+import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
@@ -14,6 +11,9 @@ import 'payment_cards_screen.dart';
 import 'connect_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
+import 'id_cards_screen.dart';
+import 'identities_screen.dart';
+import 'notes_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
