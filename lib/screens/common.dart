@@ -13,9 +13,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/widgets/widgets.dart';
 
-import 'assets.dart';
 import 'note_screen.dart';
-import 'password_screen.dart';
 
 void sortCustomFields(List<CustomField> customFields) {
   customFields.sort(
@@ -66,35 +64,6 @@ void sortIdentities(List<Identity> identities) {
   });
 }
 
-Widget buildPasswordWidget(
-    {required BuildContext context, required Password password}) {
-  return ThreeWidgetButton(
-    left: password.website == ''
-        ? logoCircle50White
-        : FavIconImage(address: password.website),
-    right: const Icon(Icons.arrow_forward_ios_rounded),
-    onPressed: () => Navigator.pushNamed(context, PasswordScreen.routeName,
-        arguments: password),
-    center: Column(
-      children: [
-        Align(
-          child: Text(
-            password.nickname,
-          ),
-          alignment: Alignment.centerLeft,
-        ),
-        Align(
-          child: Text(
-            password.username,
-            style: const TextStyle(color: Colors.grey),
-          ),
-          alignment: Alignment.centerLeft,
-        ),
-      ],
-    ),
-  );
-}
-
 List<Widget> buildPasswordWidgets({
   required BuildContext context,
   required LoadedAccount account,
@@ -107,10 +76,7 @@ List<Widget> buildPasswordWidgets({
   }
   for (Password password in passwords) {
     _passwordWidgets.add(
-      PassyPadding(buildPasswordWidget(
-        context: context,
-        password: password,
-      )),
+      PassyPadding(PasswordButton(password: password)),
     );
   }
   return _passwordWidgets;

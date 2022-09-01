@@ -64,10 +64,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
       List<Widget> _widgets = [];
       for (Password _password in _found) {
         _widgets.add(
-          PassyPadding(buildPasswordWidget(
-            context: context,
-            password: _password,
-          )),
+          PassyPadding(PasswordButton(password: _password)),
         );
       }
       return _widgets;
