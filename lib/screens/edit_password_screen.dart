@@ -116,29 +116,29 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: const InputDecoration(
             labelText: 'Nickname',
           ),
           onChanged: (value) => setState(() => _nickname = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _username,
           decoration: const InputDecoration(labelText: 'Username'),
           onChanged: (value) => setState(() => _username = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _email,
           decoration: const InputDecoration(labelText: 'Email'),
           onChanged: (value) => setState(() => _email = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _password,
           decoration: const InputDecoration(labelText: 'Password'),
           onChanged: (value) => setState(() => _password = value),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _tfaSecret.replaceFirst('=', ''),
           decoration: const InputDecoration(labelText: '2FA secret'),
           inputFormatters: [
@@ -152,19 +152,19 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             if (value.length.isOdd) value += '=';
             setState(() => _tfaSecret = value);
           },
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _tfaLength.toString(),
           decoration: const InputDecoration(labelText: '2FA length'),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) => setState(() => _tfaLength = int.parse(value)),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _tfaInterval.toString(),
           decoration: const InputDecoration(labelText: '2FA interval'),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) => setState(() => _tfaInterval = int.parse(value)),
-        ),
+        )),
         PassyPadding(EnumDropDownButtonFormField<Algorithm>(
           value: _tfaAlgorithm,
           values: Algorithm.values,
@@ -188,10 +188,11 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: const InputDecoration(labelText: '2FA is Google'),
           onChanged: (value) => setState(() => _tfaIsGoogle = value as bool),
         )),
-        PassyTextFormField(
-            initialValue: _website,
-            decoration: const InputDecoration(labelText: 'Website'),
-            onChanged: (value) => setState(() => _website = value)),
+        PassyPadding(TextFormField(
+          initialValue: _website,
+          decoration: const InputDecoration(labelText: 'Website'),
+          onChanged: (value) => setState(() => _website = value),
+        )),
         PassyPadding(ThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
           center: const Text('Add custom field'),
@@ -206,7 +207,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         )),
         buildCustomFieldEditors(
             customFields: _customFields, padding: passyPadding),
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
           initialValue: _additionalInfo,
@@ -226,7 +227,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
-        ),
+        )),
       ]),
     );
   }

@@ -117,11 +117,11 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         onSave: _onSave,
       ),
       body: ListView(children: [
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: const InputDecoration(labelText: 'Nickname'),
           onChanged: (value) => setState(() => _nickname = value.trim()),
-        ),
+        )),
         PassyPadding(EnumDropDownButtonFormField<id.Title>(
           value: _title,
           values: id.Title.values,
@@ -131,21 +131,21 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
             if (value != null) setState(() => _title = value);
           },
         )),
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _firstName,
           decoration: const InputDecoration(labelText: 'First name'),
           onChanged: (value) => setState(() => _firstName = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _middleName,
           decoration: const InputDecoration(labelText: 'Middle name'),
           onChanged: (value) => setState(() => _middleName = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _lastName,
           decoration: const InputDecoration(labelText: 'Last name'),
           onChanged: (value) => setState(() => _lastName = value.trim()),
-        ),
+        )),
         PassyPadding(EnumDropDownButtonFormField<id.Gender>(
           value: _gender,
           values: id.Gender.values,
@@ -155,43 +155,43 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
             if (value != null) setState(() => _gender = value);
           },
         )),
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _email,
           decoration: const InputDecoration(labelText: 'Email'),
           onChanged: (value) => setState(() => _email = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _number,
           decoration: const InputDecoration(labelText: 'Number'),
           onChanged: (value) => setState(() => _number = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _firstAddressLine,
           decoration: const InputDecoration(labelText: 'First address line'),
           onChanged: (value) =>
               setState(() => _firstAddressLine = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _secondAddressLine,
           decoration: const InputDecoration(labelText: 'Second address line'),
           onChanged: (value) =>
               setState(() => _secondAddressLine = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _zipCode,
           decoration: const InputDecoration(labelText: 'Zip code'),
           onChanged: (value) => setState(() => _zipCode = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _city,
           decoration: const InputDecoration(labelText: 'City'),
           onChanged: (value) => setState(() => _city = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _country,
           decoration: const InputDecoration(labelText: 'Country'),
           onChanged: (value) => setState(() => _country = value.trim()),
-        ),
+        )),
         PassyPadding(ThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
           center: const Text('Add custom field'),
@@ -206,7 +206,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         )),
         buildCustomFieldEditors(
             customFields: _customFields, padding: passyPadding),
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
           initialValue: _additionalInfo,
@@ -226,7 +226,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
-        ),
+        )),
       ]),
     );
   }

@@ -119,23 +119,23 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             obscureCardCvv: false,
             isSwipeGestureEnabled: false,
           ),
-          PassyTextFormField(
+          PassyPadding(TextFormField(
             initialValue: _nickname,
             decoration: const InputDecoration(labelText: 'Nickname'),
             onChanged: (value) => setState(() => _nickname = value.trim()),
-          ),
-          PassyTextFormField(
+          )),
+          PassyPadding(TextFormField(
             initialValue: _cardNumber,
             decoration: const InputDecoration(labelText: 'Card number'),
             onChanged: (value) => setState(() => _cardNumber = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          ),
-          PassyTextFormField(
+          )),
+          PassyPadding(TextFormField(
             initialValue: _cardholderName,
             decoration: const InputDecoration(labelText: 'Card holder name'),
             onChanged: (value) =>
                 setState(() => _cardholderName = value.trim()),
-          ),
+          )),
           PassyPadding(buildMonthPicker(context,
               initialValue: _exp,
               title: const Text('Expiration date'), getSelectedDate: () {
@@ -154,12 +154,12 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
               _exp = _month + '/' + _year;
             });
           })),
-          PassyTextFormField(
+          PassyPadding(TextFormField(
             initialValue: _cvv,
             decoration: const InputDecoration(labelText: 'CVV'),
             onChanged: (value) => setState(() => _cvv = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          ),
+          )),
           PassyPadding(ThreeWidgetButton(
             left: const Icon(Icons.add_rounded),
             center: const Text('Add custom field'),
@@ -176,7 +176,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
           )),
           buildCustomFieldEditors(
               customFields: _customFields, padding: passyPadding),
-          PassyTextFormField(
+          PassyPadding(TextFormField(
             keyboardType: TextInputType.multiline,
             maxLines: null,
             decoration: InputDecoration(
@@ -195,7 +195,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
               ),
             ),
             onChanged: (value) => setState(() => _additionalInfo = value),
-          ),
+          )),
         ],
       ),
     );

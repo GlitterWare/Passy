@@ -103,31 +103,31 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
         isNew: _isNew,
       ),
       body: ListView(children: [
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: const InputDecoration(labelText: 'Nickname'),
           onChanged: (value) => setState(() => _nickname = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _type,
           decoration: const InputDecoration(labelText: 'Type'),
           onChanged: (value) => setState(() => _type = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _idNumber,
           decoration: const InputDecoration(labelText: 'ID number'),
           onChanged: (value) => setState(() => _idNumber = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _name,
           decoration: const InputDecoration(labelText: 'Name'),
           onChanged: (value) => setState(() => _name = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           initialValue: _country,
           decoration: const InputDecoration(labelText: 'Country'),
           onChanged: (value) => setState(() => _country = value.trim()),
-        ),
+        )),
         PassyPadding(ThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
           center: const Text('Add custom field'),
@@ -142,7 +142,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
         )),
         buildCustomFieldEditors(
             customFields: _customFields, padding: passyPadding),
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
           decoration: InputDecoration(
@@ -161,7 +161,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
-        ),
+        )),
       ]),
     );
   }

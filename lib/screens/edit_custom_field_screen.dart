@@ -24,11 +24,11 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
         isNew: true,
       ),
       body: ListView(children: [
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _customField.title,
           decoration: const InputDecoration(labelText: 'Title'),
           onChanged: (value) => setState(() => _customField.title = value),
-        ),
+        )),
         PassyPadding(DropdownButtonFormField(
           items: [
             DropdownMenuItem(

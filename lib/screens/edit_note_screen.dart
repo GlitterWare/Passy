@@ -64,12 +64,12 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
-        PassyTextFormField(
+        PassyPadding(TextFormField(
           initialValue: _title,
           decoration: const InputDecoration(labelText: 'Title'),
           onChanged: (value) => setState(() => _title = value.trim()),
-        ),
-        PassyTextFormField(
+        )),
+        PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
           initialValue: _note,
@@ -89,7 +89,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             ),
           ),
           onChanged: (value) => setState(() => _note = value),
-        ),
+        )),
       ]),
     );
   }
