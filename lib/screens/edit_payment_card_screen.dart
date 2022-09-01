@@ -136,24 +136,27 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             onChanged: (value) =>
                 setState(() => _cardholderName = value.trim()),
           )),
-          PassyPadding(buildMonthPicker(context,
-              initialValue: _exp,
-              title: const Text('Expiration date'), getSelectedDate: () {
-            List<String> _date = _exp.split('/');
-            String _month = _date[0];
-            String _year = _date[1];
-            if (_month[0] == '0') {
-              _month = _month[1];
-            }
-            return DateTime.utc(int.parse(_year), int.parse(_month));
-          }, onChanged: (selectedDate) {
-            String _month = selectedDate.month.toString();
-            String _year = selectedDate.year.toString();
-            if (_month.length == 1) _month = '0' + _month;
-            setState(() {
-              _exp = _month + '/' + _year;
-            });
-          })),
+          PassyPadding(MonthPickerFormField(
+            initialValue: _exp,
+            title: const Text('Expiration date'),
+            getSelectedDate: () {
+              List<String> _date = _exp.split('/');
+              String _month = _date[0];
+              String _year = _date[1];
+              if (_month[0] == '0') {
+                _month = _month[1];
+              }
+              return DateTime.utc(int.parse(_year), int.parse(_month));
+            },
+            onChanged: (selectedDate) {
+              String _month = selectedDate.month.toString();
+              String _year = selectedDate.year.toString();
+              if (_month.length == 1) _month = '0' + _month;
+              setState(() {
+                _exp = _month + '/' + _year;
+              });
+            },
+          )),
           PassyPadding(TextFormField(
             initialValue: _cvv,
             decoration: const InputDecoration(labelText: 'CVV'),

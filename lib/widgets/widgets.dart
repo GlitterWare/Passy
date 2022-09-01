@@ -7,6 +7,7 @@ export 'entry_screen_appbar.dart';
 export 'enum_dropdown_button_form_field.dart';
 export 'id_card_widget.dart';
 export 'identity_widget.dart';
+export 'month_picker.dart';
 export 'passy_padding.dart';
 export 'record_widget.dart';
 export 'three_widget_button.dart';

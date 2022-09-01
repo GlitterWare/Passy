@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 
-import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -15,70 +13,10 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/widgets/widgets.dart';
-import 'package:passy/common/theme.dart';
 
 import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
-
-Widget buildMonthPicker(
-  BuildContext context, {
-  TextEditingController? controller,
-  String? initialValue,
-  Widget? title,
-  DateTime Function()? getSelectedDate,
-  Function(DateTime)? onChanged,
-}) {
-  return TextFormField(
-      controller: controller,
-      initialValue: initialValue,
-      decoration: const InputDecoration(labelText: 'Expiration date'),
-      focusNode: AlwaysDisabledFocusNode(),
-      onTap: () => showDialog(
-            context: context,
-            builder: (ctx) {
-              DateTime _selectedDate = getSelectedDate == null
-                  ? DateTime.now().toUtc()
-                  : getSelectedDate();
-              return AlertDialog(
-                title: title,
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: lightContentSecondaryColor),
-                      )),
-                  TextButton(
-                      onPressed: () => Navigator.pop(ctx, _selectedDate),
-                      child: Text(
-                        'Confirm',
-                        style: TextStyle(color: lightContentSecondaryColor),
-                      )),
-                ],
-                content: StatefulBuilder(
-                  builder: (ctx, setState) {
-                    return MonthPicker.single(
-                      selectedDate: _selectedDate,
-                      firstDate: DateTime.utc(-4294967296),
-                      lastDate: DateTime.utc(4294967296),
-                      onChanged: (date) {
-                        setState(() => _selectedDate = date);
-                      },
-                      datePickerStyles: DatePickerStyles(
-                          currentDateStyle:
-                              TextStyle(color: lightContentSecondaryColor),
-                          selectedDateStyle:
-                              TextStyle(color: lightContentSecondaryColor)),
-                    );
-                  },
-                ),
-              );
-            },
-          ).then((value) {
-            if (onChanged != null) onChanged(value);
-          }));
-}
 
 void sortCustomFields(List<CustomField> customFields) {
   customFields.sort(
