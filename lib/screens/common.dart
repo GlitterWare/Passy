@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,53 +19,6 @@ import 'package:passy/common/theme.dart';
 import 'assets.dart';
 import 'note_screen.dart';
 import 'password_screen.dart';
-
-Widget getTextFormFieldButtoned({
-  Key? key,
-  TextEditingController? controller,
-  String? initialValue,
-  String? labelText,
-  bool obscureText = false,
-  Widget? buttonIcon,
-  void Function()? onTap,
-  void Function(String)? onChanged,
-  void Function()? onPressed,
-  FocusNode? focusNode,
-  List<TextInputFormatter>? inputFormatters,
-}) =>
-    Row(
-      key: key,
-      children: [
-        Flexible(
-          child: Padding(
-            padding: EdgeInsets.only(
-                left: entryPadding.right,
-                top: entryPadding.top,
-                bottom: entryPadding.bottom),
-            child: TextFormField(
-              controller: controller,
-              initialValue: initialValue,
-              obscureText: obscureText,
-              decoration: InputDecoration(labelText: labelText),
-              onTap: onTap,
-              onChanged: onChanged,
-              focusNode: focusNode,
-              inputFormatters: inputFormatters,
-            ),
-          ),
-        ),
-        SizedBox(
-          child: Padding(
-            padding: EdgeInsets.only(right: entryPadding.right),
-            child: FloatingActionButton(
-              heroTag: null,
-              onPressed: onPressed,
-              child: buttonIcon,
-            ),
-          ),
-        )
-      ],
-    );
 
 Widget getThreeWidgetButton({
   Key? key,
@@ -526,6 +478,7 @@ Widget buildCustomField(BuildContext context, CustomField customField) =>
 Widget buildCustomFieldEditors({
   required List<CustomField> customFields,
   bool shouldSort = true,
+  EdgeInsetsGeometry padding = EdgeInsets.zero,
 }) {
   if (shouldSort) sortCustomFields(customFields);
   return StatefulBuilder(
@@ -534,12 +487,15 @@ Widget buildCustomFieldEditors({
             shrinkWrap: true,
             itemBuilder: (context, index) {
               CustomField _customField = customFields[index];
-              return CustomFieldEditor(
-                customField: _customField,
-                onChanged: (value) =>
-                    setState(() => _customField.value = value),
-                onRemovePressed: () =>
-                    setState(() => customFields.removeAt(index)),
+              return Padding(
+                padding: padding,
+                child: CustomFieldEditor(
+                  customField: _customField,
+                  onChanged: (value) =>
+                      setState(() => _customField.value = value),
+                  onRemovePressed: () =>
+                      setState(() => customFields.removeAt(index)),
+                ),
               );
             },
             itemCount: customFields.length,

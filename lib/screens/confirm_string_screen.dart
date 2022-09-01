@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'common.dart';
+import 'package:passy/widgets/widgets.dart';
 
 class ConfirmStringScreenArguments {
   final Widget title;
@@ -56,14 +56,16 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
             child: Column(children: [
               const Spacer(),
               _args.message,
-              getTextFormFieldButtoned(
-                labelText: _args.labelText,
-                obscureText: _args.obscureText,
-                onChanged: (s) => _input = s,
-                onPressed: _args.onConfirmPressed == null
-                    ? null
-                    : () => _args.onConfirmPressed!(context, _input),
-                buttonIcon: _args.confirmIcon,
+              PassyPadding(
+                ButtonedTextFormField(
+                  labelText: _args.labelText,
+                  obscureText: _args.obscureText,
+                  onChanged: (s) => _input = s,
+                  onPressed: _args.onConfirmPressed == null
+                      ? null
+                      : () => _args.onConfirmPressed!(context, _input),
+                  buttonIcon: _args.confirmIcon,
+                ),
               ),
               const Spacer(),
             ]),

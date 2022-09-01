@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
 import 'package:passy/common/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/screens/common.dart';
+import 'package:passy/widgets/widgets.dart';
 
 class CustomFieldEditor extends StatelessWidget {
   final CustomField _customField;
@@ -39,7 +39,7 @@ class CustomFieldEditor extends StatelessWidget {
       }
     }
 
-    return getTextFormFieldButtoned(
+    return ButtonedTextFormField(
       controller: _controller,
       focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
       labelText: _customField.title,
