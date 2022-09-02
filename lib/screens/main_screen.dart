@@ -45,7 +45,7 @@ class _MainScreen extends State<MainScreen>
                 context: context,
                 builder: (_) => AlertDialog(
                   shape: PassyTheme.dialogShape,
-                  title: Center(
+                  title: const Center(
                       child: Text(
                     'Synchronize',
                     style: TextStyle(color: PassyTheme.lightContentColor),
@@ -53,7 +53,7 @@ class _MainScreen extends State<MainScreen>
                   actionsAlignment: MainAxisAlignment.center,
                   actions: [
                     TextButton(
-                        child: Text(
+                        child: const Text(
                           'Host',
                           style: TextStyle(
                               color: PassyTheme.lightContentSecondaryColor),
@@ -62,7 +62,7 @@ class _MainScreen extends State<MainScreen>
                             SynchronizationWrapper(context: context)
                                 .host(_account)),
                     TextButton(
-                      child: Text(
+                      child: const Text(
                         'Connect',
                         style: TextStyle(
                             color: PassyTheme.lightContentSecondaryColor),
@@ -103,7 +103,7 @@ class _MainScreen extends State<MainScreen>
                                               context, ConnectScreen.routeName,
                                               arguments: _account);
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           'Can\'t scan?',
                                           style: TextStyle(
                                             color: PassyTheme
@@ -113,7 +113,7 @@ class _MainScreen extends State<MainScreen>
                                       ),
                                       TextButton(
                                         onPressed: () => Navigator.pop(ctx),
-                                        child: Text(
+                                        child: const Text(
                                           'Cancel',
                                           style: TextStyle(
                                             color: PassyTheme

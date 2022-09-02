@@ -8,14 +8,14 @@ class CustomFieldEditor extends StatefulWidget {
   final CustomField customField;
   final void Function(String value)? onChanged;
   final void Function()? onRemovePressed;
-  final ThemeData? datePickerThemeData;
+  final ColorScheme? datePickerColorScheme;
 
   const CustomFieldEditor({
     Key? key,
     required this.customField,
     this.onChanged,
     this.onRemovePressed,
-    this.datePickerThemeData,
+    this.datePickerColorScheme = PassyTheme.datePickerColorScheme,
   }) : super(key: key);
 
   @override
@@ -23,17 +23,7 @@ class CustomFieldEditor extends StatefulWidget {
 }
 
 class _CustomFieldEditor extends State<CustomFieldEditor> {
-  ThemeData datePickerThemeData = PassyTheme.datePickerTheme;
   CustomField customField = CustomField();
-
-  @override
-  void initState() {
-    super.initState();
-    if (super.widget.datePickerThemeData != null) {
-      datePickerThemeData = super.widget.datePickerThemeData!;
-    }
-    customField = super.widget.customField;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +57,8 @@ class _CustomFieldEditor extends State<CustomFieldEditor> {
                 firstDate: DateTime.utc(0, 04, 20),
                 lastDate: DateTime.utc(275760, 09, 13),
                 builder: (context, widget) => Theme(
-                  data: datePickerThemeData,
+                  data: ThemeData(
+                      colorScheme: super.widget.datePickerColorScheme),
                   child: widget!,
                 ),
               ).then((value) {

@@ -32,11 +32,11 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
           ScaffoldMessenger.of(context)
             ..clearSnackBars()
             ..showSnackBar(SnackBar(
-              content: Row(children: [
+              content: Row(children: const [
                 Icon(Icons.fingerprint_rounded,
                     color: PassyTheme.darkContentColor),
-                const SizedBox(width: 20),
-                const Expanded(child: Text('Wrong password')),
+                SizedBox(width: 20),
+                Expanded(child: Text('Wrong password')),
               ]),
             ));
           return;
@@ -48,11 +48,11 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
           ScaffoldMessenger.of(context)
             ..clearSnackBars()
             ..showSnackBar(SnackBar(
-              content: Row(children: [
+              content: Row(children: const [
                 Icon(Icons.fingerprint_rounded,
                     color: PassyTheme.darkContentColor),
-                const SizedBox(width: 20),
-                const Expanded(child: Text('Couldn\'t authenticate')),
+                SizedBox(width: 20),
+                Expanded(child: Text('Couldn\'t authenticate')),
               ]),
             ));
           return;

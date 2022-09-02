@@ -42,7 +42,7 @@ class _ConnectScreen extends State<ConnectScreen> {
             child: Column(children: [
               const Spacer(),
               RichText(
-                text: TextSpan(
+                text: const TextSpan(
                   text: 'You have to be on the ',
                   children: [
                     TextSpan(
@@ -50,7 +50,7 @@ class _ConnectScreen extends State<ConnectScreen> {
                       style: TextStyle(
                           color: PassyTheme.lightContentSecondaryColor),
                     ),
-                    const TextSpan(
+                    TextSpan(
                         text:
                             'as the host to connect.\n\nEnter host address as shown '),
                     TextSpan(
@@ -58,7 +58,7 @@ class _ConnectScreen extends State<ConnectScreen> {
                       style: TextStyle(
                           color: PassyTheme.lightContentSecondaryColor),
                     ),
-                    const TextSpan(text: ':\n'),
+                    TextSpan(text: ':\n'),
                   ],
                 ),
                 textAlign: TextAlign.center,

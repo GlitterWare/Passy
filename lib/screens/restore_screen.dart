@@ -59,7 +59,7 @@ class _RestoreScreen extends State<RestoreScreen> {
                   arguments: ConfirmStringScreenArguments(
                     title: const Text('Passy restore'),
                     message: PassyPadding(RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text:
                             'If the account you\'re restoring already exists, then ',
                         children: [
@@ -68,7 +68,7 @@ class _RestoreScreen extends State<RestoreScreen> {
                             style: TextStyle(
                                 color: PassyTheme.lightContentSecondaryColor),
                           ),
-                          const TextSpan(
+                          TextSpan(
                               text:
                                   'and replaced with the backup.\n\nEnter account password to restore.'),
                         ],
@@ -98,11 +98,11 @@ class _RestoreScreen extends State<RestoreScreen> {
                             ..clearSnackBars()
                             ..showSnackBar(
                               SnackBar(
-                                content: Row(children: [
+                                content: Row(children: const [
                                   Icon(Icons.settings_backup_restore_rounded,
                                       color: PassyTheme.darkContentColor),
-                                  const SizedBox(width: 20),
-                                  const Text('Could not restore account'),
+                                  SizedBox(width: 20),
+                                  Text('Could not restore account'),
                                 ]),
                                 action: SnackBarAction(
                                   label: 'Details',

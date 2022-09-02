@@ -31,7 +31,7 @@ class _NoteScreen extends State<NoteScreen> {
             content: const Text('Notes can only be restored from a backup.'),
             actions: [
               TextButton(
-                child: Text(
+                child: const Text(
                   'Cancel',
                   style:
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),
@@ -39,7 +39,7 @@ class _NoteScreen extends State<NoteScreen> {
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: Text(
+                child: const Text(
                   'Remove',
                   style:
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),

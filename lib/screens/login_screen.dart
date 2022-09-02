@@ -32,13 +32,13 @@ class _LoginScreen extends State<LoginScreen> {
     if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
         Icon(
           Icons.lock_rounded,
           color: PassyTheme.darkContentColor,
         ),
-        const SizedBox(width: 20),
-        const Expanded(child: Text('Incorrect password')),
+        SizedBox(width: 20),
+        Expanded(child: Text('Incorrect password')),
       ])));
       return;
     }
@@ -55,10 +55,10 @@ class _LoginScreen extends State<LoginScreen> {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(SnackBar(
-            content: Row(children: [
+            content: Row(children: const [
               Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-              const SizedBox(width: 20),
-              const Text('Could not login'),
+              SizedBox(width: 20),
+              Text('Could not login'),
             ]),
             action: SnackBarAction(
               label: 'Details',
@@ -89,14 +89,14 @@ class _LoginScreen extends State<LoginScreen> {
                                   children: [
                                     TextSpan(
                                       text: '\'$_username\' ',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: PassyTheme
                                               .lightContentSecondaryColor),
                                     ),
                                     const TextSpan(
                                         text:
                                             'by typing in its username.\n\nThis action is '),
-                                    TextSpan(
+                                    const TextSpan(
                                       text: 'irreversible',
                                       style: TextStyle(
                                           color: PassyTheme
@@ -117,11 +117,11 @@ class _LoginScreen extends State<LoginScreen> {
                                 ScaffoldMessenger.of(context)
                                   ..clearSnackBars()
                                   ..showSnackBar(SnackBar(
-                                    content: Row(children: [
+                                    content: Row(children: const [
                                       Icon(Icons.error_outline_rounded,
                                           color: PassyTheme.darkContentColor),
-                                      const SizedBox(width: 20),
-                                      const Expanded(
+                                      SizedBox(width: 20),
+                                      Expanded(
                                           child:
                                               Text('Usernames do not match')),
                                     ]),

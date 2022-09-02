@@ -32,10 +32,10 @@ class SynchronizationWrapper {
     ScaffoldMessenger.of(_context)
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
-        content: Row(children: [
+        content: Row(children: const [
           Icon(Icons.sync_problem_rounded, color: PassyTheme.darkContentColor),
-          const SizedBox(width: 20),
-          const Expanded(child: Text('Sync error')),
+          SizedBox(width: 20),
+          Expanded(child: Text('Sync error')),
         ]),
         action: SnackBarAction(label: 'Details', onPressed: _showLog),
       ));
@@ -49,11 +49,11 @@ class SynchronizationWrapper {
       ScaffoldMessenger.of(_context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
             Icon(Icons.sync_problem_rounded,
                 color: PassyTheme.darkContentColor),
-            const SizedBox(width: 20),
-            const Text('Invalid address format'),
+            SizedBox(width: 20),
+            Text('Invalid address format'),
           ]),
         ));
       return;
@@ -69,10 +69,10 @@ class SynchronizationWrapper {
         .onError((error, stackTrace) {
       ScaffoldMessenger.of(_context).clearSnackBars();
       ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
-        content: Row(children: [
+        content: Row(children: const [
           Icon(Icons.sync_problem_rounded, color: PassyTheme.darkContentColor),
-          const SizedBox(width: 20),
-          const Text('Connection failed'),
+          SizedBox(width: 20),
+          Text('Connection failed'),
         ]),
         action: SnackBarAction(
           label: 'Details',

@@ -26,50 +26,50 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (_username.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
         Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-        const SizedBox(width: 20),
-        const Text('Username is empty'),
+        SizedBox(width: 20),
+        Text('Username is empty'),
       ])));
       return;
     }
     if (_username.length < 2) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
         Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-        const SizedBox(width: 20),
-        const Text('Username is shorter than 2 letters'),
+        SizedBox(width: 20),
+        Text('Username is shorter than 2 letters'),
       ])));
       return;
     }
     if (data.hasAccount(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
         Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-        const SizedBox(width: 20),
-        const Text('Username is already in use'),
+        SizedBox(width: 20),
+        Text('Username is already in use'),
       ])));
       return;
     }
     if (_password.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
         Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-        const SizedBox(width: 20),
-        const Text('Password is empty'),
+        SizedBox(width: 20),
+        Text('Password is empty'),
       ])));
       return;
     }
     if (_password != _confirmPassword) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
         Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-        const SizedBox(width: 20),
-        const Text('Passwords do not match'),
+        SizedBox(width: 20),
+        Text('Passwords do not match'),
       ])));
       return;
     }
@@ -82,11 +82,11 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
-          content: Row(children: [
+          content: Row(children: const [
             Icon(Icons.error_outline_rounded,
                 color: PassyTheme.darkContentColor),
-            const SizedBox(width: 20),
-            const Expanded(child: Text('Couldn\'t add account')),
+            SizedBox(width: 20),
+            Expanded(child: Text('Couldn\'t add account')),
           ]),
           action: SnackBarAction(
             label: 'Details',

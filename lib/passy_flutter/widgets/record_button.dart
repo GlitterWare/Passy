@@ -13,7 +13,7 @@ class RecordButton extends StatelessWidget {
   final bool isPassword;
   final TextAlign valueAlign;
 
-  RecordButton({
+  const RecordButton({
     Key? key,
     required this.title,
     TextStyle? titleStyle,
@@ -22,7 +22,7 @@ class RecordButton extends StatelessWidget {
     this.isPassword = false,
     this.valueAlign = TextAlign.center,
   })  : titleStyle = titleStyle ??
-            TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            const TextStyle(color: PassyTheme.lightContentSecondaryColor),
         super(key: key);
 
   @override

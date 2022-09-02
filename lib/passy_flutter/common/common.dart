@@ -27,7 +27,7 @@ AlertDialog getRecordDialog(
       } else {
         _children.add(TextSpan(
             text: _iterator.current,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'FiraCode',
               color: PassyTheme.lightContentSecondaryColor,
             )));

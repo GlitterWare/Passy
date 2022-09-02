@@ -80,9 +80,9 @@ class _SettingsScreen extends State<SettingsScreen> {
                             const SizedBox(height: 32),
                             RichText(
                               textAlign: TextAlign.center,
-                              text: TextSpan(
+                              text: const TextSpan(
                                 text: 'Passy ',
-                                style: const TextStyle(fontFamily: 'FiraCode'),
+                                style: TextStyle(fontFamily: 'FiraCode'),
                                 children: [
                                   TextSpan(
                                     text: 'v$passyVersion',
@@ -95,7 +95,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            Text(
+                            const Text(
                               'Account version: $accountVersion\nSync version: $syncVersion',
                               textAlign: TextAlign.center,
                               style: TextStyle(

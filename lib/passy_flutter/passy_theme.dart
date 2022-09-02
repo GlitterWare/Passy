@@ -8,10 +8,10 @@ class PassyTheme {
   static final ShapeBorder dialogShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(12.0),
   );
-  static final darkContentColor = Colors.blueGrey[900]!;
-  static final darkContentSecondaryColor = Colors.blueGrey[600]!;
-  static final lightContentColor = Colors.blue[50]!;
-  static final lightContentSecondaryColor = Colors.blue[200]!;
+  static const darkContentColor = Color.fromRGBO(38, 50, 56, 1);
+  static const darkContentSecondaryColor = Color.fromRGBO(84, 110, 122, 1);
+  static const lightContentColor = Color.fromRGBO(227, 242, 253, 1);
+  static const lightContentSecondaryColor = Color.fromRGBO(144, 202, 249, 1);
 
   static final ThemeData theme = ThemeData(
     colorScheme: ColorScheme.dark(
@@ -24,19 +24,19 @@ class PassyTheme {
     snackBarTheme: SnackBarThemeData(actionTextColor: Colors.blueGrey[900]),
     scaffoldBackgroundColor: darkContentColor,
     inputDecorationTheme: InputDecorationTheme(
-      floatingLabelStyle: TextStyle(color: lightContentSecondaryColor),
+      floatingLabelStyle: const TextStyle(color: lightContentSecondaryColor),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(100),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(100),
-        borderSide: BorderSide(
+        borderSide: const BorderSide(
           color: darkContentSecondaryColor,
         ),
       ),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(100),
-          borderSide: BorderSide(color: lightContentColor)),
+          borderSide: const BorderSide(color: lightContentColor)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
@@ -44,17 +44,15 @@ class PassyTheme {
             MaterialStateProperty.resolveWith((states) => Colors.transparent),
       ),
     ),
-    textSelectionTheme: TextSelectionThemeData(
+    textSelectionTheme: const TextSelectionThemeData(
       cursorColor: lightContentColor,
       selectionColor: lightContentSecondaryColor,
       selectionHandleColor: lightContentColor,
     ),
   );
 
-  static final ThemeData datePickerTheme = ThemeData(
-    colorScheme: ColorScheme.dark(
-      primary: lightContentSecondaryColor,
-      onPrimary: lightContentColor,
-    ),
+  static const ColorScheme datePickerColorScheme = ColorScheme.dark(
+    primary: lightContentSecondaryColor,
+    onPrimary: lightContentColor,
   );
 }

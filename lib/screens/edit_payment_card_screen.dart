@@ -7,7 +7,6 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import '../passy_flutter/passy_theme.dart';
-import 'common.dart';
 import 'edit_custom_field_screen.dart';
 import 'main_screen.dart';
 import 'payment_card_screen.dart';
@@ -177,7 +176,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
               },
             ),
           )),
-          buildCustomFieldEditors(
+          CustomFieldEditorListView(
               customFields: _customFields, padding: PassyTheme.passyPadding),
           PassyPadding(TextFormField(
             keyboardType: TextInputType.multiline,
@@ -186,16 +185,18 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
               labelText: 'Additional info',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: PassyTheme.lightContentColor),
+                borderSide:
+                    const BorderSide(color: PassyTheme.lightContentColor),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(28.0),
-                borderSide:
-                    BorderSide(color: PassyTheme.darkContentSecondaryColor),
+                borderSide: const BorderSide(
+                    color: PassyTheme.darkContentSecondaryColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(28.0),
-                borderSide: BorderSide(color: PassyTheme.lightContentColor),
+                borderSide:
+                    const BorderSide(color: PassyTheme.lightContentColor),
               ),
             ),
             onChanged: (value) => setState(() => _additionalInfo = value),

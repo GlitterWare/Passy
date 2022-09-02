@@ -39,7 +39,7 @@ class _IdentityScreen extends State<IdentityScreen> {
                 const Text('Identities can only be restored from a backup.'),
             actions: [
               TextButton(
-                child: Text(
+                child: const Text(
                   'Cancel',
                   style:
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),
@@ -47,7 +47,7 @@ class _IdentityScreen extends State<IdentityScreen> {
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: Text(
+                child: const Text(
                   'Remove',
                   style:
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),
