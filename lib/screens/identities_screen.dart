@@ -52,7 +52,6 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
           }
         }
       }
-      PassySort.sortIdentities(_found);
       return IdentityButtonListView(
         identities: _found,
         shouldSort: true,

@@ -11,6 +11,7 @@ export 'id_card_button.dart';
 export 'identity_button_list_view.dart';
 export 'identity_button.dart';
 export 'month_picker.dart';
+export 'note_button_list_view.dart';
 export 'note_button.dart';
 export 'password_button_list_view.dart';
 export 'password_button.dart';

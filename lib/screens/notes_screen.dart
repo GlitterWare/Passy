@@ -4,7 +4,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-import 'common.dart';
 import 'main_screen.dart';
 import 'note_screen.dart';
 import 'search_screen.dart';
@@ -20,16 +19,6 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreen extends State<NotesScreen> {
-  final List<Widget> _noteWidgets = [];
-
-  @override
-  void initState() {
-    super.initState();
-    List<Widget> _widgets = buildNoteWidgets(
-        context: context, notes: data.loadedAccount!.notes.toList());
-    _noteWidgets.addAll(_widgets);
-  }
-
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditNoteScreen.routeName);
 
@@ -57,23 +46,11 @@ class _NotesScreen extends State<NotesScreen> {
           }
         }
       }
-      PassySort.sortNotes(_found);
-      List<Widget> _widgets = [];
-      for (Note _note in _found) {
-        _widgets.add(
-          PassyPadding(NoteButton(
-            note: _note,
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                NoteScreen.routeName,
-                arguments: _note,
-              );
-            },
-          )),
-        );
-      }
-      return _widgets;
+      return NoteButtonListView(
+        notes: data.loadedAccount!.notes.toList(),
+        shouldSort: true,
+        onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName),
+      );
     });
   }
 
@@ -84,7 +61,11 @@ class _NotesScreen extends State<NotesScreen> {
           title: const Center(child: Text('Notes')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: ListView(children: _noteWidgets),
+      body: NoteButtonListView(
+        notes: data.loadedAccount!.notes.toList(),
+        shouldSort: true,
+        onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName),
+      ),
     );
   }
 }

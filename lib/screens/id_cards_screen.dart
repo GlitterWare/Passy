@@ -49,7 +49,6 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           }
         }
       }
-      PassySort.sortIDCards(_found);
       return IDCardButtonListView(
         idCards: _found,
         shouldSort: true,
