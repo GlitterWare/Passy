@@ -11,7 +11,7 @@ class CustomFieldEditorListView extends StatefulWidget {
   const CustomFieldEditorListView({
     Key? key,
     required this.customFields,
-    this.shouldSort = true,
+    this.shouldSort = false,
     this.padding = EdgeInsets.zero,
     this.datePickerColorScheme = PassyTheme.datePickerColorScheme,
   }) : super(key: key);
@@ -23,6 +23,7 @@ class CustomFieldEditorListView extends StatefulWidget {
 class _CustomFieldEditorListView extends State<CustomFieldEditorListView> {
   @override
   Widget build(BuildContext context) {
+    if (widget.shouldSort) PassySort.sortCustomFields(widget.customFields);
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,

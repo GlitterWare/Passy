@@ -204,7 +204,9 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           }),
         )),
         CustomFieldEditorListView(
-            customFields: _customFields, padding: PassyTheme.passyPadding),
+            customFields: _customFields,
+            shouldSort: true,
+            padding: PassyTheme.passyPadding),
         PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
