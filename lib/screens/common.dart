@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
@@ -71,18 +70,6 @@ List<Widget> buildNoteWidgets({
     );
   }
   return _noteWidgets;
-}
-
-List<Widget> buildIdentityWidgets({
-  required BuildContext context,
-  required List<Identity> identities,
-}) {
-  final List<Widget> _identityWidgets = [];
-  PassySort.sortIdentities(identities);
-  for (Identity identity in identities) {
-    _identityWidgets.add(PassyPadding(IdentityButton(identity: identity)));
-  }
-  return _identityWidgets;
 }
 
 Widget buildCustomField(BuildContext context, CustomField customField) =>

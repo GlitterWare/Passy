@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/passy_flutter/widgets/identity_button_list_view.dart';
 import 'package:passy/screens/identity_screen.dart';
 
-import 'common.dart';
 import 'main_screen.dart';
 import 'search_screen.dart';
 import 'edit_identity_screen.dart';
@@ -21,15 +19,7 @@ class IdentitiesScreen extends StatefulWidget {
 }
 
 class _IdentitiesScreen extends State<IdentitiesScreen> {
-  final List<Widget> _identityWidgets = [];
-
-  @override
-  void initState() {
-    super.initState();
-    List<Widget> _widgets = buildIdentityWidgets(
-        context: context, identities: data.loadedAccount!.identities.toList());
-    _identityWidgets.addAll(_widgets);
-  }
+  final _account = data.loadedAccount!;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
@@ -82,7 +72,15 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
           title: const Center(child: Text('Identities')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: ListView(children: _identityWidgets),
+      body: IdentityButtonListView(
+        identities: _account.identities.toList(),
+        shouldSort: true,
+        onPressed: (identity) => Navigator.pushNamed(
+          context,
+          IdentityScreen.routeName,
+          arguments: identity,
+        ),
+      ),
     );
   }
 }
