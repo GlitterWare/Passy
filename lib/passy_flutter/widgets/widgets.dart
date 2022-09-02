@@ -6,7 +6,7 @@ export 'entries_screen_appbar.dart';
 export 'entry_screen_appbar.dart';
 export 'enum_dropdown_button_form_field.dart';
 export 'favicon_image.dart';
-export 'id_card_widget.dart';
+export 'id_card_button.dart';
 export 'identity_widget.dart';
 export 'month_picker.dart';
 export 'password_button_list_view.dart';
