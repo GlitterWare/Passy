@@ -3,10 +3,10 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-class IdentityWidget extends StatelessWidget {
+class IdentityButton extends StatelessWidget {
   final Identity identity;
 
-  const IdentityWidget({
+  const IdentityButton({
     Key? key,
     required this.identity,
   }) : super(key: key);

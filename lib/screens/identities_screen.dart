@@ -64,7 +64,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
       List<Widget> _widgets = [];
       for (Identity _identity in _found) {
         _widgets.add(
-          PassyPadding(IdentityWidget(identity: _identity)),
+          PassyPadding(IdentityButton(identity: _identity)),
         );
       }
       return _widgets;

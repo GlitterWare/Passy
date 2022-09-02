@@ -80,7 +80,7 @@ List<Widget> buildIdentityWidgets({
   final List<Widget> _identityWidgets = [];
   PassySort.sortIdentities(identities);
   for (Identity identity in identities) {
-    _identityWidgets.add(PassyPadding(IdentityWidget(identity: identity)));
+    _identityWidgets.add(PassyPadding(IdentityButton(identity: identity)));
   }
   return _identityWidgets;
 }
