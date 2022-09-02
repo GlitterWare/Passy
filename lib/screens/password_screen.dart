@@ -9,10 +9,9 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
-import '../passy_flutter/passy_theme.dart';
 import 'edit_password_screen.dart';
-import 'common.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 
@@ -185,7 +184,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   child: FavIconImage(address: _password.website, width: 35)),
             ]),
           for (CustomField _customField in _password.customFields)
-            buildCustomField(context, _customField),
+            CustomFieldButton(customField: _customField),
           if (_password.additionalInfo != '')
             PassyPadding(RecordButton(
                 title: 'Additional info', value: _password.additionalInfo)),

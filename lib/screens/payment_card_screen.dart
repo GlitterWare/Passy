@@ -4,10 +4,9 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
-import '../passy_flutter/passy_theme.dart';
 import 'main_screen.dart';
-import 'common.dart';
 import 'edit_payment_card_screen.dart';
 import 'payment_cards_screen.dart';
 
@@ -110,7 +109,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
             value: _paymentCard.cvv,
           )),
         for (CustomField _customField in _paymentCard.customFields)
-          buildCustomField(context, _customField),
+          CustomFieldButton(customField: _customField),
         if (_paymentCard.additionalInfo != '')
           PassyPadding(RecordButton(
             title: 'Additional info',

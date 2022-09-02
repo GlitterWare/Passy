@@ -7,7 +7,6 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import 'common.dart';
 import 'main_screen.dart';
 import 'edit_identity_screen.dart';
 import 'identities_screen.dart';
@@ -143,7 +142,7 @@ class _IdentityScreen extends State<IdentityScreen> {
               value: _identity.country,
             )),
           for (CustomField _customField in _identity.customFields)
-            buildCustomField(context, _customField),
+            CustomFieldButton(customField: _customField),
           if (_identity.additionalInfo != '')
             PassyPadding(RecordButton(
                 title: 'Additional info', value: _identity.additionalInfo)),

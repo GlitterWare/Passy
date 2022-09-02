@@ -1,4 +1,5 @@
 export 'buttoned_text_form_field.dart';
+export 'custom_field_button.dart';
 export 'custom_field_editor.dart';
 export 'double_action_button.dart';
 export 'edit_screen_appbar.dart';

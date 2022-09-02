@@ -15,14 +15,6 @@ const screenToRouteName = {
   Screen.identities: '',
 };
 
-Widget buildCustomField(BuildContext context, CustomField customField) =>
-    PassyPadding(RecordButton(
-      title: customField.title,
-      value: customField.value,
-      obscureValue: customField.obscured,
-      isPassword: customField.fieldType == FieldType.password,
-    ));
-
 Widget buildCustomFieldEditors({
   required List<CustomField> customFields,
   bool shouldSort = true,
