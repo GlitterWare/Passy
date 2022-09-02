@@ -27,19 +27,19 @@ class _CustomFieldEditorListView extends State<CustomFieldEditorListView> {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemBuilder: (context, index) {
-        CustomField _customField = super.widget.customFields[index];
+        CustomField _customField = widget.customFields[index];
         return Padding(
-          padding: super.widget.padding,
+          padding: widget.padding,
           child: CustomFieldEditor(
             customField: _customField,
             onChanged: (value) => setState(() => _customField.value = value),
             onRemovePressed: () =>
-                setState(() => super.widget.customFields.removeAt(index)),
-            datePickerColorScheme: super.widget.datePickerColorScheme,
+                setState(() => widget.customFields.removeAt(index)),
+            datePickerColorScheme: widget.datePickerColorScheme,
           ),
         );
       },
-      itemCount: super.widget.customFields.length,
+      itemCount: widget.customFields.length,
     );
   }
 }

@@ -23,19 +23,23 @@ class CustomFieldEditor extends StatefulWidget {
 }
 
 class _CustomFieldEditor extends State<CustomFieldEditor> {
-  CustomField customField = CustomField();
+  String value = '';
+
+  @override
+  void initState() {
+    super.initState();
+    value = widget.customField.value;
+  }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _controller =
-        TextEditingController(text: customField.value);
-    bool _isDate = customField.fieldType == FieldType.date;
+    bool _isDate = widget.customField.fieldType == FieldType.date;
     DateTime? _date;
     if (_isDate) {
-      if (customField.value == '') {
+      if (widget.customField.value == '') {
         _date = DateTime.now();
       } else {
-        List<String> _dateSplit = customField.value.split('/');
+        List<String> _dateSplit = widget.customField.value.split('/');
         _date = DateTime(
           int.parse(_dateSplit[2]),
           int.parse(_dateSplit[1]),
@@ -45,21 +49,24 @@ class _CustomFieldEditor extends State<CustomFieldEditor> {
     }
 
     return ButtonedTextFormField(
-      controller: _controller,
+      initialValue: widget.customField.value,
       focusNode: _isDate ? AlwaysDisabledFocusNode() : null,
-      labelText: customField.title,
+      labelText: widget.customField.title,
       buttonIcon: const Icon(Icons.remove_rounded),
-      onChanged: (value) => customField.value = value,
+      onChanged: (value) {
+        widget.customField.value = value;
+        setState(() => value = value);
+      },
       onTap: _isDate
           ? () => showDatePicker(
                 context: context,
-                initialDate: customField.value == '' ? DateTime.now() : _date!,
+                initialDate:
+                    widget.customField.value == '' ? DateTime.now() : _date!,
                 firstDate: DateTime.utc(0, 04, 20),
                 lastDate: DateTime.utc(275760, 09, 13),
-                builder: (context, widget) => Theme(
-                  data: ThemeData(
-                      colorScheme: super.widget.datePickerColorScheme),
-                  child: widget!,
+                builder: (context, w) => Theme(
+                  data: ThemeData(colorScheme: widget.datePickerColorScheme),
+                  child: w!,
                 ),
               ).then((value) {
                 if (value == null) return;
@@ -68,13 +75,12 @@ class _CustomFieldEditor extends State<CustomFieldEditor> {
                     value.month.toString() +
                     '/' +
                     value.year.toString();
-                setState(() => _controller.text = _value);
-                super.widget.onChanged?.call(_value);
+                widget.onChanged?.call(_value);
               })
           : null,
-      onPressed: super.widget.onRemovePressed,
+      onPressed: widget.onRemovePressed,
       inputFormatters: [
-        if (customField.fieldType == FieldType.number)
+        if (widget.customField.fieldType == FieldType.number)
           FilteringTextInputFormatter.digitsOnly,
       ],
     );
