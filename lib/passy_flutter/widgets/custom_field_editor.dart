@@ -4,20 +4,36 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/passy_flutter/common/always_disabled_focus_node.dart';
 
-class CustomFieldEditor extends StatelessWidget {
-  final ThemeData datePickerThemeData;
+class CustomFieldEditor extends StatefulWidget {
   final CustomField customField;
   final void Function(String value)? onChanged;
   final void Function()? onRemovePressed;
+  final ThemeData? datePickerThemeData;
 
-  CustomFieldEditor({
+  const CustomFieldEditor({
     Key? key,
     required this.customField,
     this.onChanged,
     this.onRemovePressed,
-    ThemeData? datePickerThemeData,
-  })  : datePickerThemeData = datePickerThemeData ?? PassyTheme.datePickerTheme,
-        super(key: key);
+    this.datePickerThemeData,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _CustomFieldEditor();
+}
+
+class _CustomFieldEditor extends State<CustomFieldEditor> {
+  ThemeData datePickerThemeData = PassyTheme.datePickerTheme;
+  CustomField customField = CustomField();
+
+  @override
+  void initState() {
+    super.initState();
+    if (super.widget.datePickerThemeData != null) {
+      datePickerThemeData = super.widget.datePickerThemeData!;
+    }
+    customField = super.widget.customField;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +77,11 @@ class CustomFieldEditor extends StatelessWidget {
                     value.month.toString() +
                     '/' +
                     value.year.toString();
-                _controller.text = _value;
-                onChanged?.call(_value);
+                setState(() => _controller.text = _value);
+                super.widget.onChanged?.call(_value);
               })
           : null,
-      onPressed: onRemovePressed,
+      onPressed: super.widget.onRemovePressed,
       inputFormatters: [
         if (customField.fieldType == FieldType.number)
           FilteringTextInputFormatter.digitsOnly,
