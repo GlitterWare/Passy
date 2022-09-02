@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/note.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'common.dart';
 import 'main_screen.dart';
@@ -56,7 +56,7 @@ class _NotesScreen extends State<NotesScreen> {
           }
         }
       }
-      sortNotes(_found);
+      PassySort.sortNotes(_found);
       List<Widget> _widgets = [];
       for (Note _note in _found) {
         _widgets.add(

@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'edit_id_card_screen.dart';
-import 'common.dart';
 import 'id_card_screen.dart';
 import 'main_screen.dart';
 import 'search_screen.dart';
@@ -79,7 +78,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           }
         }
       }
-      sortIDCards(_found);
+      PassySort.sortIDCards(_found);
       List<Widget> _widgets = [];
       for (IDCard _idCard in _found) {
         _widgets.add(

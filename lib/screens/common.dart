@@ -5,12 +5,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'main_screen.dart';
 import 'note_screen.dart';
@@ -23,45 +22,6 @@ const screenToRouteName = {
   Screen.idCards: '',
   Screen.identities: '',
 };
-
-void sortCustomFields(List<CustomField> customFields) {
-  customFields.sort(
-    (a, b) => a.title.compareTo(b.title),
-  );
-}
-
-void sortPaymentCards(List<PaymentCard> paymentCards) {
-  paymentCards.sort((a, b) {
-    int _nickComp = a.nickname.compareTo(b.nickname);
-    if (_nickComp == 0) {
-      return a.cardholderName.compareTo(b.cardholderName);
-    }
-    return _nickComp;
-  });
-}
-
-void sortNotes(List<Note> notes) =>
-    notes.sort((a, b) => a.title.compareTo(b.title));
-
-void sortIDCards(List<IDCard> idCards) {
-  idCards.sort((a, b) {
-    int _nickComp = a.nickname.compareTo(b.nickname);
-    if (_nickComp == 0) {
-      return a.name.compareTo(b.name);
-    }
-    return _nickComp;
-  });
-}
-
-void sortIdentities(List<Identity> identities) {
-  identities.sort((a, b) {
-    int _nickComp = a.nickname.compareTo(b.nickname);
-    if (_nickComp == 0) {
-      return a.firstAddressLine.compareTo(b.firstAddressLine);
-    }
-    return _nickComp;
-  });
-}
 
 CardType cardTypeFromCreditCardType(CreditCardType cardType) {
   switch (cardType) {
@@ -152,7 +112,7 @@ List<Widget> buildPaymentCardWidgets(
   void Function(PaymentCard paymentCard)? onPressed,
 }) {
   final List<PaymentCard> _paymentCards = paymentCards.toList();
-  sortPaymentCards(_paymentCards);
+  PassySort.sortPaymentCards(_paymentCards);
   final List<Widget> _paymentCardWidgets = [];
   for (PaymentCard paymentCard in paymentCards) {
     _paymentCardWidgets.add(buildPaymentCardWidget(
@@ -187,7 +147,7 @@ List<Widget> buildNoteWidgets({
   required List<Note> notes,
 }) {
   final List<Widget> _noteWidgets = [];
-  sortNotes(notes);
+  PassySort.sortNotes(notes);
   for (Note note in notes) {
     _noteWidgets.add(
       PassyPadding(buildNoteWidget(
@@ -204,7 +164,7 @@ List<Widget> buildIdentityWidgets({
   required List<Identity> identities,
 }) {
   final List<Widget> _identityWidgets = [];
-  sortIdentities(identities);
+  PassySort.sortIdentities(identities);
   for (Identity identity in identities) {
     _identityWidgets.add(PassyPadding(IdentityWidget(identity: identity)));
   }
@@ -224,7 +184,7 @@ Widget buildCustomFieldEditors({
   bool shouldSort = true,
   EdgeInsetsGeometry padding = EdgeInsets.zero,
 }) {
-  if (shouldSort) sortCustomFields(customFields);
+  if (shouldSort) PassySort.sortCustomFields(customFields);
   return StatefulBuilder(
       builder: (ctx, setState) => ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
