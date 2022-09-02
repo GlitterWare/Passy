@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/screens/assets.dart';
-import 'package:passy/screens/password_screen.dart';
 
 import 'widgets.dart';
 
 class PasswordButton extends StatelessWidget {
   final Password password;
+  final void Function()? onPressed;
 
   const PasswordButton({
     Key? key,
     required this.password,
+    this.onPressed,
   }) : super(key: key);
 
   @override
@@ -20,8 +21,7 @@ class PasswordButton extends StatelessWidget {
           ? logoCircle50White
           : FavIconImage(address: password.website),
       right: const Icon(Icons.arrow_forward_ios_rounded),
-      onPressed: () => Navigator.pushNamed(context, PasswordScreen.routeName,
-          arguments: password),
+      onPressed: onPressed,
       center: Column(
         children: [
           Align(

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
+  final EdgeInsetsGeometry buttonPadding;
+  final double buttonSplashRadius;
   final String title;
   final Function()? onSave;
   final bool isNew;
 
   const EditScreenAppBar({
     Key? key,
+    this.buttonPadding = appBarButtonPadding,
+    this.buttonSplashRadius = appBarButtonSplashRadius,
     required this.title,
     this.onSave,
     this.isNew = false,
@@ -21,6 +25,8 @@ class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       key: key,
       leading: IconButton(
+        padding: buttonPadding,
+        splashRadius: buttonSplashRadius,
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         onPressed: () => Navigator.pop(context),
       ),
@@ -29,8 +35,8 @@ class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
           : Center(child: Text('Edit $title')),
       actions: [
         IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
           onPressed: onSave,
           icon: isNew
               ? const Icon(Icons.add_rounded)

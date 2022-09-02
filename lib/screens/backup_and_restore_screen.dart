@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/passy_flutter/theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'backup_screen.dart';
@@ -29,6 +30,8 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

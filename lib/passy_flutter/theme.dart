@@ -12,7 +12,7 @@ final darkContentSecondaryColor = Colors.blueGrey[600]!;
 final lightContentColor = Colors.blue[50]!;
 final lightContentSecondaryColor = Colors.blue[200]!;
 
-final theme = ThemeData(
+final ThemeData theme = ThemeData(
   colorScheme: ColorScheme.dark(
     primary: Colors.purple[900]!,
     onPrimary: lightContentColor,
@@ -47,5 +47,12 @@ final theme = ThemeData(
     cursorColor: lightContentColor,
     selectionColor: lightContentSecondaryColor,
     selectionHandleColor: lightContentColor,
+  ),
+);
+
+final ThemeData datePickerTheme = ThemeData(
+  colorScheme: ColorScheme.dark(
+    primary: lightContentSecondaryColor,
+    onPrimary: lightContentColor,
   ),
 );

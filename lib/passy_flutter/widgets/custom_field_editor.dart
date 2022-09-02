@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/always_disabled_focus_node.dart';
-import 'package:passy/common/theme.dart';
+//import 'package:passy/passy_flutter/theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'widgets.dart';
 
 class CustomFieldEditor extends StatelessWidget {
+  final ThemeData datePickerThemeData;
   final CustomField customField;
   final void Function(String value)? onChanged;
   final void Function()? onRemovePressed;
 
-  const CustomFieldEditor({
+  CustomFieldEditor({
     Key? key,
     required this.customField,
     this.onChanged,
     this.onRemovePressed,
-  }) : super(key: key);
+    ThemeData? datePickerThemeData,
+  })  : datePickerThemeData = datePickerThemeData ?? datePickerTheme,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,12 +54,7 @@ class CustomFieldEditor extends StatelessWidget {
                 firstDate: DateTime.utc(0, 04, 20),
                 lastDate: DateTime.utc(275760, 09, 13),
                 builder: (context, widget) => Theme(
-                  data: ThemeData(
-                    colorScheme: ColorScheme.dark(
-                      primary: lightContentSecondaryColor,
-                      onPrimary: lightContentColor,
-                    ),
-                  ),
+                  data: datePickerThemeData,
                   child: widget!,
                 ),
               ).then((value) {

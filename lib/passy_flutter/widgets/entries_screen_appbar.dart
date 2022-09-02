@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 class EntriesScreenAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
+  final EdgeInsetsGeometry buttonPadding;
+  final double buttonSplashRadius;
   final Widget title;
   final void Function()? onSearchPressed;
   final void Function()? onAddPressed;
 
   const EntriesScreenAppBar({
     Key? key,
+    this.buttonPadding = appBarButtonPadding,
+    this.buttonSplashRadius = appBarButtonSplashRadius,
     required this.title,
     this.onSearchPressed,
     this.onAddPressed,
@@ -21,20 +25,22 @@ class EntriesScreenAppBar extends StatelessWidget
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
+        padding: buttonPadding,
+        splashRadius: buttonSplashRadius,
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         onPressed: () => Navigator.pop(context),
       ),
       title: title,
       actions: [
         IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
           onPressed: onSearchPressed,
           icon: const Icon(Icons.search_rounded),
         ),
         IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
           onPressed: onAddPressed,
           icon: const Icon(Icons.add_rounded),
         ),

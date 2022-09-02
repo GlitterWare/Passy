@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_flutter/theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/common/theme.dart';
 
 import 'assets.dart';
 
@@ -36,6 +36,8 @@ class _BackupScreen extends State<BackupScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

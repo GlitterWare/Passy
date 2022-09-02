@@ -7,6 +7,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'common.dart';
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
+import 'password_screen.dart';
 import 'search_screen.dart';
 
 class PasswordsScreen extends StatefulWidget {
@@ -24,8 +25,12 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   @override
   void initState() {
     super.initState();
-    List<Widget> _widgets =
-        buildPasswordWidgets(context: context, account: data.loadedAccount!);
+    List<Widget> _widgets = buildPasswordWidgets(
+        context: context,
+        account: data.loadedAccount!,
+        onPressed: (password) => Navigator.pushNamed(
+            context, PasswordScreen.routeName,
+            arguments: password));
     _passwordWidgets.addAll(_widgets);
   }
 
@@ -64,7 +69,12 @@ class _PasswordsScreen extends State<PasswordsScreen> {
       List<Widget> _widgets = [];
       for (Password _password in _found) {
         _widgets.add(
-          PassyPadding(PasswordButton(password: _password)),
+          PassyPadding(PasswordButton(
+            password: _password,
+            onPressed: () => Navigator.pushNamed(
+                context, PasswordScreen.routeName,
+                arguments: _password),
+          )),
         );
       }
       return _widgets;

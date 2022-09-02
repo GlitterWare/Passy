@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'assets.dart';
 import 'login_screen.dart';
@@ -109,6 +109,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
         leading: data.noAccounts
             ? null
             : IconButton(
+                padding: appBarButtonPadding,
+                splashRadius: appBarButtonSplashRadius,
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 onPressed: () => Navigator.pushReplacementNamed(
                     context, LoginScreen.routeName),

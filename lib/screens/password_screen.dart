@@ -10,7 +10,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import '../common/theme.dart';
+import '../passy_flutter/theme.dart';
 import 'edit_password_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';

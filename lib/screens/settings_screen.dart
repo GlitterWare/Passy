@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'assets.dart';
 import 'backup_and_restore_screen.dart';
@@ -29,6 +29,8 @@ class _SettingsScreen extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

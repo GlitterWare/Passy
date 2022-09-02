@@ -5,7 +5,7 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'assets.dart';
 import 'add_account_screen.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/passy_flutter/theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -31,6 +32,8 @@ class _SearchScreen extends State<SearchScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

@@ -5,7 +5,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'settings_screen.dart';
 
@@ -65,6 +65,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

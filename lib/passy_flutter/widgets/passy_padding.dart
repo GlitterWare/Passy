@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 class PassyPadding extends StatelessWidget {
   final Widget? child;

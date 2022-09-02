@@ -8,8 +8,7 @@ import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
-
-import 'theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 class SynchronizationWrapper {
   final BuildContext _context;

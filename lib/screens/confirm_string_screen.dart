@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
@@ -43,6 +44,8 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+            padding: appBarButtonPadding,
+            splashRadius: appBarButtonSplashRadius,
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: _args.onBackPressed == null
                 ? null

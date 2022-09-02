@@ -6,7 +6,7 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'assets.dart';
-import '../common/theme.dart';
+import '../passy_flutter/theme.dart';
 import 'backup_and_restore_screen.dart';
 import 'login_screen.dart';
 import 'log_screen.dart';
@@ -28,6 +28,8 @@ class _RestoreScreen extends State<RestoreScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          padding: appBarButtonPadding,
+          splashRadius: appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

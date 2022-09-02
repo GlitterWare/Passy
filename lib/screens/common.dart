@@ -79,6 +79,7 @@ List<Widget> buildPasswordWidgets({
   required BuildContext context,
   required LoadedAccount account,
   List<Password>? passwords,
+  void Function(Password password)? onPressed,
 }) {
   final List<Widget> _passwordWidgets = [];
   if (passwords == null) {
@@ -87,7 +88,10 @@ List<Widget> buildPasswordWidgets({
   }
   for (Password password in passwords) {
     _passwordWidgets.add(
-      PassyPadding(PasswordButton(password: password)),
+      PassyPadding(PasswordButton(
+        password: password,
+        onPressed: () => onPressed?.call(password),
+      )),
     );
   }
   return _passwordWidgets;

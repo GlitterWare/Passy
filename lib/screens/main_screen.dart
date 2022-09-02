@@ -4,7 +4,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
 import 'payment_cards_screen.dart';

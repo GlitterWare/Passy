@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/common/theme.dart';
+import 'package:passy/passy_flutter/theme.dart';
 
 import 'widgets.dart';
 
 class PassyRecord extends StatelessWidget {
   final String title;
+  final TextStyle titleStyle;
   final String value;
   final bool obscureValue;
   final bool isPassword;
   final TextAlign valueAlign;
 
-  const PassyRecord(
-      {Key? key,
-      required this.title,
-      required this.value,
-      this.obscureValue = false,
-      this.isPassword = false,
-      this.valueAlign = TextAlign.center})
-      : super(key: key);
+  PassyRecord({
+    Key? key,
+    required this.title,
+    TextStyle? titleStyle,
+    required this.value,
+    this.obscureValue = false,
+    this.isPassword = false,
+    this.valueAlign = TextAlign.center,
+  })  : titleStyle = titleStyle ?? TextStyle(color: lightContentSecondaryColor),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,7 @@ class PassyRecord extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(color: lightContentSecondaryColor),
+            style: titleStyle,
           ),
           FittedBox(
             child: Text(
