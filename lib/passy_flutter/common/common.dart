@@ -84,3 +84,6 @@ String beautifyCardNumber(String cardNumber) {
   }
   return cardNumber;
 }
+
+int alphabeticalCompare(String a, String b) =>
+    a.toLowerCase().compareTo(b.toLowerCase());
