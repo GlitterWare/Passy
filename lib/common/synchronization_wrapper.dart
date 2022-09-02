@@ -33,7 +33,7 @@ class SynchronizationWrapper {
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
         content: Row(children: [
-          Icon(Icons.sync_problem_rounded, color: darkContentColor),
+          Icon(Icons.sync_problem_rounded, color: PassyTheme.darkContentColor),
           const SizedBox(width: 20),
           const Expanded(child: Text('Sync error')),
         ]),
@@ -50,7 +50,8 @@ class SynchronizationWrapper {
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
           content: Row(children: [
-            Icon(Icons.sync_problem_rounded, color: darkContentColor),
+            Icon(Icons.sync_problem_rounded,
+                color: PassyTheme.darkContentColor),
             const SizedBox(width: 20),
             const Text('Invalid address format'),
           ]),
@@ -69,7 +70,7 @@ class SynchronizationWrapper {
       ScaffoldMessenger.of(_context).clearSnackBars();
       ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
         content: Row(children: [
-          Icon(Icons.sync_problem_rounded, color: darkContentColor),
+          Icon(Icons.sync_problem_rounded, color: PassyTheme.darkContentColor),
           const SizedBox(width: 20),
           const Text('Connection failed'),
         ]),
@@ -93,7 +94,7 @@ class SynchronizationWrapper {
       showDialog(
         context: _context,
         builder: (_) => SimpleDialog(
-          shape: dialogShape,
+          shape: PassyTheme.dialogShape,
           children: [
             Center(
               child: SizedBox(

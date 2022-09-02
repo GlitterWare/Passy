@@ -18,7 +18,7 @@ class CustomFieldEditor extends StatelessWidget {
     this.onChanged,
     this.onRemovePressed,
     ThemeData? datePickerThemeData,
-  })  : datePickerThemeData = datePickerThemeData ?? datePickerTheme,
+  })  : datePickerThemeData = datePickerThemeData ?? PassyTheme.datePickerTheme,
         super(key: key);
 
   @override

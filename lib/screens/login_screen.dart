@@ -35,7 +35,7 @@ class _LoginScreen extends State<LoginScreen> {
           content: Row(children: [
         Icon(
           Icons.lock_rounded,
-          color: darkContentColor,
+          color: PassyTheme.darkContentColor,
         ),
         const SizedBox(width: 20),
         const Expanded(child: Text('Incorrect password')),
@@ -56,7 +56,7 @@ class _LoginScreen extends State<LoginScreen> {
           ..clearSnackBars()
           ..showSnackBar(SnackBar(
             content: Row(children: [
-              Icon(Icons.lock_rounded, color: darkContentColor),
+              Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
               const SizedBox(width: 20),
               const Text('Could not login'),
             ]),
@@ -90,7 +90,8 @@ class _LoginScreen extends State<LoginScreen> {
                                     TextSpan(
                                       text: '\'$_username\' ',
                                       style: TextStyle(
-                                          color: lightContentSecondaryColor),
+                                          color: PassyTheme
+                                              .lightContentSecondaryColor),
                                     ),
                                     const TextSpan(
                                         text:
@@ -98,7 +99,8 @@ class _LoginScreen extends State<LoginScreen> {
                                     TextSpan(
                                       text: 'irreversible',
                                       style: TextStyle(
-                                          color: lightContentSecondaryColor),
+                                          color: PassyTheme
+                                              .lightContentSecondaryColor),
                                     ),
                                     const TextSpan(text: '.'),
                                   ]),
@@ -117,7 +119,7 @@ class _LoginScreen extends State<LoginScreen> {
                                   ..showSnackBar(SnackBar(
                                     content: Row(children: [
                                       Icon(Icons.error_outline_rounded,
-                                          color: darkContentColor),
+                                          color: PassyTheme.darkContentColor),
                                       const SizedBox(width: 20),
                                       const Expanded(
                                           child:
@@ -140,8 +142,8 @@ class _LoginScreen extends State<LoginScreen> {
                             }));
                   },
                   icon: const Icon(Icons.delete_outline_rounded),
-                  splashRadius: appBarButtonSplashRadius,
-                  padding: appBarButtonPadding,
+                  splashRadius: PassyTheme.appBarButtonSplashRadius,
+                  padding: PassyTheme.appBarButtonPadding,
                 ),
               ]),
               value: _username,

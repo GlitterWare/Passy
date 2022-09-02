@@ -11,7 +11,7 @@ class PassyPadding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: passyPadding,
+        padding: PassyTheme.passyPadding,
         child: child,
       );
 }

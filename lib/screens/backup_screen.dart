@@ -36,8 +36,8 @@ class _BackupScreen extends State<BackupScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
@@ -50,7 +50,7 @@ class _BackupScreen extends State<BackupScreen> {
           left: SvgPicture.asset(
             logoCircleSvg,
             width: 25,
-            color: lightContentColor,
+            color: PassyTheme.lightContentColor,
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () => _onPassyBackup(_username),

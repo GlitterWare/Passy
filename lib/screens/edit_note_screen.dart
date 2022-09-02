@@ -77,15 +77,16 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             labelText: 'Note',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: lightContentColor),
+              borderSide: BorderSide(color: PassyTheme.lightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: darkContentSecondaryColor),
+              borderSide:
+                  BorderSide(color: PassyTheme.darkContentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: lightContentColor),
+              borderSide: BorderSide(color: PassyTheme.lightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _note = value),

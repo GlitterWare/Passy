@@ -26,21 +26,23 @@ class _NoteScreen extends State<NoteScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            shape: dialogShape,
+            shape: PassyTheme.dialogShape,
             title: const Text('Remove note'),
             content: const Text('Notes can only be restored from a backup.'),
             actions: [
               TextButton(
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 child: Text(
                   'Remove',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   _account.removeNote(note.key);

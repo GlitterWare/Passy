@@ -23,12 +23,12 @@ class MonthPickerFormField extends StatelessWidget {
     this.title,
     this.getSelectedDate,
     this.onChanged,
-  })  : buttonStyle =
-            buttonStyle ?? TextStyle(color: lightContentSecondaryColor),
-        currentDateStyle =
-            currentDateStyle ?? TextStyle(color: lightContentSecondaryColor),
-        selectedDateStyle =
-            selectedDateStyle ?? TextStyle(color: lightContentSecondaryColor),
+  })  : buttonStyle = buttonStyle ??
+            TextStyle(color: PassyTheme.lightContentSecondaryColor),
+        currentDateStyle = currentDateStyle ??
+            TextStyle(color: PassyTheme.lightContentSecondaryColor),
+        selectedDateStyle = selectedDateStyle ??
+            TextStyle(color: PassyTheme.lightContentSecondaryColor),
         super(key: key);
 
   @override

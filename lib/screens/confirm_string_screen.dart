@@ -44,8 +44,8 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: appBarButtonPadding,
-            splashRadius: appBarButtonSplashRadius,
+            padding: PassyTheme.appBarButtonPadding,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: _args.onBackPressed == null
                 ? null

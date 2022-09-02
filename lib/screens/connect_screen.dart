@@ -28,8 +28,8 @@ class _ConnectScreen extends State<ConnectScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
@@ -47,14 +47,16 @@ class _ConnectScreen extends State<ConnectScreen> {
                   children: [
                     TextSpan(
                       text: 'same network ',
-                      style: TextStyle(color: lightContentSecondaryColor),
+                      style: TextStyle(
+                          color: PassyTheme.lightContentSecondaryColor),
                     ),
                     const TextSpan(
                         text:
                             'as the host to connect.\n\nEnter host address as shown '),
                     TextSpan(
                       text: 'below the QR code',
-                      style: TextStyle(color: lightContentSecondaryColor),
+                      style: TextStyle(
+                          color: PassyTheme.lightContentSecondaryColor),
                     ),
                     const TextSpan(text: ':\n'),
                   ],
@@ -65,9 +67,9 @@ class _ConnectScreen extends State<ConnectScreen> {
                 Flexible(
                   child: Padding(
                     padding: EdgeInsets.only(
-                        left: passyPadding.right,
-                        top: passyPadding.top,
-                        bottom: passyPadding.bottom),
+                        left: PassyTheme.passyPadding.right,
+                        top: PassyTheme.passyPadding.top,
+                        bottom: PassyTheme.passyPadding.bottom),
                     child: TextFormField(
                       initialValue: _address,
                       decoration: const InputDecoration(
@@ -79,7 +81,8 @@ class _ConnectScreen extends State<ConnectScreen> {
                 ),
                 SizedBox(
                   child: Padding(
-                    padding: EdgeInsets.only(right: passyPadding.right),
+                    padding:
+                        EdgeInsets.only(right: PassyTheme.passyPadding.right),
                     child: FloatingActionButton(
                       onPressed: () => SynchronizationWrapper(context: context)
                           .connect(_account, address: _address),

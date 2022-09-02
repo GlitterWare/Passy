@@ -27,7 +27,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: [
-        Icon(Icons.person_rounded, color: darkContentColor),
+        Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
         const SizedBox(width: 20),
         const Text('Username is empty'),
       ])));
@@ -37,7 +37,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: [
-        Icon(Icons.person_rounded, color: darkContentColor),
+        Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
         const SizedBox(width: 20),
         const Text('Username is shorter than 2 letters'),
       ])));
@@ -47,7 +47,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: [
-        Icon(Icons.person_rounded, color: darkContentColor),
+        Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
         const SizedBox(width: 20),
         const Text('Username is already in use'),
       ])));
@@ -57,7 +57,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: [
-        Icon(Icons.lock_rounded, color: darkContentColor),
+        Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
         const SizedBox(width: 20),
         const Text('Password is empty'),
       ])));
@@ -67,7 +67,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Row(children: [
-        Icon(Icons.lock_rounded, color: darkContentColor),
+        Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
         const SizedBox(width: 20),
         const Text('Passwords do not match'),
       ])));
@@ -83,7 +83,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
           content: Row(children: [
-            Icon(Icons.error_outline_rounded, color: darkContentColor),
+            Icon(Icons.error_outline_rounded,
+                color: PassyTheme.darkContentColor),
             const SizedBox(width: 20),
             const Expanded(child: Text('Couldn\'t add account')),
           ]),
@@ -109,8 +110,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
         leading: data.noAccounts
             ? null
             : IconButton(
-                padding: appBarButtonPadding,
-                splashRadius: appBarButtonSplashRadius,
+                padding: PassyTheme.appBarButtonPadding,
+                splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 onPressed: () => Navigator.pushReplacementNamed(
                     context, LoginScreen.routeName),

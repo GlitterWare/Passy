@@ -33,7 +33,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
             ..clearSnackBars()
             ..showSnackBar(SnackBar(
               content: Row(children: [
-                Icon(Icons.fingerprint_rounded, color: darkContentColor),
+                Icon(Icons.fingerprint_rounded,
+                    color: PassyTheme.darkContentColor),
                 const SizedBox(width: 20),
                 const Expanded(child: Text('Wrong password')),
               ]),
@@ -48,7 +49,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
             ..clearSnackBars()
             ..showSnackBar(SnackBar(
               content: Row(children: [
-                Icon(Icons.fingerprint_rounded, color: darkContentColor),
+                Icon(Icons.fingerprint_rounded,
+                    color: PassyTheme.darkContentColor),
                 const SizedBox(width: 20),
                 const Expanded(child: Text('Couldn\'t authenticate')),
               ]),
@@ -65,8 +67,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),

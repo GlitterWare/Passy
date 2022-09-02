@@ -81,7 +81,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            shape: dialogShape,
+            shape: PassyTheme.dialogShape,
             title: const Text('Remove password'),
             content:
                 const Text('Passwords can only be restored from a backup.'),
@@ -89,14 +89,16 @@ class _PasswordScreen extends State<PasswordScreen> {
               TextButton(
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 child: Text(
                   'Remove',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   _account.removePassword(password.key);
@@ -156,12 +158,12 @@ class _PasswordScreen extends State<PasswordScreen> {
             Row(
               children: [
                 SizedBox(
-                  width: passyPadding.left * 2,
+                  width: PassyTheme.passyPadding.left * 2,
                 ),
                 SizedBox(
                   child: CircularProgressIndicator(
                     value: _tfaProgress,
-                    color: lightContentSecondaryColor,
+                    color: PassyTheme.lightContentSecondaryColor,
                   ),
                 ),
                 Flexible(

@@ -33,7 +33,7 @@ class _IDCardScreen extends State<IDCardScreen> {
           context: context,
           builder: (_) {
             return AlertDialog(
-              shape: dialogShape,
+              shape: PassyTheme.dialogShape,
               title: const Text('Remove password'),
               content:
                   const Text('Passwords can only be restored from a backup.'),
@@ -41,14 +41,16 @@ class _IDCardScreen extends State<IDCardScreen> {
                 TextButton(
                   child: Text(
                     'Cancel',
-                    style: TextStyle(color: lightContentSecondaryColor),
+                    style:
+                        TextStyle(color: PassyTheme.lightContentSecondaryColor),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 TextButton(
                   child: Text(
                     'Remove',
-                    style: TextStyle(color: lightContentSecondaryColor),
+                    style:
+                        TextStyle(color: PassyTheme.lightContentSecondaryColor),
                   ),
                   onPressed: () {
                     _account.removeIDCard(_idCard.key);

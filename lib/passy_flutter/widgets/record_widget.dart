@@ -21,7 +21,8 @@ class PassyRecord extends StatelessWidget {
     this.obscureValue = false,
     this.isPassword = false,
     this.valueAlign = TextAlign.center,
-  })  : titleStyle = titleStyle ?? TextStyle(color: lightContentSecondaryColor),
+  })  : titleStyle = titleStyle ??
+            TextStyle(color: PassyTheme.lightContentSecondaryColor),
         super(key: key);
 
   @override

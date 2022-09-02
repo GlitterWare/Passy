@@ -29,8 +29,8 @@ class _SettingsScreen extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
@@ -86,7 +86,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                                   TextSpan(
                                     text: 'v$passyVersion',
                                     style: TextStyle(
-                                      color: lightContentSecondaryColor,
+                                      color:
+                                          PassyTheme.lightContentSecondaryColor,
                                     ),
                                   )
                                 ],
@@ -99,7 +100,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontFamily: 'FiraCode',
-                                color: lightContentSecondaryColor,
+                                color: PassyTheme.lightContentSecondaryColor,
                               ),
                             ),
                             const SizedBox(height: 24),
@@ -116,7 +117,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                               left: SvgPicture.asset(
                                 'assets/images/github_icon.svg',
                                 width: 26,
-                                color: lightContentColor,
+                                color: PassyTheme.lightContentColor,
                               ),
                               center: const Text('GitHub'),
                               right:

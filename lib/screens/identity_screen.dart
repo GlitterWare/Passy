@@ -33,7 +33,7 @@ class _IdentityScreen extends State<IdentityScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            shape: dialogShape,
+            shape: PassyTheme.dialogShape,
             title: const Text('Remove identity'),
             content:
                 const Text('Identities can only be restored from a backup.'),
@@ -41,14 +41,16 @@ class _IdentityScreen extends State<IdentityScreen> {
               TextButton(
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 child: Text(
                   'Remove',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   _account.removeIdentity(_identity.key);

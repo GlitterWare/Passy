@@ -19,24 +19,24 @@ class LogScreen extends StatelessWidget {
             title: const Text('Log'),
             centerTitle: true,
             leading: IconButton(
-              padding: appBarButtonPadding,
-              splashRadius: appBarButtonSplashRadius,
+              padding: PassyTheme.appBarButtonPadding,
+              splashRadius: PassyTheme.appBarButtonSplashRadius,
               icon: const Icon(Icons.arrow_back_ios_new_rounded),
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
               IconButton(
-                padding: appBarButtonPadding,
-                splashRadius: appBarButtonSplashRadius,
+                padding: PassyTheme.appBarButtonPadding,
+                splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: const Icon(Icons.copy_rounded),
                 onPressed: () => Clipboard.setData(ClipboardData(text: _log)),
               ),
               IconButton(
-                padding: appBarButtonPadding,
-                splashRadius: appBarButtonSplashRadius,
+                padding: PassyTheme.appBarButtonPadding,
+                splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: SvgPicture.asset(
                   'assets/images/github_icon.svg',
-                  color: lightContentColor,
+                  color: PassyTheme.lightContentColor,
                 ),
                 onPressed: () =>
                     launch('https://github.com/GleammerRay/Passy/issues'),

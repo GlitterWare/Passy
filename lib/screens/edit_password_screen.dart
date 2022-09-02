@@ -206,7 +206,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           }),
         )),
         buildCustomFieldEditors(
-            customFields: _customFields, padding: passyPadding),
+            customFields: _customFields, padding: PassyTheme.passyPadding),
         PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
@@ -215,15 +215,16 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             labelText: 'Additional info',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: lightContentColor),
+              borderSide: BorderSide(color: PassyTheme.lightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: darkContentSecondaryColor),
+              borderSide:
+                  BorderSide(color: PassyTheme.darkContentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: lightContentColor),
+              borderSide: BorderSide(color: PassyTheme.lightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),

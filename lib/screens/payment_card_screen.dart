@@ -26,7 +26,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            shape: dialogShape,
+            shape: PassyTheme.dialogShape,
             title: const Text('Remove payment card'),
             content:
                 const Text('Payment cards can only be restored from a backup.'),
@@ -34,14 +34,16 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
               TextButton(
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 child: Text(
                   'Remove',
-                  style: TextStyle(color: lightContentSecondaryColor),
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   LoadedAccount _account = data.loadedAccount!;

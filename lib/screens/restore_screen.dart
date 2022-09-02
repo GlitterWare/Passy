@@ -28,8 +28,8 @@ class _RestoreScreen extends State<RestoreScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          padding: appBarButtonPadding,
-          splashRadius: appBarButtonSplashRadius,
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
@@ -42,7 +42,7 @@ class _RestoreScreen extends State<RestoreScreen> {
           left: SvgPicture.asset(
             logoCircleSvg,
             width: 25,
-            color: lightContentColor,
+            color: PassyTheme.lightContentColor,
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () {
@@ -65,7 +65,8 @@ class _RestoreScreen extends State<RestoreScreen> {
                         children: [
                           TextSpan(
                             text: 'its current data will be lost ',
-                            style: TextStyle(color: lightContentSecondaryColor),
+                            style: TextStyle(
+                                color: PassyTheme.lightContentSecondaryColor),
                           ),
                           const TextSpan(
                               text:
@@ -99,7 +100,7 @@ class _RestoreScreen extends State<RestoreScreen> {
                               SnackBar(
                                 content: Row(children: [
                                   Icon(Icons.settings_backup_restore_rounded,
-                                      color: darkContentColor),
+                                      color: PassyTheme.darkContentColor),
                                   const SizedBox(width: 20),
                                   const Text('Could not restore account'),
                                 ]),

@@ -13,8 +13,8 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const EntryScreenAppBar({
     Key? key,
-    this.buttonPadding = appBarButtonPadding,
-    this.buttonSplashRadius = appBarButtonSplashRadius,
+    this.buttonPadding = PassyTheme.appBarButtonPadding,
+    this.buttonSplashRadius = PassyTheme.appBarButtonSplashRadius,
     required this.title,
     this.onRemovePressed,
     this.onEditPressed,

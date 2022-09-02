@@ -13,8 +13,8 @@ class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const EditScreenAppBar({
     Key? key,
-    this.buttonPadding = appBarButtonPadding,
-    this.buttonSplashRadius = appBarButtonSplashRadius,
+    this.buttonPadding = PassyTheme.appBarButtonPadding,
+    this.buttonSplashRadius = PassyTheme.appBarButtonSplashRadius,
     required this.title,
     this.onSave,
     this.isNew = false,

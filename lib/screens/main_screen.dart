@@ -37,24 +37,25 @@ class _MainScreen extends State<MainScreen>
         title: const Text('Passy'),
         actions: [
           IconButton(
-            splashRadius: appBarButtonSplashRadius,
-            padding: appBarButtonPadding,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
+            padding: PassyTheme.appBarButtonPadding,
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                  shape: dialogShape,
+                  shape: PassyTheme.dialogShape,
                   title: Center(
                       child: Text(
                     'Synchronize',
-                    style: TextStyle(color: lightContentColor),
+                    style: TextStyle(color: PassyTheme.lightContentColor),
                   )),
                   actionsAlignment: MainAxisAlignment.center,
                   actions: [
                     TextButton(
                         child: Text(
                           'Host',
-                          style: TextStyle(color: lightContentSecondaryColor),
+                          style: TextStyle(
+                              color: PassyTheme.lightContentSecondaryColor),
                         ),
                         onPressed: () =>
                             SynchronizationWrapper(context: context)
@@ -62,7 +63,8 @@ class _MainScreen extends State<MainScreen>
                     TextButton(
                       child: Text(
                         'Connect',
-                        style: TextStyle(color: lightContentSecondaryColor),
+                        style: TextStyle(
+                            color: PassyTheme.lightContentSecondaryColor),
                       ),
                       onPressed: isCameraSupported
                           ? () => showDialog(
@@ -103,7 +105,8 @@ class _MainScreen extends State<MainScreen>
                                         child: Text(
                                           'Can\'t scan?',
                                           style: TextStyle(
-                                            color: lightContentSecondaryColor,
+                                            color: PassyTheme
+                                                .lightContentSecondaryColor,
                                           ),
                                         ),
                                       ),
@@ -112,7 +115,8 @@ class _MainScreen extends State<MainScreen>
                                         child: Text(
                                           'Cancel',
                                           style: TextStyle(
-                                            color: lightContentSecondaryColor,
+                                            color: PassyTheme
+                                                .lightContentSecondaryColor,
                                           ),
                                         ),
                                       )
@@ -136,11 +140,11 @@ class _MainScreen extends State<MainScreen>
             icon: const Icon(Icons.sync_rounded),
           ),
           IconButton(
-            padding: appBarButtonPadding,
+            padding: PassyTheme.appBarButtonPadding,
             onPressed: () =>
                 Navigator.pushNamed(context, SettingsScreen.routeName),
             icon: const Icon(Icons.settings),
-            splashRadius: appBarButtonSplashRadius,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
           ),
         ],
       ),

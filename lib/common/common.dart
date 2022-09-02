@@ -28,7 +28,7 @@ AlertDialog getRecordDialog(
             text: _iterator.current,
             style: TextStyle(
               fontFamily: 'FiraCode',
-              color: lightContentSecondaryColor,
+              color: PassyTheme.lightContentSecondaryColor,
             )));
       }
     }
@@ -43,7 +43,7 @@ AlertDialog getRecordDialog(
       style: const TextStyle(fontFamily: 'FiraCode'),
     );
   }
-  return AlertDialog(shape: dialogShape, content: content);
+  return AlertDialog(shape: PassyTheme.dialogShape, content: content);
 }
 
 String capitalize(String string) {

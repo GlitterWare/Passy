@@ -42,7 +42,7 @@ class Passy extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Passy',
-      theme: theme,
+      theme: PassyTheme.theme,
       navigatorKey: navigatorKey,
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
