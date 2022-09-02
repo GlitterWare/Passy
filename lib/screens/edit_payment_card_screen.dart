@@ -4,9 +4,8 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
-import '../passy_flutter/passy_theme.dart';
 import 'edit_custom_field_screen.dart';
 import 'main_screen.dart';
 import 'payment_card_screen.dart';
@@ -171,7 +170,10 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             ).then(
               (value) {
                 if (value != null) {
-                  setState(() => _customFields.add(value as CustomField));
+                  setState(() {
+                    _customFields.add(value as CustomField);
+                    PassySort.sortCustomFields(_customFields);
+                  });
                 }
               },
             ),

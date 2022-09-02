@@ -184,7 +184,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   child: FavIconImage(address: _password.website, width: 35)),
             ]),
           for (CustomField _customField in _password.customFields)
-            CustomFieldButton(customField: _customField),
+            PassyPadding(CustomFieldButton(customField: _customField)),
           if (_password.additionalInfo != '')
             PassyPadding(RecordButton(
                 title: 'Additional info', value: _password.additionalInfo)),

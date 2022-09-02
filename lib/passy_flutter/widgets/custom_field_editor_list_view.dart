@@ -21,26 +21,34 @@ class CustomFieldEditorListView extends StatefulWidget {
 }
 
 class _CustomFieldEditorListView extends State<CustomFieldEditorListView> {
+  late List<CustomField> customFields;
+
+  @override
+  void initState() {
+    super.initState();
+    customFields = widget.customFields;
+    if (widget.shouldSort) PassySort.sortCustomFields(customFields);
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.shouldSort) PassySort.sortCustomFields(widget.customFields);
-    return ListView.builder(
+    return ListView(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemBuilder: (context, index) {
-        CustomField _customField = widget.customFields[index];
-        return Padding(
-          padding: widget.padding,
-          child: CustomFieldEditor(
-            customField: _customField,
-            onChanged: (value) => setState(() => _customField.value = value),
-            onRemovePressed: () =>
-                setState(() => widget.customFields.removeAt(index)),
-            datePickerColorScheme: widget.datePickerColorScheme,
+      children: [
+        for (int i = 0; i != customFields.length; i++)
+          Padding(
+            padding: widget.padding,
+            child: CustomFieldEditor(
+              key: UniqueKey(),
+              customField: widget.customFields[i],
+              onChanged: (value) =>
+                  setState(() => customFields[i].value = value),
+              onRemovePressed: () => setState(() => customFields.removeAt(i)),
+              datePickerColorScheme: widget.datePickerColorScheme,
+            ),
           ),
-        );
-      },
-      itemCount: widget.customFields.length,
+      ],
     );
   }
 }

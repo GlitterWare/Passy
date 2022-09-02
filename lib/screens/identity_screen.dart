@@ -142,7 +142,7 @@ class _IdentityScreen extends State<IdentityScreen> {
               value: _identity.country,
             )),
           for (CustomField _customField in _identity.customFields)
-            CustomFieldButton(customField: _customField),
+            PassyPadding(CustomFieldButton(customField: _customField)),
           if (_identity.additionalInfo != '')
             PassyPadding(RecordButton(
                 title: 'Additional info', value: _identity.additionalInfo)),

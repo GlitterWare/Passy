@@ -104,7 +104,7 @@ class _IDCardScreen extends State<IDCardScreen> {
             PassyPadding(
                 RecordButton(title: 'Country', value: _idCard.country)),
           for (CustomField _customField in _idCard.customFields)
-            CustomFieldButton(customField: _customField),
+            PassyPadding(CustomFieldButton(customField: _customField)),
           if (_idCard.additionalInfo != '')
             PassyPadding(RecordButton(
                 title: 'Additional info', value: _idCard.additionalInfo)),

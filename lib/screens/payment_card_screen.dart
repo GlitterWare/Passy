@@ -109,7 +109,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
             value: _paymentCard.cvv,
           )),
         for (CustomField _customField in _paymentCard.customFields)
-          CustomFieldButton(customField: _customField),
+          PassyPadding(CustomFieldButton(customField: _customField)),
         if (_paymentCard.additionalInfo != '')
           PassyPadding(RecordButton(
             title: 'Additional info',

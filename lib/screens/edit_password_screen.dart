@@ -6,8 +6,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'edit_custom_field_screen.dart';
 import 'password_screen.dart';
@@ -200,7 +199,10 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             EditCustomFieldScreen.routeName,
           ).then((value) {
             if (value != null) {
-              setState(() => _customFields.add(value as CustomField));
+              setState(() {
+                _customFields.add(value as CustomField);
+                PassySort.sortCustomFields(_customFields);
+              });
             }
           }),
         )),

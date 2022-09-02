@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/identity.dart' as id;
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'main_screen.dart';
 import 'splash_screen.dart';
@@ -199,7 +198,10 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
             EditCustomFieldScreen.routeName,
           ).then((value) {
             if (value != null) {
-              setState(() => _customFields.add(value as CustomField));
+              setState(() {
+                _customFields.add(value as CustomField);
+                PassySort.sortCustomFields(_customFields);
+              });
             }
           }),
         )),
