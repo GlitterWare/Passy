@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import 'common.dart';
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
 import 'password_screen.dart';
@@ -20,19 +20,7 @@ class PasswordsScreen extends StatefulWidget {
 }
 
 class _PasswordsScreen extends State<PasswordsScreen> {
-  final List<Widget> _passwordWidgets = [];
-
-  @override
-  void initState() {
-    super.initState();
-    List<Widget> _widgets = buildPasswordWidgets(
-        context: context,
-        account: data.loadedAccount!,
-        onPressed: (password) => Navigator.pushNamed(
-            context, PasswordScreen.routeName,
-            arguments: password));
-    _passwordWidgets.addAll(_widgets);
-  }
+  final LoadedAccount _loadedAccount = data.loadedAccount!;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
@@ -65,19 +53,13 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           }
         }
       }
-      sortPasswords(_found);
-      List<Widget> _widgets = [];
-      for (Password _password in _found) {
-        _widgets.add(
-          PassyPadding(PasswordButton(
-            password: _password,
-            onPressed: () => Navigator.pushNamed(
-                context, PasswordScreen.routeName,
-                arguments: _password),
-          )),
-        );
-      }
-      return _widgets;
+      return PasswordButtonListView(
+        passwords: _found,
+        onPressed: (password) => Navigator.pushNamed(
+            context, PasswordScreen.routeName,
+            arguments: password),
+        shouldSort: true,
+      );
     });
   }
 
@@ -88,7 +70,10 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           title: const Center(child: Text('Passwords')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: ListView(children: _passwordWidgets),
+      body: PasswordButtonListView(
+        passwords: _loadedAccount.passwords.toList(),
+        shouldSort: true,
+      ),
     );
   }
 }

@@ -7,9 +7,7 @@ import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
-import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
-import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
@@ -30,16 +28,6 @@ void sortCustomFields(List<CustomField> customFields) {
   customFields.sort(
     (a, b) => a.title.compareTo(b.title),
   );
-}
-
-void sortPasswords(List<Password> passwords) {
-  passwords.sort((a, b) {
-    int _nickComp = a.nickname.compareTo(b.nickname);
-    if (_nickComp == 0) {
-      return a.username.compareTo(b.username);
-    }
-    return _nickComp;
-  });
 }
 
 void sortPaymentCards(List<PaymentCard> paymentCards) {
@@ -73,28 +61,6 @@ void sortIdentities(List<Identity> identities) {
     }
     return _nickComp;
   });
-}
-
-List<Widget> buildPasswordWidgets({
-  required BuildContext context,
-  required LoadedAccount account,
-  List<Password>? passwords,
-  void Function(Password password)? onPressed,
-}) {
-  final List<Widget> _passwordWidgets = [];
-  if (passwords == null) {
-    passwords = account.passwords.toList();
-    sortPasswords(passwords);
-  }
-  for (Password password in passwords) {
-    _passwordWidgets.add(
-      PassyPadding(PasswordButton(
-        password: password,
-        onPressed: () => onPressed?.call(password),
-      )),
-    );
-  }
-  return _passwordWidgets;
 }
 
 CardType cardTypeFromCreditCardType(CreditCardType cardType) {

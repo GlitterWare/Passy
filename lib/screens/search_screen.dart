@@ -13,7 +13,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreen extends State<SearchScreen> {
   bool _initialized = false;
-  List<Widget> _widgets = [];
+  Widget _widget = const Text('');
 
   @override
   void initState() {
@@ -22,11 +22,10 @@ class _SearchScreen extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> Function(String terms) _builder = ModalRoute.of(context)!
-        .settings
-        .arguments as List<Widget> Function(String);
+    Widget Function(String terms) _builder =
+        ModalRoute.of(context)!.settings.arguments as Widget Function(String);
     if (!_initialized) {
-      _widgets = _builder('');
+      _widget = _builder('');
       _initialized = true;
     }
     return Scaffold(
@@ -49,14 +48,11 @@ class _SearchScreen extends State<SearchScreen> {
               ),
               onChanged: (s) {
                 setState(() {
-                  _widgets = _builder(s);
+                  _widget = _builder(s);
                 });
               })),
           Expanded(
-            child: ListView.builder(
-              itemCount: _widgets.length,
-              itemBuilder: (BuildContext context, int index) => _widgets[index],
-            ),
+            child: _widget,
           ),
         ],
       ),
