@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/note.dart';
-import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
@@ -17,23 +16,6 @@ const screenToRouteName = {
   Screen.idCards: '',
   Screen.identities: '',
 };
-
-List<Widget> buildPaymentCardWidgets(
-  BuildContext context, {
-  required Iterable<PaymentCard> paymentCards,
-  void Function(PaymentCard paymentCard)? onPressed,
-}) {
-  final List<PaymentCard> _paymentCards = paymentCards.toList();
-  PassySort.sortPaymentCards(_paymentCards);
-  final List<Widget> _paymentCardWidgets = [];
-  for (PaymentCard paymentCard in paymentCards) {
-    _paymentCardWidgets.add(PaymentCardButton(
-      paymentCard: paymentCard,
-      onPressed: onPressed == null ? null : () => onPressed(paymentCard),
-    ));
-  }
-  return _paymentCardWidgets;
-}
 
 Widget buildNoteWidget({required BuildContext context, required Note note}) {
   return ThreeWidgetButton(
