@@ -49,7 +49,8 @@ class _NotesScreen extends State<NotesScreen> {
       return NoteButtonListView(
         notes: data.loadedAccount!.notes.toList(),
         shouldSort: true,
-        onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName),
+        onPressed: (note) =>
+            Navigator.pushNamed(context, NoteScreen.routeName, arguments: note),
       );
     });
   }
@@ -64,7 +65,8 @@ class _NotesScreen extends State<NotesScreen> {
       body: NoteButtonListView(
         notes: data.loadedAccount!.notes.toList(),
         shouldSort: true,
-        onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName),
+        onPressed: (note) =>
+            Navigator.pushNamed(context, NoteScreen.routeName, arguments: note),
       ),
     );
   }
