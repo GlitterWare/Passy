@@ -7,7 +7,7 @@ import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
-import 'assets.dart';
+import '../common/assets.dart';
 import 'add_account_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';

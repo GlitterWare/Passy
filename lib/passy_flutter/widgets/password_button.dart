@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/screens/assets.dart';
+import 'package:passy/common/assets.dart';
 
 import 'widgets.dart';
 

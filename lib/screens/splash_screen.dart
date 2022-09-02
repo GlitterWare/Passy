@@ -9,7 +9,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 
-import 'assets.dart';
+import '../common/assets.dart';
 import 'add_account_screen.dart';
 import 'common.dart';
 import 'login_screen.dart';

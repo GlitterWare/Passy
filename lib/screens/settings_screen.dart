@@ -9,7 +9,7 @@ import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
-import 'assets.dart';
+import '../common/assets.dart';
 import 'backup_and_restore_screen.dart';
 import 'biometric_auth_screen.dart';
 import 'main_screen.dart';

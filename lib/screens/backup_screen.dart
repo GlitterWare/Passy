@@ -6,7 +6,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import 'assets.dart';
+import '../common/assets.dart';
 
 import 'backup_and_restore_screen.dart';
 

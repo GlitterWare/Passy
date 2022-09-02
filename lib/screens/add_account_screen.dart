@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
-import 'assets.dart';
+import '../common/assets.dart';
 import 'login_screen.dart';
 import 'log_screen.dart';
 
