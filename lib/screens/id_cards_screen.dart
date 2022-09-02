@@ -50,13 +50,15 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         }
       }
       PassySort.sortIDCards(_found);
-      List<Widget> _widgets = [];
-      for (IDCard _idCard in _found) {
-        _widgets.add(
-          PassyPadding(IDCardButton(idCard: _idCard)),
-        );
-      }
-      return _widgets;
+      return IDCardButtonListView(
+        idCards: _found,
+        shouldSort: true,
+        onPressed: (idCard) => Navigator.pushNamed(
+          context,
+          IDCardScreen.routeName,
+          arguments: idCard,
+        ),
+      );
     });
   }
 

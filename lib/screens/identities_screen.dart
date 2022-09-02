@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/passy_flutter/widgets/identity_button_list_view.dart';
+import 'package:passy/screens/identity_screen.dart';
 
 import 'common.dart';
 import 'main_screen.dart';
@@ -61,13 +63,15 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         }
       }
       PassySort.sortIdentities(_found);
-      List<Widget> _widgets = [];
-      for (Identity _identity in _found) {
-        _widgets.add(
-          PassyPadding(IdentityButton(identity: _identity)),
-        );
-      }
-      return _widgets;
+      return IdentityButtonListView(
+        identities: _found,
+        shouldSort: true,
+        onPressed: (identity) => Navigator.pushNamed(
+          context,
+          IdentityScreen.routeName,
+          arguments: identity,
+        ),
+      );
     });
   }
 
