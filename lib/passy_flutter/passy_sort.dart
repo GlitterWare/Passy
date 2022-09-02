@@ -20,7 +20,7 @@ class PassySort {
 
   static void sortCustomFields(List<CustomField> customFields) {
     customFields.sort(
-      (a, b) => a.title.compareTo(b.title),
+      (a, b) => alphabeticalCompare(a.title, b.title),
     );
   }
 
@@ -35,7 +35,7 @@ class PassySort {
   }
 
   static void sortNotes(List<Note> notes) =>
-      notes.sort((a, b) => a.title.compareTo(b.title));
+      notes.sort((a, b) => alphabeticalCompare(a.title, b.title));
 
   static void sortIDCards(List<IDCard> idCards) {
     idCards.sort((a, b) {
