@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
-import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -23,89 +19,6 @@ const screenToRouteName = {
   Screen.identities: '',
 };
 
-CardType cardTypeFromCreditCardType(CreditCardType cardType) {
-  switch (cardType) {
-    case CreditCardType.visa:
-      return CardType.visa;
-    case CreditCardType.mastercard:
-      return CardType.mastercard;
-    case CreditCardType.amex:
-      return CardType.americanExpress;
-    case CreditCardType.discover:
-      return CardType.discover;
-    default:
-      return CardType.otherBrand;
-  }
-}
-
-CardType cardTypeFromNumber(String number) =>
-    cardTypeFromCreditCardType(detectCCType(number));
-
-Widget buildPaymentCardWidget({
-  required PaymentCard paymentCard,
-  bool obscureCardNumber = true,
-  bool obscureCardCvv = true,
-  bool isSwipeGestureEnabled = false,
-  void Function()? onPressed,
-}) {
-  String beautifyCardNumber(String cardNumber) {
-    if (cardNumber.isEmpty) {
-      return '';
-    }
-    String _value = cardNumber.trim();
-    cardNumber = _value[0];
-    for (int i = 1; i < _value.length; i++) {
-      if (i % 4 == 0) cardNumber += ' ';
-      cardNumber += _value[i];
-    }
-    return cardNumber;
-  }
-
-  return Center(
-    child: Stack(
-      children: [
-        TextButton(
-          onPressed: onPressed,
-          child: CreditCardWidget(
-            glassmorphismConfig: Glassmorphism.defaultConfig(),
-            width: 350,
-            height: 200,
-            cardNumber: beautifyCardNumber(paymentCard.cardNumber),
-            expiryDate: paymentCard.exp,
-            cardHolderName: paymentCard.cardholderName,
-            customCardTypeIcons: [
-              CustomCardTypeIcon(
-                  cardType: CardType.otherBrand,
-                  cardImage: SvgPicture.asset(
-                    'assets/images/logo_circle.svg',
-                    color: Colors.purple,
-                    width: 50,
-                  ))
-            ],
-            cvvCode: paymentCard.cvv,
-            showBackView: false,
-            obscureCardNumber: obscureCardNumber,
-            obscureCardCvv: obscureCardCvv,
-            isHolderNameVisible: true,
-            cardBgColor: Colors.red,
-            backgroundImage: 'assets/images/payment_card_bg.png',
-            cardType: cardTypeFromNumber(paymentCard.cardNumber),
-            isSwipeGestureEnabled: isSwipeGestureEnabled,
-            onCreditCardWidgetChange: (brand) {},
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(35, 32, 0, 0),
-          child: Text(
-            paymentCard.nickname,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
 List<Widget> buildPaymentCardWidgets(
   BuildContext context, {
   required Iterable<PaymentCard> paymentCards,
@@ -115,9 +28,10 @@ List<Widget> buildPaymentCardWidgets(
   PassySort.sortPaymentCards(_paymentCards);
   final List<Widget> _paymentCardWidgets = [];
   for (PaymentCard paymentCard in paymentCards) {
-    _paymentCardWidgets.add(buildPaymentCardWidget(
-        paymentCard: paymentCard,
-        onPressed: onPressed == null ? null : () => onPressed(paymentCard)));
+    _paymentCardWidgets.add(PaymentCardButton(
+      paymentCard: paymentCard,
+      onPressed: onPressed == null ? null : () => onPressed(paymentCard),
+    ));
   }
   return _paymentCardWidgets;
 }

@@ -107,7 +107,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
       ),
       body: ListView(
         children: [
-          buildPaymentCardWidget(
+          PaymentCardButton(
             paymentCard: PaymentCard(
               nickname: _nickname,
               cardNumber: _cardNumber,

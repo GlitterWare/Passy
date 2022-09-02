@@ -78,7 +78,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         onEditPressed: () => _onEditPressed(_paymentCard),
       ),
       body: ListView(children: [
-        buildPaymentCardWidget(
+        PaymentCardButton(
           paymentCard: _paymentCard,
           obscureCardNumber: false,
           obscureCardCvv: false,
