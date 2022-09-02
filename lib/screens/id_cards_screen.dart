@@ -10,27 +10,6 @@ import 'id_card_screen.dart';
 import 'main_screen.dart';
 import 'search_screen.dart';
 
-List<Widget> buildIDCardWidgets({
-  required BuildContext context,
-  required LoadedAccount account,
-  List<IDCard>? idCards,
-}) {
-  final List<Widget> _idCardWidgets = [];
-  idCards ??= account.idCards.toList();
-  for (IDCard idCard in idCards) {
-    _idCardWidgets.add(
-      PassyPadding(IDCardButton(
-        idCard: idCard,
-        onPressed: () {
-          Navigator.pushNamed(context, IDCardScreen.routeName,
-              arguments: idCard);
-        },
-      )),
-    );
-  }
-  return _idCardWidgets;
-}
-
 class IDCardsScreen extends StatefulWidget {
   const IDCardsScreen({Key? key}) : super(key: key);
 
@@ -41,15 +20,7 @@ class IDCardsScreen extends StatefulWidget {
 }
 
 class _IDCardsScreen extends State<IDCardsScreen> {
-  final List<Widget> _idCardWidgets = [];
-
-  @override
-  void initState() {
-    super.initState();
-    List<Widget> _widgets =
-        buildIDCardWidgets(context: context, account: data.loadedAccount!);
-    _idCardWidgets.addAll(_widgets);
-  }
+  final LoadedAccount _account = data.loadedAccount!;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIDCardScreen.routeName);
@@ -96,7 +67,13 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           title: const Center(child: Text('ID Cards')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: ListView(children: _idCardWidgets),
+      body: IDCardButtonListView(
+        idCards: _account.idCards.toList(),
+        shouldSort: true,
+        onPressed: (idCard) => Navigator.pushNamed(
+            context, IDCardScreen.routeName,
+            arguments: idCard),
+      ),
     );
   }
 }

@@ -4,14 +4,14 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class PasswordButtonListView extends StatelessWidget {
   final List<Password> passwords;
-  final void Function(Password password)? onPressed;
   final bool shouldSort;
+  final void Function(Password password)? onPressed;
 
   const PasswordButtonListView({
     Key? key,
     required this.passwords,
-    this.onPressed,
     this.shouldSort = false,
+    this.onPressed,
   }) : super(key: key);
 
   @override
