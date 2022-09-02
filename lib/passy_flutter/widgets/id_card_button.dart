@@ -4,11 +4,11 @@ import 'package:passy/passy_data/id_card.dart';
 
 import 'widgets.dart';
 
-class IDCardWidget extends StatelessWidget {
+class IDCardButton extends StatelessWidget {
   final IDCard idCard;
   final void Function()? onPressed;
 
-  const IDCardWidget({
+  const IDCardButton({
     Key? key,
     required this.idCard,
     this.onPressed,

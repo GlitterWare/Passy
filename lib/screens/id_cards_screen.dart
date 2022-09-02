@@ -19,7 +19,7 @@ List<Widget> buildIDCardWidgets({
   idCards ??= account.idCards.toList();
   for (IDCard idCard in idCards) {
     _idCardWidgets.add(
-      PassyPadding(IDCardWidget(
+      PassyPadding(IDCardButton(
         idCard: idCard,
         onPressed: () {
           Navigator.pushNamed(context, IDCardScreen.routeName,
@@ -82,7 +82,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
       List<Widget> _widgets = [];
       for (IDCard _idCard in _found) {
         _widgets.add(
-          PassyPadding(IDCardWidget(idCard: _idCard)),
+          PassyPadding(IDCardButton(idCard: _idCard)),
         );
       }
       return _widgets;
