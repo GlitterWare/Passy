@@ -72,6 +72,9 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           onAddPressed: _onAddPressed),
       body: PasswordButtonListView(
         passwords: _loadedAccount.passwords.toList(),
+        onPressed: (password) => Navigator.pushNamed(
+            context, PasswordScreen.routeName,
+            arguments: password),
         shouldSort: true,
       ),
     );
