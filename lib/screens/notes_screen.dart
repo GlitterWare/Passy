@@ -6,6 +6,7 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'common.dart';
 import 'main_screen.dart';
+import 'note_screen.dart';
 import 'search_screen.dart';
 import 'edit_note_screen.dart';
 
@@ -60,9 +61,15 @@ class _NotesScreen extends State<NotesScreen> {
       List<Widget> _widgets = [];
       for (Note _note in _found) {
         _widgets.add(
-          PassyPadding(buildNoteWidget(
-            context: context,
+          PassyPadding(NoteButton(
             note: _note,
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                NoteScreen.routeName,
+                arguments: _note,
+              );
+            },
           )),
         );
       }

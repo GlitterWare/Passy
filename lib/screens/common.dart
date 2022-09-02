@@ -17,26 +17,6 @@ const screenToRouteName = {
   Screen.identities: '',
 };
 
-Widget buildNoteWidget({required BuildContext context, required Note note}) {
-  return ThreeWidgetButton(
-    left: const Icon(Icons.note_rounded),
-    right: const Icon(Icons.arrow_forward_ios_rounded),
-    onPressed: () {
-      Navigator.pushNamed(context, NoteScreen.routeName, arguments: note);
-    },
-    center: Column(
-      children: [
-        Align(
-          child: Text(
-            note.title,
-          ),
-          alignment: Alignment.centerLeft,
-        ),
-      ],
-    ),
-  );
-}
-
 List<Widget> buildNoteWidgets({
   required BuildContext context,
   required List<Note> notes,
@@ -45,9 +25,11 @@ List<Widget> buildNoteWidgets({
   PassySort.sortNotes(notes);
   for (Note note in notes) {
     _noteWidgets.add(
-      PassyPadding(buildNoteWidget(
-        context: context,
+      PassyPadding(NoteButton(
         note: note,
+        onPressed: () {
+          Navigator.pushNamed(context, NoteScreen.routeName, arguments: note);
+        },
       )),
     );
   }
