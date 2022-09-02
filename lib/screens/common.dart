@@ -86,7 +86,7 @@ List<Widget> buildIdentityWidgets({
 }
 
 Widget buildCustomField(BuildContext context, CustomField customField) =>
-    PassyPadding(PassyRecord(
+    PassyPadding(RecordButton(
       title: customField.title,
       value: customField.value,
       obscureValue: customField.obscured,

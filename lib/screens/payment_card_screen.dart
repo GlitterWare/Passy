@@ -85,34 +85,34 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           isSwipeGestureEnabled: false,
         ),
         if (_paymentCard.nickname != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Nickname',
             value: _paymentCard.nickname,
           )),
         if (_paymentCard.cardNumber != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Card number',
             value: _paymentCard.cardNumber,
           )),
         if (_paymentCard.cardholderName != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Card holder name',
             value: _paymentCard.cardholderName,
           )),
         if (_paymentCard.exp != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Expiration date',
             value: _paymentCard.exp,
           )),
         if (_paymentCard.cvv != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'CVV',
             value: _paymentCard.cvv,
           )),
         for (CustomField _customField in _paymentCard.customFields)
           buildCustomField(context, _customField),
         if (_paymentCard.additionalInfo != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Additional info',
             value: _paymentCard.additionalInfo,
           )),

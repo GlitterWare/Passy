@@ -84,68 +84,68 @@ class _IdentityScreen extends State<IdentityScreen> {
       body: ListView(
         children: [
           if (_identity.nickname != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Nickname',
               value: _identity.nickname,
             )),
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
               title: 'Title', value: capitalize(_identity.title.name))),
           if (_identity.firstName != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'First name',
               value: _identity.firstName,
             )),
           if (_identity.middleName != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Middle name',
               value: _identity.middleName,
             )),
           if (_identity.lastName != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Last name',
               value: _identity.lastName,
             )),
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Gender',
             value: capitalize(_identity.gender.name),
           )),
           if (_identity.email != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Email',
               value: _identity.email,
             )),
           if (_identity.number != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Number',
               value: _identity.number,
             )),
           if (_identity.firstAddressLine != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
                 title: 'First address line',
                 value: _identity.firstAddressLine)),
           if (_identity.secondAddressLine != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
                 title: 'Second address line',
                 value: _identity.secondAddressLine)),
           if (_identity.zipCode != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Zip code',
               value: _identity.zipCode,
             )),
           if (_identity.city != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'City',
               value: _identity.city,
             )),
           if (_identity.country != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Country',
               value: _identity.country,
             )),
           for (CustomField _customField in _identity.customFields)
             buildCustomField(context, _customField),
           if (_identity.additionalInfo != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
                 title: 'Additional info', value: _identity.additionalInfo)),
         ],
       ),

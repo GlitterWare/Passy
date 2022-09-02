@@ -82,31 +82,32 @@ class _IDCardScreen extends State<IDCardScreen> {
       body: ListView(
         children: [
           if (_idCard.nickname != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Nickname',
               value: _idCard.nickname,
             )),
           if (_idCard.type != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Type',
               value: _idCard.type,
             )),
           if (_idCard.idNumber != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'ID Number',
               value: _idCard.idNumber,
             )),
           if (_idCard.name != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Name',
               value: _idCard.name,
             )),
           if (_idCard.country != '')
-            PassyPadding(PassyRecord(title: 'Country', value: _idCard.country)),
+            PassyPadding(
+                RecordButton(title: 'Country', value: _idCard.country)),
           for (CustomField _customField in _idCard.customFields)
             buildCustomField(context, _customField),
           if (_idCard.additionalInfo != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
                 title: 'Additional info', value: _idCard.additionalInfo)),
         ],
       ),

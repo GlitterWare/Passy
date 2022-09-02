@@ -76,9 +76,9 @@ class _NoteScreen extends State<NoteScreen> {
       ),
       body: ListView(children: [
         if (_note.title != '')
-          PassyPadding(PassyRecord(title: 'Title', value: _note.title)),
+          PassyPadding(RecordButton(title: 'Title', value: _note.title)),
         if (_note.note != '')
-          PassyPadding(PassyRecord(
+          PassyPadding(RecordButton(
             title: 'Note',
             value: _note.note,
             valueAlign: TextAlign.left,

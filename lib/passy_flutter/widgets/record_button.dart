@@ -5,7 +5,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 
 import 'widgets.dart';
 
-class PassyRecord extends StatelessWidget {
+class RecordButton extends StatelessWidget {
   final String title;
   final TextStyle titleStyle;
   final String value;
@@ -13,7 +13,7 @@ class PassyRecord extends StatelessWidget {
   final bool isPassword;
   final TextAlign valueAlign;
 
-  PassyRecord({
+  RecordButton({
     Key? key,
     required this.title,
     TextStyle? titleStyle,

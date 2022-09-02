@@ -136,19 +136,19 @@ class _PasswordScreen extends State<PasswordScreen> {
       body: ListView(
         children: [
           if (_password.nickname != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Nickname',
               value: _password.nickname,
             )),
           if (_password.username != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Username',
               value: _password.username,
             )),
           if (_password.email != '')
-            PassyPadding(PassyRecord(title: 'Email', value: _password.email)),
+            PassyPadding(RecordButton(title: 'Email', value: _password.email)),
           if (_password.password != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
               title: 'Password',
               value: _password.password,
               obscureValue: true,
@@ -167,7 +167,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   ),
                 ),
                 Flexible(
-                  child: PassyPadding(PassyRecord(
+                  child: PassyPadding(RecordButton(
                     title: '2FA code',
                     value: _tfaCode,
                   )),
@@ -176,7 +176,7 @@ class _PasswordScreen extends State<PasswordScreen> {
             ),
           if (_password.website != '')
             Stack(children: [
-              PassyPadding(PassyRecord(
+              PassyPadding(RecordButton(
                 title: 'Website',
                 value: _password.website,
               )),
@@ -187,7 +187,7 @@ class _PasswordScreen extends State<PasswordScreen> {
           for (CustomField _customField in _password.customFields)
             buildCustomField(context, _customField),
           if (_password.additionalInfo != '')
-            PassyPadding(PassyRecord(
+            PassyPadding(RecordButton(
                 title: 'Additional info', value: _password.additionalInfo)),
         ],
       ),
