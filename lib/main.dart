@@ -4,7 +4,7 @@ import 'screens/edit_note_screen.dart';
 import 'screens/identities_screen.dart';
 import 'screens/notes_screen.dart';
 import 'screens/id_cards_screen.dart';
-import 'passy_flutter/theme.dart';
+import 'passy_flutter/passy_theme.dart';
 import 'screens/backup_and_restore_screen.dart';
 import 'screens/backup_screen.dart';
 import 'screens/biometric_auth_screen.dart';

@@ -5,7 +5,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
 import 'settings_screen.dart';
 

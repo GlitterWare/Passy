@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
 class LogScreen extends StatelessWidget {
   const LogScreen({Key? key}) : super(key: key);

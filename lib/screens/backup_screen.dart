@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'assets.dart';

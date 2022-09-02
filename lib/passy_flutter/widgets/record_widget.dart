@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
 import 'widgets.dart';
 

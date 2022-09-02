@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:universal_io/io.dart';
 
 import 'package:passy/passy_data/passy_data.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
 late PassyData data;
 

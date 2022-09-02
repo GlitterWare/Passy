@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class SearchScreen extends StatefulWidget {

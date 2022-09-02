@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
 import 'main_screen.dart';
 

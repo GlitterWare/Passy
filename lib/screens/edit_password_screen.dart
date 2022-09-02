@@ -7,7 +7,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 
 import 'common.dart';
 import 'edit_custom_field_screen.dart';

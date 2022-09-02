@@ -5,7 +5,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import '../passy_flutter/theme.dart';
+import '../passy_flutter/passy_theme.dart';
 import 'main_screen.dart';
 import 'common.dart';
 import 'edit_payment_card_screen.dart';

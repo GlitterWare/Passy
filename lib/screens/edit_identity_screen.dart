@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/theme.dart';
+import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/identity.dart' as id;
 import 'package:passy/passy_data/loaded_account.dart';
@@ -205,7 +205,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           }),
         )),
         buildCustomFieldEditors(
-            customFields: _customFields, padding: passyPadding),
+            customFields: _customFields, padding: PassyTheme.passyPadding),
         PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
@@ -214,15 +214,16 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
             labelText: 'Additional info',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: lightContentColor),
+              borderSide: BorderSide(color: PassyTheme.lightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: darkContentSecondaryColor),
+              borderSide:
+                  BorderSide(color: PassyTheme.darkContentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
-              borderSide: BorderSide(color: lightContentColor),
+              borderSide: BorderSide(color: PassyTheme.lightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
