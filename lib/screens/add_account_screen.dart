@@ -102,107 +102,115 @@ class _AddAccountScreen extends State<StatefulWidget> {
     });
   }
 
+  Future<bool> _onWillPop() {
+    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+    return Future.value(false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: data.noAccounts
-            ? null
-            : IconButton(
-                padding: PassyTheme.appBarButtonPadding,
-                splashRadius: PassyTheme.appBarButtonSplashRadius,
-                icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                onPressed: () => Navigator.pushReplacementNamed(
-                    context, LoginScreen.routeName),
-              ),
-        title: const Text('Add account'),
-        centerTitle: true,
-      ),
-      body: CustomScrollView(slivers: [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              logo60Purple,
-              const Spacer(),
-              Expanded(
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  onChanged: (a) =>
-                                      setState(() => _username = a),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Username',
-                                  ),
-                                  autofocus: true,
-                                ),
-                              )
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  obscureText: true,
-                                  onChanged: (a) =>
-                                      setState(() => _password = a),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Password',
-                                  ),
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(32),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  obscureText: true,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Confirm password',
-                                  ),
-                                  onChanged: (a) =>
-                                      setState(() => _confirmPassword = a),
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(32),
-                                  ],
-                                ),
-                              ),
-                              FloatingActionButton(
-                                onPressed: _addAccount,
-                                child: const Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                ),
-                                heroTag: 'addAccountBtn',
-                              ),
-                            ],
-                          ),
-                          const Spacer(flex: 2),
-                        ],
-                      ),
-                      flex: 10,
-                    ),
-                    const Spacer(),
-                  ],
+    return WillPopScope(
+      onWillPop: data.noAccounts ? () => Future.value(true) : _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leading: data.noAccounts
+              ? null
+              : IconButton(
+                  padding: PassyTheme.appBarButtonPadding,
+                  splashRadius: PassyTheme.appBarButtonSplashRadius,
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  onPressed: () => Navigator.pushReplacementNamed(
+                      context, LoginScreen.routeName),
                 ),
-                flex: 4,
-              ),
-            ],
-          ),
+          title: const Text('Add account'),
+          centerTitle: true,
         ),
-      ]),
+        body: CustomScrollView(slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Spacer(flex: 2),
+                logo60Purple,
+                const Spacer(),
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    onChanged: (a) =>
+                                        setState(() => _username = a),
+                                    decoration: const InputDecoration(
+                                      hintText: 'Username',
+                                    ),
+                                    autofocus: true,
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    obscureText: true,
+                                    onChanged: (a) =>
+                                        setState(() => _password = a),
+                                    decoration: const InputDecoration(
+                                      hintText: 'Password',
+                                    ),
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(32),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    obscureText: true,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Confirm password',
+                                    ),
+                                    onChanged: (a) =>
+                                        setState(() => _confirmPassword = a),
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(32),
+                                    ],
+                                  ),
+                                ),
+                                FloatingActionButton(
+                                  onPressed: _addAccount,
+                                  child: const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                  ),
+                                  heroTag: 'addAccountBtn',
+                                ),
+                              ],
+                            ),
+                            const Spacer(flex: 2),
+                          ],
+                        ),
+                        flex: 10,
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                  flex: 4,
+                ),
+              ],
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }
