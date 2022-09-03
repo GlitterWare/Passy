@@ -56,7 +56,7 @@ class _IdentityScreen extends State<IdentityScreen> {
                   _account.removeIdentity(_identity.key);
                   Navigator.popUntil(
                       context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.save().whenComplete(() =>
+                  _account.saveIdentities().whenComplete(() =>
                       Navigator.pushNamed(context, IdentitiesScreen.routeName));
                 },
               )

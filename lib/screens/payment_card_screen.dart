@@ -49,8 +49,9 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                   _account.removePaymentCard(paymentCard.key);
                   Navigator.popUntil(
                       context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.save().whenComplete(() => Navigator.pushNamed(
-                      context, PaymentCardsScreen.routeName));
+                  _account.savePaymentCards().whenComplete(() =>
+                      Navigator.pushNamed(
+                          context, PaymentCardsScreen.routeName));
                 },
               )
             ],

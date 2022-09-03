@@ -48,7 +48,7 @@ class _NoteScreen extends State<NoteScreen> {
                   _account.removeNote(note.key);
                   Navigator.popUntil(
                       context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.save().whenComplete(() =>
+                  _account.saveNotes().whenComplete(() =>
                       Navigator.pushNamed(context, NotesScreen.routeName));
                 },
               )

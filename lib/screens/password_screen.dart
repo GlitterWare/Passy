@@ -103,7 +103,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   _account.removePassword(password.key);
                   Navigator.popUntil(
                       context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.save().whenComplete(() =>
+                  _account.savePasswords().whenComplete(() =>
                       Navigator.pushNamed(context, PasswordsScreen.routeName));
                 },
               )

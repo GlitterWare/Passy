@@ -55,7 +55,7 @@ class _IDCardScreen extends State<IDCardScreen> {
                     _account.removeIDCard(_idCard.key);
                     Navigator.popUntil(context,
                         (r) => r.settings.name == MainScreen.routeName);
-                    _account.save().whenComplete(() =>
+                    _account.saveIDCards().whenComplete(() =>
                         Navigator.pushNamed(context, IDCardsScreen.routeName));
                   },
                 )

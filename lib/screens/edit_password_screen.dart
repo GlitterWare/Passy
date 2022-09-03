@@ -104,7 +104,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           );
           _account.setPassword(_passwordArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
-          _account.save().whenComplete(() {
+          _account.savePasswords().whenComplete(() {
             Navigator.popUntil(
                 context, (r) => r.settings.name == MainScreen.routeName);
             Navigator.pushNamed(context, PasswordsScreen.routeName);

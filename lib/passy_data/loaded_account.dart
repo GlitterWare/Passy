@@ -226,6 +226,8 @@ class LoadedAccount {
   String get passwordHash => _credentials.value.passwordHash;
   bool get bioAuthEnabled => _credentials.value.bioAuthEnabled;
   set bioAuthEnabled(bool value) => _credentials.value.bioAuthEnabled = value;
+  Future<void> saveCredentials() => _credentials.save();
+  void saveCredentialsSync() => _credentials.saveSync();
 
   // Account Settings wrappers
   String get icon => _settings.value.icon;
@@ -234,6 +236,8 @@ class LoadedAccount {
   set color(Color value) => _settings.value.color = color;
   Screen get defaultScreen => _settings.value.defaultScreen;
   set defaultScreen(Screen value) => _settings.value.defaultScreen = value;
+  Future<void> saveSettings() => _settings.save();
+  void saveSettingsSync() => _settings.saveSync();
 
   Future<BiometricStorageData> get biometricStorageData =>
       BiometricStorageData.fromLocker(_credentials.value.username);
@@ -241,6 +245,8 @@ class LoadedAccount {
   // History wrappers
   void clearRemovedHistory() => _history.value.clearRemoved();
   void renewHistory() => _history.value.renew();
+  Future<void> saveHistory() => _history.save();
+  void saveHistorySync() => _history.saveSync();
 
   // Passwords wrappers
   Iterable<Password> get passwords => _passwords.value.entries;
@@ -260,6 +266,9 @@ class LoadedAccount {
     _passwords.value.removeEntry(key);
   }
 
+  Future<void> savePasswords() => _passwords.save();
+  void savePasswordsSync() => _passwords.saveSync();
+
   // Password Icons wrappers
   PassyBytes? getPasswordIcon(String name) => _passwordIcons.getEntry(name);
 
@@ -277,6 +286,9 @@ class LoadedAccount {
       ..lastModified = DateTime.now().toUtc();
     _passwordIcons.removeEntry(key);
   }
+
+  Future<void> savePasswordIcons() => _passwordIcons.save();
+  void savePasswordIconsSync() => _passwordIcons.saveSync();
 
   // Notes wrappers
   Iterable<Note> get notes => _notes.value.entries;
@@ -299,6 +311,9 @@ class LoadedAccount {
     _notes.value.removeEntry(key);
   }
 
+  Future<void> saveNotes() => _notes.save();
+  void saveNotesSync() => _notes.saveSync();
+
   // Payment Cards wrappers
   Iterable<PaymentCard> get paymentCards => _paymentCards.value.entries;
 
@@ -319,6 +334,9 @@ class LoadedAccount {
       ..lastModified = DateTime.now().toUtc();
     _paymentCards.value.removeEntry(key);
   }
+
+  Future<void> savePaymentCards() => _paymentCards.save();
+  void savePaymentCardsSync() => _paymentCards.saveSync();
 
   // ID Cards wrappers
   Iterable<IDCard> get idCards => _idCards.value.entries;
@@ -341,6 +359,9 @@ class LoadedAccount {
     _idCards.value.removeEntry(key);
   }
 
+  Future<void> saveIDCards() => _idCards.save();
+  void saveIDCardsSync() => _idCards.saveSync();
+
   // Identities wrappers
   Iterable<Identity> get identities => _identities.value.entries;
 
@@ -361,4 +382,7 @@ class LoadedAccount {
       ..lastModified = DateTime.now().toUtc();
     _identities.value.removeEntry(key);
   }
+
+  Future<void> saveIdentities() => _identities.save();
+  void saveIdentitiesSync() => _identities.saveSync();
 }

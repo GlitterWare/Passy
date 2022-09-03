@@ -68,7 +68,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
       );
       _account.setIdentity(_identityArgs);
       Navigator.pushNamed(context, SplashScreen.routeName);
-      _account.save().whenComplete(() {
+      _account.saveIdentities().whenComplete(() {
         Navigator.popUntil(
             context, (r) => r.settings.name == MainScreen.routeName);
         Navigator.pushNamed(context, IdentitiesScreen.routeName);

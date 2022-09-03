@@ -93,7 +93,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
           );
           _account.setPaymentCard(_paymentCardArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
-          _account.save().whenComplete(() {
+          _account.savePaymentCards().whenComplete(() {
             Navigator.popUntil(
                 context, (r) => r.settings.name == MainScreen.routeName);
             Navigator.pushNamed(context, PaymentCardsScreen.routeName);

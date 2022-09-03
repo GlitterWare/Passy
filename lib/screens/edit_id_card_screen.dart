@@ -56,7 +56,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
     );
     _account.setIDCard(_idCardArgs);
     Navigator.pushNamed(context, SplashScreen.routeName);
-    _account.save().whenComplete(() {
+    _account.saveIDCards().whenComplete(() {
       Navigator.popUntil(
           context, (r) => r.settings.name == MainScreen.routeName);
       Navigator.pushNamed(context, IDCardsScreen.routeName);
