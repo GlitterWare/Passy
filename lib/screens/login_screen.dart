@@ -186,7 +186,7 @@ class _LoginScreen extends State<LoginScreen> {
                                       }).toList();
                                     },
                                     onChanged: (a) {
-                                      _username = a!;
+                                      setState(() => _username = a!);
                                     },
                                   ),
                                 ),
