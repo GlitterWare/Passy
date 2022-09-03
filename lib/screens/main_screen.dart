@@ -3,10 +3,10 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:universal_io/io.dart';
 
 import 'payment_cards_screen.dart';
 import 'connect_screen.dart';
@@ -67,7 +67,7 @@ class _MainScreen extends State<MainScreen>
                         style: TextStyle(
                             color: PassyTheme.lightContentSecondaryColor),
                       ),
-                      onPressed: isCameraSupported
+                      onPressed: Platform.isAndroid || Platform.isIOS
                           ? () => showDialog(
                               context: context,
                               builder: (ctx) => AlertDialog(

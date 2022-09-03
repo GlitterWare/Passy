@@ -3,13 +3,8 @@ export 'always_disabled_focus_node.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:universal_io/io.dart';
 
 import 'package:passy/passy_flutter/passy_theme.dart';
-
-final bool isPlatformMobile = Platform.isAndroid || Platform.isIOS;
-final bool isCameraSupported = isPlatformMobile;
-final bool isBiometricStorageSupported = isPlatformMobile;
 
 AlertDialog getRecordDialog(
     {required String value,

@@ -12,17 +12,20 @@ class AccountSettings with JsonConvertable {
   String icon;
   Color color;
   Screen defaultScreen;
+  bool protectScreen;
 
   AccountSettings.fromJson(Map<String, dynamic> json)
       : icon = json['icon'] ?? 'assets/images/logo_circle.svg',
         color = Color(json['color'] ?? 0xFF9C27B0),
         defaultScreen =
-            screenFromJson[json['defaultScreen'] ?? ''] ?? Screen.main;
+            screenFromJson[json['defaultScreen'] ?? ''] ?? Screen.main,
+        protectScreen = json['protectScreen'] ?? true;
 
   AccountSettings({
     this.icon = 'assets/images/logo_circle.svg',
     this.color = Colors.purple,
     this.defaultScreen = Screen.main,
+    this.protectScreen = true,
   });
 
   @override
@@ -30,6 +33,7 @@ class AccountSettings with JsonConvertable {
         'icon': icon,
         'color': color.value,
         'defaultScreen': screenToJson[defaultScreen],
+        'protectScreen': protectScreen,
       };
 
   static AccountSettingsFile fromFile(

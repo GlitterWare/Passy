@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:passy/screens/security_screen.dart';
+import 'package:universal_io/io.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
-import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/common/assets.dart';
 
-import '../common/assets.dart';
 import 'backup_and_restore_screen.dart';
-import 'biometric_auth_screen.dart';
 import 'main_screen.dart';
-import 'splash_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -48,17 +47,13 @@ class _SettingsScreen extends State<SettingsScreen> {
                 context, BackupAndRestoreScreen.routeName,
                 arguments: data.loadedAccount!.username),
           )),
-          if (isBiometricStorageSupported)
+          if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
-              center: const Text('Biometric authentication'),
-              left: const Icon(Icons.fingerprint_rounded),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () {
-                Navigator.pushNamed(context, SplashScreen.routeName);
-                Navigator.pushReplacementNamed(
-                    context, BiometricAuthScreen.routeName);
-              },
-            )),
+                center: const Text('Security'),
+                left: const Icon(Icons.lock_rounded),
+                right: const Icon(Icons.arrow_forward_ios_rounded),
+                onPressed: () =>
+                    Navigator.pushNamed(context, SecurityScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
             center: const Text('About'),
             left: const Icon(Icons.info_outline_rounded),

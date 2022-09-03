@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
+import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 import 'package:universal_io/io.dart';
 
 import 'account_credentials.dart';
@@ -80,7 +81,12 @@ class LoadedAccount {
         _identities = identities ??
             Identities.fromFile(
                 File(path + Platform.pathSeparator + 'identities.enc'),
-                encrypter: encrypter);
+                encrypter: encrypter) {
+    if (Platform.isAndroid) {
+      FlutterSecureScreen.singleton
+          .setAndroidScreenSecure(_settings.value.protectScreen);
+    }
+  }
 
   void _setAccountPassword(String password) {
     _credentials.value.password = password;
@@ -237,6 +243,8 @@ class LoadedAccount {
   Screen get defaultScreen => _settings.value.defaultScreen;
   set defaultScreen(Screen value) => _settings.value.defaultScreen = value;
   Future<void> saveSettings() => _settings.save();
+  bool get protectScreen => _settings.value.protectScreen;
+  set protectScreen(bool value) => _settings.value.protectScreen = value;
   void saveSettingsSync() => _settings.saveSync();
 
   Future<BiometricStorageData> get biometricStorageData =>

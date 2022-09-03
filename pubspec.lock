@@ -326,6 +326,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
+  flutter_secure_screen:
+    dependency: "direct main"
+    description:
+      name: flutter_secure_screen
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   flutter_svg:
     dependency: "direct main"
     description:
