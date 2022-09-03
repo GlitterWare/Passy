@@ -79,14 +79,36 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
         onAddPressed: _onAddPressed,
         onSearchPressed: _onSearchPressed,
       ),
-      body: PaymentCardButtonListView(
-        paymentCards: _account.paymentCards.toList(),
-        shouldSort: true,
-        onPressed: (paymentCard) => {
-          Navigator.pushNamed(context, PaymentCardScreen.routeName,
-              arguments: paymentCard),
-        },
-      ),
+      body: _account.paymentCards.isEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 7),
+                      const Text(
+                        'No payment cards',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      FloatingActionButton(
+                          child: const Icon(Icons.add_rounded),
+                          onPressed: () => Navigator.pushNamed(
+                              context, EditPaymentCardScreen.routeName)),
+                      const Spacer(flex: 7),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : PaymentCardButtonListView(
+              paymentCards: _account.paymentCards.toList(),
+              shouldSort: true,
+              onPressed: (paymentCard) => {
+                Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                    arguments: paymentCard),
+              },
+            ),
     );
   }
 }

@@ -30,7 +30,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         arguments: (String terms) {
       final List<IDCard> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IDCard _idCard in data.loadedAccount!.idCards) {
+      for (IDCard _idCard in _account.idCards) {
         {
           bool testIDCard(IDCard value) => _idCard.key == value.key;
 
@@ -68,13 +68,35 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           title: const Center(child: Text('ID Cards')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: IDCardButtonListView(
-        idCards: _account.idCards.toList(),
-        shouldSort: true,
-        onPressed: (idCard) => Navigator.pushNamed(
-            context, IDCardScreen.routeName,
-            arguments: idCard),
-      ),
+      body: _account.idCards.isEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 7),
+                      const Text(
+                        'No ID cards',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      FloatingActionButton(
+                          child: const Icon(Icons.add_rounded),
+                          onPressed: () => Navigator.pushNamed(
+                              context, EditIDCardScreen.routeName)),
+                      const Spacer(flex: 7),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : IDCardButtonListView(
+              idCards: _account.idCards.toList(),
+              shouldSort: true,
+              onPressed: (idCard) => Navigator.pushNamed(
+                  context, IDCardScreen.routeName,
+                  arguments: idCard),
+            ),
     );
   }
 }

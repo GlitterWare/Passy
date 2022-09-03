@@ -70,13 +70,35 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           title: const Center(child: Text('Passwords')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: PasswordButtonListView(
-        passwords: _loadedAccount.passwords.toList(),
-        onPressed: (password) => Navigator.pushNamed(
-            context, PasswordScreen.routeName,
-            arguments: password),
-        shouldSort: true,
-      ),
+      body: _loadedAccount.passwords.isEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 7),
+                      const Text(
+                        'No passwords',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      FloatingActionButton(
+                          child: const Icon(Icons.add_rounded),
+                          onPressed: () => Navigator.pushNamed(
+                              context, EditPasswordScreen.routeName)),
+                      const Spacer(flex: 7),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : PasswordButtonListView(
+              passwords: _loadedAccount.passwords.toList(),
+              onPressed: (password) => Navigator.pushNamed(
+                  context, PasswordScreen.routeName,
+                  arguments: password),
+              shouldSort: true,
+            ),
     );
   }
 }

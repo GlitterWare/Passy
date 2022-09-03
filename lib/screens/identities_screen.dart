@@ -29,7 +29,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         arguments: (String terms) {
       final List<Identity> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (Identity _identity in data.loadedAccount!.identities) {
+      for (Identity _identity in _account.identities) {
         {
           bool testIdentity(Identity value) => _identity.key == value.key;
 
@@ -71,15 +71,37 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
           title: const Center(child: Text('Identities')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: IdentityButtonListView(
-        identities: _account.identities.toList(),
-        shouldSort: true,
-        onPressed: (identity) => Navigator.pushNamed(
-          context,
-          IdentityScreen.routeName,
-          arguments: identity,
-        ),
-      ),
+      body: _account.identities.isEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 7),
+                      const Text(
+                        'No identities',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      FloatingActionButton(
+                          child: const Icon(Icons.add_rounded),
+                          onPressed: () => Navigator.pushNamed(
+                              context, EditIdentityScreen.routeName)),
+                      const Spacer(flex: 7),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : IdentityButtonListView(
+              identities: _account.identities.toList(),
+              shouldSort: true,
+              onPressed: (identity) => Navigator.pushNamed(
+                context,
+                IdentityScreen.routeName,
+                arguments: identity,
+              ),
+            ),
     );
   }
 }

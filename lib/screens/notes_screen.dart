@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
@@ -19,6 +20,8 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreen extends State<NotesScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
+
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditNoteScreen.routeName);
 
@@ -27,7 +30,7 @@ class _NotesScreen extends State<NotesScreen> {
         arguments: (String terms) {
       final List<Note> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (Note _note in data.loadedAccount!.notes) {
+      for (Note _note in _account.notes) {
         {
           bool testNote(Note value) => _note.key == value.key;
 
@@ -47,7 +50,7 @@ class _NotesScreen extends State<NotesScreen> {
         }
       }
       return NoteButtonListView(
-        notes: data.loadedAccount!.notes.toList(),
+        notes: _account.notes.toList(),
         shouldSort: true,
         onPressed: (note) =>
             Navigator.pushNamed(context, NoteScreen.routeName, arguments: note),
@@ -62,12 +65,35 @@ class _NotesScreen extends State<NotesScreen> {
           title: const Center(child: Text('Notes')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: NoteButtonListView(
-        notes: data.loadedAccount!.notes.toList(),
-        shouldSort: true,
-        onPressed: (note) =>
-            Navigator.pushNamed(context, NoteScreen.routeName, arguments: note),
-      ),
+      body: _account.notes.isEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 7),
+                      const Text(
+                        'No notes',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      FloatingActionButton(
+                          child: const Icon(Icons.add_rounded),
+                          onPressed: () => Navigator.pushNamed(
+                              context, EditNoteScreen.routeName)),
+                      const Spacer(flex: 7),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : NoteButtonListView(
+              notes: data.loadedAccount!.notes.toList(),
+              shouldSort: true,
+              onPressed: (note) => Navigator.pushNamed(
+                  context, NoteScreen.routeName,
+                  arguments: note),
+            ),
     );
   }
 }
