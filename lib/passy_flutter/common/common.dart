@@ -1,46 +1,7 @@
 export 'always_disabled_focus_node.dart';
 
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-
-import 'package:passy/passy_flutter/passy_theme.dart';
-
-AlertDialog getRecordDialog(
-    {required String value,
-    bool highlightSpecial = false,
-    TextAlign textAlign = TextAlign.center}) {
-  Widget content;
-  if (highlightSpecial) {
-    List<InlineSpan> _children = [];
-    Iterator<String> _iterator = value.characters.iterator;
-    while (_iterator.moveNext()) {
-      if (_iterator.current.contains(RegExp(r'[a-z]|[A-Z]'))) {
-        _children.add(TextSpan(
-            text: _iterator.current,
-            style: const TextStyle(fontFamily: 'FiraCode')));
-      } else {
-        _children.add(TextSpan(
-            text: _iterator.current,
-            style: const TextStyle(
-              fontFamily: 'FiraCode',
-              color: PassyTheme.lightContentSecondaryColor,
-            )));
-      }
-    }
-    content = SelectableText.rich(
-      TextSpan(text: '', children: _children),
-      textAlign: textAlign,
-    );
-  } else {
-    content = SelectableText(
-      value,
-      textAlign: textAlign,
-      style: const TextStyle(fontFamily: 'FiraCode'),
-    );
-  }
-  return AlertDialog(shape: PassyTheme.dialogShape, content: content);
-}
 
 String capitalize(String string) {
   if (string.isEmpty) return '';

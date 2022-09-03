@@ -5,8 +5,8 @@ class PassyTheme {
   static const appBarButtonSplashRadius = 28.0;
   static const appBarButtonPadding = EdgeInsets.all(16.0);
 
-  static final ShapeBorder dialogShape = RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12.0),
+  static const ShapeBorder dialogShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(12.0)),
   );
   static const darkContentColor = Color.fromRGBO(38, 50, 56, 1);
   static const darkContentSecondaryColor = Color.fromRGBO(84, 110, 122, 1);

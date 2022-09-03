@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
 import 'widgets.dart';
@@ -45,7 +44,7 @@ class RecordButton extends StatelessWidget {
       icon: const Icon(Icons.copy),
       onButtonPressed: () => showDialog(
         context: context,
-        builder: (_) => getRecordDialog(
+        builder: (_) => RecordDialog(
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
       onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
