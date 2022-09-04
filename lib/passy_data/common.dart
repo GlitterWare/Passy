@@ -7,7 +7,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'package:universal_io/io.dart';
 
-const String passyVersion = '0.11.0';
+const String passyVersion = '0.11.1';
 //TODO: split versions after v1.0.0
 const String syncVersion = passyVersion;
 const String accountVersion = passyVersion;
