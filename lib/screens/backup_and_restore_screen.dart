@@ -42,13 +42,19 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
         children: [
           PassyPadding(ThreeWidgetButton(
             center: const Text('Backup'),
-            left: const Icon(Icons.ios_share_rounded),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.ios_share_rounded),
+            ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => _onBackupPressed(_username),
           )),
           PassyPadding(ThreeWidgetButton(
             center: const Text('Restore'),
-            left: const Icon(Icons.settings_backup_restore_rounded),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.settings_backup_restore_rounded),
+            ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: _onRestorePressed,
           )),

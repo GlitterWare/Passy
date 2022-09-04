@@ -49,7 +49,10 @@ class _SecurityScreen extends State<SecurityScreen> {
           if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
               center: const Text('Biometric authentication'),
-              left: const Icon(Icons.fingerprint_rounded),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.fingerprint_rounded),
+              ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () {
                 Navigator.pushNamed(context, SplashScreen.routeName);
@@ -60,7 +63,10 @@ class _SecurityScreen extends State<SecurityScreen> {
           if (Platform.isAndroid)
             PassyPadding(ThreeWidgetButton(
               center: const Text('Protect screen'),
-              left: const Icon(Icons.smart_display),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.smart_display),
+              ),
               right: Switch(
                 value: loadedAccount.protectScreen,
                 onChanged: (value) => setProtectScreen(value),

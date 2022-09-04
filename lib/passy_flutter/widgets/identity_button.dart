@@ -15,7 +15,10 @@ class IdentityButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThreeWidgetButton(
-      left: const Icon(Icons.people_outline_rounded),
+      left: const Padding(
+        padding: EdgeInsets.only(right: 30),
+        child: Icon(Icons.people_outline_rounded),
+      ),
       right: const Icon(Icons.arrow_forward_ios_rounded),
       onPressed: onPressed,
       center: Column(

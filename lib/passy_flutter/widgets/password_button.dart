@@ -17,9 +17,12 @@ class PasswordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThreeWidgetButton(
-      left: password.website == ''
-          ? logoCircle50White
-          : FavIconImage(address: password.website),
+      left: Padding(
+        padding: const EdgeInsets.only(right: 30),
+        child: password.website == ''
+            ? logoCircle50White
+            : FavIconImage(address: password.website),
+      ),
       right: const Icon(Icons.arrow_forward_ios_rounded),
       onPressed: onPressed,
       center: Column(

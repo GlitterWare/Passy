@@ -11,6 +11,7 @@ class RecordButton extends StatelessWidget {
   final bool obscureValue;
   final bool isPassword;
   final TextAlign valueAlign;
+  final Widget? left;
 
   const RecordButton({
     Key? key,
@@ -20,14 +21,16 @@ class RecordButton extends StatelessWidget {
     this.obscureValue = false,
     this.isPassword = false,
     this.valueAlign = TextAlign.center,
+    this.left,
   })  : titleStyle = titleStyle ??
             const TextStyle(color: PassyTheme.lightContentSecondaryColor),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return DoubleActionButton(
-      body: Column(
+    return ThreeWidgetButton(
+      left: left,
+      center: Column(
         children: [
           Text(
             title,
@@ -39,13 +42,15 @@ class RecordButton extends StatelessWidget {
           ),
         ],
       ),
-      icon: const Icon(Icons.copy),
-      onButtonPressed: () => showDialog(
+      onPressed: () => showDialog(
         context: context,
         builder: (_) => RecordDialog(
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
-      onActionPressed: () => Clipboard.setData(ClipboardData(text: value)),
+      right: IconButton(
+        icon: const Icon(Icons.copy),
+        onPressed: () => Clipboard.setData(ClipboardData(text: value)),
+      ),
     );
   }
 }

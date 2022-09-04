@@ -15,7 +15,10 @@ class NoteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThreeWidgetButton(
-      left: const Icon(Icons.note_rounded),
+      left: const Padding(
+        padding: EdgeInsets.only(right: 30),
+        child: Icon(Icons.note_rounded),
+      ),
       right: const Icon(Icons.arrow_forward_ios_rounded),
       onPressed: onPressed,
       center: Column(

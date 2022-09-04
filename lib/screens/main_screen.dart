@@ -171,35 +171,50 @@ class _MainScreen extends State<MainScreen>
         body: ListView(
           children: [
             PassyPadding(ThreeWidgetButton(
-              left: const Icon(Icons.lock_rounded),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.lock_rounded),
+              ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Passwords'),
               onPressed: () =>
                   Navigator.pushNamed(context, PasswordsScreen.routeName),
             )),
             PassyPadding(ThreeWidgetButton(
-              left: const Icon(Icons.payment_rounded),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.payment_rounded),
+              ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Payment cards'),
               onPressed: () =>
                   Navigator.pushNamed(context, PaymentCardsScreen.routeName),
             )),
             PassyPadding(ThreeWidgetButton(
-              left: const Icon(Icons.note_rounded),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.note_rounded),
+              ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Notes'),
               onPressed: () =>
                   Navigator.pushNamed(context, NotesScreen.routeName),
             )),
             PassyPadding(ThreeWidgetButton(
-              left: const Icon(Icons.perm_identity_rounded),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.perm_identity_rounded),
+              ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('ID Cards'),
               onPressed: () =>
                   Navigator.pushNamed(context, IDCardsScreen.routeName),
             )),
             PassyPadding(ThreeWidgetButton(
-              left: const Icon(Icons.people_outline_rounded),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.people_outline_rounded),
+              ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: const Text('Identities'),
               onPressed: () =>

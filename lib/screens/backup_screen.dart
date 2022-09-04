@@ -47,10 +47,13 @@ class _BackupScreen extends State<BackupScreen> {
       body: ListView(children: [
         PassyPadding(ThreeWidgetButton(
           center: const Text('Passy backup'),
-          left: SvgPicture.asset(
-            logoCircleSvg,
-            width: 25,
-            color: PassyTheme.lightContentColor,
+          left: Padding(
+            padding: const EdgeInsets.only(right: 30),
+            child: SvgPicture.asset(
+              logoCircleSvg,
+              width: 30,
+              color: PassyTheme.lightContentColor,
+            ),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () => _onPassyBackup(_username),

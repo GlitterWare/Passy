@@ -39,10 +39,13 @@ class _RestoreScreen extends State<RestoreScreen> {
       body: ListView(children: [
         PassyPadding(ThreeWidgetButton(
           center: const Text('Passy restore'),
-          left: SvgPicture.asset(
-            logoCircleSvg,
-            width: 25,
-            color: PassyTheme.lightContentColor,
+          left: Padding(
+            padding: const EdgeInsets.only(right: 30),
+            child: SvgPicture.asset(
+              logoCircleSvg,
+              width: 30,
+              color: PassyTheme.lightContentColor,
+            ),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () {

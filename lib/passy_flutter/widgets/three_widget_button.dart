@@ -27,11 +27,7 @@ class ThreeWidgetButton extends StatelessWidget {
       child: Padding(
         child: Row(
           children: [
-            if (left != null)
-              Padding(
-                child: left,
-                padding: const EdgeInsets.only(right: 30),
-              ),
+            if (left != null) left!,
             Flexible(
               child: center,
               fit: FlexFit.tight,

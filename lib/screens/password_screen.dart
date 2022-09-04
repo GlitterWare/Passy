@@ -28,7 +28,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   final Completer<void> _onClosed = Completer<void>();
   final LoadedAccount _account = data.loadedAccount!;
   Password? password;
-  Future<void>? generateTFA = null;
+  Future<void>? generateTFA;
   String _tfaCode = '';
   double _tfaProgress = 0;
 
@@ -172,15 +172,11 @@ class _PasswordScreen extends State<PasswordScreen> {
               ],
             ),
           if (password!.website != '')
-            Stack(children: [
-              PassyPadding(RecordButton(
-                title: 'Website',
-                value: password!.website,
-              )),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(23, 18, 0, 0),
-                  child: FavIconImage(address: password!.website, width: 35)),
-            ]),
+            PassyPadding(RecordButton(
+              title: 'Website',
+              value: password!.website,
+              left: FavIconImage(address: password!.website, width: 30),
+            )),
           for (CustomField _customField in password!.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (password!.additionalInfo != '')

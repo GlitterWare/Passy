@@ -41,7 +41,10 @@ class _SettingsScreen extends State<SettingsScreen> {
         children: [
           PassyPadding(ThreeWidgetButton(
             center: const Text('Backup & Restore'),
-            left: const Icon(Icons.save_rounded),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.save_rounded),
+            ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => Navigator.pushNamed(
                 context, BackupAndRestoreScreen.routeName,
@@ -50,13 +53,19 @@ class _SettingsScreen extends State<SettingsScreen> {
           if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
                 center: const Text('Security'),
-                left: const Icon(Icons.lock_rounded),
+                left: const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Icon(Icons.lock_rounded),
+                ),
                 right: const Icon(Icons.arrow_forward_ios_rounded),
                 onPressed: () =>
                     Navigator.pushNamed(context, SecurityScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
             center: const Text('About'),
-            left: const Icon(Icons.info_outline_rounded),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.info_outline_rounded),
+            ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () {
               showDialog(
