@@ -192,7 +192,10 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           onChanged: (value) => setState(() => _website = value),
         )),
         PassyPadding(ThreeWidgetButton(
-          left: const Icon(Icons.add_rounded),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.add_rounded),
+          ),
           center: const Text('Add custom field'),
           onPressed: () => Navigator.pushNamed(
             context,

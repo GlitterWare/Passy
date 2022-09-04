@@ -127,7 +127,10 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
           onChanged: (value) => setState(() => _country = value.trim()),
         )),
         PassyPadding(ThreeWidgetButton(
-          left: const Icon(Icons.add_rounded),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.add_rounded),
+          ),
           center: const Text('Add custom field'),
           onPressed: () => Navigator.pushNamed(
             context,
