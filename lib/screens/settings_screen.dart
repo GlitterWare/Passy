@@ -119,10 +119,13 @@ class _SettingsScreen extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 24),
                             PassyPadding(ThreeWidgetButton(
-                              left: SvgPicture.asset(
-                                'assets/images/github_icon.svg',
-                                width: 26,
-                                color: PassyTheme.lightContentColor,
+                              left: Padding(
+                                padding: const EdgeInsets.only(right: 30),
+                                child: SvgPicture.asset(
+                                  'assets/images/github_icon.svg',
+                                  width: 26,
+                                  color: PassyTheme.lightContentColor,
+                                ),
                               ),
                               center: const Text('GitHub'),
                               right:
