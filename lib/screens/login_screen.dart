@@ -26,6 +26,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
+  static bool didRun = false;
   String _password = '';
   String _username = data.info.value.lastUsername;
 
@@ -101,7 +102,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    if (data.loadedAccount != null) _onResumed();
+    if (didRun) return;
+    didRun = true;
+    _onResumed();
   }
 
   @override
