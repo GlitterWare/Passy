@@ -37,6 +37,7 @@ class RecordButton extends StatelessWidget {
             child: Text(
               obscureValue ? '\u2022' * 6 : value,
               textAlign: valueAlign,
+              softWrap: true,
             ),
           ),
         ],
