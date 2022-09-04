@@ -23,6 +23,8 @@ Future<bool> bioAuth(String username) async {
   }
   if (getPassyHash(_bioData.password).toString() !=
       data.getPasswordHash(username)) return false;
+  data.info.value.lastUsername = username;
+  await data.info.save();
   data.loadAccount(username, getPassyEncrypter(_bioData.password));
   return true;
 }
