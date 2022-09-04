@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/login_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:passy/common/common.dart';
@@ -27,9 +28,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreen extends State<MainScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
+  bool _unlockScreenOn = false;
 
   void _logOut() {
     data.unloadAccount();
@@ -39,6 +41,40 @@ class _MainScreen extends State<MainScreen>
   Future<bool> _onWillPop() {
     _logOut();
     return Future.value(false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (_unlockScreenOn) return;
+    _unlockScreenOn = true;
+    Navigator.pushNamed(context, UnlockScreen.routeName)
+        .then((value) => _unlockScreenOn = false);
+  }
+
+  @override
+  Future<bool> didPushRoute(String route) {
+    if (route == UnlockScreen.routeName) _unlockScreenOn = true;
+    return Future.value(true);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    routeObserver.unsubscribe(this);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override

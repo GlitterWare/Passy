@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:passy/screens/security_screen.dart';
+import 'package:passy/common/common.dart';
 
+import 'screens/security_screen.dart';
 import 'screens/edit_note_screen.dart';
 import 'screens/identities_screen.dart';
 import 'screens/notes_screen.dart';
@@ -31,6 +32,7 @@ import 'screens/confirm_string_screen.dart';
 import 'screens/payment_cards_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/unlock_screen.dart';
 
 void main() => runApp(const Passy());
 
@@ -45,6 +47,9 @@ class Passy extends StatelessWidget {
       title: 'Passy',
       theme: PassyTheme.theme,
       navigatorKey: navigatorKey,
+      navigatorObservers: [
+        routeObserver,
+      ],
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
@@ -79,6 +84,7 @@ class Passy extends StatelessWidget {
         SecurityScreen.routeName: (context) => const SecurityScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
+        UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
     );
   }

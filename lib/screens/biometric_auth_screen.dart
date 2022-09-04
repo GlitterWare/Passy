@@ -19,10 +19,10 @@ class BiometricAuthScreen extends StatefulWidget {
 }
 
 class _BiometricAuthScreen extends State<BiometricAuthScreen> {
+  String _password = '';
+
   @override
   Widget build(BuildContext context) {
-    String _password = '';
-
     void setBioAuthEnabled(bool value) async {
       BiometricStorageData _bioData;
       String _username = data.loadedAccount!.username;
@@ -36,7 +36,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
                 Icon(Icons.fingerprint_rounded,
                     color: PassyTheme.darkContentColor),
                 SizedBox(width: 20),
-                Expanded(child: Text('Wrong password')),
+                Expanded(child: Text('Incorrect password')),
               ]),
             ));
           return;

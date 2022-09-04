@@ -6,6 +6,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:universal_io/io.dart';
 
 import '../common/assets.dart';
 import 'add_account_screen.dart';
@@ -24,9 +25,35 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreen();
 }
 
-class _LoginScreen extends State<LoginScreen> {
+class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   String _password = '';
   String _username = data.info.value.lastUsername;
+
+  Future<void> _onResumed() async {
+    if (data.noAccounts) {
+      Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
+      return;
+    }
+    if (Platform.isAndroid || Platform.isIOS) {
+      String username = data.info.value.lastUsername;
+      if (data.getBioAuthEnabled(username) ?? false) {
+        if (await bioAuth(username)) {
+          Navigator.pushReplacementNamed(context, MainScreen.routeName);
+          LoadedAccount _account = data.loadedAccount!;
+          if (_account.defaultScreen != Screen.main) {
+            Navigator.pushNamed(
+                context, screenToRouteName[_account.defaultScreen]!);
+          }
+        }
+      }
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) _onResumed();
+  }
 
   void login() {
     if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
@@ -68,6 +95,19 @@ class _LoginScreen extends State<LoginScreen> {
           ));
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    if (data.loadedAccount != null) _onResumed();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override

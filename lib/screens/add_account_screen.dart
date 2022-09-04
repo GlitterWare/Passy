@@ -103,6 +103,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   }
 
   Future<bool> _onWillPop() {
+    if (data.noAccounts) return Future.value(true);
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
     return Future.value(false);
   }
@@ -110,7 +111,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: data.noAccounts ? () => Future.value(true) : _onWillPop,
+      onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
