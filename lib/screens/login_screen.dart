@@ -31,10 +31,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   String _username = data.info.value.lastUsername;
 
   Future<void> _onResumed() async {
-    if (data.noAccounts) {
-      Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
-      return;
-    }
     if (Platform.isAndroid || Platform.isIOS) {
       if (data.getBioAuthEnabled(_username) ?? false) {
         if (await bioAuth(_username)) {
@@ -121,8 +117,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pushReplacementNamed(
-                        context, ConfirmStringScreen.routeName,
+                    Navigator.pushNamed(context, ConfirmStringScreen.routeName,
                         arguments: ConfirmStringScreenArguments(
                             title: const Text('Remove account'),
                             message: PassyPadding(RichText(
@@ -151,9 +146,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                             labelText: 'Confirm username',
                             confirmIcon:
                                 const Icon(Icons.delete_outline_rounded),
-                            onBackPressed: (context) =>
-                                Navigator.pushReplacementNamed(
-                                    context, LoginScreen.routeName),
+                            onBackPressed: (context) => Navigator.pop(context),
                             onConfirmPressed: (context, value) {
                               if (value != _username) {
                                 ScaffoldMessenger.of(context)
@@ -170,6 +163,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                   ));
                                 return;
                               }
+                              Navigator.pop(context);
                               Navigator.pushReplacementNamed(
                                   context, SplashScreen.routeName);
                               data.removeAccount(_username).then((value) {

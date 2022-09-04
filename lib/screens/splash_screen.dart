@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/add_account_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_io/io.dart';
 import 'package:passy/common/common.dart';
@@ -20,6 +21,10 @@ class SplashScreen extends StatelessWidget {
           Platform.pathSeparator +
           'Passy');
       loaded = true;
+      if (data.noAccounts) {
+        Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
+        return;
+      }
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
     }
 
