@@ -206,7 +206,7 @@ class _MainScreen extends State<MainScreen>
                 child: Icon(Icons.perm_identity_rounded),
               ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('ID Cards'),
+              center: const Text('ID cards'),
               onPressed: () =>
                   Navigator.pushNamed(context, IDCardsScreen.routeName),
             )),

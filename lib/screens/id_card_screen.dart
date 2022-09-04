@@ -33,9 +33,9 @@ class _IDCardScreen extends State<IDCardScreen> {
           builder: (_) {
             return AlertDialog(
               shape: PassyTheme.dialogShape,
-              title: const Text('Remove password'),
+              title: const Text('Remove ID card'),
               content:
-                  const Text('Passwords can only be restored from a backup.'),
+                  const Text('ID cards can only be restored from a backup.'),
               actions: [
                 TextButton(
                   child: const Text(
@@ -74,7 +74,7 @@ class _IDCardScreen extends State<IDCardScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
-        title: const Center(child: Text('ID Card')),
+        title: const Center(child: Text('ID card')),
         onRemovePressed: () => _onRemovePressed(),
         onEditPressed: () => _onEditPressed(),
       ),

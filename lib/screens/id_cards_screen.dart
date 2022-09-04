@@ -65,7 +65,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: EntriesScreenAppBar(
-          title: const Center(child: Text('ID Cards')),
+          title: const Center(child: Text('ID cards')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
       body: _account.idCards.isEmpty
