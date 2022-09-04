@@ -274,8 +274,15 @@ class LoadedAccount {
     _passwords.value.removeEntry(key);
   }
 
-  Future<void> savePasswords() => _passwords.save();
-  void savePasswordsSync() => _passwords.saveSync();
+  Future<void> savePasswords() async {
+    await _passwords.save();
+    await _history.save();
+  }
+
+  void savePasswordsSync() {
+    _passwords.saveSync();
+    _history.saveSync();
+  }
 
   // Password Icons wrappers
   PassyBytes? getPasswordIcon(String name) => _passwordIcons.getEntry(name);
@@ -295,8 +302,15 @@ class LoadedAccount {
     _passwordIcons.removeEntry(key);
   }
 
-  Future<void> savePasswordIcons() => _passwordIcons.save();
-  void savePasswordIconsSync() => _passwordIcons.saveSync();
+  Future<void> savePasswordIcons() async {
+    await _passwordIcons.save();
+    await _history.save();
+  }
+
+  void savePasswordIconsSync() {
+    _passwordIcons.saveSync();
+    _history.saveSync();
+  }
 
   // Notes wrappers
   Iterable<Note> get notes => _notes.value.entries;
@@ -319,8 +333,15 @@ class LoadedAccount {
     _notes.value.removeEntry(key);
   }
 
-  Future<void> saveNotes() => _notes.save();
-  void saveNotesSync() => _notes.saveSync();
+  Future<void> saveNotes() async {
+    await _notes.save();
+    await _history.save();
+  }
+
+  void saveNotesSync() {
+    _notes.saveSync();
+    _history.saveSync();
+  }
 
   // Payment Cards wrappers
   Iterable<PaymentCard> get paymentCards => _paymentCards.value.entries;
@@ -343,8 +364,15 @@ class LoadedAccount {
     _paymentCards.value.removeEntry(key);
   }
 
-  Future<void> savePaymentCards() => _paymentCards.save();
-  void savePaymentCardsSync() => _paymentCards.saveSync();
+  Future<void> savePaymentCards() async {
+    await _paymentCards.save();
+    await _history.save();
+  }
+
+  void savePaymentCardsSync() {
+    _paymentCards.saveSync();
+    _history.saveSync();
+  }
 
   // ID Cards wrappers
   Iterable<IDCard> get idCards => _idCards.value.entries;
@@ -367,8 +395,15 @@ class LoadedAccount {
     _idCards.value.removeEntry(key);
   }
 
-  Future<void> saveIDCards() => _idCards.save();
-  void saveIDCardsSync() => _idCards.saveSync();
+  Future<void> saveIDCards() async {
+    await _idCards.save();
+    await _history.save();
+  }
+
+  void saveIDCardsSync() {
+    _idCards.saveSync();
+    _history.saveSync();
+  }
 
   // Identities wrappers
   Iterable<Identity> get identities => _identities.value.entries;
@@ -391,6 +426,13 @@ class LoadedAccount {
     _identities.value.removeEntry(key);
   }
 
-  Future<void> saveIdentities() => _identities.save();
-  void saveIdentitiesSync() => _identities.saveSync();
+  Future<void> saveIdentities() async {
+    await _identities.save();
+    await _history.save();
+  }
+
+  void saveIdentitiesSync() {
+    _identities.saveSync();
+    _history.saveSync();
+  }
 }
