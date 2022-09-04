@@ -33,12 +33,9 @@ class RecordButton extends StatelessWidget {
             title,
             style: titleStyle,
           ),
-          FittedBox(
-            child: Text(
-              obscureValue ? '\u2022' * 6 : value,
-              textAlign: valueAlign,
-              softWrap: true,
-            ),
+          Text(
+            obscureValue ? '\u2022' * 6 : value,
+            textAlign: valueAlign,
           ),
         ],
       ),
