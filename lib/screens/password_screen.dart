@@ -26,8 +26,9 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreen extends State<PasswordScreen> {
   final Completer<void> _onClosed = Completer<void>();
-  final Completer<Password> _onPasswordLoaded = Completer<Password>();
   final LoadedAccount _account = data.loadedAccount!;
+  Password? password;
+  Future<void>? generateTFA = null;
   String _tfaCode = '';
   double _tfaProgress = 0;
 
@@ -63,10 +64,6 @@ class _PasswordScreen extends State<PasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _onPasswordLoaded.future.then((p) {
-      if (p.tfa == null) return;
-      _generateTFA(p.tfa!);
-    });
   }
 
   @override
@@ -122,38 +119,39 @@ class _PasswordScreen extends State<PasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Password _password =
-        ModalRoute.of(context)!.settings.arguments as Password;
-    if (!_onPasswordLoaded.isCompleted) _onPasswordLoaded.complete(_password);
+    if (password == null) {
+      password = ModalRoute.of(context)!.settings.arguments as Password;
+      if (password!.tfa != null) generateTFA = _generateTFA(password!.tfa!);
+    }
 
     return Scaffold(
       appBar: EntryScreenAppBar(
         title: const Center(child: Text('Password')),
-        onRemovePressed: () => _onRemovePressed(_password),
-        onEditPressed: () => _onEditPressed(_password),
+        onRemovePressed: () => _onRemovePressed(password!),
+        onEditPressed: () => _onEditPressed(password!),
       ),
       body: ListView(
         children: [
-          if (_password.nickname != '')
+          if (password!.nickname != '')
             PassyPadding(RecordButton(
               title: 'Nickname',
-              value: _password.nickname,
+              value: password!.nickname,
             )),
-          if (_password.username != '')
+          if (password!.username != '')
             PassyPadding(RecordButton(
               title: 'Username',
-              value: _password.username,
+              value: password!.username,
             )),
-          if (_password.email != '')
-            PassyPadding(RecordButton(title: 'Email', value: _password.email)),
-          if (_password.password != '')
+          if (password!.email != '')
+            PassyPadding(RecordButton(title: 'Email', value: password!.email)),
+          if (password!.password != '')
             PassyPadding(RecordButton(
               title: 'Password',
-              value: _password.password,
+              value: password!.password,
               obscureValue: true,
               isPassword: true,
             )),
-          if (_password.tfa != null)
+          if (password!.tfa != null)
             Row(
               children: [
                 SizedBox(
@@ -173,21 +171,21 @@ class _PasswordScreen extends State<PasswordScreen> {
                 ),
               ],
             ),
-          if (_password.website != '')
+          if (password!.website != '')
             Stack(children: [
               PassyPadding(RecordButton(
                 title: 'Website',
-                value: _password.website,
+                value: password!.website,
               )),
               Padding(
                   padding: const EdgeInsets.fromLTRB(23, 18, 0, 0),
-                  child: FavIconImage(address: _password.website, width: 35)),
+                  child: FavIconImage(address: password!.website, width: 35)),
             ]),
-          for (CustomField _customField in _password.customFields)
+          for (CustomField _customField in password!.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
-          if (_password.additionalInfo != '')
+          if (password!.additionalInfo != '')
             PassyPadding(RecordButton(
-                title: 'Additional info', value: _password.additionalInfo)),
+                title: 'Additional info', value: password!.additionalInfo)),
         ],
       ),
     );
