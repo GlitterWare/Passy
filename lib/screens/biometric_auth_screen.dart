@@ -79,7 +79,10 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
         children: [
           PassyPadding(ThreeWidgetButton(
             center: const Text('Biometric authentication'),
-            left: const Icon(Icons.fingerprint_rounded),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.fingerprint_rounded),
+            ),
             right: Switch(
               value: data.loadedAccount!.bioAuthEnabled,
               onChanged: (value) => setBioAuthEnabled(value),
