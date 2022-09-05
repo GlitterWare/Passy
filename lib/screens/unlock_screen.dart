@@ -115,29 +115,14 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                   const SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          obscureText: true,
-                          onChanged: (a) => setState(() => _password = a),
-                          decoration: const InputDecoration(
-                            hintText: 'Password',
-                          ),
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(32),
-                          ],
-                          autofocus: true,
-                        ),
-                      ),
-                      FloatingActionButton(
-                        onPressed: () => _unlock(),
-                        child: const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                        ),
-                        heroTag: 'loginBtn',
-                      ),
-                    ],
+                  PassyPadding(
+                    ButtonedTextFormField(
+                      labelText: 'Password',
+                      obscureText: true,
+                      onChanged: (a) => setState(() => _password = a),
+                      onPressed: _unlock,
+                      buttonIcon: const Icon(Icons.arrow_forward_ios_rounded),
+                    ),
                   ),
                   const Spacer(),
                 ],
