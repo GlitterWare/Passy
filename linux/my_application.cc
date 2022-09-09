@@ -7,6 +7,24 @@
 
 #include "flutter/generated_plugin_registrant.h"
 
+#include "string"
+
+std::string getExeDirectory()
+{
+  char szPath[PATH_MAX];
+  ssize_t count = readlink( "/proc/self/exe", szPath, PATH_MAX);
+  if( count < 0 || count >= PATH_MAX )
+    return {}; // some error
+  std::string _result = szPath;
+  return _result.substr(0, _result.length() - 6);
+}
+
+std::string getIconPath() {
+  std::string _result = getExeDirectory();
+  _result.append("/data/flutter_assets/assets/images/icon48.png");
+  return _result;
+}
+
 struct _MyApplication {
   GtkApplication parent_instance;
   char** dart_entrypoint_arguments;
@@ -48,6 +66,7 @@ static void my_application_activate(GApplication* application) {
   }
 
   gtk_window_set_default_size(window, 1280, 720);
+  gtk_window_set_icon_from_file(window, getIconPath().c_str(), NULL);
   gtk_widget_show(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();

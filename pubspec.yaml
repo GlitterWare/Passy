@@ -94,6 +94,7 @@ flutter:
     - assets/images/github_icon.svg
     - assets/images/icon.ico
     - assets/images/icon.png
+    - assets/images/icon48.png
     - assets/images/icon.jpg
     - assets/images/logo.svg
     - assets/images/logo_circle.svg
