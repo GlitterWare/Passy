@@ -44,12 +44,10 @@ class ButtonedTextFormField extends StatelessWidget {
             inputFormatters: inputFormatters,
           ),
         ),
-        SizedBox(
-          child: FloatingActionButton(
-            heroTag: null,
-            onPressed: onPressed,
-            child: buttonIcon,
-          ),
+        FloatingActionButton(
+          heroTag: null,
+          onPressed: onPressed,
+          child: buttonIcon,
         ),
       ],
     );
