@@ -1,4 +1,4 @@
-package com.example.passy
+package com.glitterware.passy
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import co.infinum.goldfinger.Goldfinger;

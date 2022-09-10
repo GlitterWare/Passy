@@ -61,6 +61,7 @@ dev_dependencies:
   json_serializable:
   rename:
   flutter_launcher_icons: ^0.9.2
+  change_app_package_name: ^1.1.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
