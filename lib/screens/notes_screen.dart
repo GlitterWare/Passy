@@ -50,7 +50,7 @@ class _NotesScreen extends State<NotesScreen> {
         }
       }
       return NoteButtonListView(
-        notes: _account.notes.toList(),
+        notes: _found,
         shouldSort: true,
         onPressed: (note) =>
             Navigator.pushNamed(context, NoteScreen.routeName, arguments: note),

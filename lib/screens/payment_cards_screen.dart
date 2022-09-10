@@ -57,7 +57,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           }
         }
         return PaymentCardButtonListView(
-          paymentCards: _account.paymentCards.toList(),
+          paymentCards: _found,
           shouldSort: true,
           onPressed: (paymentCard) => {
             Navigator.pushNamed(context, PaymentCardScreen.routeName,

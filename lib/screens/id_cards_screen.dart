@@ -39,6 +39,10 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         {
           int _positiveCount = 0;
           for (String _term in _terms) {
+            if (_idCard.nickname.toLowerCase().contains(_term)) {
+              _positiveCount++;
+              continue;
+            }
             if (_idCard.name.toLowerCase().contains(_term)) {
               _positiveCount++;
               continue;
