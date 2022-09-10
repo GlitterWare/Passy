@@ -1,6 +1,6 @@
 export 'buttoned_text_form_field.dart';
 export 'custom_field_button.dart';
-export 'custom_field_editor_list_view.dart';
+export 'custom_fields_editor.dart';
 export 'double_action_button.dart';
 export 'edit_screen_appbar.dart';
 export 'entries_screen_appbar.dart';
