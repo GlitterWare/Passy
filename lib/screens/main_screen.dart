@@ -31,6 +31,7 @@ class _MainScreen extends State<MainScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
+  late void Function() _onConnectPressed;
   bool _unlockScreenOn = false;
 
   void _logOut() {
@@ -71,10 +72,69 @@ class _MainScreen extends State<MainScreen>
     routeObserver.unsubscribe(this);
   }
 
+  void _showConnectDialog() {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text(
+                'Scan QR code',
+                textAlign: TextAlign.center,
+              ),
+              content: SizedBox(
+                width: 250,
+                height: 250,
+                child: MobileScanner(
+                  allowDuplicates: false,
+                  key: qrKey,
+                  onDetect: (barcode, _) {
+                    if (barcode.rawValue == null) {
+                      return;
+                    }
+                    SynchronizationWrapper(context: context)
+                        .connect(_account, address: barcode.rawValue!);
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.popUntil(context,
+                        (route) => route.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, ConnectScreen.routeName,
+                        arguments: _account);
+                  },
+                  child: const Text(
+                    'Can\'t scan?',
+                    style: TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor,
+                    ),
+                  ),
+                )
+              ],
+            ));
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _onConnectPressed = Platform.isAndroid || Platform.isIOS
+        ? _showConnectDialog
+        : () {
+            Navigator.popUntil(context,
+                (route) => route.settings.name == MainScreen.routeName);
+            Navigator.pushNamed(context, ConnectScreen.routeName,
+                arguments: _account);
+          };
   }
 
   @override
@@ -122,73 +182,7 @@ class _MainScreen extends State<MainScreen>
                           style: TextStyle(
                               color: PassyTheme.lightContentSecondaryColor),
                         ),
-                        onPressed: Platform.isAndroid || Platform.isIOS
-                            ? () => showDialog(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                      title: const Text(
-                                        'Scan QR code',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      content: SizedBox(
-                                        width: 250,
-                                        height: 250,
-                                        child: MobileScanner(
-                                          allowDuplicates: false,
-                                          key: qrKey,
-                                          onDetect: (barcode, _) {
-                                            if (barcode.rawValue == null) {
-                                              return;
-                                            }
-                                            SynchronizationWrapper(
-                                                    context: context)
-                                                .connect(_account,
-                                                    address: barcode.rawValue!);
-                                          },
-                                        ),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.popUntil(
-                                                context,
-                                                (route) =>
-                                                    route.settings.name ==
-                                                    MainScreen.routeName);
-                                            Navigator.pushNamed(context,
-                                                ConnectScreen.routeName,
-                                                arguments: _account);
-                                          },
-                                          child: const Text(
-                                            'Can\'t scan?',
-                                            style: TextStyle(
-                                              color: PassyTheme
-                                                  .lightContentSecondaryColor,
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(ctx),
-                                          child: const Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              color: PassyTheme
-                                                  .lightContentSecondaryColor,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ))
-                            : () {
-                                Navigator.popUntil(
-                                    context,
-                                    (route) =>
-                                        route.settings.name ==
-                                        MainScreen.routeName);
-                                Navigator.pushNamed(
-                                    context, ConnectScreen.routeName,
-                                    arguments: _account);
-                              },
+                        onPressed: _onConnectPressed,
                       ),
                     ],
                   ),
