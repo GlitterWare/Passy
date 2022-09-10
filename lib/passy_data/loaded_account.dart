@@ -88,7 +88,7 @@ class LoadedAccount {
     }
   }
 
-  void _setAccountPassword(String password) {
+  void setAccountPassword(String password) {
     _credentials.value.password = password;
     _encrypter = getPassyEncrypter(password);
     _settings.encrypter = _encrypter;
@@ -99,16 +99,6 @@ class LoadedAccount {
     _paymentCards.encrypter = _encrypter;
     _idCards.encrypter = _encrypter;
     _identities.encrypter = _encrypter;
-  }
-
-  Future<void> setAccountPassword(String password) {
-    _setAccountPassword(password);
-    return save();
-  }
-
-  void setAccountPasswordSync(String password) {
-    _setAccountPassword(password);
-    saveSync();
   }
 
   Future<void> save() => Future.wait([
