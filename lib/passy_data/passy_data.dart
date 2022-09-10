@@ -196,6 +196,8 @@ class PassyData {
 
   Future<void> changeAccountUsername(
       String username, String newUsername) async {
+    if (newUsername.length < 2) throw 'Username is shorter than 2 letters';
+    if (_accounts.containsKey(newUsername)) throw 'Username is already in use';
     AccountCredentials _creds;
     {
       AccountCredentialsFile _credsFile = _accounts[username]!;

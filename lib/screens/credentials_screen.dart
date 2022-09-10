@@ -61,6 +61,17 @@ class _CredentialsScreen extends State<CredentialsScreen> {
                     ])));
                     return;
                   }
+                  if (data.hasAccount(value)) {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Row(children: const [
+                      Icon(Icons.person_rounded,
+                          color: PassyTheme.darkContentColor),
+                      SizedBox(width: 20),
+                      Text('Username is already in use'),
+                    ])));
+                    return;
+                  }
                   Navigator.popUntil(
                     context,
                     (route) {
