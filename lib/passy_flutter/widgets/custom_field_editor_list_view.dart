@@ -58,44 +58,60 @@ class _CustomFieldEditorListView extends State<CustomFieldEditorListView> {
           itemCount: widget.customFields.length,
           itemBuilder: (context, index) {
             List<TextInputFormatter>? _inputFormatters;
-            FocusNode? _focusNode;
-            void Function()? _onTap;
             CustomField _field = widget.customFields[index];
+            List<Widget> _widgets = [];
             switch (_field.fieldType) {
               case (FieldType.number):
                 _inputFormatters = [FilteringTextInputFormatter.digitsOnly];
                 break;
               case (FieldType.date):
-                _focusNode = AlwaysDisabledFocusNode();
-                _onTap = () {
-                  showPassyDatePicker(
-                    context: context,
-                    date: _field.value == ''
-                        ? DateTime.now()
-                        : stringToDate(_field.value),
-                  ).then((value) {
-                    if (value == null) return;
-                    setState(() => _field.value = dateToString(value));
-                  });
-                };
+                _widgets.add(
+                  FloatingActionButton(
+                    heroTag: null,
+                    onPressed: () => showPassyDatePicker(
+                      context: context,
+                      date: _field.value == ''
+                          ? DateTime.now()
+                          : stringToDate(_field.value),
+                    ).then(
+                      (value) {
+                        if (value == null) return;
+                        setState(() => _field.value = dateToString(value));
+                      },
+                    ),
+                    child: const Icon(Icons.date_range),
+                  ),
+                );
                 break;
               default:
                 break;
             }
-            return Padding(
-              padding: widget.padding,
-              child: ButtonedTextFormField(
-                key: UniqueKey(),
-                focusNode: _focusNode,
-                initialValue: _field.value,
-                labelText: _field.title,
-                buttonIcon: const Icon(Icons.remove_rounded),
-                onChanged: (value) => _field.value = value,
-                onTap: _onTap,
-                onPressed: () => setState(
-                  () => widget.customFields.removeAt(index),
+            _widgets.insert(
+              0,
+              Flexible(
+                child: TextFormField(
+                  inputFormatters: _inputFormatters,
+                  initialValue: _field.value,
+                  decoration: InputDecoration(
+                    labelText: _field.title,
+                  ),
+                  onChanged: (value) => _field.value = value,
                 ),
-                inputFormatters: _inputFormatters,
+              ),
+            );
+            _widgets.add(
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () =>
+                    setState(() => widget.customFields.removeAt(index)),
+                child: const Icon(Icons.remove_rounded),
+              ),
+            );
+            return Padding(
+              padding: PassyTheme.passyPadding,
+              child: Row(
+                key: UniqueKey(),
+                children: _widgets,
               ),
             );
           },
