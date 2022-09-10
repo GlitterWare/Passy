@@ -47,11 +47,11 @@ dependencies:
   url_launcher: ^6.0.20
   flutter_locker: 
   cached_network_image: ^3.2.1
-  qr_code_scanner: ^1.0.0
   flutter_credit_card: ^3.0.1
   flutter_date_pickers: ^0.4.0
   credit_card_type_detector: ^2.0.0
   flutter_secure_screen: ^0.0.1
+  mobile_scanner: ^2.0.0
 
 
 dev_dependencies:

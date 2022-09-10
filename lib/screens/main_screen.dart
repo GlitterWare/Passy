@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
@@ -130,21 +130,22 @@ class _MainScreen extends State<MainScreen>
                                         'Scan QR code',
                                         textAlign: TextAlign.center,
                                       ),
-                                      content: QRView(
-                                        key: qrKey,
-                                        onQRViewCreated: (controller) {
-                                          bool _scanned = false;
-                                          controller.scannedDataStream
-                                              .listen((event) {
-                                            if (_scanned) return;
-                                            if (event.code == null) return;
-                                            _scanned = true;
+                                      content: SizedBox(
+                                        width: 250,
+                                        height: 250,
+                                        child: MobileScanner(
+                                          allowDuplicates: false,
+                                          key: qrKey,
+                                          onDetect: (barcode, _) {
+                                            if (barcode.rawValue == null) {
+                                              return;
+                                            }
                                             SynchronizationWrapper(
                                                     context: context)
                                                 .connect(_account,
-                                                    address: event.code!);
-                                          });
-                                        },
+                                                    address: barcode.rawValue!);
+                                          },
+                                        ),
                                       ),
                                       actions: [
                                         TextButton(
