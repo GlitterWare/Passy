@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/screens/credentials_screen.dart';
 import 'package:passy/screens/setup_screen.dart';
 
 import 'screens/security_screen.dart';
@@ -59,6 +60,7 @@ class Passy extends StatelessWidget {
         BiometricAuthScreen.routeName: (context) => const BiometricAuthScreen(),
         ConfirmStringScreen.routeName: (context) => const ConfirmStringScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
+        CredentialsScreen.routeName: (context) => const CredentialsScreen(),
         EditCustomFieldScreen.routeName: (context) =>
             const EditCustomFieldScreen(),
         EditIDCardScreen.routeName: (context) => const EditIDCardScreen(),

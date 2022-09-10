@@ -193,4 +193,39 @@ class PassyData {
     await _tempPathDir.delete(recursive: true);
     return LoadedAccount(path: _newAccountPath, encrypter: encrypter);
   }
+
+  Future<void> changeAccountUsername(
+      String username, String newUsername) async {
+    AccountCredentials _creds;
+    {
+      AccountCredentialsFile _credsFile = _accounts[username]!;
+      _creds = _credsFile.value;
+      _accounts.remove(username);
+      _credsFile.value.username = newUsername;
+      await _credsFile.save();
+    }
+    await Directory(passyPath +
+            Platform.pathSeparator +
+            'accounts' +
+            Platform.pathSeparator +
+            username)
+        .rename(passyPath +
+            Platform.pathSeparator +
+            'accounts' +
+            Platform.pathSeparator +
+            newUsername);
+    _accounts[newUsername] = AccountCredentialsFile(
+        File(
+          passyPath +
+              Platform.pathSeparator +
+              'accounts' +
+              Platform.pathSeparator +
+              newUsername +
+              Platform.pathSeparator +
+              'credentials.json',
+        ),
+        value: _creds);
+    info.value.lastUsername = newUsername;
+    await info.save();
+  }
 }

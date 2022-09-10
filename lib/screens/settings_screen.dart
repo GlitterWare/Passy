@@ -12,6 +12,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/common/assets.dart';
 
 import 'backup_and_restore_screen.dart';
+import 'credentials_screen.dart';
 import 'main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -60,6 +61,15 @@ class _SettingsScreen extends State<SettingsScreen> {
                 right: const Icon(Icons.arrow_forward_ios_rounded),
                 onPressed: () =>
                     Navigator.pushNamed(context, SecurityScreen.routeName))),
+          PassyPadding(ThreeWidgetButton(
+              center: const Text('Credentials'),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.person_outline_rounded),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, CredentialsScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
             center: const Text('About'),
             left: const Padding(
