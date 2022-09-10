@@ -19,7 +19,7 @@ fi
 export ARCH=$(uname -m)
 
 echo "INFO:Generator:Searching AppDir" 
-export appId='com.teampassy.passy'
+export appId='com.glitterware.passy'
 #read -p "? ID [Eg: com.example.app]: " appId
 export appName='Passy'
 #read -p "? Application Name: " appName
