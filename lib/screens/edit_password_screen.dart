@@ -191,7 +191,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: const InputDecoration(labelText: 'Website'),
           onChanged: (value) => setState(() => _website = value),
         )),
-        CustomFieldEditorListView(
+        CustomFieldsEditor(
           customFields: _customFields,
           shouldSort: true,
           padding: PassyTheme.passyPadding,

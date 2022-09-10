@@ -126,7 +126,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
           decoration: const InputDecoration(labelText: 'Country'),
           onChanged: (value) => setState(() => _country = value.trim()),
         )),
-        CustomFieldEditorListView(
+        CustomFieldsEditor(
           customFields: _customFields,
           shouldSort: true,
           padding: PassyTheme.passyPadding,

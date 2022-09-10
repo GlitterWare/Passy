@@ -161,7 +161,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             onChanged: (value) => setState(() => _cvv = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           )),
-          CustomFieldEditorListView(
+          CustomFieldsEditor(
             customFields: _customFields,
             shouldSort: true,
             padding: PassyTheme.passyPadding,

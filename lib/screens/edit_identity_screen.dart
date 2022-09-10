@@ -190,7 +190,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           decoration: const InputDecoration(labelText: 'Country'),
           onChanged: (value) => setState(() => _country = value.trim()),
         )),
-        CustomFieldEditorListView(
+        CustomFieldsEditor(
           customFields: _customFields,
           shouldSort: true,
           padding: PassyTheme.passyPadding,

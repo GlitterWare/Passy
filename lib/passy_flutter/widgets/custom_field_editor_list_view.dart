@@ -4,14 +4,14 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-class CustomFieldEditorListView extends StatefulWidget {
+class CustomFieldsEditor extends StatefulWidget {
   final List<CustomField> customFields;
   final bool shouldSort;
   final EdgeInsetsGeometry padding;
   final ColorScheme? datePickerColorScheme;
   final Future<CustomField?> Function() buildCustomField;
 
-  const CustomFieldEditorListView({
+  const CustomFieldsEditor({
     Key? key,
     required this.customFields,
     this.shouldSort = false,
@@ -21,10 +21,10 @@ class CustomFieldEditorListView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _CustomFieldEditorListView();
+  State<StatefulWidget> createState() => _CustomFieldsEditor();
 }
 
-class _CustomFieldEditorListView extends State<CustomFieldEditorListView> {
+class _CustomFieldsEditor extends State<CustomFieldsEditor> {
   @override
   void initState() {
     super.initState();
