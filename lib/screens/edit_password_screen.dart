@@ -191,28 +191,15 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: const InputDecoration(labelText: 'Website'),
           onChanged: (value) => setState(() => _website = value),
         )),
-        PassyPadding(ThreeWidgetButton(
-          left: const Padding(
-            padding: EdgeInsets.only(right: 30),
-            child: Icon(Icons.add_rounded),
-          ),
-          center: const Text('Add custom field'),
-          onPressed: () => Navigator.pushNamed(
+        CustomFieldEditorListView(
+          customFields: _customFields,
+          shouldSort: true,
+          padding: PassyTheme.passyPadding,
+          buildCustomField: () async => (await Navigator.pushNamed(
             context,
             EditCustomFieldScreen.routeName,
-          ).then((value) {
-            if (value != null) {
-              setState(() {
-                _customFields.add(value as CustomField);
-                PassySort.sortCustomFields(_customFields);
-              });
-            }
-          }),
-        )),
-        CustomFieldEditorListView(
-            customFields: _customFields,
-            shouldSort: true,
-            padding: PassyTheme.passyPadding),
+          )) as CustomField?,
+        ),
         PassyPadding(TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
