@@ -24,6 +24,8 @@ class EditPasswordScreen extends StatefulWidget {
 }
 
 class _EditPasswordScreen extends State<EditPasswordScreen> {
+  final TextEditingController _passwordController = TextEditingController();
+
   bool _isLoaded = false;
   bool _isNew = true;
 
@@ -63,6 +65,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         _username = _passwordArgs.username;
         _email = _passwordArgs.email;
         _password = _passwordArgs.password;
+        _passwordController.text = _password;
         if (_tfa != null) {
           _tfaSecret = _tfa.secret;
           _tfaLength = _tfa.length;
@@ -131,10 +134,21 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: const InputDecoration(labelText: 'Email'),
           onChanged: (value) => setState(() => _email = value.trim()),
         )),
-        PassyPadding(TextFormField(
-          initialValue: _password,
-          decoration: const InputDecoration(labelText: 'Password'),
+        PassyPadding(ButtonedTextFormField(
+          controller: _passwordController,
+          labelText: 'Password',
           onChanged: (value) => setState(() => _password = value),
+          buttonIcon: const Icon(Icons.password_rounded),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => const StringGeneratorDialog(),
+            ).then((value) {
+              if (value == null) return;
+              _passwordController.text = value;
+              setState(() => _password = value);
+            });
+          },
         )),
         PassyPadding(TextFormField(
           initialValue: _tfaSecret.replaceFirst('=', ''),
@@ -195,7 +209,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           customFields: _customFields,
           shouldSort: true,
           padding: PassyTheme.passyPadding,
-          buildCustomField: () async => (await Navigator.pushNamed(
+          constructCustomField: () async => (await Navigator.pushNamed(
             context,
             EditCustomFieldScreen.routeName,
           )) as CustomField?,

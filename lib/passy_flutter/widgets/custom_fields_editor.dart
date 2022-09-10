@@ -9,7 +9,7 @@ class CustomFieldsEditor extends StatefulWidget {
   final bool shouldSort;
   final EdgeInsetsGeometry padding;
   final ColorScheme? datePickerColorScheme;
-  final Future<CustomField?> Function() buildCustomField;
+  final Future<CustomField?> Function() constructCustomField;
 
   const CustomFieldsEditor({
     Key? key,
@@ -17,7 +17,7 @@ class CustomFieldsEditor extends StatefulWidget {
     this.shouldSort = false,
     this.padding = EdgeInsets.zero,
     this.datePickerColorScheme = PassyTheme.datePickerColorScheme,
-    required this.buildCustomField,
+    required this.constructCustomField,
   }) : super(key: key);
 
   @override
@@ -42,7 +42,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
           ),
           center: const Text('Add custom field'),
           onPressed: () {
-            widget.buildCustomField().then((value) {
+            widget.constructCustomField().then((value) {
               if (value != null) {
                 setState(() {
                   widget.customFields.add(value);
@@ -83,6 +83,23 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                   ),
                 );
                 break;
+              case (FieldType.password):
+                _widgets.add(
+                  FloatingActionButton(
+                    heroTag: null,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const StringGeneratorDialog(),
+                      ).then((value) {
+                        if (value == null) return;
+                        setState(() => _field.value = value);
+                      });
+                    },
+                    child: const Icon(Icons.password_rounded),
+                  ),
+                );
+                break;
               default:
                 break;
             }
@@ -108,7 +125,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
               ),
             );
             return Padding(
-              padding: PassyTheme.passyPadding,
+              padding: widget.padding,
               child: Row(
                 key: UniqueKey(),
                 children: _widgets,

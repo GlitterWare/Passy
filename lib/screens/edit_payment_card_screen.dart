@@ -165,7 +165,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             customFields: _customFields,
             shouldSort: true,
             padding: PassyTheme.passyPadding,
-            buildCustomField: () async => (await Navigator.pushNamed(
+            constructCustomField: () async => (await Navigator.pushNamed(
               context,
               EditCustomFieldScreen.routeName,
             )) as CustomField?,
