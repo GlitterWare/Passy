@@ -1,4 +1,5 @@
 export 'buttoned_text_form_field.dart';
+export 'confirm_string_screen.dart';
 export 'custom_field_button.dart';
 export 'custom_fields_editor.dart';
 export 'double_action_button.dart';
