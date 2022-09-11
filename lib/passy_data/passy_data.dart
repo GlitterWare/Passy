@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/material.dart';
 
 import 'package:passy/passy_data/passy_legacy.dart';
 import 'package:path_provider/path_provider.dart';
