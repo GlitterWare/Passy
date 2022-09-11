@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/screens/change_password_screen.dart';
 import 'package:passy/screens/change_username_screen.dart';
 import 'package:passy/screens/confirm_restore_screen.dart';
 import 'package:passy/screens/credentials_screen.dart';
@@ -60,6 +61,8 @@ class Passy extends StatelessWidget {
             const BackupAndRestoreScreen(),
         BackupScreen.routeName: (context) => const BackupScreen(),
         BiometricAuthScreen.routeName: (context) => const BiometricAuthScreen(),
+        ChangePasswordScreen.routeName: (context) =>
+            const ChangePasswordScreen(),
         ChangeUsernameScreen.routeName: (context) =>
             const ChangeUsernameScreen(),
         ConfirmRestoreScreen.routeName: (context) =>

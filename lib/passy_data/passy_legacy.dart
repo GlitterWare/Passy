@@ -30,8 +30,11 @@ bool canLoadAccountVersion(String accVersion) {
   return true;
 }
 
-LoadedAccount convertLegacyAccount(
-    {required String path, required Encrypter encrypter}) {
+LoadedAccount convertLegacyAccount({
+  required String path,
+  required Encrypter encrypter,
+  AccountCredentialsFile? credentials,
+}) {
   List<int> _accountVersion;
   File _versionFile = File(path + Platform.pathSeparator + 'version.txt');
   if (_versionFile.existsSync()) {
@@ -44,7 +47,11 @@ LoadedAccount convertLegacyAccount(
     _accountVersion = [0, 0, 0];
   }
   if (_accountVersion.join('.') == accountVersion) {
-    return LoadedAccount(path: path, encrypter: encrypter);
+    return LoadedAccount(
+      path: path,
+      encrypter: encrypter,
+      credentials: credentials,
+    );
   }
   {
     String _exception =
@@ -54,15 +61,17 @@ LoadedAccount convertLegacyAccount(
   if (_accountVersion[0] == 0) {
     if (_accountVersion[1] < 3) {
       // Pre-0.3.0 conversion
-      LoadedAccount _account =
-          convertPre0_3_0Account(path: path, encrypter: encrypter);
+      convertPre0_3_0Account(path: path, encrypter: encrypter);
       _versionFile.writeAsStringSync(accountVersion);
-      return _account;
     }
   }
   // No conversion
   _versionFile.writeAsStringSync(accountVersion);
-  return LoadedAccount(path: path, encrypter: encrypter);
+  return LoadedAccount(
+    path: path,
+    encrypter: encrypter,
+    credentials: credentials,
+  );
 }
 
 LoadedAccount convertPre0_3_0Account({
