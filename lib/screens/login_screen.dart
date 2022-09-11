@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_io/io.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/screen.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
-import 'package:universal_io/io.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/common/assets.dart';
 
-import '../common/assets.dart';
 import 'add_account_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';
-import 'confirm_string_screen.dart';
 import 'log_screen.dart';
 import 'splash_screen.dart';
 

@@ -3,15 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/common/assets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
-import '../common/assets.dart';
-import '../passy_flutter/passy_theme.dart';
 import 'backup_and_restore_screen.dart';
 import 'login_screen.dart';
 import 'log_screen.dart';
 import 'main_screen.dart';
-import 'confirm_string_screen.dart';
 
 class RestoreScreen extends StatefulWidget {
   const RestoreScreen({Key? key}) : super(key: key);
