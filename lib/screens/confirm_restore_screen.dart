@@ -21,7 +21,7 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
   @override
   Widget build(BuildContext context) {
     String _path = ModalRoute.of(context)!.settings.arguments as String;
-    return ConfirmStringScreen(
+    return ConfirmStringScaffold(
         title: const Text('Passy restore'),
         message: PassyPadding(RichText(
           text: const TextSpan(

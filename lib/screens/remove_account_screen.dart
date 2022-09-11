@@ -19,7 +19,7 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
   @override
   Widget build(BuildContext context) {
     String _username = ModalRoute.of(context)!.settings.arguments as String;
-    return ConfirmStringScreen(
+    return ConfirmStringScaffold(
       title: const Text('Remove account'),
       message: PassyPadding(RichText(
         text: TextSpan(text: 'Confirm the removal of account ', children: [

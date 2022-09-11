@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-class ConfirmStringScreen extends StatefulWidget {
+class ConfirmStringScaffold extends StatefulWidget {
   final Widget title;
   final Widget message;
   final String? labelText;
@@ -11,7 +11,7 @@ class ConfirmStringScreen extends StatefulWidget {
   final void Function(BuildContext context)? onBackPressed;
   final void Function(BuildContext context, String value)? onConfirmPressed;
 
-  const ConfirmStringScreen({
+  const ConfirmStringScaffold({
     Key? key,
     this.title = const Text('Confirm string'),
     this.message = const Text('Enter string to confirm'),
@@ -23,10 +23,10 @@ class ConfirmStringScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ConfirmStringScreen();
+  State<StatefulWidget> createState() => _ConfirmStringScaffold();
 }
 
-class _ConfirmStringScreen extends State<ConfirmStringScreen> {
+class _ConfirmStringScaffold extends State<ConfirmStringScaffold> {
   String _input = '';
   void Function()? _onBackPressed;
   void Function()? _onConfirmPressed;

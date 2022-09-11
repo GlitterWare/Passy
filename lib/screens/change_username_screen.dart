@@ -23,7 +23,7 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ConfirmStringScreen(
+    return ConfirmStringScaffold(
       onBackPressed: (context) => Navigator.pop(context),
       title: const Text('Change username'),
       labelText: 'New username',
