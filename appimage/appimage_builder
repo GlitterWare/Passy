@@ -23,7 +23,7 @@ export appId='com.glitterware.passy'
 #read -p "? ID [Eg: com.example.app]: " appId
 export appName='Passy'
 #read -p "? Application Name: " appName
-export appIcon='logo'
+export appIcon='passy'
 #read -p "? Icon: " appIcon
 export appExec='passy'
 #read -p "? Executable path relative to AppDir [usr/bin/app]: " appExec
