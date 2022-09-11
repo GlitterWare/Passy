@@ -39,7 +39,7 @@ class LogScreen extends StatelessWidget {
                   color: PassyTheme.lightContentColor,
                 ),
                 onPressed: () =>
-                    launch('https://github.com/GleammerRay/Passy/issues'),
+                    launch('https://github.com/GlitterWare/Passy/issues'),
               )
             ]),
         body: SelectableText(_log));
