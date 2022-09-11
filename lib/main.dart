@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/screens/change_username_screen.dart';
+import 'package:passy/screens/confirm_restore_screen.dart';
 import 'package:passy/screens/credentials_screen.dart';
+import 'package:passy/screens/remove_account_screen.dart';
 import 'package:passy/screens/setup_screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
@@ -57,7 +60,10 @@ class Passy extends StatelessWidget {
             const BackupAndRestoreScreen(),
         BackupScreen.routeName: (context) => const BackupScreen(),
         BiometricAuthScreen.routeName: (context) => const BiometricAuthScreen(),
-        ConfirmStringScreen.routeName: (context) => const ConfirmStringScreen(),
+        ChangeUsernameScreen.routeName: (context) =>
+            const ChangeUsernameScreen(),
+        ConfirmRestoreScreen.routeName: (context) =>
+            const ConfirmRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
         CredentialsScreen.routeName: (context) => const CredentialsScreen(),
         EditCustomFieldScreen.routeName: (context) =>
@@ -81,6 +87,7 @@ class Passy extends StatelessWidget {
         PasswordsScreen.routeName: (context) => const PasswordsScreen(),
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         PaymentCardsScreen.routeName: (context) => const PaymentCardsScreen(),
+        RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),
         RestoreScreen.routeName: (context) => const RestoreScreen(),
         SearchScreen.routeName: (context) => const SearchScreen(),
         SecurityScreen.routeName: (context) => const SecurityScreen(),

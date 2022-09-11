@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-class ConfirmStringScreenArguments {
+class ConfirmStringScreen extends StatefulWidget {
   final Widget title;
   final Widget message;
   final String? labelText;
@@ -11,7 +11,8 @@ class ConfirmStringScreenArguments {
   final void Function(BuildContext context)? onBackPressed;
   final void Function(BuildContext context, String value)? onConfirmPressed;
 
-  ConfirmStringScreenArguments({
+  const ConfirmStringScreen({
+    Key? key,
     this.title = const Text('Confirm string'),
     this.message = const Text('Enter string to confirm'),
     this.labelText,
@@ -19,37 +20,39 @@ class ConfirmStringScreenArguments {
     this.confirmIcon = const Icon(Icons.arrow_forward_ios_rounded),
     this.onBackPressed,
     this.onConfirmPressed,
-  });
-}
-
-class ConfirmStringScreen extends StatefulWidget {
-  const ConfirmStringScreen({Key? key}) : super(key: key);
-
-  static const routeName = '/confirmStringScreen';
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ConfirmStringScreen();
 }
 
 class _ConfirmStringScreen extends State<ConfirmStringScreen> {
+  String _input = '';
+  void Function()? _onBackPressed;
+  void Function()? _onConfirmPressed;
+  bool _initialized = false;
+
   @override
   Widget build(BuildContext context) {
-    String _input = '';
-    final ConfirmStringScreenArguments _args = ModalRoute.of(context)!
-            .settings
-            .arguments as ConfirmStringScreenArguments? ??
-        ConfirmStringScreenArguments();
+    if (!_initialized) {
+      _onBackPressed = widget.onBackPressed == null
+          ? null
+          : () => widget.onBackPressed!(context);
+      _onConfirmPressed = widget.onConfirmPressed == null
+          ? null
+          : () => widget.onConfirmPressed!(context, _input);
+      _initialized = true;
+    }
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            padding: PassyTheme.appBarButtonPadding,
-            splashRadius: PassyTheme.appBarButtonSplashRadius,
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: _args.onBackPressed == null
-                ? null
-                : () => _args.onBackPressed!(context)),
-        title: _args.title,
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: _onBackPressed,
+        ),
+        title: widget.title,
         centerTitle: true,
       ),
       body: CustomScrollView(
@@ -57,16 +60,14 @@ class _ConfirmStringScreen extends State<ConfirmStringScreen> {
           SliverFillRemaining(
             child: Column(children: [
               const Spacer(),
-              _args.message,
+              widget.message,
               PassyPadding(
                 ButtonedTextFormField(
-                  labelText: _args.labelText,
-                  obscureText: _args.obscureText,
-                  onChanged: (s) => _input = s,
-                  onPressed: _args.onConfirmPressed == null
-                      ? null
-                      : () => _args.onConfirmPressed!(context, _input),
-                  buttonIcon: _args.confirmIcon,
+                  labelText: widget.labelText,
+                  obscureText: widget.obscureText,
+                  onChanged: (s) => setState(() => _input = s),
+                  onPressed: _onConfirmPressed,
+                  buttonIcon: widget.confirmIcon,
                 ),
               ),
               const Spacer(),
