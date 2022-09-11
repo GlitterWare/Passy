@@ -74,7 +74,7 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
                 color: PassyTheme.lightContentSecondaryColor,
               ),
             ),
-            const TextSpan(text: '.\nType in the new username.')
+            const TextSpan(text: '.\nType in the new username.'),
           ],
         ),
       ),

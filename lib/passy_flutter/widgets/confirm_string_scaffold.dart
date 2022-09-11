@@ -58,6 +58,7 @@ class _ConfirmStringScaffold extends State<ConfirmStringScaffold> {
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(children: [
               const Spacer(),
               widget.message,
