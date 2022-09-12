@@ -3,6 +3,8 @@ name: Publish website to GitHub Pages
 on:
   push:
     branches: [ website ]
+    paths:
+      - 'pubspec.yaml'
 
 jobs:
   build:
