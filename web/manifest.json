@@ -1,11 +1,11 @@
 {
-    "name": "passy_website",
-    "short_name": "passy_website",
+    "name": "Passy - Cross-platform offline password manager",
+    "short_name": "Passy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Cross-platform offline password manager",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
