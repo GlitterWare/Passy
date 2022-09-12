@@ -38,8 +38,8 @@ class LogScreen extends StatelessWidget {
                   'assets/images/github_icon.svg',
                   color: PassyTheme.lightContentColor,
                 ),
-                onPressed: () =>
-                    launch('https://github.com/GlitterWare/Passy/issues'),
+                onPressed: () => launchUrl(
+                    Uri.https('github.com', '/GlitterWare/Passy/issues')),
               )
             ]),
         body: SelectableText(_log));

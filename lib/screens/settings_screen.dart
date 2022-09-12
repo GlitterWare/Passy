@@ -48,7 +48,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () =>
-                  launch('https://github.com/sponsors/GlitterWare'))),
+                  launchUrl(Uri.https('github.com', '/sponsors/GlitterWare')))),
           PassyPadding(ThreeWidgetButton(
             center: const Text('Backup & Restore'),
             left: const Padding(
@@ -149,8 +149,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                               center: const Text('GitHub'),
                               right:
                                   const Icon(Icons.arrow_forward_ios_rounded),
-                              onPressed: () => launch(
-                                  'https://github.com/GlitterWare/Passy'),
+                              onPressed: () => launchUrl(Uri.https(
+                                  'github.com', '/GlitterWare/Passy')),
                             )),
                           ],
                         ),
