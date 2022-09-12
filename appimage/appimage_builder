@@ -76,7 +76,7 @@ function create_desktop() {
   local xaa="X-AppImage-Arch=$ARCH"
   local xav="X-AppImage-Version=$appVersion"
   local xan="X-AppImage-Name=$appName"
-  local v="Version=1.0"
+  local v="Version=$appVersion"
   local ty="Type=Application"
   local te="Terminal=false"
   local n="Name=$appName"
