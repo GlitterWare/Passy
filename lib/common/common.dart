@@ -14,7 +14,7 @@ Future<String> getLatestVersion() async {
   try {
     String _version = (jsonDecode(await http.read(
       Uri.https('api.github.com', 'repositories/469494355/releases/latest'),
-    ))[0]!['tag_name'] as String);
+    ))['tag_name'] as String);
     if (_version[0] == 'v') {
       _version = _version.substring(1);
     }
