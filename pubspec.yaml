@@ -52,6 +52,7 @@ dependencies:
   flutter_secure_screen: ^0.0.1
   mobile_scanner: ^2.0.0
   http: ^0.13.5
+  flutter_autofill_service: ^0.14.0
 
 
 dev_dependencies:

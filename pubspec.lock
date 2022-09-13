@@ -258,6 +258,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_autofill_service:
+    dependency: "direct main"
+    description:
+      name: flutter_autofill_service
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0"
   flutter_blurhash:
     dependency: transitive
     description:
@@ -789,6 +796,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.4"
+  universal_platform:
+    dependency: transitive
+    description:
+      name: universal_platform
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+1"
   url_launcher:
     dependency: "direct main"
     description:

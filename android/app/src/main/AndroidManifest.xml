@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.glitterware.passy">
+    package="com.glitterware.passy"
+    xmlns:tools="http://schemas.android.com/tools">
    <application
         android:label="Passy"
         android:name="${applicationName}"
@@ -30,6 +31,55 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <activity
+            android:name=".AutofillActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
+
+            <meta-data
+                android:name="io.flutter.embedding.android.SplashScreenDrawable"
+                android:resource="@drawable/launch_background" />
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"
+                />
+            <meta-data
+                android:name="flutterEmbedding"
+                android:value="2" />
+        </activity>
+        <meta-data android:name="com.keevault.flutter_autofill_service.ACTIVITY_NAME"
+            android:value="com.glitterware.passy.AutofillActivity" />
+        <meta-data android:name="com.keevault.flutter_autofill_service.SAVE_ACTIVITY_NAME"
+            android:value="com.glitterware.passy.MainActivity" />
+        <meta-data
+            android:name="com.keevault.flutter_autofill_service.match_header_drawable_name"
+            android:value="logo" />
+        <meta-data
+            android:name="com.keevault.flutter_autofill_service.select_another_entry"
+            android:value="More entries" />
+        <service
+            android:name="com.keevault.flutter_autofill_service.FlutterAutofillService"
+            tools:replace="label"        
+            android:label="Passy"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="com.keevault.flutter_autofill_service.unlock_label"
+                android:value="Passy" />
+            <!-- Override default unlock icon with meta-data like below -->
+            <meta-data
+                android:name="com.keevault.flutter_autofill_service.unlock_drawable_name"
+                android:value="logo" />
+        </service>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

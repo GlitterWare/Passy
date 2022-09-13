@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:passy/common/common.dart';
-import 'package:passy/screens/change_password_screen.dart';
-import 'package:passy/screens/change_username_screen.dart';
-import 'package:passy/screens/confirm_restore_screen.dart';
-import 'package:passy/screens/credentials_screen.dart';
-import 'package:passy/screens/remove_account_screen.dart';
-import 'package:passy/screens/setup_screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 
+import 'common/common.dart';
+import 'screens/change_password_screen.dart';
+import 'screens/change_username_screen.dart';
+import 'screens/confirm_restore_screen.dart';
+import 'screens/credentials_screen.dart';
+import 'screens/remove_account_screen.dart';
+import 'screens/setup_screen.dart';
 import 'screens/security_screen.dart';
 import 'screens/edit_note_screen.dart';
 import 'screens/identities_screen.dart';
@@ -40,6 +41,10 @@ import 'screens/splash_screen.dart';
 import 'screens/unlock_screen.dart';
 
 void main() => runApp(const Passy());
+
+void autofillEntryPoint() {
+  print('Hello Autofill!');
+}
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
