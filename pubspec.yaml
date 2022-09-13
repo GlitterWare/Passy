@@ -51,6 +51,7 @@ dependencies:
   credit_card_type_detector: ^2.0.0
   flutter_secure_screen: ^0.0.1
   mobile_scanner: ^2.0.0
+  http: ^0.13.5
 
 
 dev_dependencies:
