@@ -45,8 +45,21 @@ class PassyData {
       info.value.version = passyVersion;
       info.saveSync();
     }
+    refeshAccounts();
+    if (!_accounts.containsKey(info.value.lastUsername)) {
+      if (_accounts.isEmpty) {
+        info.value.lastUsername = '';
+      } else {
+        info.value.lastUsername = _accounts.keys.first;
+      }
+      info.saveSync();
+    }
+  }
+
+  void refeshAccounts() {
+    _accounts.clear();
     Directory _accountsDirectory =
-        Directory(path + Platform.pathSeparator + 'accounts');
+        Directory(passyPath + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync(recursive: true);
     List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
     for (FileSystemEntity d in _accountDirectories) {
@@ -59,14 +72,6 @@ class PassyData {
             'credentials.json'),
         value: AccountCredentials(username: _username, password: 'corrupted'),
       );
-    }
-    if (!_accounts.containsKey(info.value.lastUsername)) {
-      if (_accounts.isEmpty) {
-        info.value.lastUsername = '';
-      } else {
-        info.value.lastUsername = _accounts.keys.first;
-      }
-      info.saveSync();
     }
   }
 
@@ -189,8 +194,7 @@ class PassyData {
       Directory(_tempAccountPath),
       _newAccountDir,
     );
-    _accounts[_archive.first.name] = AccountCredentials.fromFile(
-        File(_newAccountPath + Platform.pathSeparator + 'credentials.json'));
+    refeshAccounts();
     await _tempPathDir.delete(recursive: true);
     return LoadedAccount(path: _newAccountPath, encrypter: encrypter);
   }

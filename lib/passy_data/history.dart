@@ -109,24 +109,14 @@ class History with JsonConvertable {
           fromJson: History.fromJson);
 
   void clearRemoved() {
-    passwords.forEach((key, value) {
-      if (value.status == EntryStatus.removed) passwords.remove(key);
-    });
-    passwordIcons.forEach((key, value) {
-      if (value.status == EntryStatus.removed) passwords.remove(key);
-    });
-    paymentCards.forEach((key, value) {
-      if (value.status == EntryStatus.removed) passwords.remove(key);
-    });
-    notes.forEach((key, value) {
-      if (value.status == EntryStatus.removed) passwords.remove(key);
-    });
-    idCards.forEach((key, value) {
-      if (value.status == EntryStatus.removed) passwords.remove(key);
-    });
-    identities.forEach((key, value) {
-      if (value.status == EntryStatus.removed) passwords.remove(key);
-    });
+    passwords.removeWhere((key, value) => value.status == EntryStatus.removed);
+    passwordIcons
+        .removeWhere((key, value) => value.status == EntryStatus.removed);
+    paymentCards
+        .removeWhere((key, value) => value.status == EntryStatus.removed);
+    notes.removeWhere((key, value) => value.status == EntryStatus.removed);
+    idCards.removeWhere((key, value) => value.status == EntryStatus.removed);
+    identities.removeWhere((key, value) => value.status == EntryStatus.removed);
   }
 
   void renew() {
