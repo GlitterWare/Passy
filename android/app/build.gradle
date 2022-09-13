@@ -45,7 +45,8 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.glitterware.passy"
         // mobile_scanner requires minSdkVersion 21
-        minSdkVersion 21
+        // flutter_autofill_service requires minSdkVersion 26
+        minSdkVersion 26
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
