@@ -176,7 +176,7 @@ class PassyData {
     _tempAccountPath = _tempPath + Platform.pathSeparator + _username;
     {
       LoadedAccount _account =
-          LoadedAccount(path: _tempAccountPath, encrypter: encrypter);
+          convertLegacyAccount(path: _tempAccountPath, encrypter: encrypter);
       _account.bioAuthEnabled = false;
       _account.clearRemovedHistory();
       _account.renewHistory();
