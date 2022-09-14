@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'json_convertable.dart';
 import 'saveable_file_base.dart';

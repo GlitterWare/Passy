@@ -2,7 +2,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/saveable_file_base.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'passy_entries.dart';
 

@@ -1,4 +1,4 @@
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 class HostAddress {
   final InternetAddress ip;

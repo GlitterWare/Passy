@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -5,7 +7,6 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
-import 'package:universal_io/io.dart';
 
 import 'biometric_auth_screen.dart';
 

@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
+import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 import 'package:passy/screens/search_screen.dart';
-import 'package:universal_io/io.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -136,6 +138,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     if ((Platform.isAndroid || Platform.isIOS) && !widget.autofillLogin) {
+      FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
       _floatingActionButton = FloatingActionButton(
         child: const Icon(Icons.settings_rounded),
         heroTag: null,

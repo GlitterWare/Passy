@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'account_credentials.dart';
 import 'account_settings.dart';

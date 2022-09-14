@@ -1,6 +1,6 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/tfa.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'account_credentials.dart';
 import 'account_settings.dart';

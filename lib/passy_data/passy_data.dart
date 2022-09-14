@@ -4,7 +4,7 @@ import 'package:encrypt/encrypt.dart';
 
 import 'package:passy/passy_data/passy_legacy.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'account_credentials.dart';
 import 'passy_info.dart';

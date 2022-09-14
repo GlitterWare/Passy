@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'common.dart';
 import 'passy_bytes.dart';

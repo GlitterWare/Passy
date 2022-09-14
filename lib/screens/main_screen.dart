@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
@@ -8,7 +11,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:universal_io/io.dart';
 
 import 'payment_cards_screen.dart';
 import 'connect_screen.dart';
@@ -126,6 +128,8 @@ class _MainScreen extends State<MainScreen>
   @override
   void initState() {
     super.initState();
+    FlutterSecureScreen.singleton
+        .setAndroidScreenSecure(_account.protectScreen);
     WidgetsBinding.instance.addObserver(this);
     _onConnectPressed = Platform.isAndroid || Platform.isIOS
         ? _showConnectDialog

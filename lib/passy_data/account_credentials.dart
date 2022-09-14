@@ -1,4 +1,4 @@
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'common.dart';
 import 'json_convertable.dart';

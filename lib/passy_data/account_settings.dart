@@ -1,6 +1,6 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'encrypted_json_file.dart';
 import 'json_convertable.dart';

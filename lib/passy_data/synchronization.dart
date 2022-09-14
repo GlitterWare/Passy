@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 import 'common.dart';
 import 'entry_event.dart';
