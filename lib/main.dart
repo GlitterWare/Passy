@@ -47,6 +47,7 @@ import 'screens/unlock_screen.dart';
 
 void main() => runApp(const Passy());
 
+@pragma('vm:entry-point')
 void autofillEntryPoint() {
   runApp(MaterialApp(
     title: 'Passy',
