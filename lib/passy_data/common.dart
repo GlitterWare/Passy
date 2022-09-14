@@ -4,7 +4,7 @@ import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 const String passyVersion = '0.11.1';
 //TODO: split versions after v1.0.0
