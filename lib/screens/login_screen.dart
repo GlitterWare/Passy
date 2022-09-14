@@ -40,6 +40,8 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     if (Platform.isAndroid || Platform.isIOS) {
       if (data.getBioAuthEnabled(_username) ?? false) {
         if (await bioAuth(_username)) {
+          Navigator.popUntil(
+              context, (route) => route.settings.name == LoginScreen.routeName);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
           LoadedAccount _account = data.loadedAccount!;
           if (_account.defaultScreen != Screen.main) {
