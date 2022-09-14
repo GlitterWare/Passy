@@ -25,6 +25,8 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   String _password = '';
 
   void _logOut() {
+    Navigator.popUntil(
+        context, (route) => route.settings.name == MainScreen.routeName);
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
     data.unloadAccount();
   }
