@@ -3,10 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_account_screen.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_io/io.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/common/assets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,9 +42,7 @@ class SplashScreen extends StatelessWidget {
     }
 
     Future<void> _load() async {
-      data = PassyData((await getApplicationDocumentsDirectory()).path +
-          Platform.pathSeparator +
-          'Passy');
+      data = await loadPassyData();
       loaded = true;
       String _version = await getLatestVersion();
       if (data.noAccounts) {

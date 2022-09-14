@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_autofill_service/flutter_autofill_service.dart';
+import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_search.dart';
 import 'package:passy/screens/remove_account_screen.dart';
+import 'package:passy/screens/search_screen.dart';
 import 'package:universal_io/io.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
@@ -15,7 +19,9 @@ import 'main_screen.dart';
 import 'log_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final bool autofillLogin;
+
+  const LoginScreen({Key? key, this.autofillLogin = false}) : super(key: key);
 
   static const routeName = '/login';
 
@@ -49,6 +55,27 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) _onResumed();
   }
 
+  Widget _buildPasswords(String terms) {
+    List<Password> _found = PassySearch.searchPasswords(
+        passwords: data.loadedAccount!.passwords, terms: terms);
+    List<PwDataset> _dataSets = [];
+    for (Password _password in _found) {
+      _dataSets.add(PwDataset(
+        label: _password.nickname,
+        username: _password.username,
+        password: _password.password,
+      ));
+    }
+    return PasswordButtonListView(
+      passwords: _found,
+      onPressed: (password) async {
+        await AutofillService().resultWithDatasets(_dataSets);
+        Navigator.pop(context);
+      },
+      shouldSort: true,
+    );
+  }
+
   void login() {
     if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
       ScaffoldMessenger.of(context).clearSnackBars();
@@ -64,10 +91,18 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       return;
     }
     data.info.value.lastUsername = _username;
-    data.info.save().whenComplete(() {
+    data.info.save().whenComplete(() async {
       try {
         LoadedAccount _account = data.loadAccount(
             data.info.value.lastUsername, getPassyEncrypter(_password));
+        if (widget.autofillLogin) {
+          Navigator.pushNamed(
+            context,
+            SearchScreen.routeName,
+            arguments: _buildPasswords,
+          );
+          return;
+        }
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
         if (_account.defaultScreen == Screen.main) return;
         Navigator.pushNamed(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/autofill_splash_screen.dart';
+import 'package:passy/screens/no_accounts_screen.dart';
 
 import 'common/common.dart';
 import 'screens/change_password_screen.dart';
@@ -43,7 +45,24 @@ import 'screens/unlock_screen.dart';
 void main() => runApp(const Passy());
 
 void autofillEntryPoint() {
-  print('Hello Autofill!');
+  runApp(MaterialApp(
+    title: 'Passy',
+    theme: PassyTheme.theme,
+    navigatorKey: navigatorKey,
+    navigatorObservers: [
+      routeObserver,
+    ],
+    routes: {
+      AutofillSplashScreen.routeName: (context) => const AutofillSplashScreen(),
+      LogScreen.routeName: (context) => const LogScreen(),
+      LoginScreen.routeName: (context) => const LoginScreen(
+            autofillLogin: true,
+          ),
+      NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
+      SearchScreen.routeName: (context) => const SearchScreen(),
+      UnlockScreen.routeName: (context) => const UnlockScreen(),
+    },
+  ));
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -53,6 +72,10 @@ class Passy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AutofillService().setPreferences(AutofillPreferences(
+      enableDebug: false,
+      enableSaving: false,
+    ));
     return MaterialApp(
       title: 'Passy',
       theme: PassyTheme.theme,
