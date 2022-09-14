@@ -32,7 +32,7 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
               center: const Text('Enable autofill'),
               left: const Padding(
                 padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.person_outline_rounded),
+                child: Icon(Icons.password_rounded),
               ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () {
