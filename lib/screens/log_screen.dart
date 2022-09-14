@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 class LogScreen extends StatelessWidget {
   const LogScreen({Key? key}) : super(key: key);
@@ -38,9 +39,8 @@ class LogScreen extends StatelessWidget {
                   'assets/images/github_icon.svg',
                   color: PassyTheme.lightContentColor,
                 ),
-                onPressed: () => FlutterWebBrowser.openWebPage(
-                  url: 'https://github.com/GlitterWare/Passy/issues',
-                ),
+                onPressed: () =>
+                    openUrl('https://github.com/GlitterWare/Passy/issues'),
               )
             ]),
         body: SelectableText(_log));

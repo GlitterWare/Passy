@@ -11,6 +11,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
@@ -176,28 +177,36 @@ class _PasswordScreen extends State<PasswordScreen> {
             Row(
               children: [
                 Flexible(
-                  child: PassyPadding(RecordButton(
-                    title: 'Website',
-                    value: password!.website,
-                    left: FavIconImage(address: password!.website, width: 40),
-                  )),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: PassyTheme.passyPadding.left,
+                      bottom: PassyTheme.passyPadding.bottom,
+                      top: PassyTheme.passyPadding.top,
+                    ),
+                    child: RecordButton(
+                      title: 'Website',
+                      value: password!.website,
+                      left: FavIconImage(address: password!.website, width: 40),
+                    ),
+                  ),
                 ),
                 SizedBox(
-                  child: PassyPadding(FloatingActionButton(
-                    heroTag: null,
-                    onPressed: () {
-                      String _url = password!.website;
-                      if (!_url.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
-                        _url = 'http://' + _url;
-                      }
-                      try {
-                        FlutterWebBrowser.openWebPage(
-                          url: _url,
-                        );
-                      } catch (_) {}
-                    },
-                    child: const Icon(Icons.open_in_browser_rounded),
-                  )),
+                  child: PassyPadding(
+                    FloatingActionButton(
+                      heroTag: null,
+                      onPressed: () {
+                        String _url = password!.website;
+                        if (!_url
+                            .contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
+                          _url = 'http://' + _url;
+                        }
+                        try {
+                          openUrl(_url);
+                        } catch (_) {}
+                      },
+                      child: const Icon(Icons.open_in_browser_rounded),
+                    ),
+                  ),
                 )
               ],
             ),

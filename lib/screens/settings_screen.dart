@@ -12,6 +12,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/common/assets.dart';
 
 import 'backup_and_restore_screen.dart';
+import 'common.dart';
 import 'credentials_screen.dart';
 import 'main_screen.dart';
 
@@ -47,9 +48,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               child: Icon(Icons.money_rounded),
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => FlutterWebBrowser.openWebPage(
-              url: 'https://github.com/sponsors/GlitterWare',
-            ),
+            onPressed: () => openUrl('https://github.com/sponsors/GlitterWare'),
           )),
           PassyPadding(ThreeWidgetButton(
             center: const Text('Backup & Restore'),
@@ -151,8 +150,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                               center: const Text('GitHub'),
                               right:
                                   const Icon(Icons.arrow_forward_ios_rounded),
-                              onPressed: () => FlutterWebBrowser.openWebPage(
-                                url: 'https://github.com/GlitterWare/Passy',
+                              onPressed: () => openUrl(
+                                'https://github.com/GlitterWare/Passy',
                               ),
                             )),
                           ],
