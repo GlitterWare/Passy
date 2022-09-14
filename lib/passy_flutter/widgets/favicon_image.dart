@@ -19,14 +19,10 @@ class FavIconImage extends StatelessWidget {
     SvgPicture _placeholder = SvgPicture.asset(
       logoCircleSvg,
       color: Colors.white,
-      width: 50,
-      alignment: Alignment.topCenter,
+      width: width,
     );
-    if (!_url.contains(RegExp(r'https://|http://'))) {
-      _url = 'http://$_url';
-    }
-    String _request =
-        'https://s2.googleusercontent.com/s2/favicons?sz=32&domain=$_url';
+    _url = _url.replaceFirst(RegExp('https://|http://'), '');
+    String _request = 'https://api.faviconkit.com/$_url/256';
 
     return CachedNetworkImage(
       imageUrl: _request,
