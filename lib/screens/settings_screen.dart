@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:passy/screens/security_screen.dart';
-
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
@@ -48,9 +47,8 @@ class _SettingsScreen extends State<SettingsScreen> {
               child: Icon(Icons.money_rounded),
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => launchUrl(
-              Uri.https('github.com', '/sponsors/GlitterWare'),
-              mode: LaunchMode.externalApplication,
+            onPressed: () => FlutterWebBrowser.openWebPage(
+              url: 'https://github.com/sponsors/GlitterWare',
             ),
           )),
           PassyPadding(ThreeWidgetButton(
@@ -153,9 +151,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                               center: const Text('GitHub'),
                               right:
                                   const Icon(Icons.arrow_forward_ios_rounded),
-                              onPressed: () => launchUrl(
-                                Uri.https('github.com', '/GlitterWare/Passy'),
-                                mode: LaunchMode.externalApplication,
+                              onPressed: () => FlutterWebBrowser.openWebPage(
+                                url: 'https://github.com/GlitterWare/Passy',
                               ),
                             )),
                           ],

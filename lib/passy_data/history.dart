@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/encrypted_json_file.dart';
-import 'dart:io';
 
 import 'entry_event.dart';
 import 'entry_type.dart';

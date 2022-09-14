@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 
 import 'package:passy/passy_flutter/passy_theme.dart';
 
@@ -38,9 +38,8 @@ class LogScreen extends StatelessWidget {
                   'assets/images/github_icon.svg',
                   color: PassyTheme.lightContentColor,
                 ),
-                onPressed: () => launchUrl(
-                  Uri.https('github.com', '/GlitterWare/Passy/issues'),
-                  mode: LaunchMode.externalApplication,
+                onPressed: () => FlutterWebBrowser.openWebPage(
+                  url: 'https://github.com/GlitterWare/Passy/issues',
                 ),
               )
             ]),

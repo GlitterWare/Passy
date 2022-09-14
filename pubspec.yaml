@@ -42,7 +42,7 @@ dependencies:
   otp: ^3.0.2
   qr_flutter: ^4.0.0
   file_picker: ^4.5.1
-  url_launcher: ^6.0.20
+  flutter_web_browser: "^0.17.1"
   flutter_locker: 
   cached_network_image: ^3.2.1
   flutter_credit_card: ^3.0.1
@@ -50,7 +50,6 @@ dependencies:
   credit_card_type_detector: ^2.0.0
   flutter_secure_screen: ^0.0.1
   mobile_scanner: ^2.0.0
-  http: ^0.13.5
   flutter_autofill_service: ^0.14.0
 
 

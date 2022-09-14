@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
@@ -10,7 +11,6 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
@@ -191,9 +191,8 @@ class _PasswordScreen extends State<PasswordScreen> {
                         _url = 'http://' + _url;
                       }
                       try {
-                        launchUrl(
-                          Uri.parse(_url),
-                          mode: LaunchMode.externalApplication,
+                        FlutterWebBrowser.openWebPage(
+                          url: _url,
                         );
                       } catch (_) {}
                     },

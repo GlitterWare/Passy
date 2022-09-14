@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_account_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'login_screen.dart';
 
@@ -33,9 +33,8 @@ class SplashScreen extends StatelessWidget {
             ),
             center: const Text('Download'),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => launchUrl(
-              Uri.https('github.com', '/GlitterWare/Passy/releases/latest'),
-              mode: LaunchMode.externalApplication,
+            onPressed: () => FlutterWebBrowser.openWebPage(
+              url: 'https://github.com/GlitterWare/Passy/releases/latest',
             ),
           ),
         ),
