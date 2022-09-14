@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_web_browser/flutter_web_browser.dart';
 
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
