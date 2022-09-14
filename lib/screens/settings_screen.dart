@@ -41,14 +41,17 @@ class _SettingsScreen extends State<SettingsScreen> {
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-              center: const Text('Donate'),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.money_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  launchUrl(Uri.https('github.com', '/sponsors/GlitterWare')))),
+            center: const Text('Donate'),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.money_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => launchUrl(
+              Uri.https('github.com', '/sponsors/GlitterWare'),
+              mode: LaunchMode.externalApplication,
+            ),
+          )),
           PassyPadding(ThreeWidgetButton(
             center: const Text('Backup & Restore'),
             left: const Padding(
@@ -149,8 +152,10 @@ class _SettingsScreen extends State<SettingsScreen> {
                               center: const Text('GitHub'),
                               right:
                                   const Icon(Icons.arrow_forward_ios_rounded),
-                              onPressed: () => launchUrl(Uri.https(
-                                  'github.com', '/GlitterWare/Passy')),
+                              onPressed: () => launchUrl(
+                                Uri.https('github.com', '/GlitterWare/Passy'),
+                                mode: LaunchMode.externalApplication,
+                              ),
                             )),
                           ],
                         ),

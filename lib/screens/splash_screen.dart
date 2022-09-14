@@ -35,6 +35,7 @@ class SplashScreen extends StatelessWidget {
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => launchUrl(
               Uri.https('github.com', '/GlitterWare/Passy/releases/latest'),
+              mode: LaunchMode.externalApplication,
             ),
           ),
         ),
