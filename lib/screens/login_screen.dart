@@ -32,7 +32,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   static bool didRun = false;
-  Widget? _floatingActionButton = null;
+  Widget? _floatingActionButton;
   String _password = '';
   String _username = data.info.value.lastUsername;
 
@@ -133,10 +133,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    if (didRun) return;
-    didRun = true;
-    _onResumed();
     if ((Platform.isAndroid || Platform.isIOS) && !widget.autofillLogin) {
       _floatingActionButton = FloatingActionButton(
         child: const Icon(Icons.settings_rounded),
@@ -145,6 +141,10 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
             Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
       );
     }
+    WidgetsBinding.instance.addObserver(this);
+    if (didRun) return;
+    didRun = true;
+    _onResumed();
   }
 
   @override
