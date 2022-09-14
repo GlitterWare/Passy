@@ -24,25 +24,30 @@ class CustomField with JsonConvertable, CSVConvertable {
   FieldType fieldType;
   String value;
   bool obscured;
+  bool multiline;
 
   CustomField({
     this.title = 'Custom Field',
     this.fieldType = FieldType.text,
     this.value = '',
     this.obscured = false,
+    this.multiline = false,
   });
 
   CustomField.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? 'Custom Field',
         fieldType = fieldTypeFromName(json['fieldType']) ?? FieldType.text,
         value = json['value'] ?? '',
-        obscured = json['private'] ?? false;
+        obscured = json['obscured'] ?? false,
+        multiline = json['multiline'] ?? false;
 
   CustomField.fromCSV(List csv)
-      : title = csv[0] ?? 'Custom Field',
-        fieldType = fieldTypeFromName(csv[1]) ?? FieldType.text,
-        value = csv[2] ?? '',
-        obscured = boolFromString(csv[3]) ?? false;
+      : title = csv.isNotEmpty ? csv[0] : 'Custom Field',
+        fieldType =
+            fieldTypeFromName(csv.length >= 2 ? csv[1] : '') ?? FieldType.text,
+        value = csv.length >= 3 ? csv[2] : '',
+        obscured = boolFromString(csv.length >= 4 ? csv[3] : '') ?? false,
+        multiline = boolFromString(csv.length >= 5 ? csv[4] : '') ?? false;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -50,6 +55,7 @@ class CustomField with JsonConvertable, CSVConvertable {
         'fieldType': fieldType.name,
         'value': value,
         'obscured': obscured,
+        'multiline': multiline,
       };
 
   @override
@@ -58,5 +64,6 @@ class CustomField with JsonConvertable, CSVConvertable {
         fieldType.name,
         value,
         obscured.toString(),
+        multiline.toString(),
       ];
 }

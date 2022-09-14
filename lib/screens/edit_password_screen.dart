@@ -58,7 +58,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                 title: e.title,
                 fieldType: e.fieldType,
                 value: e.value,
-                obscured: e.obscured)));
+                obscured: e.obscured,
+                multiline: e.multiline)));
         _additionalInfo = _passwordArgs.additionalInfo;
         _tags = _passwordArgs.tags;
         _nickname = _passwordArgs.nickname;

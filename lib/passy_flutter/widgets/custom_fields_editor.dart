@@ -111,8 +111,24 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                   initialValue: _field.value,
                   decoration: InputDecoration(
                     labelText: _field.title,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28.0),
+                      borderSide:
+                          const BorderSide(color: PassyTheme.lightContentColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28.0),
+                      borderSide: const BorderSide(
+                          color: PassyTheme.darkContentSecondaryColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28.0),
+                      borderSide:
+                          const BorderSide(color: PassyTheme.lightContentColor),
+                    ),
                   ),
                   onChanged: (value) => _field.value = value,
+                  maxLines: _field.multiline ? null : 1,
                 ),
               ),
             );

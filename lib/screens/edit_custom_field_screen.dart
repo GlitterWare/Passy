@@ -71,6 +71,21 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
           decoration: const InputDecoration(labelText: 'Obscured'),
           onChanged: (value) => _customField.obscured = value as bool,
         )),
+        PassyPadding(DropdownButtonFormField(
+          items: const [
+            DropdownMenuItem(
+              child: Text('True'),
+              value: true,
+            ),
+            DropdownMenuItem(
+              child: Text('False'),
+              value: false,
+            ),
+          ],
+          value: _customField.obscured,
+          decoration: const InputDecoration(labelText: 'Multiline'),
+          onChanged: (value) => _customField.multiline = value as bool,
+        )),
       ]),
     );
   }
