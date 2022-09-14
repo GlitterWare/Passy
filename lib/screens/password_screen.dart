@@ -10,6 +10,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
@@ -172,11 +173,35 @@ class _PasswordScreen extends State<PasswordScreen> {
               ],
             ),
           if (password!.website != '')
-            PassyPadding(RecordButton(
-              title: 'Website',
-              value: password!.website,
-              left: FavIconImage(address: password!.website, width: 30),
-            )),
+            Row(
+              children: [
+                Flexible(
+                  child: PassyPadding(RecordButton(
+                    title: 'Website',
+                    value: password!.website,
+                    left: FavIconImage(address: password!.website, width: 40),
+                  )),
+                ),
+                SizedBox(
+                  child: PassyPadding(FloatingActionButton(
+                    heroTag: null,
+                    onPressed: () {
+                      String _url = password!.website;
+                      if (!_url.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
+                        _url = 'http://' + _url;
+                      }
+                      try {
+                        launchUrl(
+                          Uri.parse(_url),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } catch (_) {}
+                    },
+                    child: const Icon(Icons.open_in_browser_rounded),
+                  )),
+                )
+              ],
+            ),
           for (CustomField _customField in password!.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (password!.additionalInfo != '')
