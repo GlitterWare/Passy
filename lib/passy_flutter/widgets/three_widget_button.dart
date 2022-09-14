@@ -21,7 +21,7 @@ class ThreeWidgetButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.0),
+          borderRadius: BorderRadius.circular(35.0),
         ),
       ),
       child: Padding(
