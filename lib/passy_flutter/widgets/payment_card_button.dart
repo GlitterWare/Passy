@@ -51,6 +51,7 @@ class PaymentCardButton extends StatelessWidget {
               obscureCardNumber: obscureCardNumber,
               obscureCardCvv: obscureCardCvv,
               isHolderNameVisible: true,
+              isChipVisible: false,
               backgroundImage: 'assets/images/payment_card_bg.png',
               cardType: cardTypeFromNumber(paymentCard.cardNumber),
               isSwipeGestureEnabled: isSwipeGestureEnabled,
