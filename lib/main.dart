@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -72,10 +74,12 @@ class Passy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AutofillService().setPreferences(AutofillPreferences(
-      enableDebug: false,
-      enableSaving: false,
-    ));
+    if (Platform.isAndroid || Platform.isIOS) {
+      AutofillService().setPreferences(AutofillPreferences(
+        enableDebug: false,
+        enableSaving: false,
+      ));
+    }
     return MaterialApp(
       title: 'Passy',
       theme: PassyTheme.theme,
