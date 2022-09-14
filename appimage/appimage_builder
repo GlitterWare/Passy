@@ -76,7 +76,7 @@ function create_desktop() {
   local xaa="X-AppImage-Arch=$ARCH"
   local xav="X-AppImage-Version=$appVersion"
   local xan="X-AppImage-Name=$appName"
-  local v="Version=$appVersion"
+  local v="Version=1.0"
   local ty="Type=Application"
   local te="Terminal=false"
   local n="Name=$appName"
@@ -95,7 +95,7 @@ function build_appimage() {
 
   # move result in build folder
 
-  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-$appVersion-$ARCH.AppImage
+  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-v$appVersion-$ARCH.AppImage
     
 }
 
