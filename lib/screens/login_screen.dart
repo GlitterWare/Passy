@@ -15,6 +15,7 @@ import 'package:passy/common/assets.dart';
 
 import 'add_account_screen.dart';
 import 'common.dart';
+import 'global_settings_screen.dart';
 import 'main_screen.dart';
 import 'log_screen.dart';
 
@@ -31,6 +32,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   static bool didRun = false;
+  Widget? _floatingActionButton = null;
   String _password = '';
   String _username = data.info.value.lastUsername;
 
@@ -59,16 +61,18 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     List<Password> _found = PassySearch.searchPasswords(
         passwords: data.loadedAccount!.passwords, terms: terms);
     List<PwDataset> _dataSets = [];
-    for (Password _password in _found) {
-      _dataSets.add(PwDataset(
-        label: _password.nickname,
-        username: _password.username,
-        password: _password.password,
-      ));
-    }
     return PasswordButtonListView(
       passwords: _found,
       onPressed: (password) async {
+        _found.remove(password);
+        _found.insert(0, password);
+        for (Password _password in _found) {
+          _dataSets.add(PwDataset(
+            label: _password.nickname,
+            username: _password.username,
+            password: _password.password,
+          ));
+        }
         await AutofillService().resultWithDatasets(_dataSets);
         Navigator.pop(context);
       },
@@ -133,6 +137,14 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     if (didRun) return;
     didRun = true;
     _onResumed();
+    if ((Platform.isAndroid || Platform.isIOS) && !widget.autofillLogin) {
+      _floatingActionButton = FloatingActionButton(
+        child: const Icon(Icons.settings_rounded),
+        heroTag: null,
+        onPressed: () =>
+            Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
+      );
+    }
   }
 
   @override
@@ -166,6 +178,8 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         .toList();
 
     return Scaffold(
+      floatingActionButton: _floatingActionButton,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
@@ -228,7 +242,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                   child: const Icon(
                                     Icons.arrow_forward_ios_rounded,
                                   ),
-                                  heroTag: 'loginBtn',
+                                  heroTag: null,
                                 ),
                               ],
                             ),

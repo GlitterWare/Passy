@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
+import 'package:passy/screens/global_settings_screen.dart';
 import 'package:passy/screens/no_accounts_screen.dart';
 
 import 'common/common.dart';
@@ -109,6 +110,8 @@ class Passy extends StatelessWidget {
         EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
         EditPaymentCardScreen.routeName: (context) =>
             const EditPaymentCardScreen(),
+        GlobalSettingsScreen.routeName: (context) =>
+            const GlobalSettingsScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
         IDCardsScreen.routeName: (context) => const IDCardsScreen(),
         IdentitiesScreen.routeName: (context) => const IdentitiesScreen(),
