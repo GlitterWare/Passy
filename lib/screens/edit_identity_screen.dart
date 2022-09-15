@@ -83,12 +83,14 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
       if (!_isNew) {
         id.Identity _identityArgs = _args as id.Identity;
         _key = _identityArgs.key;
-        _customFields = List<CustomField>.from(_identityArgs.customFields.map(
-            (e) => CustomField(
+        _customFields = _identityArgs.customFields
+            .map((e) => CustomField(
                 title: e.title,
                 fieldType: e.fieldType,
                 value: e.value,
-                obscured: e.obscured)));
+                obscured: e.obscured,
+                multiline: e.multiline))
+            .toList();
         _additionalInfo = _identityArgs.additionalInfo;
         _tags = _identityArgs.tags;
         _nickname = _identityArgs.nickname;

@@ -78,7 +78,8 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
                 title: e.title,
                 fieldType: e.fieldType,
                 value: e.value,
-                obscured: e.obscured))
+                obscured: e.obscured,
+                multiline: e.multiline))
             .toList();
         _additionalInfo = _idCardArgs.additionalInfo;
         _tags = _idCardArgs.tags;

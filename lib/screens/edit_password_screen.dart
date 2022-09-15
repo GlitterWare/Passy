@@ -53,13 +53,14 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         Password _passwordArgs = _args as Password;
         TFA? _tfa = _passwordArgs.tfa;
         _key = _passwordArgs.key;
-        _customFields = List<CustomField>.from(_passwordArgs.customFields.map(
-            (e) => CustomField(
+        _customFields = _passwordArgs.customFields
+            .map((e) => CustomField(
                 title: e.title,
                 fieldType: e.fieldType,
                 value: e.value,
                 obscured: e.obscured,
-                multiline: e.multiline)));
+                multiline: e.multiline))
+            .toList();
         _additionalInfo = _passwordArgs.additionalInfo;
         _tags = _passwordArgs.tags;
         _nickname = _passwordArgs.nickname;

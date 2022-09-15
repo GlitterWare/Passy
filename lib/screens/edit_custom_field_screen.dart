@@ -59,12 +59,12 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
         PassyPadding(DropdownButtonFormField(
           items: const [
             DropdownMenuItem(
-              child: Text('True'),
-              value: true,
-            ),
-            DropdownMenuItem(
               child: Text('False'),
               value: false,
+            ),
+            DropdownMenuItem(
+              child: Text('True'),
+              value: true,
             ),
           ],
           value: _customField.obscured,
@@ -74,12 +74,12 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
         PassyPadding(DropdownButtonFormField(
           items: const [
             DropdownMenuItem(
-              child: Text('True'),
-              value: true,
-            ),
-            DropdownMenuItem(
               child: Text('False'),
               value: false,
+            ),
+            DropdownMenuItem(
+              child: Text('True'),
+              value: true,
             ),
           ],
           value: _customField.obscured,
