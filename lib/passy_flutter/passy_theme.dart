@@ -14,14 +14,15 @@ class PassyTheme {
   static const lightContentSecondaryColor = Color.fromRGBO(144, 202, 249, 1);
 
   static final ThemeData theme = ThemeData(
-    colorScheme: ColorScheme.dark(
-      primary: Colors.purple[900]!,
+    colorScheme: const ColorScheme.dark(
+      primary: Color.fromRGBO(74, 20, 140, 1),
       onPrimary: lightContentColor,
-      secondary: Colors.purple[700]!,
+      secondary: Color.fromRGBO(123, 31, 162, 1),
       onSecondary: lightContentColor,
       onSurface: lightContentColor,
     ),
-    snackBarTheme: SnackBarThemeData(actionTextColor: Colors.blueGrey[900]),
+    snackBarTheme:
+        const SnackBarThemeData(actionTextColor: Color.fromRGBO(38, 50, 56, 1)),
     scaffoldBackgroundColor: darkContentColor,
     inputDecorationTheme: InputDecorationTheme(
       floatingLabelStyle: const TextStyle(color: lightContentSecondaryColor),

@@ -45,13 +45,23 @@ import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/unlock_screen.dart';
 
+final ThemeData theme = ThemeData(
+  fontFamily: 'Roboto',
+  colorScheme: PassyTheme.theme.colorScheme,
+  snackBarTheme: PassyTheme.theme.snackBarTheme,
+  scaffoldBackgroundColor: PassyTheme.theme.scaffoldBackgroundColor,
+  inputDecorationTheme: PassyTheme.theme.inputDecorationTheme,
+  elevatedButtonTheme: PassyTheme.theme.elevatedButtonTheme,
+  textSelectionTheme: PassyTheme.theme.textSelectionTheme,
+);
+
 void main() => runApp(const Passy());
 
 @pragma('vm:entry-point')
 void autofillEntryPoint() {
   runApp(MaterialApp(
     title: 'Passy',
-    theme: PassyTheme.theme,
+    theme: theme,
     navigatorKey: navigatorKey,
     navigatorObservers: [
       routeObserver,
@@ -84,7 +94,7 @@ class Passy extends StatelessWidget {
     }
     return MaterialApp(
       title: 'Passy',
-      theme: PassyTheme.theme,
+      theme: theme,
       navigatorKey: navigatorKey,
       navigatorObservers: [
         routeObserver,
