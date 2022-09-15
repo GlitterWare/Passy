@@ -95,7 +95,7 @@ function build_appimage() {
 
   # move result in build folder
 
-  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-v$appVersion-$ARCH.AppImage
+  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-$appVersion-$ARCH.AppImage
     
 }
 
