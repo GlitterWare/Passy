@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:intranet_ip/intranet_ip.dart';
 import 'dart:io';
 
 import 'common.dart';
@@ -275,16 +276,12 @@ class Synchronization {
   Future<HostAddress?> host({void Function()? onConnected}) async {
     _syncLog = 'Hosting... ';
     HostAddress? _address;
-    String _ip = '127.0.0.1';
-    List<NetworkInterface> _interfaces =
-        await NetworkInterface.list(type: InternetAddressType.IPv4);
-    for (NetworkInterface element in _interfaces) {
-      for (InternetAddress ip in element.addresses) {
-        List<String> _ipList = ip.address.split('.');
-        if (_ipList[2] == '1') _ip = ip.address;
-      }
+    String _ip;
+    try {
+      _ip = (await intranetIpv4()).address;
+    } catch (_) {
+      _ip = '127.0.0.1';
     }
-
     try {
       if (_server != null) await _server?.close();
       _syncLog += 'done. \nListening... ';
