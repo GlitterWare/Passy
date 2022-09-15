@@ -6,10 +6,9 @@ import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
-const String passyVersion = '0.11.1';
-//TODO: split versions after v1.0.0
-const String syncVersion = passyVersion;
-const String accountVersion = passyVersion;
+const String passyVersion = '1.0.0';
+const String syncVersion = '1.0.0';
+const String accountVersion = '1.0.0';
 
 void copyDirectorySync(Directory source, Directory destination) {
   destination.createSync(recursive: true);
