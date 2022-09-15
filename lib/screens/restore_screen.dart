@@ -45,11 +45,14 @@ class _RestoreScreen extends State<RestoreScreen> {
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () {
             MainScreen.shouldLockScreen = false;
-            FilePicker.platform.pickFiles(
+            FilePicker.platform
+                .pickFiles(
               dialogTitle: 'Restore passy backup',
               type: FileType.custom,
               allowedExtensions: ['zip'],
-            ).then(
+              lockParentWindow: true,
+            )
+                .then(
               (_pick) {
                 MainScreen.shouldLockScreen = true;
                 if (_pick == null) return;
