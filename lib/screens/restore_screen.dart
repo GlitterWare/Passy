@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/confirm_restore_screen.dart';
+import 'package:passy/screens/main_screen.dart';
 
 import 'backup_and_restore_screen.dart';
 
@@ -43,12 +44,14 @@ class _RestoreScreen extends State<RestoreScreen> {
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () {
+            MainScreen.shouldLockScreen = false;
             FilePicker.platform.pickFiles(
               dialogTitle: 'Restore passy backup',
               type: FileType.custom,
               allowedExtensions: ['zip'],
             ).then(
               (_pick) {
+                MainScreen.shouldLockScreen = true;
                 if (_pick == null) return;
                 Navigator.pushNamed(
                   context,

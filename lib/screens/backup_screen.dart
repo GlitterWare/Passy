@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,9 +8,11 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import '../common/assets.dart';
+import 'package:passy/common/assets.dart';
+import 'package:passy/screens/main_screen.dart';
 
 import 'backup_and_restore_screen.dart';
+import 'log_screen.dart';
 
 class BackupScreen extends StatefulWidget {
   const BackupScreen({Key? key}) : super(key: key);
@@ -20,13 +24,53 @@ class BackupScreen extends StatefulWidget {
 }
 
 class _BackupScreen extends State<BackupScreen> {
-  void _onPassyBackup(String username) {
-    FilePicker.platform
-        .getDirectoryPath(dialogTitle: 'Backup Passy')
-        .then((buDir) {
-      if (buDir == null) return;
-      data.backupAccount(username, buDir);
-    });
+  Future<void> _onPassyBackup(String username) async {
+    MainScreen.shouldLockScreen = false;
+    try {
+      String? _buDir = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: 'Backup Passy',
+        lockParentWindow: true,
+      );
+      if (_buDir == null) return;
+      await data.backupAccount(username: username, outputDirectoryPath: _buDir);
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(
+          content: Row(children: const [
+            Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+            SizedBox(width: 20),
+            Text('Backup saved'),
+          ]),
+        ));
+    } catch (e, s) {
+      if (e is FileSystemException) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(
+            content: Row(children: const [
+              Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+              SizedBox(width: 20),
+              Text('Access denied, try another folder'),
+            ]),
+          ));
+      } else {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(
+            content: Row(children: const [
+              Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+              SizedBox(width: 20),
+              Text('Could not backup'),
+            ]),
+            action: SnackBarAction(
+              label: 'Details',
+              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                  arguments: e.toString() + '\n' + s.toString()),
+            ),
+          ));
+      }
+    }
+    MainScreen.shouldLockScreen = true;
   }
 
   @override

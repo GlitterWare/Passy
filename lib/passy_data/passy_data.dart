@@ -132,13 +132,23 @@ class PassyData {
 
   void unloadAccount() => _loadedAccount = null;
 
-  void backupAccount(String username, String outputDirectoryPath) {
+  Future<void> backupAccount({
+    required String username,
+    required String outputDirectoryPath,
+    String? fileName,
+  }) async {
+    String _fileName = '';
+    if (fileName == null) {
+      _fileName = outputDirectoryPath +
+          Platform.pathSeparator +
+          'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      _fileName = fileName;
+    }
     ZipFileEncoder _encoder = ZipFileEncoder();
     String _accountPath = accountsPath + Platform.pathSeparator + username;
-    _encoder.create(outputDirectoryPath +
-        Platform.pathSeparator +
-        'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip');
-    _encoder.addDirectory(Directory(_accountPath));
+    _encoder.create(_fileName);
+    await _encoder.addDirectory(Directory(_accountPath));
     _encoder.close();
   }
 

@@ -21,9 +21,10 @@ import 'identities_screen.dart';
 import 'notes_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
-
   static const routeName = '/main';
+  static bool shouldLockScreen = true;
+
+  const MainScreen({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MainScreen();
@@ -55,6 +56,7 @@ class _MainScreen extends State<MainScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    if (!MainScreen.shouldLockScreen) return;
     if (_unlockScreenOn) return;
     _unlockScreenOn = true;
     Navigator.pushNamed(context, UnlockScreen.routeName)
