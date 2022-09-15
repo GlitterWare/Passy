@@ -59,7 +59,14 @@ function after_bundle() {
   # if [[ $(file -b "$appIcon.[ps]*g") =~  ]];
 
   if [ ! -b "$appIcon.[ps]*g" ]; then 
+    mkdir ../build/appimage/$appName.AppDir/usr
+    mkdir ../build/appimage/$appName.AppDir/usr/share
+    mkdir ../build/appimage/$appName.AppDir/usr/share/icons
+    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor
+    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48
+    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48/apps
     cp $appIcon.[ps]*g ../build/appimage/$appName.AppDir
+    cp $appIcon.[ps]*g ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48/apps
     # mkdir -p $appName.AppDir/usr/share/icons/
     # cp $appIcon.[ps]*g $appName.AppDir/usr/share/icons/
   fi
