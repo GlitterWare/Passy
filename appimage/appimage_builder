@@ -58,9 +58,12 @@ function after_bundle() {
 
   # if [[ $(file -b "$appIcon.[ps]*g") =~  ]];
 
+  mkdir ../build/appimage/$appName.AppDir/usr
+  mkdir ../build/appimage/$appName.AppDir/usr/share
+  mkdir ../build/appimage/$appName.AppDir/usr/share/metainfo
+  cp com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
+
   if [ ! -b "$appIcon.[ps]*g" ]; then 
-    mkdir ../build/appimage/$appName.AppDir/usr
-    mkdir ../build/appimage/$appName.AppDir/usr/share
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48
@@ -94,6 +97,9 @@ function create_desktop() {
 
   touch ../build/appimage/$appName.AppDir/$appId.desktop
   echo -e "$de\n$xaa\n$xav\n$xan\n$v\n$ty\n$te\n$n\n$e\n$i\n$ca\n$co" > ../build/appimage/$appName.AppDir/$appId.desktop
+
+  mkdir ../build/appimage/$appName.AppDir/usr/share/applications
+  cp ../build/appimage/$appName.AppDir/$appId.desktop ../build/appimage/$appName.AppDir/usr/share/applications
 }
 
 function build_appimage() {
@@ -110,6 +116,6 @@ function build_appimage() {
 download_appimagetool
 create_appdir
 after_bundle
-create_apprun
 create_desktop
+create_apprun
 build_appimage
