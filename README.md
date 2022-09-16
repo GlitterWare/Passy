@@ -3,10 +3,10 @@
 Passy is a cross-platfrom password manager with synchronization. 🔒
 
 Passy is currently being submitted to:
-- [ ] SnapCraft
-- [ ] AppImageHub
-- [ ] F-Droid
-- [ ] Google Play Store
+- ✅ SnapCraft
+- ❌ AppImageHub
+- ❌ F-Droid
+- ❌ Google Play Store
 
 Submissions will be finished until June 1 2023.
 
@@ -72,9 +72,16 @@ Please resort to installing the [APK release](#apk) until the work is done.
 
 #### SnapCraft (Recommended)
 
-SnapCraft is already submitted and is undergoing human review by the SnapCraft admins. 👷
+Passy snap is live at [https://snapcraft.io/passy](https://snapcraft.io/passy)
 
-Have a go at the [AppImage release](#appimage) until it's reviewed.
+If you're on Ubuntu, simply visit the link above, click `Install` and select `View in Desktop store`. This will take you to Ubuntu Software app, where you can easily install Passy.
+
+Otherwise you can use Snap Store app to install Passy, get Snap Store with `sudo apt install snap-store` and open it from your application launcher or using `snap-store` command.
+
+Installing with command line: 
+- Install snap with `sudo apt install snapd`.
+- Run `sudo snap install passy`.
+- You can now open Passy from your application launcher or using `passy` command.
 
 #### AppImage
 
