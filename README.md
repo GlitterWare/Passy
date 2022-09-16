@@ -44,9 +44,11 @@ Submissions will be finished until June 1 2023.
 
 #### Installer (Recommended)
 
-Windows installer is currently being worked on. This page and the latest release will be updated as soon as we finish our magic. 🪄
+1. Download the installer from [latest release](https://github.com/GlitterWare/Passy/releases/latest). Windows installers are named in format `Passy-<version>-Windows-Installer.exe`;
+2. Run the installer and follow the instructions to complete installation.
+3. You can now open Passy from the Start menu.
 
-For now please resort to the [portable release](#portable).
+Passy can be removed by running its uninstaller from Programs and Features in the Control Panel. Your data will remain in `C:\Users\<username>\Documents\Passy`.
 
 #### Portable
 
@@ -72,16 +74,18 @@ Please resort to installing the [APK release](#apk) until the work is done.
 
 #### SnapCraft (Recommended)
 
-Passy snap is live at [https://snapcraft.io/passy](https://snapcraft.io/passy)
+Passy snap is live at [https://snapcraft.io/passy](https://snapcraft.io/passy).
 
 If you're on Ubuntu, simply visit the link above, click `Install` and select `View in Desktop store`. This will take you to Ubuntu Software app, where you can easily install Passy.
 
 Otherwise you can use Snap Store app to install Passy, get Snap Store with `sudo apt install snap-store` and open it from your application launcher or using `snap-store` command.
 
 Installing with command line: 
-- Install snap with `sudo apt install snapd`.
-- Run `sudo snap install passy`.
-- You can now open Passy from your application launcher or using `passy` command.
+1. Install snap with `sudo apt install snapd`.
+2. Run `sudo snap install passy`.
+3. You can now open Passy from your application launcher or using `passy` command.
+
+To remove Passy snap simply run `sudo snap remove passy`.
 
 #### AppImage
 
