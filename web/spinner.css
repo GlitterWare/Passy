@@ -1,3 +1,16 @@
+#spinner {
+  width: 100vw;
+  height: 100vh;
+  /* display: block; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  align-content: center;
+  background-color: #000;
+}
+
 .lds-spinner {
     color: official;
     display: inline-block;

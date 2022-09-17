@@ -39,9 +39,15 @@
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
+
+  <style>
+    body {
+      background-color: #000;
+    }
+  </style>
 </head>
 <body>
-  <div id="spinner" class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <div id="spinner"><div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>  
   <script src="main.dart.js" type="application/javascript"
     onendload="document.getElementById('spinner').remove();"></script>
   <script>
