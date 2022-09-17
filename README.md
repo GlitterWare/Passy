@@ -1,5 +1,7 @@
 # Passy
 
+https://glitterware.github.io/Passy
+
 Passy is a cross-platfrom password manager with synchronization. 🔒
 
 Passy is currently being submitted to:
