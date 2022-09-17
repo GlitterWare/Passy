@@ -1,8 +1,9 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
 import 'package:passy_website/widgets/about_passy_dialog.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MainScreen extends StatefulWidget {
@@ -56,8 +57,8 @@ class _MainScreen extends State<MainScreen> {
                       )),
                   center: const Text('GitHub'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () =>
-                      launchUrlString('https://github.com/GlitterWare/Passy'),
+                  onPressed: () => window.open(
+                      'https://github.com/GlitterWare/Passy', 'GitHub'),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
@@ -66,8 +67,9 @@ class _MainScreen extends State<MainScreen> {
                   ),
                   center: const Text('Downloads'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => launchUrlString(
-                      'https://github.com/GlitterWare/Passy/releases/latest'),
+                  onPressed: () => window.open(
+                      'https://github.com/GlitterWare/Passy/releases/latest',
+                      'Downloads'),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: Padding(
@@ -80,7 +82,7 @@ class _MainScreen extends State<MainScreen> {
                   center: const Text('Snap Store'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
                   onPressed: () =>
-                      launchUrlString('https://snapcraft.io/passy'),
+                      window.open('https://snapcraft.io/passy', 'SnapStore'),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
@@ -97,8 +99,8 @@ class _MainScreen extends State<MainScreen> {
                   ),
                   center: const Text('Donate'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => launchUrlString(
-                      'https://github.com/sponsors/GlitterWare'),
+                  onPressed: () => window.open(
+                      'https://github.com/sponsors/GlitterWare', 'Donate'),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
