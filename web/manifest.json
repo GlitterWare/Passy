@@ -1,11 +1,11 @@
 {
-    "name": "Passy - Cross-platform offline password manager",
+    "name": "Passy - Offline password manager with cross-platform synchronization",
     "short_name": "Passy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Cross-platform offline password manager",
+    "description": "Offline password manager with cross-platform synchronization",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

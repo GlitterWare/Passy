@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:passy_website/passy_flutter/passy_flutter.dart';
+import 'package:passy_website/widgets/about_passy_dialog.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/';
@@ -10,39 +15,94 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreen extends State<MainScreen> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+  void _generatePassword() {
+    showDialog(context: context, builder: (_) => const StringGeneratorDialog())
+        .then((value) {
+      if (value == null) return;
+      Clipboard.setData(ClipboardData(text: value));
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(children: const [
+        Icon(
+          Icons.password,
+          color: PassyTheme.darkContentColor,
+        ),
+        SizedBox(width: 20),
+        Expanded(child: Text('Password copied!')),
+      ])));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Demo Home Page'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        appBar: AppBar(
+          title: const Text(
+              'Passy - Offline password manager with cross-platform synchronization'),
+          centerTitle: true,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+        body: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Column(children: [
+                PassyPadding(ThreeWidgetButton(
+                  left: Padding(
+                      padding: const EdgeInsets.only(right: 30),
+                      child: SvgPicture.asset(
+                        'assets/images/github_icon.svg',
+                        color: PassyTheme.lightContentColor,
+                        width: 25,
+                      )),
+                  center: const Text('GitHub'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () =>
+                      launchUrlString('https://github.com/GlitterWare/Passy'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: const Padding(
+                    padding: EdgeInsets.only(right: 30),
+                    child: Icon(Icons.download_rounded),
+                  ),
+                  center: const Text('Downloads'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () => launchUrlString(
+                      'https://github.com/GlitterWare/Passy/releases/latest'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: Padding(
+                      padding: const EdgeInsets.only(right: 30),
+                      child: SvgPicture.asset(
+                        'assets/images/snap_store_icon.svg',
+                        color: PassyTheme.lightContentColor,
+                        width: 25,
+                      )),
+                  center: const Text('Snap Store'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () =>
+                      launchUrlString('https://snapcraft.io/passy'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: const Padding(
+                      padding: EdgeInsets.only(right: 30),
+                      child: Icon(Icons.password)),
+                  center: const Text('Password Generator'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: _generatePassword,
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: const Padding(
+                      padding: EdgeInsets.only(right: 30),
+                      child: Icon(Icons.info_outline_rounded)),
+                  center: const Text('About'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => const AboutPassyDialog()),
+                )),
+              ]),
+            )
+          ],
+        ));
   }
 }
