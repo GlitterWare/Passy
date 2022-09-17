@@ -39,7 +39,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
   String _expDate = '';
   String _country = '';
 
-  void _onSave() {
+  void _onSave() async {
     IDCard _idCardArgs = IDCard(
       key: _key,
       customFields: _customFields,
@@ -56,13 +56,12 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
     );
     _account.setIDCard(_idCardArgs);
     Navigator.pushNamed(context, SplashScreen.routeName);
-    _account.saveIDCards().whenComplete(() {
-      Navigator.popUntil(
-          context, (r) => r.settings.name == MainScreen.routeName);
-      Navigator.pushNamed(context, IDCardsScreen.routeName);
-      Navigator.pushNamed(context, IDCardScreen.routeName,
-          arguments: _idCardArgs);
-    });
+    await _account.saveIDCards();
+    await _account.saveHistory();
+    Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
+    Navigator.pushNamed(context, IDCardsScreen.routeName);
+    Navigator.pushNamed(context, IDCardScreen.routeName,
+        arguments: _idCardArgs);
   }
 
   @override

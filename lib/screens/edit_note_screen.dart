@@ -45,7 +45,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
       appBar: EditScreenAppBar(
         title: 'note',
         isNew: _isNew,
-        onSave: () {
+        onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
           Note _noteArgs = Note(
             key: _key,
@@ -54,13 +54,13 @@ class _EditNoteScreen extends State<EditNoteScreen> {
           );
           _account.setNote(_noteArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
-          _account.saveNotes().whenComplete(() {
-            Navigator.popUntil(
-                context, (r) => r.settings.name == MainScreen.routeName);
-            Navigator.pushNamed(context, NotesScreen.routeName);
-            Navigator.pushNamed(context, NoteScreen.routeName,
-                arguments: _noteArgs);
-          });
+          await _account.saveNotes();
+          await _account.saveHistory();
+          Navigator.popUntil(
+              context, (r) => r.settings.name == MainScreen.routeName);
+          Navigator.pushNamed(context, NotesScreen.routeName);
+          Navigator.pushNamed(context, NoteScreen.routeName,
+              arguments: _noteArgs);
         },
       ),
       body: ListView(children: [

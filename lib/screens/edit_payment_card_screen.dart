@@ -79,7 +79,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
     return Scaffold(
       appBar: EditScreenAppBar(
         title: 'payment card',
-        onSave: () {
+        onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
           _customFields.removeWhere((element) => element.value == '');
           PaymentCard _paymentCardArgs = PaymentCard(
@@ -95,13 +95,13 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
           );
           _account.setPaymentCard(_paymentCardArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
-          _account.savePaymentCards().whenComplete(() {
-            Navigator.popUntil(
-                context, (r) => r.settings.name == MainScreen.routeName);
-            Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-            Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                arguments: _paymentCardArgs);
-          });
+          await _account.savePaymentCards();
+          await _account.saveHistory();
+          Navigator.popUntil(
+              context, (r) => r.settings.name == MainScreen.routeName);
+          Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+          Navigator.pushNamed(context, PaymentCardScreen.routeName,
+              arguments: _paymentCardArgs);
         },
         isNew: _isNew,
       ),
@@ -173,6 +173,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             )) as CustomField?,
           ),
           PassyPadding(TextFormField(
+            initialValue: _additionalInfo,
             keyboardType: TextInputType.multiline,
             maxLines: null,
             decoration: InputDecoration(

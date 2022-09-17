@@ -44,7 +44,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    void _onSave() {
+    void _onSave() async {
       final LoadedAccount _account = data.loadedAccount!;
       _customFields.removeWhere((element) => element.value == '');
       id.Identity _identityArgs = id.Identity(
@@ -68,13 +68,13 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
       );
       _account.setIdentity(_identityArgs);
       Navigator.pushNamed(context, SplashScreen.routeName);
-      _account.saveIdentities().whenComplete(() {
-        Navigator.popUntil(
-            context, (r) => r.settings.name == MainScreen.routeName);
-        Navigator.pushNamed(context, IdentitiesScreen.routeName);
-        Navigator.pushNamed(context, IdentityScreen.routeName,
-            arguments: _identityArgs);
-      });
+      await _account.saveIdentities();
+      await _account.saveHistory();
+      Navigator.popUntil(
+          context, (r) => r.settings.name == MainScreen.routeName);
+      Navigator.pushNamed(context, IdentitiesScreen.routeName);
+      Navigator.pushNamed(context, IdentityScreen.routeName,
+          arguments: _identityArgs);
     }
 
     if (!_isLoaded) {

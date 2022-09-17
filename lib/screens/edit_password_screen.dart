@@ -84,7 +84,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
       appBar: EditScreenAppBar(
         title: 'password',
         isNew: _isNew,
-        onSave: () {
+        onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
           _customFields.removeWhere((element) => element.value == '');
           Password _passwordArgs = Password(
@@ -109,13 +109,13 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           );
           _account.setPassword(_passwordArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
-          _account.savePasswords().whenComplete(() {
-            Navigator.popUntil(
-                context, (r) => r.settings.name == MainScreen.routeName);
-            Navigator.pushNamed(context, PasswordsScreen.routeName);
-            Navigator.pushNamed(context, PasswordScreen.routeName,
-                arguments: _passwordArgs);
-          });
+          await _account.savePasswords();
+          await _account.saveHistory();
+          Navigator.popUntil(
+              context, (r) => r.settings.name == MainScreen.routeName);
+          Navigator.pushNamed(context, PasswordsScreen.routeName);
+          Navigator.pushNamed(context, PasswordScreen.routeName,
+              arguments: _passwordArgs);
         },
       ),
       body: ListView(children: [
