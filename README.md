@@ -48,6 +48,8 @@ Submissions will be finished until June 1 2023.
 2. Run the installer and follow the instructions to complete installation.
 3. You can now open Passy from the Start menu.
 
+To update Passy, simply repeat same steps with a newer version.
+
 Passy can be removed by running its uninstaller from Programs and Features in the Control Panel. Your data will remain in `C:\Users\<username>\Documents\Passy`.
 
 #### Portable
