@@ -92,6 +92,16 @@ class _MainScreen extends State<MainScreen> {
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
+                    padding: EdgeInsets.only(right: 30),
+                    child: Icon(Icons.money_rounded),
+                  ),
+                  center: const Text('Donate'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () => launchUrlString(
+                      'https://github.com/sponsors/GlitterWare'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: const Padding(
                       padding: EdgeInsets.only(right: 30),
                       child: Icon(Icons.info_outline_rounded)),
                   center: const Text('About'),
