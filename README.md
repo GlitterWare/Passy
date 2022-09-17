@@ -1,4 +1,4 @@
-# Passy Webpage
+# Passy
 
 Passy is a cross-platfrom password manager with synchronization. 🔒
 
