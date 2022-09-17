@@ -74,18 +74,9 @@ Please resort to installing the [APK release](#apk) until the work is done.
 
 #### SnapCraft (Recommended)
 
-Passy snap is live at [https://snapcraft.io/passy](https://snapcraft.io/passy).
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
 
-If you're on Ubuntu, simply visit the link above, click `Install` and select `View in Desktop store`. This will take you to Ubuntu Software app, where you can easily install Passy.
-
-Otherwise you can use Snap Store app to install Passy, get Snap Store with `sudo apt install snap-store` and open it from your application launcher or using `snap-store` command.
-
-Installing with command line: 
-1. Install snap with `sudo apt install snapd`.
-2. Run `sudo snap install passy`.
-3. You can now open Passy from your application launcher or using `passy` command.
-
-To remove Passy snap simply run `sudo snap remove passy`.
+[Get set up for snaps](https://snapcraft.io/docs/installing-snapd).
 
 #### AppImage
 
