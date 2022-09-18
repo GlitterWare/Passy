@@ -2,7 +2,7 @@
 
 https://glitterware.github.io/Passy
 
-Passy is a cross-platfrom password manager with synchronization. 🔒
+Passy is an offline password manager with cross-platfrom synchronization. 🔒
 
 Passy is currently being submitted to:
 - ✔️ SnapCraft
@@ -38,7 +38,7 @@ Submissions will be finished until June 1 2023.
 - 🔄 Synchronization – Share data between separate devices within seconds.
 - 🖐️ Biometrics – Quickly unlock the app using your fingerprint.
 - 📚 Multipurpose – Store passwords, payment cards, notes, id cards and identities, all in one place.
-- ⚡ Autofill - Quickly fill fields in apps and websites without having to open the app.
+- ⚡ Autofill – Quickly fill fields in apps and websites without having to open the app.
 
 ## Installing
 
