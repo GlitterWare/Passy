@@ -276,9 +276,20 @@ class Synchronization {
   Future<HostAddress?> host({void Function()? onConnected}) async {
     _syncLog = 'Hosting... ';
     HostAddress? _address;
-    String _ip;
+    String _ip = '';
     try {
-      _ip = (await intranetIpv4()).address;
+      List<NetworkInterface> _interfaces =
+          await NetworkInterface.list(type: InternetAddressType.IPv4);
+      for (NetworkInterface _interface in _interfaces) {
+        for (InternetAddress _address in _interface.addresses) {
+          String _strAddress = _address.address;
+          if (_strAddress.startsWith('192.168.1')) {
+            _ip = _strAddress;
+            break;
+          }
+        }
+      }
+      if (_ip == '') _ip = (await intranetIpv4()).address;
     } catch (_) {
       _ip = '127.0.0.1';
     }
