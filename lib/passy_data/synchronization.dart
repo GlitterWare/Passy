@@ -283,7 +283,7 @@ class Synchronization {
       for (NetworkInterface _interface in _interfaces) {
         for (InternetAddress _address in _interface.addresses) {
           String _strAddress = _address.address;
-          if (_strAddress.startsWith('192.168.1')) {
+          if (_strAddress.startsWith('192.168.1.')) {
             _ip = _strAddress;
             break;
           }
