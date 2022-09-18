@@ -20,7 +20,6 @@ class AboutPassyDialog extends StatelessWidget {
             Center(
                 child: SvgPicture.asset(
               'assets/images/logo.svg',
-              color: Colors.purple,
               width: 128,
             )),
             const SizedBox(height: 24),

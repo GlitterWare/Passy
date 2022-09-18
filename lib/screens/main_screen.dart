@@ -52,7 +52,6 @@ class _MainScreen extends State<MainScreen> {
                       padding: const EdgeInsets.only(right: 30),
                       child: SvgPicture.asset(
                         'assets/images/github_icon.svg',
-                        color: PassyTheme.lightContentColor,
                         width: 25,
                       )),
                   center: const Text('GitHub'),
@@ -76,7 +75,6 @@ class _MainScreen extends State<MainScreen> {
                       padding: const EdgeInsets.only(right: 30),
                       child: SvgPicture.asset(
                         'assets/images/snap_store_icon.svg',
-                        color: PassyTheme.lightContentColor,
                         width: 25,
                       )),
                   center: const Text('Snap Store'),
