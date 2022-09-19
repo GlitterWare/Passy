@@ -12,13 +12,14 @@ export version=''
 
 while read -r line; do
   if [[ $line == *'version: '* ]]; then
-    export version=${line:9:${#line}}
+    export version=$(echo ${line:9:${#line}} | cut -d '+' -f1)
+    echo $version
     break
   fi
 done <$file 
 
 if [[ ${#version} == 0 ]]; then
-  read -p "? Could not detect version. Enter version manually [Eg: 1.0.0]: " appVersion
+  read -p '? Could not detect version. Enter version manually [Eg: 1.0.0]: ' appVersion
 else
   echo 'INFO:Version detected:'$version
 fi
