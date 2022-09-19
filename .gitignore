@@ -43,7 +43,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Flutter iOS, Android and Linux
+# Flutter iOS, Android, Windows and Linux
 /ios/
 /android/
+/windows/
 /linux/
