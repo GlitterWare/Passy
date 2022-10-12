@@ -1,3 +1,7 @@
+Store passwords, payment cards notes, ID cards and identities offline and safe, synchronized between all of your devices.
+<br>
+<br>
+Features:
 <ul>
     <li>Security - All your information is encrypted in AES and stored offline on your devices, providing highest-tier security.</li>
     <li>Synchronization - Share data between separate devices within seconds.</li>
