@@ -1,0 +1,17 @@
+<ul>
+    <li>Security - All your information is encrypted in AES and stored offline on your devices, providing highest-tier security.</li>
+    <li>Synchronization - Share data between separate devices within seconds.</li>
+    <li>Biometrics - Quickly unlock the app using your fingerprint.</li>
+    <li>Multipurpose - Store passwords, payment cards, notes, id cards and identities, all in one place.</li>
+    <li>Autofill - Quickly fill fields in apps and websites without having to open the app.</li>
+</ul>
+<a href="https://glitterware.github.io/Passy">Official website</a>
+<br>
+<br>
+Permissions:
+<ul>
+    <li>Internet - needed for synchronization, happens locally, with direct connection between devices.</li>
+    <li>External storage - needed for backups/exporting.</li>
+    <li>Biometric - needed for biometric authentication as an alternative to login with master password.</li>
+    <li>Camera - needed for scanning QR codes for easy synchronization.</li>
+</ul>

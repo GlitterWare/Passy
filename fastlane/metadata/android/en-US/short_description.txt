@@ -1,0 +1,1 @@
+Offline password manager with cross-platform synchronization
