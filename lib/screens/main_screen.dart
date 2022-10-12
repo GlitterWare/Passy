@@ -1,16 +1,19 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:image/image.dart' as imglib;
+import 'package:passy/screens/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:zxing2/zxing2.dart';
 
 import 'payment_cards_screen.dart';
 import 'connect_screen.dart';
@@ -76,7 +79,13 @@ class _MainScreen extends State<MainScreen>
     routeObserver.unsubscribe(this);
   }
 
-  void _showConnectDialog() {
+  Future<void> _showConnectDialog() async {
+    CameraController _controller = CameraController(
+      (await availableCameras()).first,
+      ResolutionPreset.low,
+      enableAudio: false,
+    );
+    Future<void> _initializeControllerFuture = _controller.initialize();
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -87,15 +96,14 @@ class _MainScreen extends State<MainScreen>
               content: SizedBox(
                 width: 250,
                 height: 250,
-                child: MobileScanner(
-                  allowDuplicates: false,
-                  key: qrKey,
-                  onDetect: (barcode, _) {
-                    if (barcode.rawValue == null) {
-                      return;
+                child: FutureBuilder<void>(
+                  future: _initializeControllerFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return CameraPreview(_controller);
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
                     }
-                    SynchronizationWrapper(context: context)
-                        .connect(_account, address: barcode.rawValue!);
                   },
                 ),
               ),
@@ -124,7 +132,27 @@ class _MainScreen extends State<MainScreen>
                   ),
                 )
               ],
-            ));
+            )).whenComplete(() {
+      _controller.dispose();
+    });
+    Future(() async {
+      await _initializeControllerFuture;
+      _controller.startImageStream((image) {
+        imglib.Image? _image = imageFromCameraImage(image);
+        if (_image == null) return;
+        Result? _result = qrResultFromImage(_image);
+        if (_result == null) {
+          _result = qrResultFromImage(imglib.invert(_image));
+          if (_result == null) {
+            return;
+          }
+        }
+        Navigator.popUntil(
+            context, (route) => route.settings.name == MainScreen.routeName);
+        SynchronizationWrapper(context: context)
+            .connect(_account, address: _result.text);
+      });
+    });
   }
 
   @override

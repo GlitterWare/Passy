@@ -222,9 +222,15 @@ class Synchronization {
           continue;
         }
 
+        _events[_entryData.key] = _entryData.event;
+        if (_entryData.value == null) {
+          _entryData.event
+            ..lastModified = DateTime.now().toUtc()
+            ..status = EntryStatus.removed;
+          return;
+        }
         _loadedAccount.setEntry(_entryData.type)(
             PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
-        _events[_entryData.key] = _entryData.event;
       } catch (e, s) {
         _handleException(
             'Could not save an entry\n${e.toString()}\n${s.toString()}');
