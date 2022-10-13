@@ -31,6 +31,7 @@ Submissions will be finished until June 1 2023.
     - [Windows](#windows-1)
     - [Linux](#linux-1)
 4. [Building](#building)
+    - [Build Options](#build-options)
 
 ## Features
 
@@ -123,5 +124,12 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 1. [Install Flutter](https://docs.flutter.dev/get-started/install).
 2. Clone the repository or [get the source code from the latest Passy release](https://github.com/GlitterWare/Passy/releases/latest).
 3. Run `flutter build [subcommand]` to build passy for your system. Passy can be built to `windows`, `linux`, `apk` and `aab`.
+
+### Build Options
+
+Build options are specified with `--dart-define=<option name>=<option value>` (without angle brackets) after the build command.
+
+Available options:
+- `UPDATES_POPUP_ENABLED` - Defaults is `true`, if set to `false`, the update popup will never show up on the login screen.
 
 #### Made with 💜 by Gleammer.

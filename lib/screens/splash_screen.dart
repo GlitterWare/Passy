@@ -49,7 +49,9 @@ class SplashScreen extends StatelessWidget {
         return;
       }
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-      if (_version != passyVersion) showUpdateDialog();
+      if (const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false') {
+        if (_version != passyVersion) showUpdateDialog();
+      }
     }
 
     if (!loaded) {
