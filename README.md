@@ -130,6 +130,6 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 Build options are specified with `--dart-define=<option name>=<option value>` (without angle brackets) after the build command.
 
 Available options:
-- `UPDATES_POPUP_ENABLED` - Defaults is `true`, if set to `false`, the update popup will never show up on the login screen.
+- `UPDATES_POPUP_ENABLED` - Default is `true`, if set to `false`, the update popup will never show up on the login screen.
 
 #### Made with 💜 by Gleammer.
