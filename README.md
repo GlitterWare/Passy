@@ -135,6 +135,6 @@ Available options:
 
 ## Privacy Policy
 
-[17 OCTOBER, 2021](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
+[17 OCTOBER, 2022](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
 
 #### Made with 💜 by Gleammer.
