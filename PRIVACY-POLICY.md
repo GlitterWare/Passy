@@ -41,6 +41,9 @@ This makes data safe to transfer in any networks for as long as user's password 
 GlitterWare does not collect any usage information from customers who use Passy.  
 GlitterWare will never have access to your master password, individual records, or any data that is collected and stored locally on user's device by Passy.
 
+Any data collected locally on the device may be stored in the `Passy` directory in user's `Documents` folder or in an isolated environment on that device.  
+Neither GlitterWare employees nor any of its contractors have access to this locally collected data.
+
 If GlitterWare is involved in a merger, acquisition, or sale of all or a portion of its assets, you will be notified of any change in ownership or uses of your personal information, as well as any choices you may have regarding your personal information via a prominent notice in this repository's `README.md` and in a popup in the app's login screen.
 
 We will not provide your personal information to companies that do or do not provide services to help us with our business activities such as analytics provider.
@@ -60,7 +63,7 @@ Other than as disclosed in this Privacy Policy, at no time will Passy disclose i
 Your Passy password manager is protected by a master password so that you have secure access to entering and editing personal information.  
 It is the user's responsibility to protect their master password. Passy password manager encrypts customer data to protect it from being divulged or accessed by anyone other than the user.  
 Neither GlitterWare employees nor any of its contractors can obtain or access user's data from Passy application.  
-It will not happen that GlitterWare employees or any of its contractors will ask you for the data you have entered into your Passy application via mail, email, telephone or any other unsolicited manner.
+Neither GlitterWare employees nor any of its contractors will ask you for the data you have entered into your Passy application via mail, email, telephone or any other unsolicited manner.
 
 ## Further Questions
 
