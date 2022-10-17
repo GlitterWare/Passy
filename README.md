@@ -32,6 +32,7 @@ Submissions will be finished until June 1 2023.
     - [Linux](#linux-1)
 4. [Building](#building)
     - [Build Options](#build-options)
+5. [Privacy Policy](#privacy-policy)
 
 ## Features
 
@@ -131,5 +132,9 @@ Build options are specified with `--dart-define=<option name>=<option value>` (w
 
 Available options:
 - `UPDATES_POPUP_ENABLED` - Default is `true`, if set to `false`, the update popup will never show up on the login screen.
+
+## Privacy Policy
+
+[17 OCTOBER, 2021](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
 
 #### Made with 💜 by Gleammer.
