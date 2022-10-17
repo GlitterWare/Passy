@@ -32,8 +32,8 @@ It is therefore client user's responsibility to enter the correct IP address dur
 This means that if any data gets sent to an undesired device then we are not responsible for that, as it was a part of user's decision to do that.
 
 Any personal data transferred during synchronization is encrypted with AES512 SIC encryption with PCKS7 padding, and can only be decrypted with user's master password.  
-Encrypted personal data will only be transferred once the client device authenticates successfully with the host device.
-The client device sends an encrypted message containing user's username that the host device needs to confirm, making it impossible to receive the data without knowing the master password and the username.
+Encrypted personal data will only be transferred once the client device authenticates successfully with the host device.  
+The client device sends an encrypted message containing user's username that the host device needs to confirm, making it impossible to receive the data without knowing the master password and the username.  
 This makes data safe to transfer in any networks for as long as user's password is complex enough.
 
 ## Information We Collect
