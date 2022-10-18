@@ -21,7 +21,7 @@ When a user’s device is lost or stolen, the data on that device will remain sa
 ## Synchronization
 
 If the user has decided to opt in to the synchronization features of our app via pressing the "Host" or "Connect" buttons via in the app's UI, then their private or user information in its encrypted form may be subjected to a one-time transfer via either a Local Area Network or the Internet from one of their personal devices to another device.  
-We do not provide any intermediary services for this data transfer and we expect the intermediaries, if any are present, to be chosen by the user and their Internet Service Provider.
+We do not provide any intermediary services for this data transfer and we expect the intermediaries, if any are present, to be chosen by the user and their Internet Service Provider.  
 This means that the user data will never arrive to our servers, and may only be transferred between two devices under user's acknowledgement.
 
 Whenever synchronization occurs, host user's device temporarily opens a random, system-provided port for data transfer.  
