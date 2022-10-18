@@ -20,7 +20,8 @@ When a user’s device is lost or stolen, the data on that device will remain sa
 
 ## Synchronization
 
-If the user has decided to opt in to the synchronization features of our app via pressing the "Host" or "Connect" buttons via in the app's UI, then their private or user information in its encrypted form may be subjected to a one-time transfer via the Internet from one of their personal devices to another device without any intermediaries.  
+If the user has decided to opt in to the synchronization features of our app via pressing the "Host" or "Connect" buttons via in the app's UI, then their private or user information in its encrypted form may be subjected to a one-time transfer via either a Local Area Network or the Internet from one of their personal devices to another device.  
+We do not provide any intermediary services for this data transfer and we expect the intermediaries, if any are present, to be chosen by the user and their Internet Service Provider.
 This means that the user data will never arrive to our servers, and may only be transferred between two devices under user's acknowledgement.
 
 Whenever synchronization occurs, host user's device temporarily opens a random, system-provided port for data transfer.  
@@ -42,7 +43,7 @@ GlitterWare does not collect any usage information from customers who use Passy.
 GlitterWare will never have access to your master password, individual records, or any data that is collected and stored locally on user's device by Passy.
 
 Any data collected locally on the device may be stored in the `Passy` directory in user's `Documents` folder or in an isolated environment on that device.  
-Neither GlitterWare employees nor any of its contractors have access to this locally collected data.
+Neither GlitterWare employees nor any of its contractors have access to this locally stored data.
 
 If GlitterWare is involved in a merger, acquisition, or sale of all or a portion of its assets, you will be notified of any change in ownership or uses of your personal information, as well as any choices you may have regarding your personal information via a prominent notice in this repository's `README.md` and in a popup in the app's login screen.
 
@@ -71,4 +72,4 @@ If you have further questions about our Privacy Policy, email us at GlitterWare@
 
 GlitterWare
 
-17 OCTOBER, 2022
+19 OCTOBER, 2022
