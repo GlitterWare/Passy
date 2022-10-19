@@ -43,13 +43,13 @@ class SplashScreen extends StatelessWidget {
     Future<void> _load() async {
       data = await loadPassyData();
       loaded = true;
-      String _version = await getLatestVersion();
       if (data.noAccounts) {
         Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
         return;
       }
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       if (const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false') {
+        String _version = await getLatestVersion();
         if (_version != passyVersion) showUpdateDialog();
       }
     }
