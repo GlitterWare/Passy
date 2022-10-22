@@ -4,10 +4,14 @@ https://glitterware.github.io/Passy
 
 Passy is an offline password manager with cross-platfrom synchronization. 🔒
 
+<a href="https://f-droid.org/en/packages/com.glitterware.passy"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75"></a>
+
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
+
 Passy is currently being submitted to:
 - ✔️ SnapCraft
 - ✔️ AppImageHub
-- ❌ F-Droid
+- ✔️ F-Droid
 - ❌ Google Play Store
 
 Submissions will be finished until June 1 2023.
@@ -66,9 +70,7 @@ Passy can be removed by running its uninstaller from Programs and Features in th
 
 #### F-Droid (Recommended)
 
-Right now we're making sure that our F-Droid release is flawless. 🌀
-
-Please resort to installing the [APK release](#apk) until the work is done.
+<a href="https://f-droid.org/en/packages/com.glitterware.passy"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75"></a>
 
 #### APK
 
