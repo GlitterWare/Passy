@@ -4,9 +4,9 @@ https://glitterware.github.io/Passy
 
 Passy is an offline password manager with cross-platfrom synchronization. 🔒
 
-![Github Latest Release](https://img.shields.io/github/release/GlitterWare/Passy.svg?logo=github&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)
+[![Github Latest Release](https://img.shields.io/github/release/GlitterWare/Passy.svg?logo=github&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://github.com/GlitterWare/Passy/releases/latest)
 
-![F-Droid Latest Release](https://img.shields.io/f-droid/v/com.glitterware.passy.svg?logo=F-Droid&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)
+[![F-Droid Latest Release](https://img.shields.io/f-droid/v/com.glitterware.passy.svg?logo=F-Droid&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://f-droid.org/en/packages/com.glitterware.passy)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
 
