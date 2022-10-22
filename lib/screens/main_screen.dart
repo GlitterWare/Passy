@@ -74,19 +74,32 @@ class _MainScreen extends State<MainScreen> {
                   left: Padding(
                       padding: const EdgeInsets.only(right: 30),
                       child: SvgPicture.asset(
+                        'assets/images/fdroid.svg',
+                        width: 25,
+                      )),
+                  center: const Text('F-Droid'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () => window.open(
+                      'https://f-droid.org/en/packages/com.glitterware.passy',
+                      'F-Droid'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: Padding(
+                      padding: const EdgeInsets.only(right: 30),
+                      child: SvgPicture.asset(
                         'assets/images/snap_store_icon.svg',
                         width: 25,
                       )),
                   center: const Text('Snap Store'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
                   onPressed: () =>
-                      window.open('https://snapcraft.io/passy', 'SnapStore'),
+                      window.open('https://snapcraft.io/passy', 'Snap Store'),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
                       padding: EdgeInsets.only(right: 30),
                       child: Icon(Icons.password)),
-                  center: const Text('Password Generator'),
+                  center: const Text('Password generator'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
                   onPressed: _generatePassword,
                 )),
@@ -99,6 +112,18 @@ class _MainScreen extends State<MainScreen> {
                   right: const Icon(Icons.arrow_forward_ios_rounded),
                   onPressed: () => window.open(
                       'https://github.com/sponsors/GlitterWare', 'Donate'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: const Padding(
+                    padding: EdgeInsets.only(right: 30),
+                    child: Icon(Icons.shield_moon_outlined),
+                  ),
+                  center: const Text('Privacy policy'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () => window.open(
+                    'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md',
+                    'Privacy policy',
+                  ),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
