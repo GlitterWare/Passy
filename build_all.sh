@@ -13,7 +13,6 @@ export version=''
 while read -r line; do
   if [[ $line == *'version: '* ]]; then
     export version=$(echo ${line:9:${#line}} | cut -d '+' -f1)
-    echo $version
     break
   fi
 done <$file 
