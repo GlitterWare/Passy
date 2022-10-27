@@ -10,7 +10,6 @@ import 'entry_event.dart';
 import 'history.dart';
 import 'id_card.dart';
 import 'identity.dart';
-import 'passy_images.dart';
 import 'loaded_account.dart';
 import 'note.dart';
 import 'password.dart';
@@ -47,7 +46,7 @@ LoadedAccount convertLegacyAccount({
     _accountVersion = [0, 0, 0];
   }
   if (_accountVersion.join('.') == accountVersion) {
-    return LoadedAccount(
+    return LoadedAccount.fromDirectory(
       path: path,
       encrypter: encrypter,
       credentials: credentials,
@@ -67,7 +66,7 @@ LoadedAccount convertLegacyAccount({
   }
   // No conversion
   _versionFile.writeAsStringSync(accountVersion);
-  return LoadedAccount(
+  return LoadedAccount.fromDirectory(
     path: path,
     encrypter: encrypter,
     credentials: credentials,
@@ -208,7 +207,7 @@ LoadedAccount convertPre0_3_0Account({
         ));
   }
 
-  _account = LoadedAccount(
+  _account = LoadedAccount.fromDirectory(
     path: path,
     encrypter: encrypter,
     history: _loadedHistory,
@@ -220,8 +219,6 @@ LoadedAccount convertPre0_3_0Account({
     passwords: _loadPasswords(
       File(path + Platform.pathSeparator + 'passwords.enc'),
     ),
-    passwordIcons: PassyImages(path + Platform.pathSeparator + 'password_icons',
-        encrypter: encrypter),
     notes: _loadNotes(File(path + Platform.pathSeparator + 'notes.enc')),
     paymentCards: _loadPaymentCards(
         File(path + Platform.pathSeparator + 'payment_cards.enc')),

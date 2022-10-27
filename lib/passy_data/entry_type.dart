@@ -6,7 +6,6 @@ import 'payment_card.dart';
 
 enum EntryType {
   password,
-  passwordIcon,
   paymentCard,
   note,
   idCard,
@@ -17,8 +16,6 @@ EntryType? entryTypeFromName(String name) {
   switch (name) {
     case 'password':
       return EntryType.password;
-    case 'passwordIcon':
-      return EntryType.passwordIcon;
     case 'paymentCard':
       return EntryType.paymentCard;
     case 'note':

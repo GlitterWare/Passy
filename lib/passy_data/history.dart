@@ -86,8 +86,6 @@ class History with JsonConvertable {
     switch (type) {
       case EntryType.password:
         return passwords;
-      case EntryType.passwordIcon:
-        return passwordIcons;
       case EntryType.paymentCard:
         return paymentCards;
       case EntryType.note:

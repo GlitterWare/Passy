@@ -5,7 +5,6 @@ import 'identity.dart';
 import 'json_convertable.dart';
 import 'note.dart';
 import 'password.dart';
-import 'passy_bytes.dart';
 import 'payment_card.dart';
 
 abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
@@ -38,8 +37,6 @@ abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
     switch (entryType) {
       case EntryType.password:
         return Password.fromCSV;
-      case EntryType.passwordIcon:
-        return PassyBytes.fromCSV;
       case EntryType.paymentCard:
         return PaymentCard.fromCSV;
       case EntryType.note:

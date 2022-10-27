@@ -9,20 +9,19 @@ typedef AccountCredentialsFile = JsonFile<AccountCredentials>;
 class AccountCredentials with JsonConvertable {
   String username;
   bool bioAuthEnabled;
-  String _passwordHash;
+  String passwordHash;
 
-  set password(String value) => _passwordHash = getPassyHash(value).toString();
-  String get passwordHash => _passwordHash;
+  set password(String value) => passwordHash = getPassyHash(value).toString();
 
   AccountCredentials(
       {required this.username,
       required String password,
       this.bioAuthEnabled = false})
-      : _passwordHash = getPassyHash(password).toString();
+      : passwordHash = getPassyHash(password).toString();
 
   AccountCredentials.fromJson(Map<String, dynamic> json)
       : username = json['username'] ?? '',
-        _passwordHash = json['passwordHash'] ?? '',
+        passwordHash = json['passwordHash'] ?? '',
         bioAuthEnabled =
             boolFromString(json['bioAuthEnabled'] ?? 'false') ?? false;
 
@@ -30,7 +29,7 @@ class AccountCredentials with JsonConvertable {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'username': username,
         'bioAuthEnabled': bioAuthEnabled.toString(),
-        'passwordHash': _passwordHash,
+        'passwordHash': passwordHash,
       };
 
   static AccountCredentialsFile fromFile(File file,

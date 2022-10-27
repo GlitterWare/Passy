@@ -13,6 +13,7 @@ import 'package:passy/common/assets.dart';
 import 'backup_and_restore_screen.dart';
 import 'common.dart';
 import 'credentials_screen.dart';
+import 'export_and_import_screen.dart';
 import 'main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -58,6 +59,17 @@ class _SettingsScreen extends State<SettingsScreen> {
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => Navigator.pushNamed(
                 context, BackupAndRestoreScreen.routeName,
+                arguments: data.loadedAccount!.username),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: const Text('Export & Import'),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.ios_share_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => Navigator.pushNamed(
+                context, ExportAndImportScreen.routeName,
                 arguments: data.loadedAccount!.username),
           )),
           if (Platform.isAndroid || Platform.isIOS)

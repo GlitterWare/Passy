@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
+import 'package:passy/screens/confirm_import_screen.dart';
+import 'package:passy/screens/export_and_import_screen.dart';
+import 'package:passy/screens/export_screen.dart';
 import 'package:passy/screens/global_settings_screen.dart';
+import 'package:passy/screens/import_screen.dart';
 import 'package:passy/screens/no_accounts_screen.dart';
 
 import 'common/common.dart';
@@ -109,6 +113,7 @@ class Passy extends StatelessWidget {
             const ChangePasswordScreen(),
         ChangeUsernameScreen.routeName: (context) =>
             const ChangeUsernameScreen(),
+        ConfirmImportScreen.routeName: (context) => const ConfirmImportScreen(),
         ConfirmRestoreScreen.routeName: (context) =>
             const ConfirmRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
@@ -121,12 +126,16 @@ class Passy extends StatelessWidget {
         EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
         EditPaymentCardScreen.routeName: (context) =>
             const EditPaymentCardScreen(),
+        ExportAndImportScreen.routeName: (context) =>
+            const ExportAndImportScreen(),
+        ExportScreen.routeName: (context) => const ExportScreen(),
         GlobalSettingsScreen.routeName: (context) =>
             const GlobalSettingsScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
         IDCardsScreen.routeName: (context) => const IDCardsScreen(),
         IdentitiesScreen.routeName: (context) => const IdentitiesScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
+        ImportScreen.routeName: (context) => const ImportScreen(),
         LogScreen.routeName: (context) => const LogScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         MainScreen.routeName: (context) => const MainScreen(),

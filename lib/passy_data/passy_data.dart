@@ -19,6 +19,7 @@ class PassyData {
   Map<String, String> get passwordHashes =>
       _accounts.map((key, value) => MapEntry(key, value.value.passwordHash));
   LoadedAccount? get loadedAccount => _loadedAccount;
+  Encrypter? _loadedAccountEncrypter;
 
   final String passyPath;
   final String accountsPath;
@@ -84,7 +85,7 @@ class PassyData {
       ..createSync()
       ..writeAsStringSync(accountVersion);
     _accounts[username] = _file;
-    LoadedAccount(
+    LoadedAccount.fromDirectory(
       path: _accountPath,
       credentials: _file,
       encrypter: getPassyEncrypter(password),
@@ -127,32 +128,36 @@ class PassyData {
       encrypter: encrypter,
       credentials: _accounts[username],
     );
+    _loadedAccountEncrypter = encrypter;
     return _loadedAccount!;
   }
 
-  void unloadAccount() => _loadedAccount = null;
+  void unloadAccount() {
+    _loadedAccount = null;
+    _loadedAccountEncrypter = null;
+  }
 
-  Future<void> backupAccount({
+  Future<String> backupAccount({
     required String username,
     required String outputDirectoryPath,
     String? fileName,
   }) async {
-    String _fileName = '';
     if (fileName == null) {
-      _fileName = outputDirectoryPath +
+      fileName = outputDirectoryPath +
           Platform.pathSeparator +
           'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip';
     } else {
-      _fileName = fileName;
+      fileName = outputDirectoryPath + Platform.pathSeparator + fileName;
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     String _accountPath = accountsPath + Platform.pathSeparator + username;
-    _encoder.create(_fileName);
+    _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(Directory(_accountPath));
     _encoder.close();
+    return fileName;
   }
 
-  Future<LoadedAccount> restoreAccount(String backupPath,
+  Future<String> restoreAccount(String backupPath,
       {required Encrypter encrypter}) async {
     String _tempPath = (await getTemporaryDirectory()).path +
         Platform.pathSeparator +
@@ -191,6 +196,7 @@ class PassyData {
       _account.clearRemovedHistory();
       _account.renewHistory();
       _account.saveSync();
+      _username = _account.username;
     }
     // Able to load the account, safe to replace
     _newAccountPath = accountsPath + Platform.pathSeparator + _username;
@@ -206,7 +212,119 @@ class PassyData {
     );
     refeshAccounts();
     await _tempPathDir.delete(recursive: true);
-    return LoadedAccount(path: _newAccountPath, encrypter: encrypter);
+    return _username;
+  }
+
+  Future<String> exportAccount({
+    required String username,
+    required String outputDirectoryPath,
+    required Encrypter encrypter,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectoryPath +
+          Platform.pathSeparator +
+          'passy-export-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectoryPath + Platform.pathSeparator + fileName;
+    }
+    String _tempPath = (await getTemporaryDirectory()).path +
+        Platform.pathSeparator +
+        'passy-export-' +
+        DateTime.now().toIso8601String().replaceAll(':', ';');
+    String _tempAccPath = _tempPath + Platform.pathSeparator + username;
+    Directory _tempPathDir = Directory(_tempPath);
+    if (await _tempPathDir.exists()) {
+      await _tempPathDir.delete(recursive: true);
+    }
+    await _tempPathDir.create(recursive: true);
+    Directory _tempAccDir = Directory(_tempAccPath);
+    await _tempAccDir.create();
+    Directory _accDir =
+        Directory(accountsPath + Platform.pathSeparator + username);
+    await copyDirectory(_accDir, _tempAccDir);
+    {
+      JSONLoadedAccount _jsonAcc = JSONLoadedAccount.fromEncryptedCSVDirectory(
+          path: _tempAccPath, encrypter: encrypter);
+      await _tempAccDir.delete(recursive: true);
+      await _tempAccDir.create();
+      _jsonAcc.saveSync();
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempPathDir.delete(recursive: true);
+    return fileName;
+  }
+
+  Future<void> exportLoadedAccount({
+    required String outputDirectoryPath,
+    String? fileName,
+  }) =>
+      exportAccount(
+          username: _loadedAccount!.username,
+          outputDirectoryPath: outputDirectoryPath,
+          encrypter: _loadedAccountEncrypter!,
+          fileName: fileName);
+
+  Future<String> importAccount(String path,
+      {required Encrypter encrypter}) async {
+    String _tempPath = (await getTemporaryDirectory()).path +
+        Platform.pathSeparator +
+        'passy-restore-' +
+        DateTime.now().toIso8601String().replaceAll(':', ';');
+    Directory _tempPathDir = Directory(_tempPath);
+    if (await _tempPathDir.exists()) {
+      await _tempPathDir.delete(recursive: true);
+    }
+    await _tempPathDir.create(recursive: true);
+    String _username;
+    String _tempAccountPath;
+    String _newAccountPath;
+    Directory _newAccountDir;
+    ZipDecoder _decoder = ZipDecoder();
+    Archive _archive = _decoder.decodeBytes(await File(path).readAsBytes());
+    for (final file in _archive) {
+      final filename = file.name;
+      if (file.isFile) {
+        final data = file.content as List<int>;
+        await File(_tempPath + Platform.pathSeparator + filename)
+            .create(recursive: true)
+            .then((value) => value.writeAsBytes(data));
+      } else {
+        await Directory(_tempPath + Platform.pathSeparator + filename)
+            .create(recursive: true);
+      }
+    }
+    _username = _archive.first.name.split('/')[0];
+    _tempAccountPath = _tempPath + Platform.pathSeparator + _username;
+    Directory _tempAccountDir = Directory(_tempAccountPath);
+    {
+      LoadedAccount _account =
+          JSONLoadedAccount.fromDirectory(path: _tempAccountPath)
+              .toEncryptedCSVLoadedAccount(encrypter);
+      await _tempAccountDir.delete(recursive: true);
+      await _tempAccountDir.create();
+      _account.bioAuthEnabled = false;
+      _account.saveSync();
+      _username = _account.username;
+    }
+    // Able to load the account, safe to replace
+    _newAccountPath = accountsPath + Platform.pathSeparator + _username;
+    _newAccountDir = Directory(_newAccountPath);
+    unloadAccount();
+    if (await _newAccountDir.exists()) {
+      await _newAccountDir.delete(recursive: true);
+    }
+    await _newAccountDir.create(recursive: true);
+    await copyDirectory(
+      Directory(_tempAccountPath),
+      _newAccountDir,
+    );
+    refeshAccounts();
+    await _tempPathDir.delete(recursive: true);
+    return _username;
   }
 
   Future<void> changeAccountUsername(

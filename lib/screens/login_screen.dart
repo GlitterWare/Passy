@@ -111,6 +111,10 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           );
           return;
         }
+        if (Platform.isAndroid) {
+          FlutterSecureScreen.singleton
+              .setAndroidScreenSecure(_account.protectScreen);
+        }
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
         if (_account.defaultScreen == Screen.main) return;
         Navigator.pushNamed(

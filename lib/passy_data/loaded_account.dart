@@ -3,7 +3,8 @@ import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
-import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:passy/passy_data/json_file.dart';
+import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -15,77 +16,94 @@ import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
-import 'passy_images.dart';
 import 'note.dart';
 import 'password.dart';
-import 'passy_bytes.dart';
 import 'passy_entry.dart';
 import 'payment_card.dart';
 import 'screen.dart';
 import 'synchronization.dart';
 
 class LoadedAccount {
+  Encrypter _encrypter;
+  final File _versionFile;
   final AccountCredentialsFile _credentials;
   final AccountSettingsFile _settings;
   final HistoryFile _history;
   final PasswordsFile _passwords;
-  final PassyImages _passwordIcons;
   final NotesFile _notes;
   final PaymentCardsFile _paymentCards;
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
-  Encrypter _encrypter;
 
   LoadedAccount({
+    required Encrypter encrypter,
+    required File versionFile,
+    required AccountCredentialsFile credentials,
+    required AccountSettingsFile settings,
+    required HistoryFile history,
+    required PasswordsFile passwords,
+    required NotesFile notes,
+    required PaymentCardsFile paymentCards,
+    required IDCardsFile idCards,
+    required IdentitiesFile identities,
+  })  : _encrypter = encrypter,
+        _versionFile = versionFile,
+        _credentials = credentials,
+        _settings = settings,
+        _history = history,
+        _passwords = passwords,
+        _notes = notes,
+        _paymentCards = paymentCards,
+        _idCards = idCards,
+        _identities = identities;
+
+  factory LoadedAccount.fromDirectory({
     required String path,
     required Encrypter encrypter,
+    File? versionFile,
     AccountCredentialsFile? credentials,
     AccountSettingsFile? settings,
     HistoryFile? history,
     PasswordsFile? passwords,
-    PassyImages? passwordIcons,
     NotesFile? notes,
     PaymentCardsFile? paymentCards,
     IDCardsFile? idCards,
     IdentitiesFile? identities,
-  })  : _encrypter = encrypter,
-        _credentials = credentials ??
-            AccountCredentials.fromFile(
-                File(path + Platform.pathSeparator + 'credentials.json')),
-        _settings = settings ??
-            AccountSettings.fromFile(
-                File(path + Platform.pathSeparator + 'settings.enc'),
-                encrypter: encrypter),
-        _history = history ??
-            History.fromFile(
-                File(path + Platform.pathSeparator + 'history.enc'),
-                encrypter: encrypter),
-        _passwords = passwords ??
-            Passwords.fromFile(
-                File(path + Platform.pathSeparator + 'passwords.enc'),
-                encrypter: encrypter),
-        _passwordIcons = passwordIcons ??
-            PassyImages(path + Platform.pathSeparator + 'password_icons',
-                encrypter: encrypter),
-        _notes = notes ??
-            Notes.fromFile(File(path + Platform.pathSeparator + 'notes.enc'),
-                encrypter: encrypter),
-        _paymentCards = paymentCards ??
-            PaymentCards.fromFile(
-                File(path + Platform.pathSeparator + 'payment_cards.enc'),
-                encrypter: encrypter),
-        _idCards = idCards ??
-            IDCards.fromFile(
-                File(path + Platform.pathSeparator + 'id_cards.enc'),
-                encrypter: encrypter),
-        _identities = identities ??
-            Identities.fromFile(
-                File(path + Platform.pathSeparator + 'identities.enc'),
-                encrypter: encrypter) {
-    if (Platform.isAndroid) {
-      FlutterSecureScreen.singleton
-          .setAndroidScreenSecure(_settings.value.protectScreen);
-    }
+  }) {
+    versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
+    credentials ??= AccountCredentials.fromFile(
+        File(path + Platform.pathSeparator + 'credentials.json'));
+    settings ??= AccountSettings.fromFile(
+        File(path + Platform.pathSeparator + 'settings.enc'),
+        encrypter: encrypter);
+    history ??= History.fromFile(
+        File(path + Platform.pathSeparator + 'history.enc'),
+        encrypter: encrypter);
+    passwords ??= Passwords.fromFile(
+        File(path + Platform.pathSeparator + 'passwords.enc'),
+        encrypter: encrypter);
+    notes ??= Notes.fromFile(File(path + Platform.pathSeparator + 'notes.enc'),
+        encrypter: encrypter);
+    paymentCards ??= PaymentCards.fromFile(
+        File(path + Platform.pathSeparator + 'payment_cards.enc'),
+        encrypter: encrypter);
+    idCards ??= IDCards.fromFile(
+        File(path + Platform.pathSeparator + 'id_cards.enc'),
+        encrypter: encrypter);
+    identities ??= Identities.fromFile(
+        File(path + Platform.pathSeparator + 'identities.enc'),
+        encrypter: encrypter);
+    return LoadedAccount(
+        encrypter: encrypter,
+        versionFile: versionFile,
+        credentials: credentials,
+        settings: settings,
+        history: history,
+        passwords: passwords,
+        notes: notes,
+        paymentCards: paymentCards,
+        idCards: idCards,
+        identities: identities);
   }
 
   void setAccountPassword(String password) {
@@ -94,7 +112,6 @@ class LoadedAccount {
     _settings.encrypter = _encrypter;
     _history.encrypter = _encrypter;
     _passwords.encrypter = _encrypter;
-    _passwordIcons.encrypter = _encrypter;
     _notes.encrypter = _encrypter;
     _paymentCards.encrypter = _encrypter;
     _idCards.encrypter = _encrypter;
@@ -102,11 +119,11 @@ class LoadedAccount {
   }
 
   Future<void> save() => Future.wait([
+        _versionFile.writeAsString(accountVersion),
         _credentials.save(),
         _settings.save(),
         _history.save(),
         _passwords.save(),
-        _passwordIcons.save(),
         _notes.save(),
         _paymentCards.save(),
         _idCards.save(),
@@ -114,11 +131,11 @@ class LoadedAccount {
       ]);
 
   void saveSync() {
+    _versionFile.writeAsStringSync(accountVersion);
     _credentials.saveSync();
     _settings.saveSync();
     _history.saveSync();
     _passwords.saveSync();
-    _passwordIcons.saveSync();
     _notes.saveSync();
     _paymentCards.saveSync();
     _idCards.saveSync();
@@ -163,8 +180,6 @@ class LoadedAccount {
     switch (type) {
       case EntryType.password:
         return (PassyEntry value) => setPassword(value as Password);
-      case EntryType.passwordIcon:
-        return (PassyEntry value) => setPasswordIcon(value as PassyBytes);
       case EntryType.paymentCard:
         return (PassyEntry value) => setPaymentCard(value as PaymentCard);
       case EntryType.note:
@@ -182,8 +197,6 @@ class LoadedAccount {
     switch (type) {
       case EntryType.password:
         return getPassword;
-      case EntryType.passwordIcon:
-        return getPasswordIcon;
       case EntryType.paymentCard:
         return getPaymentCard;
       case EntryType.note:
@@ -201,8 +214,6 @@ class LoadedAccount {
     switch (type) {
       case EntryType.password:
         return removePassword;
-      case EntryType.passwordIcon:
-        return removePasswordIcon;
       case EntryType.paymentCard:
         return removePaymentCard;
       case EntryType.note:
@@ -271,34 +282,6 @@ class LoadedAccount {
 
   void savePasswordsSync() {
     _passwords.saveSync();
-    _history.saveSync();
-  }
-
-  // Password Icons wrappers
-  PassyBytes? getPasswordIcon(String name) => _passwordIcons.getEntry(name);
-
-  void setPasswordIcon(PassyBytes passwordIcon) {
-    _history.value.passwordIcons[passwordIcon.key] = EntryEvent(
-        passwordIcon.key,
-        status: EntryStatus.alive,
-        lastModified: DateTime.now().toUtc());
-    _passwordIcons.setEntry(passwordIcon);
-  }
-
-  void removePasswordIcon(String key) {
-    _history.value.passwordIcons[key]!
-      ..status = EntryStatus.removed
-      ..lastModified = DateTime.now().toUtc();
-    _passwordIcons.removeEntry(key);
-  }
-
-  Future<void> savePasswordIcons() async {
-    await _passwordIcons.save();
-    await _history.save();
-  }
-
-  void savePasswordIconsSync() {
-    _passwordIcons.saveSync();
     _history.saveSync();
   }
 
@@ -424,5 +407,191 @@ class LoadedAccount {
   void saveIdentitiesSync() {
     _identities.saveSync();
     _history.saveSync();
+  }
+}
+
+class JSONLoadedAccount {
+  final File _versionFile;
+  final AccountCredentialsFile _credentials;
+  final JsonFile<AccountSettings> _settings;
+  final JsonFile<History> _history;
+  final PassyEntriesJSONFile<Password> _passwords;
+  final PassyEntriesJSONFile<Note> _notes;
+  final PassyEntriesJSONFile<PaymentCard> _paymentCards;
+  final PassyEntriesJSONFile<IDCard> _idCards;
+  final PassyEntriesJSONFile<Identity> _identities;
+
+  JSONLoadedAccount({
+    required File versionFile,
+    required AccountCredentialsFile credentials,
+    required JsonFile<AccountSettings> settings,
+    required JsonFile<History> history,
+    required PassyEntriesJSONFile<Password> passwords,
+    required PassyEntriesJSONFile<Note> notes,
+    required PassyEntriesJSONFile<PaymentCard> paymentCards,
+    required PassyEntriesJSONFile<IDCard> idCards,
+    required PassyEntriesJSONFile<Identity> identities,
+  })  : _versionFile = versionFile,
+        _credentials = credentials,
+        _settings = settings,
+        _history = history,
+        _passwords = passwords,
+        _notes = notes,
+        _paymentCards = paymentCards,
+        _idCards = idCards,
+        _identities = identities;
+
+  factory JSONLoadedAccount.fromDirectory({
+    required String path,
+    File? versionFile,
+    AccountCredentialsFile? credentials,
+    JsonFile<AccountSettings>? settings,
+    JsonFile<History>? history,
+    PassyEntriesJSONFile<Password>? passwords,
+    PassyEntriesJSONFile<Note>? notes,
+    PassyEntriesJSONFile<PaymentCard>? paymentCards,
+    PassyEntriesJSONFile<IDCard>? idCards,
+    PassyEntriesJSONFile<Identity>? identities,
+  }) {
+    versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
+    credentials ??= AccountCredentials.fromFile(
+        File(path + Platform.pathSeparator + 'credentials.json'));
+    settings ??= JsonFile<AccountSettings>.fromFile(
+      File(path + Platform.pathSeparator + 'settings.enc'),
+      constructor: () => AccountSettings(),
+      fromJson: AccountSettings.fromJson,
+    );
+    history ??= JsonFile<History>.fromFile(
+      File(path + Platform.pathSeparator + 'history.enc'),
+      constructor: () => History(),
+      fromJson: History.fromJson,
+    );
+    passwords ??= PassyEntriesJSONFile<Password>.fromFile(
+      File(path + Platform.pathSeparator + 'passwords.enc'),
+    );
+    notes ??= PassyEntriesJSONFile<Note>.fromFile(
+      File(path + Platform.pathSeparator + 'notes.enc'),
+    );
+    paymentCards ??= PassyEntriesJSONFile<PaymentCard>.fromFile(
+      File(path + Platform.pathSeparator + 'payment_cards.enc'),
+    );
+    idCards ??= PassyEntriesJSONFile<IDCard>.fromFile(
+      File(path + Platform.pathSeparator + 'id_cards.enc'),
+    );
+    identities ??= PassyEntriesJSONFile<Identity>.fromFile(
+      File(path + Platform.pathSeparator + 'identities.enc'),
+    );
+    return JSONLoadedAccount(
+        versionFile: versionFile,
+        credentials: credentials,
+        settings: settings,
+        history: history,
+        passwords: passwords,
+        notes: notes,
+        paymentCards: paymentCards,
+        idCards: idCards,
+        identities: identities);
+  }
+
+  factory JSONLoadedAccount.fromEncryptedCSVDirectory({
+    required String path,
+    required Encrypter encrypter,
+    File? versionFile,
+    AccountCredentialsFile? credentials,
+    JsonFile<AccountSettings>? settings,
+    JsonFile<History>? history,
+    PassyEntriesJSONFile<Password>? passwords,
+    PassyEntriesJSONFile<Note>? notes,
+    PassyEntriesJSONFile<PaymentCard>? paymentCards,
+    PassyEntriesJSONFile<IDCard>? idCards,
+    PassyEntriesJSONFile<Identity>? identities,
+  }) {
+    File _settingsFile = File(path + Platform.pathSeparator + 'settings.enc');
+    File _historyFile = File(path + Platform.pathSeparator + 'history.enc');
+    File _passwordsFile = File(path + Platform.pathSeparator + 'passwords.enc');
+    File _notesFile = File(path + Platform.pathSeparator + 'notes.enc');
+    File _paymentCardsFile =
+        File(path + Platform.pathSeparator + 'payment_cards.enc');
+    File _idCardsFile = File(path + Platform.pathSeparator + 'id_cards.enc');
+    File _identitiesFile =
+        File(path + Platform.pathSeparator + 'identities.enc');
+    versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
+    credentials ??= AccountCredentials.fromFile(
+        File(path + Platform.pathSeparator + 'credentials.json'));
+    settings ??= JsonFile(_settingsFile,
+        value: AccountSettings.fromFile(_settingsFile, encrypter: encrypter)
+            .value);
+    history ??= JsonFile<History>(_historyFile,
+        value: History.fromFile(
+                File(path + Platform.pathSeparator + 'history.enc'),
+                encrypter: encrypter)
+            .value);
+    passwords ??= PassyEntriesJSONFile<Password>(_passwordsFile,
+        value:
+            Passwords.fromFile<Password>(_passwordsFile, encrypter: encrypter)
+                .value);
+    notes ??= PassyEntriesJSONFile<Note>(_notesFile,
+        value: Notes.fromFile<Note>(_notesFile, encrypter: encrypter).value);
+    paymentCards ??= PassyEntriesJSONFile<PaymentCard>(_paymentCardsFile,
+        value: PaymentCards.fromFile<PaymentCard>(_paymentCardsFile,
+                encrypter: encrypter)
+            .value);
+    idCards ??= PassyEntriesJSONFile<IDCard>(_idCardsFile,
+        value:
+            IDCards.fromFile<IDCard>(_idCardsFile, encrypter: encrypter).value);
+    identities ??= PassyEntriesJSONFile<Identity>(_identitiesFile,
+        value:
+            Identities.fromFile<Identity>(_identitiesFile, encrypter: encrypter)
+                .value);
+    return JSONLoadedAccount(
+      versionFile: versionFile,
+      credentials: credentials,
+      settings: settings,
+      history: history,
+      passwords: passwords,
+      notes: notes,
+      paymentCards: paymentCards,
+      idCards: idCards,
+      identities: identities,
+    );
+  }
+
+  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter) {
+    return LoadedAccount(
+      encrypter: encrypter,
+      versionFile: _versionFile,
+      credentials: _credentials,
+      settings: _settings.toEncryptedJSONFile(encrypter),
+      history: _history.toEncryptedJSONFile(encrypter),
+      passwords: _passwords.toPassyEntriesEncryptedCSVFile(encrypter),
+      notes: _notes.toPassyEntriesEncryptedCSVFile(encrypter),
+      paymentCards: _paymentCards.toPassyEntriesEncryptedCSVFile(encrypter),
+      idCards: _idCards.toPassyEntriesEncryptedCSVFile(encrypter),
+      identities: _identities.toPassyEntriesEncryptedCSVFile(encrypter),
+    );
+  }
+
+  Future<void> save() => Future.wait([
+        _versionFile.writeAsString(accountVersion),
+        _credentials.save(),
+        _settings.save(),
+        _history.save(),
+        _passwords.save(),
+        _notes.save(),
+        _paymentCards.save(),
+        _idCards.save(),
+        _identities.save(),
+      ]);
+
+  void saveSync() {
+    _versionFile.writeAsStringSync(accountVersion);
+    _credentials.saveSync();
+    _settings.saveSync();
+    _history.saveSync();
+    _passwords.saveSync();
+    _notes.saveSync();
+    _paymentCards.saveSync();
+    _idCards.saveSync();
+    _identities.saveSync();
   }
 }

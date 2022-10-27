@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'dart:io';
 
+import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/encrypted_json_file.dart';
+
 import 'json_convertable.dart';
 import 'saveable_file_base.dart';
 
@@ -32,4 +35,7 @@ class JsonFile<T extends JsonConvertable> with SaveableFileBase {
   Future<void> save() => _file.writeAsString(jsonEncode(value));
   @override
   void saveSync() => _file.writeAsStringSync(jsonEncode(value));
+
+  EncryptedJsonFile<T> toEncryptedJSONFile(Encrypter encrypter) =>
+      EncryptedJsonFile<T>(_file, encrypter: encrypter, value: value);
 }

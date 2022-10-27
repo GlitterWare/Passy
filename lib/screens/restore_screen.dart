@@ -47,7 +47,7 @@ class _RestoreScreen extends State<RestoreScreen> {
             MainScreen.shouldLockScreen = false;
             FilePicker.platform
                 .pickFiles(
-              dialogTitle: 'Restore passy backup',
+              dialogTitle: 'Restore Passy backup',
               type: FileType.custom,
               allowedExtensions: ['zip'],
               lockParentWindow: true,
