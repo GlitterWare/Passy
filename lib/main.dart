@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
+import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/export_and_import_screen.dart';
 import 'package:passy/screens/export_screen.dart';
@@ -105,6 +106,8 @@ class Passy extends StatelessWidget {
       ],
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
+        AutomaticBackupScreen.routeName: (context) =>
+            const AutomaticBackupScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
             const BackupAndRestoreScreen(),
         BackupScreen.routeName: (context) => const BackupScreen(),

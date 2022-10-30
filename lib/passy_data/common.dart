@@ -8,7 +8,7 @@ import 'dart:io';
 
 const String passyVersion = '1.1.1';
 const String syncVersion = '1.0.0';
-const String accountVersion = '1.0.0';
+const String accountVersion = '1.1.0';
 
 void copyDirectorySync(Directory source, Directory destination) {
   destination.createSync(recursive: true);

@@ -45,11 +45,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
-          LoadedAccount _account = data.loadedAccount!;
-          if (_account.defaultScreen != Screen.main) {
-            Navigator.pushNamed(
-                context, screenToRouteName[_account.defaultScreen]!);
-          }
         }
       }
     }
@@ -116,9 +111,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
               .setAndroidScreenSecure(_account.protectScreen);
         }
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
-        if (_account.defaultScreen == Screen.main) return;
-        Navigator.pushNamed(
-            context, screenToRouteName[_account.defaultScreen]!);
       } catch (e, s) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()

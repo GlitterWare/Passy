@@ -1,14 +1,15 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/json_file.dart';
+import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
 import 'account_settings.dart';
+import 'auto_backup_settings.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -27,6 +28,7 @@ class LoadedAccount {
   Encrypter _encrypter;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
+  final LocalSettingsFile _localSettings;
   final AccountSettingsFile _settings;
   final HistoryFile _history;
   final PasswordsFile _passwords;
@@ -39,6 +41,7 @@ class LoadedAccount {
     required Encrypter encrypter,
     required File versionFile,
     required AccountCredentialsFile credentials,
+    required LocalSettingsFile localSettings,
     required AccountSettingsFile settings,
     required HistoryFile history,
     required PasswordsFile passwords,
@@ -49,6 +52,7 @@ class LoadedAccount {
   })  : _encrypter = encrypter,
         _versionFile = versionFile,
         _credentials = credentials,
+        _localSettings = localSettings,
         _settings = settings,
         _history = history,
         _passwords = passwords,
@@ -62,6 +66,7 @@ class LoadedAccount {
     required Encrypter encrypter,
     File? versionFile,
     AccountCredentialsFile? credentials,
+    LocalSettingsFile? localSettings,
     AccountSettingsFile? settings,
     HistoryFile? history,
     PasswordsFile? passwords,
@@ -73,6 +78,8 @@ class LoadedAccount {
     versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
     credentials ??= AccountCredentials.fromFile(
         File(path + Platform.pathSeparator + 'credentials.json'));
+    localSettings ??= LocalSettings.fromFile(
+        File(path + Platform.pathSeparator + 'local_settings.json'));
     settings ??= AccountSettings.fromFile(
         File(path + Platform.pathSeparator + 'settings.enc'),
         encrypter: encrypter);
@@ -97,6 +104,7 @@ class LoadedAccount {
         encrypter: encrypter,
         versionFile: versionFile,
         credentials: credentials,
+        localSettings: localSettings,
         settings: settings,
         history: history,
         passwords: passwords,
@@ -121,6 +129,7 @@ class LoadedAccount {
   Future<void> save() => Future.wait([
         _versionFile.writeAsString(accountVersion),
         _credentials.save(),
+        _localSettings.save(),
         _settings.save(),
         _history.save(),
         _passwords.save(),
@@ -133,6 +142,7 @@ class LoadedAccount {
   void saveSync() {
     _versionFile.writeAsStringSync(accountVersion);
     _credentials.saveSync();
+    _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
     _passwords.saveSync();
@@ -236,16 +246,17 @@ class LoadedAccount {
   Future<void> saveCredentials() => _credentials.save();
   void saveCredentialsSync() => _credentials.saveSync();
 
+  // Local Settings wrappers
+  AutoBackupSettings? get autoBackup => _localSettings.value.autoBackup;
+  set autoBackup(AutoBackupSettings? value) =>
+      _localSettings.value.autoBackup = value;
+  Future<void> saveLocalSettings() => _localSettings.save();
+  void saveLocalSettingsSync() => _localSettings.saveSync();
+
   // Account Settings wrappers
-  String get icon => _settings.value.icon;
-  set icon(String value) => _settings.value.icon = value;
-  Color get color => _settings.value.color;
-  set color(Color value) => _settings.value.color = color;
-  Screen get defaultScreen => _settings.value.defaultScreen;
-  set defaultScreen(Screen value) => _settings.value.defaultScreen = value;
-  Future<void> saveSettings() => _settings.save();
   bool get protectScreen => _settings.value.protectScreen;
   set protectScreen(bool value) => _settings.value.protectScreen = value;
+  Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
 
   Future<BiometricStorageData> get biometricStorageData =>
@@ -413,6 +424,7 @@ class LoadedAccount {
 class JSONLoadedAccount {
   final File _versionFile;
   final AccountCredentialsFile _credentials;
+  final LocalSettingsFile _localSettings;
   final JsonFile<AccountSettings> _settings;
   final JsonFile<History> _history;
   final PassyEntriesJSONFile<Password> _passwords;
@@ -424,6 +436,7 @@ class JSONLoadedAccount {
   JSONLoadedAccount({
     required File versionFile,
     required AccountCredentialsFile credentials,
+    required LocalSettingsFile localSettings,
     required JsonFile<AccountSettings> settings,
     required JsonFile<History> history,
     required PassyEntriesJSONFile<Password> passwords,
@@ -433,6 +446,7 @@ class JSONLoadedAccount {
     required PassyEntriesJSONFile<Identity> identities,
   })  : _versionFile = versionFile,
         _credentials = credentials,
+        _localSettings = localSettings,
         _settings = settings,
         _history = history,
         _passwords = passwords,
@@ -445,6 +459,7 @@ class JSONLoadedAccount {
     required String path,
     File? versionFile,
     AccountCredentialsFile? credentials,
+    LocalSettingsFile? localSettings,
     JsonFile<AccountSettings>? settings,
     JsonFile<History>? history,
     PassyEntriesJSONFile<Password>? passwords,
@@ -456,6 +471,8 @@ class JSONLoadedAccount {
     versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
     credentials ??= AccountCredentials.fromFile(
         File(path + Platform.pathSeparator + 'credentials.json'));
+    localSettings ??= LocalSettings.fromFile(
+        File(path + Platform.pathSeparator + 'local_settings.json'));
     settings ??= JsonFile<AccountSettings>.fromFile(
       File(path + Platform.pathSeparator + 'settings.enc'),
       constructor: () => AccountSettings(),
@@ -484,6 +501,7 @@ class JSONLoadedAccount {
     return JSONLoadedAccount(
         versionFile: versionFile,
         credentials: credentials,
+        localSettings: localSettings,
         settings: settings,
         history: history,
         passwords: passwords,
@@ -498,6 +516,7 @@ class JSONLoadedAccount {
     required Encrypter encrypter,
     File? versionFile,
     AccountCredentialsFile? credentials,
+    LocalSettingsFile? localSettings,
     JsonFile<AccountSettings>? settings,
     JsonFile<History>? history,
     PassyEntriesJSONFile<Password>? passwords,
@@ -518,6 +537,8 @@ class JSONLoadedAccount {
     versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
     credentials ??= AccountCredentials.fromFile(
         File(path + Platform.pathSeparator + 'credentials.json'));
+    localSettings ??= LocalSettings.fromFile(
+        File(path + Platform.pathSeparator + 'local_settings.json'));
     settings ??= JsonFile(_settingsFile,
         value: AccountSettings.fromFile(_settingsFile, encrypter: encrypter)
             .value);
@@ -546,6 +567,7 @@ class JSONLoadedAccount {
     return JSONLoadedAccount(
       versionFile: versionFile,
       credentials: credentials,
+      localSettings: localSettings,
       settings: settings,
       history: history,
       passwords: passwords,
@@ -561,6 +583,7 @@ class JSONLoadedAccount {
       encrypter: encrypter,
       versionFile: _versionFile,
       credentials: _credentials,
+      localSettings: _localSettings,
       settings: _settings.toEncryptedJSONFile(encrypter),
       history: _history.toEncryptedJSONFile(encrypter),
       passwords: _passwords.toPassyEntriesEncryptedCSVFile(encrypter),
@@ -574,6 +597,7 @@ class JSONLoadedAccount {
   Future<void> save() => Future.wait([
         _versionFile.writeAsString(accountVersion),
         _credentials.save(),
+        _localSettings.save(),
         _settings.save(),
         _history.save(),
         _passwords.save(),
@@ -586,6 +610,7 @@ class JSONLoadedAccount {
   void saveSync() {
     _versionFile.writeAsStringSync(accountVersion);
     _credentials.saveSync();
+    _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
     _passwords.saveSync();

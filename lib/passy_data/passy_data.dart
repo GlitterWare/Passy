@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/auto_backup_settings.dart';
 
-import 'package:passy/passy_data/passy_legacy.dart';
+import 'package:passy/passy_data/legacy/legacy.dart';
+import 'package:passy/passy_data/local_settings.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
@@ -24,6 +26,7 @@ class PassyData {
   final String passyPath;
   final String accountsPath;
   final Map<String, AccountCredentialsFile> _accounts = {};
+  final Map<String, Timer> _autoBackupTimers = {};
   LoadedAccount? _loadedAccount;
 
   String? getPasswordHash(String username) =>
@@ -46,7 +49,7 @@ class PassyData {
       info.value.version = passyVersion;
       info.saveSync();
     }
-    refeshAccounts();
+    refreshAccounts();
     if (!_accounts.containsKey(info.value.lastUsername)) {
       if (_accounts.isEmpty) {
         info.value.lastUsername = '';
@@ -57,12 +60,16 @@ class PassyData {
     }
   }
 
-  void refeshAccounts() {
+  void refreshAccounts() {
     _accounts.clear();
     Directory _accountsDirectory =
         Directory(passyPath + Platform.pathSeparator + 'accounts');
     _accountsDirectory.createSync(recursive: true);
     List<FileSystemEntity> _accountDirectories = _accountsDirectory.listSync();
+    for (Timer t in _autoBackupTimers.values) {
+      t.cancel();
+    }
+    _autoBackupTimers.clear();
     for (FileSystemEntity d in _accountDirectories) {
       String _username = d.path.split(Platform.pathSeparator).last;
       _accounts[_username] = AccountCredentials.fromFile(
@@ -71,8 +78,41 @@ class PassyData {
             _username +
             Platform.pathSeparator +
             'credentials.json'),
-        value: AccountCredentials(username: _username, password: 'corrupted'),
+        value:
+            AccountCredentials(username: _username, passwordHash: 'corrupted'),
       );
+      LocalSettingsFile _localSettings = LocalSettings.fromFile(
+        File(accountsPath +
+            Platform.pathSeparator +
+            _username +
+            Platform.pathSeparator +
+            'local_settings.json'),
+      );
+      AutoBackupSettings? _autoBackup = _localSettings.value.autoBackup;
+      if (_autoBackup != null) {
+        DateTime _now = DateTime.now().toUtc();
+        void _autoBackupCycle() {
+          backupAccount(
+              username: _username, outputDirectoryPath: _autoBackup.path);
+          _autoBackup.lastBackup = _now;
+          _localSettings.saveSync();
+          _autoBackupTimers[_username] = Timer(
+            Duration(milliseconds: _autoBackup.backupInterval),
+            _autoBackupCycle,
+          );
+        }
+
+        int _timeDelta = _now.millisecondsSinceEpoch -
+            _autoBackup.lastBackup.millisecondsSinceEpoch;
+        if (_timeDelta >= _autoBackup.backupInterval) {
+          _autoBackupCycle();
+          return;
+        }
+        _autoBackupTimers[_username] = Timer(
+          Duration(milliseconds: _autoBackup.backupInterval - _timeDelta),
+          _autoBackupCycle,
+        );
+      }
     }
   }
 
@@ -80,7 +120,9 @@ class PassyData {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
     AccountCredentialsFile _file = AccountCredentials.fromFile(
         File(_accountPath + Platform.pathSeparator + 'credentials.json'),
-        value: AccountCredentials(username: username, password: password));
+        value: AccountCredentials(
+            username: username,
+            passwordHash: getPassyHash(password).toString()));
     File(_accountPath + Platform.pathSeparator + 'version.txt')
       ..createSync()
       ..writeAsStringSync(accountVersion);
@@ -123,7 +165,7 @@ class PassyData {
   }
 
   LoadedAccount loadAccount(String username, Encrypter encrypter) {
-    _loadedAccount = convertLegacyAccount(
+    _loadedAccount = loadLegacyAccount(
       path: accountsPath + Platform.pathSeparator + username,
       encrypter: encrypter,
       credentials: _accounts[username],
@@ -191,7 +233,7 @@ class PassyData {
     _tempAccountPath = _tempPath + Platform.pathSeparator + _username;
     {
       LoadedAccount _account =
-          convertLegacyAccount(path: _tempAccountPath, encrypter: encrypter);
+          loadLegacyAccount(path: _tempAccountPath, encrypter: encrypter)!;
       _account.bioAuthEnabled = false;
       _account.clearRemovedHistory();
       _account.renewHistory();
@@ -210,7 +252,7 @@ class PassyData {
       Directory(_tempAccountPath),
       _newAccountDir,
     );
-    refeshAccounts();
+    refreshAccounts();
     await _tempPathDir.delete(recursive: true);
     return _username;
   }
@@ -322,7 +364,7 @@ class PassyData {
       Directory(_tempAccountPath),
       _newAccountDir,
     );
-    refeshAccounts();
+    refreshAccounts();
     await _tempPathDir.delete(recursive: true);
     return _username;
   }

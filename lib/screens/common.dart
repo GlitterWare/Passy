@@ -2,15 +2,19 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/screen.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zxing2/qrcode.dart';
 
+import 'log_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 
@@ -45,6 +49,63 @@ void openUrl(String url) {
     return;
   }
   launchUrlString(url);
+}
+
+Future<String?> backupAccount(
+  BuildContext context, {
+  required String username,
+}) async {
+  try {
+    MainScreen.shouldLockScreen = false;
+    String? _buDir = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Backup Passy',
+      lockParentWindow: true,
+    );
+    MainScreen.shouldLockScreen = true;
+    if (_buDir == null) return null;
+    await data.backupAccount(
+      username: username,
+      outputDirectoryPath: _buDir,
+    );
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
+        content: Row(children: const [
+          Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+          SizedBox(width: 20),
+          Text('Backup saved'),
+        ]),
+      ));
+    return _buDir;
+  } catch (e, s) {
+    if (e is FileSystemException) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(
+          content: Row(children: const [
+            Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+            SizedBox(width: 20),
+            Text('Access denied, try another folder'),
+          ]),
+        ));
+    } else {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(
+          content: Row(children: const [
+            Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+            SizedBox(width: 20),
+            Text('Could not backup'),
+          ]),
+          action: SnackBarAction(
+            label: 'Details',
+            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                arguments: e.toString() + '\n' + s.toString()),
+          ),
+        ));
+    }
+    rethrow;
+  }
 }
 
 // CameraImage BGRA8888 -> PNG

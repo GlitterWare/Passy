@@ -10,6 +10,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/common/assets.dart';
 
+import 'automatic_backup_screen.dart';
 import 'backup_and_restore_screen.dart';
 import 'common.dart';
 import 'credentials_screen.dart';
@@ -49,6 +50,17 @@ class _SettingsScreen extends State<SettingsScreen> {
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => openUrl('https://github.com/sponsors/GlitterWare'),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: const Text('Automatic Backup'),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.save_outlined),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => Navigator.pushNamed(
+                context, AutomaticBackupScreen.routeName,
+                arguments: data.loadedAccount!.username),
           )),
           PassyPadding(ThreeWidgetButton(
             center: const Text('Backup & Restore'),
