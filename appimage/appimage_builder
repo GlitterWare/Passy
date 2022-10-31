@@ -19,8 +19,6 @@ fi
 export ARCH=$(uname -m)
 
 echo "INFO:Generator:Searching AppDir" 
-export appId='com.glitterware.passy'
-#read -p "? ID [Eg: com.example.app]: " appId
 export appName='Passy'
 #read -p "? Application Name: " appName
 export appIcon='passy'
@@ -58,16 +56,11 @@ function after_bundle() {
 
   # if [[ $(file -b "$appIcon.[ps]*g") =~  ]];
 
-  mkdir ../build/appimage/$appName.AppDir/usr
-  mkdir ../build/appimage/$appName.AppDir/usr/share
-  mkdir ../build/appimage/$appName.AppDir/usr/share/metainfo
+  mkdir -p ../build/appimage/$appName.AppDir/usr/share/metainfo
   cp ../linux_meta/com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
 
   if [ ! -b "../assets/images/logo_purple.svg" ]; then 
-    mkdir ../build/appimage/$appName.AppDir/usr/share/icons
-    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor
-    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable
-    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps
+    mkdir -p ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps
     cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/com.glitterware.passy.svg
     cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps/com.glitterware.passy.svg
     # mkdir -p $appName.AppDir/usr/share/icons/
@@ -82,24 +75,10 @@ function create_apprun() {
 }
 
 function create_desktop() {
-  local de="[Desktop Entry]"
-  local xaa="X-AppImage-Arch=$ARCH"
-  local xav="X-AppImage-Version=$appVersion"
-  local xan="X-AppImage-Name=$appName"
-  local v="Version=1.0"
-  local ty="Type=Application"
-  local te="Terminal=false"
-  local n="Name=$appName"
-  local e="Exec=$appExec %u"
-  local i="Icon=com.glitterware.passy"
-  local ca="Categories=Utility;"
-  local co="Comment=Cross-Platform Password Manager"
-
-  touch ../build/appimage/$appName.AppDir/$appId.desktop
-  echo -e "$de\n$xaa\n$xav\n$xan\n$v\n$ty\n$te\n$n\n$e\n$i\n$ca\n$co" > ../build/appimage/$appName.AppDir/$appId.desktop
+  cp ../linux_meta/com.glitterware.passy.desktop ../build/appimage/$appName.AppDir/com.glitterware.passy.desktop
 
   mkdir ../build/appimage/$appName.AppDir/usr/share/applications
-  cp ../build/appimage/$appName.AppDir/$appId.desktop ../build/appimage/$appName.AppDir/usr/share/applications
+  cp ../build/appimage/$appName.AppDir/com.glitterware.passy.desktop ../build/appimage/$appName.AppDir/usr/share/applications/
 }
 
 function build_appimage() {
