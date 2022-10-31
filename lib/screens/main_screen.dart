@@ -173,6 +173,57 @@ class _MainScreen extends State<MainScreen>
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _screenButtons = [
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.password_rounded),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: const Text('Passwords'),
+        onPressed: () =>
+            Navigator.pushNamed(context, PasswordsScreen.routeName),
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.payment_rounded),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: const Text('Payment cards'),
+        onPressed: () =>
+            Navigator.pushNamed(context, PaymentCardsScreen.routeName),
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.note_rounded),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: const Text('Notes'),
+        onPressed: () => Navigator.pushNamed(context, NotesScreen.routeName),
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.perm_identity_rounded),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: const Text('ID cards'),
+        onPressed: () => Navigator.pushNamed(context, IDCardsScreen.routeName),
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.people_outline_rounded),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: const Text('Identities'),
+        onPressed: () =>
+            Navigator.pushNamed(context, IdentitiesScreen.routeName),
+      )),
+    ];
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -233,59 +284,52 @@ class _MainScreen extends State<MainScreen>
             ),
           ],
         ),
-        body: ListView(
-          children: [
-            PassyPadding(ThreeWidgetButton(
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.password_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Passwords'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, PasswordsScreen.routeName),
-            )),
-            PassyPadding(ThreeWidgetButton(
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.payment_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Payment cards'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, PaymentCardsScreen.routeName),
-            )),
-            PassyPadding(ThreeWidgetButton(
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.note_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Notes'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, NotesScreen.routeName),
-            )),
-            PassyPadding(ThreeWidgetButton(
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.perm_identity_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('ID cards'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, IDCardsScreen.routeName),
-            )),
-            PassyPadding(ThreeWidgetButton(
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.people_outline_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              center: const Text('Identities'),
-              onPressed: () =>
-                  Navigator.pushNamed(context, IdentitiesScreen.routeName),
-            )),
-          ],
+        body: LayoutBuilder(
+          builder: (ctx, constr) {
+            if (constr.maxWidth >= 1100) {
+              return Row(children: [
+                Expanded(
+                    child: ListView(
+                  children: [
+                    _screenButtons[0],
+                    _screenButtons[1],
+                  ],
+                )),
+                Expanded(
+                    child: ListView(
+                  children: [
+                    _screenButtons[2],
+                    _screenButtons[3],
+                  ],
+                )),
+                Expanded(
+                    child: ListView(
+                  children: [
+                    _screenButtons[4],
+                  ],
+                ))
+              ]);
+            }
+            if (constr.maxWidth >= 700) {
+              return Row(children: [
+                Expanded(
+                  child: ListView(children: [
+                    _screenButtons[0],
+                    _screenButtons[1],
+                    _screenButtons[2],
+                  ]),
+                ),
+                Expanded(
+                    child: ListView(
+                  children: [
+                    _screenButtons[3],
+                    _screenButtons[4],
+                  ],
+                )),
+              ]);
+            }
+            return ListView(children: _screenButtons);
+          },
         ),
       ),
     );
