@@ -90,11 +90,10 @@ class PassyData {
       );
       AutoBackupSettings? _autoBackup = _localSettings.value.autoBackup;
       if (_autoBackup != null) {
-        DateTime _now = DateTime.now().toUtc();
         void _autoBackupCycle() {
           backupAccount(
               username: _username, outputDirectoryPath: _autoBackup.path);
-          _autoBackup.lastBackup = _now;
+          _autoBackup.lastBackup = DateTime.now().toUtc();
           _localSettings.saveSync();
           _autoBackupTimers[_username] = Timer(
             Duration(milliseconds: _autoBackup.backupInterval),
@@ -102,7 +101,7 @@ class PassyData {
           );
         }
 
-        int _timeDelta = _now.millisecondsSinceEpoch -
+        int _timeDelta = DateTime.now().toUtc().millisecondsSinceEpoch -
             _autoBackup.lastBackup.millisecondsSinceEpoch;
         if (_timeDelta >= _autoBackup.backupInterval) {
           _autoBackupCycle();
