@@ -11,6 +11,7 @@ echo 'INFO:Building APK'
 flutter build apk
 echo 'INFO:Building Linux Bundle'
 flutter build linux
+cp ./linux_meta/* './build/linux/x64/release/bundle'
 echo 'INFO:Building Linux AppImage'
 echo 'v'$version | ./appimage/appimage_builder
 echo ''
