@@ -63,13 +63,13 @@ function after_bundle() {
   mkdir ../build/appimage/$appName.AppDir/usr/share/metainfo
   cp com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
 
-  if [ ! -b "$appIcon.[ps]*g" ]; then 
+  if [ ! -b "../assets/images/logo_purple.svg" ]; then 
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor
-    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48
-    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48/apps
-    cp $appIcon.[ps]*g ../build/appimage/$appName.AppDir
-    cp $appIcon.[ps]*g ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/48x48/apps
+    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable
+    mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps
+    cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/com.glitterware.passy.svg
+    cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable4/apps/com.glitterware.passy.svg
     # mkdir -p $appName.AppDir/usr/share/icons/
     # cp $appIcon.[ps]*g $appName.AppDir/usr/share/icons/
   fi
@@ -91,7 +91,7 @@ function create_desktop() {
   local te="Terminal=false"
   local n="Name=$appName"
   local e="Exec=$appExec %u"
-  local i="Icon=$appIcon"
+  local i="Icon=com.glitterware.passy"
   local ca="Categories=Utility;"
   local co="Comment=Cross-Platform Password Manager"
 
