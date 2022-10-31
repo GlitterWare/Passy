@@ -69,7 +69,7 @@ function after_bundle() {
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps
     cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/com.glitterware.passy.svg
-    cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable4/apps/com.glitterware.passy.svg
+    cp "../assets/images/logo_purple.svg" ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps/com.glitterware.passy.svg
     # mkdir -p $appName.AppDir/usr/share/icons/
     # cp $appIcon.[ps]*g $appName.AppDir/usr/share/icons/
   fi
