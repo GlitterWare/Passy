@@ -61,7 +61,7 @@ function after_bundle() {
   mkdir ../build/appimage/$appName.AppDir/usr
   mkdir ../build/appimage/$appName.AppDir/usr/share
   mkdir ../build/appimage/$appName.AppDir/usr/share/metainfo
-  cp com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
+  cp ../linux_meta/com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
 
   if [ ! -b "../assets/images/logo_purple.svg" ]; then 
     mkdir ../build/appimage/$appName.AppDir/usr/share/icons
