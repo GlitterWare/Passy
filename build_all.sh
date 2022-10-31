@@ -7,8 +7,6 @@ user_interrupt(){
 trap user_interrupt SIGINT
 trap user_interrupt SIGTSTP
 
-cp ./linux_meta/* './build/linux/x64/release/bundle'
-cp './assets/images/logo_purple.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
 echo 'INFO:Building APK'
 flutter build apk
 echo 'INFO:Building Linux Bundle'
