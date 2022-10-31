@@ -104,10 +104,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     data.info.value.lastUsername = _username;
     data.loadAccount(_username, getPassyEncrypter(_password));
     data.info.save().then((value) {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        Navigator.pushReplacementNamed(context, MainScreen.routeName);
-        return;
-      }
       Navigator.pushReplacementNamed(context, SetupScreen.routeName);
     });
   }

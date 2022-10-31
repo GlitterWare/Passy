@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/security_screen.dart';
 
@@ -27,15 +31,27 @@ class _SetupScreen extends State<SetupScreen> {
       ),
       body: ListView(
         children: [
+          if (Platform.isAndroid || Platform.isIOS)
+            PassyPadding(ThreeWidgetButton(
+                center: const Text('Security'),
+                left: const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Icon(Icons.lock_rounded),
+                ),
+                right: const Icon(Icons.arrow_forward_ios_rounded),
+                onPressed: () =>
+                    Navigator.pushNamed(context, SecurityScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
-              center: const Text('Security'),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.lock_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, SecurityScreen.routeName))),
+            center: const Text('Automatic Backup'),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.save_outlined),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => Navigator.pushNamed(
+                context, AutomaticBackupScreen.routeName,
+                arguments: data.loadedAccount!.username),
+          )),
         ],
       ),
     );
