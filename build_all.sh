@@ -8,11 +8,12 @@ trap user_interrupt SIGINT
 trap user_interrupt SIGTSTP
 
 read -p "? Version [Eg: 1.0.0]: " appVersion
+read -p "? Build options: " buildOptions
 
 echo 'INFO:Building APK'
-flutter build apk
+flutter build apk $buildOptions
 echo 'INFO:Building Linux Bundle'
-flutter build linux
+flutter build linux $buildOptions
 cp ./linux_meta/* './build/linux/x64/release/bundle'
 cp './assets/images/logo_purple.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
 echo 'INFO:Building Linux AppImage'
