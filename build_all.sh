@@ -15,7 +15,7 @@ flutter build apk $buildOptions
 echo 'INFO:Building Linux Bundle'
 flutter build linux $buildOptions
 cp ./linux_meta/* './build/linux/x64/release/bundle'
-cp './assets/images/logo_purple.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
+cp './logo.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
 echo 'INFO:Building Linux AppImage'
 echo 'v'$appVersion | ./appimage/appimage_builder
 echo ''
