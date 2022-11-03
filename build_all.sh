@@ -1,25 +1,55 @@
 #! /bin/bash
 
-user_interrupt(){
+user_interrupt() {
   exit
 }
 
 trap user_interrupt SIGINT
 trap user_interrupt SIGTSTP
 
-read -p "? Version [Eg: 1.0.0]: " appVersion
-read -p "? Build options: " buildOptions
+bash update_version.sh
 
-echo 'INFO:Building APK'
-flutter build apk $buildOptions
-echo 'INFO:Building Linux Bundle'
-flutter build linux $buildOptions
-cp ./linux_meta/* './build/linux/x64/release/bundle'
-cp './logo.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
-echo 'INFO:Building Linux AppImage'
-echo 'v'$appVersion | ./appimage/appimage_builder
+printf 'Build Targets:\n1. Android and Linux. (default)\n2. Android.\n3. Linux.\n'
+read -p '?:What do you want to build for? [1/2/3]: ' BUILD_TARGET
+BUILD_TARGET=${BUILD_TARGET:-'1'}
+
+read -p '?:Enable updates popup? [y/N]: ' ENABLE_UPDATES_POPUP
+ENABLE_UPDATES_POPUP=$(echo ${ENABLE_UPDATES_POPUP:-'n'} | tr '[:upper:]' '[:lower:]')
+if [ $ENABLE_UPDATES_POPUP = 'n' ]; then
+  ENABLE_UPDATES_POPUP='--dart-define=UPDATES_POPUP_ENABLED=false'
+else
+  ENABLE_UPDATES_POPUP=''
+fi
+
+read -p '?:Build options: ' BUILD_OPTIONS
+
+FLUTTER='flutter --no-version-check --suppress-analytics'
+
+build_linux() {
+  echo 'INFO:Building Linux Bundle.'
+  $FLUTTER build linux $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
+  cp ./linux_meta/* './build/linux/x64/release/bundle'
+  cp './logo.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
+  echo 'INFO:Building Linux AppImage.'
+  echo 'v'$version | bash appimage/appimage_builder  
+}
+
+build_android() {
+  echo 'INFO:Building APK.'
+  $FLUTTER build apk $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
+}
+
+if [ $BUILD_TARGET = '1' ]; then
+  build_android
+  build_linux
+elif [ $BUILD_TARGET = '2' ]; then
+  build_android
+elif [ $BUILD_TARGET = '3' ]; then
+  build_linux
+fi
+
 echo ''
-echo 'Results:'
+echo 'Builds can be found in:'
+echo '- Linux Bundle - '$PWD'/build/linux/x64/release/bundle'
+echo '- Linux AppImage - '$PWD'/build/appimage/Passy-v'$appVersion'-x86_64.AppImage'
 echo '- Android Apk - '$PWD'/build/app/outputs/flutter-apk/app-release.apk'
-echo '- Linux x86_64 Bundle - '$PWD'/build/linux/x64/release/bundle'
-echo '- Linux x86_64 AppImage - '$PWD'/build/appimage/Passy-v'$appVersion'-x86_64.AppImage'
