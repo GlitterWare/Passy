@@ -16,7 +16,10 @@ else
 fi
 
 export newVersion=''
-read -p '? Enter new version [Eg: 1.0.0]: ' newVersion
+read -p '? Enter new version [Default: '$version']: ' newVersion
+if [[ ${#newVersion} == 0 ]]; then
+  newVersion=$version
+fi
 
 echo 'INFO:Changing version '$version' to '$newVersion
 
