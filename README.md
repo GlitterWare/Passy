@@ -8,6 +8,8 @@ Passy is an offline password manager with cross-platfrom synchronization. 🔒
 
 [![F-Droid Latest Release](https://img.shields.io/f-droid/v/com.glitterware.passy.svg?logo=F-Droid&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://f-droid.org/en/packages/com.glitterware.passy)
 
+[![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy)
+
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
 
 Passy is currently being submitted to:
@@ -30,6 +32,7 @@ Submissions will be finished until June 1 2023.
         - [APK](#apk)
     - [Linux](#linux)
         - [SnapCraft (Recommended)](#snapcraft-recommended)
+        - [Flathub](#flathub)
         - [AppImage](#appimage)
         - [Bundle](#bundle)
 3. [Exporting / Backups](#exporting--backups)
@@ -87,6 +90,10 @@ Passy can be removed by running its uninstaller from Programs and Features in th
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
 
 [Get set up for snaps](https://snapcraft.io/docs/installing-snapd).
+
+#### Flathub
+
+[![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy)
 
 #### AppImage
 
