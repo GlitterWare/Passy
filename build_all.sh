@@ -28,7 +28,7 @@ FLUTTER='flutter --no-version-check --suppress-analytics'
 build_linux() {
   echo 'INFO:Building Linux Bundle.'
   $FLUTTER build linux $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
-  cp ./linux_meta/* './build/linux/x64/release/bundle'
+  cp ./linux_assets/* './build/linux/x64/release/bundle'
   cp './logo.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
   echo 'INFO:Building Linux AppImage.'
   echo 'v'$version | bash appimage/appimage_builder  

@@ -57,7 +57,7 @@ function after_bundle() {
   # if [[ $(file -b "$appIcon.[ps]*g") =~  ]];
 
   mkdir -p ../build/appimage/$appName.AppDir/usr/share/metainfo
-  cp ../linux_meta/com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
+  cp ../linux_assets/com.glitterware.passy.appdata.xml ../build/appimage/$appName.AppDir/usr/share/metainfo  
 
   if [ ! -b "../assets/images/logo_purple.svg" ]; then 
     mkdir -p ../build/appimage/$appName.AppDir/usr/share/icons/hicolor/scalable/apps
@@ -75,7 +75,7 @@ function create_apprun() {
 }
 
 function create_desktop() {
-  cp ../linux_meta/com.glitterware.passy.desktop ../build/appimage/$appName.AppDir/com.glitterware.passy.desktop
+  cp ../linux_assets/com.glitterware.passy.desktop ../build/appimage/$appName.AppDir/com.glitterware.passy.desktop
 
   mkdir ../build/appimage/$appName.AppDir/usr/share/applications
   cp ../build/appimage/$appName.AppDir/com.glitterware.passy.desktop ../build/appimage/$appName.AppDir/usr/share/applications/
