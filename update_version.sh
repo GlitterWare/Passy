@@ -23,9 +23,9 @@ fi
 
 echo 'INFO:Changing version '$version' to '$newVersion
 
-echo 'INFO:Changing version in AppStream metadata.'
-sed -i 's/version="v'$version'"/version="v'$newVersion'"/' ./linux_assets/com.glitterware.passy.appdata.xml
-echo 'INFO:Changing version in `.desktop` file.'
-sed -i 's/Version='$version'/Version='$newVersion'/' ./linux_assets/com.glitterware.passy.desktop
+echo 'INFO:Changing version in `lib/passy_data/common.dart`.'
+sed -i 's/passyVersion = '\'$version\'\;'/passyVersion = '\'$newVersion\'\;'/' ./lib/passy_data/common.dart
 echo 'INFO:Changing version in `pubspec.yaml`.'
 sed -i 's/version: '$version'/version: '$newVersion'/' ./pubspec.yaml
+echo 'INFO:Changing version in AppStream metadata.'
+sed -i 's/version="v'$version'"/version="v'$newVersion'"/' ./linux_assets/com.glitterware.passy.appdata.xml
