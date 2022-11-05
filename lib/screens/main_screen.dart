@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
 import 'package:passy_website/widgets/about_passy_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:passy_website/widgets/downloads_dialog.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/';
@@ -66,34 +67,9 @@ class _MainScreen extends State<MainScreen> {
                   ),
                   center: const Text('Downloads'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                      'https://github.com/GlitterWare/Passy/releases/latest',
-                      'Downloads'),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: SvgPicture.asset(
-                        'assets/images/fdroid.svg',
-                        width: 25,
-                      )),
-                  center: const Text('F-Droid'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                      'https://f-droid.org/en/packages/com.glitterware.passy',
-                      'F-Droid'),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: SvgPicture.asset(
-                        'assets/images/snap_store_icon.svg',
-                        width: 25,
-                      )),
-                  center: const Text('Snap Store'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () =>
-                      window.open('https://snapcraft.io/passy', 'Snap Store'),
+                  onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => const DownloadsDialog()),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(

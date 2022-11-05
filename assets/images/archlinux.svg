@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   role="img"
+   viewBox="0 0 24 24"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="archlinux.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="22.627417"
+     inkscape:cx="7.380427"
+     inkscape:cy="15.026019"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6"
+     inkscape:snap-page="true"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-center="true"
+     inkscape:bbox-paths="true" />
+  <title
+     id="title2">Arch Linux</title>
+  <path
+     d="M 11.935077,0.11936631 C 10.872552,2.7253837 10.231264,4.4312929 9.0482347,6.958721 9.7743992,7.7278472 10.665076,8.6237639 12.111117,9.634945 10.556099,8.9957527 9.4956691,8.3523692 8.7034902,7.6859329 7.1882907,10.846266 4.8159452,15.347855 0,24 3.7848551,21.815221 6.7188513,20.468726 9.4527071,19.953181 9.3293493,19.421779 9.2692055,18.877663 9.2735237,18.332148 l 0.00314,-0.120503 c 0.060776,-2.425787 1.3213453,-4.29097 2.8155883,-4.163131 1.494242,0.125742 2.655266,2.196305 2.596586,4.619996 -0.0091,0.438062 -0.06035,0.874233 -0.152987,1.302485 2.703468,0.529167 5.608125,1.872518 9.340587,4.027957 -0.735595,-1.354877 -1.393648,-2.576677 -2.021314,-3.740845 -0.988128,-0.764935 -2.01817,-1.762493 -4.121217,-2.842833 1.446041,0.37618 2.480275,0.808945 3.287124,1.293054 C 14.639593,6.8319305 14.124048,5.2538597 11.936125,0.11936631 Z"
+     id="path4"
+     style="fill:#e3f2fd;fill-opacity:1;stroke-width:1.04786"
+     sodipodi:nodetypes="ccccccccccccccccc" />
+  <metadata
+     id="metadata827">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Arch Linux</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
