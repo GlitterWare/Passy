@@ -9,6 +9,21 @@ trap user_interrupt SIGTSTP
 
 bash update_version.sh
 
+export version=''
+
+while read -r line; do
+  if [[ $line == *'version: '* ]]; then
+    export version=$(echo ${line:9:${#line}} | cut -d '+' -f1)
+    break
+  fi
+done <'./pubspec.yaml'
+
+if [[ ${#version} == 0 ]]; then
+  read -p '? Could not detect current version. Enter current version manually [Eg: 1.0.0]: ' version
+else
+  echo 'INFO:Version detected:'$version
+fi
+
 printf 'Build Targets:\n1. Android and Linux. (default)\n2. Android.\n3. Linux.\n'
 read -p '?:What do you want to build for? [1/2/3]: ' BUILD_TARGET
 BUILD_TARGET=${BUILD_TARGET:-'1'}
@@ -51,5 +66,5 @@ fi
 echo ''
 echo 'Builds can be found in:'
 echo '- Linux Bundle - '$PWD'/build/linux/x64/release/bundle'
-echo '- Linux AppImage - '$PWD'/build/appimage/Passy-v'$appVersion'-x86_64.AppImage'
+echo '- Linux AppImage - '$PWD'/build/appimage/Passy-v'$version'-x86_64.AppImage'
 echo '- Android Apk - '$PWD'/build/app/outputs/flutter-apk/app-release.apk'

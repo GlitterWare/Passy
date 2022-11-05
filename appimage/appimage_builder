@@ -26,9 +26,23 @@ export appIcon='passy'
 export appExec='passy'
 #read -p "? Executable path relative to AppDir [usr/bin/app]: " appExec
 # read -p "? Arguments [Default: $@]: " appExec_args
-read -p "? Version [Eg: 1.0.0]: " appVersion
 # read -p "? Update Information [Default: guess]: " guess
 # read -p "? Architecture: " x86_64
+
+export version=''
+
+while read -r line; do
+  if [[ $line == *'version: '* ]]; then
+    export version=$(echo ${line:9:${#line}} | cut -d '+' -f1)
+    break
+  fi
+done <'../pubspec.yaml'
+
+if [[ ${#version} == 0 ]]; then
+  read -p '? Could not detect current version. Enter current version manually [Eg: 1.0.0]: ' version
+else
+  echo 'INFO:Version detected:'$version
+fi
 
 function download_appimagetool() {
   if [ ! -d ../build ]; then mkdir ../build; fi
@@ -87,7 +101,7 @@ function build_appimage() {
 
   # move result in build folder
 
-  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-$appVersion-$ARCH.AppImage
+  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-v$version-$ARCH.AppImage
     
 }
 
