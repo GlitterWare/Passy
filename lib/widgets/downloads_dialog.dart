@@ -14,8 +14,8 @@ class DownloadsDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: SizedBox(
-          width: 900,
-          height: 250,
+          width: 1200,
+          height: 400,
           child: ListView(
             children: [
               PassyPadding(ThreeWidgetButton(
@@ -31,30 +31,30 @@ class DownloadsDialog extends StatelessWidget {
                     'https://github.com/GlitterWare/Passy/releases/latest',
                     'Downloads'),
               )),
-              Row(
-                children: [
-                  Flexible(
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Flexible(
-                            flex: 12,
-                            child: Text(
-                              'Android',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 22),
-                            ),
-                          ),
-                          Spacer(),
-                          Flexible(
-                            flex: 12,
-                            child: Icon(Icons.android_rounded),
-                          ),
-                        ],
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Flexible(
+                      child: Text(
+                        'Android',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 22),
                       ),
                     ),
-                  ),
+                    SizedBox(
+                      width: 10,
+                      height: 10,
+                    ),
+                    Flexible(
+                      child: Icon(Icons.android_rounded),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  const Spacer(),
                   Flexible(
                     flex: 2,
                     child: PassyPadding(ThreeWidgetButton(
@@ -74,31 +74,30 @@ class DownloadsDialog extends StatelessWidget {
                   const Spacer(),
                 ],
               ),
-              Row(
-                children: [
-                  Flexible(
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Flexible(
-                            flex: 12,
-                            child: Text(
-                              'Windows',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 22),
-                            ),
-                          ),
-                          const Spacer(),
-                          Flexible(
-                            flex: 12,
-                            child:
-                                SvgPicture.asset('assets/images/windows11.svg'),
-                          ),
-                        ],
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Flexible(
+                      child: Text(
+                        'Windows',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 22),
                       ),
                     ),
-                  ),
+                    const SizedBox(
+                      width: 10,
+                      height: 10,
+                    ),
+                    Flexible(
+                      child: SvgPicture.asset('assets/images/windows11.svg'),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  const Spacer(),
                   Flexible(
                     flex: 2,
                     child: PassyPadding(ThreeWidgetButton(
@@ -118,30 +117,31 @@ class DownloadsDialog extends StatelessWidget {
                   const Spacer(),
                 ],
               ),
-              Row(
-                children: [
-                  Flexible(
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Flexible(
-                            flex: 12,
-                            child: Text(
-                              'Linux',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 22),
-                            ),
-                          ),
-                          const Spacer(),
-                          Flexible(
-                            flex: 12,
-                            child: SvgPicture.asset('assets/images/linux.svg'),
-                          ),
-                        ],
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Flexible(
+                      flex: 12,
+                      child: Text(
+                        'Linux',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 22),
                       ),
                     ),
-                  ),
+                    const SizedBox(
+                      width: 10,
+                      height: 10,
+                    ),
+                    Flexible(
+                      flex: 12,
+                      child: SvgPicture.asset('assets/images/linux.svg'),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
                   Flexible(
                       child: PassyPadding(ThreeWidgetButton(
                     left: Padding(
@@ -169,21 +169,29 @@ class DownloadsDialog extends StatelessWidget {
                         'https://flathub.org/apps/details/io.github.glitterware.Passy',
                         'Flathub'),
                   ))),
-                  Flexible(
-                      child: PassyPadding(ThreeWidgetButton(
-                    left: Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: SvgPicture.asset(
-                          'assets/images/archlinux.svg',
-                          width: 25,
-                        )),
-                    center: const Text('AUR'),
-                    right: const Icon(Icons.arrow_forward_ios_rounded),
-                    onPressed: () => window.open(
-                        'https://aur.archlinux.org/packages/passy', 'AUR'),
-                  ))),
                 ],
               ),
+              Row(
+                children: [
+                  const Spacer(),
+                  Flexible(
+                    flex: 2,
+                    child: PassyPadding(ThreeWidgetButton(
+                      left: Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: SvgPicture.asset(
+                            'assets/images/archlinux.svg',
+                            width: 25,
+                          )),
+                      center: const Text('AUR'),
+                      right: const Icon(Icons.arrow_forward_ios_rounded),
+                      onPressed: () => window.open(
+                          'https://aur.archlinux.org/packages/passy', 'AUR'),
+                    )),
+                  ),
+                  const Spacer(),
+                ],
+              )
             ],
           ),
         ));
