@@ -92,7 +92,7 @@ Passy can be removed by running its uninstaller from Programs and Features in th
 
 [![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy)
 
-### AUR
+#### AUR
 
 [![AUR Latest Release](https://img.shields.io/aur/version/passy?logo=Arch%20Linux&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://aur.archlinux.org/packages/passy)
 
