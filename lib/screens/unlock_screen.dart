@@ -42,9 +42,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   void _unlock() {
-    String password = _password;
+    String _passwordHash = getPassyHash(_password).toString();
     _password = '';
-    if (getPassyHash(password).toString() ==
+    if (_passwordHash ==
         data.getPasswordHash(_account.username)) {
       _shouldPop = true;
       Navigator.pop(context);
