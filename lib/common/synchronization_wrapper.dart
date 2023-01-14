@@ -23,6 +23,13 @@ class SynchronizationWrapper {
   void _onSyncComplete() {
     Navigator.popUntil(
         _context, (r) => r.settings.name == MainScreen.routeName);
+    showDialog(
+        context: _context,
+        builder: (ctx) => AlertDialog(
+              title: const Text('Synchronization Complete'),
+              content: Text(
+                  'Entries added: ${_sync!.entriesAdded}\nEntries removed: ${_sync!.entriesRemoved}'),
+            ));
   }
 
   void _onSyncError(String log) {
@@ -59,14 +66,12 @@ class SynchronizationWrapper {
       return;
     }
 
-    account
-        .connect(
-      _hostAddress,
+    _sync = account.getSynchronization(
       onConnected: () => _onConnected(),
       onComplete: () => _onSyncComplete(),
       onError: (log) => _onSyncError(log),
-    )
-        .onError((error, stackTrace) {
+    );
+    _sync!.connect(_hostAddress).onError((error, stackTrace) {
       ScaffoldMessenger.of(_context).clearSnackBars();
       ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
         content: Row(children: const [

@@ -144,6 +144,11 @@ class Synchronization {
   static Socket? _socket;
   String _syncLog = '';
   bool _isConnected = false;
+  int _entriesAdded = 0;
+  int _entriesRemoved = 0;
+
+  get entriesAdded => _entriesAdded;
+  get entriesRemoved => _entriesRemoved;
 
   Synchronization(this._loadedAccount,
       {required History history,
@@ -217,21 +222,25 @@ class Synchronization {
             }
           }
           _events[_entryData.key] = _entryData.event;
+          _entriesRemoved += 1;
           continue;
         }
 
-        _events[_entryData.key] = _entryData.event;
         if (_entryData.value == null) {
           _entryData.event
             ..lastModified = DateTime.now().toUtc()
             ..status = EntryStatus.removed;
-          return;
+          _events[_entryData.key] = _entryData.event;
+          continue;
         }
         _loadedAccount.setEntry(_entryData.type)(
             PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
+        _events[_entryData.key] = _entryData.event;
+        _entriesAdded += 1;
       } catch (e, s) {
         _handleException(
             'Could not save an entry\n${e.toString()}\n${s.toString()}');
+        return;
       }
     }
     return _loadedAccount.save();
