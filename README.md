@@ -39,6 +39,8 @@ Submissions will be finished until June 1 2023.
 4. [Building](#building)
     - [Build Options](#build-options)
 5. [Privacy Policy](#privacy-policy)
+6. [Links & Mentions](#links--mentions)
+    - [Store Releases](#store-releases)
 
 ## Features
 
@@ -148,5 +150,17 @@ Available options:
 ## Privacy Policy
 
 [27 OCTOBER, 2022](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
+
+## Links & Mentions
+
+### Store Releases
+
+- AppImageHub release - https://www.appimagehub.com/p/1906459/.
+- AUR releases:
+  - (git) https://aur.archlinux.org/packages/passy.
+  - (git) https://aur.archlinux.org/packages/passy-git.
+- Flathub release - https://flathub.org/apps/details/io.github.glitterware.Passy.
+- F-Droid release - https://f-droid.org/en/packages/com.glitterware.passy.
+- Snap release - https://snapcraft.io/passy.
 
 #### Made with 💜 by Gleammer.
