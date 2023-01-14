@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/common.dart';
 
-void convertPre1d1d0AccountTo1d1d0({
+void convertPre1_1_0AccountTo1_1_0({
   required String path,
   required Encrypter encrypter,
 }) {

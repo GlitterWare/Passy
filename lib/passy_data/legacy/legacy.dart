@@ -63,7 +63,7 @@ void convertLegacyAccount({
   if (_accountVersion[0] == 1) {
     if (_accountVersion[1] < 1) {
       // Pre 1.1.0 conversion
-      convertPre1d1d0AccountTo1d1d0(path: path, encrypter: encrypter);
+      convertPre1_1_0AccountTo1_1_0(path: path, encrypter: encrypter);
     }
   }
   // No conversion
