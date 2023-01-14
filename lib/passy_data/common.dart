@@ -10,6 +10,32 @@ const String passyVersion = '1.2.0';
 const String syncVersion = '1.0.0';
 const String accountVersion = '1.1.0';
 
+bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
+  if (lineDelimiter.length == 1) {
+    return char == lineDelimiter;
+  } else {
+    return priorChar + char == lineDelimiter;
+  }
+}
+
+String? readLine(RandomAccessFile raf,
+    {String lineDelimiter = '\n', void Function()? onEOF}) {
+  String line = '';
+  int byte;
+  String priorChar = '';
+  byte = raf.readByteSync();
+  while (byte != -1) {
+    var char = utf8.decode([byte]);
+    if (isLineDelimiter(priorChar, char, lineDelimiter)) return line;
+    line += char;
+    priorChar = char;
+    byte = raf.readByteSync();
+  }
+  if (byte == -1) onEOF?.call();
+  if (line.isEmpty) return null;
+  return line;
+}
+
 void copyDirectorySync(Directory source, Directory destination) {
   destination.createSync(recursive: true);
   source.listSync(recursive: false).forEach((var entity) {
