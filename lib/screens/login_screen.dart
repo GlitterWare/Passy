@@ -36,8 +36,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   Widget? _floatingActionButton;
   String _password = '';
   String _username = data.info.value.lastUsername;
+  FloatingActionButton? _bioAuthButton;
 
-  Future<void> _onResumed() async {
+  Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
       if (data.getBioAuthEnabled(_username) ?? false) {
         if (await bioAuth(_username)) {
@@ -52,7 +53,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) _onResumed();
+    if (state == AppLifecycleState.resumed) _bioAuth();
   }
 
   Widget _buildPasswords(String terms) {
@@ -129,6 +130,22 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     });
   }
 
+  void updateBioAuthButton() {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+    if (widget.autofillLogin) return;
+    if (data.getBioAuthEnabled(_username) == true) {
+      _bioAuthButton = FloatingActionButton(
+        onPressed: () => _bioAuth(),
+        child: const Icon(
+          Icons.fingerprint_rounded,
+        ),
+        heroTag: null,
+      );
+    } else {
+      _bioAuthButton = null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -144,7 +161,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     if (didRun) return;
     didRun = true;
-    _onResumed();
+    _bioAuth();
   }
 
   @override
@@ -155,6 +172,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    updateBioAuthButton();
     final List<DropdownMenuItem<String>> usernames = data.usernames
         .map<DropdownMenuItem<String>>((_username) => DropdownMenuItem(
               child: Row(children: [
@@ -244,6 +262,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                   ),
                                   heroTag: null,
                                 ),
+                                if (_bioAuthButton != null) _bioAuthButton!,
                               ],
                             ),
                           ],
