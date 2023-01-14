@@ -21,7 +21,6 @@ import 'note.dart';
 import 'password.dart';
 import 'passy_entry.dart';
 import 'payment_card.dart';
-import 'screen.dart';
 import 'synchronization.dart';
 
 class LoadedAccount {

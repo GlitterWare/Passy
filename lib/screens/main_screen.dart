@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -41,8 +42,36 @@ class _MainScreen extends State<MainScreen>
   bool _unlockScreenOn = false;
 
   void _logOut() {
-    data.unloadAccount();
-    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Log out'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text(
+                  'Stay',
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                )),
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  data.unloadAccount();
+                  Navigator.pushReplacementNamed(
+                      context, LoginScreen.routeName);
+                },
+                child: const Text(
+                  'Log out',
+                  style:
+                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                )),
+          ],
+          content: const Text('Are you sure you want to log out?'),
+        );
+      },
+    );
   }
 
   Future<bool> _onWillPop() {
@@ -233,7 +262,11 @@ class _MainScreen extends State<MainScreen>
           leading: IconButton(
             splashRadius: PassyTheme.appBarButtonSplashRadius,
             padding: PassyTheme.appBarButtonPadding,
-            icon: const Icon(Icons.arrow_back_ios_rounded),
+            icon: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.rotationY(pi),
+              child: const Icon(Icons.exit_to_app_rounded),
+            ),
             onPressed: _logOut,
           ),
           actions: [

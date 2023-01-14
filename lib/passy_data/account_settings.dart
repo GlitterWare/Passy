@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'encrypted_json_file.dart';
 import 'json_convertable.dart';
-import 'screen.dart';
 
 typedef AccountSettingsFile = EncryptedJsonFile<AccountSettings>;
 

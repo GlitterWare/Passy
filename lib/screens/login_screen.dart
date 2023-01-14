@@ -11,7 +11,6 @@ import 'package:passy/screens/search_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/common/assets.dart';
 
