@@ -141,9 +141,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         ),
         heroTag: null,
       );
-    } else {
-      _bioAuthButton = null;
+      return;
     }
+    _bioAuthButton = null;
   }
 
   @override

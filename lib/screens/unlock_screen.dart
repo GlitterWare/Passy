@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
@@ -23,6 +24,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   final LoadedAccount _account = data.loadedAccount!;
   bool _shouldPop = false;
   String _password = '';
+  FloatingActionButton? _bioAuthButton;
 
   void _logOut() {
     Navigator.popUntil(
@@ -41,11 +43,18 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     return Future.value(false);
   }
 
+  Future<void> _bioAuth() async {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+    if (!_account.bioAuthEnabled) return;
+    if (!await bioAuth(_account.username)) return;
+    _shouldPop = true;
+    Navigator.pop(context);
+  }
+
   void _unlock() {
     String _passwordHash = getPassyHash(_password).toString();
     _password = '';
-    if (_passwordHash ==
-        data.getPasswordHash(_account.username)) {
+    if (_passwordHash == data.getPasswordHash(_account.username)) {
       _shouldPop = true;
       Navigator.pop(context);
       return;
@@ -67,6 +76,18 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+    if (data.getBioAuthEnabled(_account.username) == true) {
+      _bioAuthButton = FloatingActionButton(
+        onPressed: () => _bioAuth(),
+        child: const Icon(
+          Icons.fingerprint_rounded,
+        ),
+        heroTag: null,
+      );
+      return;
+    }
+    _bioAuthButton = null;
   }
 
   @override
@@ -78,14 +99,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state != AppLifecycleState.resumed) return;
-    if (Platform.isAndroid || Platform.isIOS) {
-      if (_account.bioAuthEnabled) {
-        if (await bioAuth(_account.username)) {
-          _shouldPop = true;
-          Navigator.pop(context);
-        }
-      }
-    }
+    _bioAuth();
   }
 
   @override
@@ -99,7 +113,11 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
           leading: IconButton(
             splashRadius: PassyTheme.appBarButtonSplashRadius,
             padding: PassyTheme.appBarButtonPadding,
-            icon: const Icon(Icons.arrow_back_ios_rounded),
+            icon: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.rotationY(pi),
+              child: const Icon(Icons.exit_to_app_rounded),
+            ),
             onPressed: _logOut,
           ),
         ),
@@ -108,7 +126,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
             SliverFillRemaining(
               child: Column(
                 children: [
-                  const Spacer(),
+                  const Spacer(
+                    flex: 5,
+                  ),
                   Text(
                     _account.username,
                     style: const TextStyle(
@@ -128,7 +148,13 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                       buttonIcon: const Icon(Icons.arrow_forward_ios_rounded),
                     ),
                   ),
-                  const Spacer(),
+                  const Spacer(
+                    flex: 2,
+                  ),
+                  if (_bioAuthButton != null) _bioAuthButton!,
+                  const Spacer(
+                    flex: 3,
+                  ),
                 ],
               ),
             )
