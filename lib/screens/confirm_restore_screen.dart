@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/backup_and_restore_screen.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/restore_screen.dart';
 
 import 'log_screen.dart';
 
 class ConfirmRestoreScreen extends StatefulWidget {
-  static const String routeName = '${RestoreScreen.routeName}/confirm';
+  static const String routeName =
+      '${BackupAndRestoreScreen.routeName}/confirmRestore';
 
   const ConfirmRestoreScreen({Key? key}) : super(key: key);
 

@@ -1,9 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import 'backup_screen.dart';
-import 'restore_screen.dart';
+import 'common.dart';
+import 'confirm_restore_screen.dart';
+import 'main_screen.dart';
 import 'settings_screen.dart';
 
 class BackupAndRestoreScreen extends StatefulWidget {
@@ -16,12 +18,35 @@ class BackupAndRestoreScreen extends StatefulWidget {
 }
 
 class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
-  void _onBackupPressed(String username) {
-    Navigator.pushNamed(context, BackupScreen.routeName, arguments: username);
+  Future<void> _onBackupPressed(String username) async {
+    try {
+      await backupAccount(context, username: username);
+    } catch (e) {
+      //
+    }
   }
 
-  void _onRestorePressed() =>
-      Navigator.pushNamed(context, RestoreScreen.routeName);
+  void _onRestorePressed() {
+    MainScreen.shouldLockScreen = false;
+    FilePicker.platform
+        .pickFiles(
+      dialogTitle: 'Restore Passy backup',
+      type: FileType.custom,
+      allowedExtensions: ['zip'],
+      lockParentWindow: true,
+    )
+        .then(
+      (_pick) {
+        MainScreen.shouldLockScreen = true;
+        if (_pick == null) return;
+        Navigator.pushNamed(
+          context,
+          ConfirmRestoreScreen.routeName,
+          arguments: _pick.files[0].path,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +81,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
               child: Icon(Icons.settings_backup_restore_rounded),
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: _onRestorePressed,
+            onPressed: () => _onRestorePressed(),
           )),
         ],
       ),

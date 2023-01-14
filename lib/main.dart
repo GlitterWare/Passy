@@ -25,9 +25,7 @@ import 'screens/identities_screen.dart';
 import 'screens/notes_screen.dart';
 import 'screens/id_cards_screen.dart';
 import 'screens/backup_and_restore_screen.dart';
-import 'screens/backup_screen.dart';
 import 'screens/biometric_auth_screen.dart';
-import 'screens/restore_screen.dart';
 import 'screens/add_account_screen.dart';
 import 'screens/connect_screen.dart';
 import 'screens/edit_custom_field_screen.dart';
@@ -110,7 +108,6 @@ class Passy extends StatelessWidget {
             const AutomaticBackupScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
             const BackupAndRestoreScreen(),
-        BackupScreen.routeName: (context) => const BackupScreen(),
         BiometricAuthScreen.routeName: (context) => const BiometricAuthScreen(),
         ChangePasswordScreen.routeName: (context) =>
             const ChangePasswordScreen(),
@@ -149,7 +146,6 @@ class Passy extends StatelessWidget {
         PaymentCardScreen.routeName: (context) => const PaymentCardScreen(),
         PaymentCardsScreen.routeName: (context) => const PaymentCardsScreen(),
         RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),
-        RestoreScreen.routeName: (context) => const RestoreScreen(),
         SearchScreen.routeName: (context) => const SearchScreen(),
         SecurityScreen.routeName: (context) => const SecurityScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
