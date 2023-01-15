@@ -17,6 +17,9 @@ bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
   return '$priorChar$char' == lineDelimiter;
 }
 
+/// Reads one line and returns its contents.
+///
+/// If end-of-file has been reached and the line is empty null is returned.
 String? readLine(RandomAccessFile raf,
     {String lineDelimiter = '\n', void Function()? onEOF}) {
   String line = '';
@@ -35,18 +38,21 @@ String? readLine(RandomAccessFile raf,
   return line;
 }
 
-void skipLine(RandomAccessFile raf,
+/// Skips one line and returns the last byte read.
+///
+/// If end-of-file has been reached -1 is returned.
+int skipLine(RandomAccessFile raf,
     {String lineDelimiter = '\n', void Function()? onEOF}) {
   int byte;
   String priorChar = '';
   byte = raf.readByteSync();
   while (byte != -1) {
     String char = utf8.decode([byte]);
-    if (isLineDelimiter(priorChar, char, lineDelimiter)) return;
+    if (isLineDelimiter(priorChar, char, lineDelimiter)) return byte;
     priorChar = char;
     byte = raf.readByteSync();
   }
-  onEOF?.call();
+  return byte;
 }
 
 void copyDirectorySync(Directory source, Directory destination) {
@@ -227,4 +233,40 @@ List csvDecode(String source,
   }
 
   return _decode(source);
+}
+
+/// Reads all lines in the file and executes [onLine] per each.
+///
+/// If [onLine] returns true the function terminates.
+void processLines(
+  RandomAccessFile raf, {
+  String lineDelimiter = '\n',
+  required bool? Function(String line, bool eofReached) onLine,
+}) {
+  bool _eofReached = false;
+  do {
+    String? _line;
+    _line = readLine(raf,
+        lineDelimiter: lineDelimiter, onEOF: () => _eofReached = true);
+    if (_line == null) return;
+    if (onLine(_line, _eofReached) == true) return;
+  } while (!_eofReached);
+}
+
+/// Reads all lines in the file and executes [onLine] per each.
+///
+/// If [onLine] returns true the function terminates.
+Future<void> processLinesAsync(
+  RandomAccessFile raf, {
+  String lineDelimiter = '\n',
+  required Future<bool?> Function(String line, bool eofReached) onLine,
+}) async {
+  bool _eofReached = false;
+  do {
+    String? _line;
+    _line = readLine(raf,
+        lineDelimiter: lineDelimiter, onEOF: () => _eofReached = true);
+    if (_line == null) return;
+    if (await onLine(_line, _eofReached) == true) return;
+  } while (!_eofReached);
 }

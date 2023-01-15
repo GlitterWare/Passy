@@ -259,6 +259,9 @@ class LoadedAccount {
   void saveHistorySync() => _history.saveSync();
 
   // Passwords wrappers
+  List<String> get passwordKeys => _passwords.keys;
+  Iterable<PasswordMeta> get passwordMetadata =>
+      _passwords.metadata.map((e) => e as PasswordMeta);
   Map<String, Password> get passwords => _passwords.entries;
 
   Password? getPassword(String key) => _passwords.getEntry(key);
@@ -282,6 +285,9 @@ class LoadedAccount {
   }
 
   // Notes wrappers
+  List<String> get notesKeys => _notes.keys;
+  Iterable<NoteMeta> get notesMetadata =>
+      _notes.metadata.map((e) => e as NoteMeta);
   Map<String, Note> get notes => _notes.entries;
 
   Note? getNote(String key) => _notes.getEntry(key);
@@ -307,6 +313,9 @@ class LoadedAccount {
   }
 
   // Payment Cards wrappers
+  List<String> get paymentCardKeys => _paymentCards.keys;
+  Iterable<PaymentCardMeta> get paymentCardMetadata =>
+      _paymentCards.metadata.map((e) => e as PaymentCardMeta);
   Map<String, PaymentCard> get paymentCards => _paymentCards.entries;
 
   PaymentCard? getPaymentCard(String key) => _paymentCards.getEntry(key);
@@ -333,6 +342,9 @@ class LoadedAccount {
   }
 
   // ID Cards wrappers
+  List<String> get idCardsKeys => _idCards.keys;
+  Iterable<IDCardMeta> get idCardsMetadata =>
+      _idCards.metadata.map((e) => e as IDCardMeta);
   Map<String, IDCard> get idCards => _idCards.entries;
 
   IDCard? getIDCard(String key) => _idCards.getEntry(key);
@@ -357,6 +369,9 @@ class LoadedAccount {
   }
 
   // Identities wrappers
+  List<String> get identitiesKeys => _identities.keys;
+  Iterable<IdentityMeta> get identityMetadata =>
+      _identities.metadata.map((e) => e as IdentityMeta);
   Map<String, Identity> get identities => _identities.entries;
 
   Identity? getIdentity(String key) => _identities.getEntry(key);
