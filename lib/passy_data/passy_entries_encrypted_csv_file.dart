@@ -29,8 +29,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>>
       RandomAccessFile _file = file.openSync();
       bool eofReached = false;
       do {
-        String line = readLine(_file, onEOF: () => eofReached = true) ?? '';
-        if (line == '') continue;
+        String? line = readLine(_file, onEOF: () => eofReached = true);
+        if (line == null) continue;
         List<dynamic> _decoded1 = csvDecode(line);
         List<dynamic> _decoded2 = csvDecode(
             decrypt(_decoded1[1], encrypter: encrypter),
@@ -74,5 +74,25 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>>
       _file.writeAsStringSync(_encodeEntryForSaving(_entry),
           mode: FileMode.append);
     }
+  }
+
+  T? getEntry(String key) {
+    RandomAccessFile _raf = _file.openSync();
+    bool _eofReached = false;
+    void _onEOF() => _eofReached = true;
+    do {
+      String? _key = readLine(_raf, lineDelimiter: ',', onEOF: _onEOF);
+      if (_key == null) continue;
+      if (_key == key) {
+        if (_eofReached) return null;
+        String? _entry = readLine(_raf, onEOF: _onEOF);
+        if (_entry == null) return null;
+        return PassyEntry.fromCSV(entryTypeFromType(T)!)(csvDecode(
+            decrypt(_entry, encrypter: _encrypter),
+            recursive: true)) as T;
+      }
+      skipLine(_raf, onEOF: _onEOF);
+    } while (_eofReached == false);
+    return null;
   }
 }
