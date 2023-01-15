@@ -8,14 +8,13 @@ import 'dart:io';
 
 const String passyVersion = '1.2.0';
 const String syncVersion = '1.0.0';
-const String accountVersion = '1.1.0';
+const String accountVersion = '2.0.0';
 
 bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
   if (lineDelimiter.length == 1) {
     return char == lineDelimiter;
-  } else {
-    return priorChar + char == lineDelimiter;
   }
+  return '$priorChar$char' == lineDelimiter;
 }
 
 String? readLine(RandomAccessFile raf,
@@ -25,15 +24,29 @@ String? readLine(RandomAccessFile raf,
   String priorChar = '';
   byte = raf.readByteSync();
   while (byte != -1) {
-    var char = utf8.decode([byte]);
+    String char = utf8.decode([byte]);
     if (isLineDelimiter(priorChar, char, lineDelimiter)) return line;
     line += char;
     priorChar = char;
     byte = raf.readByteSync();
   }
-  if (byte == -1) onEOF?.call();
+  onEOF?.call();
   if (line.isEmpty) return null;
   return line;
+}
+
+void skipLine(RandomAccessFile raf,
+    {String lineDelimiter = '\n', void Function()? onEOF}) {
+  int byte;
+  String priorChar = '';
+  byte = raf.readByteSync();
+  while (byte != -1) {
+    String char = utf8.decode([byte]);
+    if (isLineDelimiter(priorChar, char, lineDelimiter)) return;
+    priorChar = char;
+    byte = raf.readByteSync();
+  }
+  onEOF?.call();
 }
 
 void copyDirectorySync(Directory source, Directory destination) {

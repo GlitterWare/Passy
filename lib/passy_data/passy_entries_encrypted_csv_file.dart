@@ -1,5 +1,6 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/saveable_file_base.dart';
 import 'dart:io';
@@ -24,18 +25,23 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>>
     required Encrypter encrypter,
   }) {
     if (file.existsSync()) {
-      String _decrypted =
-          decrypt(file.readAsStringSync(), encrypter: encrypter);
-      List<String> _split = _decrypted.split('\n');
-      List<List> _decoded = [];
-      for (String s in _split) {
-        if (s == '') continue;
-        _decoded.add(csvDecode(s, recursive: true));
-      }
+      Map<String, T> _entries = {};
+      RandomAccessFile _file = file.openSync();
+      bool eofReached = false;
+      do {
+        String line = readLine(_file, onEOF: () => eofReached = true) ?? '';
+        if (line == '') continue;
+        List<dynamic> _decoded1 = csvDecode(line);
+        List<dynamic> _decoded2 = csvDecode(
+            decrypt(_decoded1[1], encrypter: encrypter),
+            recursive: true);
+        _entries[_decoded1[0]] =
+            (PassyEntry.fromCSV(entryTypeFromType(T)!)(_decoded2) as T);
+      } while (eofReached == false);
       return PassyEntriesEncryptedCSVFile<T>(
         file,
         encrypter: encrypter,
-        value: PassyEntries<T>.fromCSV(_decoded),
+        value: PassyEntries<T>(entries: _entries),
       );
     }
     file.createSync(recursive: true);
@@ -50,9 +56,10 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>>
   String _save() {
     String _result = '';
     for (List _value in value.toCSV()) {
-      _result += csvEncode(_value) + '\n';
+      String _key = _value[0];
+      _result += '$_key,${encrypt(csvEncode(_value), encrypter: _encrypter)}\n';
     }
-    return _result == '' ? '' : encrypt(_result, encrypter: _encrypter);
+    return _result;
   }
 
   @override

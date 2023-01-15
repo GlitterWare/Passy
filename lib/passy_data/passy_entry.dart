@@ -33,7 +33,7 @@ abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
     }
   }
 
-  static PassyEntry Function(List csv) fromCSV(EntryType entryType) {
+  static PassyEntry Function(List csv) fromCSV<T>(entryType) {
     switch (entryType) {
       case EntryType.password:
         return Password.fromCSV;
