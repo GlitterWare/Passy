@@ -1,3 +1,6 @@
+import 'package:passy/passy_data/entry_meta.dart';
+import 'package:passy/passy_data/json_convertable.dart';
+
 import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
@@ -6,6 +9,22 @@ import 'passy_entry.dart';
 typedef IDCards = PassyEntries<IDCard>;
 
 typedef IDCardsFile = PassyEntriesEncryptedCSVFile<IDCard>;
+
+class IDCardMeta extends EntryMeta {
+  final List<String> tags;
+  final String nickname;
+  final String name;
+
+  IDCardMeta(String key, this.tags, this.nickname, this.name) : super(key);
+
+  @override
+  toJson() => {
+        'key': key,
+        'tags': tags,
+        'nickname': nickname,
+        'name': name,
+      };
+}
 
 class IDCard extends PassyEntry<IDCard> {
   List<CustomField> customFields;
@@ -37,6 +56,9 @@ class IDCard extends PassyEntry<IDCard> {
         customFields = customFields ?? [],
         tags = tags ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
+
+  @override
+  IDCardMeta get metadata => IDCardMeta(key, tags.toList(), nickname, name);
 
   IDCard.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

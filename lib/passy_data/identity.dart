@@ -1,3 +1,5 @@
+import 'package:passy/passy_data/entry_meta.dart';
+
 import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
@@ -35,6 +37,23 @@ Gender? genderFromName(String name) {
       return Gender.other;
   }
   return null;
+}
+
+class IdentityMeta extends EntryMeta {
+  final List<String> tags;
+  final String nickname;
+  final String firstAddressLine;
+
+  IdentityMeta(String key, this.tags, this.nickname, this.firstAddressLine)
+      : super(key);
+
+  @override
+  toJson() => {
+        'key': key,
+        'tags': tags,
+        'nickname': nickname,
+        'firstAddressLine': firstAddressLine,
+      };
 }
 
 class Identity extends PassyEntry<Identity> {
@@ -76,6 +95,10 @@ class Identity extends PassyEntry<Identity> {
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
+
+  @override
+  IdentityMeta get metadata =>
+      IdentityMeta(key, tags.toList(), nickname, firstAddressLine);
 
   Identity.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

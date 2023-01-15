@@ -1,3 +1,5 @@
+import 'package:passy/passy_data/entry_meta.dart';
+
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
 import 'passy_entry.dart';
@@ -5,6 +7,18 @@ import 'passy_entry.dart';
 typedef Notes = PassyEntries<Note>;
 
 typedef NotesFile = PassyEntriesEncryptedCSVFile<Note>;
+
+class NoteMeta extends EntryMeta {
+  final String title;
+
+  NoteMeta(String key, this.title) : super(key);
+
+  @override
+  toJson() => {
+        'key': key,
+        'title': title,
+      };
+}
 
 class Note extends PassyEntry<Note> {
   String title;
@@ -15,6 +29,9 @@ class Note extends PassyEntry<Note> {
     this.title = '',
     this.note = '',
   }) : super(key ?? DateTime.now().toUtc().toIso8601String());
+
+  @override
+  EntryMeta get metadata => NoteMeta(key, title);
 
   Note.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? '',

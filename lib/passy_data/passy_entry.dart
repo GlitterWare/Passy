@@ -1,3 +1,5 @@
+import 'package:passy/passy_data/entry_meta.dart';
+
 import 'csv_convertable.dart';
 import 'entry_type.dart';
 import 'id_card.dart';
@@ -12,6 +14,7 @@ abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
 
   PassyEntry(this.key);
 
+  EntryMeta get metadata;
   int compareTo(T other);
 
   static PassyEntry Function(Map<String, dynamic> json) fromJson(

@@ -1,3 +1,4 @@
+import 'package:passy/passy_data/entry_meta.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 
 import 'custom_field.dart';
@@ -7,6 +8,23 @@ import 'passy_entry.dart';
 typedef PaymentCards = PassyEntries<PaymentCard>;
 
 typedef PaymentCardsFile = PassyEntriesEncryptedCSVFile<PaymentCard>;
+
+class PaymentCardMeta extends EntryMeta {
+  final List<String> tags;
+  final String nickname;
+  final String cardholderName;
+
+  PaymentCardMeta(String key, this.tags, this.nickname, this.cardholderName)
+      : super(key);
+
+  @override
+  toJson() => {
+        'key': key,
+        'tags': tags,
+        'nickname': nickname,
+        'cardholderName': cardholderName,
+      };
+}
 
 class PaymentCard extends PassyEntry<PaymentCard> {
   List<CustomField> customFields;
@@ -31,6 +49,10 @@ class PaymentCard extends PassyEntry<PaymentCard> {
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
+
+  @override
+  PaymentCardMeta get metadata =>
+      PaymentCardMeta(key, tags.toList(), nickname, cardholderName);
 
   PaymentCard.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

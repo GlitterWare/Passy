@@ -1,3 +1,5 @@
+import 'package:passy/passy_data/entry_meta.dart';
+
 import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
@@ -7,6 +9,23 @@ import 'tfa.dart';
 typedef Passwords = PassyEntries<Password>;
 
 typedef PasswordsFile = PassyEntriesEncryptedCSVFile<Password>;
+
+class PasswordMeta extends EntryMeta {
+  final List<String> tags;
+  final String nickname;
+  final String username;
+
+  PasswordMeta(String key, this.tags, this.nickname, this.username)
+      : super(key);
+
+  @override
+  toJson() => {
+        'key': key,
+        'tags': tags,
+        'nickname': nickname,
+        'username': username,
+      };
+}
 
 class Password extends PassyEntry<Password> {
   List<CustomField> customFields;
@@ -35,6 +54,10 @@ class Password extends PassyEntry<Password> {
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
+
+  @override
+  PasswordMeta get metadata =>
+      PasswordMeta(key, tags.toList(), nickname, username);
 
   Password.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)
