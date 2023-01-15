@@ -30,7 +30,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         arguments: (String terms) {
       final List<IDCard> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IDCard _idCard in _account.idCards) {
+      for (IDCard _idCard in _account.idCards.values) {
         {
           bool testIDCard(IDCard value) => _idCard.key == value.key;
 
@@ -95,7 +95,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
               ],
             )
           : IDCardButtonListView(
-              idCards: _account.idCards.toList(),
+              idCards: _account.idCards.values.toList(),
               shouldSort: true,
               onPressed: (idCard) => Navigator.pushNamed(
                   context, IDCardScreen.routeName,

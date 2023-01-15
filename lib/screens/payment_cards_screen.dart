@@ -28,7 +28,8 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
       arguments: (String terms) {
         final List<PaymentCard> _found = [];
         final List<String> _terms = terms.trim().toLowerCase().split(' ');
-        for (PaymentCard _paymentCard in data.loadedAccount!.paymentCards) {
+        for (PaymentCard _paymentCard
+            in data.loadedAccount!.paymentCards.values) {
           {
             bool testPaymentCard(PaymentCard value) =>
                 _paymentCard.key == value.key;
@@ -102,7 +103,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
               ],
             )
           : PaymentCardButtonListView(
-              paymentCards: _account.paymentCards.toList(),
+              paymentCards: _account.paymentCards.values.toList(),
               shouldSort: true,
               onPressed: (paymentCard) => {
                 Navigator.pushNamed(context, PaymentCardScreen.routeName,

@@ -54,10 +54,8 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
       expDate: _expDate,
       country: _country,
     );
-    _account.setIDCard(_idCardArgs);
+    await _account.setIDCard(_idCardArgs);
     Navigator.pushNamed(context, SplashScreen.routeName);
-    await _account.saveIDCards();
-    await _account.saveHistory();
     Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
     Navigator.pushNamed(context, IDCardsScreen.routeName);
     Navigator.pushNamed(context, IDCardScreen.routeName,

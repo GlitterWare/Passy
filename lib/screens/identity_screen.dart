@@ -6,6 +6,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/splash_screen.dart';
 
 import 'main_screen.dart';
 import 'edit_identity_screen.dart';
@@ -53,11 +54,12 @@ class _IdentityScreen extends State<IdentityScreen> {
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
-                  _account.removeIdentity(_identity.key);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.saveIdentities().whenComplete(() =>
-                      Navigator.pushNamed(context, IdentitiesScreen.routeName));
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  _account.removeIdentity(_identity.key).whenComplete(() {
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, IdentitiesScreen.routeName);
+                  });
                 },
               )
             ],

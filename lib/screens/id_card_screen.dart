@@ -6,6 +6,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/splash_screen.dart';
 
 import 'edit_id_card_screen.dart';
 import 'id_cards_screen.dart';
@@ -52,11 +53,12 @@ class _IDCardScreen extends State<IDCardScreen> {
                         TextStyle(color: PassyTheme.lightContentSecondaryColor),
                   ),
                   onPressed: () {
-                    _account.removeIDCard(_idCard.key);
-                    Navigator.popUntil(context,
-                        (r) => r.settings.name == MainScreen.routeName);
-                    _account.saveIDCards().whenComplete(() =>
-                        Navigator.pushNamed(context, IDCardsScreen.routeName));
+                    Navigator.pushNamed(context, SplashScreen.routeName);
+                    _account.removeIDCard(_idCard.key).whenComplete(() {
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(context, IDCardsScreen.routeName);
+                    });
                   },
                 )
               ],

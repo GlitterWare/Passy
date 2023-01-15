@@ -28,7 +28,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
   Widget _buildPasswords(String terms) {
     List<Password> _found = PassySearch.searchPasswords(
-        passwords: _account.passwords, terms: terms);
+        passwords: _account.passwords.values, terms: terms);
     return PasswordButtonListView(
       passwords: _found,
       onPressed: (password) => Navigator.pushNamed(
@@ -73,7 +73,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
               ],
             )
           : PasswordButtonListView(
-              passwords: _account.passwords.toList(),
+              passwords: _account.passwords.values.toList(),
               onPressed: (password) => Navigator.pushNamed(
                   context, PasswordScreen.routeName,
                   arguments: password),

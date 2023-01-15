@@ -29,7 +29,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         arguments: (String terms) {
       final List<Identity> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (Identity _identity in _account.identities) {
+      for (Identity _identity in _account.identities.values) {
         {
           bool testIdentity(Identity value) => _identity.key == value.key;
 
@@ -94,7 +94,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
               ],
             )
           : IdentityButtonListView(
-              identities: _account.identities.toList(),
+              identities: _account.identities.values.toList(),
               shouldSort: true,
               onPressed: (identity) => Navigator.pushNamed(
                 context,

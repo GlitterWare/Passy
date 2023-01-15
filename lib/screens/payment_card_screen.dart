@@ -9,6 +9,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'main_screen.dart';
 import 'edit_payment_card_screen.dart';
 import 'payment_cards_screen.dart';
+import 'splash_screen.dart';
 
 class PaymentCardScreen extends StatefulWidget {
   const PaymentCardScreen({Key? key}) : super(key: key);
@@ -46,12 +47,12 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                 ),
                 onPressed: () {
                   LoadedAccount _account = data.loadedAccount!;
-                  _account.removePaymentCard(paymentCard.key);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.savePaymentCards().whenComplete(() =>
-                      Navigator.pushNamed(
-                          context, PaymentCardsScreen.routeName));
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  _account.removePaymentCard(paymentCard.key).whenComplete(() {
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+                  });
                 },
               )
             ],

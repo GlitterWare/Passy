@@ -107,10 +107,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                   ),
             website: _website,
           );
-          _account.setPassword(_passwordArgs);
+          await _account.setPassword(_passwordArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
-          await _account.savePasswords();
-          await _account.saveHistory();
           Navigator.popUntil(
               context, (r) => r.settings.name == MainScreen.routeName);
           Navigator.pushNamed(context, PasswordsScreen.routeName);

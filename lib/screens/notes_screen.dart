@@ -30,7 +30,7 @@ class _NotesScreen extends State<NotesScreen> {
         arguments: (String terms) {
       final List<Note> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (Note _note in _account.notes) {
+      for (Note _note in _account.notes.values) {
         {
           bool testNote(Note value) => _note.key == value.key;
 
@@ -88,7 +88,7 @@ class _NotesScreen extends State<NotesScreen> {
               ],
             )
           : NoteButtonListView(
-              notes: data.loadedAccount!.notes.toList(),
+              notes: data.loadedAccount!.notes.values.toList(),
               shouldSort: true,
               onPressed: (note) => Navigator.pushNamed(
                   context, NoteScreen.routeName,

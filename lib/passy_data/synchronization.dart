@@ -233,7 +233,7 @@ class Synchronization {
           _events[_entryData.key] = _entryData.event;
           continue;
         }
-        _loadedAccount.setEntry(_entryData.type)(
+        await _loadedAccount.setEntry(_entryData.type)(
             PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
         _events[_entryData.key] = _entryData.event;
         _entriesAdded += 1;

@@ -39,6 +39,5 @@ class PassyEntriesJSONFile<T extends PassyEntry<T>> with SaveableFileBase {
 
   PassyEntriesEncryptedCSVFile<T> toPassyEntriesEncryptedCSVFile(
           Encrypter encrypter) =>
-      PassyEntriesEncryptedCSVFile<T>(_file,
-          encrypter: encrypter, value: value);
+      PassyEntriesEncryptedCSVFile<T>(_file, encrypter: encrypter);
 }

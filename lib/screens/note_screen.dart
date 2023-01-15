@@ -8,6 +8,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'main_screen.dart';
 import 'edit_note_screen.dart';
 import 'notes_screen.dart';
+import 'splash_screen.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({Key? key}) : super(key: key);
@@ -45,11 +46,12 @@ class _NoteScreen extends State<NoteScreen> {
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
-                  _account.removeNote(note.key);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.saveNotes().whenComplete(() =>
-                      Navigator.pushNamed(context, NotesScreen.routeName));
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  _account.removeNote(note.key).whenComplete(() {
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, NotesScreen.routeName);
+                  });
                 },
               )
             ],

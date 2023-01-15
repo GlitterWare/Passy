@@ -19,6 +19,7 @@ import 'id_card.dart';
 import 'identity.dart';
 import 'note.dart';
 import 'password.dart';
+import 'passy_entries.dart';
 import 'passy_entry.dart';
 import 'payment_card.dart';
 import 'synchronization.dart';
@@ -131,11 +132,6 @@ class LoadedAccount {
         _localSettings.save(),
         _settings.save(),
         _history.save(),
-        _passwords.save(),
-        _notes.save(),
-        _paymentCards.save(),
-        _idCards.save(),
-        _identities.save(),
       ]);
 
   void saveSync() {
@@ -144,11 +140,6 @@ class LoadedAccount {
     _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
-    _passwords.saveSync();
-    _notes.saveSync();
-    _paymentCards.saveSync();
-    _idCards.saveSync();
-    _identities.saveSync();
   }
 
   Synchronization getSynchronization({
@@ -185,7 +176,7 @@ class LoadedAccount {
         .connect(address);
   }
 
-  void Function(PassyEntry value) setEntry(EntryType type) {
+  Future<void> Function(PassyEntry value) setEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
         return (PassyEntry value) => setPassword(value as Password);
@@ -268,155 +259,127 @@ class LoadedAccount {
   void saveHistorySync() => _history.saveSync();
 
   // Passwords wrappers
-  Iterable<Password> get passwords => _passwords.value.entries;
+  Map<String, Password> get passwords => _passwords.entries;
 
-  Password? getPassword(String key) => _passwords.value.getEntry(key);
+  Password? getPassword(String key) => _passwords.getEntry(key);
 
-  void setPassword(Password password) {
+  Future<void> setPassword(Password password) async {
     _history.value.passwords[password.key] = EntryEvent(password.key,
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
-    _passwords.value.setEntry(password);
+    Future<void> _saveFuture =
+        _passwords.setEntry(password.key, entry: password);
+    await _history.save();
+    await _saveFuture;
   }
 
-  void removePassword(String key) {
+  Future<void> removePassword(String key) async {
     _history.value.passwords[key]!
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
-    _passwords.value.removeEntry(key);
-  }
-
-  Future<void> savePasswords() async {
-    await _passwords.save();
+    Future<void> _saveFuture = _passwords.setEntry(key);
     await _history.save();
-  }
-
-  void savePasswordsSync() {
-    _passwords.saveSync();
-    _history.saveSync();
+    await _saveFuture;
   }
 
   // Notes wrappers
-  Iterable<Note> get notes => _notes.value.entries;
+  Map<String, Note> get notes => _notes.entries;
 
-  Note? getNote(String key) => _notes.value.getEntry(key);
+  Note? getNote(String key) => _notes.getEntry(key);
 
-  void setNote(Note note) {
+  Future<void> setNote(Note note) async {
     _history.value.notes[note.key] = EntryEvent(
       note.key,
       status: EntryStatus.alive,
       lastModified: DateTime.now().toUtc(),
     );
-    _notes.value.setEntry(note);
+    Future<void> _saveFuture = _notes.setEntry(note.key, entry: note);
+    await _history.save();
+    await _saveFuture;
   }
 
-  void removeNote(String key) {
+  Future<void> removeNote(String key) async {
     _history.value.notes[key]!
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
-    _notes.value.removeEntry(key);
-  }
-
-  Future<void> saveNotes() async {
-    await _notes.save();
+    Future<void> _saveFuture = _notes.setEntry(key);
     await _history.save();
-  }
-
-  void saveNotesSync() {
-    _notes.saveSync();
-    _history.saveSync();
+    await _saveFuture;
   }
 
   // Payment Cards wrappers
-  Iterable<PaymentCard> get paymentCards => _paymentCards.value.entries;
+  Map<String, PaymentCard> get paymentCards => _paymentCards.entries;
 
-  PaymentCard? getPaymentCard(String key) => _paymentCards.value.getEntry(key);
+  PaymentCard? getPaymentCard(String key) => _paymentCards.getEntry(key);
 
-  void setPaymentCard(PaymentCard paymentCard) {
+  Future<void> setPaymentCard(PaymentCard paymentCard) async {
     _history.value.paymentCards[paymentCard.key] = EntryEvent(
       paymentCard.key,
       status: EntryStatus.alive,
       lastModified: DateTime.now().toUtc(),
     );
-    _paymentCards.value.setEntry(paymentCard);
+    Future<void> _saveFuture =
+        _paymentCards.setEntry(paymentCard.key, entry: paymentCard);
+    await _history.save();
+    await _saveFuture;
   }
 
-  void removePaymentCard(String key) {
+  Future<void> removePaymentCard(String key) async {
     _history.value.paymentCards[key]!
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
-    _paymentCards.value.removeEntry(key);
-  }
-
-  Future<void> savePaymentCards() async {
-    await _paymentCards.save();
+    Future<void> _saveFuture = _paymentCards.setEntry(key);
     await _history.save();
-  }
-
-  void savePaymentCardsSync() {
-    _paymentCards.saveSync();
-    _history.saveSync();
+    await _saveFuture;
   }
 
   // ID Cards wrappers
-  Iterable<IDCard> get idCards => _idCards.value.entries;
+  Map<String, IDCard> get idCards => _idCards.entries;
 
-  IDCard? getIDCard(String key) => _idCards.value.getEntry(key);
+  IDCard? getIDCard(String key) => _idCards.getEntry(key);
 
-  void setIDCard(IDCard idCard) {
+  Future<void> setIDCard(IDCard idCard) async {
     _history.value.idCards[idCard.key] = EntryEvent(
       idCard.key,
       status: EntryStatus.alive,
       lastModified: DateTime.now().toUtc(),
     );
-    _idCards.value.setEntry(idCard);
-  }
-
-  void removeIDCard(String key) {
-    _history.value.idCards[key]!
-      ..status = EntryStatus.removed
-      ..lastModified = DateTime.now().toUtc();
-    _idCards.value.removeEntry(key);
-  }
-
-  Future<void> saveIDCards() async {
-    await _idCards.save();
+    await _idCards.setEntry(idCard.key, entry: idCard);
     await _history.save();
   }
 
-  void saveIDCardsSync() {
-    _idCards.saveSync();
-    _history.saveSync();
+  Future<void> removeIDCard(String key) async {
+    _history.value.idCards[key]!
+      ..status = EntryStatus.removed
+      ..lastModified = DateTime.now().toUtc();
+    Future<void> _saveFuture = _idCards.setEntry(key);
+    await _history.save();
+    await _saveFuture;
   }
 
   // Identities wrappers
-  Iterable<Identity> get identities => _identities.value.entries;
+  Map<String, Identity> get identities => _identities.entries;
 
-  Identity? getIdentity(String key) => _identities.value.getEntry(key);
+  Identity? getIdentity(String key) => _identities.getEntry(key);
 
-  void setIdentity(Identity identity) {
+  Future<void> setIdentity(Identity identity) async {
     _history.value.identities[identity.key] = EntryEvent(
       identity.key,
       status: EntryStatus.alive,
       lastModified: DateTime.now().toUtc(),
     );
-    _identities.value.setEntry(identity);
+    Future<void> _saveFuture =
+        _identities.setEntry(identity.key, entry: identity);
+    await _history.save();
+    await _saveFuture;
   }
 
-  void removeIdentity(String key) {
+  Future<void> removeIdentity(String key) async {
     _history.value.identities[key]!
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
-    _identities.value.removeEntry(key);
-  }
-
-  Future<void> saveIdentities() async {
-    await _identities.save();
+    Future<void> _saveFuture = _identities.setEntry(key);
     await _history.save();
-  }
-
-  void saveIdentitiesSync() {
-    _identities.saveSync();
-    _history.saveSync();
+    await _saveFuture;
   }
 }
 
@@ -547,22 +510,29 @@ class JSONLoadedAccount {
                 encrypter: encrypter)
             .value);
     passwords ??= PassyEntriesJSONFile<Password>(_passwordsFile,
-        value:
-            Passwords.fromFile<Password>(_passwordsFile, encrypter: encrypter)
-                .value);
+        value: PassyEntries(
+            entries: Passwords.fromFile<Password>(_passwordsFile,
+                    encrypter: encrypter)
+                .entries));
     notes ??= PassyEntriesJSONFile<Note>(_notesFile,
-        value: Notes.fromFile<Note>(_notesFile, encrypter: encrypter).value);
+        value: PassyEntries(
+            entries: Notes.fromFile<Note>(_notesFile, encrypter: encrypter)
+                .entries));
     paymentCards ??= PassyEntriesJSONFile<PaymentCard>(_paymentCardsFile,
-        value: PaymentCards.fromFile<PaymentCard>(_paymentCardsFile,
-                encrypter: encrypter)
-            .value);
+        value: PassyEntries(
+            entries: PaymentCards.fromFile<PaymentCard>(_paymentCardsFile,
+                    encrypter: encrypter)
+                .entries));
     idCards ??= PassyEntriesJSONFile<IDCard>(_idCardsFile,
-        value:
-            IDCards.fromFile<IDCard>(_idCardsFile, encrypter: encrypter).value);
+        value: PassyEntries(
+            entries:
+                IDCards.fromFile<IDCard>(_idCardsFile, encrypter: encrypter)
+                    .entries));
     identities ??= PassyEntriesJSONFile<Identity>(_identitiesFile,
-        value:
-            Identities.fromFile<Identity>(_identitiesFile, encrypter: encrypter)
-                .value);
+        value: PassyEntries(
+            entries: Identities.fromFile<Identity>(_identitiesFile,
+                    encrypter: encrypter)
+                .entries));
     return JSONLoadedAccount(
       versionFile: versionFile,
       credentials: credentials,

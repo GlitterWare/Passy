@@ -15,6 +15,7 @@ import 'package:passy/screens/common.dart';
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
+import 'splash_screen.dart';
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({Key? key}) : super(key: key);
@@ -98,11 +99,12 @@ class _PasswordScreen extends State<PasswordScreen> {
                       TextStyle(color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
-                  _account.removePassword(password.key);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  _account.savePasswords().whenComplete(() =>
-                      Navigator.pushNamed(context, PasswordsScreen.routeName));
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  _account.removePassword(password.key).whenComplete(() {
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, PasswordsScreen.routeName);
+                  });
                 },
               )
             ],
