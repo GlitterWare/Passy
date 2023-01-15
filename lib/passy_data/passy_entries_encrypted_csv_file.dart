@@ -53,18 +53,26 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>>
     return _file;
   }
 
-  String _save() {
-    String _result = '';
-    for (List _value in value.toCSV()) {
-      String _key = _value[0];
-      _result += '$_key,${encrypt(csvEncode(_value), encrypter: _encrypter)}\n';
-    }
-    return _result;
+  String _encodeEntryForSaving(List<dynamic> _entry) {
+    String _key = _entry[0];
+    return '$_key,${encrypt(csvEncode(_entry), encrypter: _encrypter)}\n';
   }
 
   @override
-  Future<void> save() => _file.writeAsString(_save());
+  Future<void> save() async {
+    await _file.writeAsString('');
+    for (List _entry in value.toCSV()) {
+      await _file.writeAsString(_encodeEntryForSaving(_entry),
+          mode: FileMode.append);
+    }
+  }
 
   @override
-  void saveSync() => _file.writeAsStringSync(_save());
+  void saveSync() {
+    _file.writeAsStringSync('');
+    for (List _entry in value.toCSV()) {
+      _file.writeAsStringSync(_encodeEntryForSaving(_entry),
+          mode: FileMode.append);
+    }
+  }
 }
