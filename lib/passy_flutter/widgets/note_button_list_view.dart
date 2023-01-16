@@ -3,9 +3,9 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class NoteButtonListView extends StatelessWidget {
-  final List<Note> notes;
+  final List<NoteMeta> notes;
   final bool shouldSort;
-  final void Function(Note note)? onPressed;
+  final void Function(NoteMeta note)? onPressed;
 
   const NoteButtonListView({
     Key? key,
@@ -19,7 +19,7 @@ class NoteButtonListView extends StatelessWidget {
     if (shouldSort) PassySort.sortNotes(notes);
     return ListView(
       children: [
-        for (Note note in notes)
+        for (NoteMeta note in notes)
           PassyPadding(NoteButton(
             note: note,
             onPressed: () => onPressed?.call(note),

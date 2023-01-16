@@ -3,7 +3,7 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class IdentityButton extends StatelessWidget {
-  final Identity identity;
+  final IdentityMeta identity;
   final void Function()? onPressed;
 
   const IdentityButton({

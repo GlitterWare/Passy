@@ -26,12 +26,12 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
       context,
       SearchScreen.routeName,
       arguments: (String terms) {
-        final List<PaymentCard> _found = [];
+        final List<PaymentCardMeta> _found = [];
         final List<String> _terms = terms.trim().toLowerCase().split(' ');
-        for (PaymentCard _paymentCard
-            in data.loadedAccount!.paymentCards.values) {
+        for (PaymentCardMeta _paymentCard
+            in data.loadedAccount!.paymentCardMetadata) {
           {
-            bool testPaymentCard(PaymentCard value) =>
+            bool testPaymentCard(PaymentCardMeta value) =>
                 _paymentCard.key == value.key;
 
             if (_found.any(testPaymentCard)) continue;
@@ -62,7 +62,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           shouldSort: true,
           onPressed: (paymentCard) => {
             Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                arguments: paymentCard),
+                arguments: _account.getPaymentCard(paymentCard.key)),
           },
         );
       },
@@ -74,13 +74,14 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<PaymentCardMeta> _paymentCards = _account.paymentCardMetadata.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
         title: const Text('Payment cards'),
         onAddPressed: _onAddPressed,
         onSearchPressed: _onSearchPressed,
       ),
-      body: _account.paymentCards.isEmpty
+      body: _paymentCards.isEmpty
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
@@ -103,11 +104,11 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
               ],
             )
           : PaymentCardButtonListView(
-              paymentCards: _account.paymentCards.values.toList(),
+              paymentCards: _paymentCards,
               shouldSort: true,
               onPressed: (paymentCard) => {
                 Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                    arguments: paymentCard),
+                    arguments: _account.getPaymentCard(paymentCard.key)),
               },
             ),
     );

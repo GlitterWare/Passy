@@ -27,13 +27,13 @@ class _PasswordsScreen extends State<PasswordsScreen> {
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
 
   Widget _buildPasswords(String terms) {
-    List<Password> _found = PassySearch.searchPasswords(
-        passwords: _account.passwords.values, terms: terms);
+    List<PasswordMeta> _found = PassySearch.searchPasswords(
+        passwords: _account.passwordMetadata, terms: terms);
     return PasswordButtonListView(
       passwords: _found,
       onPressed: (password) => Navigator.pushNamed(
           context, PasswordScreen.routeName,
-          arguments: password),
+          arguments: _account.getPassword(password.key)!),
       shouldSort: true,
     );
   }
@@ -45,12 +45,13 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<PasswordMeta> _passwords = _account.passwordMetadata.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Passwords')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: _account.passwords.isEmpty
+      body: _passwords.isEmpty
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
@@ -73,10 +74,10 @@ class _PasswordsScreen extends State<PasswordsScreen> {
               ],
             )
           : PasswordButtonListView(
-              passwords: _account.passwords.values.toList(),
+              passwords: _passwords.toList(),
               onPressed: (password) => Navigator.pushNamed(
                   context, PasswordScreen.routeName,
-                  arguments: password),
+                  arguments: _account.getPassword(password.key)!),
               shouldSort: true,
             ),
     );

@@ -106,12 +106,13 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
       body: ListView(
         children: [
           PaymentCardButton(
-            paymentCard: PaymentCard(
+            paymentCard: PaymentCardMeta(
+              key: '',
+              tags: [],
               nickname: _nickname,
               cardNumber: _cardNumber,
               cardholderName: _cardholderName,
               exp: _exp,
-              cvv: _cvv,
             ),
             obscureCardNumber: false,
             obscureCardCvv: false,

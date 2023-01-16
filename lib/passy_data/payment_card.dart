@@ -12,10 +12,18 @@ typedef PaymentCardsFile = PassyEntriesEncryptedCSVFile<PaymentCard>;
 class PaymentCardMeta extends EntryMeta {
   final List<String> tags;
   final String nickname;
+  final String cardNumber;
   final String cardholderName;
+  final String exp;
 
-  PaymentCardMeta(String key, this.tags, this.nickname, this.cardholderName)
-      : super(key);
+  PaymentCardMeta({
+    required String key,
+    required this.tags,
+    required this.nickname,
+    required this.cardNumber,
+    required this.cardholderName,
+    required this.exp,
+  }) : super(key);
 
   @override
   toJson() => {
@@ -51,8 +59,23 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
-  PaymentCardMeta get metadata =>
-      PaymentCardMeta(key, tags.toList(), nickname, cardholderName);
+  PaymentCardMeta get metadata => PaymentCardMeta(
+      key: key,
+      tags: tags.toList(),
+      nickname: nickname,
+      cardNumber: cardNumber.length < 5
+          ? cardNumber
+          : cardNumber.replaceRange(4, null, '************'),
+      cardholderName: cardholderName,
+      exp: exp);
+
+  PaymentCardMeta get uncensoredMetadata => PaymentCardMeta(
+      key: key,
+      tags: tags,
+      nickname: nickname,
+      cardNumber: cardNumber,
+      cardholderName: cardholderName,
+      exp: exp);
 
   PaymentCard.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

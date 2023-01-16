@@ -3,9 +3,9 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class PaymentCardButtonListView extends StatelessWidget {
-  final List<PaymentCard> paymentCards;
+  final List<PaymentCardMeta> paymentCards;
   final bool shouldSort;
-  final void Function(PaymentCard paymentCard)? onPressed;
+  final void Function(PaymentCardMeta paymentCard)? onPressed;
 
   const PaymentCardButtonListView({
     Key? key,
@@ -19,7 +19,7 @@ class PaymentCardButtonListView extends StatelessWidget {
     if (shouldSort) PassySort.sortPaymentCards(paymentCards);
     return ListView(
       children: [
-        for (PaymentCard paymentCard in paymentCards)
+        for (PaymentCardMeta paymentCard in paymentCards)
           PassyPadding(PaymentCardButton(
             paymentCard: paymentCard,
             onPressed: () => onPressed?.call(paymentCard),

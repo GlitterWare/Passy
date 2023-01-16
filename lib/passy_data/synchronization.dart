@@ -218,7 +218,7 @@ class Synchronization {
         if (_entryData.event.status == EntryStatus.removed) {
           if (_events.containsKey(_entryData.key)) {
             if (_events[_entryData.key]!.status == EntryStatus.alive) {
-              _loadedAccount.removeEntry(_entryData.type)(_entryData.key);
+              await _loadedAccount.removeEntry(_entryData.type)(_entryData.key);
             }
           }
           _events[_entryData.key] = _entryData.event;

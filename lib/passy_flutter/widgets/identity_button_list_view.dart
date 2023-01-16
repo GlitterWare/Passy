@@ -3,9 +3,9 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class IdentityButtonListView extends StatelessWidget {
-  final List<Identity> identities;
+  final List<IdentityMeta> identities;
   final bool shouldSort;
-  final void Function(Identity identity)? onPressed;
+  final void Function(IdentityMeta identity)? onPressed;
 
   const IdentityButtonListView({
     Key? key,
@@ -19,7 +19,7 @@ class IdentityButtonListView extends StatelessWidget {
     if (shouldSort) PassySort.sortIdentities(identities);
     return ListView(
       children: [
-        for (Identity identity in identities)
+        for (IdentityMeta identity in identities)
           PassyPadding(IdentityButton(
             identity: identity,
             onPressed: () => onPressed?.call(identity),

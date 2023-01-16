@@ -80,7 +80,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
       ),
       body: ListView(children: [
         PaymentCardButton(
-          paymentCard: _paymentCard,
+          paymentCard: _paymentCard.uncensoredMetadata,
           obscureCardNumber: false,
           obscureCardCvv: false,
           isSwipeGestureEnabled: false,

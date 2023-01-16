@@ -3,7 +3,7 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class NoteButton extends StatelessWidget {
-  final Note note;
+  final NoteMeta note;
   final void Function()? onPressed;
 
   const NoteButton({

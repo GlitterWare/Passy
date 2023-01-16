@@ -28,11 +28,11 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: (String terms) {
-      final List<IDCard> _found = [];
+      final List<IDCardMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IDCard _idCard in _account.idCards.values) {
+      for (IDCardMeta _idCard in _account.idCardsMetadata) {
         {
-          bool testIDCard(IDCard value) => _idCard.key == value.key;
+          bool testIDCard(IDCardMeta value) => _idCard.key == value.key;
 
           if (_found.any(testIDCard)) continue;
         }
@@ -59,7 +59,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         onPressed: (idCard) => Navigator.pushNamed(
           context,
           IDCardScreen.routeName,
-          arguments: idCard,
+          arguments: _account.getIDCard(idCard.key),
         ),
       );
     });
@@ -67,12 +67,13 @@ class _IDCardsScreen extends State<IDCardsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<IDCardMeta> _idCards = _account.idCardsMetadata.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('ID cards')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: _account.idCards.isEmpty
+      body: _idCards.isEmpty
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
@@ -95,11 +96,11 @@ class _IDCardsScreen extends State<IDCardsScreen> {
               ],
             )
           : IDCardButtonListView(
-              idCards: _account.idCards.values.toList(),
+              idCards: _idCards,
               shouldSort: true,
               onPressed: (idCard) => Navigator.pushNamed(
                   context, IDCardScreen.routeName,
-                  arguments: idCard),
+                  arguments: _account.getIDCard(idCard.key)),
             ),
     );
   }

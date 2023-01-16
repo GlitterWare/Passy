@@ -1,5 +1,4 @@
 import 'package:passy/passy_data/entry_meta.dart';
-import 'package:passy/passy_data/json_convertable.dart';
 
 import 'custom_field.dart';
 import 'passy_entries.dart';
@@ -15,7 +14,12 @@ class IDCardMeta extends EntryMeta {
   final String nickname;
   final String name;
 
-  IDCardMeta(String key, this.tags, this.nickname, this.name) : super(key);
+  IDCardMeta(
+      {required String key,
+      required this.tags,
+      required this.nickname,
+      required this.name})
+      : super(key);
 
   @override
   toJson() => {
@@ -58,7 +62,8 @@ class IDCard extends PassyEntry<IDCard> {
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
-  IDCardMeta get metadata => IDCardMeta(key, tags.toList(), nickname, name);
+  IDCardMeta get metadata =>
+      IDCardMeta(key: key, tags: tags.toList(), nickname: nickname, name: name);
 
   IDCard.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

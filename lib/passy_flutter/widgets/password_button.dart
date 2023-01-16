@@ -5,7 +5,7 @@ import 'package:passy/common/assets.dart';
 import 'widgets.dart';
 
 class PasswordButton extends StatelessWidget {
-  final Password password;
+  final PasswordMeta password;
   final void Function()? onPressed;
 
   const PasswordButton({

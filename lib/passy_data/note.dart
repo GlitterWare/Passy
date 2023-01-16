@@ -11,7 +11,7 @@ typedef NotesFile = PassyEntriesEncryptedCSVFile<Note>;
 class NoteMeta extends EntryMeta {
   final String title;
 
-  NoteMeta(String key, this.title) : super(key);
+  NoteMeta({required String key, required this.title}) : super(key);
 
   @override
   toJson() => {
@@ -31,7 +31,7 @@ class Note extends PassyEntry<Note> {
   }) : super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
-  EntryMeta get metadata => NoteMeta(key, title);
+  EntryMeta get metadata => NoteMeta(key: key, title: title);
 
   Note.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? '',

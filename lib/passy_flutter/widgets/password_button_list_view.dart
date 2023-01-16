@@ -3,9 +3,9 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class PasswordButtonListView extends StatelessWidget {
-  final List<Password> passwords;
+  final List<PasswordMeta> passwords;
   final bool shouldSort;
-  final void Function(Password password)? onPressed;
+  final void Function(PasswordMeta password)? onPressed;
 
   const PasswordButtonListView({
     Key? key,
@@ -19,7 +19,7 @@ class PasswordButtonListView extends StatelessWidget {
     if (shouldSort) PassySort.sortPasswords(passwords);
     return ListView(
       children: [
-        for (Password password in passwords)
+        for (PasswordMeta password in passwords)
           PassyPadding(PasswordButton(
             password: password,
             onPressed: () => onPressed?.call(password),

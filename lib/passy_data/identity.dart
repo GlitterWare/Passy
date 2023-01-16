@@ -44,7 +44,11 @@ class IdentityMeta extends EntryMeta {
   final String nickname;
   final String firstAddressLine;
 
-  IdentityMeta(String key, this.tags, this.nickname, this.firstAddressLine)
+  IdentityMeta(
+      {required String key,
+      required this.tags,
+      required this.nickname,
+      required this.firstAddressLine})
       : super(key);
 
   @override
@@ -97,8 +101,11 @@ class Identity extends PassyEntry<Identity> {
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
-  IdentityMeta get metadata =>
-      IdentityMeta(key, tags.toList(), nickname, firstAddressLine);
+  IdentityMeta get metadata => IdentityMeta(
+      key: key,
+      tags: tags.toList(),
+      nickname: nickname,
+      firstAddressLine: firstAddressLine);
 
   Identity.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

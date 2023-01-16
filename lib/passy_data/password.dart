@@ -14,8 +14,14 @@ class PasswordMeta extends EntryMeta {
   final List<String> tags;
   final String nickname;
   final String username;
+  String website;
 
-  PasswordMeta(String key, this.tags, this.nickname, this.username)
+  PasswordMeta(
+      {required String key,
+      required this.tags,
+      required this.nickname,
+      required this.username,
+      required this.website})
       : super(key);
 
   @override
@@ -24,6 +30,7 @@ class PasswordMeta extends EntryMeta {
         'tags': tags,
         'nickname': nickname,
         'username': username,
+        'website': website,
       };
 }
 
@@ -56,8 +63,12 @@ class Password extends PassyEntry<Password> {
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
-  PasswordMeta get metadata =>
-      PasswordMeta(key, tags.toList(), nickname, username);
+  PasswordMeta get metadata => PasswordMeta(
+      key: key,
+      tags: tags.toList(),
+      nickname: nickname,
+      username: username,
+      website: website);
 
   Password.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)

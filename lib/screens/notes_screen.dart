@@ -28,11 +28,11 @@ class _NotesScreen extends State<NotesScreen> {
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: (String terms) {
-      final List<Note> _found = [];
+      final List<NoteMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (Note _note in _account.notes.values) {
+      for (NoteMeta _note in _account.notesMetadata) {
         {
-          bool testNote(Note value) => _note.key == value.key;
+          bool testNote(NoteMeta value) => _note.key == value.key;
 
           if (_found.any(testNote)) continue;
         }
@@ -52,20 +52,21 @@ class _NotesScreen extends State<NotesScreen> {
       return NoteButtonListView(
         notes: _found,
         shouldSort: true,
-        onPressed: (note) =>
-            Navigator.pushNamed(context, NoteScreen.routeName, arguments: note),
+        onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName,
+            arguments: _account.getNote(note.key)),
       );
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    List<NoteMeta> _notes = _account.notesMetadata.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Notes')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: _account.notes.isEmpty
+      body: _notes.isEmpty
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
@@ -88,11 +89,11 @@ class _NotesScreen extends State<NotesScreen> {
               ],
             )
           : NoteButtonListView(
-              notes: data.loadedAccount!.notes.values.toList(),
+              notes: _notes,
               shouldSort: true,
               onPressed: (note) => Navigator.pushNamed(
                   context, NoteScreen.routeName,
-                  arguments: note),
+                  arguments: _account.getNote(note.key)),
             ),
     );
   }

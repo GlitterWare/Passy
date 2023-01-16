@@ -210,7 +210,7 @@ class LoadedAccount {
     }
   }
 
-  void Function(String key) removeEntry(EntryType type) {
+  Future<void> Function(String key) removeEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
         return removePassword;
@@ -370,7 +370,7 @@ class LoadedAccount {
 
   // Identities wrappers
   List<String> get identitiesKeys => _identities.keys;
-  Iterable<IdentityMeta> get identityMetadata =>
+  Iterable<IdentityMeta> get identitiesMetadata =>
       _identities.metadata.map((e) => e as IdentityMeta);
   Map<String, Identity> get identities => _identities.entries;
 

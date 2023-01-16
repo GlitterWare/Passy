@@ -57,19 +57,19 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   }
 
   Widget _buildPasswords(String terms) {
-    List<Password> _found = PassySearch.searchPasswords(
-        passwords: data.loadedAccount!.passwords.values, terms: terms);
+    List<PasswordMeta> _found = PassySearch.searchPasswords(
+        passwords: data.loadedAccount!.passwordMetadata, terms: terms);
     List<PwDataset> _dataSets = [];
     return PasswordButtonListView(
       passwords: _found,
       onPressed: (password) async {
         _found.remove(password);
         _found.insert(0, password);
-        for (Password _password in _found) {
+        for (PasswordMeta _password in _found) {
           _dataSets.add(PwDataset(
             label: _password.nickname,
             username: _password.username,
-            password: _password.password,
+            password: data.loadedAccount!.getPassword(_password.key)!.password,
           ));
         }
         await AutofillService().resultWithDatasets(_dataSets);

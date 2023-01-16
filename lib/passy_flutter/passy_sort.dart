@@ -8,7 +8,7 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'common/common.dart';
 
 class PassySort {
-  static void sortPasswords(List<Password> passwords) {
+  static void sortPasswords(List<PasswordMeta> passwords) {
     passwords.sort((a, b) {
       int _nickComp = alphabeticalCompare(a.nickname, b.nickname);
       if (_nickComp == 0) {
@@ -24,7 +24,7 @@ class PassySort {
     );
   }
 
-  static void sortPaymentCards(List<PaymentCard> paymentCards) {
+  static void sortPaymentCards(List<PaymentCardMeta> paymentCards) {
     paymentCards.sort((a, b) {
       int _nickComp = alphabeticalCompare(a.nickname, b.nickname);
       if (_nickComp == 0) {
@@ -34,10 +34,10 @@ class PassySort {
     });
   }
 
-  static void sortNotes(List<Note> notes) =>
+  static void sortNotes(List<NoteMeta> notes) =>
       notes.sort((a, b) => alphabeticalCompare(a.title, b.title));
 
-  static void sortIDCards(List<IDCard> idCards) {
+  static void sortIDCards(List<IDCardMeta> idCards) {
     idCards.sort((a, b) {
       int _nickComp = alphabeticalCompare(a.nickname, b.nickname);
       if (_nickComp == 0) {
@@ -47,7 +47,7 @@ class PassySort {
     });
   }
 
-  static void sortIdentities(List<Identity> identities) {
+  static void sortIdentities(List<IdentityMeta> identities) {
     identities.sort((a, b) {
       int _nickComp = alphabeticalCompare(a.nickname, b.nickname);
       if (_nickComp == 0) {

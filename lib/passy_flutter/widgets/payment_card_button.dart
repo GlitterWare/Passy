@@ -5,7 +5,7 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 
 class PaymentCardButton extends StatelessWidget {
-  final PaymentCard paymentCard;
+  final PaymentCardMeta paymentCard;
   final bool obscureCardNumber;
   final bool obscureCardCvv;
   final bool isSwipeGestureEnabled;
@@ -46,7 +46,7 @@ class PaymentCardButton extends StatelessWidget {
                           width: 50,
                         ))
                   ],
-              cvvCode: paymentCard.cvv,
+              cvvCode: '',
               showBackView: false,
               obscureCardNumber: obscureCardNumber,
               obscureCardCvv: obscureCardCvv,

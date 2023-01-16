@@ -27,11 +27,11 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: (String terms) {
-      final List<Identity> _found = [];
+      final List<IdentityMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (Identity _identity in _account.identities.values) {
+      for (IdentityMeta _identity in _account.identitiesMetadata) {
         {
-          bool testIdentity(Identity value) => _identity.key == value.key;
+          bool testIdentity(IdentityMeta value) => _identity.key == value.key;
 
           if (_found.any(testIdentity)) continue;
         }
@@ -58,7 +58,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         onPressed: (identity) => Navigator.pushNamed(
           context,
           IdentityScreen.routeName,
-          arguments: identity,
+          arguments: _account.getIdentity(identity.key),
         ),
       );
     });
@@ -66,12 +66,13 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<IdentityMeta> _identities = _account.identitiesMetadata.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Identities')),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
-      body: _account.identities.isEmpty
+      body: _identities.isEmpty
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
@@ -94,12 +95,12 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
               ],
             )
           : IdentityButtonListView(
-              identities: _account.identities.values.toList(),
+              identities: _identities,
               shouldSort: true,
               onPressed: (identity) => Navigator.pushNamed(
                 context,
                 IdentityScreen.routeName,
-                arguments: identity,
+                arguments: _account.getIdentity(identity.key),
               ),
             ),
     );
