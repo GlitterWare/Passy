@@ -26,6 +26,7 @@ class SynchronizationWrapper {
     showDialog(
         context: _context,
         builder: (ctx) => AlertDialog(
+              shape: PassyTheme.dialogShape,
               title: const Text('Synchronization Complete'),
               content: Text(
                   'Entries added: ${_sync!.entriesAdded}\nEntries removed: ${_sync!.entriesRemoved}'),

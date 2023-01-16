@@ -53,9 +53,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
+      shape: PassyTheme.dialogShape,
       child: ListView(
         shrinkWrap: true,
         children: [

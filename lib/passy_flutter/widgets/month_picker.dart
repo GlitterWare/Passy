@@ -45,6 +45,7 @@ class MonthPickerFormField extends StatelessWidget {
                     ? DateTime.now().toUtc()
                     : getSelectedDate!();
                 return AlertDialog(
+                  shape: PassyTheme.dialogShape,
                   title: title,
                   actions: [
                     TextButton(

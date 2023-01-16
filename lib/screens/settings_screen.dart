@@ -114,6 +114,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
+                        shape: PassyTheme.dialogShape,
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [

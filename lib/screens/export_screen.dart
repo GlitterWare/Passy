@@ -28,6 +28,7 @@ class _ExportScreen extends State<ExportScreen> {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: PassyTheme.dialogShape,
         title: const Text('Confirm export'),
         content: RichText(
           text: const TextSpan(

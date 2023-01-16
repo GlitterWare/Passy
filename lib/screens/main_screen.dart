@@ -46,6 +46,7 @@ class _MainScreen extends State<MainScreen>
       context: context,
       builder: (ctx) {
         return AlertDialog(
+          shape: PassyTheme.dialogShape,
           title: const Text('Log out'),
           actions: [
             TextButton(
@@ -118,6 +119,7 @@ class _MainScreen extends State<MainScreen>
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
+              shape: PassyTheme.dialogShape,
               title: const Text(
                 'Scan QR code',
                 textAlign: TextAlign.center,

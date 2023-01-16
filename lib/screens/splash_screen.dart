@@ -21,6 +21,7 @@ class SplashScreen extends StatelessWidget {
       return showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
+          shape: PassyTheme.dialogShape,
           title: const Text('New version available'),
           content: ThreeWidgetButton(
             left: Padding(
