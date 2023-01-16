@@ -50,8 +50,25 @@ class SplashScreen extends StatelessWidget {
       }
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       if (const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false') {
-        String _version = await getLatestVersion();
-        if (_version != passyVersion) showUpdateDialog();
+        try {
+          String _version = await getLatestVersion();
+          if (_version == passyVersion) return;
+          List<String> _newVersionSplit = _version.split('.');
+          List<String> _currentVersionSplit = passyVersion.split('.');
+          if (int.parse(_newVersionSplit[0]) <
+              int.parse(_currentVersionSplit[0])) return;
+          if (int.parse(_newVersionSplit[0]) ==
+              int.parse(_currentVersionSplit[0])) {
+            if (int.parse(_newVersionSplit[1]) <
+                int.parse(_currentVersionSplit[1])) return;
+            if (int.parse(_newVersionSplit[1]) ==
+                int.parse(_currentVersionSplit[1])) {
+              if (int.parse(_newVersionSplit[2]) <=
+                  int.parse(_currentVersionSplit[2])) return;
+            }
+          }
+          showUpdateDialog();
+        } catch (_) {}
       }
     }
 
