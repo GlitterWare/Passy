@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 import 'widgets.dart';
 
@@ -48,8 +49,14 @@ class RecordButton extends StatelessWidget {
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
       right: IconButton(
-        icon: const Icon(Icons.copy),
-        onPressed: () => Clipboard.setData(ClipboardData(text: value)),
+        icon: const Icon(Icons.copy_rounded),
+        onPressed: () {
+          Clipboard.setData(ClipboardData(text: value));
+          showSnackBar(context,
+              message: 'Copied $title',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
       ),
     );
   }
