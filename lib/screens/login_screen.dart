@@ -218,6 +218,8 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                 ),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30)),
                                     value: _username,
                                     items: usernames,
                                     selectedItemBuilder: (context) {

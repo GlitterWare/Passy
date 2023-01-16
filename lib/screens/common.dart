@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
@@ -180,4 +181,75 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
     ]),
     action: action,
   ));
+}
+
+PopupMenuItem getIconedPopupMenuItem({
+  required Widget content,
+  required Widget icon,
+  void Function()? onTap,
+}) {
+  return PopupMenuItem(
+    child: Row(
+      children: [icon, const SizedBox(width: 20), content],
+    ),
+    onTap: onTap,
+  );
+}
+
+List<PopupMenuEntry> passwordPopupMenuBuilder(context, passwordMeta) {
+  return [
+    if (passwordMeta.username != '')
+      getIconedPopupMenuItem(
+        content: const Text('Username'),
+        icon: const Icon(Icons.person_outline_rounded),
+        onTap: () {
+          Clipboard.setData(ClipboardData(
+              text:
+                  data.loadedAccount!.getPassword(passwordMeta.key)!.username));
+          showSnackBar(context,
+              message: 'Username copied',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+    getIconedPopupMenuItem(
+      content: const Text('Email'),
+      icon: const Icon(Icons.mail_outline_rounded),
+      onTap: () {
+        Clipboard.setData(ClipboardData(
+            text: data.loadedAccount!.getPassword(passwordMeta.key)!.email));
+        showSnackBar(context,
+            message: 'Email copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+    getIconedPopupMenuItem(
+      content: const Text('Password'),
+      icon: const Icon(Icons.lock_outline_rounded),
+      onTap: () {
+        Clipboard.setData(ClipboardData(
+            text: data.loadedAccount!.getPassword(passwordMeta.key)!.password));
+        showSnackBar(context,
+            message: 'Password copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+    if (passwordMeta.website != '')
+      getIconedPopupMenuItem(
+        content: const Text('Visit'),
+        icon: const Icon(Icons.open_in_browser_outlined),
+        onTap: () {
+          String _url =
+              data.loadedAccount!.getPassword(passwordMeta.key)!.website;
+          if (!_url.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
+            _url = 'http://' + _url;
+          }
+          try {
+            openUrl(_url);
+          } catch (_) {}
+        },
+      ),
+  ];
 }

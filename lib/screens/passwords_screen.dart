@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'edit_password_screen.dart';
 import 'main_screen.dart';
@@ -35,6 +37,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           context, PasswordScreen.routeName,
           arguments: _account.getPassword(password.key)!),
       shouldSort: true,
+      popupMenuItemBuilder: passwordPopupMenuBuilder,
     );
   }
 
@@ -79,6 +82,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                   context, PasswordScreen.routeName,
                   arguments: _account.getPassword(password.key)!),
               shouldSort: true,
+              popupMenuItemBuilder: passwordPopupMenuBuilder,
             ),
     );
   }

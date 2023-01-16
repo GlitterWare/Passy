@@ -53,7 +53,7 @@ class RecordButton extends StatelessWidget {
         onPressed: () {
           Clipboard.setData(ClipboardData(text: value));
           showSnackBar(context,
-              message: 'Copied $title',
+              message: '$title copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
