@@ -8,7 +8,7 @@ import 'dart:io';
 
 const String passyVersion = '1.2.0';
 const String syncVersion = '1.0.0';
-const String accountVersion = '2.0.0';
+const String accountVersion = '2.1.0';
 
 bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
   if (lineDelimiter.length == 1) {
@@ -101,21 +101,21 @@ Encrypter getPassyEncrypter(String password) {
 
 Digest getPassyHash(String value) => sha512.convert(utf8.encode(value));
 
-String encrypt(String data, {required Encrypter encrypter}) {
+String encrypt(String data, {required Encrypter encrypter, IV? iv}) {
   if (data.isEmpty) return '';
   return encrypter
       .encrypt(
         data,
-        iv: IV.fromLength(16),
+        iv: iv ?? IV.fromLength(16),
       )
       .base64;
 }
 
-String decrypt(String data, {required Encrypter encrypter}) {
+String decrypt(String data, {required Encrypter encrypter, IV? iv}) {
   if (data.isEmpty) return '';
   return encrypter.decrypt64(
     data,
-    iv: IV.fromLength(16),
+    iv: iv ?? IV.fromLength(16),
   );
 }
 

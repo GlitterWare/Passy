@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:encrypt/encrypt.dart';
 import '../common.dart';
 
-void convert1_1_0AccountTo2_2_0({
+void convert1_1_0AccountTo2_0_0({
   required String path,
   required Encrypter encrypter,
 }) {

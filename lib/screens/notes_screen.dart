@@ -30,7 +30,7 @@ class _NotesScreen extends State<NotesScreen> {
         arguments: (String terms) {
       final List<NoteMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (NoteMeta _note in _account.notesMetadata) {
+      for (NoteMeta _note in _account.notesMetadata.values) {
         {
           bool testNote(NoteMeta value) => _note.key == value.key;
 
@@ -60,7 +60,7 @@ class _NotesScreen extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<NoteMeta> _notes = _account.notesMetadata.toList();
+    List<NoteMeta> _notes = _account.notesMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Notes')),

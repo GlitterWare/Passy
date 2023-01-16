@@ -29,7 +29,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         arguments: (String terms) {
       final List<IdentityMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IdentityMeta _identity in _account.identitiesMetadata) {
+      for (IdentityMeta _identity in _account.identitiesMetadata.values) {
         {
           bool testIdentity(IdentityMeta value) => _identity.key == value.key;
 
@@ -66,7 +66,8 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<IdentityMeta> _identities = _account.identitiesMetadata.toList();
+    List<IdentityMeta> _identities =
+        _account.identitiesMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Identities')),

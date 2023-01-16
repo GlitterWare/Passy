@@ -30,7 +30,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         arguments: (String terms) {
       final List<IDCardMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IDCardMeta _idCard in _account.idCardsMetadata) {
+      for (IDCardMeta _idCard in _account.idCardsMetadata.values) {
         {
           bool testIDCard(IDCardMeta value) => _idCard.key == value.key;
 
@@ -67,7 +67,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<IDCardMeta> _idCards = _account.idCardsMetadata.toList();
+    List<IDCardMeta> _idCards = _account.idCardsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('ID cards')),

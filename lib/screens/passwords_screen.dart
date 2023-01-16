@@ -28,7 +28,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
   Widget _buildPasswords(String terms) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
-        passwords: _account.passwordMetadata, terms: terms);
+        passwords: _account.passwordMetadata.values, terms: terms);
     return PasswordButtonListView(
       passwords: _found,
       onPressed: (password) => Navigator.pushNamed(
@@ -45,7 +45,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<PasswordMeta> _passwords = _account.passwordMetadata.toList();
+    List<PasswordMeta> _passwords = _account.passwordMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
           title: const Center(child: Text('Passwords')),

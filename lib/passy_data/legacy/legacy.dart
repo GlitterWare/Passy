@@ -1,5 +1,6 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/legacy/convert_1d1d0_account_to_2d0d0.dart';
+import 'package:passy/passy_data/legacy/convert_2d0d0_account_to_2d1d0.dart';
 import 'dart:io';
 
 import '../account_credentials.dart';
@@ -65,10 +66,19 @@ void convertLegacyAccount({
     if (_accountVersion[1] < 1) {
       // Pre 1.1.0 conversion
       convertPre1_1_0AccountTo1_1_0(path: path, encrypter: encrypter);
+      _accountVersion = [1, 1, 0];
     }
     if (_accountVersion[1] == 1) {
       // 1.1.0 conversion
-      convert1_1_0AccountTo2_2_0(path: path, encrypter: encrypter);
+      convert1_1_0AccountTo2_0_0(path: path, encrypter: encrypter);
+      _accountVersion = [2, 0, 0];
+    }
+  }
+  if (_accountVersion[0] == 2) {
+    if (_accountVersion[1] == 0) {
+      // 2.0.0 conversion
+      convert2_0_0AccountTo2_1_0(path: path, encrypter: encrypter);
+      _accountVersion = [2, 1, 0];
     }
   }
   // No conversion
