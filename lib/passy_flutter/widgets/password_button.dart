@@ -3,8 +3,6 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-import 'widgets.dart';
-
 class PasswordButton extends StatelessWidget {
   final PasswordMeta password;
   final void Function()? onPressed;

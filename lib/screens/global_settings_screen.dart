@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/passy_flutter/widgets/passy_about_dialog.dart';
 
 class GlobalSettingsScreen extends StatefulWidget {
   static const String routeName = '/globalSettings';
@@ -27,19 +30,37 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
       ),
       body: ListView(
         children: [
-          PassyPadding(
-            ThreeWidgetButton(
-              center: const Text('Enable autofill'),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.password_rounded),
+          if (Platform.isAndroid || Platform.isIOS)
+            PassyPadding(
+              ThreeWidgetButton(
+                center: const Text('Enable autofill'),
+                left: const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Icon(Icons.password_rounded),
+                ),
+                right: const Icon(Icons.arrow_forward_ios_rounded),
+                onPressed: () {
+                  AutofillService().requestSetAutofillService();
+                },
               ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () {
-                AutofillService().requestSetAutofillService();
-              },
             ),
-          )
+          PassyPadding(ThreeWidgetButton(
+            center: const Text('About'),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.info_outline_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () {
+              showDialog(
+                  context: context, builder: (ctx) => const PassyAboutDialog());
+            },
+          )),
+          const Center(
+              child: Text(
+            'Updates popup enabled: ${const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false'}',
+            style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+          )),
         ],
       ),
     );
