@@ -59,16 +59,12 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       Navigator.pop(context);
       return;
     }
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Row(children: const [
-      Icon(
-        Icons.lock_rounded,
-        color: PassyTheme.darkContentColor,
-      ),
-      SizedBox(width: 20),
-      Expanded(child: Text('Incorrect password')),
-    ])));
+    showSnackBar(context,
+        message: 'Incorrect password',
+        icon: const Icon(
+          Icons.lock_rounded,
+          color: PassyTheme.darkContentColor,
+        ));
     return;
   }
 

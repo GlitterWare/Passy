@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'add_account_screen.dart';
 import 'login_screen.dart';
@@ -42,16 +43,10 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
       onBackPressed: (context) => Navigator.pop(context),
       onConfirmPressed: (context, value) {
         if (value != _username) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(
-              content: Row(children: const [
-                Icon(Icons.error_outline_rounded,
-                    color: PassyTheme.darkContentColor),
-                SizedBox(width: 20),
-                Expanded(child: Text('Usernames do not match')),
-              ]),
-            ));
+          showSnackBar(context,
+              message: 'Usernames do not match',
+              icon: const Icon(Icons.error_outline_rounded,
+                  color: PassyTheme.darkContentColor));
           return;
         }
         Navigator.pop(context);

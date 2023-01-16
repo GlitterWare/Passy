@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'credentials_screen.dart';
 import 'login_screen.dart';
@@ -29,23 +30,17 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
       labelText: 'New username',
       onConfirmPressed: (context, value) {
         if (value.length < 2) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Row(children: const [
-            Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Text('Username is shorter than 2 letters'),
-          ])));
+          showSnackBar(context,
+              message: 'Username is shorter than 2 letters',
+              icon: const Icon(Icons.person_rounded,
+                  color: PassyTheme.darkContentColor));
           return;
         }
         if (data.hasAccount(value)) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Row(children: const [
-            Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Text('Username is already in use'),
-          ])));
+          showSnackBar(context,
+              message: 'Username is already in use',
+              icon: const Icon(Icons.person_rounded,
+                  color: PassyTheme.darkContentColor));
           return;
         }
         Navigator.popUntil(

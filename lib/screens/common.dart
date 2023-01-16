@@ -67,42 +67,29 @@ Future<String?> backupAccount(
       username: username,
       outputDirectoryPath: _buDir,
     );
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Row(children: const [
-          Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
-          SizedBox(width: 20),
-          Text('Backup saved'),
-        ]),
-      ));
+    showSnackBar(context,
+        message: 'Backup saved',
+        icon:
+            const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor));
     return _buDir;
   } catch (e, s) {
     if (e is FileSystemException) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Row(children: const [
-            Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Text('Access denied, try another folder'),
-          ]),
-        ));
+      showSnackBar(context,
+          message: 'Access denied, try another folder',
+          icon: const Icon(Icons.save_rounded,
+              color: PassyTheme.darkContentColor));
     } else {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Row(children: const [
-            Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Text('Could not backup'),
-          ]),
-          action: SnackBarAction(
-            label: 'Details',
-            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                arguments: e.toString() + '\n' + s.toString()),
-          ),
-        ));
+      showSnackBar(
+        context,
+        message: 'Could not backup',
+        icon:
+            const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: 'Details',
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
     }
     rethrow;
   }
@@ -176,4 +163,21 @@ Result? qrResultFromImage(imglib.Image image) {
   } catch (e) {
     return null;
   }
+}
+
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
+  BuildContext context, {
+  required String message,
+  required Widget icon,
+  SnackBarAction? action,
+}) {
+  ScaffoldMessenger.of(context).clearSnackBars();
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Row(children: [
+      icon,
+      const SizedBox(width: 20),
+      Expanded(child: Text(message)),
+    ]),
+    action: action,
+  ));
 }

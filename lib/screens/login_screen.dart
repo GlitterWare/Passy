@@ -81,16 +81,12 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
 
   void login() {
     if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(
-          Icons.lock_rounded,
-          color: PassyTheme.darkContentColor,
-        ),
-        SizedBox(width: 20),
-        Expanded(child: Text('Incorrect password')),
-      ])));
+      showSnackBar(
+        context,
+        message: 'Incorrect password',
+        icon:
+            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+      );
       return;
     }
     data.info.value.lastUsername = _username;
@@ -112,20 +108,17 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         }
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
       } catch (e, s) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(
-            content: Row(children: const [
-              Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-              SizedBox(width: 20),
-              Text('Could not login'),
-            ]),
-            action: SnackBarAction(
-              label: 'Details',
-              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                  arguments: e.toString() + '\n' + s.toString()),
-            ),
-          ));
+        showSnackBar(
+          context,
+          message: 'Could not login',
+          icon: const Icon(Icons.lock_rounded,
+              color: PassyTheme.darkContentColor),
+          action: SnackBarAction(
+            label: 'Details',
+            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                arguments: e.toString() + '\n' + s.toString()),
+          ),
+        );
       }
     });
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/screens/common.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:passy/main.dart';
@@ -36,17 +37,11 @@ class SynchronizationWrapper {
   void _onSyncError(String log) {
     void _showLog() => navigatorKey.currentState!
         .pushNamed(LogScreen.routeName, arguments: log);
-
-    ScaffoldMessenger.of(_context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Row(children: const [
-          Icon(Icons.sync_problem_rounded, color: PassyTheme.darkContentColor),
-          SizedBox(width: 20),
-          Expanded(child: Text('Sync error')),
-        ]),
-        action: SnackBarAction(label: 'Details', onPressed: _showLog),
-      ));
+    showSnackBar(_context,
+        message: 'Sync error',
+        icon: const Icon(Icons.sync_problem_rounded,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(label: 'Details', onPressed: _showLog));
   }
 
   void connect(LoadedAccount account, {required String address}) {
@@ -54,16 +49,12 @@ class SynchronizationWrapper {
     try {
       _hostAddress = HostAddress.parse(address);
     } catch (e) {
-      ScaffoldMessenger.of(_context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Row(children: const [
-            Icon(Icons.sync_problem_rounded,
-                color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Text('Invalid address format'),
-          ]),
-        ));
+      showSnackBar(
+        _context,
+        message: 'Invalid address format',
+        icon: const Icon(Icons.sync_problem_rounded,
+            color: PassyTheme.darkContentColor),
+      );
       return;
     }
 
@@ -73,19 +64,17 @@ class SynchronizationWrapper {
       onError: (log) => _onSyncError(log),
     );
     _sync!.connect(_hostAddress).onError((error, stackTrace) {
-      ScaffoldMessenger.of(_context).clearSnackBars();
-      ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
-        content: Row(children: const [
-          Icon(Icons.sync_problem_rounded, color: PassyTheme.darkContentColor),
-          SizedBox(width: 20),
-          Text('Connection failed'),
-        ]),
+      showSnackBar(
+        _context,
+        message: 'Connection failed',
+        icon: const Icon(Icons.sync_problem_rounded,
+            color: PassyTheme.darkContentColor),
         action: SnackBarAction(
           label: 'Details',
           onPressed: () => Navigator.pushNamed(_context, LogScreen.routeName,
               arguments: error.toString() + '\n' + stackTrace.toString()),
         ),
-      ));
+      );
     });
   }
 

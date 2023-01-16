@@ -9,6 +9,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'package:passy/common/assets.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/main_screen.dart';
 
 import 'export_and_import_screen.dart';
@@ -74,41 +75,28 @@ class _ExportScreen extends State<ExportScreen> {
       );
       if (_expDir == null) return;
       await data.exportLoadedAccount(outputDirectoryPath: _expDir);
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Row(children: const [
-            Icon(Icons.ios_share_rounded, color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Text('Export saved'),
-          ]),
-        ));
+      showSnackBar(context,
+          message: 'Export saved',
+          icon: const Icon(Icons.ios_share_rounded,
+              color: PassyTheme.darkContentColor));
     } catch (e, s) {
       if (e is FileSystemException) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(
-            content: Row(children: const [
-              Icon(Icons.ios_share_rounded, color: PassyTheme.darkContentColor),
-              SizedBox(width: 20),
-              Text('Access denied, try another folder'),
-            ]),
-          ));
+        showSnackBar(context,
+            message: 'Access denied, try another folder',
+            icon: const Icon(Icons.ios_share_rounded,
+                color: PassyTheme.darkContentColor));
       } else {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(
-            content: Row(children: const [
-              Icon(Icons.ios_share_rounded, color: PassyTheme.darkContentColor),
-              SizedBox(width: 20),
-              Text('Could not export'),
-            ]),
-            action: SnackBarAction(
-              label: 'Details',
-              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                  arguments: e.toString() + '\n' + s.toString()),
-            ),
-          ));
+        showSnackBar(
+          context,
+          message: 'Could not export',
+          icon: const Icon(Icons.ios_share_rounded,
+              color: PassyTheme.darkContentColor),
+          action: SnackBarAction(
+            label: 'Details',
+            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                arguments: e.toString() + '\n' + s.toString()),
+          ),
+        );
       }
     }
     MainScreen.shouldLockScreen = true;

@@ -4,11 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/setup_screen.dart';
 
 import '../common/assets.dart';
-import 'login_screen.dart';
 import 'log_screen.dart';
+import 'login_screen.dart';
 
 class AddAccountScreen extends StatefulWidget {
   const AddAccountScreen({Key? key}) : super(key: key);
@@ -26,53 +27,48 @@ class _AddAccountScreen extends State<StatefulWidget> {
 
   void _addAccount() {
     if (_username.isEmpty) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Username is empty'),
-      ])));
+      showSnackBar(
+        context,
+        message: 'Username is empty',
+        icon: const Icon(Icons.person_rounded,
+            color: PassyTheme.darkContentColor),
+      );
       return;
     }
     if (_username.length < 2) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Username is shorter than 2 letters'),
-      ])));
+      showSnackBar(
+        context,
+        message: 'Username is shorter than 2 letters',
+        icon: const Icon(Icons.person_rounded,
+            color: PassyTheme.darkContentColor),
+      );
       return;
     }
     if (data.hasAccount(_username)) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.person_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Username is already in use'),
-      ])));
+      showSnackBar(
+        context,
+        message: 'Username is already in use',
+        icon: const Icon(Icons.person_rounded,
+            color: PassyTheme.darkContentColor),
+      );
       return;
     }
     if (_password.isEmpty) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Password is empty'),
-      ])));
+      showSnackBar(
+        context,
+        message: 'Password is empty',
+        icon:
+            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+      );
       return;
     }
     if (_password != _confirmPassword) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Passwords do not match'),
-      ])));
+      showSnackBar(
+        context,
+        message: 'Passwords do not match',
+        icon:
+            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+      );
       return;
     }
     try {
@@ -81,21 +77,17 @@ class _AddAccountScreen extends State<StatefulWidget> {
         _password,
       );
     } catch (e, s) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-          content: Row(children: const [
-            Icon(Icons.error_outline_rounded,
-                color: PassyTheme.darkContentColor),
-            SizedBox(width: 20),
-            Expanded(child: Text('Couldn\'t add account')),
-          ]),
-          action: SnackBarAction(
-            label: 'Details',
-            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                arguments: e.toString() + '\n' + s.toString()),
-          ),
-        ));
+      showSnackBar(
+        context,
+        message: 'Couldn\'t add account',
+        icon: const Icon(Icons.error_outline_rounded,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: 'Details',
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
       return;
     }
     data.info.value.lastUsername = _username;

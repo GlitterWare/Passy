@@ -3,6 +3,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/credentials_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
@@ -26,36 +27,30 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   void _onConfirmPressed() {
     if (getPassyHash(_password).toString() !=
         data.getPasswordHash(_account.username)) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(
-          Icons.lock_rounded,
-          color: PassyTheme.darkContentColor,
-        ),
-        SizedBox(width: 20),
-        Expanded(child: Text('Incorrect password')),
-      ])));
+      showSnackBar(context,
+          message: 'Incorrect password',
+          icon: const Icon(
+            Icons.lock_rounded,
+            color: PassyTheme.darkContentColor,
+          ));
       return;
     }
     if (_newPassword.isEmpty) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Password is empty'),
-      ])));
+      showSnackBar(context,
+          message: 'Password is empty',
+          icon: const Icon(
+            Icons.lock_rounded,
+            color: PassyTheme.darkContentColor,
+          ));
       return;
     }
     if (_newPassword != _newPasswordConfirm) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
-        Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
-        SizedBox(width: 20),
-        Text('Passwords do not match'),
-      ])));
+      showSnackBar(context,
+          message: 'Passwords do not match',
+          icon: const Icon(
+            Icons.lock_rounded,
+            color: PassyTheme.darkContentColor,
+          ));
       return;
     }
     Navigator.pushNamed(context, SplashScreen.routeName);

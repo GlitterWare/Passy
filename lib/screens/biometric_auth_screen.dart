@@ -6,6 +6,7 @@ import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 import 'settings_screen.dart';
 
@@ -29,32 +30,20 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
       if (value == true) {
         if (getPassyHash(_password).toString() !=
             data.loadedAccount!.passwordHash) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(
-              content: Row(children: const [
-                Icon(Icons.fingerprint_rounded,
-                    color: PassyTheme.darkContentColor),
-                SizedBox(width: 20),
-                Expanded(child: Text('Incorrect password')),
-              ]),
-            ));
+          showSnackBar(context,
+              message: 'Incorrect password',
+              icon: const Icon(Icons.lock_rounded,
+                  color: PassyTheme.darkContentColor));
           return;
         }
         _bioData = BiometricStorageData(key: _username, password: _password);
         try {
           await _bioData.save();
         } catch (e) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(
-              content: Row(children: const [
-                Icon(Icons.fingerprint_rounded,
-                    color: PassyTheme.darkContentColor),
-                SizedBox(width: 20),
-                Expanded(child: Text('Couldn\'t authenticate')),
-              ]),
-            ));
+          showSnackBar(context,
+              message: 'Couldn\'t authenticate',
+              icon: const Icon(Icons.fingerprint_rounded,
+                  color: PassyTheme.darkContentColor));
           return;
         }
       } else {

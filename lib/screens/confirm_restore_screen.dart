@@ -3,6 +3,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/backup_and_restore_screen.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 
@@ -51,24 +52,18 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
               Navigator.pushReplacementNamed(context, LoginScreen.routeName);
             },
             onError: (e, s) {
-              ScaffoldMessenger.of(context)
-                ..clearSnackBars()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Row(children: const [
-                      Icon(Icons.settings_backup_restore_rounded,
-                          color: PassyTheme.darkContentColor),
-                      SizedBox(width: 20),
-                      Text('Could not restore account'),
-                    ]),
-                    action: SnackBarAction(
-                      label: 'Details',
-                      onPressed: () => Navigator.pushNamed(
-                          context, LogScreen.routeName,
-                          arguments: e.toString() + '\n' + s.toString()),
-                    ),
-                  ),
-                );
+              showSnackBar(
+                context,
+                message: 'Could not restore account',
+                icon: const Icon(Icons.settings_backup_restore_rounded,
+                    color: PassyTheme.darkContentColor),
+                action: SnackBarAction(
+                  label: 'Details',
+                  onPressed: () => Navigator.pushNamed(
+                      context, LogScreen.routeName,
+                      arguments: e.toString() + '\n' + s.toString()),
+                ),
+              );
             },
           );
         });

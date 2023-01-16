@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 
@@ -27,23 +28,17 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
           context, (route) => route.settings.name == MainScreen.routeName);
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
     } catch (e, s) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(
-            content: Row(children: const [
-              Icon(Icons.download_for_offline_outlined,
-                  color: PassyTheme.darkContentColor),
-              SizedBox(width: 20),
-              Text('Could not import account'),
-            ]),
-            action: SnackBarAction(
-              label: 'Details',
-              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                  arguments: e.toString() + '\n' + s.toString()),
-            ),
-          ),
-        );
+      showSnackBar(
+        context,
+        message: 'Could not import account',
+        icon: const Icon(Icons.download_for_offline_outlined,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: 'Details',
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
     }
   }
 
