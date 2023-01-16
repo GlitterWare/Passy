@@ -38,7 +38,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
-		<release version="v1.2.0" date="2022-10-31">
+		<release version="v1.3.0" date="2023-01-16">
 		</release>
 	</releases>
 </component>
