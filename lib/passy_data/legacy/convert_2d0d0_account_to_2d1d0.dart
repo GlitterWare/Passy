@@ -16,7 +16,10 @@ void convert2_0_0AccountTo2_1_0({
   // - 2.4. Join, separating with the comma (,), entry key, the random IV and the encrypted entry.
   // - 2.5. Rewrite the result of 2.4. as the line contents.
   void _convert(File file) {
-    File _fileTemp = file.copySync(file.path + '_temp');
+    File _fileTemp = File('${file.path}_temp');
+    if (!_fileTemp.existsSync()) {
+      _fileTemp = file.copySync(_fileTemp.path);
+    }
     file.writeAsStringSync('');
     RandomAccessFile _fileTempRaf = _fileTemp.openSync(mode: FileMode.read);
     RandomAccessFile _file = file.openSync(mode: FileMode.append);
@@ -31,6 +34,8 @@ void convert2_0_0AccountTo2_1_0({
       _file.writeStringSync('${_decoded[0]},${_iv.base64},$_reencrypted\n');
       return null;
     });
+    _file.closeSync();
+    _fileTempRaf.closeSync();
     _fileTemp.deleteSync();
   }
 
