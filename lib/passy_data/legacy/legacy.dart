@@ -77,8 +77,15 @@ void convertLegacyAccount({
   if (_accountVersion[0] == 2) {
     if (_accountVersion[1] == 0) {
       // 2.0.0 conversion
-      convert2_0_0AccountTo2_1_0(path: path, encrypter: encrypter);
-      _accountVersion = [2, 1, 0];
+      convert2_0_0AccountTo2_1_1(path: path, encrypter: encrypter);
+      _accountVersion = [2, 1, 1];
+    }
+    if (_accountVersion[1] == 1) {
+      if (_accountVersion[2] == 0) {
+        // 2.1.0 conversion
+        convert2_0_0AccountTo2_1_1(path: path, encrypter: encrypter);
+        _accountVersion = [2, 1, 1];
+      }
     }
   }
   // No conversion
