@@ -23,8 +23,19 @@ void convert2_0_0AccountTo2_1_1({
     file.writeAsStringSync('');
     RandomAccessFile _fileTempRaf = _fileTemp.openSync(mode: FileMode.read);
     RandomAccessFile _file = file.openSync(mode: FileMode.append);
+    bool _doesNotRequireConversion = false;
     processLines(_fileTempRaf, onLine: (line, eofReached) {
       List<String> _decoded = line.split(',');
+      if (_decoded.length == 3) {
+        // 2.1.1 conversion is not required
+        _doesNotRequireConversion = true;
+        _file.closeSync();
+        _fileTempRaf.closeSync();
+        file.deleteSync();
+        _fileTemp.copySync(file.path);
+        _fileTemp.deleteSync();
+        return true;
+      }
       IV _iv = IV.fromSecureRandom(16);
       String _reencrypted;
       {
@@ -34,6 +45,7 @@ void convert2_0_0AccountTo2_1_1({
       _file.writeStringSync('${_decoded[0]},${_iv.base64},$_reencrypted\n');
       return null;
     });
+    if (_doesNotRequireConversion) return;
     _file.closeSync();
     _fileTempRaf.closeSync();
     _fileTemp.deleteSync();
