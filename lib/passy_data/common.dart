@@ -6,7 +6,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
-const String passyVersion = '1.3.0';
+const String passyVersion = '1.3.1';
 const String syncVersion = '1.0.0';
 const String accountVersion = '2.1.1';
 
