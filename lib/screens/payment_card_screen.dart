@@ -109,6 +109,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           PassyPadding(RecordButton(
             title: 'CVV',
             value: _paymentCard.cvv,
+            obscureValue: true,
           )),
         for (CustomField _customField in _paymentCard.customFields)
           PassyPadding(CustomFieldButton(customField: _customField)),
