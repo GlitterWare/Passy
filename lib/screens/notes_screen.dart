@@ -4,6 +4,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'main_screen.dart';
 import 'note_screen.dart';
@@ -54,6 +55,7 @@ class _NotesScreen extends State<NotesScreen> {
         shouldSort: true,
         onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName,
             arguments: _account.getNote(note.key)),
+        popupMenuItemBuilder: notePopupMenuBuilder,
       );
     });
   }
@@ -94,6 +96,7 @@ class _NotesScreen extends State<NotesScreen> {
               onPressed: (note) => Navigator.pushNamed(
                   context, NoteScreen.routeName,
                   arguments: _account.getNote(note.key)),
+              popupMenuItemBuilder: notePopupMenuBuilder,
             ),
     );
   }

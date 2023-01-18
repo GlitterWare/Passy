@@ -12,6 +12,7 @@ import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -280,6 +281,24 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
                   color: PassyTheme.darkContentColor));
         },
       ),
+  ];
+}
+
+List<PopupMenuEntry> notePopupMenuBuilder(
+    BuildContext context, NoteMeta identityMeta) {
+  return [
+    getIconedPopupMenuItem(
+      content: const Text('Copy'),
+      icon: const Icon(Icons.copy_rounded),
+      onTap: () {
+        Clipboard.setData(ClipboardData(
+            text: data.loadedAccount!.getNote(identityMeta.key)!.note));
+        showSnackBar(context,
+            message: 'Note copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
   ];
 }
 

@@ -5,32 +5,51 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 class NoteButton extends StatelessWidget {
   final NoteMeta note;
   final void Function()? onPressed;
+  final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
+      popupMenuItemBuilder;
 
   const NoteButton({
     Key? key,
     required this.note,
     this.onPressed,
+    this.popupMenuItemBuilder,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ThreeWidgetButton(
-      left: const Padding(
-        padding: EdgeInsets.only(right: 30),
-        child: Icon(Icons.note_rounded),
-      ),
-      right: const Icon(Icons.arrow_forward_ios_rounded),
-      onPressed: onPressed,
-      center: Column(
-        children: [
-          Align(
-            child: Text(
-              note.title,
+    return Row(
+      children: [
+        Flexible(
+          child: ThreeWidgetButton(
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.note_rounded),
             ),
-            alignment: Alignment.centerLeft,
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: onPressed,
+            center: Column(
+              children: [
+                Align(
+                  child: Text(
+                    note.title,
+                  ),
+                  alignment: Alignment.centerLeft,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        ),
+        if (popupMenuItemBuilder != null)
+          FittedBox(
+            child: PopupMenuButton(
+              shape: PassyTheme.dialogShape,
+              icon: const Icon(Icons.more_vert_rounded),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              splashRadius: 24,
+              itemBuilder: popupMenuItemBuilder!,
+            ),
+          ),
+      ],
     );
   }
 }
