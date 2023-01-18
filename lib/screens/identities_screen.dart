@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/identity_screen.dart';
 
 import 'main_screen.dart';
@@ -60,6 +61,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
           IdentityScreen.routeName,
           arguments: _account.getIdentity(identity.key),
         ),
+        popupMenuItemBuilder: identityPopupMenuBuilder,
       );
     });
   }
@@ -103,6 +105,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
                 IdentityScreen.routeName,
                 arguments: _account.getIdentity(identity.key),
               ),
+              popupMenuItemBuilder: identityPopupMenuBuilder,
             ),
     );
   }

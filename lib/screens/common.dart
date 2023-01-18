@@ -11,6 +11,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -221,6 +222,60 @@ List<PopupMenuEntry> idCardPopupMenuBuilder(
           Clipboard.setData(ClipboardData(text: idCardMeta.name));
           showSnackBar(context,
               message: 'Name copied',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+  ];
+}
+
+List<PopupMenuEntry> identityPopupMenuBuilder(
+    BuildContext context, IdentityMeta identityMeta) {
+  return [
+    getIconedPopupMenuItem(
+      content: const Text('Name'),
+      icon: const Icon(Icons.person_outline_rounded),
+      onTap: () {
+        Identity? _identity = data.loadedAccount!.getIdentity(identityMeta.key);
+        if (_identity == null) return;
+        String _name = _identity.firstName;
+        if (_name == '') {
+          _name = _identity.middleName;
+        } else {
+          _name += ' ${_identity.middleName}';
+        }
+        if (_name == '') {
+          _name = _identity.lastName;
+        } else {
+          _name += ' ${_identity.lastName}';
+        }
+        Clipboard.setData(ClipboardData(text: _name));
+        showSnackBar(context,
+            message: 'Name copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+    getIconedPopupMenuItem(
+      content: const Text('Email'),
+      icon: const Icon(Icons.mail_outline_rounded),
+      onTap: () {
+        Clipboard.setData(ClipboardData(
+            text: data.loadedAccount!.getIdentity(identityMeta.key)!.email));
+        showSnackBar(context,
+            message: 'Email copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+    if (identityMeta.firstAddressLine != '')
+      getIconedPopupMenuItem(
+        content: const Text('Address line'),
+        icon: const Icon(Icons.house_outlined),
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: identityMeta.firstAddressLine));
+          showSnackBar(context,
+              message: 'Address line copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },

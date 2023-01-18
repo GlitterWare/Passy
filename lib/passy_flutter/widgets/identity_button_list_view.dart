@@ -6,12 +6,15 @@ class IdentityButtonListView extends StatelessWidget {
   final List<IdentityMeta> identities;
   final bool shouldSort;
   final void Function(IdentityMeta identity)? onPressed;
+  final List<PopupMenuEntry<dynamic>> Function(
+      BuildContext context, IdentityMeta identityMeta)? popupMenuItemBuilder;
 
   const IdentityButtonListView({
     Key? key,
     required this.identities,
     this.shouldSort = false,
     this.onPressed,
+    this.popupMenuItemBuilder,
   }) : super(key: key);
 
   @override
@@ -23,6 +26,9 @@ class IdentityButtonListView extends StatelessWidget {
           PassyPadding(IdentityButton(
             identity: identity,
             onPressed: () => onPressed?.call(identity),
+            popupMenuItemBuilder: popupMenuItemBuilder == null
+                ? null
+                : (context) => popupMenuItemBuilder!(context, identity),
           )),
       ],
     );
