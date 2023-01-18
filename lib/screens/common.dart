@@ -10,6 +10,8 @@ import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -196,7 +198,38 @@ PopupMenuItem getIconedPopupMenuItem({
   );
 }
 
-List<PopupMenuEntry> passwordPopupMenuBuilder(context, passwordMeta) {
+List<PopupMenuEntry> idCardPopupMenuBuilder(
+    BuildContext context, IDCardMeta idCardMeta) {
+  return [
+    getIconedPopupMenuItem(
+      content: const Text('ID number'),
+      icon: const Icon(Icons.numbers_outlined),
+      onTap: () {
+        Clipboard.setData(ClipboardData(
+            text: data.loadedAccount!.getIDCard(idCardMeta.key)!.idNumber));
+        showSnackBar(context,
+            message: 'ID number copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+    if (idCardMeta.name != '')
+      getIconedPopupMenuItem(
+        content: const Text('Name'),
+        icon: const Icon(Icons.person_outline_rounded),
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: idCardMeta.name));
+          showSnackBar(context,
+              message: 'Name copied',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+  ];
+}
+
+List<PopupMenuEntry> passwordPopupMenuBuilder(
+    BuildContext context, PasswordMeta passwordMeta) {
   return [
     if (passwordMeta.username != '')
       getIconedPopupMenuItem(

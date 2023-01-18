@@ -4,6 +4,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'edit_id_card_screen.dart';
 import 'id_card_screen.dart';
@@ -61,6 +62,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           IDCardScreen.routeName,
           arguments: _account.getIDCard(idCard.key),
         ),
+        popupMenuItemBuilder: idCardPopupMenuBuilder,
       );
     });
   }
@@ -101,6 +103,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
               onPressed: (idCard) => Navigator.pushNamed(
                   context, IDCardScreen.routeName,
                   arguments: _account.getIDCard(idCard.key)),
+              popupMenuItemBuilder: idCardPopupMenuBuilder,
             ),
     );
   }
