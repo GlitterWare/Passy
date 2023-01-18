@@ -12,6 +12,7 @@ class ButtonedTextFormField extends StatelessWidget {
   final void Function()? onPressed;
   final FocusNode? focusNode;
   final List<TextInputFormatter>? inputFormatters;
+  final String? tooltip;
 
   const ButtonedTextFormField({
     Key? key,
@@ -25,6 +26,7 @@ class ButtonedTextFormField extends StatelessWidget {
     this.onPressed,
     this.focusNode,
     this.inputFormatters,
+    this.tooltip,
   }) : super(key: key);
 
   @override
@@ -48,6 +50,7 @@ class ButtonedTextFormField extends StatelessWidget {
           heroTag: null,
           onPressed: onPressed,
           child: buttonIcon,
+          tooltip: tooltip,
         ),
       ],
     );

@@ -38,6 +38,7 @@ class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
           onPressed: onSave,
+          tooltip: isNew ? 'Add' : 'Save',
           icon: isNew
               ? const Icon(Icons.add_rounded)
               : const Icon(Icons.check_rounded),

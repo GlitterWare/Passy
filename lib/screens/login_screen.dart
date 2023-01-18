@@ -132,6 +132,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         child: const Icon(
           Icons.fingerprint_rounded,
         ),
+        tooltip: 'Authenticate',
         heroTag: null,
       );
       return;
@@ -146,6 +147,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
       _floatingActionButton = FloatingActionButton(
         child: const Icon(Icons.settings_rounded),
+        tooltip: 'Settings',
         heroTag: null,
         onPressed: () =>
             Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
@@ -180,6 +182,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                     );
                   },
                   icon: const Icon(Icons.delete_outline_rounded),
+                  tooltip: 'Remove',
                   splashRadius: PassyTheme.appBarButtonSplashRadius,
                   padding: PassyTheme.appBarButtonPadding,
                 ),
@@ -214,6 +217,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                       Navigator.pushReplacementNamed(
                                           context, AddAccountScreen.routeName),
                                   child: const Icon(Icons.add_rounded),
+                                  tooltip: 'Add account',
                                   heroTag: 'addAccountBtn',
                                 ),
                                 Expanded(
@@ -255,6 +259,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                   child: const Icon(
                                     Icons.arrow_forward_ios_rounded,
                                   ),
+                                  tooltip: 'Log in',
                                   heroTag: null,
                                 ),
                                 if (_bioAuthButton != null) _bioAuthButton!,

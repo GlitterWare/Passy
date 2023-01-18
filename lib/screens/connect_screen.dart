@@ -84,6 +84,7 @@ class _ConnectScreen extends State<ConnectScreen> {
                     padding:
                         EdgeInsets.only(right: PassyTheme.passyPadding.right),
                     child: FloatingActionButton(
+                      tooltip: 'Connect',
                       onPressed: () => SynchronizationWrapper(context: context)
                           .connect(_account, address: _address),
                       child: const Icon(Icons.sync_rounded),

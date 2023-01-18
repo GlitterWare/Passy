@@ -264,6 +264,7 @@ class _MainScreen extends State<MainScreen>
           leading: IconButton(
             splashRadius: PassyTheme.appBarButtonSplashRadius,
             padding: PassyTheme.appBarButtonPadding,
+            tooltip: 'Log out',
             icon: Transform(
               alignment: Alignment.center,
               transform: Matrix4.rotationY(pi),
@@ -275,6 +276,7 @@ class _MainScreen extends State<MainScreen>
             IconButton(
               splashRadius: PassyTheme.appBarButtonSplashRadius,
               padding: PassyTheme.appBarButtonPadding,
+              tooltip: 'Synchronize',
               onPressed: () {
                 showDialog(
                   context: context,
@@ -312,6 +314,7 @@ class _MainScreen extends State<MainScreen>
             ),
             IconButton(
               padding: PassyTheme.appBarButtonPadding,
+              tooltip: 'Settings',
               onPressed: () =>
                   Navigator.pushNamed(context, SettingsScreen.routeName),
               icon: const Icon(Icons.settings),

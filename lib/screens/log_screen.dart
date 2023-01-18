@@ -29,6 +29,7 @@ class LogScreen extends StatelessWidget {
                 padding: PassyTheme.appBarButtonPadding,
                 splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: const Icon(Icons.copy_rounded),
+                tooltip: 'Copy',
                 onPressed: () => Clipboard.setData(ClipboardData(text: _log)),
               ),
               IconButton(
@@ -38,6 +39,7 @@ class LogScreen extends StatelessWidget {
                   'assets/images/github_icon.svg',
                   color: PassyTheme.lightContentColor,
                 ),
+                tooltip: 'Submit an issue',
                 onPressed: () =>
                     openUrl('https://github.com/GlitterWare/Passy/issues'),
               )

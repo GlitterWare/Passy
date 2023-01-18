@@ -68,6 +68,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                 _widgets.add(
                   FloatingActionButton(
                     heroTag: null,
+                    tooltip: 'Select date',
                     onPressed: () => showPassyDatePicker(
                       context: context,
                       date: _field.value == ''
@@ -96,6 +97,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                         setState(() => _field.value = value);
                       });
                     },
+                    tooltip: 'Generate',
                     child: const Icon(Icons.password_rounded),
                   ),
                 );
@@ -135,6 +137,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
             _widgets.add(
               FloatingActionButton(
                 heroTag: null,
+                tooltip: 'Remove',
                 onPressed: () =>
                     setState(() => widget.customFields.removeAt(index)),
                 child: const Icon(Icons.remove_rounded),

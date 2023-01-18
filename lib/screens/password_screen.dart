@@ -195,6 +195,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   child: PassyPadding(
                     FloatingActionButton(
                       heroTag: null,
+                      tooltip: 'Visit',
                       onPressed: () {
                         String _url = password!.website;
                         if (!_url

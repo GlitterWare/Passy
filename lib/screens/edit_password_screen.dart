@@ -137,6 +137,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         PassyPadding(ButtonedTextFormField(
           controller: _passwordController,
           labelText: 'Password',
+          tooltip: 'Generate',
           onChanged: (value) => setState(() => _password = value),
           buttonIcon: const Icon(Icons.password_rounded),
           onPressed: () {

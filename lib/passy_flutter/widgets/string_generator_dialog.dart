@@ -125,6 +125,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
+                  tooltip: 'Cancel',
                   onPressed: () => Navigator.pop(context),
                   child: const Icon(Icons.close_rounded),
                 ),
@@ -132,6 +133,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
+                  tooltip: 'Generate',
                   onPressed: () => setState(() => _generatePassword()),
                   child: const Icon(Icons.refresh_rounded),
                 ),
@@ -139,6 +141,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
+                  tooltip: 'Done',
                   onPressed: () => Navigator.pop(context, _value),
                   child: const Icon(Icons.check_rounded),
                 ),

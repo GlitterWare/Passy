@@ -50,6 +50,7 @@ class RecordButton extends StatelessWidget {
       ),
       right: IconButton(
         icon: const Icon(Icons.copy_rounded),
+        tooltip: 'Copy',
         onPressed: () {
           Clipboard.setData(ClipboardData(text: value));
           showSnackBar(context,

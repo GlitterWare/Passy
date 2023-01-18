@@ -35,11 +35,13 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
           icon: const Icon(Icons.delete_outline_rounded),
+          tooltip: 'Remove',
           onPressed: onRemovePressed,
         ),
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
+          tooltip: 'Edit',
           icon: const Icon(Icons.edit_rounded),
           onPressed: onEditPressed,
         ),

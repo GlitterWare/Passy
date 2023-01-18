@@ -195,6 +195,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   child: const Icon(
                                     Icons.arrow_forward_ios_rounded,
                                   ),
+                                  tooltip: 'Add account',
                                   heroTag: 'addAccountBtn',
                                 ),
                               ],
