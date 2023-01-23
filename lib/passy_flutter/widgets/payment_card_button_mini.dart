@@ -39,7 +39,7 @@ class PaymentCardButtonMini extends StatelessWidget {
               ),
               Align(
                 child: Text(
-                  paymentCard.cardNumber,
+                  paymentCard.cardholderName,
                   style: const TextStyle(color: Colors.grey),
                 ),
                 alignment: Alignment.centerLeft,
