@@ -22,6 +22,7 @@ class _SearchScreen extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var _a = ModalRoute.of(context)!.settings.arguments;
     Widget Function(String terms) _builder =
         ModalRoute.of(context)!.settings.arguments as Widget Function(String);
     if (!_initialized) {

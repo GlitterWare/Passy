@@ -5,9 +5,22 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 import 'package:image/image.dart' as imglib;
+import 'package:passy/passy_data/entry_type.dart';
+import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/note.dart';
+import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/payment_card.dart';
+import 'package:passy/passy_flutter/search_entry_data.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/id_card_screen.dart';
+import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
+import 'package:passy/screens/note_screen.dart';
+import 'package:passy/screens/password_screen.dart';
+import 'package:passy/screens/payment_card_screen.dart';
+import 'package:passy/screens/search_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
 
 import 'package:passy/common/common.dart';
@@ -40,6 +53,100 @@ class _MainScreen extends State<MainScreen>
   final LoadedAccount _account = data.loadedAccount!;
   late void Function() _onConnectPressed;
   bool _unlockScreenOn = false;
+
+  PassyEntryButtonListView _searchBuilder(String terms) {
+    final List<SearchEntryData> _found = [];
+    final List<String> _terms = terms.trim().toLowerCase().split(' ');
+    final List<SearchEntryData> _searchEntries = [];
+    for (IDCardMeta idCard in _account.idCardsMetadata.values) {
+      _searchEntries.add(SearchEntryData(
+          name: idCard.nickname,
+          description: idCard.name,
+          type: EntryType.idCard,
+          meta: idCard));
+    }
+    for (IdentityMeta _identity in _account.identitiesMetadata.values) {
+      _searchEntries.add(SearchEntryData(
+          name: _identity.nickname,
+          description: _identity.firstAddressLine,
+          type: EntryType.identity,
+          meta: _identity));
+    }
+    for (NoteMeta _note in _account.notesMetadata.values) {
+      _searchEntries.add(SearchEntryData(
+          name: _note.title,
+          description: '',
+          type: EntryType.note,
+          meta: _note));
+    }
+    for (PasswordMeta _password in _account.passwordMetadata.values) {
+      _searchEntries.add(SearchEntryData(
+          name: _password.nickname,
+          description: _password.username,
+          type: EntryType.password,
+          meta: _password));
+    }
+    for (PaymentCardMeta _paymentCard in _account.paymentCardMetadata.values) {
+      _searchEntries.add(SearchEntryData(
+          name: _paymentCard.nickname,
+          description: _paymentCard.cardholderName,
+          type: EntryType.paymentCard,
+          meta: _paymentCard));
+    }
+    for (SearchEntryData _searchEntry in _searchEntries) {
+      {
+        bool testSearchEntry(SearchEntryData value) =>
+            _searchEntry.meta.key == value.meta.key;
+
+        if (_found.any(testSearchEntry)) continue;
+      }
+      {
+        int _positiveCount = 0;
+        for (String _term in _terms) {
+          if (_searchEntry.name.toLowerCase().contains(_term)) {
+            _positiveCount++;
+            continue;
+          }
+          if (_searchEntry.description.toLowerCase().contains(_term)) {
+            _positiveCount++;
+            continue;
+          }
+        }
+        if (_positiveCount == _terms.length) {
+          _found.add(_searchEntry);
+        }
+      }
+    }
+    return PassyEntryButtonListView(
+      entries: _found,
+      shouldSort: true,
+      onPressed: (entry) {
+        switch (entry.type) {
+          case EntryType.idCard:
+            Navigator.pushNamed(context, IDCardScreen.routeName,
+                arguments: _account.getIDCard(entry.meta.key));
+            return;
+          case EntryType.identity:
+            Navigator.pushNamed(context, IdentityScreen.routeName,
+                arguments: _account.getIdentity(entry.meta.key));
+            return;
+          case EntryType.note:
+            Navigator.pushNamed(context, NoteScreen.routeName,
+                arguments: _account.getNote(entry.meta.key));
+            return;
+          case EntryType.password:
+            Navigator.pushNamed(context, PasswordScreen.routeName,
+                arguments: _account.getPassword(entry.meta.key));
+            return;
+          case EntryType.paymentCard:
+            Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                arguments: _account.getPaymentCard(entry.meta.key));
+            return;
+        }
+      },
+      popupMenuItemBuilder: passyEntryPopupMenuItemBuilder,
+    );
+  }
 
   void _logOut() {
     showDialog(
@@ -273,6 +380,15 @@ class _MainScreen extends State<MainScreen>
             onPressed: _logOut,
           ),
           actions: [
+            IconButton(
+              padding: PassyTheme.appBarButtonPadding,
+              tooltip: 'Search',
+              onPressed: () => Navigator.pushNamed(
+                  context, SearchScreen.routeName,
+                  arguments: _searchBuilder),
+              icon: const Icon(Icons.search_rounded),
+              splashRadius: PassyTheme.appBarButtonSplashRadius,
+            ),
             IconButton(
               splashRadius: PassyTheme.appBarButtonSplashRadius,
               padding: PassyTheme.appBarButtonPadding,

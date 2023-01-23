@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/passy_flutter/widgets/passy_about_dialog.dart';
 
 class GlobalSettingsScreen extends StatefulWidget {
   static const String routeName = '/globalSettings';

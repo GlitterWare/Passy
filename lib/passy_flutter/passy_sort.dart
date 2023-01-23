@@ -6,6 +6,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 
 import 'common/common.dart';
+import 'passy_flutter.dart';
 
 class PassySort {
   static void sortPasswords(List<PasswordMeta> passwords) {
@@ -54,6 +55,16 @@ class PassySort {
         return alphabeticalCompare(a.firstAddressLine, b.firstAddressLine);
       }
       return _nickComp;
+    });
+  }
+
+  static void sortEntries(List<SearchEntryData> entries) {
+    entries.sort((a, b) {
+      int _nameComp = alphabeticalCompare(a.name, b.name);
+      if (_nameComp == 0) {
+        return alphabeticalCompare(a.description, b.description);
+      }
+      return _nameComp;
     });
   }
 }

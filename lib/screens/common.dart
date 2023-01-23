@@ -10,10 +10,12 @@ import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -359,4 +361,80 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
         },
       ),
   ];
+}
+
+List<PopupMenuEntry> paymentCardPopupMenuBuilder(
+    BuildContext context, PaymentCardMeta paymentCardMeta) {
+  return [
+    if (paymentCardMeta.cardNumber != '')
+      getIconedPopupMenuItem(
+        content: const Text('Card number'),
+        icon: const Icon(Icons.numbers_outlined),
+        onTap: () {
+          Clipboard.setData(ClipboardData(
+              text: data.loadedAccount!
+                  .getPaymentCard(paymentCardMeta.key)!
+                  .cardNumber));
+          showSnackBar(context,
+              message: 'Card number copied',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+    if (paymentCardMeta.cardholderName != '')
+      getIconedPopupMenuItem(
+        content: const Text('Card holder name'),
+        icon: const Icon(Icons.person_outline_rounded),
+        onTap: () {
+          Clipboard.setData(
+              ClipboardData(text: paymentCardMeta.cardholderName));
+          showSnackBar(context,
+              message: 'Card holder name copied',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+    if (paymentCardMeta.exp != '')
+      getIconedPopupMenuItem(
+        content: const Text('Expiration date'),
+        icon: const Icon(Icons.date_range_outlined),
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: paymentCardMeta.exp));
+          showSnackBar(context,
+              message: 'Expiration date copied',
+              icon: const Icon(Icons.copy_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+    getIconedPopupMenuItem(
+      content: const Text('CVV'),
+      icon: const Icon(Icons.password_outlined),
+      onTap: () {
+        Clipboard.setData(ClipboardData(
+            text:
+                data.loadedAccount!.getPaymentCard(paymentCardMeta.key)!.cvv));
+        showSnackBar(context,
+            message: 'CVV copied',
+            icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+  ];
+}
+
+List<PopupMenuEntry> passyEntryPopupMenuItemBuilder(
+    BuildContext context, SearchEntryData entry) {
+  switch (entry.type) {
+    case EntryType.idCard:
+      return idCardPopupMenuBuilder(context, entry.meta as IDCardMeta);
+    case EntryType.identity:
+      return identityPopupMenuBuilder(context, entry.meta as IdentityMeta);
+    case EntryType.note:
+      return notePopupMenuBuilder(context, entry.meta as NoteMeta);
+    case EntryType.password:
+      return passwordPopupMenuBuilder(context, entry.meta as PasswordMeta);
+    case EntryType.paymentCard:
+      return paymentCardPopupMenuBuilder(
+          context, entry.meta as PaymentCardMeta);
+  }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/passy_flutter/widgets/payment_card_button_mini.dart';
 
 class PaymentCardButtonMiniListView extends StatelessWidget {
   final List<PaymentCardMeta> paymentCards;
