@@ -29,7 +29,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
         final List<PaymentCardMeta> _found = [];
         final List<String> _terms = terms.trim().toLowerCase().split(' ');
         for (PaymentCardMeta _paymentCard
-            in data.loadedAccount!.paymentCardMetadata.values) {
+            in data.loadedAccount!.paymentCardsMetadata.values) {
           {
             bool testPaymentCard(PaymentCardMeta value) =>
                 _paymentCard.key == value.key;
@@ -75,7 +75,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   @override
   Widget build(BuildContext context) {
     List<PaymentCardMeta> _paymentCards =
-        _account.paymentCardMetadata.values.toList();
+        _account.paymentCardsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
         title: const Text('Payment cards'),

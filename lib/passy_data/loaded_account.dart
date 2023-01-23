@@ -260,7 +260,7 @@ class LoadedAccount {
 
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
-  Map<String, PasswordMeta> get passwordMetadata =>
+  Map<String, PasswordMeta> get passwordsMetadata =>
       _passwords.metadata.map((key, e) => MapEntry(key, e as PasswordMeta));
   Map<String, Password> get passwords => _passwords.entries;
 
@@ -314,8 +314,9 @@ class LoadedAccount {
 
   // Payment Cards wrappers
   List<String> get paymentCardKeys => _paymentCards.keys;
-  Map<String, PaymentCardMeta> get paymentCardMetadata => _paymentCards.metadata
-      .map((key, e) => MapEntry(key, e as PaymentCardMeta));
+  Map<String, PaymentCardMeta> get paymentCardsMetadata =>
+      _paymentCards.metadata
+          .map((key, e) => MapEntry(key, e as PaymentCardMeta));
   Map<String, PaymentCard> get paymentCards => _paymentCards.entries;
 
   PaymentCard? getPaymentCard(String key) => _paymentCards.getEntry(key);

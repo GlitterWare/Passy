@@ -79,14 +79,14 @@ class _MainScreen extends State<MainScreen>
           type: EntryType.note,
           meta: _note));
     }
-    for (PasswordMeta _password in _account.passwordMetadata.values) {
+    for (PasswordMeta _password in _account.passwordsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
           meta: _password));
     }
-    for (PaymentCardMeta _paymentCard in _account.paymentCardMetadata.values) {
+    for (PaymentCardMeta _paymentCard in _account.paymentCardsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
