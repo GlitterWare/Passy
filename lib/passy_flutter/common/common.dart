@@ -3,6 +3,8 @@ export 'always_disabled_focus_node.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 String capitalize(String string) {
@@ -78,5 +80,18 @@ Future<DateTime?> showPassyDatePicker(
       data: ThemeData(colorScheme: colorScheme),
       child: w!,
     ),
+  );
+}
+
+Widget getCardTypeImage(CardType? cardType) {
+  if (cardType == CardType.otherBrand) {
+    return logoCircle50White;
+  }
+
+  return Image.asset(
+    CardTypeIconAsset[cardType]!,
+    height: 48,
+    width: 48,
+    package: 'flutter_credit_card',
   );
 }
