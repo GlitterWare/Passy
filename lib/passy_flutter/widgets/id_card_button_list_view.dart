@@ -25,7 +25,7 @@ class IDCardButtonListView extends StatelessWidget {
         for (IDCardMeta idCard in idCards)
           PassyPadding(IDCardButton(
             idCard: idCard,
-            onPressed: () => onPressed?.call(idCard),
+            onPressed: onPressed == null ? null : () => onPressed!(idCard),
             popupMenuItemBuilder: popupMenuItemBuilder == null
                 ? null
                 : (context) => popupMenuItemBuilder!(context, idCard),

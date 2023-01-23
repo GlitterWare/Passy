@@ -25,7 +25,7 @@ class NoteButtonListView extends StatelessWidget {
         for (NoteMeta note in notes)
           PassyPadding(NoteButton(
             note: note,
-            onPressed: () => onPressed?.call(note),
+            onPressed: onPressed == null ? null : () => onPressed!(note),
             popupMenuItemBuilder: popupMenuItemBuilder == null
                 ? null
                 : (context) => popupMenuItemBuilder!(context, note),

@@ -22,7 +22,7 @@ class PaymentCardButtonListView extends StatelessWidget {
         for (PaymentCardMeta paymentCard in paymentCards)
           PassyPadding(PaymentCardButton(
             paymentCard: paymentCard,
-            onPressed: () => onPressed?.call(paymentCard),
+            onPressed: onPressed == null ? null : () => onPressed!(paymentCard),
           )),
       ],
     );

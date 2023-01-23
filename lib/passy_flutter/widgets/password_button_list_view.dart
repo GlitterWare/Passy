@@ -25,7 +25,7 @@ class PasswordButtonListView extends StatelessWidget {
         for (PasswordMeta password in passwords)
           PassyPadding(PasswordButton(
             password: password,
-            onPressed: () => onPressed?.call(password),
+            onPressed: onPressed == null ? null : () => onPressed!(password),
             popupMenuItemBuilder: popupMenuItemBuilder == null
                 ? null
                 : (ctx) => popupMenuItemBuilder!(ctx, password),

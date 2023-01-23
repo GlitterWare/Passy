@@ -26,7 +26,7 @@ class PaymentCardButtonMiniListView extends StatelessWidget {
         for (PaymentCardMeta paymentCard in paymentCards)
           PassyPadding(PaymentCardButtonMini(
             paymentCard: paymentCard,
-            onPressed: () => onPressed?.call(paymentCard),
+            onPressed: onPressed == null ? null : () => onPressed!(paymentCard),
             popupMenuItemBuilder: popupMenuItemBuilder == null
                 ? null
                 : (context) => popupMenuItemBuilder!(context, paymentCard),

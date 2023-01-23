@@ -25,7 +25,7 @@ class IdentityButtonListView extends StatelessWidget {
         for (IdentityMeta identity in identities)
           PassyPadding(IdentityButton(
             identity: identity,
-            onPressed: () => onPressed?.call(identity),
+            onPressed: onPressed == null ? null : () => onPressed!(identity),
             popupMenuItemBuilder: popupMenuItemBuilder == null
                 ? null
                 : (context) => popupMenuItemBuilder!(context, identity),
