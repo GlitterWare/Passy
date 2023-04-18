@@ -31,6 +31,13 @@ class _SecurityScreen extends State<SecurityScreen> {
     loadedAccount.saveSettings();
   }
 
+  void setAutoScreenLock(bool value) {
+    setState(() {
+      loadedAccount.autoScreenLock = value;
+    });
+    loadedAccount.saveSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +79,19 @@ class _SecurityScreen extends State<SecurityScreen> {
                 onChanged: (value) => setProtectScreen(value),
               ),
               onPressed: () => setProtectScreen(!loadedAccount.protectScreen),
+            )),
+          if (Platform.isAndroid)
+            PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.automaticScreenLock),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.security),
+              ),
+              right: Switch(
+                value: loadedAccount.autoScreenLock,
+                onChanged: (value) => setAutoScreenLock(value),
+              ),
+              onPressed: () => setAutoScreenLock(!loadedAccount.autoScreenLock),
             )),
         ],
       ),

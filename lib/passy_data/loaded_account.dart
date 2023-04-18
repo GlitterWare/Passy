@@ -246,6 +246,8 @@ class LoadedAccount {
   // Account Settings wrappers
   bool get protectScreen => _settings.value.protectScreen;
   set protectScreen(bool value) => _settings.value.protectScreen = value;
+  bool get autoScreenLock => _settings.value.autoScreenLock;
+  set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
 

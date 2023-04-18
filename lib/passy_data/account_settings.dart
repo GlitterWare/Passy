@@ -8,17 +8,21 @@ typedef AccountSettingsFile = EncryptedJsonFile<AccountSettings>;
 
 class AccountSettings with JsonConvertable {
   bool protectScreen;
+  bool autoScreenLock;
 
   AccountSettings.fromJson(Map<String, dynamic> json)
-      : protectScreen = json['protectScreen'] ?? true;
+      : protectScreen = json['protectScreen'] ?? true,
+        autoScreenLock = json['autoScreenLock'] ?? true;
 
   AccountSettings({
     this.protectScreen = true,
+    this.autoScreenLock = true,
   });
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'protectScreen': protectScreen,
+        'autoScreenLock': autoScreenLock,
       };
 
   static AccountSettingsFile fromFile(
