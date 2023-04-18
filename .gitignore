@@ -47,3 +47,7 @@ app.*.map.json
 
 # Snap packaging files
 /snap/*
+
+# Development log files
+/log/*
+!/log/empty
