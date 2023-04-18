@@ -42,6 +42,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   int _tfaInterval = 30;
   Algorithm _tfaAlgorithm = Algorithm.SHA1;
   bool _tfaIsGoogle = true;
+  bool _tfaIsExpanded = false;
   String _website = '';
 
   @override
@@ -151,63 +152,112 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             });
           },
         )),
-        PassyPadding(TextFormField(
-          initialValue: _tfaSecret.replaceFirst('=', ''),
-          decoration: InputDecoration(
-              labelText: '2FA ${localizations.secret.toLowerCase()}'),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[a-z]|[A-Z]|[2-7]')),
-            TextInputFormatter.withFunction((oldValue, newValue) =>
-                TextEditingValue(
-                    text: newValue.text.toUpperCase(),
-                    selection: newValue.selection)),
-          ],
-          onChanged: (value) {
-            if (value.length.isOdd) value += '=';
-            setState(() => _tfaSecret = value);
-          },
-        )),
-        PassyPadding(TextFormField(
-          initialValue: _tfaLength.toString(),
-          decoration: InputDecoration(
-              labelText: '2FA ${localizations.length.toLowerCase()}'),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: (value) => setState(() => _tfaLength = int.parse(value)),
-        )),
-        PassyPadding(TextFormField(
-          initialValue: _tfaInterval.toString(),
-          decoration: InputDecoration(
-              labelText: '2FA ${localizations.interval.toLowerCase()}'),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: (value) => setState(() => _tfaInterval = int.parse(value)),
-        )),
-        PassyPadding(EnumDropDownButtonFormField<Algorithm>(
-          value: _tfaAlgorithm,
-          values: Algorithm.values,
-          decoration: InputDecoration(
-              labelText: '2FA ${localizations.algorithm.toLowerCase()}'),
-          onChanged: (value) {
-            if (value != null) setState(() => _tfaAlgorithm = value);
-          },
-        )),
-        PassyPadding(DropdownButtonFormField(
-          items: [
-            DropdownMenuItem(
-              child: Text(
-                  '${localizations.true_} (${localizations.recommended.toLowerCase()})'),
-              value: true,
-            ),
-            DropdownMenuItem(
-              child: Text(localizations.false_),
-              value: false,
-            ),
-          ],
-          value: _tfaIsGoogle,
-          decoration: InputDecoration(
-              labelText:
-                  '2FA ${localizations.isGoogle.replaceRange(0, 1, localizations.isGoogle[0].toLowerCase())}'),
-          onChanged: (value) => setState(() => _tfaIsGoogle = value as bool),
-        )),
+        ExpansionPanelList(
+            expandedHeaderPadding: EdgeInsets.zero,
+            expansionCallback: (panelIndex, isExpanded) =>
+                setState(() => _tfaIsExpanded = !isExpanded),
+            elevation: 0,
+            dividerColor: PassyTheme.lightContentSecondaryColor,
+            children: [
+              ExpansionPanel(
+                  backgroundColor: PassyTheme.darkContentColor,
+                  isExpanded: _tfaIsExpanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isExpanded) {
+                    return Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Container(
+                            decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(32.0)),
+                                color: PassyTheme.darkPassyPurple),
+                            child: PassyPadding(Row(
+                              children: const [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Icon(Icons.security),
+                                ),
+                                Padding(
+                                    padding: EdgeInsets.only(left: 15),
+                                    child: Text('Two-Factor Authentication')),
+                              ],
+                            ))));
+                  },
+                  body: Column(
+                    children: [
+                      PassyPadding(TextFormField(
+                        initialValue: _tfaSecret.replaceFirst('=', ''),
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.secret.toLowerCase()}'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-z]|[A-Z]|[2-7]')),
+                          TextInputFormatter.withFunction(
+                              (oldValue, newValue) => TextEditingValue(
+                                  text: newValue.text.toUpperCase(),
+                                  selection: newValue.selection)),
+                        ],
+                        onChanged: (value) {
+                          if (value.length.isOdd) value += '=';
+                          setState(() => _tfaSecret = value);
+                        },
+                      )),
+                      PassyPadding(TextFormField(
+                        initialValue: _tfaLength.toString(),
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.length.toLowerCase()}'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _tfaLength = int.parse(value)),
+                      )),
+                      PassyPadding(TextFormField(
+                        initialValue: _tfaInterval.toString(),
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.interval.toLowerCase()}'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _tfaInterval = int.parse(value)),
+                      )),
+                      PassyPadding(EnumDropDownButtonFormField<Algorithm>(
+                        value: _tfaAlgorithm,
+                        values: Algorithm.values,
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.algorithm.toLowerCase()}'),
+                        onChanged: (value) {
+                          if (value != null)
+                            setState(() => _tfaAlgorithm = value);
+                        },
+                      )),
+                      PassyPadding(DropdownButtonFormField(
+                        items: [
+                          DropdownMenuItem(
+                            child: Text(
+                                '${localizations.true_} (${localizations.recommended.toLowerCase()})'),
+                            value: true,
+                          ),
+                          DropdownMenuItem(
+                            child: Text(localizations.false_),
+                            value: false,
+                          ),
+                        ],
+                        value: _tfaIsGoogle,
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.isGoogle.replaceRange(0, 1, localizations.isGoogle[0].toLowerCase())}'),
+                        onChanged: (value) =>
+                            setState(() => _tfaIsGoogle = value as bool),
+                      )),
+                    ],
+                  ))
+            ]),
         PassyPadding(TextFormField(
           initialValue: _website,
           decoration: const InputDecoration(labelText: 'Website'),

@@ -12,6 +12,7 @@ class PassyTheme {
   static const darkContentSecondaryColor = Color.fromRGBO(84, 110, 122, 1);
   static const lightContentColor = Color.fromRGBO(227, 242, 253, 1);
   static const lightContentSecondaryColor = Color.fromRGBO(144, 202, 249, 1);
+  static const darkPassyPurple = Color.fromRGBO(74, 20, 140, 1);
 
   static final ThemeData theme = ThemeData(
     colorScheme: const ColorScheme.dark(
