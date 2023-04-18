@@ -154,14 +154,14 @@ class _MainScreen extends State<MainScreen>
       builder: (ctx) {
         return AlertDialog(
           shape: PassyTheme.dialogShape,
-          title: const Text('Log out'),
+          title: Text(localizations.logOut),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text(
-                  'Stay',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.stay,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 )),
             TextButton(
                 onPressed: () {
@@ -170,13 +170,13 @@ class _MainScreen extends State<MainScreen>
                   Navigator.pushReplacementNamed(
                       context, LoginScreen.routeName);
                 },
-                child: const Text(
-                  'Log out',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.logOut,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 )),
           ],
-          content: const Text('Are you sure you want to log out?'),
+          content: Text(localizations.areYouSureYouWantToLogOutQuestion),
         );
       },
     );
@@ -227,8 +227,8 @@ class _MainScreen extends State<MainScreen>
         context: context,
         builder: (ctx) => AlertDialog(
               shape: PassyTheme.dialogShape,
-              title: const Text(
-                'Scan QR code',
+              title: Text(
+                localizations.scanQRCode,
                 textAlign: TextAlign.center,
               ),
               content: SizedBox(
@@ -253,18 +253,18 @@ class _MainScreen extends State<MainScreen>
                     Navigator.pushNamed(context, ConnectScreen.routeName,
                         arguments: _account);
                   },
-                  child: const Text(
-                    'Can\'t scan?',
-                    style: TextStyle(
+                  child: Text(
+                    localizations.canNotScanQuestion,
+                    style: const TextStyle(
                       color: PassyTheme.lightContentSecondaryColor,
                     ),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
+                  child: Text(
+                    localizations.cancel,
+                    style: const TextStyle(
                       color: PassyTheme.lightContentSecondaryColor,
                     ),
                   ),
@@ -318,7 +318,7 @@ class _MainScreen extends State<MainScreen>
           child: Icon(Icons.password_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: const Text('Passwords'),
+        center: Text(localizations.passwords),
         onPressed: () =>
             Navigator.pushNamed(context, PasswordsScreen.routeName),
       )),
@@ -328,7 +328,7 @@ class _MainScreen extends State<MainScreen>
           child: Icon(Icons.payment_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: const Text('Payment cards'),
+        center: Text(localizations.paymentCards),
         onPressed: () =>
             Navigator.pushNamed(context, PaymentCardsScreen.routeName),
       )),
@@ -338,7 +338,7 @@ class _MainScreen extends State<MainScreen>
           child: Icon(Icons.note_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: const Text('Notes'),
+        center: Text(localizations.notes),
         onPressed: () => Navigator.pushNamed(context, NotesScreen.routeName),
       )),
       PassyPadding(ThreeWidgetButton(
@@ -347,7 +347,7 @@ class _MainScreen extends State<MainScreen>
           child: Icon(Icons.perm_identity_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: const Text('ID cards'),
+        center: Text(localizations.idCards),
         onPressed: () => Navigator.pushNamed(context, IDCardsScreen.routeName),
       )),
       PassyPadding(ThreeWidgetButton(
@@ -356,7 +356,7 @@ class _MainScreen extends State<MainScreen>
           child: Icon(Icons.people_outline_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: const Text('Identities'),
+        center: Text(localizations.identities),
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
@@ -371,7 +371,7 @@ class _MainScreen extends State<MainScreen>
           leading: IconButton(
             splashRadius: PassyTheme.appBarButtonSplashRadius,
             padding: PassyTheme.appBarButtonPadding,
-            tooltip: 'Log out',
+            tooltip: localizations.logOut,
             icon: Transform(
               alignment: Alignment.center,
               transform: Matrix4.rotationY(pi),
@@ -382,7 +382,7 @@ class _MainScreen extends State<MainScreen>
           actions: [
             IconButton(
               padding: PassyTheme.appBarButtonPadding,
-              tooltip: 'Search',
+              tooltip: localizations.search,
               onPressed: () => Navigator.pushNamed(
                   context, SearchScreen.routeName,
                   arguments: _searchBuilder),
@@ -392,32 +392,33 @@ class _MainScreen extends State<MainScreen>
             IconButton(
               splashRadius: PassyTheme.appBarButtonSplashRadius,
               padding: PassyTheme.appBarButtonPadding,
-              tooltip: 'Synchronize',
+              tooltip: localizations.synchronize,
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (_) => AlertDialog(
                     shape: PassyTheme.dialogShape,
-                    title: const Center(
+                    title: Center(
                         child: Text(
-                      'Synchronize',
-                      style: TextStyle(color: PassyTheme.lightContentColor),
+                      localizations.synchronize,
+                      style:
+                          const TextStyle(color: PassyTheme.lightContentColor),
                     )),
                     actionsAlignment: MainAxisAlignment.center,
                     actions: [
                       TextButton(
-                          child: const Text(
-                            'Host',
-                            style: TextStyle(
+                          child: Text(
+                            localizations.host,
+                            style: const TextStyle(
                                 color: PassyTheme.lightContentSecondaryColor),
                           ),
                           onPressed: () =>
                               SynchronizationWrapper(context: context)
                                   .host(_account)),
                       TextButton(
-                        child: const Text(
-                          'Connect',
-                          style: TextStyle(
+                        child: Text(
+                          localizations.connect,
+                          style: const TextStyle(
                               color: PassyTheme.lightContentSecondaryColor),
                         ),
                         onPressed: _onConnectPressed,
@@ -430,7 +431,7 @@ class _MainScreen extends State<MainScreen>
             ),
             IconButton(
               padding: PassyTheme.appBarButtonPadding,
-              tooltip: 'Settings',
+              tooltip: localizations.settings,
               onPressed: () =>
                   Navigator.pushNamed(context, SettingsScreen.routeName),
               icon: const Icon(Icons.settings),

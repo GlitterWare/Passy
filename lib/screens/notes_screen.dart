@@ -65,7 +65,7 @@ class _NotesScreen extends State<NotesScreen> {
     List<NoteMeta> _notes = _account.notesMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
-          title: const Center(child: Text('Notes')),
+          title: Center(child: Text(localizations.notes)),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
       body: _notes.isEmpty
@@ -75,8 +75,8 @@ class _NotesScreen extends State<NotesScreen> {
                   child: Column(
                     children: [
                       const Spacer(flex: 7),
-                      const Text(
-                        'No notes',
+                      Text(
+                        localizations.noNotes,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),

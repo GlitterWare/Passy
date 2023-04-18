@@ -60,7 +60,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       return;
     }
     showSnackBar(context,
-        message: 'Incorrect password',
+        message: localizations.incorrectPassword,
         icon: const Icon(
           Icons.lock_rounded,
           color: PassyTheme.darkContentColor,
@@ -79,6 +79,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
         child: const Icon(
           Icons.fingerprint_rounded,
         ),
+        tooltip: localizations.authenticate,
         heroTag: null,
       );
       return;
@@ -104,7 +105,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Unlock'),
+          title: Text(localizations.unlock),
           centerTitle: true,
           leading: IconButton(
             splashRadius: PassyTheme.appBarButtonSplashRadius,
@@ -137,7 +138,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                   ),
                   PassyPadding(
                     ButtonedTextFormField(
-                      labelText: 'Password',
+                      labelText: localizations.password,
                       obscureText: true,
                       onChanged: (a) => setState(() => _password = a),
                       onPressed: _unlock,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -33,7 +34,7 @@ class _ConnectScreen extends State<ConnectScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Connect'),
+        title: Text(localizations.connect),
         centerTitle: true,
       ),
       body: CustomScrollView(
@@ -42,23 +43,23 @@ class _ConnectScreen extends State<ConnectScreen> {
             child: Column(children: [
               const Spacer(),
               RichText(
-                text: const TextSpan(
-                  text: 'You have to be on the ',
+                text: TextSpan(
+                  text: localizations.connect1,
                   children: [
                     TextSpan(
-                      text: 'same network ',
-                      style: TextStyle(
+                      text: localizations.connect2Highlighted,
+                      style: const TextStyle(
                           color: PassyTheme.lightContentSecondaryColor),
                     ),
                     TextSpan(
                         text:
-                            'as the host to connect.\n\nEnter host address as shown '),
+                            '${localizations.connect3}.\n\n${localizations.connect4}'),
                     TextSpan(
-                      text: 'below the QR code',
-                      style: TextStyle(
+                      text: localizations.connect5Highlighted,
+                      style: const TextStyle(
                           color: PassyTheme.lightContentSecondaryColor),
                     ),
-                    TextSpan(text: ':\n'),
+                    const TextSpan(text: ':\n'),
                   ],
                 ),
                 textAlign: TextAlign.center,
@@ -72,8 +73,8 @@ class _ConnectScreen extends State<ConnectScreen> {
                         bottom: PassyTheme.passyPadding.bottom),
                     child: TextFormField(
                       initialValue: _address,
-                      decoration: const InputDecoration(
-                        labelText: 'Host address',
+                      decoration: InputDecoration(
+                        labelText: localizations.hostAddress,
                       ),
                       onChanged: (s) => setState(() => _address = s),
                     ),
@@ -84,7 +85,7 @@ class _ConnectScreen extends State<ConnectScreen> {
                     padding:
                         EdgeInsets.only(right: PassyTheme.passyPadding.right),
                     child: FloatingActionButton(
-                      tooltip: 'Connect',
+                      tooltip: localizations.connect,
                       onPressed: () => SynchronizationWrapper(context: context)
                           .connect(_account, address: _address),
                       child: const Icon(Icons.sync_rounded),

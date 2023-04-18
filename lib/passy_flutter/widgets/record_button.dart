@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
 
@@ -50,11 +51,11 @@ class RecordButton extends StatelessWidget {
       ),
       right: IconButton(
         icon: const Icon(Icons.copy_rounded),
-        tooltip: 'Copy',
+        tooltip: localizations.copy,
         onPressed: () {
           Clipboard.setData(ClipboardData(text: value));
           showSnackBar(context,
-              message: '$title copied',
+              message: '$title ${localizations.copied.toLowerCase()}',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },

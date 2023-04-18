@@ -34,13 +34,13 @@ class _SettingsScreen extends State<SettingsScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Settings'),
+        title: Text(localizations.settings),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Donate'),
+            center: Text(localizations.donate),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.money_rounded),
@@ -49,7 +49,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             onPressed: () => openUrl('https://github.com/sponsors/GlitterWare'),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Automatic Backup'),
+            center: Text(localizations.automaticBackup),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.save_outlined),
@@ -60,7 +60,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 arguments: data.loadedAccount!.username),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Backup & Restore'),
+            center: Text(localizations.backupAndRestore),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.save_rounded),
@@ -71,7 +71,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 arguments: data.loadedAccount!.username),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Export & Import'),
+            center: Text(localizations.exportAndImport),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.ios_share_rounded),
@@ -83,7 +83,7 @@ class _SettingsScreen extends State<SettingsScreen> {
           )),
           if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
-                center: const Text('Security'),
+                center: Text(localizations.security),
                 left: const Padding(
                   padding: EdgeInsets.only(right: 30),
                   child: Icon(Icons.lock_rounded),
@@ -92,7 +92,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 onPressed: () =>
                     Navigator.pushNamed(context, SecurityScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
-              center: const Text('Credentials'),
+              center: Text(localizations.credentials),
               left: const Padding(
                 padding: EdgeInsets.only(right: 30),
                 child: Icon(Icons.person_outline_rounded),
@@ -101,7 +101,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               onPressed: () =>
                   Navigator.pushNamed(context, CredentialsScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('About'),
+            center: Text(localizations.about),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.info_outline_rounded),

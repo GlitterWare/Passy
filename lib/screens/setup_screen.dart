@@ -21,7 +21,7 @@ class _SetupScreen extends State<SetupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account setup'),
+        title: Text(localizations.accountSetup),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
@@ -33,7 +33,7 @@ class _SetupScreen extends State<SetupScreen> {
         children: [
           if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
-                center: const Text('Security'),
+                center: Text(localizations.security),
                 left: const Padding(
                   padding: EdgeInsets.only(right: 30),
                   child: Icon(Icons.lock_rounded),
@@ -42,7 +42,7 @@ class _SetupScreen extends State<SetupScreen> {
                 onPressed: () =>
                     Navigator.pushNamed(context, SecurityScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Automatic Backup'),
+            center: Text(localizations.automaticBackup),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.save_outlined),

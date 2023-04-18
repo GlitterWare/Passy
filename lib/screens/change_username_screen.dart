@@ -26,19 +26,19 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
   Widget build(BuildContext context) {
     return ConfirmStringScaffold(
       onBackPressed: (context) => Navigator.pop(context),
-      title: const Text('Change username'),
-      labelText: 'New username',
+      title: Text(localizations.changeUsername),
+      labelText: localizations.newUsername,
       onConfirmPressed: (context, value) {
         if (value.length < 2) {
           showSnackBar(context,
-              message: 'Username is shorter than 2 letters',
+              message: localizations.usernameShorterThan2Letters,
               icon: const Icon(Icons.person_rounded,
                   color: PassyTheme.darkContentColor));
           return;
         }
         if (data.hasAccount(value)) {
           showSnackBar(context,
-              message: 'Username is already in use',
+              message: localizations.usernameAlreadyInUse,
               icon: const Icon(Icons.person_rounded,
                   color: PassyTheme.darkContentColor));
           return;
@@ -61,7 +61,7 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
       message: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          text: 'Current username is ',
+          text: localizations.currentUsernameIs,
           children: [
             TextSpan(
               text: _account.username,
@@ -69,7 +69,7 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
                 color: PassyTheme.lightContentSecondaryColor,
               ),
             ),
-            const TextSpan(text: '.\nType in the new username.'),
+            TextSpan(text: '.\n\n${localizations.typeInTheNewUsername}.'),
           ],
         ),
       ),

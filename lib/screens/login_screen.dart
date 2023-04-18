@@ -83,7 +83,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
       showSnackBar(
         context,
-        message: 'Incorrect password',
+        message: localizations.incorrectPassword,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
       );
@@ -110,11 +110,11 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       } catch (e, s) {
         showSnackBar(
           context,
-          message: 'Could not login',
+          message: localizations.couldNotLogin,
           icon: const Icon(Icons.lock_rounded,
               color: PassyTheme.darkContentColor),
           action: SnackBarAction(
-            label: 'Details',
+            label: localizations.details,
             onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
                 arguments: e.toString() + '\n' + s.toString()),
           ),
@@ -132,7 +132,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         child: const Icon(
           Icons.fingerprint_rounded,
         ),
-        tooltip: 'Authenticate',
+        tooltip: localizations.authenticate,
         heroTag: null,
       );
       return;
@@ -147,7 +147,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
       _floatingActionButton = FloatingActionButton(
         child: const Icon(Icons.settings_rounded),
-        tooltip: 'Settings',
+        tooltip: localizations.settings,
         heroTag: null,
         onPressed: () =>
             Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
@@ -182,7 +182,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                     );
                   },
                   icon: const Icon(Icons.delete_outline_rounded),
-                  tooltip: 'Remove',
+                  tooltip: localizations.remove,
                   splashRadius: PassyTheme.appBarButtonSplashRadius,
                   padding: PassyTheme.appBarButtonPadding,
                 ),
@@ -217,7 +217,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                       Navigator.pushReplacementNamed(
                                           context, AddAccountScreen.routeName),
                                   child: const Icon(Icons.add_rounded),
-                                  tooltip: 'Add account',
+                                  tooltip: localizations.addAccount,
                                   heroTag: 'addAccountBtn',
                                 ),
                                 Expanded(
@@ -245,8 +245,8 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                     obscureText: true,
                                     onChanged: (a) =>
                                         setState(() => _password = a),
-                                    decoration: const InputDecoration(
-                                      hintText: 'Password',
+                                    decoration: InputDecoration(
+                                      hintText: localizations.password,
                                     ),
                                     inputFormatters: [
                                       LengthLimitingTextInputFormatter(32),
@@ -259,7 +259,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                   child: const Icon(
                                     Icons.arrow_forward_ios_rounded,
                                   ),
-                                  tooltip: 'Log in',
+                                  tooltip: localizations.logIn,
                                   heroTag: null,
                                 ),
                                 if (_bioAuthButton != null) _bioAuthButton!,

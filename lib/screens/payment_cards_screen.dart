@@ -78,7 +78,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
         _account.paymentCardsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
-        title: const Text('Payment cards'),
+        title: Text(localizations.paymentCards),
         onAddPressed: _onAddPressed,
         onSearchPressed: _onSearchPressed,
       ),
@@ -89,8 +89,8 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
                   child: Column(
                     children: [
                       const Spacer(flex: 7),
-                      const Text(
-                        'No payment cards',
+                      Text(
+                        localizations.noPaymentCards,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),

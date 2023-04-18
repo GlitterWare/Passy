@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
 class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -35,13 +36,13 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
           icon: const Icon(Icons.delete_outline_rounded),
-          tooltip: 'Remove',
+          tooltip: localizations.remove,
           onPressed: onRemovePressed,
         ),
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
-          tooltip: 'Edit',
+          tooltip: localizations.edit,
           icon: const Icon(Icons.edit_rounded),
           onPressed: onEditPressed,
         ),

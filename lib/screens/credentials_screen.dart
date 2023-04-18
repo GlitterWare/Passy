@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/change_password_screen.dart';
 import 'package:passy/screens/change_username_screen.dart';
@@ -24,13 +25,13 @@ class _CredentialsScreen extends State<CredentialsScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Credentials'),
+        title: Text(localizations.credentials),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Change username'),
+            center: Text(localizations.changeUsername),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.person_outline_rounded),
@@ -40,7 +41,7 @@ class _CredentialsScreen extends State<CredentialsScreen> {
                 Navigator.pushNamed(context, ChangeUsernameScreen.routeName),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Change password'),
+            center: Text(localizations.changePassword),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.lock_rounded),

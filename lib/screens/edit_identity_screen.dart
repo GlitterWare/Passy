@@ -110,20 +110,20 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
 
     return Scaffold(
       appBar: EditScreenAppBar(
-        title: 'identity',
+        title: localizations.identity.toLowerCase(),
         isNew: _isNew,
         onSave: _onSave,
       ),
       body: ListView(children: [
         PassyPadding(TextFormField(
           initialValue: _nickname,
-          decoration: const InputDecoration(labelText: 'Nickname'),
+          decoration: InputDecoration(labelText: localizations.nickname),
           onChanged: (value) => setState(() => _nickname = value.trim()),
         )),
         PassyPadding(EnumDropDownButtonFormField<id.Title>(
           value: _title,
           values: id.Title.values,
-          decoration: const InputDecoration(labelText: 'Title'),
+          decoration: InputDecoration(labelText: localizations.title),
           textCapitalization: TextCapitalization.words,
           onChanged: (value) {
             if (value != null) setState(() => _title = value);
@@ -131,23 +131,23 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         )),
         PassyPadding(TextFormField(
           initialValue: _firstName,
-          decoration: const InputDecoration(labelText: 'First name'),
+          decoration: InputDecoration(labelText: localizations.firstName),
           onChanged: (value) => setState(() => _firstName = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _middleName,
-          decoration: const InputDecoration(labelText: 'Middle name'),
+          decoration: InputDecoration(labelText: localizations.middleName),
           onChanged: (value) => setState(() => _middleName = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _lastName,
-          decoration: const InputDecoration(labelText: 'Last name'),
+          decoration: InputDecoration(labelText: localizations.lastName),
           onChanged: (value) => setState(() => _lastName = value.trim()),
         )),
         PassyPadding(EnumDropDownButtonFormField<id.Gender>(
           value: _gender,
           values: id.Gender.values,
-          decoration: const InputDecoration(labelText: 'Gender'),
+          decoration: InputDecoration(labelText: localizations.gender),
           textCapitalization: TextCapitalization.words,
           onChanged: (value) {
             if (value != null) setState(() => _gender = value);
@@ -155,39 +155,41 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         )),
         PassyPadding(TextFormField(
           initialValue: _email,
-          decoration: const InputDecoration(labelText: 'Email'),
+          decoration: InputDecoration(labelText: localizations.email),
           onChanged: (value) => setState(() => _email = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _number,
-          decoration: const InputDecoration(labelText: 'Number'),
+          decoration: InputDecoration(labelText: localizations.phoneNumber),
           onChanged: (value) => setState(() => _number = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _firstAddressLine,
-          decoration: const InputDecoration(labelText: 'First address line'),
+          decoration:
+              InputDecoration(labelText: localizations.firstAddresssLine),
           onChanged: (value) =>
               setState(() => _firstAddressLine = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _secondAddressLine,
-          decoration: const InputDecoration(labelText: 'Second address line'),
+          decoration:
+              InputDecoration(labelText: localizations.secondAddressLine),
           onChanged: (value) =>
               setState(() => _secondAddressLine = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _zipCode,
-          decoration: const InputDecoration(labelText: 'Zip code'),
+          decoration: InputDecoration(labelText: localizations.zipCode),
           onChanged: (value) => setState(() => _zipCode = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _city,
-          decoration: const InputDecoration(labelText: 'City'),
+          decoration: InputDecoration(labelText: localizations.city),
           onChanged: (value) => setState(() => _city = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _country,
-          decoration: const InputDecoration(labelText: 'Country'),
+          decoration: InputDecoration(labelText: localizations.country),
           onChanged: (value) => setState(() => _country = value.trim()),
         )),
         CustomFieldsEditor(
@@ -204,7 +206,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           maxLines: null,
           initialValue: _additionalInfo,
           decoration: InputDecoration(
-            labelText: 'Additional info',
+            labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),

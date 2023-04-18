@@ -94,34 +94,34 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
 
     return Scaffold(
       appBar: EditScreenAppBar(
-        title: 'ID card',
+        title: localizations.idCard,
         onSave: _onSave,
         isNew: _isNew,
       ),
       body: ListView(children: [
         PassyPadding(TextFormField(
           initialValue: _nickname,
-          decoration: const InputDecoration(labelText: 'Nickname'),
+          decoration: InputDecoration(labelText: localizations.nickname),
           onChanged: (value) => setState(() => _nickname = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _type,
-          decoration: const InputDecoration(labelText: 'Type'),
+          decoration: InputDecoration(labelText: localizations.type),
           onChanged: (value) => setState(() => _type = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _idNumber,
-          decoration: const InputDecoration(labelText: 'ID number'),
+          decoration: InputDecoration(labelText: localizations.idNumber),
           onChanged: (value) => setState(() => _idNumber = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _name,
-          decoration: const InputDecoration(labelText: 'Name'),
+          decoration: InputDecoration(labelText: localizations.name),
           onChanged: (value) => setState(() => _name = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _country,
-          decoration: const InputDecoration(labelText: 'Country'),
+          decoration: InputDecoration(labelText: localizations.country),
           onChanged: (value) => setState(() => _country = value.trim()),
         )),
         CustomFieldsEditor(
@@ -137,7 +137,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
           keyboardType: TextInputType.multiline,
           maxLines: null,
           decoration: InputDecoration(
-            labelText: 'Additional info',
+            labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),

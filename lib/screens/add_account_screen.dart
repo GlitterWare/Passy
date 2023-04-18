@@ -29,7 +29,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (_username.isEmpty) {
       showSnackBar(
         context,
-        message: 'Username is empty',
+        message: localizations.usernameIsEmpty,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -38,7 +38,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (_username.length < 2) {
       showSnackBar(
         context,
-        message: 'Username is shorter than 2 letters',
+        message: localizations.usernameShorterThan2Letters,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -47,7 +47,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (data.hasAccount(_username)) {
       showSnackBar(
         context,
-        message: 'Username is already in use',
+        message: localizations.usernameAlreadyInUse,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -56,7 +56,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (_password.isEmpty) {
       showSnackBar(
         context,
-        message: 'Password is empty',
+        message: localizations.passwordIsEmpty,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
       );
@@ -65,7 +65,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     if (_password != _confirmPassword) {
       showSnackBar(
         context,
-        message: 'Passwords do not match',
+        message: localizations.passwordsDoNotMatch,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
       );
@@ -79,11 +79,11 @@ class _AddAccountScreen extends State<StatefulWidget> {
     } catch (e, s) {
       showSnackBar(
         context,
-        message: 'Couldn\'t add account',
+        message: localizations.couldNotAddAccount,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),
         action: SnackBarAction(
-          label: 'Details',
+          label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
               arguments: e.toString() + '\n' + s.toString()),
         ),
@@ -119,7 +119,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                   onPressed: () => Navigator.pushReplacementNamed(
                       context, LoginScreen.routeName),
                 ),
-          title: const Text('Add account'),
+          title: Text(localizations.addAccount),
           centerTitle: true,
         ),
         body: CustomScrollView(slivers: [
@@ -143,8 +143,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   child: TextField(
                                     onChanged: (a) =>
                                         setState(() => _username = a),
-                                    decoration: const InputDecoration(
-                                      hintText: 'Username',
+                                    decoration: InputDecoration(
+                                      hintText: localizations.username,
                                     ),
                                     autofocus: true,
                                     inputFormatters: [
@@ -165,8 +165,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     obscureText: true,
                                     onChanged: (a) =>
                                         setState(() => _password = a),
-                                    decoration: const InputDecoration(
-                                      hintText: 'Password',
+                                    decoration: InputDecoration(
+                                      hintText: localizations.password,
                                     ),
                                     inputFormatters: [
                                       LengthLimitingTextInputFormatter(32),
@@ -180,8 +180,8 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                 Expanded(
                                   child: TextField(
                                     obscureText: true,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Confirm password',
+                                    decoration: InputDecoration(
+                                      hintText: localizations.confirmPassword,
                                     ),
                                     onChanged: (a) =>
                                         setState(() => _confirmPassword = a),
@@ -195,7 +195,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                   child: const Icon(
                                     Icons.arrow_forward_ios_rounded,
                                   ),
-                                  tooltip: 'Add account',
+                                  tooltip: localizations.addAccount,
                                   heroTag: 'addAccountBtn',
                                 ),
                               ],

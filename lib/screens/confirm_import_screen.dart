@@ -30,11 +30,11 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
     } catch (e, s) {
       showSnackBar(
         context,
-        message: 'Could not import account',
+        message: localizations.couldNotImportAccount,
         icon: const Icon(Icons.download_for_offline_outlined,
             color: PassyTheme.darkContentColor),
         action: SnackBarAction(
-          label: 'Details',
+          label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
               arguments: e.toString() + '\n' + s.toString()),
         ),
@@ -46,23 +46,24 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
   Widget build(BuildContext context) {
     _path = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
-        title: const Text('Passy import'),
+        title: Text(localizations.passyImport),
         message: PassyPadding(RichText(
-          text: const TextSpan(
-            text: 'If the account you\'re importing already exists, then ',
+          text: TextSpan(
+            text: localizations.confirmImport1,
             children: [
               TextSpan(
-                text: 'its current data will be lost ',
-                style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                text: localizations.confirmImport2Highlighted,
+                style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor),
               ),
               TextSpan(
                   text:
-                      'and replaced with the import.\n\nEnter password to import.'),
+                      '${localizations.confirmImport3}.\n\n${localizations.enterAccountPasswordToImport}.'),
             ],
           ),
           textAlign: TextAlign.center,
         )),
-        labelText: 'Enter password',
+        labelText: localizations.enterPassword,
         obscureText: true,
         confirmIcon: const Icon(Icons.download_for_offline_outlined),
         onBackPressed: (context) => Navigator.pop(context),

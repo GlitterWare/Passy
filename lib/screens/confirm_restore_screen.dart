@@ -24,23 +24,24 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
   Widget build(BuildContext context) {
     String _path = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
-        title: const Text('Passy restore'),
+        title: Text(localizations.passyRestore),
         message: PassyPadding(RichText(
-          text: const TextSpan(
-            text: 'If the account you\'re restoring already exists, then ',
+          text: TextSpan(
+            text: localizations.confirmRestore1,
             children: [
               TextSpan(
-                text: 'its current data will be lost ',
-                style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                text: localizations.confirmRestore2Highlighted,
+                style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor),
               ),
               TextSpan(
                   text:
-                      'and replaced with the backup.\n\nEnter account password to restore.'),
+                      '${localizations.confirmRestore3}.\n\n${localizations.enterAccountPasswordToRestore}.'),
             ],
           ),
           textAlign: TextAlign.center,
         )),
-        labelText: 'Enter password',
+        labelText: localizations.enterPassword,
         obscureText: true,
         confirmIcon: const Icon(Icons.settings_backup_restore_rounded),
         onBackPressed: (context) => Navigator.pop(context),
@@ -54,11 +55,11 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
             onError: (e, s) {
               showSnackBar(
                 context,
-                message: 'Could not restore account',
+                message: localizations.couldNotRestoreAccount,
                 icon: const Icon(Icons.settings_backup_restore_rounded,
                     color: PassyTheme.darkContentColor),
                 action: SnackBarAction(
-                  label: 'Details',
+                  label: localizations.details,
                   onPressed: () => Navigator.pushNamed(
                       context, LogScreen.routeName,
                       arguments: e.toString() + '\n' + s.toString()),

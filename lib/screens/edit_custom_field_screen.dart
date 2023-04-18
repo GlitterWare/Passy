@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
@@ -19,14 +20,14 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: EditScreenAppBar(
-        title: 'custom field',
+        title: localizations.customField.toLowerCase(),
         onSave: () => Navigator.pop(context, _customField),
         isNew: true,
       ),
       body: ListView(children: [
         PassyPadding(TextFormField(
           initialValue: _customField.title,
-          decoration: const InputDecoration(labelText: 'Title'),
+          decoration: InputDecoration(labelText: localizations.title),
           onChanged: (value) => setState(() => _customField.title = value),
         )),
         PassyPadding(DropdownButtonFormField(
@@ -53,37 +54,37 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
             ),
           ],
           value: _customField.fieldType,
-          decoration: const InputDecoration(labelText: 'Type'),
+          decoration: InputDecoration(labelText: localizations.type),
           onChanged: (value) => _customField.fieldType = value as FieldType,
         )),
         PassyPadding(DropdownButtonFormField(
-          items: const [
+          items: [
             DropdownMenuItem(
-              child: Text('False'),
+              child: Text(localizations.false_),
               value: false,
             ),
             DropdownMenuItem(
-              child: Text('True'),
+              child: Text(localizations.true_),
               value: true,
             ),
           ],
           value: _customField.obscured,
-          decoration: const InputDecoration(labelText: 'Obscured'),
+          decoration: InputDecoration(labelText: localizations.obscured),
           onChanged: (value) => _customField.obscured = value as bool,
         )),
         PassyPadding(DropdownButtonFormField(
-          items: const [
+          items: [
             DropdownMenuItem(
-              child: Text('False'),
+              child: Text(localizations.false_),
               value: false,
             ),
             DropdownMenuItem(
-              child: Text('True'),
+              child: Text(localizations.true_),
               value: true,
             ),
           ],
           value: _customField.obscured,
-          decoration: const InputDecoration(labelText: 'Multiline'),
+          decoration: InputDecoration(labelText: localizations.multiline),
           onChanged: (value) => _customField.multiline = value as bool,
         )),
       ]),

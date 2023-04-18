@@ -7,15 +7,21 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/passy_data.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 late PassyData data;
+late AppLocalizations localizations;
 
 Future<PassyData> loadPassyData() async {
   return PassyData((await getApplicationDocumentsDirectory()).path +
       Platform.pathSeparator +
       'Passy');
+}
+
+void loadLocalizations(BuildContext context) {
+  localizations = AppLocalizations.of(context)!;
 }
 
 Future<String> getLatestVersion() async {

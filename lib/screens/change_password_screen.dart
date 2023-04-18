@@ -28,7 +28,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     if (getPassyHash(_password).toString() !=
         data.getPasswordHash(_account.username)) {
       showSnackBar(context,
-          message: 'Incorrect password',
+          message: localizations.incorrectPassword,
           icon: const Icon(
             Icons.lock_rounded,
             color: PassyTheme.darkContentColor,
@@ -37,7 +37,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     if (_newPassword.isEmpty) {
       showSnackBar(context,
-          message: 'Password is empty',
+          message: localizations.passwordIsEmpty,
           icon: const Icon(
             Icons.lock_rounded,
             color: PassyTheme.darkContentColor,
@@ -46,7 +46,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     if (_newPassword != _newPasswordConfirm) {
       showSnackBar(context,
-          message: 'Passwords do not match',
+          message: localizations.passwordsDoNotMatch,
           icon: const Icon(
             Icons.lock_rounded,
             color: PassyTheme.darkContentColor,
@@ -65,7 +65,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change password'),
+        title: Text(localizations.changePassword),
         centerTitle: true,
         leading: IconButton(
           padding: PassyTheme.appBarButtonPadding,
@@ -81,35 +81,36 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
             child: Column(children: [
               const Spacer(),
               RichText(
-                text:
-                    TextSpan(text: 'You\'re changing password for ', children: [
-                  TextSpan(
-                    text: _account.username,
-                    style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor,
-                    ),
-                  ),
-                  const TextSpan(text: '.')
-                ]),
+                text: TextSpan(
+                    text: localizations.youAreChangingPasswordFor,
+                    children: [
+                      TextSpan(
+                        text: _account.username,
+                        style: const TextStyle(
+                          color: PassyTheme.lightContentSecondaryColor,
+                        ),
+                      ),
+                      const TextSpan(text: '.')
+                    ]),
               ),
               Expanded(
                 child: PassyPadding(
                   Column(
                     children: [
                       TextFormField(
-                        decoration: const InputDecoration(
-                            labelText: 'Current password'),
+                        decoration: InputDecoration(
+                            labelText: localizations.currentPassword),
                         obscureText: true,
                         onChanged: (s) => setState(() => _password = s),
                       ),
                       TextFormField(
-                        decoration:
-                            const InputDecoration(labelText: 'New password'),
+                        decoration: InputDecoration(
+                            labelText: localizations.newPassword),
                         obscureText: true,
                         onChanged: (s) => setState(() => _newPassword = s),
                       ),
                       ButtonedTextFormField(
-                        labelText: 'Confirm password',
+                        labelText: localizations.confirmPassword,
                         obscureText: true,
                         onChanged: (s) =>
                             setState(() => _newPasswordConfirm = s),

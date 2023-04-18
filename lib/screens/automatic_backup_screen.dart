@@ -167,13 +167,13 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Automatic Backup'),
+        title: Text(localizations.automaticBackup),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Automatic backup'),
+            center: Text(localizations.automaticBackup),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.save_outlined),
@@ -190,7 +190,8 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
               children: [
                 Flexible(
                   child: TextFormField(
-                    decoration: const InputDecoration(labelText: 'Interval'),
+                    decoration:
+                        InputDecoration(labelText: localizations.interval),
                     initialValue: _buInterval.toString(),
                     onChanged: _onBuIntervalChanged,
                     inputFormatters: [
@@ -210,7 +211,7 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
             )),
           if (_account.autoBackup != null)
             PassyPadding(ThreeWidgetButton(
-              center: const Text('Change backup path'),
+              center: Text(localizations.changeBackupPath),
               left: const Padding(
                   padding: EdgeInsets.only(right: 30),
                   child: Icon(Icons.folder_outlined)),
@@ -221,7 +222,7 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
             PassyPadding(
               RichText(
                 text: TextSpan(
-                  text: 'Backup path: ',
+                  text: localizations.backupPathColon,
                   children: [
                     TextSpan(
                       text: _account.autoBackup!.path,

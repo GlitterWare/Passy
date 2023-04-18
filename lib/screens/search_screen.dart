@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
@@ -36,14 +37,14 @@ class _SearchScreen extends State<SearchScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Search'),
+        title: Text(localizations.search),
         centerTitle: true,
       ),
       body: Column(
         children: [
           PassyPadding(TextFormField(
-              decoration: const InputDecoration(
-                label: Text('Search'),
+              decoration: InputDecoration(
+                label: Text(localizations.search),
                 hintText: 'github human@example.com',
               ),
               onChanged: (s) {

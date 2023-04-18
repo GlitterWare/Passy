@@ -72,7 +72,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
     List<IDCardMeta> _idCards = _account.idCardsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
-          title: const Center(child: Text('ID cards')),
+          title: Center(child: Text(localizations.idCards)),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
       body: _idCards.isEmpty
@@ -82,8 +82,8 @@ class _IDCardsScreen extends State<IDCardsScreen> {
                   child: Column(
                     children: [
                       const Spacer(flex: 7),
-                      const Text(
-                        'No ID cards',
+                      Text(
+                        localizations.noIDCards,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),

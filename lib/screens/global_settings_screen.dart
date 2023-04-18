@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class GlobalSettingsScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(localizations.settings),
         centerTitle: true,
         leading: IconButton(
           padding: PassyTheme.appBarButtonPadding,
@@ -32,7 +33,7 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
           if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(
               ThreeWidgetButton(
-                center: const Text('Enable autofill'),
+                center: Text(localizations.enableAutofill),
                 left: const Padding(
                   padding: EdgeInsets.only(right: 30),
                   child: Icon(Icons.password_rounded),
@@ -44,7 +45,7 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
               ),
             ),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('About'),
+            center: Text(localizations.about),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.info_outline_rounded),
@@ -55,10 +56,11 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
                   context: context, builder: (ctx) => const PassyAboutDialog());
             },
           )),
-          const Center(
+          Center(
               child: Text(
-            'Updates popup enabled: ${const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false'}',
-            style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            '${localizations.updatesPopupEnabled}: ${const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false'}',
+            style:
+                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
           )),
         ],
       ),

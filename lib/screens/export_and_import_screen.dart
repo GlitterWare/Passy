@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/settings_screen.dart';
 
@@ -35,13 +36,13 @@ class _ExportAndImportScreen extends State<ExportAndImportScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Export & Import'),
+        title: Text(localizations.exportAndImport),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Export'),
+            center: Text(localizations.export),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.ios_share_rounded),
@@ -50,7 +51,7 @@ class _ExportAndImportScreen extends State<ExportAndImportScreen> {
             onPressed: () => _onExportPressed(_username),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Import'),
+            center: Text(localizations.import),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.download_for_offline_outlined),

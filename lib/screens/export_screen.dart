@@ -30,18 +30,16 @@ class _ExportScreen extends State<ExportScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: PassyTheme.dialogShape,
-        title: const Text('Confirm export'),
+        title: Text(localizations.confirmExport),
         content: RichText(
-          text: const TextSpan(
-            text: 'When exported, account data becomes ',
+          text: TextSpan(
+            text: localizations.confirmExport1,
             children: [
               TextSpan(
-                  text: 'unencrypted',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor)),
-              TextSpan(
-                  text:
-                      '.\n\nIf your export falls into the wrong hands, all your information saved in Passy will be endangered.'),
+                  text: localizations.confirmExport2Highlighted,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor)),
+              TextSpan(text: '.\n\n${localizations.confirmImport3}.'),
             ],
           ),
           textAlign: TextAlign.center,
@@ -49,15 +47,17 @@ class _ExportScreen extends State<ExportScreen> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+              child: Text(
+                localizations.cancel,
+                style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor),
               )),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                'Confirm',
-                style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+              child: Text(
+                localizations.confirm,
+                style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor),
               )),
         ],
       ),
@@ -70,29 +70,29 @@ class _ExportScreen extends State<ExportScreen> {
       bool? _isConfirmed = await _showExportWarningDialog();
       if (_isConfirmed != true) return;
       String? _expDir = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Export Passy',
+        dialogTitle: localizations.exportPassy,
         lockParentWindow: true,
       );
       if (_expDir == null) return;
       await data.exportLoadedAccount(outputDirectoryPath: _expDir);
       showSnackBar(context,
-          message: 'Export saved',
+          message: localizations.exportSaved,
           icon: const Icon(Icons.ios_share_rounded,
               color: PassyTheme.darkContentColor));
     } catch (e, s) {
       if (e is FileSystemException) {
         showSnackBar(context,
-            message: 'Access denied, try another folder',
+            message: localizations.accessDeniedTryAnotherFolder,
             icon: const Icon(Icons.ios_share_rounded,
                 color: PassyTheme.darkContentColor));
       } else {
         showSnackBar(
           context,
-          message: 'Could not export',
+          message: localizations.couldNotExport,
           icon: const Icon(Icons.ios_share_rounded,
               color: PassyTheme.darkContentColor),
           action: SnackBarAction(
-            label: 'Details',
+            label: localizations.details,
             onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
                 arguments: e.toString() + '\n' + s.toString()),
           ),
@@ -114,12 +114,12 @@ class _ExportScreen extends State<ExportScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Export'),
+        title: Text(localizations.export),
         centerTitle: true,
       ),
       body: ListView(children: [
         PassyPadding(ThreeWidgetButton(
-          center: const Text('Passy export'),
+          center: Text(localizations.passyExport),
           left: Padding(
             padding: const EdgeInsets.only(right: 30),
             child: SvgPicture.asset(

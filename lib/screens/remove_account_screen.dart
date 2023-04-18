@@ -21,30 +21,33 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
   Widget build(BuildContext context) {
     String _username = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
-      title: const Text('Remove account'),
+      title: Text(localizations.removeAccount),
       message: PassyPadding(RichText(
-        text: TextSpan(text: 'Confirm the removal of account ', children: [
+        text: TextSpan(text: localizations.confirmRemoveAccount1, children: [
           TextSpan(
             text: '\'$_username\' ',
             style:
                 const TextStyle(color: PassyTheme.lightContentSecondaryColor),
           ),
-          const TextSpan(text: 'by typing in its username.\n\nThis action is '),
-          const TextSpan(
-            text: 'irreversible',
-            style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+          TextSpan(
+              text:
+                  '${localizations.confirmRemoveAccount2}.\n\n${localizations.confirmRemoveAccount3}'),
+          TextSpan(
+            text: localizations.confirmRemoveAccount4Highlighted,
+            style:
+                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
           ),
           const TextSpan(text: '.'),
         ]),
         textAlign: TextAlign.center,
       )),
-      labelText: 'Confirm username',
+      labelText: localizations.confirmUsername,
       confirmIcon: const Icon(Icons.delete_outline_rounded),
       onBackPressed: (context) => Navigator.pop(context),
       onConfirmPressed: (context, value) {
         if (value != _username) {
           showSnackBar(context,
-              message: 'Usernames do not match',
+              message: localizations.usernamesDoNotMatch,
               icon: const Icon(Icons.error_outline_rounded,
                   color: PassyTheme.darkContentColor));
           return;

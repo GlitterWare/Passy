@@ -50,7 +50,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     List<PasswordMeta> _passwords = _account.passwordsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
-          title: const Center(child: Text('Passwords')),
+          title: Center(child: Text(localizations.passwords)),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
       body: _passwords.isEmpty
@@ -60,8 +60,8 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                   child: Column(
                     children: [
                       const Spacer(flex: 7),
-                      const Text(
-                        'No passwords',
+                      Text(
+                        localizations.noPasswords,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),

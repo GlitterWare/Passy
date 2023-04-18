@@ -54,6 +54,9 @@ dependencies:
   url_launcher: ^6.0.20
   intranet_ip: ^1.0.2
   zxing2: ^0.1.1
+  intl: any
+  flutter_localizations:
+    sdk: flutter
 
 
 dev_dependencies:
@@ -82,7 +85,7 @@ flutter_icons:
 
 # The following section is specific to Flutter.
 flutter:
-
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

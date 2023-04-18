@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class StringGeneratorDialog extends StatefulWidget {
@@ -58,7 +59,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
         shrinkWrap: true,
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Numbers'),
+            center: Text(localizations.numbers),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.numbers),
@@ -70,7 +71,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
             onPressed: () => _setNumbersEnabled(!_numbersEnabled),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Symbols'),
+            center: Text(localizations.symbols),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.star),
@@ -125,7 +126,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
-                  tooltip: 'Cancel',
+                  tooltip: localizations.cancel,
                   onPressed: () => Navigator.pop(context),
                   child: const Icon(Icons.close_rounded),
                 ),
@@ -133,7 +134,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
-                  tooltip: 'Generate',
+                  tooltip: localizations.generate,
                   onPressed: () => setState(() => _generatePassword()),
                   child: const Icon(Icons.refresh_rounded),
                 ),
@@ -141,7 +142,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
-                  tooltip: 'Done',
+                  tooltip: localizations.done,
                   onPressed: () => Navigator.pop(context, _value),
                   child: const Icon(Icons.check_rounded),
                 ),

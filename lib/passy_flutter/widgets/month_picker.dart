@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/common/always_disabled_focus_node.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
@@ -36,7 +37,6 @@ class MonthPickerFormField extends StatelessWidget {
     return TextFormField(
         controller: controller,
         initialValue: initialValue,
-        decoration: const InputDecoration(labelText: 'Expiration date'),
         focusNode: AlwaysDisabledFocusNode(),
         onTap: () => showDialog(
               context: context,
@@ -51,13 +51,13 @@ class MonthPickerFormField extends StatelessWidget {
                     TextButton(
                         onPressed: () => Navigator.pop(ctx),
                         child: Text(
-                          'Cancel',
+                          localizations.cancel,
                           style: buttonStyle,
                         )),
                     TextButton(
                         onPressed: () => Navigator.pop(ctx, _selectedDate),
                         child: Text(
-                          'Confirm',
+                          localizations.confirm,
                           style: buttonStyle,
                         )),
                   ],

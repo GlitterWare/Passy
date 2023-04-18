@@ -35,23 +35,23 @@ class _IdentityScreen extends State<IdentityScreen> {
         builder: (_) {
           return AlertDialog(
             shape: PassyTheme.dialogShape,
-            title: const Text('Remove identity'),
-            content:
-                const Text('Identities can only be restored from a backup.'),
+            title: Text(localizations.removeIdentity),
+            content: Text(
+                '${localizations.identitiesCanOnlyBeRestoredFromABackup}.'),
             actions: [
               TextButton(
-                child: const Text(
-                  'Cancel',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.cancel,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: const Text(
-                  'Remove',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.remove,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, SplashScreen.routeName);
@@ -78,7 +78,7 @@ class _IdentityScreen extends State<IdentityScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
-        title: const Center(child: Text('Identity')),
+        title: Center(child: Text(localizations.identity)),
         onRemovePressed: _onRemovePressed,
         onEditPressed: _onEditPressed,
       ),
@@ -86,68 +86,70 @@ class _IdentityScreen extends State<IdentityScreen> {
         children: [
           if (_identity.nickname != '')
             PassyPadding(RecordButton(
-              title: 'Nickname',
+              title: localizations.nickname,
               value: _identity.nickname,
             )),
           PassyPadding(RecordButton(
-              title: 'Title', value: capitalize(_identity.title.name))),
+              title: localizations.title,
+              value: capitalize(_identity.title.name))),
           if (_identity.firstName != '')
             PassyPadding(RecordButton(
-              title: 'First name',
+              title: localizations.firstName,
               value: _identity.firstName,
             )),
           if (_identity.middleName != '')
             PassyPadding(RecordButton(
-              title: 'Middle name',
+              title: localizations.middleName,
               value: _identity.middleName,
             )),
           if (_identity.lastName != '')
             PassyPadding(RecordButton(
-              title: 'Last name',
+              title: localizations.lastName,
               value: _identity.lastName,
             )),
           PassyPadding(RecordButton(
-            title: 'Gender',
+            title: localizations.gender,
             value: capitalize(_identity.gender.name),
           )),
           if (_identity.email != '')
             PassyPadding(RecordButton(
-              title: 'Email',
+              title: localizations.email,
               value: _identity.email,
             )),
           if (_identity.number != '')
             PassyPadding(RecordButton(
-              title: 'Number',
+              title: localizations.phoneNumber,
               value: _identity.number,
             )),
           if (_identity.firstAddressLine != '')
             PassyPadding(RecordButton(
-                title: 'First address line',
+                title: localizations.firstAddresssLine,
                 value: _identity.firstAddressLine)),
           if (_identity.secondAddressLine != '')
             PassyPadding(RecordButton(
-                title: 'Second address line',
+                title: localizations.secondAddressLine,
                 value: _identity.secondAddressLine)),
           if (_identity.zipCode != '')
             PassyPadding(RecordButton(
-              title: 'Zip code',
+              title: localizations.zipCode,
               value: _identity.zipCode,
             )),
           if (_identity.city != '')
             PassyPadding(RecordButton(
-              title: 'City',
+              title: localizations.city,
               value: _identity.city,
             )),
           if (_identity.country != '')
             PassyPadding(RecordButton(
-              title: 'Country',
+              title: localizations.country,
               value: _identity.country,
             )),
           for (CustomField _customField in _identity.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (_identity.additionalInfo != '')
             PassyPadding(RecordButton(
-                title: 'Additional info', value: _identity.additionalInfo)),
+                title: localizations.additionalInfo,
+                value: _identity.additionalInfo)),
         ],
       ),
     );

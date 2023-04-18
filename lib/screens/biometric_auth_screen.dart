@@ -31,7 +31,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
         if (getPassyHash(_password).toString() !=
             data.loadedAccount!.passwordHash) {
           showSnackBar(context,
-              message: 'Incorrect password',
+              message: localizations.incorrectPassword,
               icon: const Icon(Icons.lock_rounded,
                   color: PassyTheme.darkContentColor));
           return;
@@ -41,7 +41,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
           await _bioData.save();
         } catch (e) {
           showSnackBar(context,
-              message: 'Couldn\'t authenticate',
+              message: localizations.couldNotAuthenticate,
               icon: const Icon(Icons.fingerprint_rounded,
                   color: PassyTheme.darkContentColor));
           return;
@@ -61,13 +61,13 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Biometric authentication'),
+        title: Text(localizations.biometricAuthentication),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Biometric authentication'),
+            center: Text(localizations.biometricAuthentication),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.fingerprint_rounded),
@@ -83,8 +83,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
             PassyPadding(TextFormField(
               initialValue: _password,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Account password',
+              decoration: InputDecoration(
+                labelText: localizations.accountPassword,
               ),
               onChanged: (value) => setState(() => _password = value),
             )),

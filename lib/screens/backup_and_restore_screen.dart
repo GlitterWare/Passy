@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
@@ -30,7 +31,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
     MainScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
-      dialogTitle: 'Restore Passy backup',
+      dialogTitle: localizations.restorePassyBackup,
       type: FileType.custom,
       allowedExtensions: ['zip'],
       lockParentWindow: true,
@@ -60,13 +61,13 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Backup & Restore'),
+        title: Text(localizations.backupAndRestore),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Backup'),
+            center: Text(localizations.backup),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.ios_share_rounded),
@@ -75,7 +76,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
             onPressed: () => _onBackupPressed(_username),
           )),
           PassyPadding(ThreeWidgetButton(
-            center: const Text('Restore'),
+            center: Text(localizations.restore),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
               child: Icon(Icons.settings_backup_restore_rounded),

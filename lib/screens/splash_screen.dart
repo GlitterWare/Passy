@@ -17,6 +17,7 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    loadLocalizations(context);
     Future<void> showUpdateDialog() {
       return showDialog<void>(
         context: context,

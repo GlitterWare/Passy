@@ -34,23 +34,23 @@ class _IDCardScreen extends State<IDCardScreen> {
           builder: (_) {
             return AlertDialog(
               shape: PassyTheme.dialogShape,
-              title: const Text('Remove ID card'),
+              title: Text(localizations.removeIDCard),
               content:
-                  const Text('ID cards can only be restored from a backup.'),
+                  Text('${localizations.idCardsCanOnlyBeRestoredFromABackup}.'),
               actions: [
                 TextButton(
-                  child: const Text(
-                    'Cancel',
-                    style:
-                        TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                  child: Text(
+                    localizations.cancel,
+                    style: const TextStyle(
+                        color: PassyTheme.lightContentSecondaryColor),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 TextButton(
-                  child: const Text(
-                    'Remove',
-                    style:
-                        TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                  child: Text(
+                    localizations.remove,
+                    style: const TextStyle(
+                        color: PassyTheme.lightContentSecondaryColor),
                   ),
                   onPressed: () {
                     Navigator.pushNamed(context, SplashScreen.routeName);
@@ -76,7 +76,7 @@ class _IDCardScreen extends State<IDCardScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
-        title: const Center(child: Text('ID card')),
+        title: Center(child: Text(localizations.idCard)),
         onRemovePressed: () => _onRemovePressed(),
         onEditPressed: () => _onEditPressed(),
       ),
@@ -84,32 +84,33 @@ class _IDCardScreen extends State<IDCardScreen> {
         children: [
           if (_idCard.nickname != '')
             PassyPadding(RecordButton(
-              title: 'Nickname',
+              title: localizations.nickname,
               value: _idCard.nickname,
             )),
           if (_idCard.type != '')
             PassyPadding(RecordButton(
-              title: 'Type',
+              title: localizations.type,
               value: _idCard.type,
             )),
           if (_idCard.idNumber != '')
             PassyPadding(RecordButton(
-              title: 'ID Number',
+              title: localizations.idNumber,
               value: _idCard.idNumber,
             )),
           if (_idCard.name != '')
             PassyPadding(RecordButton(
-              title: 'Name',
+              title: localizations.name,
               value: _idCard.name,
             )),
           if (_idCard.country != '')
-            PassyPadding(
-                RecordButton(title: 'Country', value: _idCard.country)),
+            PassyPadding(RecordButton(
+                title: localizations.country, value: _idCard.country)),
           for (CustomField _customField in _idCard.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (_idCard.additionalInfo != '')
             PassyPadding(RecordButton(
-                title: 'Additional info', value: _idCard.additionalInfo)),
+                title: localizations.additionalInfo,
+                value: _idCard.additionalInfo)),
         ],
       ),
     );

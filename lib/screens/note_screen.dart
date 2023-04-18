@@ -28,22 +28,23 @@ class _NoteScreen extends State<NoteScreen> {
         builder: (_) {
           return AlertDialog(
             shape: PassyTheme.dialogShape,
-            title: const Text('Remove note'),
-            content: const Text('Notes can only be restored from a backup.'),
+            title: Text(localizations.removeNote),
+            content:
+                Text('${localizations.notesCanOnlyBeRestoredFromABackup}.'),
             actions: [
               TextButton(
-                child: const Text(
-                  'Cancel',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.cancel,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: const Text(
-                  'Remove',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.remove,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, SplashScreen.routeName);
@@ -72,16 +73,17 @@ class _NoteScreen extends State<NoteScreen> {
     final Note _note = ModalRoute.of(context)!.settings.arguments as Note;
     return Scaffold(
       appBar: EntryScreenAppBar(
-        title: const Center(child: Text('Note')),
+        title: Center(child: Text(localizations.note)),
         onRemovePressed: () => _onRemovePressed(_note),
         onEditPressed: () => _onEditPressed(_note),
       ),
       body: ListView(children: [
         if (_note.title != '')
-          PassyPadding(RecordButton(title: 'Title', value: _note.title)),
+          PassyPadding(
+              RecordButton(title: localizations.title, value: _note.title)),
         if (_note.note != '')
           PassyPadding(RecordButton(
-            title: 'Note',
+            title: localizations.note,
             value: _note.note,
             valueAlign: TextAlign.left,
           )),

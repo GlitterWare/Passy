@@ -43,7 +43,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
 
     return Scaffold(
       appBar: EditScreenAppBar(
-        title: 'note',
+        title: localizations.note.toLowerCase(),
         isNew: _isNew,
         onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
@@ -64,7 +64,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
       body: ListView(children: [
         PassyPadding(TextFormField(
           initialValue: _title,
-          decoration: const InputDecoration(labelText: 'Title'),
+          decoration: InputDecoration(labelText: localizations.title),
           onChanged: (value) => setState(() => _title = value.trim()),
         )),
         PassyPadding(TextFormField(
@@ -72,7 +72,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
           maxLines: null,
           initialValue: _note,
           decoration: InputDecoration(
-            labelText: 'Note',
+            labelText: localizations.note,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),

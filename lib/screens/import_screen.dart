@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/assets.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/main_screen.dart';
@@ -22,7 +23,7 @@ class _ImportScreen extends State<ImportScreen> {
     MainScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
-      dialogTitle: 'Import from Passy',
+      dialogTitle: localizations.importFromPassy,
       type: FileType.custom,
       allowedExtensions: ['zip'],
       lockParentWindow: true,
@@ -50,12 +51,12 @@ class _ImportScreen extends State<ImportScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Import'),
+        title: Text(localizations.import),
         centerTitle: true,
       ),
       body: ListView(children: [
         PassyPadding(ThreeWidgetButton(
-          center: const Text('Passy import'),
+          center: Text(localizations.passyImport),
           left: Padding(
             padding: const EdgeInsets.only(right: 30),
             child: SvgPicture.asset(

@@ -80,23 +80,23 @@ class _PasswordScreen extends State<PasswordScreen> {
         builder: (_) {
           return AlertDialog(
             shape: PassyTheme.dialogShape,
-            title: const Text('Remove password'),
+            title: Text(localizations.removePassword),
             content:
-                const Text('Passwords can only be restored from a backup.'),
+                Text('${localizations.passwordsCanOnlyBeRestoredFromABackup}.'),
             actions: [
               TextButton(
-                child: const Text(
-                  'Cancel',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.cancel,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: const Text(
-                  'Remove',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.remove,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, SplashScreen.routeName);
@@ -129,7 +129,7 @@ class _PasswordScreen extends State<PasswordScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
-        title: const Center(child: Text('Password')),
+        title: Center(child: Text(localizations.password)),
         onRemovePressed: () => _onRemovePressed(password!),
         onEditPressed: () => _onEditPressed(password!),
       ),
@@ -137,19 +137,20 @@ class _PasswordScreen extends State<PasswordScreen> {
         children: [
           if (password!.nickname != '')
             PassyPadding(RecordButton(
-              title: 'Nickname',
+              title: localizations.nickname,
               value: password!.nickname,
             )),
           if (password!.username != '')
             PassyPadding(RecordButton(
-              title: 'Username',
+              title: localizations.username,
               value: password!.username,
             )),
           if (password!.email != '')
-            PassyPadding(RecordButton(title: 'Email', value: password!.email)),
+            PassyPadding(RecordButton(
+                title: localizations.email, value: password!.email)),
           if (password!.password != '')
             PassyPadding(RecordButton(
-              title: 'Password',
+              title: localizations.password,
               value: password!.password,
               obscureValue: true,
               isPassword: true,
@@ -168,7 +169,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                 ),
                 Flexible(
                   child: PassyPadding(RecordButton(
-                    title: '2FA code',
+                    title: localizations.tfaCode,
                     value: _tfaCode,
                   )),
                 ),
@@ -185,7 +186,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                       top: PassyTheme.passyPadding.top,
                     ),
                     child: RecordButton(
-                      title: 'Website',
+                      title: localizations.website,
                       value: password!.website,
                       left: FavIconImage(address: password!.website, width: 40),
                     ),
@@ -195,7 +196,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                   child: PassyPadding(
                     FloatingActionButton(
                       heroTag: null,
-                      tooltip: 'Visit',
+                      tooltip: localizations.visit,
                       onPressed: () {
                         String _url = password!.website;
                         if (!_url
@@ -216,7 +217,8 @@ class _PasswordScreen extends State<PasswordScreen> {
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (password!.additionalInfo != '')
             PassyPadding(RecordButton(
-                title: 'Additional info', value: password!.additionalInfo)),
+                title: localizations.additionalInfo,
+                value: password!.additionalInfo)),
         ],
       ),
     );

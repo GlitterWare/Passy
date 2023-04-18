@@ -27,23 +27,23 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         builder: (_) {
           return AlertDialog(
             shape: PassyTheme.dialogShape,
-            title: const Text('Remove payment card'),
-            content:
-                const Text('Payment cards can only be restored from a backup.'),
+            title: Text(localizations.removePaymentCard),
+            content: Text(
+                '${localizations.paymentCardsCanOnlyBeRestoredFromABackup}.'),
             actions: [
               TextButton(
-                child: const Text(
-                  'Cancel',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.cancel,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: const Text(
-                  'Remove',
-                  style:
-                      TextStyle(color: PassyTheme.lightContentSecondaryColor),
+                child: Text(
+                  localizations.remove,
+                  style: const TextStyle(
+                      color: PassyTheme.lightContentSecondaryColor),
                 ),
                 onPressed: () {
                   LoadedAccount _account = data.loadedAccount!;
@@ -74,7 +74,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         ModalRoute.of(context)!.settings.arguments as PaymentCard;
     return Scaffold(
       appBar: EntryScreenAppBar(
-        title: const Center(child: Text('Payment Card')),
+        title: Center(child: Text(localizations.paymentCard)),
         onRemovePressed: () => _onRemovePressed(_paymentCard),
         onEditPressed: () => _onEditPressed(_paymentCard),
       ),
@@ -87,22 +87,22 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         ),
         if (_paymentCard.nickname != '')
           PassyPadding(RecordButton(
-            title: 'Nickname',
+            title: localizations.nickname,
             value: _paymentCard.nickname,
           )),
         if (_paymentCard.cardNumber != '')
           PassyPadding(RecordButton(
-            title: 'Card number',
+            title: localizations.cardNumber,
             value: _paymentCard.cardNumber,
           )),
         if (_paymentCard.cardholderName != '')
           PassyPadding(RecordButton(
-            title: 'Card holder name',
+            title: localizations.cardHolderName,
             value: _paymentCard.cardholderName,
           )),
         if (_paymentCard.exp != '')
           PassyPadding(RecordButton(
-            title: 'Expiration date',
+            title: localizations.expirationDate,
             value: _paymentCard.exp,
           )),
         if (_paymentCard.cvv != '')
@@ -115,7 +115,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           PassyPadding(CustomFieldButton(customField: _customField)),
         if (_paymentCard.additionalInfo != '')
           PassyPadding(RecordButton(
-            title: 'Additional info',
+            title: localizations.additionalInfo,
             value: _paymentCard.additionalInfo,
           )),
       ]),

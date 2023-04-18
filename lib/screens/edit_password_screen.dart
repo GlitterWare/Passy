@@ -82,7 +82,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
 
     return Scaffold(
       appBar: EditScreenAppBar(
-        title: 'password',
+        title: localizations.password.toLowerCase(),
         isNew: _isNew,
         onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
@@ -119,25 +119,25 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
       body: ListView(children: [
         PassyPadding(TextFormField(
           initialValue: _nickname,
-          decoration: const InputDecoration(
-            labelText: 'Nickname',
+          decoration: InputDecoration(
+            labelText: localizations.nickname,
           ),
           onChanged: (value) => setState(() => _nickname = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _username,
-          decoration: const InputDecoration(labelText: 'Username'),
+          decoration: InputDecoration(labelText: localizations.username),
           onChanged: (value) => setState(() => _username = value.trim()),
         )),
         PassyPadding(TextFormField(
           initialValue: _email,
-          decoration: const InputDecoration(labelText: 'Email'),
+          decoration: InputDecoration(labelText: localizations.email),
           onChanged: (value) => setState(() => _email = value.trim()),
         )),
         PassyPadding(ButtonedTextFormField(
           controller: _passwordController,
-          labelText: 'Password',
-          tooltip: 'Generate',
+          labelText: localizations.password,
+          tooltip: localizations.generate,
           onChanged: (value) => setState(() => _password = value),
           buttonIcon: const Icon(Icons.password_rounded),
           onPressed: () {
@@ -153,7 +153,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         )),
         PassyPadding(TextFormField(
           initialValue: _tfaSecret.replaceFirst('=', ''),
-          decoration: const InputDecoration(labelText: '2FA secret'),
+          decoration: InputDecoration(
+              labelText: '2FA ${localizations.secret.toLowerCase()}'),
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'[a-z]|[A-Z]|[2-7]')),
             TextInputFormatter.withFunction((oldValue, newValue) =>
@@ -168,37 +169,43 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         )),
         PassyPadding(TextFormField(
           initialValue: _tfaLength.toString(),
-          decoration: const InputDecoration(labelText: '2FA length'),
+          decoration: InputDecoration(
+              labelText: '2FA ${localizations.length.toLowerCase()}'),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) => setState(() => _tfaLength = int.parse(value)),
         )),
         PassyPadding(TextFormField(
           initialValue: _tfaInterval.toString(),
-          decoration: const InputDecoration(labelText: '2FA interval'),
+          decoration: InputDecoration(
+              labelText: '2FA ${localizations.interval.toLowerCase()}'),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) => setState(() => _tfaInterval = int.parse(value)),
         )),
         PassyPadding(EnumDropDownButtonFormField<Algorithm>(
           value: _tfaAlgorithm,
           values: Algorithm.values,
-          decoration: const InputDecoration(labelText: '2FA algorithm'),
+          decoration: InputDecoration(
+              labelText: '2FA ${localizations.algorithm.toLowerCase()}'),
           onChanged: (value) {
             if (value != null) setState(() => _tfaAlgorithm = value);
           },
         )),
         PassyPadding(DropdownButtonFormField(
-          items: const [
+          items: [
             DropdownMenuItem(
-              child: Text('True (recommended)'),
+              child: Text(
+                  '${localizations.true_} (${localizations.recommended.toLowerCase()})'),
               value: true,
             ),
             DropdownMenuItem(
-              child: Text('False'),
+              child: Text(localizations.false_),
               value: false,
             ),
           ],
           value: _tfaIsGoogle,
-          decoration: const InputDecoration(labelText: '2FA is Google'),
+          decoration: InputDecoration(
+              labelText:
+                  '2FA ${localizations.isGoogle.replaceRange(0, 1, localizations.isGoogle[0].toLowerCase())}'),
           onChanged: (value) => setState(() => _tfaIsGoogle = value as bool),
         )),
         PassyPadding(TextFormField(
@@ -220,7 +227,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           maxLines: null,
           initialValue: _additionalInfo,
           decoration: InputDecoration(
-            labelText: 'Additional info',
+            labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(28.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),

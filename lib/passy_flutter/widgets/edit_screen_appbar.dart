@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
 class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -31,14 +32,14 @@ class EditScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => Navigator.pop(context),
       ),
       title: isNew
-          ? Center(child: Text('Add $title'))
-          : Center(child: Text('Edit $title')),
+          ? Center(child: Text('${localizations.add} $title'))
+          : Center(child: Text('${localizations.edit} $title')),
       actions: [
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
           onPressed: onSave,
-          tooltip: isNew ? 'Add' : 'Save',
+          tooltip: isNew ? localizations.add : localizations.save,
           icon: isNew
               ? const Icon(Icons.add_rounded)
               : const Icon(Icons.check_rounded),

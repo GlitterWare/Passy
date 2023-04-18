@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -40,7 +41,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
             padding: EdgeInsets.only(right: 30),
             child: Icon(Icons.add_rounded),
           ),
-          center: const Text('Add custom field'),
+          center: Text(localizations.addCustomField),
           onPressed: () {
             widget.constructCustomField().then((value) {
               if (value != null) {
@@ -68,7 +69,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                 _widgets.add(
                   FloatingActionButton(
                     heroTag: null,
-                    tooltip: 'Select date',
+                    tooltip: localizations.selectDate,
                     onPressed: () => showPassyDatePicker(
                       context: context,
                       date: _field.value == ''
@@ -97,7 +98,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                         setState(() => _field.value = value);
                       });
                     },
-                    tooltip: 'Generate',
+                    tooltip: localizations.generate,
                     child: const Icon(Icons.password_rounded),
                   ),
                 );
@@ -137,7 +138,7 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
             _widgets.add(
               FloatingActionButton(
                 heroTag: null,
-                tooltip: 'Remove',
+                tooltip: localizations.remove,
                 onPressed: () =>
                     setState(() => widget.customFields.removeAt(index)),
                 child: const Icon(Icons.remove_rounded),

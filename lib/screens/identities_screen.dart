@@ -72,7 +72,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         _account.identitiesMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
-          title: const Center(child: Text('Identities')),
+          title: Center(child: Text(localizations.identities)),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),
       body: _identities.isEmpty
@@ -82,8 +82,8 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
                   child: Column(
                     children: [
                       const Spacer(flex: 7),
-                      const Text(
-                        'No identities',
+                      Text(
+                        localizations.noIdentities,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),

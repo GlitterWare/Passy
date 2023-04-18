@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
 import 'package:passy/screens/automatic_backup_screen.dart';
@@ -47,6 +48,7 @@ import 'screens/payment_cards_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/unlock_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 final ThemeData theme = ThemeData(
   fontFamily: 'Roboto',
@@ -153,6 +155,17 @@ class Passy extends StatelessWidget {
         SplashScreen.routeName: (context) => const SplashScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
+      localizationsDelegates: const [
+        AppLocalizations.delegate, // Add this line
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      // LOCALIZATION TEST
+      //locale: const Locale('en'),
+      supportedLocales: const [
+        Locale('en'),
+      ],
     );
   }
 }

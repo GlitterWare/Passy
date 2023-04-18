@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
 class EntriesScreenAppBar extends StatelessWidget
@@ -36,14 +37,14 @@ class EntriesScreenAppBar extends StatelessWidget
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
           onPressed: onSearchPressed,
-          tooltip: 'Search',
+          tooltip: localizations.search,
           icon: const Icon(Icons.search_rounded),
         ),
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
           onPressed: onAddPressed,
-          tooltip: 'Add entry',
+          tooltip: localizations.addEntry,
           icon: const Icon(Icons.add_rounded),
         ),
       ],

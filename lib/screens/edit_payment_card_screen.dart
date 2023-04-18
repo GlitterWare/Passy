@@ -78,7 +78,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
 
     return Scaffold(
       appBar: EditScreenAppBar(
-        title: 'payment card',
+        title: localizations.paymentCard.toLowerCase(),
         onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
           _customFields.removeWhere((element) => element.value == '');
@@ -120,24 +120,25 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
           ),
           PassyPadding(TextFormField(
             initialValue: _nickname,
-            decoration: const InputDecoration(labelText: 'Nickname'),
+            decoration: InputDecoration(labelText: localizations.nickname),
             onChanged: (value) => setState(() => _nickname = value.trim()),
           )),
           PassyPadding(TextFormField(
             initialValue: _cardNumber,
-            decoration: const InputDecoration(labelText: 'Card number'),
+            decoration: InputDecoration(labelText: localizations.cardNumber),
             onChanged: (value) => setState(() => _cardNumber = value),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           )),
           PassyPadding(TextFormField(
             initialValue: _cardholderName,
-            decoration: const InputDecoration(labelText: 'Card holder name'),
+            decoration:
+                InputDecoration(labelText: localizations.cardHolderName),
             onChanged: (value) =>
                 setState(() => _cardholderName = value.trim()),
           )),
           PassyPadding(MonthPickerFormField(
             initialValue: _exp,
-            title: const Text('Expiration date'),
+            title: Text(localizations.expirationDate),
             getSelectedDate: () {
               List<String> _date = _exp.split('/');
               String _month = _date[0];
@@ -176,7 +177,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             keyboardType: TextInputType.multiline,
             maxLines: null,
             decoration: InputDecoration(
-              labelText: 'Additional info',
+              labelText: localizations.additionalInfo,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(28.0),
                 borderSide:

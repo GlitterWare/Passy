@@ -48,7 +48,7 @@ class _SecurityScreen extends State<SecurityScreen> {
         children: [
           if (Platform.isAndroid || Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
-              center: const Text('Biometric authentication'),
+              center: Text(localizations.biometricAuthentication),
               left: const Padding(
                 padding: EdgeInsets.only(right: 30),
                 child: Icon(Icons.fingerprint_rounded),
@@ -62,7 +62,7 @@ class _SecurityScreen extends State<SecurityScreen> {
             )),
           if (Platform.isAndroid)
             PassyPadding(ThreeWidgetButton(
-              center: const Text('Protect screen'),
+              center: Text(localizations.protectScreen),
               left: const Padding(
                 padding: EdgeInsets.only(right: 30),
                 child: Icon(Icons.smart_display),
