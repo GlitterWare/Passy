@@ -33,6 +33,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   Future<void>? generateTFA;
   String _tfaCode = '';
   double _tfaProgress = 0;
+  Color _tfaColor = PassyTheme.lightContentSecondaryColor;
 
   Future<void> _generateTFA(TFA tfa) async {
     double _tfaProgressLast = 1.0;
@@ -44,6 +45,29 @@ class _PasswordScreen extends State<PasswordScreen> {
       setState(() {
         _tfaProgress = _tfaCycles - _tfaCycles.floor();
       });
+      switch (_tfaColor.value) {
+        case 4287679225:
+          // Blue
+          if (_tfaProgress < 0.60) break;
+          setState(() {
+            _tfaColor = Colors.yellow;
+          });
+          break;
+        case 4294961979:
+          // Yellow
+          if (_tfaProgress < 0.85) break;
+          setState(() {
+            _tfaColor = Colors.red;
+          });
+          break;
+        case 4294198070:
+          // Red
+          if (_tfaProgress > 0.60) break;
+          setState(() {
+            _tfaColor = PassyTheme.lightContentSecondaryColor;
+          });
+          break;
+      }
       if (_tfaProgress < _tfaProgressLast) {
         setState(() {
           _tfaCode = OTP.generateTOTPCodeString(
@@ -57,7 +81,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         });
       }
       _tfaProgressLast = _tfaProgress;
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 50));
     }
   }
 
@@ -164,7 +188,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                 SizedBox(
                   child: CircularProgressIndicator(
                     value: _tfaProgress,
-                    color: PassyTheme.lightContentSecondaryColor,
+                    color: _tfaColor,
                   ),
                 ),
                 Flexible(
