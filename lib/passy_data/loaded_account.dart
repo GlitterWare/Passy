@@ -299,8 +299,11 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoritePassword(String key) async {
-    if (_favorites.value.passwords[key] == null) return;
-    _favorites.value.passwords.remove(key);
+    EntryEvent? _password = _favorites.value.passwords[key];
+    if (_password == null) return;
+    if (_password.status == EntryStatus.removed) return;
+    _password.lastModified = DateTime.now().toUtc();
+    _password.status = EntryStatus.alive;
     await _favorites.save();
   }
 
@@ -315,8 +318,11 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoritePaymentCard(String key) async {
-    if (_favorites.value.paymentCards[key] == null) return;
-    _favorites.value.paymentCards.remove(key);
+    EntryEvent? _paymentCard = _favorites.value.paymentCards[key];
+    if (_paymentCard == null) return;
+    if (_paymentCard.status == EntryStatus.removed) return;
+    _paymentCard.lastModified = DateTime.now().toUtc();
+    _paymentCard.status = EntryStatus.alive;
     await _favorites.save();
   }
 
@@ -331,8 +337,11 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteNote(String key) async {
-    if (_favorites.value.notes[key] == null) return;
-    _favorites.value.notes.remove(key);
+    EntryEvent? _note = _favorites.value.notes[key];
+    if (_note == null) return;
+    if (_note.status == EntryStatus.removed) return;
+    _note.lastModified = DateTime.now().toUtc();
+    _note.status = EntryStatus.alive;
     await _favorites.save();
   }
 
@@ -347,8 +356,11 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteIDCard(String key) async {
-    if (_favorites.value.idCards[key] == null) return;
-    _favorites.value.idCards.remove(key);
+    EntryEvent? _idCard = _favorites.value.idCards[key];
+    if (_idCard == null) return;
+    if (_idCard.status == EntryStatus.removed) return;
+    _idCard.lastModified = DateTime.now().toUtc();
+    _idCard.status = EntryStatus.alive;
     await _favorites.save();
   }
 
@@ -363,8 +375,11 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteIdentity(String key) async {
-    if (_favorites.value.identities[key] == null) return;
-    _favorites.value.identities.remove(key);
+    EntryEvent? _identity = _favorites.value.identities[key];
+    if (_identity == null) return;
+    if (_identity.status == EntryStatus.removed) return;
+    _identity.lastModified = DateTime.now().toUtc();
+    _identity.status = EntryStatus.alive;
     await _favorites.save();
   }
 
