@@ -302,7 +302,7 @@ class LoadedAccount {
     if (_password == null) return;
     if (_password.status == EntryStatus.removed) return;
     _password.lastModified = DateTime.now().toUtc();
-    _password.status = EntryStatus.alive;
+    _password.status = EntryStatus.removed;
     await _favorites.save();
   }
 
@@ -321,7 +321,7 @@ class LoadedAccount {
     if (_paymentCard == null) return;
     if (_paymentCard.status == EntryStatus.removed) return;
     _paymentCard.lastModified = DateTime.now().toUtc();
-    _paymentCard.status = EntryStatus.alive;
+    _paymentCard.status = EntryStatus.removed;
     await _favorites.save();
   }
 
@@ -340,7 +340,7 @@ class LoadedAccount {
     if (_note == null) return;
     if (_note.status == EntryStatus.removed) return;
     _note.lastModified = DateTime.now().toUtc();
-    _note.status = EntryStatus.alive;
+    _note.status = EntryStatus.removed;
     await _favorites.save();
   }
 
@@ -359,7 +359,7 @@ class LoadedAccount {
     if (_idCard == null) return;
     if (_idCard.status == EntryStatus.removed) return;
     _idCard.lastModified = DateTime.now().toUtc();
-    _idCard.status = EntryStatus.alive;
+    _idCard.status = EntryStatus.removed;
     await _favorites.save();
   }
 
@@ -378,7 +378,7 @@ class LoadedAccount {
     if (_identity == null) return;
     if (_identity.status == EntryStatus.removed) return;
     _identity.lastModified = DateTime.now().toUtc();
-    _identity.status = EntryStatus.alive;
+    _identity.status = EntryStatus.removed;
     await _favorites.save();
   }
 
