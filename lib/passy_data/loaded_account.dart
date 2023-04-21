@@ -386,15 +386,21 @@ class LoadedAccount {
   void removeDeletedFavorites() {
     // TODO: optimize IO
     // multiple entries should be requested via one get command per entry type
-    _favorites.value.passwords
-        .removeWhere((key, value) => getPassword(key) == null);
-    _favorites.value.paymentCards
-        .removeWhere((key, value) => getPaymentCard(key) == null);
-    _favorites.value.notes.removeWhere((key, value) => getNote(key) == null);
-    _favorites.value.idCards
-        .removeWhere((key, value) => getIDCard(key) == null);
-    _favorites.value.identities
-        .removeWhere((key, value) => getIdentity(key) == null);
+    _favorites.value.passwords.forEach((key, value) {
+      if (getPassword(key) == null) removeFavoritePassword(key);
+    });
+    _favorites.value.paymentCards.forEach((key, value) {
+      if (getPaymentCard(key) == null) removeFavoritePaymentCard(key);
+    });
+    _favorites.value.notes.forEach((key, value) {
+      if (getNote(key) == null) removeFavoriteNote(key);
+    });
+    _favorites.value.idCards.forEach((key, value) {
+      if (getIDCard(key) == null) removeFavoriteIDCard(key);
+    });
+    _favorites.value.identities.forEach((key, value) {
+      if (getIdentity(key) == null) removeFavoriteIdentity(key);
+    });
   }
 
   // Passwords wrappers
