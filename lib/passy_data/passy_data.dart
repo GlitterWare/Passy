@@ -236,6 +236,8 @@ class PassyData {
       _account.bioAuthEnabled = false;
       _account.clearRemovedHistory();
       _account.renewHistory();
+      _account.clearRemovedFavorites();
+      _account.renewFavorites();
       _account.saveSync();
       _username = _account.username;
     }

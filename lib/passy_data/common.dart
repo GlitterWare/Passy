@@ -8,7 +8,7 @@ import 'dart:io';
 
 const String passyVersion = '1.3.1';
 const String syncVersion = '1.0.0';
-const String accountVersion = '2.1.1';
+const String accountVersion = '2.2.0';
 
 bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
   if (lineDelimiter.length == 1) {

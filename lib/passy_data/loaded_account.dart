@@ -13,6 +13,7 @@ import 'auto_backup_settings.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
+import 'favorites.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
@@ -31,6 +32,7 @@ class LoadedAccount {
   final LocalSettingsFile _localSettings;
   final AccountSettingsFile _settings;
   final HistoryFile _history;
+  final FavoritesFile _favorites;
   final PasswordsFile _passwords;
   final NotesFile _notes;
   final PaymentCardsFile _paymentCards;
@@ -44,6 +46,7 @@ class LoadedAccount {
     required LocalSettingsFile localSettings,
     required AccountSettingsFile settings,
     required HistoryFile history,
+    required FavoritesFile favorites,
     required PasswordsFile passwords,
     required NotesFile notes,
     required PaymentCardsFile paymentCards,
@@ -55,6 +58,7 @@ class LoadedAccount {
         _localSettings = localSettings,
         _settings = settings,
         _history = history,
+        _favorites = favorites,
         _passwords = passwords,
         _notes = notes,
         _paymentCards = paymentCards,
@@ -69,6 +73,7 @@ class LoadedAccount {
     LocalSettingsFile? localSettings,
     AccountSettingsFile? settings,
     HistoryFile? history,
+    FavoritesFile? favorites,
     PasswordsFile? passwords,
     NotesFile? notes,
     PaymentCardsFile? paymentCards,
@@ -85,6 +90,9 @@ class LoadedAccount {
         encrypter: encrypter);
     history ??= History.fromFile(
         File(path + Platform.pathSeparator + 'history.enc'),
+        encrypter: encrypter);
+    favorites ??= Favorites.fromFile(
+        File(path + Platform.pathSeparator + 'favorites.enc'),
         encrypter: encrypter);
     passwords ??= Passwords.fromFile(
         File(path + Platform.pathSeparator + 'passwords.enc'),
@@ -107,6 +115,7 @@ class LoadedAccount {
         localSettings: localSettings,
         settings: settings,
         history: history,
+        favorites: favorites,
         passwords: passwords,
         notes: notes,
         paymentCards: paymentCards,
@@ -119,6 +128,7 @@ class LoadedAccount {
     _encrypter = getPassyEncrypter(password);
     _settings.encrypter = _encrypter;
     _history.encrypter = _encrypter;
+    _favorites.encrypter = _encrypter;
     _passwords.encrypter = _encrypter;
     _notes.encrypter = _encrypter;
     _paymentCards.encrypter = _encrypter;
@@ -132,6 +142,7 @@ class LoadedAccount {
         _localSettings.save(),
         _settings.save(),
         _history.save(),
+        _favorites.save(),
       ]);
 
   void saveSync() {
@@ -140,6 +151,7 @@ class LoadedAccount {
     _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
+    _favorites.saveSync();
   }
 
   Synchronization getSynchronization({
@@ -259,6 +271,116 @@ class LoadedAccount {
   void renewHistory() => _history.value.renew();
   Future<void> saveHistory() => _history.save();
   void saveHistorySync() => _history.saveSync();
+
+  // Favorites wrappers
+  void clearRemovedFavorites() => _favorites.value.clearRemoved();
+  void renewFavorites() => _favorites.value.renew();
+  Future<void> saveFavorites() => _favorites.save();
+  void saveFavoritesSync() => _favorites.saveSync();
+  int get favoritesLength => _favorites.value.length;
+  Map<String, EntryEvent> get favoritePasswords =>
+      Map.from(_favorites.value.passwords);
+  Map<String, EntryEvent> get favoritePaymentCards =>
+      Map.from(_favorites.value.passwords);
+  Map<String, EntryEvent> get favoriteNotes =>
+      Map.from(_favorites.value.passwords);
+  Map<String, EntryEvent> get favoriteIDCards =>
+      Map.from(_favorites.value.passwords);
+  Map<String, EntryEvent> get favoriteIdentities =>
+      Map.from(_favorites.value.passwords);
+  Future<void> addFavoritePassword(String key) async {
+    if (getPassword(key) == null) return;
+    _favorites.value.passwords[key] = EntryEvent(
+      key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
+    await _favorites.save();
+  }
+
+  Future<void> removeFavoritePassword(String key) async {
+    if (_favorites.value.passwords[key] == null) return;
+    _favorites.value.passwords.remove(key);
+    await _favorites.save();
+  }
+
+  Future<void> addFavoritePaymentCard(String key) async {
+    if (getPaymentCard(key) == null) return;
+    _favorites.value.paymentCards[key] = EntryEvent(
+      key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
+    await _favorites.save();
+  }
+
+  Future<void> removeFavoritePaymentCard(String key) async {
+    if (_favorites.value.paymentCards[key] == null) return;
+    _favorites.value.paymentCards.remove(key);
+    await _favorites.save();
+  }
+
+  Future<void> addFavoriteNote(String key) async {
+    if (getNote(key) == null) return;
+    _favorites.value.notes[key] = EntryEvent(
+      key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
+    await _favorites.save();
+  }
+
+  Future<void> removeFavoriteNote(String key) async {
+    if (_favorites.value.notes[key] == null) return;
+    _favorites.value.notes.remove(key);
+    await _favorites.save();
+  }
+
+  Future<void> addFavoriteIDCard(String key) async {
+    if (getIDCard(key) == null) return;
+    _favorites.value.idCards[key] = EntryEvent(
+      key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
+    await _favorites.save();
+  }
+
+  Future<void> removeFavoriteIDCard(String key) async {
+    if (_favorites.value.idCards[key] == null) return;
+    _favorites.value.idCards.remove(key);
+    await _favorites.save();
+  }
+
+  Future<void> addFavoriteIdentity(String key) async {
+    if (getIdentity(key) == null) return;
+    _favorites.value.identities[key] = EntryEvent(
+      key,
+      status: EntryStatus.alive,
+      lastModified: DateTime.now().toUtc(),
+    );
+    await _favorites.save();
+  }
+
+  Future<void> removeFavoriteIdentity(String key) async {
+    if (_favorites.value.identities[key] == null) return;
+    _favorites.value.identities.remove(key);
+    await _favorites.save();
+  }
+
+  void removeDeletedFavorites() {
+    // TODO: optimize IO
+    // multiple entries should be requested via one get command per entry type
+    _favorites.value.passwords
+        .removeWhere((key, value) => getPassword(key) == null);
+    _favorites.value.paymentCards
+        .removeWhere((key, value) => getPaymentCard(key) == null);
+    _favorites.value.notes.removeWhere((key, value) => getNote(key) == null);
+    _favorites.value.idCards
+        .removeWhere((key, value) => getIDCard(key) == null);
+    _favorites.value.identities
+        .removeWhere((key, value) => getIdentity(key) == null);
+  }
 
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
@@ -407,6 +529,7 @@ class JSONLoadedAccount {
   final LocalSettingsFile _localSettings;
   final JsonFile<AccountSettings> _settings;
   final JsonFile<History> _history;
+  final JsonFile<Favorites> _favorites;
   final PassyEntriesJSONFile<Password> _passwords;
   final PassyEntriesJSONFile<Note> _notes;
   final PassyEntriesJSONFile<PaymentCard> _paymentCards;
@@ -419,6 +542,7 @@ class JSONLoadedAccount {
     required LocalSettingsFile localSettings,
     required JsonFile<AccountSettings> settings,
     required JsonFile<History> history,
+    required JsonFile<Favorites> favorites,
     required PassyEntriesJSONFile<Password> passwords,
     required PassyEntriesJSONFile<Note> notes,
     required PassyEntriesJSONFile<PaymentCard> paymentCards,
@@ -429,6 +553,7 @@ class JSONLoadedAccount {
         _localSettings = localSettings,
         _settings = settings,
         _history = history,
+        _favorites = favorites,
         _passwords = passwords,
         _notes = notes,
         _paymentCards = paymentCards,
@@ -442,6 +567,7 @@ class JSONLoadedAccount {
     LocalSettingsFile? localSettings,
     JsonFile<AccountSettings>? settings,
     JsonFile<History>? history,
+    JsonFile<Favorites>? favorites,
     PassyEntriesJSONFile<Password>? passwords,
     PassyEntriesJSONFile<Note>? notes,
     PassyEntriesJSONFile<PaymentCard>? paymentCards,
@@ -462,6 +588,11 @@ class JSONLoadedAccount {
       File(path + Platform.pathSeparator + 'history.enc'),
       constructor: () => History(),
       fromJson: History.fromJson,
+    );
+    favorites ??= JsonFile<Favorites>.fromFile(
+      File(path + Platform.pathSeparator + 'favorites.enc'),
+      constructor: () => Favorites(),
+      fromJson: Favorites.fromJson,
     );
     passwords ??= PassyEntriesJSONFile<Password>.fromFile(
       File(path + Platform.pathSeparator + 'passwords.enc'),
@@ -484,6 +615,7 @@ class JSONLoadedAccount {
         localSettings: localSettings,
         settings: settings,
         history: history,
+        favorites: favorites,
         passwords: passwords,
         notes: notes,
         paymentCards: paymentCards,
@@ -499,6 +631,7 @@ class JSONLoadedAccount {
     LocalSettingsFile? localSettings,
     JsonFile<AccountSettings>? settings,
     JsonFile<History>? history,
+    JsonFile<Favorites>? favorites,
     PassyEntriesJSONFile<Password>? passwords,
     PassyEntriesJSONFile<Note>? notes,
     PassyEntriesJSONFile<PaymentCard>? paymentCards,
@@ -507,6 +640,7 @@ class JSONLoadedAccount {
   }) {
     File _settingsFile = File(path + Platform.pathSeparator + 'settings.enc');
     File _historyFile = File(path + Platform.pathSeparator + 'history.enc');
+    File _favoritesFile = File(path + Platform.pathSeparator + 'favorites.enc');
     File _passwordsFile = File(path + Platform.pathSeparator + 'passwords.enc');
     File _notesFile = File(path + Platform.pathSeparator + 'notes.enc');
     File _paymentCardsFile =
@@ -525,6 +659,11 @@ class JSONLoadedAccount {
     history ??= JsonFile<History>(_historyFile,
         value: History.fromFile(
                 File(path + Platform.pathSeparator + 'history.enc'),
+                encrypter: encrypter)
+            .value);
+    favorites ??= JsonFile<Favorites>(_favoritesFile,
+        value: Favorites.fromFile(
+                File(path + Platform.pathSeparator + 'favorites.enc'),
                 encrypter: encrypter)
             .value);
     passwords ??= PassyEntriesJSONFile<Password>(_passwordsFile,
@@ -557,6 +696,7 @@ class JSONLoadedAccount {
       localSettings: localSettings,
       settings: settings,
       history: history,
+      favorites: favorites,
       passwords: passwords,
       notes: notes,
       paymentCards: paymentCards,
@@ -573,6 +713,7 @@ class JSONLoadedAccount {
       localSettings: _localSettings,
       settings: _settings.toEncryptedJSONFile(encrypter),
       history: _history.toEncryptedJSONFile(encrypter),
+      favorites: _favorites.toEncryptedJSONFile(encrypter),
       passwords: _passwords.toPassyEntriesEncryptedCSVFile(encrypter),
       notes: _notes.toPassyEntriesEncryptedCSVFile(encrypter),
       paymentCards: _paymentCards.toPassyEntriesEncryptedCSVFile(encrypter),
@@ -587,6 +728,7 @@ class JSONLoadedAccount {
         _localSettings.save(),
         _settings.save(),
         _history.save(),
+        _favorites.save(),
         _passwords.save(),
         _notes.save(),
         _paymentCards.save(),
@@ -600,6 +742,7 @@ class JSONLoadedAccount {
     _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
+    _favorites.saveSync();
     _passwords.saveSync();
     _notes.saveSync();
     _paymentCards.saveSync();
