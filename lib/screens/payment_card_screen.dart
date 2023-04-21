@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 import 'main_screen.dart';
 import 'edit_payment_card_screen.dart';
@@ -21,6 +23,9 @@ class PaymentCardScreen extends StatefulWidget {
 }
 
 class _PaymentCardScreen extends State<PaymentCardScreen> {
+  final _account = data.loadedAccount!;
+  bool isFavorite = false;
+
   void _onRemovePressed(PaymentCard paymentCard) {
     showDialog(
         context: context,
@@ -72,11 +77,35 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
   Widget build(BuildContext context) {
     final PaymentCard _paymentCard =
         ModalRoute.of(context)!.settings.arguments as PaymentCard;
+    isFavorite = _account.favoritePaymentCards[_paymentCard.key]?.status ==
+        EntryStatus.alive;
+
     return Scaffold(
       appBar: EntryScreenAppBar(
         title: Center(child: Text(localizations.paymentCard)),
         onRemovePressed: () => _onRemovePressed(_paymentCard),
         onEditPressed: () => _onEditPressed(_paymentCard),
+        isFavorite: isFavorite,
+        onFavoritePressed: () async {
+          if (isFavorite) {
+            await _account.removeFavoritePaymentCard(_paymentCard.key);
+            showSnackBar(context,
+                message: localizations.removedFromFavorites,
+                icon: const Icon(
+                  Icons.star_outline_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          } else {
+            await _account.addFavoritePaymentCard(_paymentCard.key);
+            showSnackBar(context,
+                message: localizations.addedToFavorites,
+                icon: const Icon(
+                  Icons.star_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          }
+          setState(() {});
+        },
       ),
       body: ListView(children: [
         PaymentCardButton(

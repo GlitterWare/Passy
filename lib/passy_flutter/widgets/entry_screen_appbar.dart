@@ -11,6 +11,8 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
   final void Function()? onRemovePressed;
   final void Function()? onEditPressed;
+  final bool isFavorite;
+  final void Function()? onFavoritePressed;
 
   const EntryScreenAppBar({
     Key? key,
@@ -19,6 +21,8 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.onRemovePressed,
     this.onEditPressed,
+    this.isFavorite = false,
+    this.onFavoritePressed,
   }) : super(key: key);
 
   @override
@@ -38,6 +42,17 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.delete_outline_rounded),
           tooltip: localizations.remove,
           onPressed: onRemovePressed,
+        ),
+        IconButton(
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
+          tooltip: isFavorite
+              ? localizations.removeFromFavorites
+              : localizations.addToFavorites,
+          icon: isFavorite
+              ? const Icon(Icons.star_rounded)
+              : const Icon(Icons.star_outline_rounded),
+          onPressed: onFavoritePressed,
         ),
         IconButton(
           padding: buttonPadding,

@@ -27,7 +27,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
 
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: (String terms) {
+        arguments: SearchScreenArgs(builder: (String terms) {
       final List<IdentityMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (IdentityMeta _identity in _account.identitiesMetadata.values) {
@@ -53,6 +53,24 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
           }
         }
       }
+      if (_found.isEmpty) {
+        return CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              child: Column(
+                children: [
+                  const Spacer(flex: 7),
+                  Text(
+                    localizations.noSearchResults,
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(flex: 7),
+                ],
+              ),
+            ),
+          ],
+        );
+      }
       return IdentityButtonListView(
         identities: _found,
         shouldSort: true,
@@ -63,7 +81,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         ),
         popupMenuItemBuilder: identityPopupMenuBuilder,
       );
-    });
+    }));
   }
 
   @override

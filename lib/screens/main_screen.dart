@@ -2,9 +2,11 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 import 'package:image/image.dart' as imglib;
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -54,39 +56,67 @@ class _MainScreen extends State<MainScreen>
   late void Function() _onConnectPressed;
   bool _unlockScreenOn = false;
 
-  PassyEntryButtonListView _searchBuilder(String terms) {
+  Widget _searchBuilder(String terms) {
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     final List<SearchEntryData> _searchEntries = [];
-    for (IDCardMeta idCard in _account.idCardsMetadata.values) {
+    Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
+    Map<String, IdentityMeta> identitiesMetadata = _account.identitiesMetadata;
+    Map<String, NoteMeta> notesMetadata = _account.notesMetadata;
+    Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
+    Map<String, PaymentCardMeta> paymentCardsMetadata =
+        _account.paymentCardsMetadata;
+    if (idCardsMetadata.isEmpty &&
+        identitiesMetadata.isEmpty &&
+        notesMetadata.isEmpty &&
+        passwordsMetadata.isEmpty &&
+        paymentCardsMetadata.isEmpty) {
+      return CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Column(
+              children: [
+                const Spacer(flex: 7),
+                Text(
+                  localizations.noEntries,
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(flex: 7),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    for (IDCardMeta idCard in idCardsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: idCard.nickname,
           description: idCard.name,
           type: EntryType.idCard,
           meta: idCard));
     }
-    for (IdentityMeta _identity in _account.identitiesMetadata.values) {
+    for (IdentityMeta _identity in identitiesMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _identity.nickname,
           description: _identity.firstAddressLine,
           type: EntryType.identity,
           meta: _identity));
     }
-    for (NoteMeta _note in _account.notesMetadata.values) {
+    for (NoteMeta _note in notesMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _note.title,
           description: '',
           type: EntryType.note,
           meta: _note));
     }
-    for (PasswordMeta _password in _account.passwordsMetadata.values) {
+    for (PasswordMeta _password in passwordsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
           meta: _password));
     }
-    for (PaymentCardMeta _paymentCard in _account.paymentCardsMetadata.values) {
+    for (PaymentCardMeta _paymentCard in paymentCardsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
@@ -116,6 +146,181 @@ class _MainScreen extends State<MainScreen>
           _found.add(_searchEntry);
         }
       }
+    }
+    if (_found.isEmpty) {
+      return CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Column(
+              children: [
+                const Spacer(flex: 7),
+                Text(
+                  localizations.noSearchResults,
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(flex: 7),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    return PassyEntryButtonListView(
+      entries: _found,
+      shouldSort: true,
+      onPressed: (entry) {
+        switch (entry.type) {
+          case EntryType.idCard:
+            Navigator.pushNamed(context, IDCardScreen.routeName,
+                arguments: _account.getIDCard(entry.meta.key));
+            return;
+          case EntryType.identity:
+            Navigator.pushNamed(context, IdentityScreen.routeName,
+                arguments: _account.getIdentity(entry.meta.key));
+            return;
+          case EntryType.note:
+            Navigator.pushNamed(context, NoteScreen.routeName,
+                arguments: _account.getNote(entry.meta.key));
+            return;
+          case EntryType.password:
+            Navigator.pushNamed(context, PasswordScreen.routeName,
+                arguments: _account.getPassword(entry.meta.key));
+            return;
+          case EntryType.paymentCard:
+            Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                arguments: _account.getPaymentCard(entry.meta.key));
+            return;
+        }
+      },
+      popupMenuItemBuilder: passyEntryPopupMenuItemBuilder,
+    );
+  }
+
+  Widget _favoritesSearchBuilder(String terms) {
+    if (!_account.hasFavorites) {
+      return CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Column(
+              children: [
+                const Spacer(flex: 7),
+                RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                        text: '${localizations.noFavorites}.',
+                        children: [
+                          TextSpan(text: '\n\n${localizations.noFavorites1}'),
+                          const WidgetSpan(
+                              child: Icon(Icons.star_outline_rounded)),
+                          TextSpan(text: ' ${localizations.noFavorites2}.'),
+                        ])),
+                const Spacer(flex: 7),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    final List<SearchEntryData> _found = [];
+    final List<String> _terms = terms.trim().toLowerCase().split(' ');
+    final List<SearchEntryData> _searchEntries = [];
+    Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
+    Map<String, IdentityMeta> identitiesMetadata = _account.identitiesMetadata;
+    Map<String, NoteMeta> notesMetadata = _account.notesMetadata;
+    Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
+    Map<String, PaymentCardMeta> paymentCardsMetadata =
+        _account.paymentCardsMetadata;
+    for (EntryEvent event in _account.favoriteIDCards.values) {
+      if (event.status == EntryStatus.removed) continue;
+      IDCardMeta? idCard = idCardsMetadata[event.key];
+      if (idCard == null) continue;
+      _searchEntries.add(SearchEntryData(
+          name: idCard.nickname,
+          description: idCard.name,
+          type: EntryType.idCard,
+          meta: idCard));
+    }
+    for (EntryEvent event in _account.favoriteIdentities.values) {
+      if (event.status == EntryStatus.removed) continue;
+      IdentityMeta? _identity = identitiesMetadata[event.key];
+      if (_identity == null) continue;
+      _searchEntries.add(SearchEntryData(
+          name: _identity.nickname,
+          description: _identity.firstAddressLine,
+          type: EntryType.identity,
+          meta: _identity));
+    }
+    for (EntryEvent event in _account.favoriteNotes.values) {
+      if (event.status == EntryStatus.removed) continue;
+      NoteMeta? _note = notesMetadata[event.key];
+      if (_note == null) continue;
+      _searchEntries.add(SearchEntryData(
+          name: _note.title,
+          description: '',
+          type: EntryType.note,
+          meta: _note));
+    }
+    for (EntryEvent event in _account.favoritePasswords.values) {
+      if (event.status == EntryStatus.removed) continue;
+      PasswordMeta? _password = passwordsMetadata[event.key];
+      if (_password == null) continue;
+      _searchEntries.add(SearchEntryData(
+          name: _password.nickname,
+          description: _password.username,
+          type: EntryType.password,
+          meta: _password));
+    }
+    for (EntryEvent event in _account.favoritePaymentCards.values) {
+      if (event.status == EntryStatus.removed) continue;
+      PaymentCardMeta? _paymentCard = paymentCardsMetadata[event.key];
+      if (_paymentCard == null) continue;
+      _searchEntries.add(SearchEntryData(
+          name: _paymentCard.nickname,
+          description: _paymentCard.cardholderName,
+          type: EntryType.paymentCard,
+          meta: _paymentCard));
+    }
+    for (SearchEntryData _searchEntry in _searchEntries) {
+      {
+        bool testSearchEntry(SearchEntryData value) =>
+            _searchEntry.meta.key == value.meta.key;
+
+        if (_found.any(testSearchEntry)) continue;
+      }
+      {
+        int _positiveCount = 0;
+        for (String _term in _terms) {
+          if (_searchEntry.name.toLowerCase().contains(_term)) {
+            _positiveCount++;
+            continue;
+          }
+          if (_searchEntry.description.toLowerCase().contains(_term)) {
+            _positiveCount++;
+            continue;
+          }
+        }
+        if (_positiveCount == _terms.length) {
+          _found.add(_searchEntry);
+        }
+      }
+    }
+    if (_found.isEmpty) {
+      return CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Column(
+              children: [
+                const Spacer(flex: 7),
+                Text(
+                  localizations.noSearchResults,
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(flex: 7),
+              ],
+            ),
+          ),
+        ],
+      );
     }
     return PassyEntryButtonListView(
       entries: _found,
@@ -316,6 +521,32 @@ class _MainScreen extends State<MainScreen>
       PassyPadding(ThreeWidgetButton(
         left: const Padding(
           padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.star_rounded),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: Text(localizations.favorites),
+        onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
+            arguments: SearchScreenArgs(
+              title: localizations.favorites,
+              builder: _favoritesSearchBuilder,
+            )),
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(CupertinoIcons.globe),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: Text(localizations.searchAllEntries),
+        onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
+            arguments: SearchScreenArgs(
+              title: localizations.allEntries,
+              builder: _searchBuilder,
+            )),
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
           child: Icon(Icons.password_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
@@ -384,9 +615,12 @@ class _MainScreen extends State<MainScreen>
             IconButton(
               padding: PassyTheme.appBarButtonPadding,
               tooltip: localizations.search,
-              onPressed: () => Navigator.pushNamed(
-                  context, SearchScreen.routeName,
-                  arguments: _searchBuilder),
+              onPressed: () =>
+                  Navigator.pushNamed(context, SearchScreen.routeName,
+                      arguments: SearchScreenArgs(
+                        title: localizations.allEntries,
+                        builder: _searchBuilder,
+                      )),
               icon: const Icon(Icons.search_rounded),
               splashRadius: PassyTheme.appBarButtonSplashRadius,
             ),
@@ -449,19 +683,21 @@ class _MainScreen extends State<MainScreen>
                   children: [
                     _screenButtons[0],
                     _screenButtons[1],
-                  ],
-                )),
-                Expanded(
-                    child: ListView(
-                  children: [
                     _screenButtons[2],
-                    _screenButtons[3],
                   ],
                 )),
                 Expanded(
                     child: ListView(
                   children: [
+                    _screenButtons[3],
                     _screenButtons[4],
+                  ],
+                )),
+                Expanded(
+                    child: ListView(
+                  children: [
+                    _screenButtons[5],
+                    _screenButtons[6],
                   ],
                 ))
               ]);
@@ -473,13 +709,15 @@ class _MainScreen extends State<MainScreen>
                     _screenButtons[0],
                     _screenButtons[1],
                     _screenButtons[2],
+                    _screenButtons[3],
                   ]),
                 ),
                 Expanded(
                     child: ListView(
                   children: [
-                    _screenButtons[3],
                     _screenButtons[4],
+                    _screenButtons[5],
+                    _screenButtons[6],
                   ],
                 )),
               ]);

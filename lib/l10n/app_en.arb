@@ -187,5 +187,19 @@
     "copied": "Copied",
     "numbers": "Numbers",
     "symbols": "Symbols",
-    "done": "Done"
+    "done": "Done",
+    "allEntries": "All entries",
+    "searchAllEntries": "Search all entries",
+    "favorites": "Favorites",
+    "noFavorites": "No favorites",
+    "noFavorites1": "You may add favorites by pressing the ",
+    "noFavorites2": " button at the top bar of any entry screen",
+    "@noFavorites1": { "description": "noFavorites, noFavorites1 and noFavorites2 make up a single message used in the Favorites search screen. noFavorites1 is followed by a star icon." },
+    "@noFavorites2": { "description": "noFavorites, noFavorites1 and noFavorites2 make up a single message used in the Favorites search screen. noFavorites1 is followed by a star icon." },
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "noEntries": "No entries",
+    "noSearchResults": "No search results"
 }

@@ -3,6 +3,16 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
+class SearchScreenArgs {
+  String? title;
+  Widget Function(String) builder;
+
+  SearchScreenArgs({
+    this.title,
+    required this.builder,
+  });
+}
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
 
@@ -23,8 +33,9 @@ class _SearchScreen extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget Function(String terms) _builder =
-        ModalRoute.of(context)!.settings.arguments as Widget Function(String);
+    SearchScreenArgs _args =
+        ModalRoute.of(context)!.settings.arguments as SearchScreenArgs;
+    Widget Function(String terms) _builder = _args.builder;
     if (!_initialized) {
       _widget = _builder('');
       _initialized = true;
@@ -37,7 +48,7 @@ class _SearchScreen extends State<SearchScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(localizations.search),
+        title: Text(_args.title ?? localizations.search),
         centerTitle: true,
       ),
       body: Column(

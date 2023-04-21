@@ -232,8 +232,9 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                             labelText:
                                 '2FA ${localizations.algorithm.toLowerCase()}'),
                         onChanged: (value) {
-                          if (value != null)
+                          if (value != null) {
                             setState(() => _tfaAlgorithm = value);
+                          }
                         },
                       )),
                       PassyPadding(DropdownButtonFormField(

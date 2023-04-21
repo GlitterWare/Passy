@@ -98,7 +98,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           Navigator.pushNamed(
             context,
             SearchScreen.routeName,
-            arguments: _buildPasswords,
+            arguments: SearchScreenArgs(builder: _buildPasswords),
           );
           return;
         }

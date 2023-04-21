@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -8,6 +9,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/splash_screen.dart';
 
+import 'common.dart';
 import 'edit_id_card_screen.dart';
 import 'id_cards_screen.dart';
 import 'main_screen.dart';
@@ -23,10 +25,13 @@ class IDCardScreen extends StatefulWidget {
 
 class _IDCardScreen extends State<IDCardScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
     final IDCard _idCard = ModalRoute.of(context)!.settings.arguments as IDCard;
+    isFavorite =
+        _account.favoriteIDCards[_idCard.key]?.status == EntryStatus.alive;
 
     void _onRemovePressed() {
       showDialog(
@@ -79,6 +84,27 @@ class _IDCardScreen extends State<IDCardScreen> {
         title: Center(child: Text(localizations.idCard)),
         onRemovePressed: () => _onRemovePressed(),
         onEditPressed: () => _onEditPressed(),
+        isFavorite: isFavorite,
+        onFavoritePressed: () async {
+          if (isFavorite) {
+            await _account.removeFavoriteIDCard(_idCard.key);
+            showSnackBar(context,
+                message: localizations.removedFromFavorites,
+                icon: const Icon(
+                  Icons.star_outline_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          } else {
+            await _account.addFavoriteIDCard(_idCard.key);
+            showSnackBar(context,
+                message: localizations.addedToFavorites,
+                icon: const Icon(
+                  Icons.star_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          }
+          setState(() {});
+        },
       ),
       body: ListView(
         children: [

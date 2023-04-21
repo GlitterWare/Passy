@@ -28,7 +28,7 @@ class _NotesScreen extends State<NotesScreen> {
 
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: (String terms) {
+        arguments: SearchScreenArgs(builder: (String terms) {
       final List<NoteMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (NoteMeta _note in _account.notesMetadata.values) {
@@ -50,6 +50,24 @@ class _NotesScreen extends State<NotesScreen> {
           }
         }
       }
+      if (_found.isEmpty) {
+        return CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              child: Column(
+                children: [
+                  const Spacer(flex: 7),
+                  Text(
+                    localizations.noSearchResults,
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(flex: 7),
+                ],
+              ),
+            ),
+          ],
+        );
+      }
       return NoteButtonListView(
         notes: _found,
         shouldSort: true,
@@ -57,7 +75,7 @@ class _NotesScreen extends State<NotesScreen> {
             arguments: _account.getNote(note.key)),
         popupMenuItemBuilder: notePopupMenuBuilder,
       );
-    });
+    }));
   }
 
   @override

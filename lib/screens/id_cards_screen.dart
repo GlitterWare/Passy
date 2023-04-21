@@ -28,7 +28,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
 
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: (String terms) {
+        arguments: SearchScreenArgs(builder: (String terms) {
       final List<IDCardMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (IDCardMeta _idCard in _account.idCardsMetadata.values) {
@@ -54,6 +54,24 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           }
         }
       }
+      if (_found.isEmpty) {
+        return CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              child: Column(
+                children: [
+                  const Spacer(flex: 7),
+                  Text(
+                    localizations.noSearchResults,
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(flex: 7),
+                ],
+              ),
+            ),
+          ],
+        );
+      }
       return IDCardButtonListView(
         idCards: _found,
         shouldSort: true,
@@ -64,7 +82,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         ),
         popupMenuItemBuilder: idCardPopupMenuBuilder,
       );
-    });
+    }));
   }
 
   @override

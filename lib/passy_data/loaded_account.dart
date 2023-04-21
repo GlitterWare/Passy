@@ -278,6 +278,7 @@ class LoadedAccount {
   Future<void> saveFavorites() => _favorites.save();
   void saveFavoritesSync() => _favorites.saveSync();
   int get favoritesLength => _favorites.value.length;
+  bool get hasFavorites => _favorites.value.hasFavorites;
   Map<String, EntryEvent> get favoritePasswords =>
       Map.from(_favorites.value.passwords);
   Map<String, EntryEvent> get favoritePaymentCards =>

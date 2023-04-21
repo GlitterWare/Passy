@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
@@ -8,6 +9,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/splash_screen.dart';
 
+import 'common.dart';
 import 'main_screen.dart';
 import 'edit_identity_screen.dart';
 import 'identities_screen.dart';
@@ -23,11 +25,14 @@ class IdentityScreen extends StatefulWidget {
 
 class _IdentityScreen extends State<IdentityScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
     final Identity _identity =
         ModalRoute.of(context)!.settings.arguments as Identity;
+    isFavorite =
+        _account.favoriteIdentities[_identity.key]?.status == EntryStatus.alive;
 
     void _onRemovePressed() {
       showDialog(
@@ -81,6 +86,27 @@ class _IdentityScreen extends State<IdentityScreen> {
         title: Center(child: Text(localizations.identity)),
         onRemovePressed: _onRemovePressed,
         onEditPressed: _onEditPressed,
+        isFavorite: isFavorite,
+        onFavoritePressed: () async {
+          if (isFavorite) {
+            await _account.removeFavoriteIdentity(_identity.key);
+            showSnackBar(context,
+                message: localizations.removedFromFavorites,
+                icon: const Icon(
+                  Icons.star_outline_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          } else {
+            await _account.addFavoriteIdentity(_identity.key);
+            showSnackBar(context,
+                message: localizations.addedToFavorites,
+                icon: const Icon(
+                  Icons.star_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          }
+          setState(() {});
+        },
       ),
       body: ListView(
         children: [

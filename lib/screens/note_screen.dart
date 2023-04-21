@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
+import 'common.dart';
 import 'main_screen.dart';
 import 'edit_note_screen.dart';
 import 'notes_screen.dart';
@@ -21,6 +23,7 @@ class NoteScreen extends StatefulWidget {
 
 class _NoteScreen extends State<NoteScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  bool isFavorite = false;
 
   void _onRemovePressed(Note note) {
     showDialog(
@@ -71,11 +74,35 @@ class _NoteScreen extends State<NoteScreen> {
   @override
   Widget build(BuildContext context) {
     final Note _note = ModalRoute.of(context)!.settings.arguments as Note;
+    isFavorite = _account.favoriteNotes[_note.key]?.status == EntryStatus.alive;
+    ;
+
     return Scaffold(
       appBar: EntryScreenAppBar(
         title: Center(child: Text(localizations.note)),
         onRemovePressed: () => _onRemovePressed(_note),
         onEditPressed: () => _onEditPressed(_note),
+        isFavorite: isFavorite,
+        onFavoritePressed: () async {
+          if (isFavorite) {
+            await _account.removeFavoriteNote(_note.key);
+            showSnackBar(context,
+                message: localizations.removedFromFavorites,
+                icon: const Icon(
+                  Icons.star_outline_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          } else {
+            await _account.addFavoriteNote(_note.key);
+            showSnackBar(context,
+                message: localizations.addedToFavorites,
+                icon: const Icon(
+                  Icons.star_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          }
+          setState(() {});
+        },
       ),
       body: ListView(children: [
         if (_note.title != '')

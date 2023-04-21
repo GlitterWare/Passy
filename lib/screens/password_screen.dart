@@ -5,6 +5,7 @@ import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
@@ -34,6 +35,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   String _tfaCode = '';
   double _tfaProgress = 0;
   Color _tfaColor = PassyTheme.lightContentSecondaryColor;
+  bool isFavorite = false;
 
   Future<void> _generateTFA(TFA tfa) async {
     double _tfaProgressLast = 1.0;
@@ -150,12 +152,35 @@ class _PasswordScreen extends State<PasswordScreen> {
       password = ModalRoute.of(context)!.settings.arguments as Password;
       if (password!.tfa != null) generateTFA = _generateTFA(password!.tfa!);
     }
+    isFavorite =
+        _account.favoritePasswords[password!.key]?.status == EntryStatus.alive;
 
     return Scaffold(
       appBar: EntryScreenAppBar(
         title: Center(child: Text(localizations.password)),
         onRemovePressed: () => _onRemovePressed(password!),
         onEditPressed: () => _onEditPressed(password!),
+        isFavorite: isFavorite,
+        onFavoritePressed: () async {
+          if (isFavorite) {
+            await _account.removeFavoritePassword(password!.key);
+            showSnackBar(context,
+                message: localizations.removedFromFavorites,
+                icon: const Icon(
+                  Icons.star_outline_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          } else {
+            await _account.addFavoritePassword(password!.key);
+            showSnackBar(context,
+                message: localizations.addedToFavorites,
+                icon: const Icon(
+                  Icons.star_rounded,
+                  color: PassyTheme.darkContentColor,
+                ));
+          }
+          setState(() {});
+        },
       ),
       body: ListView(
         children: [

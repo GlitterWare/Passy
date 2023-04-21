@@ -23,6 +23,25 @@ class Favorites with JsonConvertable {
       idCards.length +
       identities.length;
 
+  bool get hasFavorites {
+    for (EntryEvent event in passwords.values) {
+      if (event.status == EntryStatus.alive) return true;
+    }
+    for (EntryEvent event in paymentCards.values) {
+      if (event.status == EntryStatus.alive) return true;
+    }
+    for (EntryEvent event in notes.values) {
+      if (event.status == EntryStatus.alive) return true;
+    }
+    for (EntryEvent event in idCards.values) {
+      if (event.status == EntryStatus.alive) return true;
+    }
+    for (EntryEvent event in identities.values) {
+      if (event.status == EntryStatus.alive) return true;
+    }
+    return false;
+  }
+
   Favorites({
     //this.version = 0,
     Map<String, EntryEvent>? passwords,
