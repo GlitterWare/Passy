@@ -281,13 +281,12 @@ class LoadedAccount {
   Map<String, EntryEvent> get favoritePasswords =>
       Map.from(_favorites.value.passwords);
   Map<String, EntryEvent> get favoritePaymentCards =>
-      Map.from(_favorites.value.passwords);
-  Map<String, EntryEvent> get favoriteNotes =>
-      Map.from(_favorites.value.passwords);
+      Map.from(_favorites.value.paymentCards);
+  Map<String, EntryEvent> get favoriteNotes => Map.from(_favorites.value.notes);
   Map<String, EntryEvent> get favoriteIDCards =>
-      Map.from(_favorites.value.passwords);
+      Map.from(_favorites.value.idCards);
   Map<String, EntryEvent> get favoriteIdentities =>
-      Map.from(_favorites.value.passwords);
+      Map.from(_favorites.value.identities);
   Future<void> addFavoritePassword(String key) async {
     if (getPassword(key) == null) return;
     _favorites.value.passwords[key] = EntryEvent(
