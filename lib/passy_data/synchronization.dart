@@ -1125,8 +1125,11 @@ class Synchronization {
                     'Received malformed favorites. Expected type `List<dynamic>`, received type `${favoritesEntries.runtimeType.toString()}`.');
                 return;
               }
-              for (EntryEvent localFavoriteEntry
-                  in _loadedAccount.getFavoriteEntries(entryType).values) {
+              Map<String, EntryEvent> localFavoriteEntries =
+                  _loadedAccount.getFavoriteEntries(entryType);
+              List<EntryEvent> localFavoriteEntryValues =
+                  localFavoriteEntries.values.toList();
+              for (EntryEvent localFavoriteEntry in localFavoriteEntryValues) {
                 if (favoritesEntries.containsKey(localFavoriteEntry.key)) {
                   EntryEvent favoriteDecoded;
                   try {
@@ -1179,6 +1182,21 @@ class Synchronization {
                   return;
                 }
                 continue;
+              }
+              for (dynamic favoriteEntry in favoritesEntries.values) {
+                EntryEvent favoriteDecoded;
+                try {
+                  favoriteDecoded = EntryEvent.fromJson(favoriteEntry);
+                } catch (e, s) {
+                  _handleException(
+                      'Could not decode favorites entry.\n${e.toString()}\n${s.toString()}');
+                  return;
+                }
+                if (localFavoriteEntries.containsKey(favoriteDecoded.key)) {
+                  continue;
+                }
+                localFavorites[favoriteDecoded.key] = favoriteDecoded;
+                await _loadedAccount.saveFavorites();
               }
             }
           }
