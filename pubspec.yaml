@@ -57,6 +57,8 @@ dependencies:
   intl: any
   flutter_localizations:
     sdk: flutter
+  crypton: ^2.1.0
+  event: ^2.1.2
 
 
 dev_dependencies:

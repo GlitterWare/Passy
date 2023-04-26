@@ -7,8 +7,23 @@ import 'package:path/path.dart' as path;
 import 'dart:io';
 
 const String passyVersion = '1.3.1';
-const String syncVersion = '1.0.0';
+const String syncVersion = '2.0.0';
 const String accountVersion = '2.2.0';
+
+/// Returns false if version2 is lower, true if version2 is higher and null if both versions are the same
+bool? compareVersions(version1, version2) {
+  List<int> version1Split =
+      version1.split('.').map<int>((str) => int.parse(str)).toList();
+  List<int> version2Split =
+      version2.split('.').map<int>((str) => int.parse(str)).toList();
+  if (version2Split[0] < version1Split[0]) return false;
+  if (version2Split[0] > version1Split[0]) return true;
+  if (version2Split[1] < version1Split[1]) return false;
+  if (version2Split[1] > version1Split[1]) return true;
+  if (version2Split[2] < version1Split[2]) return false;
+  if (version2Split[2] > version1Split[2]) return true;
+  return null;
+}
 
 bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
   if (lineDelimiter.length == 1) {

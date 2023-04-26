@@ -43,3 +43,18 @@ EntryType? entryTypeFromType(Type type) {
   }
   return null;
 }
+
+Type entryTypeToType(EntryType type) {
+  switch (type) {
+    case EntryType.password:
+      return Password;
+    case EntryType.paymentCard:
+      return PaymentCard;
+    case EntryType.note:
+      return Note;
+    case EntryType.idCard:
+      return IDCard;
+    case EntryType.identity:
+      return Identity;
+  }
+}

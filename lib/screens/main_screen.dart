@@ -502,8 +502,10 @@ class _MainScreen extends State<MainScreen>
   @override
   void initState() {
     super.initState();
-    FlutterSecureScreen.singleton
-        .setAndroidScreenSecure(_account.protectScreen);
+    if (Platform.isAndroid) {
+      FlutterSecureScreen.singleton
+          .setAndroidScreenSecure(_account.protectScreen);
+    }
     WidgetsBinding.instance.addObserver(this);
     _onConnectPressed = Platform.isAndroid || Platform.isIOS
         ? _showConnectDialog

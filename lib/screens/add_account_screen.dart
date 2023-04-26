@@ -119,7 +119,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                   onPressed: () => Navigator.pushReplacementNamed(
                       context, LoginScreen.routeName),
                 ),
-          title: Text(localizations.addAccount),
+          title: Text(localizations.createLocalAccount),
           centerTitle: true,
         ),
         body: CustomScrollView(slivers: [

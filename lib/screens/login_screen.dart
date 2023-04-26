@@ -144,7 +144,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     if (!widget.autofillLogin) {
-      FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
+      if (Platform.isAndroid) {
+        FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
+      }
       _floatingActionButton = FloatingActionButton(
         child: const Icon(Icons.settings_rounded),
         tooltip: localizations.settings,

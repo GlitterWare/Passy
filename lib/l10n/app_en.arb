@@ -8,6 +8,7 @@
     "couldNotAddAccount": "Couldn't add account",
     "details": "Details",
     "addAccount": "Add account",
+    "createLocalAccount": "Create local account",
     "username": "Username",
     "password": "Password",
     "confirmPassword": "Confirm password",

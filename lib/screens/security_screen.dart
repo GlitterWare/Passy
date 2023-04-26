@@ -26,8 +26,10 @@ class _SecurityScreen extends State<SecurityScreen> {
     setState(() {
       loadedAccount.protectScreen = value;
     });
-    FlutterSecureScreen.singleton
-        .setAndroidScreenSecure(loadedAccount.protectScreen);
+    if (Platform.isAndroid) {
+      FlutterSecureScreen.singleton
+          .setAndroidScreenSecure(loadedAccount.protectScreen);
+    }
     loadedAccount.saveSettings();
   }
 

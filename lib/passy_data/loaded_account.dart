@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/json_file.dart';
@@ -161,6 +163,7 @@ class LoadedAccount {
   }) =>
       Synchronization(this,
           history: _history.value,
+          favorites: _favorites.value,
           encrypter: _encrypter,
           onComplete: onComplete,
           onError: onError);
@@ -271,6 +274,7 @@ class LoadedAccount {
   void renewHistory() => _history.value.renew();
   Future<void> saveHistory() => _history.save();
   void saveHistorySync() => _history.saveSync();
+  Digest get historyHash => getPassyHash(jsonEncode(_history.value.toJson()));
 
   // Favorites wrappers
   void clearRemovedFavorites() => _favorites.value.clearRemoved();
@@ -279,15 +283,34 @@ class LoadedAccount {
   void saveFavoritesSync() => _favorites.saveSync();
   int get favoritesLength => _favorites.value.length;
   bool get hasFavorites => _favorites.value.hasFavorites;
-  Map<String, EntryEvent> get favoritePasswords =>
-      Map.from(_favorites.value.passwords);
-  Map<String, EntryEvent> get favoritePaymentCards =>
-      Map.from(_favorites.value.paymentCards);
-  Map<String, EntryEvent> get favoriteNotes => Map.from(_favorites.value.notes);
-  Map<String, EntryEvent> get favoriteIDCards =>
-      Map.from(_favorites.value.idCards);
-  Map<String, EntryEvent> get favoriteIdentities =>
-      Map.from(_favorites.value.identities);
+  Digest get favoritesHash =>
+      getPassyHash(jsonEncode(_favorites.value.toJson()));
+  Map<String, EntryEvent> get favoritePasswords => _favorites.value.passwords
+      .map((key, value) => MapEntry(key, EntryEvent.fromJson(value.toJson())));
+  Map<String, EntryEvent> get favoritePaymentCards => _favorites
+      .value.paymentCards
+      .map((key, value) => MapEntry(key, EntryEvent.fromJson(value.toJson())));
+  Map<String, EntryEvent> get favoriteNotes => _favorites.value.notes
+      .map((key, value) => MapEntry(key, EntryEvent.fromJson(value.toJson())));
+  Map<String, EntryEvent> get favoriteIDCards => _favorites.value.idCards
+      .map((key, value) => MapEntry(key, EntryEvent.fromJson(value.toJson())));
+  Map<String, EntryEvent> get favoriteIdentities => _favorites.value.identities
+      .map((key, value) => MapEntry(key, EntryEvent.fromJson(value.toJson())));
+  Map<String, EntryEvent> getFavoriteEntries(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return favoritePasswords;
+      case EntryType.paymentCard:
+        return favoritePaymentCards;
+      case EntryType.note:
+        return favoriteNotes;
+      case EntryType.idCard:
+        return favoriteIDCards;
+      case EntryType.identity:
+        return favoriteIdentities;
+    }
+  }
+
   Future<void> addFavoritePassword(String key) async {
     if (getPassword(key) == null) return;
     _favorites.value.passwords[key] = EntryEvent(
@@ -383,6 +406,36 @@ class LoadedAccount {
     await _favorites.save();
   }
 
+  Future<void> Function(String key) addFavoriteEntry(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return addFavoritePassword;
+      case EntryType.paymentCard:
+        return addFavoritePaymentCard;
+      case EntryType.note:
+        return addFavoriteNote;
+      case EntryType.idCard:
+        return addFavoriteIDCard;
+      case EntryType.identity:
+        return addFavoriteIdentity;
+    }
+  }
+
+  Future<void> Function(String key) removeFavoriteEntry(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return removeFavoritePassword;
+      case EntryType.paymentCard:
+        return removeFavoritePaymentCard;
+      case EntryType.note:
+        return removeFavoriteNote;
+      case EntryType.idCard:
+        return removeFavoriteIDCard;
+      case EntryType.identity:
+        return removeFavoriteIdentity;
+    }
+  }
+
   void removeDeletedFavorites() {
     // TODO: optimize IO
     // multiple entries should be requested via one get command per entry type
@@ -421,11 +474,14 @@ class LoadedAccount {
   }
 
   Future<void> removePassword(String key) async {
-    _history.value.passwords[key]!
+    EntryEvent? _event = _history.value.passwords[key];
+    if (_event == null) return;
+    _event
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     Future<void> _saveFuture = _passwords.setEntry(key);
     await _history.save();
+    await removeFavoritePassword(key);
     await _saveFuture;
   }
 
@@ -449,11 +505,14 @@ class LoadedAccount {
   }
 
   Future<void> removeNote(String key) async {
-    _history.value.notes[key]!
+    EntryEvent? _event = _history.value.notes[key];
+    if (_event == null) return;
+    _event
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     Future<void> _saveFuture = _notes.setEntry(key);
     await _history.save();
+    await removeFavoriteNote(key);
     await _saveFuture;
   }
 
@@ -479,11 +538,14 @@ class LoadedAccount {
   }
 
   Future<void> removePaymentCard(String key) async {
-    _history.value.paymentCards[key]!
+    EntryEvent? _event = _history.value.paymentCards[key];
+    if (_event == null) return;
+    _event
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     Future<void> _saveFuture = _paymentCards.setEntry(key);
     await _history.save();
+    await removeFavoritePaymentCard(key);
     await _saveFuture;
   }
 
@@ -506,11 +568,14 @@ class LoadedAccount {
   }
 
   Future<void> removeIDCard(String key) async {
-    _history.value.idCards[key]!
+    EntryEvent? _event = _history.value.idCards[key];
+    if (_event == null) return;
+    _event
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     Future<void> _saveFuture = _idCards.setEntry(key);
     await _history.save();
+    await removeFavoriteIDCard(key);
     await _saveFuture;
   }
 
@@ -535,11 +600,14 @@ class LoadedAccount {
   }
 
   Future<void> removeIdentity(String key) async {
-    _history.value.identities[key]!
+    EntryEvent? _event = _history.value.identities[key];
+    if (_event == null) return;
+    _event
       ..status = EntryStatus.removed
       ..lastModified = DateTime.now().toUtc();
     Future<void> _saveFuture = _identities.setEntry(key);
     await _history.save();
+    await removeFavoriteIdentity(key);
     await _saveFuture;
   }
 }

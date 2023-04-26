@@ -99,6 +99,23 @@ class History with JsonConvertable {
     }
   }
 
+  Iterable<String> getKeys(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return passwords.keys;
+      case EntryType.paymentCard:
+        return paymentCards.keys;
+      case EntryType.note:
+        return notes.keys;
+      case EntryType.idCard:
+        return idCards.keys;
+      case EntryType.identity:
+        return identities.keys;
+      default:
+        return {};
+    }
+  }
+
   static HistoryFile fromFile(File file, {required Encrypter encrypter}) =>
       HistoryFile.fromFile(file,
           encrypter: encrypter,

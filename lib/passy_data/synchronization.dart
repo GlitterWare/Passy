@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
+import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:intranet_ip/intranet_ip.dart';
+import 'package:passy/passy_data/favorites.dart';
+import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
 import 'dart:io';
 
 import 'common.dart';
@@ -16,9 +19,46 @@ import 'json_convertable.dart';
 import 'loaded_account.dart';
 import 'passy_entry.dart';
 import 'passy_stream_subscription.dart';
+import 'glare/glare_client.dart';
+import 'glare/glare_server.dart';
 
 const String _hello = 'hello';
 const String _sameHistoryHash = 'same';
+bool _isLoading = false;
+RSAKeypair? _rsaKeypair;
+Completer _onLoadedCompleter = Completer();
+
+Future<void> loadSynchronization() async {
+  if (_isLoading) return;
+  _isLoading = true;
+  _rsaKeypair = RSAKeypair.fromRandom(keySize: 4096);
+  _onLoadedCompleter.complete();
+}
+
+class SynchronizationSignalData with JsonConvertable {
+  String name;
+
+  SynchronizationSignalData({required this.name});
+
+  @override
+  toJson() {
+    return {
+      'name': name,
+    };
+  }
+}
+
+class SynchronizationSignal with JsonConvertable {
+  String type = 'signal';
+  SynchronizationSignalData data;
+
+  SynchronizationSignal({required this.data});
+
+  @override
+  toJson() {
+    return {'type': type, 'data': data.toJson()};
+  }
+}
 
 class _EntryData with JsonConvertable {
   final String key;
@@ -137,8 +177,10 @@ class _EntryInfo with JsonConvertable {
 class Synchronization {
   final LoadedAccount _loadedAccount;
   final History _history;
+  final Favorites _favorites;
   final Encrypter _encrypter;
   final void Function()? _onComplete;
+  bool _isOnCompleteCalled = false;
   final void Function(String log)? _onError;
   static ServerSocket? _server;
   static Socket? _socket;
@@ -146,19 +188,29 @@ class Synchronization {
   bool _isConnected = false;
   int _entriesAdded = 0;
   int _entriesRemoved = 0;
+  GlareClient? _sync2d0d0Client;
+  GlareServer? _sync2d0d0Host;
 
   get entriesAdded => _entriesAdded;
   get entriesRemoved => _entriesRemoved;
 
   Synchronization(this._loadedAccount,
       {required History history,
+      required Favorites favorites,
       required Encrypter encrypter,
       void Function()? onComplete,
       void Function(String log)? onError})
       : _history = history,
+        _favorites = favorites,
         _encrypter = encrypter,
         _onComplete = onComplete,
         _onError = onError;
+
+  void _callOnComplete() {
+    if (_isOnCompleteCalled) return;
+    _isOnCompleteCalled = true;
+    _onComplete?.call();
+  }
 
   void _handleException(String message) {
     _socket?.destroy();
@@ -167,16 +219,24 @@ class Synchronization {
       _server?.close();
       _server = null;
     }
+    _sync2d0d0Client?.disconnect();
+    _sync2d0d0Host?.stop();
     String _exception = '\nLocal exception has occurred: ' + message;
     _syncLog += _exception;
     _onError?.call(_syncLog);
-    _onComplete?.call();
+    _callOnComplete();
   }
 
   List<List<int>> _encodeData(_Request request) {
     List<List<int>> _data = [];
 
-    for (EntryType entryType in EntryType.values) {
+    for (EntryType entryType in [
+      EntryType.password,
+      EntryType.paymentCard,
+      EntryType.note,
+      EntryType.idCard,
+      EntryType.identity,
+    ]) {
       for (String key in request.getKeys(entryType)) {
         _data.add(utf8.encode(encrypt(
                 jsonEncode(_EntryData(
@@ -287,6 +347,10 @@ class Synchronization {
   }
 
   Future<HostAddress?> host({void Function()? onConnected}) async {
+    if (!_onLoadedCompleter.isCompleted) {
+      loadSynchronization();
+      await _onLoadedCompleter.future;
+    }
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
@@ -354,7 +418,7 @@ class Synchronization {
                   _socket = null;
                   socket.destroy();
                   server.close();
-                  _onComplete?.call();
+                  _callOnComplete();
                   return;
                 }
                 _remoteHistory = History.fromJson(
@@ -373,7 +437,13 @@ class Synchronization {
                 _info = _EntryInfo();
                 _remoteRequest = _Request();
 
-                for (EntryType entryType in EntryType.values) {
+                for (EntryType entryType in [
+                  EntryType.password,
+                  EntryType.paymentCard,
+                  EntryType.note,
+                  EntryType.idCard,
+                  EntryType.identity,
+                ]) {
                   Map<String, EntryEvent> _localEvents =
                       _history.getEvents(entryType);
                   Map<String, EntryEvent> _shortLocalEvents =
@@ -457,7 +527,7 @@ class Synchronization {
                   // Cleanup
                   _syncLog += 'done.';
                   _isConnected = false;
-                  _onComplete?.call();
+                  _callOnComplete();
                 });
                 _sendInfo(_info);
                 _syncLog += 'done.\nExchanging data... ';
@@ -473,6 +543,86 @@ class Synchronization {
               return socket.flush();
             }
 
+            void _handleSignal(List<int> data) {
+              _syncLog += '\nReceived synchronization signal. Decoding... ';
+              dynamic _signal;
+              try {
+                _signal = utf8.decode(data);
+                _signal = jsonDecode(_signal);
+              } catch (e, s) {
+                _handleException(
+                    'Could not decode synchronization signal.\n${e.toString()}\n${s.toString()}');
+                return;
+              }
+              if (_signal is! Map<String, dynamic>) {
+                _handleException('Synchronization signal is empty.');
+                return;
+              }
+              dynamic _type = _signal['type'];
+              if (_type is! String) {
+                _handleException(
+                    'Synchronization signal does not specify a type.\n${_signal.toString()}');
+                return;
+              }
+              if (_type != 'signal') {
+                _handleException('Unsupported signal type.\n$_type');
+                return;
+              }
+              dynamic _data = _signal['data'];
+              if (_data is! Map<String, dynamic>) {
+                _handleException(
+                    'Synchronization signal does not specify data.\n${_signal.toString()}');
+                return;
+              }
+              dynamic name = _data['name'];
+              if (name is! String) {
+                _handleException(
+                    'Synchronization signal does not specify a name.\n${_signal.toString()}');
+                return;
+              }
+              switch (name) {
+                case 'exit':
+                  // Disconnect
+                  _socket?.destroy();
+                  _socket = null;
+                  server.close();
+                  _server = null;
+                  // Cleanup
+                  _syncLog += 'done.';
+                  _isConnected = false;
+                  _callOnComplete();
+                  return;
+              }
+              _handleException(
+                  'Unrecognized synchronization signal.\n${_signal.toString()}');
+              return;
+            }
+
+            void _synchronization2d0d0() async {
+              _sub.onData(_handleSignal);
+              _syncLog +=
+                  'done.\nClient supports 2.0.0+ synchronization. Starting 2.0.0+ synchronization server... ';
+              GlareServer host = await GlareServer.bind(
+                address: _address!.ip,
+                port: 0,
+                keypair: _rsaKeypair,
+                modules: buildSynchronization2d0d0Modules(
+                  account: _loadedAccount,
+                  history: _history,
+                  favorites: _favorites,
+                  onSetEntry: () => _entriesAdded++,
+                  onRemoveEntry: () => _entriesRemoved++,
+                ),
+                serviceInfo:
+                    'Passy cross-platform password manager entry synchronization server v$syncVersion',
+              );
+              _sync2d0d0Host = host;
+              _syncLog +=
+                  'done.\nSending 2.0.0+ synchronization server address... ';
+              socket.add(
+                  utf8.encode('${host.address.address}:${host.port}\u0000'));
+            }
+
             void _handleHello(List<int> data) {
               _syncLog += 'done.\nReceiving hello... ';
               String _data;
@@ -481,6 +631,12 @@ class Synchronization {
               } catch (e, s) {
                 _handleException(
                     'Could not decode hello.\n${e.toString()}\n${s.toString()}');
+                return;
+              }
+              List<String> _dataSplit = _data.split(' ');
+              if (_dataSplit[0] == _hello) {
+                // 2.0.0+ synchronization
+                _synchronization2d0d0();
                 return;
               }
               try {
@@ -502,7 +658,7 @@ class Synchronization {
 
             Future<void> _sendServiceInfo() {
               _syncLog += 'done.\nSending service info... ';
-              socket.add(utf8.encode('Passy $syncVersion\u0000'));
+              socket.add(utf8.encode('Passy 1.0.0 - $syncVersion\u0000'));
               return socket.flush();
             }
 
@@ -518,7 +674,11 @@ class Synchronization {
     return null;
   }
 
-  Future<void> connect(HostAddress address) {
+  Future<void> connect(HostAddress address) async {
+    if (!_onLoadedCompleter.isCompleted) {
+      loadSynchronization();
+      await _onLoadedCompleter.future;
+    }
     void _onConnected(Socket socket) {
       _isConnected = true;
       bool _serviceInfoHandled = false;
@@ -591,7 +751,7 @@ class Synchronization {
             _socket = null;
             await _decryptEntriesCompleter.future;
             _syncLog += 'done.';
-            _onComplete?.call();
+            _callOnComplete();
           });
         }
       }
@@ -604,13 +764,14 @@ class Synchronization {
       }
 
       void _handleHistoryHash(List<int> data) {
-        _syncLog += 'done.\nReceiving history hash... ';
+        _syncLog += 'done.\nDecoding history hash... ';
         String _historyJson = jsonEncode(_history.toJson());
         bool _same = true;
         try {
           _same = getPassyHash(_historyJson) == Digest(data);
         } catch (e, s) {
-          _handleException('Could not read history hash.\n${s.toString()}');
+          _handleException(
+              'Could not read history hash.\n${e.toString()}\n${s.toString()}');
           return;
         }
         if (_same) {
@@ -622,6 +783,432 @@ class Synchronization {
         }
         _sub.onData(_handleInfo);
         _sendHistory(_historyJson);
+      }
+
+      void _synchronization2d0d0(String address) async {
+        Map<String, dynamic> _checkResponse(Map<String, dynamic>? response) {
+          if (response is! Map<String, dynamic>) {
+            return {
+              'error':
+                  'Malformed server response. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
+            };
+          }
+          if (response.containsKey('error')) return response['error'];
+          dynamic data = response['data'];
+          if (data is! Map<String, dynamic>) {
+            return {
+              'error':
+                  'Malformed server response data. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
+            };
+          }
+          dynamic error = data['error'];
+          if (error != null) return {'error': error};
+          dynamic result = data['result'];
+          if (result == null) {
+            return {'error': 'Server module responded with null'};
+          }
+          return response['data']['result'];
+        }
+
+        List<String> _addressSplit = address.split(':');
+        if (_addressSplit.length < 2) {
+          _handleException(
+              'Could not connect. Malformed server address: $address.');
+          return;
+        }
+        int? port = int.tryParse(_addressSplit[1]);
+        if (port == null) {
+          _handleException(
+              'Could not connect. Malformed server address: $address.');
+          return;
+        }
+        GlareClient _safeSync2d0d0Client;
+        try {
+          _safeSync2d0d0Client = await GlareClient.connect(
+            host: _addressSplit[0],
+            port: port,
+            keypair: _rsaKeypair,
+          );
+          _sync2d0d0Client = _safeSync2d0d0Client;
+        } catch (e, s) {
+          _handleException(
+              'Could not connect.\n${e.toString()}\n${s.toString()}');
+          return;
+        }
+        _syncLog += 'done.\nReceiving users list... ';
+        Map<String, dynamic> response =
+            _checkResponse(await _safeSync2d0d0Client.runModule([
+          '2d0d0',
+          'getUsers',
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        dynamic users = response['users'];
+        if (users is! List<dynamic>) {
+          _handleException(
+              'Malformed users list. Expected type `List<dynamic>`, received type `${users.runtimeType.toString()}`.');
+          return;
+        }
+        for (dynamic user in users) {
+          _syncLog += 'done.\nProcessing next user... ';
+          if (user is! Map<String, dynamic>) {
+            _handleException(
+                'Malformed user information. Expected type `Map<String, dynamic>`, received type `${users.runtimeType.toString()}`.');
+            return;
+          }
+          dynamic username = user['username'];
+          if (username is! String) {
+            _handleException(
+                'Malformed username. Expected type `String`, received type `${username.runtimeType.toString()}`.');
+            return;
+          }
+          if (username != _loadedAccount.username) {
+            _handleException(
+                'No shared accounts found. Please make sure that your main and/or shared accounts are added on both ends and have the same usernames and passwords.');
+            return;
+          }
+          Map<String, dynamic> auth = {
+            'account': {
+              'username': username,
+              'passwordHash': _loadedAccount.passwordHash,
+            }
+          };
+          String authEncoded = jsonEncode(auth);
+          _syncLog += 'done.\nReceiving history hash... ';
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            '2d0d0',
+            'getHistoryHash',
+            authEncoded,
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          _syncLog += 'done.\nComparing history hashes... ';
+          dynamic remoteHistoryHash = response['historyHash'];
+          if (remoteHistoryHash is! String) {
+            _handleException(
+                'Received malformed history hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
+            return;
+          }
+          if (remoteHistoryHash != _loadedAccount.historyHash.toString()) {
+            for (EntryType entryType in [
+              EntryType.password,
+              EntryType.paymentCard,
+              EntryType.note,
+              EntryType.idCard,
+              EntryType.identity,
+            ]) {
+              _syncLog +=
+                  'done.\nReceiving entry keys of type ${entryTypeToType(entryType)}... ';
+              response = _checkResponse(await _safeSync2d0d0Client.runModule([
+                '2d0d0',
+                'getEntryKeys',
+                jsonEncode({
+                  ...auth,
+                  'entryType': entryType.name,
+                }),
+              ]));
+              if (response.containsKey('error')) {
+                _handleException(
+                    '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                return;
+              }
+              dynamic entryKeys = response['entryKeys'];
+              if (entryKeys is! List<dynamic>) {
+                _handleException(
+                    'Received malformed entry keys. Expected type `List<dynamic>`, received type `${entryKeys.runtimeType.toString()}`.');
+                return;
+              }
+              Map<String, EntryEvent> localHistoryEvents =
+                  _history.getEvents(entryType);
+              _syncLog += 'done.\nSending entries... ';
+              for (EntryEvent historyEvent in localHistoryEvents.values) {
+                if (entryKeys.contains(historyEvent.key)) continue;
+                PassyEntry<dynamic>? entry =
+                    _loadedAccount.getEntry(entryType)(historyEvent.key);
+                response = _checkResponse(await _safeSync2d0d0Client.runModule([
+                  '2d0d0',
+                  'setEntry',
+                  jsonEncode({
+                    ...auth,
+                    'entryType': entryType.name,
+                    'historyEntry': historyEvent.toJson(),
+                    'entry': entry?.toJson(),
+                  }),
+                ]));
+                if (response.containsKey('error')) {
+                  _handleException(
+                      '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                  return null;
+                }
+              }
+              _syncLog += 'done.\nExchanging entries... ';
+              for (dynamic entryKey in entryKeys) {
+                if (entryKey is! String) {
+                  _handleException(
+                      'Received malformed entry key. Expected type `String`, received type `${entryKey.runtimeType.toString()}`.');
+                  return;
+                }
+                response = _checkResponse(await _safeSync2d0d0Client.runModule([
+                  '2d0d0',
+                  'getHistoryEntry',
+                  jsonEncode({
+                    ...auth,
+                    'entryType': entryType.name,
+                    'entryKey': entryKey,
+                  }),
+                ]));
+                if (response.containsKey('error')) {
+                  _handleException(
+                      '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                  return;
+                }
+                dynamic historyEntry = response['historyEntry'];
+                if (historyEntry is! Map<String, dynamic>) {
+                  _handleException(
+                      'Received malformed history entry. Expected type `Map<String, dynamic>`, received type `${historyEntry.runtimeType.toString()}`.');
+                  return;
+                }
+                EntryEvent historyEntryDecoded;
+                try {
+                  historyEntryDecoded = EntryEvent.fromJson(historyEntry);
+                } catch (e, s) {
+                  _handleException(
+                      'Could not decode history entry.\n${e.toString()}\n${s.toString()}');
+                  return;
+                }
+                EntryEvent? localHistoryEntry = localHistoryEvents[entryKey];
+                Future<PassyEntry<dynamic>?> requestRemoteEntry() async {
+                  response =
+                      _checkResponse(await _safeSync2d0d0Client.runModule([
+                    '2d0d0',
+                    'getEntry',
+                    jsonEncode({
+                      ...auth,
+                      'entryType': entryType.name,
+                      'entryKey': entryKey,
+                    }),
+                  ]));
+                  if (response.containsKey('error')) {
+                    _handleException(
+                        '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                    return null;
+                  }
+                  dynamic entry = response['entry'];
+                  if (entry is! Map<String, dynamic>) {
+                    _handleException(
+                        'Received malformed entry. Expected type `Map<String, dynamic>`, received type `${entry.runtimeType.toString()}`.');
+                    return null;
+                  }
+                  PassyEntry<dynamic> entryDecoded;
+                  try {
+                    entryDecoded = PassyEntry.fromJson(entryType)(entry);
+                  } catch (e, s) {
+                    _handleException(
+                        'Could not decode history entry.\n${e.toString()}\n${s.toString()}');
+                    return null;
+                  }
+                  return entryDecoded;
+                }
+
+                if (localHistoryEntry == null) {
+                  PassyEntry<dynamic>? entry;
+                  if (historyEntryDecoded.status == EntryStatus.alive) {
+                    entry = await requestRemoteEntry();
+                    if (entry == null) return;
+                    await _loadedAccount.setEntry(entryType)(entry);
+                    _entriesAdded++;
+                  } else {
+                    await _loadedAccount
+                        .removeEntry(entryType)(historyEntryDecoded.key);
+                    _entriesRemoved++;
+                  }
+                  localHistoryEvents[entryKey] = historyEntryDecoded;
+                  await _loadedAccount.saveHistory();
+                  continue;
+                }
+                if (localHistoryEntry.lastModified
+                    .isAtSameMomentAs(historyEntryDecoded.lastModified)) {
+                  continue;
+                }
+                if (localHistoryEntry.lastModified
+                    .isBefore(historyEntryDecoded.lastModified)) {
+                  PassyEntry<dynamic>? entry;
+                  if (historyEntryDecoded.status == EntryStatus.alive) {
+                    entry = await requestRemoteEntry();
+                    if (entry == null) return;
+                    await _loadedAccount.setEntry(entryType)(entry);
+                    _entriesAdded++;
+                  } else {
+                    await _loadedAccount
+                        .removeEntry(entryType)(historyEntryDecoded.key);
+                    _entriesRemoved++;
+                  }
+                  localHistoryEvents[entryKey] = historyEntryDecoded;
+                  await _loadedAccount.saveHistory();
+                  continue;
+                } else {
+                  PassyEntry<dynamic>? entry =
+                      _loadedAccount.getEntry(entryType)(entryKey);
+                  response =
+                      _checkResponse(await _safeSync2d0d0Client.runModule([
+                    '2d0d0',
+                    'setEntry',
+                    jsonEncode({
+                      ...auth,
+                      'entryType': entryType.name,
+                      'historyEntry': localHistoryEntry.toJson(),
+                      'entry': entry?.toJson(),
+                    }),
+                  ]));
+                  if (response.containsKey('error')) {
+                    _handleException(
+                        '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                    return null;
+                  }
+                  continue;
+                }
+              }
+            }
+          }
+          _syncLog += 'done.\nReceiving favorites hash... ';
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            '2d0d0',
+            'getFavoritesHash',
+            authEncoded,
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          _syncLog += 'done.\nComparing favorites hashes... ';
+          dynamic remoteFavoritesHash = response['favoritesHash'];
+          if (remoteFavoritesHash is! String) {
+            _handleException(
+                'Received malformed favorites hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
+            return;
+          }
+          if (remoteFavoritesHash != _loadedAccount.favoritesHash.toString()) {
+            for (EntryType entryType in [
+              EntryType.password,
+              EntryType.paymentCard,
+              EntryType.note,
+              EntryType.idCard,
+              EntryType.identity,
+            ]) {
+              Map<String, EntryEvent> localFavorites =
+                  _favorites.getEvents(entryType);
+              _syncLog +=
+                  'done.\nReceiving favorites of type ${entryTypeToType(entryType)}... ';
+              response = _checkResponse(await _safeSync2d0d0Client.runModule([
+                '2d0d0',
+                'getFavoritesEntries',
+                jsonEncode({
+                  ...auth,
+                  'entryType': entryType.name,
+                }),
+              ]));
+              if (response.containsKey('error')) {
+                _handleException(
+                    '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                return;
+              }
+              dynamic favoritesEntries = response['entries'];
+              if (favoritesEntries is! Map<String, dynamic>) {
+                _handleException(
+                    'Received malformed favorites. Expected type `List<dynamic>`, received type `${favoritesEntries.runtimeType.toString()}`.');
+                return;
+              }
+              for (EntryEvent localFavoriteEntry
+                  in _loadedAccount.getFavoriteEntries(entryType).values) {
+                if (favoritesEntries.containsKey(localFavoriteEntry.key)) {
+                  EntryEvent favoriteDecoded;
+                  try {
+                    favoriteDecoded = EntryEvent.fromJson(
+                        favoritesEntries[localFavoriteEntry.key]);
+                  } catch (e, s) {
+                    _handleException(
+                        'Could not decode favorites entry.\n${e.toString()}\n${s.toString()}');
+                    return;
+                  }
+                  if (localFavoriteEntry.lastModified
+                      .isAtSameMomentAs(favoriteDecoded.lastModified)) {
+                    continue;
+                  }
+                  if (localFavoriteEntry.lastModified
+                      .isBefore(favoriteDecoded.lastModified)) {
+                    localFavorites[favoriteDecoded.key] = favoriteDecoded;
+                    await _loadedAccount.saveFavorites();
+                  } else {
+                    response =
+                        _checkResponse(await _safeSync2d0d0Client.runModule([
+                      '2d0d0',
+                      'setFavoritesEntry',
+                      jsonEncode({
+                        ...auth,
+                        'entryType': entryType.name,
+                        'entry': localFavoriteEntry.toJson(),
+                      }),
+                    ]));
+                    if (response.containsKey('error')) {
+                      _handleException(
+                          '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                      return;
+                    }
+                  }
+                  continue;
+                }
+                response = _checkResponse(await _safeSync2d0d0Client.runModule([
+                  '2d0d0',
+                  'setFavoritesEntry',
+                  jsonEncode({
+                    ...auth,
+                    'entryType': entryType.name,
+                    'entry': localFavoriteEntry.toJson(),
+                  }),
+                ]));
+                if (response.containsKey('error')) {
+                  _handleException(
+                      '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+                  return;
+                }
+                continue;
+              }
+            }
+          }
+        }
+        _syncLog += '\nAll done.\nDisconnecting... ';
+        _safeSync2d0d0Client.disconnect();
+        _socket = null;
+        socket.add(utf8.encode(jsonEncode(SynchronizationSignal(
+                    data: SynchronizationSignalData(name: 'exit'))
+                .toJson()) +
+            '\u0000'));
+        socket.flush();
+        _callOnComplete();
+        Future.delayed(const Duration(milliseconds: 500), () {
+          socket.destroy();
+          _syncLog += 'done.';
+        });
+      }
+
+      _handle2p0p0ServerAddress(List<int> data) {
+        String _address2d0d0;
+        try {
+          _address2d0d0 = utf8.decode(data);
+        } catch (e, s) {
+          _handleException(
+              'Could not decode 2.0.0+ synchronization server address.\n${e.toString()}\n${s.toString()}');
+          return;
+        }
+        _syncLog += 'done.\nConnecting... ';
+        _synchronization2d0d0(_address2d0d0);
       }
 
       Future<void> _sendHello(String hello) {
@@ -652,11 +1239,21 @@ class Synchronization {
               'Remote service is not Passy. Service name: ${_hello[0]}.');
           return;
         }
-        if (syncVersion != _info[1]) {
+        if ('1.0.0' != _info[1]) {
           _handleException(
-              'Local and remote versions are different. Local version: $syncVersion. Remote version: ${_info[1]}.');
+              'Local and remote versions are different. Local version: 1.0.0. Remote version: ${_info[1]}.');
           return;
         }
+        if (_info.length > 3) {
+          // 2.0.0+ synchronization
+          _syncLog +=
+              'done.\nHost supports 2.0.0+ synchronization. Sending 2.0.0+ hello... ';
+          socket.add(utf8.encode(_hello + '\u0000'));
+          _syncLog += 'done.\nReceiving 2.0.0+ server address... ';
+          _sub.onData(_handle2p0p0ServerAddress);
+          return;
+        }
+        _syncLog += 'done.\nReceiving history hash... ';
         _sub.onData(_handleHistoryHash);
         _sendHello(encrypt(
             encrypt(_hello,
@@ -668,7 +1265,7 @@ class Synchronization {
     }
 
     _syncLog = 'Connecting... ';
-    return Socket.connect(address.ip, address.port,
+    return await Socket.connect(address.ip, address.port,
             timeout: const Duration(seconds: 8))
         .then((socket) => _onConnected(socket),
             onError: (e, s) => _handleException(
@@ -680,7 +1277,7 @@ class Synchronization {
     if (!_isConnected) {
       _server?.close();
       _socket?.destroy();
-      _onComplete?.call();
+      _callOnComplete();
     } else {
       _handleException('Synchronization requested to close while connected.');
     }
