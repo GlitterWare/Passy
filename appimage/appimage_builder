@@ -97,12 +97,14 @@ function create_desktop() {
 
 function build_appimage() {
   # the build command itself:
-  ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage ../build/appimage/$appName.AppDir 
+  ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage -n ../build/appimage/$appName.AppDir 
 
   # move result in build folder
 
-  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-v$version-$ARCH.AppImage
-    
+  #if [ -b "../build/appimage/$appName-v$version-$ARCH.AppImage" ]; then rm "../build/appimage/$appName-v$version-$ARCH.AppImage"; fi
+  cp ./$appName-$ARCH.AppImage ../build/appimage/$appName-v$version-$ARCH.AppImage
+  #if [ -b "../build/appimage/$appName-latest-$ARCH.AppImage" ]; then rm "../build/appimage/$appName-Latest-$ARCH.AppImage"; fi
+  mv ./$appName-$ARCH.AppImage ../build/appimage/$appName-Latest-$ARCH.AppImage
 }
 
 

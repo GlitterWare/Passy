@@ -7,7 +7,7 @@ user_interrupt() {
 trap user_interrupt SIGINT
 trap user_interrupt SIGTSTP
 
-bash update_version.sh
+#bash update_version.sh
 
 export version=''
 
@@ -66,5 +66,5 @@ fi
 echo ''
 echo 'Builds can be found in:'
 echo '- Linux Bundle - '$PWD'/build/linux/x64/release/bundle'
-echo '- Linux AppImage - '$PWD'/build/appimage/Passy-v'$version'-x86_64.AppImage'
+echo '- Linux AppImage - '$PWD'/build/appimage/Passy-Latest-x86_64.AppImage'
 echo '- Android Apk - '$PWD'/build/app/outputs/flutter-apk/app-release.apk'

@@ -1,0 +1,1 @@
+echo "echo 1;echo n;echo;" | bash | bash build_all.sh
