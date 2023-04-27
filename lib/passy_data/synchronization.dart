@@ -1295,6 +1295,8 @@ class Synchronization {
     if (!_isConnected) {
       _server?.close();
       _socket?.destroy();
+      _sync2d0d0Host?.stop();
+      _sync2d0d0Client?.disconnect();
       _callOnComplete();
     } else {
       _handleException('Synchronization requested to close while connected.');
