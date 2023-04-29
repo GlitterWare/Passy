@@ -202,5 +202,6 @@
     "addedToFavorites": "Added to favorites",
     "removedFromFavorites": "Removed from favorites",
     "noEntries": "No entries",
-    "noSearchResults": "No search results"
+    "noSearchResults": "No search results",
+    "settingUpSynchronization": "Setting up synchronization"
 }

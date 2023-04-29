@@ -25,16 +25,6 @@ import 'synchronization_2d0d0_utils.dart' as util;
 
 const String _hello = 'hello';
 const String _sameHistoryHash = 'same';
-bool _isLoading = false;
-RSAKeypair? _rsaKeypair;
-Completer _onLoadedCompleter = Completer();
-
-Future<void> loadSynchronization() async {
-  if (_isLoading) return;
-  _isLoading = true;
-  _rsaKeypair = RSAKeypair.fromRandom(keySize: 4096);
-  _onLoadedCompleter.complete();
-}
 
 class SynchronizationSignalData with JsonConvertable {
   String name;
@@ -189,6 +179,7 @@ class Synchronization {
   bool _isConnected = false;
   int _entriesAdded = 0;
   int _entriesRemoved = 0;
+  final RSAKeypair _rsaKeypair;
   GlareClient? _sync2d0d0Client;
   GlareServer? _sync2d0d0Host;
 
@@ -199,11 +190,13 @@ class Synchronization {
       {required History history,
       required Favorites favorites,
       required Encrypter encrypter,
+      required RSAKeypair rsaKeypair,
       void Function()? onComplete,
       void Function(String log)? onError})
       : _history = history,
         _favorites = favorites,
         _encrypter = encrypter,
+        _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
         _onError = onError;
 
@@ -348,10 +341,6 @@ class Synchronization {
   }
 
   Future<HostAddress?> host({void Function()? onConnected}) async {
-    if (!_onLoadedCompleter.isCompleted) {
-      loadSynchronization();
-      await _onLoadedCompleter.future;
-    }
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
@@ -676,10 +665,6 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) async {
-    if (!_onLoadedCompleter.isCompleted) {
-      loadSynchronization();
-      await _onLoadedCompleter.future;
-    }
     void _onConnected(Socket socket) {
       _isConnected = true;
       bool _serviceInfoHandled = false;

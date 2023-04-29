@@ -631,6 +631,15 @@ class _MainScreen extends State<MainScreen>
               padding: PassyTheme.appBarButtonPadding,
               tooltip: localizations.synchronize,
               onPressed: () {
+                if (!_account.isRSAKeypairLoaded) {
+                  showSnackBar(
+                    context,
+                    message: localizations.settingUpSynchronization,
+                    icon: const Icon(CupertinoIcons.clock_solid,
+                        color: PassyTheme.darkContentColor),
+                  );
+                  return;
+                }
                 showDialog(
                   context: context,
                   builder: (_) => AlertDialog(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/json_file.dart';
@@ -65,7 +66,12 @@ class LoadedAccount {
         _notes = notes,
         _paymentCards = paymentCards,
         _idCards = idCards,
-        _identities = identities;
+        _identities = identities {
+    Future(() async {
+      await _settings.value.rsaKeypairCompleter.future;
+      await _settings.save();
+    });
+  }
 
   factory LoadedAccount.fromDirectory({
     required String path,
@@ -156,39 +162,45 @@ class LoadedAccount {
     _favorites.saveSync();
   }
 
-  Synchronization getSynchronization({
+  Synchronization? getSynchronization({
     void Function()? onConnected,
     void Function()? onComplete,
     void Function(String log)? onError,
-  }) =>
-      Synchronization(this,
-          history: _history.value,
-          favorites: _favorites.value,
-          encrypter: _encrypter,
-          onComplete: onComplete,
-          onError: onError);
+  }) {
+    RSAKeypair? rsaKeypair = _settings.value.rsaKeypair;
+    if (rsaKeypair == null) return null;
+    return Synchronization(
+      this,
+      history: _history.value,
+      favorites: _favorites.value,
+      encrypter: _encrypter,
+      rsaKeypair: rsaKeypair,
+      onComplete: onComplete,
+      onError: onError,
+    );
+  }
 
   Future<HostAddress?> host({
     void Function()? onConnected,
     void Function()? onComplete,
     void Function(String log)? onError,
-  }) =>
-      getSynchronization(
+  }) async =>
+      await getSynchronization(
               onConnected: onConnected,
               onComplete: onComplete,
               onError: onError)
-          .host(onConnected: onConnected);
+          ?.host(onConnected: onConnected);
 
   Future<void> connect(
     HostAddress address, {
     void Function()? onConnected,
     void Function()? onComplete,
     void Function(String log)? onError,
-  }) {
+  }) async {
     onConnected?.call();
-    return getSynchronization(
+    return await getSynchronization(
             onConnected: onConnected, onComplete: onComplete, onError: onError)
-        .connect(address);
+        ?.connect(address);
   }
 
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
@@ -263,6 +275,7 @@ class LoadedAccount {
   set protectScreen(bool value) => _settings.value.protectScreen = value;
   bool get autoScreenLock => _settings.value.autoScreenLock;
   set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
+  bool get isRSAKeypairLoaded => _settings.value.rsaKeypair != null;
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
 
