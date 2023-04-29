@@ -127,7 +127,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       String _tempPath = (await getTemporaryDirectory()).path +
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
-          DateTime.now().toIso8601String().replaceAll(':', ';');
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
       _tempFile = await _file.copy(_tempPath);
     }
     await _file.writeAsString('');

@@ -31,7 +31,8 @@ class LogScreen extends StatelessWidget {
                 splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: const Icon(Icons.copy_rounded),
                 tooltip: localizations.copy,
-                onPressed: () => Clipboard.setData(ClipboardData(text: _log)),
+                onPressed: () =>
+                    Clipboard.setData(ClipboardData(text: '```\n$_log\n```')),
               ),
               IconButton(
                 padding: PassyTheme.appBarButtonPadding,

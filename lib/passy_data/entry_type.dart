@@ -58,3 +58,18 @@ Type entryTypeToType(EntryType type) {
       return Identity;
   }
 }
+
+String entryTypeToNamePlural(EntryType type) {
+  switch (type) {
+    case EntryType.password:
+      return 'passwords';
+    case EntryType.paymentCard:
+      return 'paymentCards';
+    case EntryType.note:
+      return 'notes';
+    case EntryType.idCard:
+      return 'idCards';
+    case EntryType.identity:
+      return 'identities';
+  }
+}

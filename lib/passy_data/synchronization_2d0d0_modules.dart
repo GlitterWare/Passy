@@ -1,18 +1,14 @@
 import 'dart:convert';
 
-import 'package:passy/passy_data/entry_event.dart';
-import 'package:passy/passy_data/entry_type.dart';
-import 'package:passy/passy_data/history.dart';
-import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_data/glare/glare_module.dart';
-
-import 'favorites.dart';
+import 'entry_event.dart';
+import 'entry_type.dart';
+import 'history.dart';
+import 'loaded_account.dart';
+import 'glare/glare_module.dart';
 import 'passy_entry.dart';
-
-enum _DataCheck {
-  entryType,
-  entryKey,
-}
+import 'synchronization_2d0d0_utils.dart' as util;
+import 'common.dart';
+import 'favorites.dart';
 
 Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required LoadedAccount account,
@@ -28,25 +24,19 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         if (args.length == 3) {
           return {
             'commands': [
-              {'name': 'getUsers'},
-              {'name': 'getHistoryHash'},
-              {'name': 'getEntryKeys'},
-              {'name': 'getHistoryEntry'},
-              {'name': 'getEntry'},
-              {'name': 'setEntry'},
-              {'name': 'getFavoritesHash'},
+              {'name': 'getHashes'},
+              {'name': 'getHistoryEntries'},
+              {'name': 'getEntries'},
+              {'name': 'setEntries'},
               {'name': 'getFavoritesEntries'},
-              {'name': 'setFavoritesEntry'},
-              {'name': 'deleteSharedUser'},
-              {'name': 'addSharedUser'},
-              {'name': 'changeSharedUserPassword'},
+              {'name': 'setFavoritesEntries'},
             ]
           };
         }
-        Map<String, dynamic> checkArgs(List<String> args,
-            {List<_DataCheck>? checks}) {
+
+        Map<String, dynamic> checkArgs(List<String> args) {
           if (args.length == 4) {
-            return {
+            throw {
               'error': {'type': 'Missing arguments'},
             };
           }
@@ -54,7 +44,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           try {
             decoded = jsonDecode(args[4]);
           } catch (e) {
-            return {
+            throw {
               'error': {
                 'type': 'Could not decode arguments',
                 'exception': e.toString(),
@@ -63,7 +53,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           }
           dynamic _account = decoded['account'];
           if (_account is! Map<String, dynamic>) {
-            return {
+            throw {
               'error': {
                 'type': 'Malformed account',
                 'description':
@@ -73,7 +63,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           }
           dynamic username = _account['username'];
           if (username is! String) {
-            return {
+            throw {
               'error': {
                 'type': 'Malformed username',
                 'description':
@@ -81,16 +71,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               },
             };
           }
-          if (username != account.username) {
-            return {
-              'error': {
-                'type': 'No account available under the specified username'
-              },
-            };
-          }
           dynamic passwordHash = _account['passwordHash'];
           if (passwordHash is! String) {
-            return {
+            throw {
               'error': {
                 'type': 'Malformed password hash',
                 'description':
@@ -98,223 +81,152 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               },
             };
           }
-          if (passwordHash != account.passwordHash) {
+          if (username != account.username) {
             return {
-              'error': {'type': 'Passwords do not match'},
+              'error': {'type': 'Invalid credentials'},
+              'description':
+                  'Make sure that both accounts have the same username and password',
             };
           }
-          if (checks == null) return decoded;
-          if (checks.isEmpty) return decoded;
-          for (_DataCheck check in checks) {
-            switch (check) {
-              case _DataCheck.entryType:
-                dynamic entryTypeName = decoded['entryType'];
-                if (entryTypeName is! String) {
-                  return {
-                    'error': {
-                      'type': 'Malformed entry type',
-                      'description':
-                          'Expected type `String`, received type `${entryTypeName.runtimeType.toString()}`',
-                    },
-                  };
-                }
-                EntryType? entryType = entryTypeFromName(entryTypeName);
-                if (entryType == null) {
-                  return {
-                    'error': {
-                      'type': 'Unknown entry type',
-                      'description': 'Received: `$entryTypeName`',
-                    },
-                  };
-                }
-                continue;
-              case _DataCheck.entryKey:
-                dynamic entryKey = decoded['entryKey'];
-                if (entryKey is! String) {
-                  return {
-                    'error': {
-                      'type': 'Malformed entry key',
-                      'description':
-                          'Expected type `String`, received type `${entryKey.runtimeType.toString()}`',
-                    },
-                  };
-                }
-                continue;
-            }
+          if (passwordHash != account.passwordHash) {
+            return {
+              'error': {'type': 'Invalid credentials'},
+              'description':
+                  'Make sure that both accounts have the same username and password',
+            };
           }
           return decoded;
         }
 
         switch (args[3]) {
-          case 'getUsers':
-            List<Map<String, dynamic>> users = [
-              {
-                'username': account.username,
-                'type': 'main',
-              }
-            ];
-            return {
-              'users': users,
-            };
-          case 'getHistoryHash':
+          case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
+            Map<String, dynamic> historyJson = history.toJson();
+            Map<String, dynamic> favoritesJson = favorites.toJson();
+            String historyHash =
+                getPassyHash(jsonEncode(historyJson)).toString();
+            String favoritesHash =
+                getPassyHash(jsonEncode(favoritesJson)).toString();
+            Map<String, dynamic> historyHashes = {};
+            Map<String, dynamic> favoritesHashes = {};
+            for (EntryType entryType in [
+              EntryType.password,
+              EntryType.paymentCard,
+              EntryType.note,
+              EntryType.idCard,
+              EntryType.identity
+            ]) {
+              String entryTypeName = entryType.name;
+              String entryTypeNamePlural = entryTypeToNamePlural(entryType);
+              historyHashes[entryTypeName] =
+                  getPassyHash(jsonEncode(historyJson[entryTypeNamePlural]))
+                      .toString();
+              favoritesHashes[entryTypeName] =
+                  getPassyHash(jsonEncode(favoritesJson[entryTypeNamePlural]))
+                      .toString();
+            }
             return {
-              'historyHash': account.historyHash.toString(),
+              'historyHash': historyHash,
+              'historyHashes': historyHashes,
+              'favoritesHash': favoritesHash,
+              'favoritesHashes': favoritesHashes,
             };
-          case 'getEntryKeys':
-            Map<String, dynamic> check =
-                checkArgs(args, checks: [_DataCheck.entryType]);
+          case 'getHistoryEntries':
+            Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
-            EntryType entryType = entryTypeFromName(check['entryType'])!;
-            return {'entryKeys': history.getKeys(entryType).toList()};
-          case 'getHistoryEntry':
-            Map<String, dynamic> check = checkArgs(args,
-                checks: [_DataCheck.entryType, _DataCheck.entryKey]);
-            if (check.containsKey('error')) return check;
-            EntryType entryType = entryTypeFromName(check['entryType'])!;
-            String entryKey = check['entryKey'];
-            EntryEvent? historyEntry = history.getEvents(entryType)[entryKey];
-            return {'historyEntry': historyEntry?.toJson()};
-          case 'getEntry':
-            Map<String, dynamic> check =
-                checkArgs(args, checks: [_DataCheck.entryType]);
-            if (check.containsKey('error')) return check;
-            EntryType entryType = entryTypeFromName(check['entryType'])!;
-            String entryKey = check['entryKey'];
-            EntryEvent? historyEntry = history.getEvents(entryType)[entryKey];
-            PassyEntry<dynamic>? entry = account.getEntry(entryType)(entryKey);
+            List<EntryType> entryTypes;
+            entryTypes = util.getEntryTypes(check['entryTypes']);
+            Map<String, dynamic> result = {};
+            for (EntryType type in entryTypes) {
+              result[type.name] = history
+                  .getEvents(type)
+                  .values
+                  .map<Map<String, dynamic>>((value) => value.toJson())
+                  .toList();
+            }
             return {
-              'historyEntry': historyEntry?.toJson(),
-              'entry': entry?.toJson(),
+              'historyEntries': result,
             };
-          case 'setEntry':
-            Map<String, dynamic> check =
-                checkArgs(args, checks: [_DataCheck.entryType]);
+          case 'getEntries':
+            Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
-            EntryType entryType = entryTypeFromName(check['entryType'])!;
-            dynamic historyEntry = check['historyEntry'];
-            if (historyEntry is! Map<String, dynamic>) {
-              return {
-                'error': {
-                  'type': 'Malformed history entry',
-                  'description':
-                      'Expected type `Map<String, dynamic>`, received type `${historyEntry.runtimeType.toString()}`',
-                },
-              };
-            }
-            EntryEvent historyEntryDecoded;
-            try {
-              historyEntryDecoded = EntryEvent.fromJson(historyEntry);
-            } catch (e) {
-              return {
-                'error': {
-                  'type': 'Failed to decode history entry',
-                  'exception': e.toString(),
-                },
-              };
-            }
-            if (historyEntryDecoded.status == EntryStatus.removed) {
-              await account.removeEntry(entryType)(historyEntryDecoded.key);
-              onRemoveEntry?.call();
-              history.getEvents(entryType)[historyEntryDecoded.key] =
-                  historyEntryDecoded;
-              await account.saveHistory();
-              return {
-                'status': {'type': 'Success'}
-              };
-            }
-            dynamic entry = check['entry'];
-            if (entry is! Map<String, dynamic>) {
-              return {
-                'error': {
-                  'type': 'Malformed entry',
-                  'description':
-                      'Expected type `Map<String, dynamic>`, received type `${entry.runtimeType.toString()}`',
-                },
-              };
-            }
-            PassyEntry<dynamic> entryDecoded;
-            try {
-              entryDecoded = PassyEntry.fromJson(entryType)(entry);
-            } catch (e) {
-              return {
-                'error': {
-                  'type': 'Failed to decode entry',
-                  'exception': e.toString(),
-                },
-              };
-            }
-            await account.setEntry(entryType)(entryDecoded);
-            onSetEntry?.call();
-            history.getEvents(entryType)[historyEntryDecoded.key] =
-                historyEntryDecoded;
-            await account.saveHistory();
+            Map<EntryType, List<String>> entryKeys;
+            entryKeys = util.getEntryKeys(check['entryKeys']);
+            return {
+              'entries': entryKeys.map((entryType, entryKeys) {
+                Map<String, EntryEvent> historyEntries =
+                    history.getEvents(entryType);
+                PassyEntry? Function(String) getEntry =
+                    account.getEntry(entryType);
+                return MapEntry(
+                  entryType.name,
+                  entryKeys.map<Map<String, dynamic>>((e) {
+                    return {
+                      'key': e,
+                      'historyEntry': historyEntries[e],
+                      'entry': getEntry(e),
+                    };
+                  }).toList(),
+                );
+              }),
+            };
+          case 'setEntries':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            Map<EntryType, List<util.ExchangeEntry>> exchangeEntries;
+            exchangeEntries = util.getEntries(check['entries']);
+            await util.processTypedExchangeEntries(
+              entries: exchangeEntries,
+              account: account,
+              history: history,
+              onRemoveEntry: onRemoveEntry,
+              onSetEntry: onSetEntry,
+            );
             return {
               'status': {'type': 'Success'}
             };
-          case 'getFavoritesHash':
+          case 'getFavoritesEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
+            List<EntryType> entryTypes;
+            entryTypes = util.getEntryTypes(check['entryTypes']);
+            Map<String, dynamic> result = {};
+            for (EntryType type in entryTypes) {
+              result[type.name] = favorites
+                  .getEvents(type)
+                  .values
+                  .map<Map<String, dynamic>>((value) => value.toJson())
+                  .toList();
+            }
             return {
-              'favoritesHash': account.favoritesHash.toString(),
+              'favoritesEntries': result,
             };
-          case 'getFavoritesEntries':
-            Map<String, dynamic> check =
-                checkArgs(args, checks: [_DataCheck.entryType]);
+          case 'setFavoritesEntries':
+            Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
-            EntryType entryType = entryTypeFromName(check['entryType'])!;
-            Map<String, EntryEvent>? favoriteEntries =
-                favorites.getEvents(entryType);
-            return {
-              'entries': favoriteEntries.map<String, dynamic>(
-                (key, value) => MapEntry(key, value.toJson()),
-              )
-            };
-          case 'setFavoritesEntry':
-            Map<String, dynamic> check =
-                checkArgs(args, checks: [_DataCheck.entryType]);
-            EntryType entryType = entryTypeFromName(check['entryType'])!;
-            dynamic entry = check['entry'];
-            if (entry is! Map<String, dynamic>) {
-              return {
-                'error': {
-                  'type': 'Malformed favorites entry',
-                  'description':
-                      'Expected type `Map<String, dynamic>`, received type `${entry.runtimeType.toString()}`',
-                },
-              };
+            Map<EntryType, Map<String, EntryEvent>> favoritesEntries =
+                util.getTypedEntryEvents(check['favoritesEntries']);
+            for (MapEntry<EntryType,
+                    Map<String, EntryEvent>> favoritesEntriesEntry
+                in favoritesEntries.entries) {
+              EntryType entryType = favoritesEntriesEntry.key;
+              Map<String, EntryEvent>? typeFavoritesEntries =
+                  favoritesEntries[entryType];
+              if (typeFavoritesEntries == null) continue;
+              Map<String, EntryEvent> localFavoritesEntries =
+                  favorites.getEvents(entryType);
+              for (EntryEvent entryEvent
+                  in favoritesEntriesEntry.value.values) {
+                localFavoritesEntries[entryEvent.key] = entryEvent;
+              }
             }
-            EntryEvent entryDecoded;
-            try {
-              entryDecoded = EntryEvent.fromJson(entry);
-            } catch (e) {
-              return {
-                'error': {
-                  'type': 'Failed to decode favorite entry',
-                  'exception': e.toString(),
-                },
-              };
-            }
-            favorites.getEvents(entryType)[entryDecoded.key] = entryDecoded;
             await account.saveFavorites();
             return {
               'status': {'type': 'Success'}
             };
-          case 'addSharedUser':
-            //Map<String, dynamic> check = checkArgs(args);
-            //if (check.containsKey('error')) return check;
-            break;
-          case 'deleteSharedUser':
-            //Map<String, dynamic> check = checkArgs(args);
-            //if (check.containsKey('error')) return check;
-            break;
-          case 'changeSharedUserPassword':
-            //Map<String, dynamic> check = checkArgs(args);
-            //if (check.containsKey('error')) return check;
-            break;
         }
-        return {
+        throw {
           'error': {'type': 'No such command'}
         };
       },

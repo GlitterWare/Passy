@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:intranet_ip/intranet_ip.dart';
-import 'package:passy/passy_data/favorites.dart';
-import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
-import 'dart:io';
 
+import 'favorites.dart';
+import 'synchronization_2d0d0_modules.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -21,6 +21,7 @@ import 'passy_entry.dart';
 import 'passy_stream_subscription.dart';
 import 'glare/glare_client.dart';
 import 'glare/glare_server.dart';
+import 'synchronization_2d0d0_utils.dart' as util;
 
 const String _hello = 'hello';
 const String _sameHistoryHash = 'same';
@@ -786,6 +787,14 @@ class Synchronization {
       }
 
       void _synchronization2d0d0(String address) async {
+        void _handleApiException(String message, Object exception) {
+          if (exception is Map<String, dynamic>) {
+            _handleException('$message: ${jsonEncode(exception)}');
+            return;
+          }
+          _handleException('$message: $exception.');
+        }
+
         Map<String, dynamic> _checkResponse(Map<String, dynamic>? response) {
           if (response is! Map<String, dynamic>) {
             return {
@@ -836,22 +845,10 @@ class Synchronization {
           return;
         }
         _syncLog += 'done.\nReceiving users list... ';
-        Map<String, dynamic> response =
-            _checkResponse(await _safeSync2d0d0Client.runModule([
-          '2d0d0',
-          'getUsers',
-        ]));
-        if (response.containsKey('error')) {
-          _handleException(
-              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-          return;
-        }
-        dynamic users = response['users'];
-        if (users is! List<dynamic>) {
-          _handleException(
-              'Malformed users list. Expected type `List<dynamic>`, received type `${users.runtimeType.toString()}`.');
-          return;
-        }
+        Map<String, dynamic> response;
+        dynamic users = [
+          {'username': _loadedAccount.username}
+        ];
         for (dynamic user in users) {
           _syncLog += 'done.\nProcessing next user... ';
           if (user is! Map<String, dynamic>) {
@@ -877,10 +874,11 @@ class Synchronization {
             }
           };
           String authEncoded = jsonEncode(auth);
-          _syncLog += 'done.\nReceiving history hash... ';
+          // 1. Receive hashes
+          _syncLog += 'done.\nReceiving hashes... ';
           response = _checkResponse(await _safeSync2d0d0Client.runModule([
             '2d0d0',
-            'getHistoryHash',
+            'getHashes',
             authEncoded,
           ]));
           if (response.containsKey('error')) {
@@ -888,29 +886,114 @@ class Synchronization {
                 '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
             return;
           }
-          _syncLog += 'done.\nComparing history hashes... ';
           dynamic remoteHistoryHash = response['historyHash'];
+          dynamic remoteFavoritesHash = response['favoritesHash'];
           if (remoteHistoryHash is! String) {
             _handleException(
                 'Received malformed history hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
             return;
           }
-          if (remoteHistoryHash != _loadedAccount.historyHash.toString()) {
-            for (EntryType entryType in [
-              EntryType.password,
-              EntryType.paymentCard,
-              EntryType.note,
-              EntryType.idCard,
-              EntryType.identity,
-            ]) {
-              _syncLog +=
-                  'done.\nReceiving entry keys of type ${entryTypeToType(entryType)}... ';
+          if (remoteFavoritesHash is! String) {
+            _handleException(
+                'Received malformed favorites hash. Expected type `String`, received type `${remoteFavoritesHash.runtimeType.toString()}`.');
+            return;
+          }
+          Map<EntryType, String> historyHashes;
+          try {
+            historyHashes = util.getEntriesHashes(response['historyHashes']);
+          } catch (e) {
+            _handleApiException('Received malformed history hashes', e);
+            return;
+          }
+          Map<EntryType, String> favoritesHashes;
+          try {
+            favoritesHashes =
+                util.getEntriesHashes(response['favoritesHashes']);
+          } catch (e) {
+            _handleApiException('Received malformed favorites hashes', e);
+            return;
+          }
+          Map<String, dynamic> historyJson = _history.toJson();
+          _syncLog += 'done.\nComparing history hashes... ';
+          if (remoteHistoryHash !=
+              getPassyHash(jsonEncode(historyJson)).toString()) {
+            // 2. Compare history hashes and find entry types that require synchronization
+            Map<EntryType, String> localHistoryHashes;
+            try {
+              localHistoryHashes = util.findEntriesHashes(json: historyJson);
+            } catch (e) {
+              _handleApiException('Failed to find local history hashes', e);
+              return;
+            }
+            List<EntryType> entryTypes;
+            try {
+              entryTypes = util.findEntryTypesToSynchronize(
+                  localHashes: localHistoryHashes, remoteHashes: historyHashes);
+            } catch (e) {
+              _handleApiException('Failed to compare history hashes', e);
+              return;
+            }
+            // 3. Receive history for entry types that require synchronization
+            _syncLog += 'done.\nReceiving history entries... ';
+            response = _checkResponse(await _safeSync2d0d0Client.runModule([
+              '2d0d0',
+              'getHistoryEntries',
+              jsonEncode({
+                ...auth,
+                'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
+              }),
+            ]));
+            if (response.containsKey('error')) {
+              _handleException(
+                  '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+              return;
+            }
+            Map<EntryType, Map<String, EntryEvent>> historyEntries;
+            try {
+              historyEntries =
+                  util.getTypedEntryEvents(response['historyEntries']);
+            } catch (e) {
+              _handleApiException('Received malformed history entries', e);
+              return;
+            }
+            Map<EntryType, Map<String, EntryEvent>> localHistoryEntries = {};
+            for (EntryType type in entryTypes) {
+              localHistoryEntries[type] = _history.getEvents(type);
+            }
+            _syncLog += 'done.\nComparing history entries... ';
+            util.EntriesToSynchronize entriesToSynchronize;
+            try {
+              entriesToSynchronize = util.findEntriesToSynchronize(
+                  localEntries: localHistoryEntries,
+                  remoteEntries: historyEntries);
+            } catch (e) {
+              _handleApiException('Failed to compare history entries', e);
+              return;
+            }
+            if (entriesToSynchronize.entriesToSend.isNotEmpty) {
+              _syncLog += 'done.\nSending entries... ';
               response = _checkResponse(await _safeSync2d0d0Client.runModule([
                 '2d0d0',
-                'getEntryKeys',
+                'setEntries',
                 jsonEncode({
                   ...auth,
-                  'entryType': entryType.name,
+                  'entries': entriesToSynchronize.entriesToSend
+                      .map((entryType, entryKeys) {
+                    Map<String, EntryEvent> historyEntries =
+                        _history.getEvents(entryType);
+                    PassyEntry? Function(String) getEntry =
+                        _loadedAccount.getEntry(entryType);
+                    return MapEntry(
+                      entryType.name,
+                      entryKeys.map<Map<String, dynamic>>((e) {
+                        return {
+                          'key': e,
+                          'historyEntry': historyEntries[e],
+                          'entry': getEntry(e),
+                        };
+                      }).toList(),
+                    );
+                  }),
                 }),
               ]));
               if (response.containsKey('error')) {
@@ -918,200 +1001,126 @@ class Synchronization {
                     '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
                 return;
               }
-              dynamic entryKeys = response['entryKeys'];
-              if (entryKeys is! List<dynamic>) {
+            }
+            if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
+              _syncLog += 'done.\nReceiving entries... ';
+              response = _checkResponse(await _safeSync2d0d0Client.runModule([
+                '2d0d0',
+                'getEntries',
+                jsonEncode({
+                  ...auth,
+                  'entryKeys': entriesToSynchronize.entriesToRetrieve
+                      .map((key, value) => MapEntry(key.name, value)),
+                }),
+              ]));
+              if (response.containsKey('error')) {
                 _handleException(
-                    'Received malformed entry keys. Expected type `List<dynamic>`, received type `${entryKeys.runtimeType.toString()}`.');
+                    '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
                 return;
               }
-              Map<String, EntryEvent> localHistoryEvents =
-                  _history.getEvents(entryType);
-              _syncLog += 'done.\nSending entries... ';
-              for (EntryEvent historyEvent in localHistoryEvents.values) {
-                if (entryKeys.contains(historyEvent.key)) continue;
-                PassyEntry<dynamic>? entry =
-                    _loadedAccount.getEntry(entryType)(historyEvent.key);
-                response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                  '2d0d0',
-                  'setEntry',
-                  jsonEncode({
-                    ...auth,
-                    'entryType': entryType.name,
-                    'historyEntry': historyEvent.toJson(),
-                    'entry': entry?.toJson(),
-                  }),
-                ]));
-                if (response.containsKey('error')) {
-                  _handleException(
-                      '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                  return null;
-                }
+              Map<EntryType, List<util.ExchangeEntry>> entries;
+              try {
+                entries = util.getEntries(response['entries']);
+              } catch (e) {
+                _handleApiException('Malformed entries received', e);
+                return;
               }
-              _syncLog += 'done.\nExchanging entries... ';
-              for (dynamic entryKey in entryKeys) {
-                if (entryKey is! String) {
-                  _handleException(
-                      'Received malformed entry key. Expected type `String`, received type `${entryKey.runtimeType.toString()}`.');
-                  return;
-                }
-                response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                  '2d0d0',
-                  'getHistoryEntry',
-                  jsonEncode({
-                    ...auth,
-                    'entryType': entryType.name,
-                    'entryKey': entryKey,
-                  }),
-                ]));
-                if (response.containsKey('error')) {
-                  _handleException(
-                      '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                  return;
-                }
-                dynamic historyEntry = response['historyEntry'];
-                if (historyEntry is! Map<String, dynamic>) {
-                  _handleException(
-                      'Received malformed history entry. Expected type `Map<String, dynamic>`, received type `${historyEntry.runtimeType.toString()}`.');
-                  return;
-                }
-                EntryEvent historyEntryDecoded;
-                try {
-                  historyEntryDecoded = EntryEvent.fromJson(historyEntry);
-                } catch (e, s) {
-                  _handleException(
-                      'Could not decode history entry.\n${e.toString()}\n${s.toString()}');
-                  return;
-                }
-                EntryEvent? localHistoryEntry = localHistoryEvents[entryKey];
-                Future<PassyEntry<dynamic>?> requestRemoteEntry() async {
-                  response =
-                      _checkResponse(await _safeSync2d0d0Client.runModule([
-                    '2d0d0',
-                    'getEntry',
-                    jsonEncode({
-                      ...auth,
-                      'entryType': entryType.name,
-                      'entryKey': entryKey,
-                    }),
-                  ]));
-                  if (response.containsKey('error')) {
-                    _handleException(
-                        '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                    return null;
-                  }
-                  dynamic entry = response['entry'];
-                  if (entry is! Map<String, dynamic>) {
-                    _handleException(
-                        'Received malformed entry. Expected type `Map<String, dynamic>`, received type `${entry.runtimeType.toString()}`.');
-                    return null;
-                  }
-                  PassyEntry<dynamic> entryDecoded;
-                  try {
-                    entryDecoded = PassyEntry.fromJson(entryType)(entry);
-                  } catch (e, s) {
-                    _handleException(
-                        'Could not decode history entry.\n${e.toString()}\n${s.toString()}');
-                    return null;
-                  }
-                  return entryDecoded;
-                }
-
-                if (localHistoryEntry == null) {
-                  PassyEntry<dynamic>? entry;
-                  if (historyEntryDecoded.status == EntryStatus.alive) {
-                    entry = await requestRemoteEntry();
-                    if (entry == null) return;
-                    await _loadedAccount.setEntry(entryType)(entry);
-                    _entriesAdded++;
-                  } else {
-                    await _loadedAccount
-                        .removeEntry(entryType)(historyEntryDecoded.key);
-                    _entriesRemoved++;
-                  }
-                  localHistoryEvents[entryKey] = historyEntryDecoded;
-                  await _loadedAccount.saveHistory();
-                  continue;
-                }
-                if (localHistoryEntry.lastModified
-                    .isAtSameMomentAs(historyEntryDecoded.lastModified)) {
-                  continue;
-                }
-                if (localHistoryEntry.lastModified
-                    .isBefore(historyEntryDecoded.lastModified)) {
-                  PassyEntry<dynamic>? entry;
-                  if (historyEntryDecoded.status == EntryStatus.alive) {
-                    entry = await requestRemoteEntry();
-                    if (entry == null) return;
-                    await _loadedAccount.setEntry(entryType)(entry);
-                    _entriesAdded++;
-                  } else {
-                    await _loadedAccount
-                        .removeEntry(entryType)(historyEntryDecoded.key);
-                    _entriesRemoved++;
-                  }
-                  localHistoryEvents[entryKey] = historyEntryDecoded;
-                  await _loadedAccount.saveHistory();
-                  continue;
-                } else {
-                  PassyEntry<dynamic>? entry =
-                      _loadedAccount.getEntry(entryType)(entryKey);
-                  response =
-                      _checkResponse(await _safeSync2d0d0Client.runModule([
-                    '2d0d0',
-                    'setEntry',
-                    jsonEncode({
-                      ...auth,
-                      'entryType': entryType.name,
-                      'historyEntry': localHistoryEntry.toJson(),
-                      'entry': entry?.toJson(),
-                    }),
-                  ]));
-                  if (response.containsKey('error')) {
-                    _handleException(
-                        '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                    return null;
-                  }
-                  continue;
-                }
+              _syncLog += 'done.\nProcessing entries... ';
+              try {
+                await util.processTypedExchangeEntries(
+                  entries: entries,
+                  account: _loadedAccount,
+                  history: _history,
+                  onRemoveEntry: () => _entriesRemoved++,
+                  onSetEntry: () => _entriesAdded++,
+                );
+              } catch (e) {
+                _handleApiException('Failed to process entries', e);
+                return;
               }
             }
           }
-          _syncLog += 'done.\nReceiving favorites hash... ';
-          response = _checkResponse(await _safeSync2d0d0Client.runModule([
-            '2d0d0',
-            'getFavoritesHash',
-            authEncoded,
-          ]));
-          if (response.containsKey('error')) {
-            _handleException(
-                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-            return;
-          }
+          Map<String, dynamic> favoritesJson = _favorites.toJson();
           _syncLog += 'done.\nComparing favorites hashes... ';
-          dynamic remoteFavoritesHash = response['favoritesHash'];
-          if (remoteFavoritesHash is! String) {
-            _handleException(
-                'Received malformed favorites hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
-            return;
-          }
-          if (remoteFavoritesHash != _loadedAccount.favoritesHash.toString()) {
-            for (EntryType entryType in [
-              EntryType.password,
-              EntryType.paymentCard,
-              EntryType.note,
-              EntryType.idCard,
-              EntryType.identity,
-            ]) {
-              Map<String, EntryEvent> localFavorites =
-                  _favorites.getEvents(entryType);
-              _syncLog +=
-                  'done.\nReceiving favorites of type ${entryTypeToType(entryType)}... ';
+          if (remoteFavoritesHash !=
+              getPassyHash(jsonEncode(favoritesJson)).toString()) {
+            // Compare favorites hashes and find entry types that require synchronization
+            Map<EntryType, String> localFavoritesHashes;
+            try {
+              localFavoritesHashes =
+                  util.findEntriesHashes(json: favoritesJson);
+            } catch (e) {
+              _handleApiException('Failed to find local favorites hashes', e);
+              return;
+            }
+            List<EntryType> entryTypes;
+            try {
+              entryTypes = util.findEntryTypesToSynchronize(
+                  localHashes: localFavoritesHashes,
+                  remoteHashes: favoritesHashes);
+            } catch (e) {
+              _handleApiException('Failed to compare favorites hashes', e);
+              return;
+            }
+            // Receive favorites for entry types that require synchronization
+            _syncLog += 'done.\nReceiving favorites entries... ';
+            response = _checkResponse(await _safeSync2d0d0Client.runModule([
+              '2d0d0',
+              'getFavoritesEntries',
+              jsonEncode({
+                ...auth,
+                'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
+              }),
+            ]));
+            if (response.containsKey('error')) {
+              _handleException(
+                  '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+              return;
+            }
+            Map<EntryType, Map<String, EntryEvent>> favoritesEntries;
+            try {
+              favoritesEntries =
+                  util.getTypedEntryEvents(response['favoritesEntries']);
+            } catch (e) {
+              _handleApiException('Received malformed favorites entries', e);
+              return;
+            }
+            Map<EntryType, Map<String, EntryEvent>> localFavoritesEntries = {};
+            for (EntryType type in entryTypes) {
+              localFavoritesEntries[type] = _favorites.getEvents(type);
+            }
+            _syncLog += 'done.\nComparing favorites entries... ';
+            util.EntriesToSynchronize entriesToSynchronize;
+            try {
+              entriesToSynchronize = util.findEntriesToSynchronize(
+                  localEntries: localFavoritesEntries,
+                  remoteEntries: favoritesEntries);
+            } catch (e) {
+              _handleApiException('Failed to compare favorites entries', e);
+              return;
+            }
+            if (entriesToSynchronize.entriesToSend.isNotEmpty) {
+              _syncLog += 'done.\nSending favorites entries... ';
               response = _checkResponse(await _safeSync2d0d0Client.runModule([
                 '2d0d0',
-                'getFavoritesEntries',
+                'setFavoritesEntries',
                 jsonEncode({
                   ...auth,
-                  'entryType': entryType.name,
+                  'favoritesEntries': entriesToSynchronize.entriesToSend
+                      .map<String, dynamic>((entryType, keyList) {
+                    Map<String, EntryEvent> localFavorites =
+                        _favorites.getEvents(entryType);
+                    List<dynamic> val = [];
+                    for (String key in keyList) {
+                      EntryEvent? entryEvent = localFavorites[key];
+                      if (entryEvent == null) continue;
+                      val.add(entryEvent);
+                    }
+                    return MapEntry(
+                      entryType.name,
+                      val,
+                    );
+                  }),
                 }),
               ]));
               if (response.containsKey('error')) {
@@ -1119,85 +1128,24 @@ class Synchronization {
                     '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
                 return;
               }
-              dynamic favoritesEntries = response['entries'];
-              if (favoritesEntries is! Map<String, dynamic>) {
-                _handleException(
-                    'Received malformed favorites. Expected type `List<dynamic>`, received type `${favoritesEntries.runtimeType.toString()}`.');
-                return;
+            }
+            if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
+              _syncLog += 'done.\nSaving favorites entries... ';
+              for (MapEntry<EntryType, List<String>> entriesToRetrieveEntry
+                  in entriesToSynchronize.entriesToRetrieve.entries) {
+                EntryType entryType = entriesToRetrieveEntry.key;
+                Map<String, EntryEvent>? typeFavoritesEntries =
+                    favoritesEntries[entryType];
+                if (typeFavoritesEntries == null) continue;
+                Map<String, EntryEvent> localFavoritesEntries =
+                    _favorites.getEvents(entryType);
+                for (String entryKey in entriesToRetrieveEntry.value) {
+                  EntryEvent? favoritesEntry = typeFavoritesEntries[entryKey];
+                  if (favoritesEntry == null) continue;
+                  localFavoritesEntries[entryKey] = favoritesEntry;
+                }
               }
-              Map<String, EntryEvent> localFavoriteEntries =
-                  _loadedAccount.getFavoriteEntries(entryType);
-              List<EntryEvent> localFavoriteEntryValues =
-                  localFavoriteEntries.values.toList();
-              for (EntryEvent localFavoriteEntry in localFavoriteEntryValues) {
-                if (favoritesEntries.containsKey(localFavoriteEntry.key)) {
-                  EntryEvent favoriteDecoded;
-                  try {
-                    favoriteDecoded = EntryEvent.fromJson(
-                        favoritesEntries[localFavoriteEntry.key]);
-                  } catch (e, s) {
-                    _handleException(
-                        'Could not decode favorites entry.\n${e.toString()}\n${s.toString()}');
-                    return;
-                  }
-                  if (localFavoriteEntry.lastModified
-                      .isAtSameMomentAs(favoriteDecoded.lastModified)) {
-                    continue;
-                  }
-                  if (localFavoriteEntry.lastModified
-                      .isBefore(favoriteDecoded.lastModified)) {
-                    localFavorites[favoriteDecoded.key] = favoriteDecoded;
-                    await _loadedAccount.saveFavorites();
-                  } else {
-                    response =
-                        _checkResponse(await _safeSync2d0d0Client.runModule([
-                      '2d0d0',
-                      'setFavoritesEntry',
-                      jsonEncode({
-                        ...auth,
-                        'entryType': entryType.name,
-                        'entry': localFavoriteEntry.toJson(),
-                      }),
-                    ]));
-                    if (response.containsKey('error')) {
-                      _handleException(
-                          '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                      return;
-                    }
-                  }
-                  continue;
-                }
-                response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                  '2d0d0',
-                  'setFavoritesEntry',
-                  jsonEncode({
-                    ...auth,
-                    'entryType': entryType.name,
-                    'entry': localFavoriteEntry.toJson(),
-                  }),
-                ]));
-                if (response.containsKey('error')) {
-                  _handleException(
-                      '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                  return;
-                }
-                continue;
-              }
-              for (dynamic favoriteEntry in favoritesEntries.values) {
-                EntryEvent favoriteDecoded;
-                try {
-                  favoriteDecoded = EntryEvent.fromJson(favoriteEntry);
-                } catch (e, s) {
-                  _handleException(
-                      'Could not decode favorites entry.\n${e.toString()}\n${s.toString()}');
-                  return;
-                }
-                if (localFavoriteEntries.containsKey(favoriteDecoded.key)) {
-                  continue;
-                }
-                localFavorites[favoriteDecoded.key] = favoriteDecoded;
-                await _loadedAccount.saveFavorites();
-              }
+              await _loadedAccount.saveFavorites();
             }
           }
         }

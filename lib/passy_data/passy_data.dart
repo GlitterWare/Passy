@@ -186,7 +186,7 @@ class PassyData {
     if (fileName == null) {
       fileName = outputDirectoryPath +
           Platform.pathSeparator +
-          'passy-backup-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip';
+          'passy-backup-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
     } else {
       fileName = outputDirectoryPath + Platform.pathSeparator + fileName;
     }
@@ -203,7 +203,7 @@ class PassyData {
     String _tempPath = (await getTemporaryDirectory()).path +
         Platform.pathSeparator +
         'passy-restore-' +
-        DateTime.now().toIso8601String().replaceAll(':', ';');
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
     Directory _tempPathDir = Directory(_tempPath);
     if (await _tempPathDir.exists()) {
       await _tempPathDir.delete(recursive: true);
@@ -267,14 +267,14 @@ class PassyData {
     if (fileName == null) {
       fileName = outputDirectoryPath +
           Platform.pathSeparator +
-          'passy-export-$username-${DateTime.now().toIso8601String().replaceAll(':', ';')}.zip';
+          'passy-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
     } else {
       fileName = outputDirectoryPath + Platform.pathSeparator + fileName;
     }
     String _tempPath = (await getTemporaryDirectory()).path +
         Platform.pathSeparator +
         'passy-export-' +
-        DateTime.now().toIso8601String().replaceAll(':', ';');
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
     String _tempAccPath = _tempPath + Platform.pathSeparator + username;
     Directory _tempPathDir = Directory(_tempPath);
     if (await _tempPathDir.exists()) {
@@ -316,7 +316,7 @@ class PassyData {
     String _tempPath = (await getTemporaryDirectory()).path +
         Platform.pathSeparator +
         'passy-restore-' +
-        DateTime.now().toIso8601String().replaceAll(':', ';');
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
     Directory _tempPathDir = Directory(_tempPath);
     if (await _tempPathDir.exists()) {
       await _tempPathDir.delete(recursive: true);
