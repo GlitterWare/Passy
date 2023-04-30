@@ -39,7 +39,7 @@ This makes data safe to transfer in any networks for as long as user's password 
 
 For information on synchronization exclusive to Passy v1.4.0 and higher read [2.0.0+ Synchronization](#200-synchronization).
 
-# 2.0.0+ Synchronization
+## 2.0.0+ Synchronization
 
 2.0.0+ synchronization is available under Passy v1.4.0 and higher.
 It uses a hybrid RSA encryption to send and receive entries. 2.0.0+ synchronization is only used if both client and host support it, otherwise old synchronization (see [Synchronization](#synchronization)) is used as a fallback.
