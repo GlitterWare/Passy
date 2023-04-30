@@ -164,7 +164,7 @@ class LoadedAccount {
 
   Synchronization? getSynchronization({
     void Function()? onConnected,
-    void Function()? onComplete,
+    void Function(SynchronizationResults results)? onComplete,
     void Function(String log)? onError,
   }) {
     RSAKeypair? rsaKeypair = _settings.value.rsaKeypair;
@@ -182,7 +182,7 @@ class LoadedAccount {
 
   Future<HostAddress?> host({
     void Function()? onConnected,
-    void Function()? onComplete,
+    void Function(SynchronizationResults results)? onComplete,
     void Function(String log)? onError,
   }) async =>
       await getSynchronization(
@@ -194,7 +194,7 @@ class LoadedAccount {
   Future<void> connect(
     HostAddress address, {
     void Function()? onConnected,
-    void Function()? onComplete,
+    void Function(SynchronizationResults results)? onComplete,
     void Function(String log)? onError,
   }) async {
     onConnected?.call();

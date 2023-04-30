@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -81,6 +82,8 @@ class _IDCardScreen extends State<IDCardScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
+        entryType: EntryType.idCard,
+        entryKey: _idCard.key,
         title: Center(child: Text(localizations.idCard)),
         onRemovePressed: () => _onRemovePressed(),
         onEditPressed: () => _onEditPressed(),

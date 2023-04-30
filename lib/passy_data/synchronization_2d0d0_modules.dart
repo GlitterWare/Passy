@@ -14,9 +14,26 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required LoadedAccount account,
   required History history,
   required Favorites favorites,
+  Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
 }) {
+  sharedEntryKeys ??= {};
+  Map<String, dynamic> sharedEntries =
+      sharedEntryKeys.map((entryType, entryKeys) {
+    Map<String, EntryEvent> historyEntries = history.getEvents(entryType);
+    PassyEntry? Function(String) getEntry = account.getEntry(entryType);
+    return MapEntry(
+      entryType.name,
+      entryKeys.map<Map<String, dynamic>>((e) {
+        return {
+          'key': e,
+          'historyEntry': historyEntries[e],
+          'entry': getEntry(e),
+        };
+      }).toList(),
+    );
+  });
   return {
     '2d0d0': GlareModule(
       name: 'Passy 2.0.0+ Synchronization Modules',
@@ -24,9 +41,11 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         if (args.length == 3) {
           return {
             'commands': [
+              {'name': 'checkAccount'},
               {'name': 'getHashes'},
               {'name': 'getHistoryEntries'},
               {'name': 'getEntries'},
+              {'name': 'getSharedEntries'},
               {'name': 'setEntries'},
               {'name': 'getFavoritesEntries'},
               {'name': 'setFavoritesEntries'},
@@ -85,20 +104,26 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'error': {'type': 'Invalid credentials'},
               'description':
-                  'Make sure that both accounts have the same username and password',
+                  'Make sure that both accounts have the same username and password. The only viable synchronization option between different accounts is entry sharing.',
             };
           }
           if (passwordHash != account.passwordHash) {
             return {
               'error': {'type': 'Invalid credentials'},
               'description':
-                  'Make sure that both accounts have the same username and password',
+                  'Make sure that both accounts have the same username and password. The only viable synchronization option between different accounts is entry sharing.',
             };
           }
           return decoded;
         }
 
         switch (args[3]) {
+          case 'checkAccount':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            return {
+              'status': {'type': 'Success'}
+            };
           case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -170,6 +195,10 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
                   }).toList(),
                 );
               }),
+            };
+          case 'getSharedEntries':
+            return {
+              'entries': sharedEntries,
             };
           case 'setEntries':
             Map<String, dynamic> check = checkArgs(args);

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
+import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
@@ -18,20 +19,61 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/id_cards_screen.dart';
+import 'package:passy/screens/identities_screen.dart';
+import 'package:passy/screens/notes_screen.dart';
+import 'package:passy/screens/payment_cards_screen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zxing2/qrcode.dart';
 
+import 'connect_screen.dart';
+import 'id_card_screen.dart';
+import 'identity_screen.dart';
 import 'log_screen.dart';
 import 'main_screen.dart';
+import 'note_screen.dart';
+import 'password_screen.dart';
 import 'passwords_screen.dart';
+import 'payment_card_screen.dart';
 
 const screenToRouteName = {
   Screen.main: MainScreen.routeName,
   Screen.passwords: PasswordsScreen.routeName,
-  Screen.notes: '',
-  Screen.idCards: '',
-  Screen.identities: '',
+  Screen.paymentCards: PaymentCardsScreen.routeName,
+  Screen.notes: NotesScreen.routeName,
+  Screen.idCards: IDCardsScreen.routeName,
+  Screen.identities: IdentitiesScreen.routeName,
 };
+
+String entryTypeToEntriesRouteName(EntryType entryType) {
+  switch (entryType) {
+    case EntryType.password:
+      return PasswordsScreen.routeName;
+    case EntryType.paymentCard:
+      return PaymentCardsScreen.routeName;
+    case EntryType.note:
+      return NotesScreen.routeName;
+    case EntryType.idCard:
+      return IDCardsScreen.routeName;
+    case EntryType.identity:
+      return IdentitiesScreen.routeName;
+  }
+}
+
+String entryTypeToEntryRouteName(EntryType entryType) {
+  switch (entryType) {
+    case EntryType.password:
+      return PasswordScreen.routeName;
+    case EntryType.paymentCard:
+      return PaymentCardScreen.routeName;
+    case EntryType.note:
+      return NoteScreen.routeName;
+    case EntryType.idCard:
+      return IDCardScreen.routeName;
+    case EntryType.identity:
+      return IdentityScreen.routeName;
+  }
+}
 
 final bool _isMobile = Platform.isAndroid || Platform.isIOS;
 
@@ -437,4 +479,130 @@ List<PopupMenuEntry> passyEntryPopupMenuItemBuilder(
       return paymentCardPopupMenuBuilder(
           context, entry.meta as PaymentCardMeta);
   }
+}
+
+Future<void> showConnectDialog(BuildContext context,
+    {String popUntilRouteName = MainScreen.routeName}) async {
+  CameraController _controller = CameraController(
+    (await availableCameras()).first,
+    ResolutionPreset.low,
+    enableAudio: false,
+  );
+  Future<void> _initializeControllerFuture = _controller.initialize();
+  showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+            shape: PassyTheme.dialogShape,
+            title: Text(
+              localizations.scanQRCode,
+              textAlign: TextAlign.center,
+            ),
+            content: SizedBox(
+              width: 250,
+              height: 250,
+              child: FutureBuilder<void>(
+                future: _initializeControllerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return CameraPreview(_controller);
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.popUntil(context,
+                      (route) => route.settings.name == popUntilRouteName);
+                  Navigator.pushNamed(context, ConnectScreen.routeName,
+                      arguments: data.loadedAccount!);
+                },
+                child: Text(
+                  localizations.canNotScanQuestion,
+                  style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  localizations.cancel,
+                  style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor,
+                  ),
+                ),
+              )
+            ],
+          )).whenComplete(() {
+    _controller.dispose();
+  });
+  Future(() async {
+    await _initializeControllerFuture;
+    _controller.startImageStream((image) {
+      imglib.Image? _image = imageFromCameraImage(image);
+      if (_image == null) return;
+      Result? _result = qrResultFromImage(_image);
+      if (_result == null) {
+        _result = qrResultFromImage(imglib.invert(_image));
+        if (_result == null) {
+          return;
+        }
+      }
+      Navigator.popUntil(
+          context, (route) => route.settings.name == popUntilRouteName);
+      SynchronizationWrapper(context: context).connect(data.loadedAccount!,
+          address: _result.text, popUntilRouteName: popUntilRouteName);
+    });
+  });
+}
+
+void Function() onConnectPressed(BuildContext context,
+    {String popUntilRouteName = MainScreen.routeName}) {
+  return Platform.isAndroid || Platform.isIOS
+      ? () => showConnectDialog(context, popUntilRouteName: popUntilRouteName)
+      : () {
+          Navigator.popUntil(
+              context, (route) => route.settings.name == popUntilRouteName);
+          Navigator.pushNamed(context, ConnectScreen.routeName,
+              arguments: data.loadedAccount!);
+        };
+}
+
+void showSynchronizationDialog(BuildContext context,
+    {String popUntilRouteName = MainScreen.routeName}) {
+  void Function() _onConnectPressed =
+      onConnectPressed(context, popUntilRouteName: popUntilRouteName);
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      shape: PassyTheme.dialogShape,
+      title: Center(
+          child: Text(
+        localizations.synchronize,
+        style: const TextStyle(color: PassyTheme.lightContentColor),
+      )),
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        TextButton(
+            child: Text(
+              localizations.host,
+              style:
+                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            ),
+            onPressed: () => SynchronizationWrapper(context: context)
+                .host(data.loadedAccount!)),
+        TextButton(
+          child: Text(
+            localizations.connect,
+            style:
+                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+          ),
+          onPressed: _onConnectPressed,
+        ),
+      ],
+    ),
+  ).then((value) => null);
 }

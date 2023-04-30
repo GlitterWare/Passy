@@ -5,10 +5,8 @@ import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 
-import 'main_screen.dart';
-
 class ConnectScreen extends StatefulWidget {
-  static const routeName = '${MainScreen.routeName}/connect';
+  static const routeName = '/connect';
 
   const ConnectScreen({Key? key}) : super(key: key);
 

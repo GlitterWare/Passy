@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:passy/passy_data/entry_type.dart';
+import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/screens/common.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -10,6 +14,7 @@ import 'package:passy/screens/log_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
 
 class SynchronizationWrapper {
   final BuildContext _context;
@@ -21,9 +26,42 @@ class SynchronizationWrapper {
     Navigator.pushNamed(_context, SplashScreen.routeName);
   }
 
-  void _onSyncComplete() {
-    Navigator.popUntil(
-        _context, (r) => r.settings.name == MainScreen.routeName);
+  void _onSyncComplete(
+    SynchronizationResults results, {
+    required LoadedAccount account,
+    String popUntilRouteName = MainScreen.routeName,
+  }) {
+    Navigator.popUntil(_context, (r) => r.settings.name == popUntilRouteName);
+    Map<EntryType, List<util.ExchangeEntry>>? sharedEntries =
+        results.sharedEntries;
+    if (sharedEntries != null) {
+      if (sharedEntries.isNotEmpty) {
+        EntryType? entryType;
+        String? entryKey;
+        for (MapEntry<EntryType, List<util.ExchangeEntry>> sharedEntriesEntry
+            in sharedEntries.entries) {
+          List<util.ExchangeEntry> exchangeEntries = sharedEntriesEntry.value;
+          if (exchangeEntries.isEmpty) continue;
+          util.ExchangeEntry exchangeEntry = exchangeEntries.first;
+          PassyEntry? entry = exchangeEntry.entry;
+          if (entry == null) continue;
+          entryType = sharedEntriesEntry.key;
+          entryKey = entry.key;
+        }
+        if (entryType != null) {
+          if (entryKey != null) {
+            Navigator.popUntil(
+                _context, (r) => r.settings.name == MainScreen.routeName);
+            Navigator.pushNamed(
+              _context,
+              entryTypeToEntriesRouteName(entryType),
+            );
+            Navigator.pushNamed(_context, entryTypeToEntryRouteName(entryType),
+                arguments: account.getEntry(entryType)(entryKey));
+          }
+        }
+      }
+    }
     showDialog(
         context: _context,
         builder: (ctx) => AlertDialog(
@@ -44,7 +82,11 @@ class SynchronizationWrapper {
         action: SnackBarAction(label: 'Details', onPressed: _showLog));
   }
 
-  void connect(LoadedAccount account, {required String address}) {
+  void connect(
+    LoadedAccount account, {
+    required String address,
+    String popUntilRouteName = MainScreen.routeName,
+  }) {
     HostAddress _hostAddress;
     try {
       _hostAddress = HostAddress.parse(address);
@@ -60,7 +102,11 @@ class SynchronizationWrapper {
 
     _sync = account.getSynchronization(
       onConnected: () => _onConnected(),
-      onComplete: () => _onSyncComplete(),
+      onComplete: (SynchronizationResults results) => _onSyncComplete(
+        results,
+        account: account,
+        popUntilRouteName: popUntilRouteName,
+      ),
       onError: (log) => _onSyncError(log),
     );
     _sync!.connect(_hostAddress).onError((error, stackTrace) {
@@ -78,13 +124,23 @@ class SynchronizationWrapper {
     });
   }
 
-  void host(LoadedAccount account) {
+  void host(
+    LoadedAccount account, {
+    Map<EntryType, List<String>>? sharedEntryKeys,
+    String popUntilRouteName = MainScreen.routeName,
+  }) {
     _sync = account.getSynchronization(
       onConnected: _onConnected,
-      onComplete: _onSyncComplete,
+      onComplete: (results) => _onSyncComplete(
+        results,
+        account: account,
+        popUntilRouteName: popUntilRouteName,
+      ),
       onError: _onSyncError,
     );
-    _sync!.host(onConnected: _onConnected).then((value) {
+    _sync!
+        .host(onConnected: _onConnected, sharedEntryKeys: sharedEntryKeys)
+        .then((value) {
       if (value == null) return;
       showDialog(
         context: _context,

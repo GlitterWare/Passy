@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
-import 'package:image/image.dart' as imglib;
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -26,13 +24,10 @@ import 'package:passy/screens/search_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:zxing2/zxing2.dart';
 
 import 'payment_cards_screen.dart';
-import 'connect_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
 import 'id_cards_screen.dart';
@@ -53,7 +48,6 @@ class _MainScreen extends State<MainScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
-  late void Function() _onConnectPressed;
   bool _unlockScreenOn = false;
 
   Widget _searchBuilder(String terms) {
@@ -422,83 +416,6 @@ class _MainScreen extends State<MainScreen>
     routeObserver.unsubscribe(this);
   }
 
-  Future<void> _showConnectDialog() async {
-    CameraController _controller = CameraController(
-      (await availableCameras()).first,
-      ResolutionPreset.low,
-      enableAudio: false,
-    );
-    Future<void> _initializeControllerFuture = _controller.initialize();
-    showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              shape: PassyTheme.dialogShape,
-              title: Text(
-                localizations.scanQRCode,
-                textAlign: TextAlign.center,
-              ),
-              content: SizedBox(
-                width: 250,
-                height: 250,
-                child: FutureBuilder<void>(
-                  future: _initializeControllerFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return CameraPreview(_controller);
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.popUntil(context,
-                        (route) => route.settings.name == MainScreen.routeName);
-                    Navigator.pushNamed(context, ConnectScreen.routeName,
-                        arguments: _account);
-                  },
-                  child: Text(
-                    localizations.canNotScanQuestion,
-                    style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(
-                    localizations.cancel,
-                    style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor,
-                    ),
-                  ),
-                )
-              ],
-            )).whenComplete(() {
-      _controller.dispose();
-    });
-    Future(() async {
-      await _initializeControllerFuture;
-      _controller.startImageStream((image) {
-        imglib.Image? _image = imageFromCameraImage(image);
-        if (_image == null) return;
-        Result? _result = qrResultFromImage(_image);
-        if (_result == null) {
-          _result = qrResultFromImage(imglib.invert(_image));
-          if (_result == null) {
-            return;
-          }
-        }
-        Navigator.popUntil(
-            context, (route) => route.settings.name == MainScreen.routeName);
-        SynchronizationWrapper(context: context)
-            .connect(_account, address: _result.text);
-      });
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -507,14 +424,6 @@ class _MainScreen extends State<MainScreen>
           .setAndroidScreenSecure(_account.protectScreen);
     }
     WidgetsBinding.instance.addObserver(this);
-    _onConnectPressed = Platform.isAndroid || Platform.isIOS
-        ? _showConnectDialog
-        : () {
-            Navigator.popUntil(context,
-                (route) => route.settings.name == MainScreen.routeName);
-            Navigator.pushNamed(context, ConnectScreen.routeName,
-                arguments: _account);
-          };
   }
 
   @override
@@ -640,38 +549,7 @@ class _MainScreen extends State<MainScreen>
                   );
                   return;
                 }
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    shape: PassyTheme.dialogShape,
-                    title: Center(
-                        child: Text(
-                      localizations.synchronize,
-                      style:
-                          const TextStyle(color: PassyTheme.lightContentColor),
-                    )),
-                    actionsAlignment: MainAxisAlignment.center,
-                    actions: [
-                      TextButton(
-                          child: Text(
-                            localizations.host,
-                            style: const TextStyle(
-                                color: PassyTheme.lightContentSecondaryColor),
-                          ),
-                          onPressed: () =>
-                              SynchronizationWrapper(context: context)
-                                  .host(_account)),
-                      TextButton(
-                        child: Text(
-                          localizations.connect,
-                          style: const TextStyle(
-                              color: PassyTheme.lightContentSecondaryColor),
-                        ),
-                        onPressed: _onConnectPressed,
-                      ),
-                    ],
-                  ),
-                ).then((value) => null);
+                showSynchronizationDialog(context);
               },
               icon: const Icon(Icons.sync_rounded),
             ),

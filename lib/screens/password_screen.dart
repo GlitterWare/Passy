@@ -6,6 +6,7 @@ import 'package:otp/otp.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
@@ -157,6 +158,8 @@ class _PasswordScreen extends State<PasswordScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
+        entryType: EntryType.password,
+        entryKey: password!.key,
         title: Center(child: Text(localizations.password)),
         onRemovePressed: () => _onRemovePressed(password!),
         onEditPressed: () => _onEditPressed(password!),

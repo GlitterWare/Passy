@@ -1,11 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/common/synchronization_wrapper.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
+  final EntryType entryType;
+  final String entryKey;
   final EdgeInsetsGeometry buttonPadding;
   final double buttonSplashRadius;
   final Widget title;
@@ -16,6 +22,8 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const EntryScreenAppBar({
     Key? key,
+    required this.entryType,
+    required this.entryKey,
     this.buttonPadding = PassyTheme.appBarButtonPadding,
     this.buttonSplashRadius = PassyTheme.appBarButtonSplashRadius,
     required this.title,
@@ -36,6 +44,27 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: title,
       actions: [
+        IconButton(
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
+          icon: const Icon(Icons.qr_code),
+          tooltip: localizations.shareEntry,
+          onPressed: () {
+            if (!data.loadedAccount!.isRSAKeypairLoaded) {
+              showSnackBar(
+                context,
+                message: localizations.settingUpSynchronization,
+                icon: const Icon(CupertinoIcons.clock_solid,
+                    color: PassyTheme.darkContentColor),
+              );
+              return;
+            }
+            SynchronizationWrapper(context: context)
+                .host(data.loadedAccount!, sharedEntryKeys: {
+              entryType: [entryKey],
+            });
+          },
+        ),
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,

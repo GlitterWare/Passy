@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/custom_field.dart';
@@ -83,6 +84,8 @@ class _IdentityScreen extends State<IdentityScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
+        entryType: EntryType.identity,
+        entryKey: _identity.key,
         title: Center(child: Text(localizations.identity)),
         onRemovePressed: _onRemovePressed,
         onEditPressed: _onEditPressed,

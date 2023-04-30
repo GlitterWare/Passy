@@ -203,5 +203,6 @@
     "removedFromFavorites": "Removed from favorites",
     "noEntries": "No entries",
     "noSearchResults": "No search results",
-    "settingUpSynchronization": "Setting up synchronization"
+    "settingUpSynchronization": "Setting up synchronization",
+    "shareEntry": "Share entry"
 }

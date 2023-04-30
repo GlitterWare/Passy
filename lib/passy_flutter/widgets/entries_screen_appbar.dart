@@ -1,12 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 class EntriesScreenAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
+  final EntryType entryType;
   final EdgeInsetsGeometry buttonPadding;
   final double buttonSplashRadius;
   final Widget title;
@@ -15,6 +19,7 @@ class EntriesScreenAppBar extends StatelessWidget
 
   const EntriesScreenAppBar({
     Key? key,
+    required this.entryType,
     this.buttonPadding = PassyTheme.appBarButtonPadding,
     this.buttonSplashRadius = PassyTheme.appBarButtonSplashRadius,
     required this.title,
@@ -33,6 +38,25 @@ class EntriesScreenAppBar extends StatelessWidget
       ),
       title: title,
       actions: [
+        IconButton(
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
+          onPressed: () {
+            if (!data.loadedAccount!.isRSAKeypairLoaded) {
+              showSnackBar(
+                context,
+                message: localizations.settingUpSynchronization,
+                icon: const Icon(CupertinoIcons.clock_solid,
+                    color: PassyTheme.darkContentColor),
+              );
+              return;
+            }
+            onConnectPressed(context,
+                popUntilRouteName: entryTypeToEntriesRouteName(entryType))();
+          },
+          tooltip: localizations.scanQRCode,
+          icon: const Icon(Icons.qr_code_scanner),
+        ),
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,

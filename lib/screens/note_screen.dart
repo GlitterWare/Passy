@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
@@ -78,6 +79,8 @@ class _NoteScreen extends State<NoteScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
+        entryType: EntryType.note,
+        entryKey: _note.key,
         title: Center(child: Text(localizations.note)),
         onRemovePressed: () => _onRemovePressed(_note),
         onEditPressed: () => _onEditPressed(_note),

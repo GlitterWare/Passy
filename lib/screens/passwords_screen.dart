@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
@@ -68,6 +69,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     List<PasswordMeta> _passwords = _account.passwordsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
+          entryType: EntryType.password,
           title: Center(child: Text(localizations.passwords)),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),

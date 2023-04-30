@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
@@ -90,6 +91,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         _account.identitiesMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
+          entryType: EntryType.identity,
           title: Center(child: Text(localizations.identities)),
           onSearchPressed: _onSearchPressed,
           onAddPressed: _onAddPressed),

@@ -26,6 +26,12 @@ import 'synchronization_2d0d0_utils.dart' as util;
 const String _hello = 'hello';
 const String _sameHistoryHash = 'same';
 
+class SynchronizationResults {
+  Map<EntryType, List<util.ExchangeEntry>>? sharedEntries;
+
+  SynchronizationResults({this.sharedEntries});
+}
+
 class SynchronizationSignalData with JsonConvertable {
   String name;
 
@@ -170,7 +176,9 @@ class Synchronization {
   final History _history;
   final Favorites _favorites;
   final Encrypter _encrypter;
-  final void Function()? _onComplete;
+  final SynchronizationResults _synchronizationResults =
+      SynchronizationResults();
+  final void Function(SynchronizationResults)? _onComplete;
   bool _isOnCompleteCalled = false;
   final void Function(String log)? _onError;
   static ServerSocket? _server;
@@ -191,7 +199,7 @@ class Synchronization {
       required Favorites favorites,
       required Encrypter encrypter,
       required RSAKeypair rsaKeypair,
-      void Function()? onComplete,
+      void Function(SynchronizationResults)? onComplete,
       void Function(String log)? onError})
       : _history = history,
         _favorites = favorites,
@@ -203,7 +211,7 @@ class Synchronization {
   void _callOnComplete() {
     if (_isOnCompleteCalled) return;
     _isOnCompleteCalled = true;
-    _onComplete?.call();
+    _onComplete?.call(_synchronizationResults);
   }
 
   void _handleException(String message) {
@@ -340,7 +348,10 @@ class Synchronization {
     return _completer.future;
   }
 
-  Future<HostAddress?> host({void Function()? onConnected}) async {
+  Future<HostAddress?> host({
+    void Function()? onConnected,
+    Map<EntryType, List<String>>? sharedEntryKeys,
+  }) async {
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
@@ -600,6 +611,7 @@ class Synchronization {
                   account: _loadedAccount,
                   history: _history,
                   favorites: _favorites,
+                  sharedEntryKeys: sharedEntryKeys,
                   onSetEntry: () => _entriesAdded++,
                   onRemoveEntry: () => _entriesRemoved++,
                 ),
@@ -859,6 +871,64 @@ class Synchronization {
             }
           };
           String authEncoded = jsonEncode(auth);
+          _syncLog += 'done.\nAuthenticating... ';
+          Map<String, dynamic> authResponse =
+              _checkResponse(await _safeSync2d0d0Client.runModule([
+            '2d0d0',
+            'checkAccount',
+            authEncoded,
+          ]));
+          if (authResponse.containsKey('error')) {
+            _syncLog +=
+                'done.\nFailed to authenticate. Receiving shared entries... ';
+            response = _checkResponse(await _safeSync2d0d0Client.runModule([
+              '2d0d0',
+              'getSharedEntries',
+            ]));
+            if (response.containsKey('error')) {
+              _handleException(
+                  '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+              return;
+            }
+            print(response);
+            Map<EntryType, List<util.ExchangeEntry>> sharedEntries;
+            try {
+              sharedEntries = util.getEntries(response['entries']);
+            } catch (e) {
+              _handleApiException('Malformed entries received', e);
+              return;
+            }
+            print(sharedEntries);
+            if (sharedEntries.isEmpty) {
+              _handleException(
+                  '2.0.0+ synchronization host error:\n${jsonEncode(authResponse)}');
+              return;
+            } else {
+              _syncLog += 'done.\nProcessing shared entries... ';
+              String nowString = DateTime.now().toUtc().toIso8601String();
+              int i = 0;
+              for (List<util.ExchangeEntry> sharedEntriesEntry
+                  in sharedEntries.values) {
+                for (util.ExchangeEntry exchangeEntry in sharedEntriesEntry) {
+                  exchangeEntry.key = '$nowString-shared-$i';
+                  i++;
+                  if (i == 15) break;
+                }
+                if (i == 15) break;
+              }
+              try {
+                await util.processTypedExchangeEntries(
+                    entries: sharedEntries,
+                    account: _loadedAccount,
+                    history: _history);
+              } catch (e) {
+                _handleApiException('Failed to process shared entries', e);
+                return;
+              }
+              _synchronizationResults.sharedEntries = sharedEntries;
+              continue;
+            }
+          }
           // 1. Receive hashes
           _syncLog += 'done.\nReceiving hashes... ';
           response = _checkResponse(await _safeSync2d0d0Client.runModule([
@@ -1216,12 +1286,11 @@ class Synchronization {
     }
 
     _syncLog = 'Connecting... ';
-    return await Socket.connect(address.ip, address.port,
+    await Socket.connect(address.ip, address.port,
             timeout: const Duration(seconds: 8))
         .then((socket) => _onConnected(socket),
             onError: (e, s) => _handleException(
                 'Failed to connect.\n${e.toString()}\n${s.toString()}'));
-    // Ask server for data hashes, if they are not the same, exchange data
   }
 
   void close() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
@@ -82,6 +83,8 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
 
     return Scaffold(
       appBar: EntryScreenAppBar(
+        entryType: EntryType.paymentCard,
+        entryKey: _paymentCard.key,
         title: Center(child: Text(localizations.paymentCard)),
         onRemovePressed: () => _onRemovePressed(_paymentCard),
         onEditPressed: () => _onEditPressed(_paymentCard),
