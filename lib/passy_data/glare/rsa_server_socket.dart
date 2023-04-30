@@ -7,7 +7,6 @@ import 'package:encrypt/encrypt.dart';
 
 import 'common.dart';
 import 'line_stream_subscription.dart';
-import 'package:uuid/uuid.dart';
 
 class RSAServerSocket {
   static const version = rsaSocketVersion;
