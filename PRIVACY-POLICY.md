@@ -37,7 +37,7 @@ Encrypted personal data will only be transferred once the client device authenti
 The client device sends an encrypted message containing a hello message that the host device needs to confirm, making it impossible to receive the data without knowing the master password.  
 This makes data safe to transfer in any networks for as long as user's password is complex enough.
 
-For information on synchronization exclusive to Passy v1.4.0 and higher read [2.0.0+ Synchronization](200-synchronization).
+For information on synchronization exclusive to Passy v1.4.0 and higher read [2.0.0+ Synchronization](#200-synchronization).
 
 # 2.0.0+ Synchronization
 
