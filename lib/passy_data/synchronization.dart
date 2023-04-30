@@ -890,7 +890,6 @@ class Synchronization {
                   '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
               return;
             }
-            print(response);
             Map<EntryType, List<util.ExchangeEntry>> sharedEntries;
             try {
               sharedEntries = util.getEntries(response['entries']);
@@ -898,7 +897,6 @@ class Synchronization {
               _handleApiException('Malformed entries received', e);
               return;
             }
-            print(sharedEntries);
             if (sharedEntries.isEmpty) {
               _handleException(
                   '2.0.0+ synchronization host error:\n${jsonEncode(authResponse)}');
