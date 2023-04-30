@@ -71,7 +71,7 @@ class RSAServerSocket {
         }));
     subscription.onData((data) {
       if (_handshake(data)) {
-        String _password = const Uuid().v4().substring(0, 32);
+        String _password = generatePassword();
         _encrypter = Encrypter(AES(Key.fromUtf8(_password)));
         _socket.writeln(
             _clientPublicKey!.encrypt(jsonEncode({'password': _password})));
