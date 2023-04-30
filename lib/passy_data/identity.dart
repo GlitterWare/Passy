@@ -9,10 +9,12 @@ typedef Identities = PassyEntries<Identity>;
 
 typedef IdentitiesFile = PassyEntriesEncryptedCSVFile<Identity>;
 
-enum Title { mr, mrs, miss, other }
+enum Title { mx, mr, mrs, miss, other }
 
 Title? titleFromName(String name) {
   switch (name) {
+    case 'mx':
+      return Title.mx;
     case 'mr':
       return Title.mr;
     case 'mrs':
@@ -25,10 +27,12 @@ Title? titleFromName(String name) {
   return null;
 }
 
-enum Gender { male, female, other }
+enum Gender { notSpecified, male, female, other }
 
 Gender? genderFromName(String name) {
   switch (name) {
+    case 'notSpecified':
+      return Gender.notSpecified;
     case 'male':
       return Gender.male;
     case 'female':
@@ -84,11 +88,11 @@ class Identity extends PassyEntry<Identity> {
     this.additionalInfo = '',
     List<String>? tags,
     this.nickname = '',
-    this.title = Title.mr,
+    this.title = Title.mx,
     this.firstName = '',
     this.middleName = '',
     this.lastName = '',
-    this.gender = Gender.male,
+    this.gender = Gender.notSpecified,
     this.email = '',
     this.number = '',
     this.firstAddressLine = '',
@@ -115,11 +119,11 @@ class Identity extends PassyEntry<Identity> {
         additionalInfo = json['additionalInfo'] ?? '',
         tags = (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
         nickname = json['nickname'] ?? '',
-        title = titleFromName(json['title']) ?? Title.mr,
+        title = titleFromName(json['title']) ?? Title.mx,
         firstName = json['firstName'] ?? '',
         middleName = json['middleName'] ?? '',
         lastName = json['lastName'] ?? '',
-        gender = genderFromName(json['gender']) ?? Gender.male,
+        gender = genderFromName(json['gender']) ?? Gender.notSpecified,
         email = json['email'] ?? '',
         number = json['number'] ?? '',
         firstAddressLine = json['firstAddressLine'] ?? '',
@@ -136,11 +140,11 @@ class Identity extends PassyEntry<Identity> {
         additionalInfo = csv[2] ?? '',
         tags = (csv[3] as List?)?.map((e) => e as String).toList() ?? [],
         nickname = csv[4] ?? '',
-        title = titleFromName(csv[5]) ?? Title.mr,
+        title = titleFromName(csv[5]) ?? Title.mx,
         firstName = csv[6] ?? '',
         middleName = csv[7] ?? '',
         lastName = csv[8] ?? '',
-        gender = genderFromName(csv[9]) ?? Gender.male,
+        gender = genderFromName(csv[9]) ?? Gender.notSpecified,
         email = csv[10] ?? '',
         number = csv[11] ?? '',
         firstAddressLine = csv[12] ?? '',

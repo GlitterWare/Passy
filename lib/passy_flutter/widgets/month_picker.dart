@@ -10,7 +10,7 @@ class MonthPickerFormField extends StatelessWidget {
   final TextStyle buttonStyle;
   final TextStyle currentDateStyle;
   final TextStyle selectedDateStyle;
-  final Widget? title;
+  final String title;
   final DateTime Function()? getSelectedDate;
   final Function(DateTime)? onChanged;
 
@@ -21,7 +21,7 @@ class MonthPickerFormField extends StatelessWidget {
     TextStyle? buttonStyle,
     TextStyle? currentDateStyle,
     TextStyle? selectedDateStyle,
-    this.title,
+    this.title = '',
     this.getSelectedDate,
     this.onChanged,
   })  : buttonStyle = buttonStyle ??
@@ -36,6 +36,7 @@ class MonthPickerFormField extends StatelessWidget {
   Widget build(context) {
     return TextFormField(
         controller: controller,
+        decoration: InputDecoration(labelText: title),
         initialValue: initialValue,
         focusNode: AlwaysDisabledFocusNode(),
         onTap: () => showDialog(
@@ -46,7 +47,7 @@ class MonthPickerFormField extends StatelessWidget {
                     : getSelectedDate!();
                 return AlertDialog(
                   shape: PassyTheme.dialogShape,
-                  title: title,
+                  title: Text(title),
                   actions: [
                     TextButton(
                         onPressed: () => Navigator.pop(ctx),
@@ -79,7 +80,9 @@ class MonthPickerFormField extends StatelessWidget {
                 );
               },
             ).then((value) {
-              if (onChanged != null) onChanged!(value);
+              if (onChanged == null) return;
+              if (value == null) return;
+              onChanged!(value);
             }));
   }
 }

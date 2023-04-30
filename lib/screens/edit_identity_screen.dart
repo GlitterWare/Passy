@@ -5,6 +5,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/identity.dart' as id;
 import 'package:passy/passy_data/loaded_account.dart';
 
+import 'common.dart';
 import 'main_screen.dart';
 import 'splash_screen.dart';
 import 'edit_custom_field_screen.dart';
@@ -29,11 +30,11 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
   String _additionalInfo = '';
   List<String> _tags = [];
   String _nickname = '';
-  id.Title _title = id.Title.mr;
+  id.Title _title = id.Title.mx;
   String _firstName = '';
   String _middleName = '';
   String _lastName = '';
-  id.Gender _gender = id.Gender.male;
+  id.Gender _gender = id.Gender.notSpecified;
   String _email = '';
   String _number = '';
   String _firstAddressLine = '';
@@ -147,6 +148,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         PassyPadding(EnumDropDownButtonFormField<id.Gender>(
           value: _gender,
           values: id.Gender.values,
+          getName: (id.Gender gender) => genderToReadableName(gender),
           decoration: InputDecoration(labelText: localizations.gender),
           textCapitalization: TextCapitalization.words,
           onChanged: (value) {

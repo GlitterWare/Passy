@@ -204,5 +204,10 @@
     "noEntries": "No entries",
     "noSearchResults": "No search results",
     "settingUpSynchronization": "Setting up synchronization",
-    "shareEntry": "Share entry"
+    "shareEntry": "Share entry",
+    "dateOfIssue": "Date of issue",
+    "notSpecified": "Not specified",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
 }

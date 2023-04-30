@@ -4,6 +4,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'edit_custom_field_screen.dart';
@@ -137,24 +138,30 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
                 setState(() => _cardholderName = value.trim()),
           )),
           PassyPadding(MonthPickerFormField(
+            key: UniqueKey(),
             initialValue: _exp,
-            title: Text(localizations.expirationDate),
+            title: localizations.expirationDate,
             getSelectedDate: () {
+              DateTime _now = DateTime.now();
               List<String> _date = _exp.split('/');
+              if (_date.length < 2) return DateTime.now();
               String _month = _date[0];
               String _year = _date[1];
               if (_month[0] == '0') {
                 _month = _month[1];
               }
-              return DateTime.utc(int.parse(_year), int.parse(_month));
+              int? _monthDecoded = int.tryParse(_month);
+              if (_monthDecoded == null) return _now;
+              int? _yearDecoded = int.tryParse(_year);
+              if (_yearDecoded == null) return _now;
+              if (_yearDecoded < _now.year) _yearDecoded = _now.year;
+              return DateTime.utc(_yearDecoded, _monthDecoded);
             },
             onChanged: (selectedDate) {
               String _month = selectedDate.month.toString();
               String _year = selectedDate.year.toString();
               if (_month.length == 1) _month = '0' + _month;
-              setState(() {
-                _exp = _month + '/' + _year;
-              });
+              setState(() => _exp = _month + '/' + _year);
             },
           )),
           PassyPadding(TextFormField(

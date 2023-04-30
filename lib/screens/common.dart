@@ -606,3 +606,16 @@ void showSynchronizationDialog(BuildContext context,
     ),
   ).then((value) => null);
 }
+
+String genderToReadableName(Gender gender) {
+  switch (gender) {
+    case Gender.notSpecified:
+      return localizations.notSpecified;
+    case Gender.male:
+      return localizations.male;
+    case Gender.female:
+      return localizations.female;
+    case Gender.other:
+      return localizations.other;
+  }
+}

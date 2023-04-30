@@ -138,7 +138,7 @@ class _IdentityScreen extends State<IdentityScreen> {
             )),
           PassyPadding(RecordButton(
             title: localizations.gender,
-            value: capitalize(_identity.gender.name),
+            value: genderToReadableName(_identity.gender),
           )),
           if (_identity.email != '')
             PassyPadding(RecordButton(

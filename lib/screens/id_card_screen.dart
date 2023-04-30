@@ -134,6 +134,12 @@ class _IDCardScreen extends State<IDCardScreen> {
           if (_idCard.country != '')
             PassyPadding(RecordButton(
                 title: localizations.country, value: _idCard.country)),
+          if (_idCard.issDate != '')
+            PassyPadding(RecordButton(
+                title: localizations.dateOfIssue, value: _idCard.issDate)),
+          if (_idCard.expDate != '')
+            PassyPadding(RecordButton(
+                title: localizations.expirationDate, value: _idCard.expDate)),
           for (CustomField _customField in _idCard.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (_idCard.additionalInfo != '')
