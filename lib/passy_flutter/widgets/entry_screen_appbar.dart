@@ -59,10 +59,14 @@ class EntryScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
               );
               return;
             }
-            SynchronizationWrapper(context: context)
-                .host(data.loadedAccount!, sharedEntryKeys: {
-              entryType: [entryKey],
-            });
+            SynchronizationWrapper(context: context).host(data.loadedAccount!,
+                title: Text(
+                  localizations.shareEntry,
+                  textAlign: TextAlign.center,
+                ),
+                sharedEntryKeys: {
+                  entryType: [entryKey],
+                });
           },
         ),
         IconButton(

@@ -458,6 +458,26 @@ class _MainScreen extends State<MainScreen>
       PassyPadding(ThreeWidgetButton(
         left: const Padding(
           padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.qr_code_scanner),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        center: Text(localizations.synchronize),
+        onPressed: () {
+          if (!_account.isRSAKeypairLoaded) {
+            showSnackBar(
+              context,
+              message: localizations.settingUpSynchronization,
+              icon: const Icon(CupertinoIcons.clock_solid,
+                  color: PassyTheme.darkContentColor),
+            );
+            return;
+          }
+          showSynchronizationDialog(context);
+        },
+      )),
+      PassyPadding(ThreeWidgetButton(
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
           child: Icon(Icons.password_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
@@ -580,13 +600,14 @@ class _MainScreen extends State<MainScreen>
                   children: [
                     _screenButtons[3],
                     _screenButtons[4],
+                    _screenButtons[5],
                   ],
                 )),
                 Expanded(
                     child: ListView(
                   children: [
-                    _screenButtons[5],
                     _screenButtons[6],
+                    _screenButtons[7],
                   ],
                 ))
               ]);
@@ -607,6 +628,7 @@ class _MainScreen extends State<MainScreen>
                     _screenButtons[4],
                     _screenButtons[5],
                     _screenButtons[6],
+                    _screenButtons[7],
                   ],
                 )),
               ]);

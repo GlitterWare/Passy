@@ -128,6 +128,7 @@ class SynchronizationWrapper {
     LoadedAccount account, {
     Map<EntryType, List<String>>? sharedEntryKeys,
     String popUntilRouteName = MainScreen.routeName,
+    Widget? title,
   }) {
     _sync = account.getSynchronization(
       onConnected: _onConnected,
@@ -145,6 +146,7 @@ class SynchronizationWrapper {
       showDialog(
         context: _context,
         builder: (_) => SimpleDialog(
+          title: title,
           shape: PassyTheme.dialogShape,
           children: [
             Center(
