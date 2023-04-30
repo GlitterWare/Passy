@@ -5,6 +5,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
+import 'package:passy/screens/csv_import_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 
 import 'export_and_import_screen.dart';
@@ -68,6 +69,17 @@ class _ImportScreen extends State<ImportScreen> {
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: _onPassyImportPressed,
         )),
+        PassyPadding(
+          ThreeWidgetButton(
+              center: Text(localizations.csvImport),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.download_for_offline_outlined),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, CSVImportScreen.routeName)),
+        ),
       ]),
     );
   }

@@ -58,12 +58,14 @@ String dateToString(DateTime date) {
 DateTime stringToDate(String value) {
   if (value == '') return DateTime.now();
   List<String> _dateSplit = value.split('/');
-  if (_dateSplit.length == 3) return DateTime.now();
-  return DateTime(
-    int.parse(_dateSplit[2]),
-    int.parse(_dateSplit[1]),
-    int.parse(_dateSplit[0]),
-  );
+  if (_dateSplit.length < 3) return DateTime.now();
+  int? yy = int.tryParse(_dateSplit[2]);
+  if (yy == null) return DateTime.now();
+  int? mm = int.tryParse(_dateSplit[1]);
+  if (mm == null) return DateTime.now();
+  int? dd = int.tryParse(_dateSplit[0]);
+  if (dd == null) return DateTime.now();
+  return DateTime(yy, mm, dd);
 }
 
 Future<DateTime?> showPassyDatePicker(

@@ -85,7 +85,7 @@
     "lastName": "Last name",
     "gender": "Gender",
     "email": "Email",
-    "phoneNumber": "phoneNumber",
+    "phoneNumber": "Phone number",
     "firstAddresssLine": "First address line",
     "secondAddressLine": "Second address line",
     "zipCode": "Zip code",
@@ -209,5 +209,16 @@
     "notSpecified": "Not specified",
     "male": "Male",
     "female": "Female",
-    "other": "Other"
+    "other": "Other",
+    "csvImport": "CSV import",
+    "importPasswords": "Import passwords",
+    "importPaymentCards": "Import payment cards",
+    "importNotes": "Import notes",
+    "importIDCards": "Import ID cards",
+    "importIdentities": "Import identities",
+    "noCSVDataFound": "No CSV data found",
+    "csvImportMessage1":"Select CSV field values to match the entry variables",
+    "csvImportMessage2": "This template will be used for all CSV entries",
+    "@csvImportMessage1": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" },
+    "@csvImportMessage2": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" }
 }
