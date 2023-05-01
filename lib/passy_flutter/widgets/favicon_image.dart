@@ -76,7 +76,7 @@ class FavIconImage extends StatelessWidget {
         if (_imageURL is String) return Favicon(_imageURL);
         Favicon? icon;
         try {
-          await FaviconFinder.getBest(_url,
+          icon = await FaviconFinder.getBest(_url,
               suffixes: ['png', 'jpg', 'jpeg', 'ico']);
         } catch (_) {
           return null;
