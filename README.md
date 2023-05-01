@@ -1,5 +1,7 @@
 # Passy
 
+#### Want to translate the app to your language? It's simple! Head over to https://github.com/GlitterWare/Passy/issues and create a new issue to get started.
+
 https://glitterware.github.io/Passy
 
 Passy is an offline password manager with cross-platfrom synchronization. 🔒
