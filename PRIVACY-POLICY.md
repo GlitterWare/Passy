@@ -57,7 +57,7 @@ If this authentication fails, the host will not send/receive any information to/
 Entry sharing may be used to send an entry between different accounts.  
 It is a part of 2.0.0+ synchronization feature set and uses the same API layer.
 
-By pressing the "Share entry" button (e.g. at the top bar of a password screen), the user expresses consent for anyone with access to their device address to be able to retrieve and view the selected shared entry/entries.
+By pressing the "Share entry" button (e.g. at the top bar of a password screen), the user expresses consent for anyone with access to their device address to be able to retrieve and view the selected shared entry/entries for as long as the 2.0.0+ synchronization server remains online.
 
 ## Information We Collect
 
