@@ -72,13 +72,10 @@ class FavIconImage extends StatelessWidget {
     return FutureBuilder(
       future: Future(() async {
         await _faviconManagerCompleter.future;
-        print(_favicons);
-        print(_url);
         dynamic _imageURL = _favicons[_url];
         if (_imageURL is String) return Favicon(_imageURL);
         Favicon? icon = await FaviconFinder.getBest(_url,
             suffixes: ['png', 'jpg', 'jpeg', 'ico']);
-        print('bad');
         if (icon == null) return null;
         _favicons[_url] = icon.url;
         _saveRequested = true;
