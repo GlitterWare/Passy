@@ -36,9 +36,9 @@ jobs:
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: zip
-          directory: ../build
+          directory: ../build/linux-bundle
           filename: Passy-Linux-Bundle.zip
-          path: linux-bundle/Passy
+          path: Passy
       - name: Archive Linux AppImage build
         uses: thedoctor0/zip-release@0.7.1
         with:
@@ -75,6 +75,20 @@ jobs:
           cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
           chmod +x build/linux-bundle/Passy/passy
           chmod +x build/Passy-Latest-x86_64.AppImage
+      - name: Archive Linux bundle build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build/linux-bundle
+          filename: Passy-Linux-Bundle.zip
+          path: Passy
+      - name: Archive Linux AppImage build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-Linux-AppImage.zip
+          path: Passy-Latest-x86_64.AppImage
       - name: Upload Android no updates popup build
         uses: actions/upload-artifact@v3
         with:
