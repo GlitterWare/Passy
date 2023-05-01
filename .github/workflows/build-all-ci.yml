@@ -19,10 +19,6 @@ jobs:
       - name: Configure flutter
         shell: bash
         run: flutter config --no-analytics
-      - name: Prepare environment
-        shell: bash
-        run: |
-          mkdir -p ../build/linux-bundle/Passy
       - name: Build with updates popup
         shell: bash
         run: bash build_all_with_updates_popup.sh
@@ -30,6 +26,7 @@ jobs:
         shell: bash
         run: |
           cd ..
+          mkdir -p build/linux-bundle/Passy
           cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
           cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
           cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
@@ -72,6 +69,7 @@ jobs:
         run: |
           cd ..
           rm -rf build/*
+          mkdir -p build/linux-bundle/Passy
           cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
           cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
           cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
@@ -114,7 +112,7 @@ jobs:
         run: |
           cd ..
           mkdir -p build/windows-portable/Passy
-          cp -r Passy/build/windows/runner/Release/* build/windows-portable/Passy
+          cp -r Passy/build/windows/runner/Release/. build/windows-portable/Passy
       - name: Upload Windows portable build
         uses: actions/upload-artifact@v3
         with:
