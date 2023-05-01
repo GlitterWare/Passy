@@ -19,42 +19,79 @@ jobs:
       - name: Configure flutter
         shell: bash
         run: flutter config --no-analytics
+      - name: Prepare environment
+        shell: bash
+        run: |
+          mkdir -p ../build/linux-bundle/Passy
       - name: Build with updates popup
         shell: bash
         run: bash build_all_with_updates_popup.sh
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
+          cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
+          cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
+          chmod +x build/linux-bundle/Passy/passy
+          chmod +x build/Passy-Latest-x86_64.AppImage
+      - name: Archive Linux bundle build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-Linux-Bundle.zip
+          path: linux-bundle/Passy
+      - name: Archive Linux AppImage build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-Linux-AppImage.zip
+          path: Passy-Latest-x86_64.AppImage
       - name: Upload Android build
         uses: actions/upload-artifact@v3
         with:
           name: android
-          path: /home/runner/work/Passy/Passy/build/app/outputs/flutter-apk/app-release.apk
+          path: /home/runner/work/Passy/build/Passy-Android.apk
       - name: Upload Linux bundle build
         uses: actions/upload-artifact@v3
         with:
           name: linux-bundle
-          path: /home/runner/work/Passy/Passy/build/linux/x64/release/bundle
+          path: /home/runner/work/Passy/build/Passy-Linux-Bundle.zip
       - name: Upload Linux AppImage build
         uses: actions/upload-artifact@v3
         with:
           name: linux-appimage
-          path: /home/runner/work/Passy/Passy/build/appimage/Passy-Latest-x86_64.AppImage
+          path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
       - name: Build without updates popup
         shell: bash
         run: bash build_all_without_updates_popup.sh
-      - name: Upload Linux bundle no updates popup build
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-bundle-no-updates-popup
-          path: /home/runner/work/Passy/Passy/build/linux/x64/release/bundle
-      - name: Upload Linux AppImage no updates popup build
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-appimage-no-updates-popup
-          path: /home/runner/work/Passy/Passy/build/appimage/Passy-Latest-x86_64.AppImage
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          rm -rf build/*
+          cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
+          cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
+          cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
+          chmod +x build/linux-bundle/Passy/passy
+          chmod +x build/Passy-Latest-x86_64.AppImage
       - name: Upload Android no updates popup build
         uses: actions/upload-artifact@v3
         with:
           name: android-no-updates-popup
-          path: /home/runner/work/Passy/Passy/build/app/outputs/flutter-apk/app-release.apk
+          path: /home/runner/work/Passy/build/Passy-Android.apk
+      - name: Upload Linux bundle no updates popup build
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-bundle-no-updates-popup
+          path: /home/runner/work/Passy/build/Passy-Linux-Bundle.zip
+      - name: Upload Linux AppImage no updates popup build
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-appimage-no-updates-popup
+          path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
   build_windows:
     name: Build Passy for Windows
     runs-on: windows-latest
@@ -72,8 +109,14 @@ jobs:
       - name: Build Passy for Windows
         shell: bash
         run: ./build_windows_with_updates_popup.bat
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          mkdir -p build/windows-portable/Passy
+          cp -r Passy/build/windows/runner/Release/* build/windows-portable/Passy
       - name: Upload Windows portable build
         uses: actions/upload-artifact@v3
         with:
           name: windows-portable
-          path: build/windows
+          path: D:\a\Passy\build\windows-portable\Passy
