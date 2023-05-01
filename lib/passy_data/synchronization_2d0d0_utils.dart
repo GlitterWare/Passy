@@ -346,7 +346,7 @@ Map<EntryType, Map<String, EntryEvent>> getTypedEntryEvents(
   if (typedEntryEvents is! Map<String, dynamic>) {
     throw {
       'error': {
-        'type': 'Malformed types entry events',
+        'type': 'Malformed typed entry events',
         'description':
             'Expected type `Map<String, dynamic>`, received type `${typedEntryEvents.runtimeType.toString()}`',
       },
@@ -373,7 +373,6 @@ EntriesToSynchronize findEntriesToSynchronize({
       in localEntries.entries) {
     EntryType entryType = localEntriesEntry.key;
     List<String> entriesToSendList = [];
-    entriesToSend[entryType] = entriesToSendList;
     Map<String, EntryEvent>? remoteEntryEvents = remoteEntries[entryType];
     if (remoteEntryEvents == null) continue;
     Map<String, EntryEvent> localEntryEvents = localEntriesEntry.value;
@@ -383,14 +382,16 @@ EntriesToSynchronize findEntriesToSynchronize({
       if (remoteEntryKeys.contains(key)) continue;
       entriesToSendList.add(key);
     }
+    if (entriesToSendList.isNotEmpty) {
+      entriesToSend[entryType] = entriesToSendList;
+    }
   }
   for (MapEntry<EntryType, Map<String, EntryEvent>> remoteEntriesEntry
       in remoteEntries.entries) {
     EntryType entryType = remoteEntriesEntry.key;
     List<String>? entriesToSendList = entriesToSend[entryType];
-    if (entriesToSendList == null) continue;
+    entriesToSendList ??= [];
     List<String> entriesToRetrieveList = [];
-    entriesToRetrieve[entryType] = entriesToRetrieveList;
     Map<String, EntryEvent>? localEntryEvents = localEntries[entryType];
     if (localEntryEvents == null) continue;
     Map<String, EntryEvent> remoteEntryEvents = remoteEntriesEntry.value;
@@ -413,6 +414,12 @@ EntriesToSynchronize findEntriesToSynchronize({
         continue;
       }
       entriesToSendList.add(key);
+    }
+    if (entriesToRetrieveList.isNotEmpty) {
+      entriesToRetrieve[entryType] = entriesToRetrieveList;
+    }
+    if (entriesToSendList.isNotEmpty) {
+      entriesToSend[entryType] = entriesToSendList;
     }
   }
   return EntriesToSynchronize(
