@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:csv/csv_settings_autodetection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -12,6 +12,7 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/csv_import_entries_screen.dart';
+import 'package:csv/csv.dart';
 import 'common.dart';
 import 'import_screen.dart';
 import 'log_screen.dart';
@@ -57,9 +58,9 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     String? filePath = fileResult.files[0].path;
     if (filePath == null) return;
     File file = File(filePath);
-    List<String> fileData;
+    String fileData;
     try {
-      fileData = (await file.readAsString()).split('\n');
+      fileData = (await file.readAsString()).replaceAll('\r', '');
     } catch (e, s) {
       showSnackBar(
         context,
@@ -76,21 +77,8 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     }
     List<List<String>> fileDataDecoded = [];
     try {
-      for (String line in fileData) {
-        List<dynamic> lineDecoded = csvDecode(line);
-        List<String> lineDecodedString = [];
-        for (dynamic value in lineDecoded) {
-          if (value.length > 1) {
-            if (value[0] == '"') {
-              if (value[value.length - 1] == '"') {
-                value = value.substring(1, value.length - 1);
-              }
-            }
-          }
-          lineDecodedString.add(value);
-        }
-        fileDataDecoded.add(lineDecodedString);
-      }
+      fileDataDecoded = const CsvToListConverter()
+          .convert<String>(fileData, shouldParseNumbers: false, eol: '\n');
     } catch (e, s) {
       showSnackBar(
         context,

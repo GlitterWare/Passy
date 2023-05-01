@@ -3,6 +3,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/splash_screen.dart';
 import 'common.dart';
 import 'csv_import_screen.dart';
 import 'log_screen.dart';
@@ -187,6 +188,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: Text(localizations.import),
               onPressed: () async {
+                Navigator.pushNamed(context, SplashScreen.routeName);
                 List<PassyEntry> result = [];
                 DateTime _now = DateTime.now().toUtc();
                 int i = 0;
@@ -217,6 +219,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                     entryDecoded =
                         PassyEntry.fromJson(args.entryType)(jsonResult);
                   } catch (e, s) {
+                    Navigator.pop(context);
                     showSnackBar(
                       context,
                       message: localizations.couldNotImportAccount,
@@ -239,6 +242,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                 for (PassyEntry entry in result) {
                   await setEntry(entry);
                 }
+                Navigator.pop(context);
                 Navigator.pop(context);
               })),
         ]));
