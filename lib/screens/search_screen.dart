@@ -54,6 +54,7 @@ class _SearchScreen extends State<SearchScreen> {
       body: Column(
         children: [
           PassyPadding(TextFormField(
+              autofocus: true,
               decoration: InputDecoration(
                 label: Text(localizations.search),
                 hintText: 'github human@example.com',
