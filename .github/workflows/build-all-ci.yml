@@ -14,7 +14,7 @@ jobs:
       - name: Install flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.4'
+          flutter-version: '3.7.12'
           channel: 'stable'
       - name: Configure flutter
         shell: bash
@@ -113,7 +113,7 @@ jobs:
       - name: Install flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.4'
+          flutter-version: '3.7.12'
           channel: 'stable'
       - name: Configure flutter
         shell: bash
