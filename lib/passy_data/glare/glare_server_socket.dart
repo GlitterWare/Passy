@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypton/crypton.dart';
@@ -93,13 +94,17 @@ class GlareServerSocket {
         },
       };
     } catch (e, s) {
+      dynamic errorEncoded;
+      try {
+        errorEncoded = jsonEncode(e);
+      } catch (_) {}
       return {
         'type': 'commandResponse',
         'arguments': args,
         'data': {
           'error': {
             'type': 'Module exception',
-            'exception': e.toString(),
+            'exception': errorEncoded == null ? e.toString() : e,
             'stack': s.toString(),
           },
         },

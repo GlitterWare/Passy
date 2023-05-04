@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:encrypt/encrypt.dart';
+
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'history.dart';
@@ -12,12 +14,25 @@ import 'favorites.dart';
 
 Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required LoadedAccount account,
+  required Encrypter encrypter,
   required History history,
   required Favorites favorites,
   Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
 }) {
+  Encrypter usernameEncrypter = getPassyEncrypter(account.username);
+  String apiVersion =
+      DateTime.now().toUtc().isBefore(synchronization2d0d0DeprecationDate)
+          ? '2d0d0'
+          : '2d0d1';
+  bool useNewAuth = // true
+      apiVersion == '2d0d1';
+  String generateAuth() {
+    return util.generateAuth(
+        encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+  }
+
   sharedEntryKeys ??= {};
   Map<String, dynamic> sharedEntries =
       sharedEntryKeys.map((entryType, entryKeys) {
@@ -35,13 +50,14 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
     );
   });
   return {
-    '2d0d0': GlareModule(
+    apiVersion: GlareModule(
       name: 'Passy 2.0.0+ Synchronization Modules',
       target: (args) async {
         if (args.length == 3) {
           return {
             'commands': [
               {'name': 'checkAccount'},
+              {'name': 'authenticate'},
               {'name': 'getHashes'},
               {'name': 'getHistoryEntries'},
               {'name': 'getEntries'},
@@ -69,6 +85,16 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
                 'exception': e.toString(),
               },
             };
+          }
+          if (useNewAuth) {
+            try {
+              util.verifyAuth(decoded['auth'],
+                  encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+            } catch (e) {
+              if (e is Map<String, dynamic>) return e;
+              rethrow;
+            }
+            return decoded;
           }
           dynamic _account = decoded['account'];
           if (_account is! Map<String, dynamic>) {
@@ -123,6 +149,13 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             if (check.containsKey('error')) return check;
             return {
               'status': {'type': 'Success'}
+            };
+          case 'authenticate':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            return {
+              'status': {'type': 'Success'},
+              'auth': generateAuth(),
             };
           case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);

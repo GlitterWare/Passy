@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:passy/passy_data/history.dart';
-import 'package:passy/passy_data/loaded_account.dart';
+import 'package:encrypt/encrypt.dart';
 
+import 'history.dart';
+import 'loaded_account.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -496,5 +497,89 @@ Future<void> processTypedExchangeEntries({
       onRemoveEntry: onRemoveEntry,
       onSetEntry: onSetEntry,
     );
+  }
+}
+
+String generateAuth(
+    {required Encrypter encrypter, required Encrypter usernameEncrypter}) {
+  return encrypt(
+      encrypt(jsonEncode({'date': DateTime.now().toUtc().toIso8601String()}),
+          encrypter: usernameEncrypter),
+      encrypter: encrypter);
+}
+
+void verifyAuth(dynamic auth,
+    {required Encrypter encrypter, required Encrypter usernameEncrypter}) {
+  if (auth is! String) {
+    throw {
+      'error': {
+        'type': 'Malformed auth',
+        'description':
+            'Expected type `String`, received type `${auth.runtimeType.toString()}`',
+      },
+    };
+  }
+  try {
+    auth = decrypt(decrypt(auth, encrypter: encrypter),
+        encrypter: usernameEncrypter);
+  } catch (e) {
+    throw {
+      'error': {
+        'type': 'Could not decrypt auth',
+        'description':
+            'Make sure that both accounts have the same username and password. The only viable synchronization option between different accounts is entry sharing.'
+      },
+    };
+  }
+  try {
+    auth = jsonDecode(auth);
+  } catch (e) {
+    throw {
+      'error': {
+        'type': 'Could not decode auth',
+        'exception': e.toString(),
+      },
+    };
+  }
+  if (auth is! Map<String, dynamic>) {
+    throw {
+      'error': {
+        'type': 'Malformed auth',
+        'description':
+            'Expected type `Map<String, dynamic>`, received type `${auth.runtimeType.toString()}`',
+      },
+    };
+  }
+  dynamic date = auth['date'];
+  if (date is! String) {
+    throw {
+      'error': {
+        'type': 'Malformed date',
+        'description':
+            'Expected type `String`, received type `${date.runtimeType.toString()}`',
+      },
+    };
+  }
+  DateTime? dateDecoded = DateTime.tryParse(date);
+  if (dateDecoded == null) {
+    throw {
+      'error': {
+        'type': 'Could not decode date',
+        'description': 'Received $date',
+      },
+    };
+  }
+  if (DateTime.now()
+      .toUtc()
+      .subtract(const Duration(seconds: 5))
+      .isAfter(dateDecoded)) {
+    throw {
+      'error': {
+        'type': 'Stale auth',
+        'date': date,
+        'description':
+            'Packet took too long to reach its destination, please check your network conditions',
+      },
+    };
   }
 }

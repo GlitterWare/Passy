@@ -604,11 +604,12 @@ class Synchronization {
               _syncLog +=
                   'done.\nClient supports 2.0.0+ synchronization. Starting 2.0.0+ synchronization server... ';
               GlareServer host = await GlareServer.bind(
-                address: _address!.ip,
+                address: _ip,
                 port: 0,
                 keypair: _rsaKeypair,
                 modules: buildSynchronization2d0d0Modules(
                   account: _loadedAccount,
+                  encrypter: _encrypter,
                   history: _history,
                   favorites: _favorites,
                   sharedEntryKeys: sharedEntryKeys,
@@ -621,8 +622,7 @@ class Synchronization {
               _sync2d0d0Host = host;
               _syncLog +=
                   'done.\nSending 2.0.0+ synchronization server address... ';
-              socket.add(
-                  utf8.encode('${host.address.address}:${host.port}\u0000'));
+              socket.add(utf8.encode('$_ip:${host.port}\u0000'));
             }
 
             void _handleHello(List<int> data) {
@@ -864,25 +864,41 @@ class Synchronization {
                 'No shared accounts found. Please make sure that your main and/or shared accounts are added on both ends and have the same usernames and passwords.');
             return;
           }
-          Map<String, dynamic> auth = {
-            'account': {
-              'username': username,
-              'passwordHash': _loadedAccount.passwordHash,
-            }
-          };
-          String authEncoded = jsonEncode(auth);
+          Encrypter usernameEncrypter =
+              getPassyEncrypter(_loadedAccount.username);
+          String apiVersion = DateTime.now()
+                  .toUtc()
+                  .isBefore(synchronization2d0d0DeprecationDate)
+              ? '2d0d0'
+              : '2d0d1';
+          bool useNewAuth = // true
+              apiVersion == '2d0d1';
+
+          Map<String, dynamic> auth() {
+            return {
+              'account': useNewAuth
+                  ? null
+                  : {
+                      'username': username,
+                      'passwordHash': _loadedAccount.passwordHash,
+                    },
+              'auth': util.generateAuth(
+                  encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
+            };
+          }
+
           _syncLog += 'done.\nAuthenticating... ';
           Map<String, dynamic> authResponse =
               _checkResponse(await _safeSync2d0d0Client.runModule([
-            '2d0d0',
-            'checkAccount',
-            authEncoded,
+            apiVersion,
+            useNewAuth ? 'authenticate' : 'checkAccount',
+            jsonEncode(auth()),
           ]));
           if (authResponse.containsKey('error')) {
             _syncLog +=
                 'done.\nFailed to authenticate. Receiving shared entries... ';
             response = _checkResponse(await _safeSync2d0d0Client.runModule([
-              '2d0d0',
+              apiVersion,
               'getSharedEntries',
             ]));
             if (response.containsKey('error')) {
@@ -916,9 +932,12 @@ class Synchronization {
               }
               try {
                 await util.processTypedExchangeEntries(
-                    entries: sharedEntries,
-                    account: _loadedAccount,
-                    history: _history);
+                  entries: sharedEntries,
+                  account: _loadedAccount,
+                  history: _history,
+                  onSetEntry: () => _entriesAdded++,
+                  onRemoveEntry: () => _entriesAdded++,
+                );
               } catch (e) {
                 _handleApiException('Failed to process shared entries', e);
                 return;
@@ -927,12 +946,21 @@ class Synchronization {
               continue;
             }
           }
+          if (useNewAuth) {
+            try {
+              util.verifyAuth(authResponse['auth'],
+                  encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
+            } catch (e) {
+              _handleApiException('Failed to verify host auth', e);
+              return;
+            }
+          }
           // 1. Receive hashes
           _syncLog += 'done.\nReceiving hashes... ';
           response = _checkResponse(await _safeSync2d0d0Client.runModule([
-            '2d0d0',
+            apiVersion,
             'getHashes',
-            authEncoded,
+            jsonEncode(auth()),
           ]));
           if (response.containsKey('error')) {
             _handleException(
@@ -989,10 +1017,10 @@ class Synchronization {
             // 3. Receive history for entry types that require synchronization
             _syncLog += 'done.\nReceiving history entries... ';
             response = _checkResponse(await _safeSync2d0d0Client.runModule([
-              '2d0d0',
+              apiVersion,
               'getHistoryEntries',
               jsonEncode({
-                ...auth,
+                ...auth(),
                 'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
               }),
             ]));
@@ -1026,10 +1054,10 @@ class Synchronization {
             if (entriesToSynchronize.entriesToSend.isNotEmpty) {
               _syncLog += 'done.\nSending entries... ';
               response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                '2d0d0',
+                apiVersion,
                 'setEntries',
                 jsonEncode({
-                  ...auth,
+                  ...auth(),
                   'entries': entriesToSynchronize.entriesToSend
                       .map((entryType, entryKeys) {
                     Map<String, EntryEvent> historyEntries =
@@ -1058,10 +1086,10 @@ class Synchronization {
             if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
               _syncLog += 'done.\nReceiving entries... ';
               response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                '2d0d0',
+                apiVersion,
                 'getEntries',
                 jsonEncode({
-                  ...auth,
+                  ...auth(),
                   'entryKeys': entriesToSynchronize.entriesToRetrieve
                       .map((key, value) => MapEntry(key.name, value)),
                 }),
@@ -1118,10 +1146,10 @@ class Synchronization {
             // Receive favorites for entry types that require synchronization
             _syncLog += 'done.\nReceiving favorites entries... ';
             response = _checkResponse(await _safeSync2d0d0Client.runModule([
-              '2d0d0',
+              apiVersion,
               'getFavoritesEntries',
               jsonEncode({
-                ...auth,
+                ...auth(),
                 'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
               }),
             ]));
@@ -1155,10 +1183,10 @@ class Synchronization {
             if (entriesToSynchronize.entriesToSend.isNotEmpty) {
               _syncLog += 'done.\nSending favorites entries... ';
               response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                '2d0d0',
+                apiVersion,
                 'setFavoritesEntries',
                 jsonEncode({
-                  ...auth,
+                  ...auth(),
                   'favoritesEntries': entriesToSynchronize.entriesToSend
                       .map<String, dynamic>((entryType, keyList) {
                     Map<String, EntryEvent> localFavorites =
