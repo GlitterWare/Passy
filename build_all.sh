@@ -42,6 +42,7 @@ FLUTTER='flutter --no-version-check --suppress-analytics'
 
 build_linux() {
   echo 'INFO:Building Linux Bundle.'
+  echo "Running \`$FLUTTER build linux $ENABLE_UPDATES_POPUP $BUILD_OPTIONS\`" 
   $FLUTTER build linux $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
   cp ./linux_assets/* './build/linux/x64/release/bundle'
   cp './logo.svg' './build/linux/x64/release/bundle/com.glitterware.passy.svg'
@@ -51,6 +52,7 @@ build_linux() {
 
 build_android() {
   echo 'INFO:Building APK.'
+  echo "Running \`$FLUTTER build apk $ENABLE_UPDATES_POPUP $BUILD_OPTIONS\`" 
   $FLUTTER build apk $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
 }
 
