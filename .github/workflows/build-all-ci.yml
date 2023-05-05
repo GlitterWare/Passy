@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   pull_request:
     types: [ opened, synchronized, edited, reopened, review_requested ]
+    branches:
+      - main
+      - dev
 jobs:
   build_linux:
     name: Build Passy for Android and Linux
