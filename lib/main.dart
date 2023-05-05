@@ -167,7 +167,7 @@ class Passy extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       // LOCALIZATION TEST
-      //locale: const Locale('en'),
+      locale: const Locale('it'),
       supportedLocales: const [
         Locale('en'),
         Locale('it'),
