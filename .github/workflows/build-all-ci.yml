@@ -1,9 +1,7 @@
 name: Build Passy for all platforms
 on:
   workflow_dispatch:
-  pull_request_review_comment:
-    types:
-      - created
+  pull_request:
 jobs:
   build_linux:
     name: Build Passy for Android and Linux
