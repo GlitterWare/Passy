@@ -2,7 +2,7 @@ name: Build Passy for all platforms
 on:
   workflow_dispatch:
   pull_request:
-    types: [ opened, synchronized, edited, reopened, review_requested ]
+    types: [ opened, synchronize, edited, reopened, review_requested ]
     branches:
       - main
       - dev
