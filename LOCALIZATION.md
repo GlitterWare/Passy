@@ -41,6 +41,8 @@ When you're done, head to the end of the `main.dart` file in `Passy/lib` and ins
 
 After this, you may commit and push your changes to your fork and submit a pull request at https://github.com/GlitterWare/Passy/pulls.
 
+Our build workflow should then build our application with your localization included. It is highly advised that you only use workflow artifacts for testing and do not share workflow artifacts with your friends to use, as builds from the development branch may be very unstable and can, in worst case, cause damage to your account data.
+
 ### File upload
 
 Otherwise, you may download/copy the file from the [aforementioned link](https://github.com/GlitterWare/Passy/blob/dev/lib/l10n/app_en.arb), translate it fully, upload it to https://gist.github.com (make sure to click the arrow to the right of the `Create secret gist`  button and select `Create public gist` so that a maintainer is able to open and see your file) and create a new issue at https://github.com/GlitterWare/Passy/issues/new.
