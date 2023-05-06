@@ -1,0 +1,27 @@
+name: Suggestion
+description: Request a change to the app
+title: "[Suggestion]: "
+labels: ["enhancement"]
+assignees:
+  - GleammerRay
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We need your feedback to keep improving our app!
+        
+        If you have not found similar open/pinned issues at https://github.com/GlitterWare/Passy/issues then fully describe your request.
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggestion
+      description: What do you want to be changed? Please provide as much information as possible to help us understand what you need. You may provide image attachments.
+  - type: checkboxes
+    id: submission-checklist
+    attributes:
+      label: Submission checklist
+      description: Please make sure that this issue meets the submission requirements.
+      options:
+        - label: I have specified my suggestion in the issue title
+          required: true
+

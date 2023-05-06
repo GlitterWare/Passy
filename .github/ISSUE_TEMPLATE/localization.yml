@@ -1,0 +1,34 @@
+name: New/edited localization file(s)
+description: Propose an addition/change to app localization files
+title: "[Localization]: "
+labels: ["localization"]
+assignees:
+  - GleammerRay
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking interest in localizing our application!
+        
+        Please make sure that you have carefully read https://github.com/GlitterWare/Passy/blob/dev/LOCALIZATION.md.
+        
+        To create your localization, download/copy the file from https://github.com/GlitterWare/Passy/blob/dev/lib/l10n/app_en.arb, translate it fully, upload it to https://gist.github.com (make sure to click the arrow to the right of the `Create secret gist`  button and select `Create public gist` so that a maintainer is able to open and see your file) and paste the link in the section below.
+  - type: input
+    id: localization-link
+    attributes:
+      label: Localization link
+      description: Provide a link to your localization gist.
+  - type: textarea
+    id: localization-changes
+    attributes:
+      label: Localization changes
+      description: If necessary, describe the changes you have made.
+  - type: checkboxes
+    id: submission-checklist
+    attributes:
+      label: Submission checklist
+      description: Please make sure that this issue meets the submission requirements.
+      options:
+        - label: I have specified the localization language in the issue title
+          required: true
+
