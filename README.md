@@ -1,6 +1,6 @@
 # Passy
 
-#### Want to translate the app to your language? It's simple! Head over to https://github.com/GlitterWare/Passy/issues and create a new issue to get started.
+#### Want to translate the app to your language? It's simple! Read https://github.com/GlitterWare/Passy/blob/dev/LOCALIZATION.md to get started.
 
 https://glitterware.github.io/Passy
 
