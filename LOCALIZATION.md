@@ -45,5 +45,5 @@ Our build workflow should then build our application with your localization incl
 
 ### File upload
 
-Otherwise, you may download/copy the file from the [aforementioned link](https://github.com/GlitterWare/Passy/blob/dev/lib/l10n/app_en.arb), translate it fully, upload it to https://gist.github.com (make sure to click the arrow to the right of the `Create secret gist`  button and select `Create public gist` so that a maintainer is able to open and see your file) and create a new issue at https://github.com/GlitterWare/Passy/issues/new.
+Otherwise, you may download/copy the file from the [aforementioned link](https://github.com/GlitterWare/Passy/blob/dev/lib/l10n/app_en.arb), translate it fully, upload it to https://gist.github.com (make sure to click the arrow to the right of the `Create secret gist`  button and select `Create public gist` so that a maintainer is able to open and see your file) and create a new issue at https://github.com/GlitterWare/Passy/issues/new/choose.
 
