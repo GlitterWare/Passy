@@ -171,6 +171,8 @@ class Passy extends StatelessWidget {
       supportedLocales: const [
         Locale('en'),
         Locale('it'),
+		Locale('it')
+		//isn't last line supposed to not include a "," ?
       ],
     );
   }
