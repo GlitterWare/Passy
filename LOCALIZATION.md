@@ -18,7 +18,7 @@ All keys starting with '@' are comments that may help you understand what each m
 
 The rest of the entries need translation.
 
-If you wish to test your localization, I offer to build the app with your localization files for you to test on Windows/Linux/Android with unlimited test builds, but do make sure that your translation is complete before asking for a new build. If you are familiar with Git/GitHub, you may take advantage of our GitHub build workflow by submitting a pull request (see [How to submit](#how-to-submit)).
+If you wish to test your localization, we offer to build the app with your localization files for you to test on Windows/Linux/Android with unlimited test builds, but do make sure that your translation is complete before asking for a new build. If you are familiar with Git/GitHub, you may take advantage of our GitHub build workflow by submitting a pull request (see [How to submit](#how-to-submit)).
 
 Please keep to same capitalization as original if possible, e.g. if the English localization says 'Hello world' then your localization should have the first letter in uppercase and the rest of the first letters in lowercase, if applicable.
 
