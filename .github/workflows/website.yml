@@ -21,3 +21,4 @@ jobs:
       - uses: bluefireteam/flutter-gh-pages@v7
         with:
           baseHref: /Passy/
+          webRenderer: html
