@@ -51,3 +51,4 @@ app.*.map.json
 # Development log files
 /log/*
 !/log/empty
+lib/passy_cli/bin/passy_cli
