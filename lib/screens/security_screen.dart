@@ -77,6 +77,7 @@ class _SecurityScreen extends State<SecurityScreen> {
                 child: Icon(Icons.smart_display),
               ),
               right: Switch(
+                activeColor: Colors.greenAccent,
                 value: loadedAccount.protectScreen,
                 onChanged: (value) => setProtectScreen(value),
               ),
@@ -90,6 +91,7 @@ class _SecurityScreen extends State<SecurityScreen> {
                 child: Icon(Icons.security),
               ),
               right: Switch(
+                activeColor: Colors.greenAccent,
                 value: loadedAccount.autoScreenLock,
                 onChanged: (value) => setAutoScreenLock(value),
               ),

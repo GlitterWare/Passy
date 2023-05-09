@@ -179,6 +179,7 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
               child: Icon(Icons.save_outlined),
             ),
             right: Switch(
+              activeColor: Colors.greenAccent,
               value: _account.autoBackup != null,
               onChanged: (value) => _setAutoBackupEnabled(value),
             ),
