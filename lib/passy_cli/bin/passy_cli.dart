@@ -46,12 +46,21 @@ Commands:
     passwords set <username> <csv>
         - Set a new value for password.
           Returns `true` on success.
+
+  Development
+    native_messaging start
+        - Start in native messaging mode.
 ''';
 
 const String passyShellVersion = '1.0.0';
+// Worst case scenario: all characters weigh 4 bytes and each is escaped
+// (1000000/4)/2
+// + minus the extra messaging space
+const int maxNativeMessageLength = 120000;
 
 bool _isBusy = false;
 bool _isInteractive = false;
+bool _isNativeMessaging = false;
 
 bool _shouldMoveLine = false;
 bool _logDisabled = false;
@@ -60,9 +69,41 @@ late String _accountsPath;
 Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
 
-void log(Object? object) {
+void nativeMessagingLog(dynamic id, String msg) {
+  List<String> msgSplit = [];
+  if (msg.length < maxNativeMessageLength) {
+    msgSplit.add(msg);
+  } else {
+    for (int i = 0; i < msg.length; i += maxNativeMessageLength) {
+      int end = i + maxNativeMessageLength;
+      end = end > msg.length ? msg.length : end;
+      msgSplit.add(msg.substring(i, end));
+    }
+  }
+  for (int i = 0; i != msgSplit.length; i++) {
+    String msgPart = msgSplit[i];
+    msgPart = jsonEncode({
+      'id': id,
+      'part': i + 1,
+      'partsTotal': msgSplit.length,
+      'data': msgPart,
+    });
+    int bytesLength = utf8.encode(msgPart).length;
+    stdout.writeCharCode((bytesLength >> 0) & 0xFF);
+    stdout.writeCharCode((bytesLength >> 8) & 0xFF);
+    stdout.writeCharCode((bytesLength >> 16) & 0xFF);
+    stdout.writeCharCode((bytesLength >> 24) & 0xFF);
+    stdout.write(msgPart);
+  }
+}
+
+void log(Object? object, {dynamic id}) {
   if (_logDisabled) return;
   String msg = object.toString();
+  if (_isNativeMessaging) {
+    nativeMessagingLog(id, msg);
+    return;
+  }
   if (_shouldMoveLine) {
     _shouldMoveLine = false;
     msg = '\n$msg';
@@ -107,50 +148,71 @@ Future<void> onInterrupt() async {
   cleanup();
 }
 
-Future<void> executeCommand(List<String> command) async {
+StreamSubscription<List<int>> startInteractive() {
+  return stdin.listen((List<int> event) async {
+    _shouldMoveLine = false;
+    String commandEncoded = utf8.decode(event);
+    if (_isNativeMessaging) {
+      if (commandEncoded.length < 5) return;
+      commandEncoded = commandEncoded.substring(4);
+    }
+    List<String> command = parseCommand(commandEncoded.replaceFirst('\n', ''));
+    if (command.isNotEmpty) {
+      if (_isBusy) return;
+      _isBusy = true;
+      await executeCommand(command, id: commandEncoded);
+      _isBusy = false;
+    }
+    if (_isInteractive) log('[passy]\$ ');
+  });
+}
+
+Future<void> executeCommand(List<String> command, {dynamic id}) async {
   switch (command[0]) {
     case 'help':
-      log(helpMsg);
+      log(helpMsg, id: id);
       return;
     case 'exit':
-      log('Have a splendid day!');
-      log('');
+      log('Have a splendid day!\n', id: id);
       cleanup();
       return;
     case 'accounts':
       if (command.length == 1) break;
       switch (command[1]) {
         case 'list':
-          log(_accounts.values
-              .map<String>((e) => '${e.value.username},${e.value.passwordHash}')
-              .join('\n'));
+          log(
+              _accounts.values
+                  .map<String>(
+                      (e) => '${e.value.username},${e.value.passwordHash}')
+                  .join('\n'),
+              id: id);
           return;
         case 'verify':
           if (command.length < 4) break;
           String accountName = command[2];
           AccountCredentials? _credentials = _accounts[accountName]?.value;
           if (_credentials == null) {
-            log('false');
+            log('false', id: id);
             return;
           }
           String password = command[3];
           bool match =
               _credentials.passwordHash == getPassyHash(password).toString();
-          log(match.toString());
+          log(match.toString(), id: id);
           return;
         case 'login':
           if (command.length < 4) break;
           String accountName = command[2];
           AccountCredentials? _credentials = _accounts[accountName]?.value;
           if (_credentials == null) {
-            log('false');
+            log('false', id: id);
             return;
           }
           String password = command[3];
           bool match =
               _credentials.passwordHash == getPassyHash(password).toString();
           if (match) _encrypters[accountName] = getPassyEncrypter(password);
-          log(match.toString());
+          log(match.toString(), id: id);
           return;
         case 'logout':
           if (command.length < 3) break;
@@ -167,7 +229,8 @@ Future<void> executeCommand(List<String> command) async {
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:passwords:list:No account credentials provided, please use `accounts login` first.');
+            log('passy:passwords:list:No account credentials provided, please use `accounts login` first.',
+                id: id);
             return;
           }
           PasswordsFile passwords = PasswordsFile.fromFile(
@@ -178,16 +241,19 @@ Future<void> executeCommand(List<String> command) async {
                 'passwords.enc'),
             encrypter: encrypter,
           );
-          log(passwords.metadata.values
-              .map<String>((e) => jsonEncode(e.toJson()))
-              .join('\n'));
+          log(
+              passwords.metadata.values
+                  .map<String>((e) => jsonEncode(e.toJson()))
+                  .join('\n'),
+              id: id);
           return;
         case 'get':
           if (command.length < 4) break;
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.');
+            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.',
+                id: id);
             return;
           }
           String entryKey = command[3];
@@ -199,14 +265,15 @@ Future<void> executeCommand(List<String> command) async {
                 'passwords.enc'),
             encrypter: encrypter,
           );
-          log(passwords.getEntryString(entryKey));
+          log(passwords.getEntryString(entryKey), id: id);
           return;
         case 'set':
           if (command.length < 4) break;
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.');
+            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.',
+                id: id);
             return;
           }
           String csvEntry = command[3];
@@ -214,7 +281,8 @@ Future<void> executeCommand(List<String> command) async {
           try {
             password = Password.fromCSV(csvDecode(csvEntry, recursive: true));
           } catch (e, s) {
-            log('passy:passwords:set:Failed to decode password:\n$e\n$s');
+            log('passy:passwords:set:Failed to decode password:\n$e\n$s',
+                id: id);
             return;
           }
           PasswordsFile passwordsFile = PasswordsFile.fromFile(
@@ -228,7 +296,8 @@ Future<void> executeCommand(List<String> command) async {
           try {
             await passwordsFile.setEntry(password.key, entry: password);
           } catch (e, s) {
-            log('passy:passwords:set:Failed to set password entry:\n$e\n$s');
+            log('passy:passwords:set:Failed to set password entry:\n$e\n$s',
+                id: id);
             return;
           }
           HistoryFile historyFile = History.fromFile(
@@ -246,23 +315,33 @@ Future<void> executeCommand(List<String> command) async {
           try {
             await historyFile.save();
           } catch (e, s) {
-            log('passy:passwords:set:Failed to save history:\n$e\n$s');
+            log('passy:passwords:set:Failed to save history:\n$e\n$s', id: id);
             return;
           }
-          log(true);
+          log(true, id: id);
+          return;
+      }
+      break;
+    case 'native_messaging':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'start':
+          _isNativeMessaging = true;
+          startInteractive();
           return;
       }
       break;
   }
-  log('passy:Unknown command:${command.join(' ')}.');
-  if (!_isInteractive) log(helpMsg);
+  if (_isNativeMessaging) return;
+  log('passy:Unknown command:${command.join(' ')}.', id: id);
+  if (!_isInteractive) log(helpMsg, id: id);
 }
 
 void main(List<String> arguments) {
   if (arguments.isNotEmpty) {
     load().then((value) async {
       await executeCommand(arguments);
-      log('');
+      if (!_isNativeMessaging) log('');
     });
     return;
   }
@@ -296,18 +375,7 @@ Type `exit` to quit.
   ProcessSignal.sigint.watch().listen((event) => onInterrupt());
   ProcessSignal.sigterm.watch().listen((event) => onInterrupt());
   load().then((value) {
-    return stdin.listen((List<int> event) async {
-      _shouldMoveLine = false;
-      List<String> command =
-          parseCommand(utf8.decode(event).replaceFirst('\n', ''));
-      if (command.isNotEmpty) {
-        if (_isBusy) return;
-        _isBusy = true;
-        await executeCommand(command);
-        _isBusy = false;
-      }
-      log('[passy]\$ ');
-    });
+    return startInteractive();
   });
   log('[passy]\$ ');
 }
