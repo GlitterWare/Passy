@@ -13,12 +13,21 @@ String getBoxMessage(String message) {
 }
 
 List<String> parseCommand(String command) {
+  bool isEscaped = false;
   String curStr = '';
   List<String> result = [];
   bool isSingleQuoted = false;
   bool isDoubleQuoted = false;
   for (int i = 0; i != command.length; i++) {
     String c = command[i];
+    if (isEscaped) {
+      curStr += c;
+      isEscaped = false;
+      continue;
+    } else if (c == '\\') {
+      isEscaped = true;
+      continue;
+    }
     if (!isDoubleQuoted) {
       if (c == '\'') {
         isSingleQuoted = !isSingleQuoted;

@@ -7,6 +7,8 @@ import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/history.dart';
 import 'package:passy/passy_data/password.dart';
 
 const String helpMsg = '''
@@ -41,6 +43,9 @@ Commands:
     passwords get <username> <key>
         - Get a decrypted CSV string for the password under the specified key.
           Returns `null` if no value is found.
+    passwords set <username> <csv>
+        - Set a new value for password.
+          Returns `true` on success.
 ''';
 
 const String passyShellVersion = '1.0.0';
@@ -195,6 +200,56 @@ Future<void> executeCommand(List<String> command) async {
             encrypter: encrypter,
           );
           log(passwords.getEntryString(entryKey));
+          return;
+        case 'set':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.');
+            return;
+          }
+          String csvEntry = command[3];
+          Password password;
+          try {
+            password = Password.fromCSV(csvDecode(csvEntry, recursive: true));
+          } catch (e, s) {
+            log('passy:passwords:set:Failed to decode password:\n$e\n$s');
+            return;
+          }
+          PasswordsFile passwordsFile = PasswordsFile.fromFile(
+            File(_accountsPath +
+                Platform.pathSeparator +
+                accountName +
+                Platform.pathSeparator +
+                'passwords.enc'),
+            encrypter: encrypter,
+          );
+          try {
+            await passwordsFile.setEntry(password.key, entry: password);
+          } catch (e, s) {
+            log('passy:passwords:set:Failed to set password entry:\n$e\n$s');
+            return;
+          }
+          HistoryFile historyFile = History.fromFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  'history.enc'),
+              encrypter: encrypter);
+          historyFile.value.passwords[password.key] = EntryEvent(
+            password.key,
+            status: EntryStatus.alive,
+            lastModified: DateTime.now().toUtc(),
+          );
+          try {
+            await historyFile.save();
+          } catch (e, s) {
+            log('passy:passwords:set:Failed to save history:\n$e\n$s');
+            return;
+          }
+          log(true);
           return;
       }
       break;
