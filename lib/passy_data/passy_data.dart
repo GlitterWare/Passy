@@ -402,6 +402,7 @@ class PassyData {
               Platform.pathSeparator +
               'credentials.json',
         ),
+        fromJson: AccountCredentials.fromJson,
         value: _creds);
     info.value.lastUsername = newUsername;
     await info.save();

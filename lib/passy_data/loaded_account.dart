@@ -473,8 +473,22 @@ class LoadedAccount {
 
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
-  Map<String, PasswordMeta> get passwordsMetadata =>
-      _passwords.metadata.map((key, e) => MapEntry(key, e as PasswordMeta));
+  Map<String, PasswordMeta> get passwordsMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, PasswordMeta> result = _passwords.metadata.map((key, e) {
+      PasswordMeta meta = e as PasswordMeta;
+      if (!_history.value.passwords.containsKey(key)) {
+        _history.value.passwords[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, Password> get passwords => _passwords.entries;
 
   Password? getPassword(String key) => _passwords.getEntry(key);
@@ -504,8 +518,22 @@ class LoadedAccount {
 
   // Notes wrappers
   List<String> get notesKeys => _notes.keys;
-  Map<String, NoteMeta> get notesMetadata =>
-      _notes.metadata.map((key, e) => MapEntry(key, e as NoteMeta));
+  Map<String, NoteMeta> get notesMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, NoteMeta> result = _notes.metadata.map((key, e) {
+      NoteMeta meta = e as NoteMeta;
+      if (!_history.value.notes.containsKey(key)) {
+        _history.value.notes[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, Note> get notes => _notes.entries;
 
   Note? getNote(String key) => _notes.getEntry(key);
@@ -537,9 +565,22 @@ class LoadedAccount {
 
   // Payment Cards wrappers
   List<String> get paymentCardKeys => _paymentCards.keys;
-  Map<String, PaymentCardMeta> get paymentCardsMetadata =>
-      _paymentCards.metadata
-          .map((key, e) => MapEntry(key, e as PaymentCardMeta));
+  Map<String, PaymentCardMeta> get paymentCardsMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, PaymentCardMeta> result = _paymentCards.metadata.map((key, e) {
+      PaymentCardMeta meta = e as PaymentCardMeta;
+      if (!_history.value.paymentCards.containsKey(key)) {
+        _history.value.paymentCards[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, PaymentCard> get paymentCards => _paymentCards.entries;
 
   PaymentCard? getPaymentCard(String key) => _paymentCards.getEntry(key);
@@ -572,8 +613,22 @@ class LoadedAccount {
 
   // ID Cards wrappers
   List<String> get idCardsKeys => _idCards.keys;
-  Map<String, IDCardMeta> get idCardsMetadata =>
-      _idCards.metadata.map((key, e) => MapEntry(key, e as IDCardMeta));
+  Map<String, IDCardMeta> get idCardsMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, IDCardMeta> result = _idCards.metadata.map((key, e) {
+      IDCardMeta meta = e as IDCardMeta;
+      if (!_history.value.idCards.containsKey(key)) {
+        _history.value.idCards[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, IDCard> get idCards => _idCards.entries;
 
   IDCard? getIDCard(String key) => _idCards.getEntry(key);
@@ -604,8 +659,22 @@ class LoadedAccount {
 
   // Identities wrappers
   List<String> get identitiesKeys => _identities.keys;
-  Map<String, IdentityMeta> get identitiesMetadata =>
-      _identities.metadata.map((key, e) => MapEntry(key, e as IdentityMeta));
+  Map<String, IdentityMeta> get identitiesMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, IdentityMeta> result = _identities.metadata.map((key, e) {
+      IdentityMeta meta = e as IdentityMeta;
+      if (!_history.value.identities.containsKey(key)) {
+        _history.value.identities[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, Identity> get identities => _identities.entries;
 
   Identity? getIdentity(String key) => _identities.getEntry(key);
@@ -768,14 +837,17 @@ class JSONLoadedAccount {
     localSettings ??= LocalSettings.fromFile(
         File(path + Platform.pathSeparator + 'local_settings.json'));
     settings ??= JsonFile(_settingsFile,
+        fromJson: AccountSettings.fromJson,
         value: AccountSettings.fromFile(_settingsFile, encrypter: encrypter)
             .value);
     history ??= JsonFile<History>(_historyFile,
+        fromJson: History.fromJson,
         value: History.fromFile(
                 File(path + Platform.pathSeparator + 'history.enc'),
                 encrypter: encrypter)
             .value);
     favorites ??= JsonFile<Favorites>(_favoritesFile,
+        fromJson: Favorites.fromJson,
         value: Favorites.fromFile(
                 File(path + Platform.pathSeparator + 'favorites.enc'),
                 encrypter: encrypter)
