@@ -21,6 +21,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
 }) {
+  history.reloadSync();
   Encrypter usernameEncrypter = getPassyEncrypter(account.username);
   String apiVersion =
       DateTime.now().toUtc().isBefore(synchronization2d0d0DeprecationDate)

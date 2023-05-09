@@ -354,6 +354,7 @@ class Synchronization {
     void Function()? onConnected,
     Map<EntryType, List<String>>? sharedEntryKeys,
   }) async {
+    await _history.reload();
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
@@ -679,6 +680,7 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) async {
+    await _history.reload();
     void _onConnected(Socket socket) {
       _isConnected = true;
       bool _serviceInfoHandled = false;
