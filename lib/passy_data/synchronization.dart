@@ -173,7 +173,7 @@ class _EntryInfo with JsonConvertable {
 
 class Synchronization {
   final LoadedAccount _loadedAccount;
-  final History _history;
+  final HistoryFile _history;
   final Favorites _favorites;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
@@ -195,7 +195,7 @@ class Synchronization {
   get entriesRemoved => _entriesRemoved;
 
   Synchronization(this._loadedAccount,
-      {required History history,
+      {required HistoryFile history,
       required Favorites favorites,
       required Encrypter encrypter,
       required RSAKeypair rsaKeypair,
@@ -244,7 +244,7 @@ class Synchronization {
                 jsonEncode(_EntryData(
                     key: key,
                     type: entryType,
-                    event: _history.getEvents(entryType)[key]!,
+                    event: _history.value.getEvents(entryType)[key]!,
                     value: _loadedAccount.getEntry(entryType)(key)?.toCSV())),
                 encrypter: _encrypter) +
             '\u0000'));
@@ -263,6 +263,7 @@ class Synchronization {
   }
 
   Future<void> _decryptEntries(List<List<int>> entries) async {
+    await _history.reload();
     for (List<int> entry in entries) {
       _EntryData _entryData;
       try {
@@ -275,7 +276,8 @@ class Synchronization {
       }
 
       try {
-        Map<String, EntryEvent> _events = _history.getEvents(_entryData.type);
+        Map<String, EntryEvent> _events =
+            _history.value.getEvents(_entryData.type);
 
         if (_entryData.event.status == EntryStatus.removed) {
           if (_events.containsKey(_entryData.key)) {
@@ -446,7 +448,7 @@ class Synchronization {
                   EntryType.identity,
                 ]) {
                   Map<String, EntryEvent> _localEvents =
-                      _history.getEvents(entryType);
+                      _history.value.getEvents(entryType);
                   Map<String, EntryEvent> _shortLocalEvents =
                       _info.history.getEvents(entryType);
                   List<String> _localRequestKeys =
@@ -537,7 +539,7 @@ class Synchronization {
 
             Future<void> _sendHistoryHash() {
               _syncLog += 'done.\nSending history hash... ';
-              Map<String, dynamic> _localHistory = _history.toJson();
+              Map<String, dynamic> _localHistory = _history.value.toJson();
               socket.add(utf8.encode(
                   getPassyHash(jsonEncode(_localHistory)).toString() +
                       '\u0000'));
@@ -763,7 +765,7 @@ class Synchronization {
 
       void _handleHistoryHash(List<int> data) {
         _syncLog += 'done.\nDecoding history hash... ';
-        String _historyJson = jsonEncode(_history.toJson());
+        String _historyJson = jsonEncode(_history.value.toJson());
         bool _same = true;
         try {
           _same = getPassyHash(_historyJson) == Digest(data);
@@ -934,7 +936,7 @@ class Synchronization {
                 await util.processTypedExchangeEntries(
                   entries: sharedEntries,
                   account: _loadedAccount,
-                  history: _history,
+                  history: _history.value,
                   onSetEntry: () => _entriesAdded++,
                   onRemoveEntry: () => _entriesAdded++,
                 );
@@ -994,7 +996,7 @@ class Synchronization {
             _handleApiException('Received malformed favorites hashes', e);
             return;
           }
-          Map<String, dynamic> historyJson = _history.toJson();
+          Map<String, dynamic> historyJson = _history.value.toJson();
           _syncLog += 'done.\nComparing history hashes... ';
           if (remoteHistoryHash !=
               getPassyHash(jsonEncode(historyJson)).toString()) {
@@ -1039,7 +1041,7 @@ class Synchronization {
             }
             Map<EntryType, Map<String, EntryEvent>> localHistoryEntries = {};
             for (EntryType type in entryTypes) {
-              localHistoryEntries[type] = _history.getEvents(type);
+              localHistoryEntries[type] = _history.value.getEvents(type);
             }
             _syncLog += 'done.\nComparing history entries... ';
             util.EntriesToSynchronize entriesToSynchronize;
@@ -1061,7 +1063,7 @@ class Synchronization {
                   'entries': entriesToSynchronize.entriesToSend
                       .map((entryType, entryKeys) {
                     Map<String, EntryEvent> historyEntries =
-                        _history.getEvents(entryType);
+                        _history.value.getEvents(entryType);
                     PassyEntry? Function(String) getEntry =
                         _loadedAccount.getEntry(entryType);
                     return MapEntry(
@@ -1108,10 +1110,11 @@ class Synchronization {
               }
               _syncLog += 'done.\nProcessing entries... ';
               try {
+                await _history.reload();
                 await util.processTypedExchangeEntries(
                   entries: entries,
                   account: _loadedAccount,
-                  history: _history,
+                  history: _history.value,
                   onRemoveEntry: () => _entriesRemoved++,
                   onSetEntry: () => _entriesAdded++,
                 );

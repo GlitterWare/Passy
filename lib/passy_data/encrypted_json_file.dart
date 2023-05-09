@@ -8,7 +8,7 @@ import 'json_convertable.dart';
 import 'saveable_file_base.dart';
 
 class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
-  final T value;
+  T value;
   final File _file;
   Encrypter _encrypter;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
@@ -39,6 +39,11 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     _file.saveSync();
     return _file;
   }
+
+  Future<void> reload() async => value =
+      jsonDecode(decrypt(await _file.readAsString(), encrypter: _encrypter));
+  void reloadSync() => value =
+      jsonDecode(decrypt(_file.readAsStringSync(), encrypter: _encrypter));
 
   @override
   Future<void> save() =>

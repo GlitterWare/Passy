@@ -238,7 +238,7 @@ class PassyData {
       _account.renewHistory();
       _account.clearRemovedFavorites();
       _account.renewFavorites();
-      _account.saveSync();
+      await _account.save();
       _username = _account.username;
     }
     // Able to load the account, safe to replace
@@ -350,7 +350,7 @@ class PassyData {
       await _tempAccountDir.delete(recursive: true);
       await _tempAccountDir.create();
       _account.bioAuthEnabled = false;
-      _account.saveSync();
+      await _account.save();
       _username = _account.username;
     }
     // Able to load the account, safe to replace

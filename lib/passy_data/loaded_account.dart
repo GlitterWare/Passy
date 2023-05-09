@@ -171,7 +171,7 @@ class LoadedAccount {
     if (rsaKeypair == null) return null;
     return Synchronization(
       this,
-      history: _history.value,
+      history: _history,
       favorites: _favorites.value,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
@@ -285,6 +285,8 @@ class LoadedAccount {
   // History wrappers
   void clearRemovedHistory() => _history.value.clearRemoved();
   void renewHistory() => _history.value.renew();
+  Future<void> reloadHistory() => _history.reload();
+  void reloadHistorySync() => _history.reloadSync();
   Future<void> saveHistory() => _history.save();
   void saveHistorySync() => _history.saveSync();
   Digest get historyHash => getPassyHash(jsonEncode(_history.value.toJson()));
@@ -478,6 +480,7 @@ class LoadedAccount {
   Password? getPassword(String key) => _passwords.getEntry(key);
 
   Future<void> setPassword(Password password) async {
+    await _history.reload();
     _history.value.passwords[password.key] = EntryEvent(password.key,
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     Future<void> _saveFuture =
@@ -487,6 +490,7 @@ class LoadedAccount {
   }
 
   Future<void> removePassword(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.passwords[key];
     if (_event == null) return;
     _event
@@ -507,6 +511,7 @@ class LoadedAccount {
   Note? getNote(String key) => _notes.getEntry(key);
 
   Future<void> setNote(Note note) async {
+    await _history.reload();
     _history.value.notes[note.key] = EntryEvent(
       note.key,
       status: EntryStatus.alive,
@@ -518,6 +523,7 @@ class LoadedAccount {
   }
 
   Future<void> removeNote(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.notes[key];
     if (_event == null) return;
     _event
@@ -539,6 +545,7 @@ class LoadedAccount {
   PaymentCard? getPaymentCard(String key) => _paymentCards.getEntry(key);
 
   Future<void> setPaymentCard(PaymentCard paymentCard) async {
+    await _history.reload();
     _history.value.paymentCards[paymentCard.key] = EntryEvent(
       paymentCard.key,
       status: EntryStatus.alive,
@@ -551,6 +558,7 @@ class LoadedAccount {
   }
 
   Future<void> removePaymentCard(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.paymentCards[key];
     if (_event == null) return;
     _event
@@ -571,6 +579,7 @@ class LoadedAccount {
   IDCard? getIDCard(String key) => _idCards.getEntry(key);
 
   Future<void> setIDCard(IDCard idCard) async {
+    await _history.reload();
     _history.value.idCards[idCard.key] = EntryEvent(
       idCard.key,
       status: EntryStatus.alive,
@@ -581,6 +590,7 @@ class LoadedAccount {
   }
 
   Future<void> removeIDCard(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.idCards[key];
     if (_event == null) return;
     _event
@@ -601,6 +611,7 @@ class LoadedAccount {
   Identity? getIdentity(String key) => _identities.getEntry(key);
 
   Future<void> setIdentity(Identity identity) async {
+    await _history.reload();
     _history.value.identities[identity.key] = EntryEvent(
       identity.key,
       status: EntryStatus.alive,
@@ -613,6 +624,7 @@ class LoadedAccount {
   }
 
   Future<void> removeIdentity(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.identities[key];
     if (_event == null) return;
     _event
