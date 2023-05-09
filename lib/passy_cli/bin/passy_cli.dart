@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
@@ -160,7 +161,7 @@ StreamSubscription<List<int>> startInteractive() {
     if (command.isNotEmpty) {
       if (_isBusy) return;
       _isBusy = true;
-      await executeCommand(command, id: commandEncoded);
+      await executeCommand(command, id: sha512.convert(event).toString());
       _isBusy = false;
     }
     if (_isInteractive) log('[passy]\$ ');
