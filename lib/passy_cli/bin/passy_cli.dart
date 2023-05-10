@@ -164,7 +164,7 @@ StreamSubscription<List<int>> startInteractive() {
     if (command.isNotEmpty) {
       if (_isBusy) return;
       _isBusy = true;
-      await executeCommand(command, id: sha512.convert(event).toString());
+      await executeCommand(command, id: getPassyHash(commandEncoded));
       _isBusy = false;
     }
     if (_isInteractive) log('[passy]\$ ');
