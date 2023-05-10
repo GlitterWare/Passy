@@ -84,17 +84,19 @@ void nativeMessagingLog(dynamic id, String msg) {
   for (int i = 0; i != msgSplit.length; i++) {
     String msgPart = msgSplit[i];
     msgPart = jsonEncode({
-      'id': id,
-      'part': i + 1,
-      'partsTotal': msgSplit.length,
+      'id': id.toString(),
+      'part': (i + 1).toString(),
+      'partsTotal': msgSplit.length.toString(),
       'data': msgPart,
     });
-    int bytesLength = utf8.encode(msgPart).length;
-    stdout.writeCharCode((bytesLength >> 0) & 0xFF);
-    stdout.writeCharCode((bytesLength >> 8) & 0xFF);
-    stdout.writeCharCode((bytesLength >> 16) & 0xFF);
-    stdout.writeCharCode((bytesLength >> 24) & 0xFF);
-    stdout.write(msgPart);
+    List<int> bytes = utf8.encode(msgPart);
+    stdout.add([
+      (bytes.length >> 0) & 0xFF,
+      (bytes.length >> 8) & 0xFF,
+      (bytes.length >> 16) & 0xFF,
+      (bytes.length >> 24) & 0xFF,
+      ...bytes
+    ]);
   }
 }
 
@@ -156,6 +158,7 @@ StreamSubscription<List<int>> startInteractive() {
     if (_isNativeMessaging) {
       if (commandEncoded.length < 5) return;
       commandEncoded = commandEncoded.substring(4);
+      commandEncoded = jsonDecode(commandEncoded)['command'];
     }
     List<String> command = parseCommand(commandEncoded.replaceFirst('\n', ''));
     if (command.isNotEmpty) {
