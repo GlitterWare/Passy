@@ -36,6 +36,8 @@ Commands:
     accounts login <username> <password>
         - Save account encrypter for the current interactive session.
           Returns `true` if the password is correct, `false` otherwise.
+    accounts is_logged_in <username>
+        - Check if account encrypter is loaded for the specified username
     accounts logout <username>
         - Forget account encrypter.
     accounts logout_all
@@ -232,8 +234,17 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           if (match) _encrypters[accountName] = getPassyEncrypter(password);
           log(match.toString(), id: id);
           return;
+        case 'is_logged_in':
+          if (command.length == 2) break;
+          String accountName = command[2];
+          if (_encrypters.containsKey(accountName)) {
+            log('true', id: id);
+          } else {
+            log('false', id: id);
+          }
+          return;
         case 'logout':
-          if (command.length < 3) break;
+          if (command.length == 2) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
           log('true', id: id);
