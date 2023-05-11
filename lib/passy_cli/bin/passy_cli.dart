@@ -406,7 +406,9 @@ Type `exit` to quit.
 ''');
   _isInteractive = true;
   ProcessSignal.sigint.watch().listen((event) => onInterrupt());
-  ProcessSignal.sigterm.watch().listen((event) => onInterrupt());
+  if (!Platform.isWindows) {
+    ProcessSignal.sigterm.watch().listen((event) => onInterrupt());
+  }
   load().then((value) {
     return startInteractive();
   });
