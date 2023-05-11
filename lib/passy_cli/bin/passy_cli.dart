@@ -38,6 +38,8 @@ Commands:
           Returns `true` if the password is correct, `false` otherwise.
     accounts logout <username>
         - Forget account encrypter.
+    accounts logout_all
+        - Unload all account encrypters.
 
   Passwords
     passwords list <username>
@@ -234,6 +236,11 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           if (command.length < 3) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
+          log('true');
+          return;
+        case 'logout_all':
+          _encrypters.clear();
+          log('true');
           return;
       }
       break;
