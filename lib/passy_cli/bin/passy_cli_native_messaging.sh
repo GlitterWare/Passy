@@ -1,1 +1,1 @@
-./passy_cli native_messaging start
+until ./passy_cli native_messaging start < "/dev/stdin"; do sleep 0.001; done
