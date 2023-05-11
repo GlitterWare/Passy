@@ -236,11 +236,11 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           if (command.length < 3) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
-          log('true');
+          log('true', id: id);
           return;
         case 'logout_all':
           _encrypters.clear();
-          log('true');
+          log('true', id: id);
           return;
       }
       break;
