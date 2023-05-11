@@ -175,7 +175,8 @@ StreamSubscription<List<int>> startInteractive() {
       commandEncoded = commandEncoded.substring(4);
       commandEncoded = jsonDecode(commandEncoded)['command'];
     }
-    List<String> command = parseCommand(commandEncoded.replaceFirst('\n', ''));
+    commandEncoded = commandEncoded.replaceAll('\n', '').replaceAll('\r', '');
+    List<String> command = parseCommand(commandEncoded);
     if (command.isNotEmpty) {
       if (_isBusy) return;
       _isBusy = true;
