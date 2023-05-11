@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
@@ -59,6 +60,7 @@ const String passyShellVersion = '1.0.0';
 // + minus the extra messaging space
 const int maxNativeMessageLength = 120000;
 
+bool _isBigEndian = Endian.host == Endian.big;
 bool _isBusy = false;
 bool _isInteractive = false;
 bool _isNativeMessaging = false;
@@ -90,12 +92,22 @@ void nativeMessagingLog(dynamic id, String msg) {
       'data': msgPart,
     });
     List<int> bytes = utf8.encode(msgPart);
+    List<int> nativeLength = _isBigEndian
+        ? [
+            (bytes.length >> 24) & 0xFF,
+            (bytes.length >> 16) & 0xFF,
+            (bytes.length >> 8) & 0xFF,
+            (bytes.length >> 0) & 0xFF,
+          ]
+        : [
+            (bytes.length >> 0) & 0xFF,
+            (bytes.length >> 8) & 0xFF,
+            (bytes.length >> 16) & 0xFF,
+            (bytes.length >> 24) & 0xFF,
+          ];
     stdout.add([
-      (bytes.length >> 0) & 0xFF,
-      (bytes.length >> 8) & 0xFF,
-      (bytes.length >> 16) & 0xFF,
-      (bytes.length >> 24) & 0xFF,
-      ...bytes
+      ...nativeLength,
+      ...bytes,
     ]);
   }
 }
