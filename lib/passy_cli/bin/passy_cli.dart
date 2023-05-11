@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
