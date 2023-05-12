@@ -200,6 +200,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
       if (command.length == 1) break;
       switch (command[1]) {
         case 'list':
+          refreshAccounts();
           log(
               _accounts.values
                   .map<String>(
@@ -208,6 +209,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               id: id);
           return;
         case 'verify':
+          refreshAccounts();
           if (command.length < 4) break;
           String accountName = command[2];
           AccountCredentials? _credentials = _accounts[accountName]?.value;
@@ -221,6 +223,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           log(match.toString(), id: id);
           return;
         case 'login':
+          refreshAccounts();
           if (command.length < 4) break;
           String accountName = command[2];
           AccountCredentials? _credentials = _accounts[accountName]?.value;
