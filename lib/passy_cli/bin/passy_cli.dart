@@ -60,7 +60,10 @@ Commands:
           Returns `null` if no value is found.
     entries set <username> <entry type> <csv>
         - Set a new value for password.
+          Creates a new password if none exists under the provided key.
           Returns `true` on success.
+    entries remove <username> <entry type> <entry key>
+        - Remove entry under the specified key.
 
   Development
     native_messaging start
@@ -363,13 +366,13 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:entries:get:No account credentials provided, please use `accounts login` first.',
+            log('passy:entries:set:No account credentials provided, please use `accounts login` first.',
                 id: id);
             return;
           }
           EntryType? entryType = entryTypeFromName(command[3]);
           if (entryType == null) {
-            log('passy:entries:list:Unknown entry type provided: ${command[3]}.',
+            log('passy:entries:set:Unknown entry type provided: ${command[3]}.',
                 id: id);
             return;
           }
@@ -413,6 +416,61 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           } catch (e, s) {
             log('passy:entries:set:Failed to save history:\n$e\n$s', id: id);
             return;
+          }
+          log(true, id: id);
+          return;
+        case 'remove':
+          if (command.length < 5) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:entries:remove:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:entries:remove:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          String entryKey = command[4];
+          PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  entryTypeToFilename(entryType)),
+              type: entryType,
+              encrypter: encrypter);
+          try {
+            await entriesFile.setEntry(entryKey, entry: null);
+          } catch (e, s) {
+            log('passy:entries:remove:Failed to remove entry:\n$e\n$s', id: id);
+            return;
+          }
+          HistoryFile historyFile = History.fromFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  'history.enc'),
+              encrypter: encrypter);
+          Map<String, EntryEvent> historyEntries =
+              historyFile.value.getEvents(entryType);
+          if (historyEntries.containsKey(entryKey)) {
+            historyEntries[entryKey] = EntryEvent(
+              entryKey,
+              status: EntryStatus.alive,
+              lastModified: DateTime.now().toUtc(),
+            );
+            try {
+              await historyFile.save();
+            } catch (e, s) {
+              log('passy:entries:remove:Failed to save history:\n$e\n$s',
+                  id: id);
+              return;
+            }
           }
           log(true, id: id);
           return;
