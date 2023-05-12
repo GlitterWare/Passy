@@ -461,7 +461,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           if (historyEntries.containsKey(entryKey)) {
             historyEntries[entryKey] = EntryEvent(
               entryKey,
-              status: EntryStatus.alive,
+              status: EntryStatus.removed,
               lastModified: DateTime.now().toUtc(),
             );
             try {
