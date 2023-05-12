@@ -9,8 +9,15 @@ import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/history.dart';
+import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
+import 'package:passy/passy_data/passy_entry.dart';
+import 'package:passy/passy_data/payment_card.dart';
 
 const String helpMsg = '''
 
@@ -42,13 +49,16 @@ Commands:
     accounts logout_all
         - Unload all account encrypters.
 
-  Passwords
-    passwords list <username>
-        - List all password metadata.
-    passwords get <username> <key>
-        - Get a decrypted CSV string for the password under the specified key.
+  Entries
+    For all commands in this section, <entry type> argument is one of the following:
+    password, paymentCard, note, idCard, identity.
+
+    entries list <username> <entry type>
+        - List all entry metadata.
+    entries get <username> <entry type> <key>
+        - Get a decrypted CSV string for the entry under the specified key.
           Returns `null` if no value is found.
-    passwords set <username> <csv>
+    entries set <username> <entry type> <csv>
         - Set a new value for password.
           Returns `true` on success.
 
@@ -187,6 +197,38 @@ StreamSubscription<List<int>> startInteractive() {
   });
 }
 
+PassyEntriesEncryptedCSVFile getEntriesFile(File file,
+    {required EntryType type, required Encrypter encrypter}) {
+  switch (type) {
+    case EntryType.password:
+      return PasswordsFile.fromFile(
+        file,
+        encrypter: encrypter,
+      );
+
+    case EntryType.paymentCard:
+      return PaymentCardsFile.fromFile(
+        file,
+        encrypter: encrypter,
+      );
+    case EntryType.note:
+      return NotesFile.fromFile(
+        file,
+        encrypter: encrypter,
+      );
+    case EntryType.idCard:
+      return IDCardsFile.fromFile(
+        file,
+        encrypter: encrypter,
+      );
+    case EntryType.identity:
+      return IdentitiesFile.fromFile(
+        file,
+        encrypter: encrypter,
+      );
+  }
+}
+
 Future<void> executeCommand(List<String> command, {dynamic id}) async {
   switch (command[0]) {
     case 'help':
@@ -258,83 +300,100 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           return;
       }
       break;
-    case 'passwords':
+    case 'entries':
       if (command.length == 1) break;
       switch (command[1]) {
         case 'list':
-          if (command.length < 3) break;
+          if (command.length < 4) break;
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:passwords:list:No account credentials provided, please use `accounts login` first.',
+            log('passy:entries:list:No account credentials provided, please use `accounts login` first.',
                 id: id);
             return;
           }
-          PasswordsFile passwords = PasswordsFile.fromFile(
-            File(_accountsPath +
-                Platform.pathSeparator +
-                accountName +
-                Platform.pathSeparator +
-                'passwords.enc'),
-            encrypter: encrypter,
-          );
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:entries:list:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  entryTypeToFilename(entryType)),
+              type: entryType,
+              encrypter: encrypter);
           log(
-              passwords.metadata.values
+              entriesFile.metadata.values
                   .map<String>((e) => jsonEncode(e.toJson()))
                   .join('\n'),
               id: id);
           return;
         case 'get':
-          if (command.length < 4) break;
+          if (command.length < 5) break;
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.',
+            log('passy:entries:get:No account credentials provided, please use `accounts login` first.',
                 id: id);
             return;
           }
-          String entryKey = command[3];
-          PasswordsFile passwords = PasswordsFile.fromFile(
-            File(_accountsPath +
-                Platform.pathSeparator +
-                accountName +
-                Platform.pathSeparator +
-                'passwords.enc'),
-            encrypter: encrypter,
-          );
-          log(passwords.getEntryString(entryKey), id: id);
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:entries:list:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          String entryKey = command[4];
+          PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  entryTypeToFilename(entryType)),
+              type: entryType,
+              encrypter: encrypter);
+          log(entriesFile.getEntryString(entryKey), id: id);
           return;
         case 'set':
-          if (command.length < 4) break;
+          if (command.length < 5) break;
           String accountName = command[2];
           Encrypter? encrypter = _encrypters[accountName];
           if (encrypter == null) {
-            log('passy:passwords:get:No account credentials provided, please use `accounts login` first.',
+            log('passy:entries:get:No account credentials provided, please use `accounts login` first.',
                 id: id);
             return;
           }
-          String csvEntry = command[3];
-          Password password;
-          try {
-            password = Password.fromCSV(csvDecode(csvEntry, recursive: true));
-          } catch (e, s) {
-            log('passy:passwords:set:Failed to decode password:\n$e\n$s',
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:entries:list:Unknown entry type provided: ${command[3]}.',
                 id: id);
             return;
           }
-          PasswordsFile passwordsFile = PasswordsFile.fromFile(
-            File(_accountsPath +
-                Platform.pathSeparator +
-                accountName +
-                Platform.pathSeparator +
-                'passwords.enc'),
-            encrypter: encrypter,
-          );
+          String csvEntry = command[4];
+          PassyEntry entry;
           try {
-            await passwordsFile.setEntry(password.key, entry: password);
+            entry = PassyEntry.fromCSV(entryType)(
+                csvDecode(csvEntry, recursive: true));
           } catch (e, s) {
-            log('passy:passwords:set:Failed to set password entry:\n$e\n$s',
-                id: id);
+            log('passy:entries:set:Failed to decode entry:\n$e\n$s', id: id);
+            return;
+          }
+          PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  entryTypeToFilename(entryType)),
+              type: entryType,
+              encrypter: encrypter);
+          try {
+            await entriesFile.setEntry(entry.key, entry: entry);
+          } catch (e, s) {
+            log('passy:entries:set:Failed to set entry:\n$e\n$s', id: id);
             return;
           }
           HistoryFile historyFile = History.fromFile(
@@ -344,15 +403,15 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   Platform.pathSeparator +
                   'history.enc'),
               encrypter: encrypter);
-          historyFile.value.passwords[password.key] = EntryEvent(
-            password.key,
+          historyFile.value.getEvents(entryType)[entry.key] = EntryEvent(
+            entry.key,
             status: EntryStatus.alive,
             lastModified: DateTime.now().toUtc(),
           );
           try {
             await historyFile.save();
           } catch (e, s) {
-            log('passy:passwords:set:Failed to save history:\n$e\n$s', id: id);
+            log('passy:entries:set:Failed to save history:\n$e\n$s', id: id);
             return;
           }
           log(true, id: id);
