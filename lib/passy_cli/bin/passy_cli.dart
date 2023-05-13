@@ -199,17 +199,26 @@ StreamSubscription<List<int>> startInteractive() {
   return stdin.listen((List<int> event) async {
     _shouldMoveLine = false;
     String commandEncoded = utf8.decode(event);
+    List<String> command;
     if (_isNativeMessaging) {
       if (commandEncoded.length < 5) return;
       commandEncoded = commandEncoded.substring(4);
-      commandEncoded = jsonDecode(commandEncoded)['command'];
+      dynamic commandJson;
+      try {
+        commandJson = jsonDecode(commandEncoded)['command'];
+      } catch (_) {}
+      if (commandJson is! List<dynamic>) return;
+      command = commandJson.map((e) => e.toString()).toList();
+    } else {
+      commandEncoded = commandEncoded.replaceAll('\n', '').replaceAll('\r', '');
+      command = parseCommand(commandEncoded);
     }
-    commandEncoded = commandEncoded.replaceAll('\n', '').replaceAll('\r', '');
-    List<String> command = parseCommand(commandEncoded);
     if (command.isNotEmpty) {
       if (_isBusy) return;
       _isBusy = true;
-      await executeCommand(command, id: getPassyHash(commandEncoded));
+      try {
+        await executeCommand(command, id: getPassyHash(jsonEncode(command)));
+      } catch (_) {}
       _isBusy = false;
     }
     if (_isInteractive) log('[passy]\$ ');
