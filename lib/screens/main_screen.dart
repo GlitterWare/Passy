@@ -437,11 +437,16 @@ class _MainScreen extends State<MainScreen>
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
         center: Text(localizations.favorites),
-        onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
-            arguments: SearchScreenArgs(
-              title: localizations.favorites,
-              builder: _favoritesSearchBuilder,
-            )),
+        onPressed: () async {
+          await _account.reloadFavorites();
+          if (mounted) {
+            Navigator.pushNamed(context, SearchScreen.routeName,
+                arguments: SearchScreenArgs(
+                  title: localizations.favorites,
+                  builder: _favoritesSearchBuilder,
+                ));
+          }
+        },
       )),
       PassyPadding(ThreeWidgetButton(
         left: const Padding(
