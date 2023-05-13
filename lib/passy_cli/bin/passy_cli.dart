@@ -72,6 +72,9 @@ Commands:
 
     favorites list <username> <entry type>
         - List all favorites of entry type.
+    favorites toggle <username> <entry type> <entry key> <toggle>
+        - Toggle a favorite.
+          The allowed value for toggle is `true` or `false`.
 
   Development
     native_messaging start
@@ -520,6 +523,49 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             result.add(jsonEncode(value));
           }
           log(result.join('\n'));
+          return;
+        case 'toggle':
+          if (command.length < 6) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:favorites:toggle:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:favorites:toggle:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          String entryKey = command[4];
+          bool? toggle = boolFromString(command[5]);
+          if (toggle == null) {
+            log('passy:favorites:toggle:Invalid toggle value provided: expected `true` or `false`, received ${command[4]}.',
+                id: id);
+            return;
+          }
+          FavoritesFile favoritesFile = Favorites.fromFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  'favorites.enc'),
+              encrypter: encrypter);
+          favoritesFile.value.getEvents(entryType)[entryKey] = EntryEvent(
+            entryKey,
+            status: toggle ? EntryStatus.alive : EntryStatus.removed,
+            lastModified: DateTime.now().toUtc(),
+          );
+          try {
+            await favoritesFile.save();
+          } catch (e, s) {
+            log('passy:favorites:toggle:Failed to save favorites:\n$e\n$s',
+                id: id);
+            return;
+          }
+          log(true, id: id);
           return;
       }
       break;
