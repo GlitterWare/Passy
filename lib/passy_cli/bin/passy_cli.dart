@@ -602,7 +602,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             String copyPath = copyDir.path +
                 Platform.pathSeparator +
                 'passy_cli_' +
-                DateTime.now().toIso8601String();
+                DateTime.now().toIso8601String().replaceAll(':', ';');
             if (Platform.isWindows) copyPath += '.exe';
             copy = await File(Platform.resolvedExecutable).copy(copyPath);
           } catch (e, s) {

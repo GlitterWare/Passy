@@ -1,4 +1,6 @@
 @echo off
+SET "PASSY_PATH=%~dp0passy_cli.exe"
 :Start
-%~dp0passy_cli.exe native_messaging start
+FOR /F "tokens=* USEBACKQ" %%F IN (`%%PASSY_PATH%% install temp`) DO (SET PASSY_TEMP_PATH=%%F)
+call "%%PASSY_TEMP_PATH%%" native_messaging start
 GOTO:Start
