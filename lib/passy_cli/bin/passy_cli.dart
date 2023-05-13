@@ -10,6 +10,7 @@ import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
+import 'package:passy/passy_data/favorites.dart';
 import 'package:passy/passy_data/history.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -64,6 +65,13 @@ Commands:
           Returns `true` on success.
     entries remove <username> <entry type> <entry key>
         - Remove entry under the specified key.
+
+  Favorites
+    For all commands in this section, <entry type> argument is one of the following:
+    password, paymentCard, note, idCard, identity.
+
+    favorites list <username> <entry type>
+        - List all favorites of entry type.
 
   Development
     native_messaging start
@@ -473,6 +481,45 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             }
           }
           log(true, id: id);
+          return;
+      }
+      break;
+    case 'favorites':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'list':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:favorites:list:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:favorites:list:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          FavoritesFile favoritesFile = Favorites.fromFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  'favorites.enc'),
+              encrypter: encrypter);
+          List<String> result = [];
+          dynamic entries =
+              favoritesFile.value.toJson()[entryTypeToNamePlural(entryType)];
+          if (entries is! Map<String, dynamic>) {
+            log('');
+            return;
+          }
+          for (dynamic value in entries.values) {
+            result.add(jsonEncode(value));
+          }
+          log(result.join('\n'));
           return;
       }
       break;
