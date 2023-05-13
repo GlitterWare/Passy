@@ -172,7 +172,7 @@ class LoadedAccount {
     return Synchronization(
       this,
       history: _history,
-      favorites: _favorites.value,
+      favorites: _favorites,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
       onComplete: onComplete,
@@ -294,6 +294,8 @@ class LoadedAccount {
   // Favorites wrappers
   void clearRemovedFavorites() => _favorites.value.clearRemoved();
   void renewFavorites() => _favorites.value.renew();
+  Future<void> reloadFavorites() => _favorites.reload();
+  void reloadFavoritesSync() => _favorites.reloadSync();
   Future<void> saveFavorites() => _favorites.save();
   void saveFavoritesSync() => _favorites.saveSync();
   int get favoritesLength => _favorites.value.length;
@@ -327,6 +329,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoritePassword(String key) async {
+    await _favorites.reload();
     if (getPassword(key) == null) return;
     _favorites.value.passwords[key] = EntryEvent(
       key,
@@ -337,6 +340,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoritePassword(String key) async {
+    await _favorites.reload();
     EntryEvent? _password = _favorites.value.passwords[key];
     if (_password == null) return;
     if (_password.status == EntryStatus.removed) return;
@@ -346,6 +350,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoritePaymentCard(String key) async {
+    await _favorites.reload();
     if (getPaymentCard(key) == null) return;
     _favorites.value.paymentCards[key] = EntryEvent(
       key,
@@ -356,6 +361,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoritePaymentCard(String key) async {
+    await _favorites.reload();
     EntryEvent? _paymentCard = _favorites.value.paymentCards[key];
     if (_paymentCard == null) return;
     if (_paymentCard.status == EntryStatus.removed) return;
@@ -365,6 +371,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoriteNote(String key) async {
+    await _favorites.reload();
     if (getNote(key) == null) return;
     _favorites.value.notes[key] = EntryEvent(
       key,
@@ -375,6 +382,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteNote(String key) async {
+    await _favorites.reload();
     EntryEvent? _note = _favorites.value.notes[key];
     if (_note == null) return;
     if (_note.status == EntryStatus.removed) return;
@@ -384,6 +392,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoriteIDCard(String key) async {
+    await _favorites.reload();
     if (getIDCard(key) == null) return;
     _favorites.value.idCards[key] = EntryEvent(
       key,
@@ -394,6 +403,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteIDCard(String key) async {
+    await _favorites.reload();
     EntryEvent? _idCard = _favorites.value.idCards[key];
     if (_idCard == null) return;
     if (_idCard.status == EntryStatus.removed) return;
@@ -403,6 +413,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoriteIdentity(String key) async {
+    await _favorites.reload();
     if (getIdentity(key) == null) return;
     _favorites.value.identities[key] = EntryEvent(
       key,
@@ -413,6 +424,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteIdentity(String key) async {
+    await _favorites.reload();
     EntryEvent? _identity = _favorites.value.identities[key];
     if (_identity == null) return;
     if (_identity.status == EntryStatus.removed) return;
@@ -451,9 +463,10 @@ class LoadedAccount {
     }
   }
 
-  void removeDeletedFavorites() {
-    // TODO: optimize IO
+  void removeDeletedFavorites() async {
+    // TODO: optimize IO + await on each statement
     // multiple entries should be requested via one get command per entry type
+    await _favorites.reload();
     _favorites.value.passwords.forEach((key, value) {
       if (getPassword(key) == null) removeFavoritePassword(key);
     });

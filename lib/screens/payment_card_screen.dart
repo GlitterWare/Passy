@@ -78,6 +78,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
   Widget build(BuildContext context) {
     final PaymentCard _paymentCard =
         ModalRoute.of(context)!.settings.arguments as PaymentCard;
+    _account.reloadFavoritesSync();
     isFavorite = _account.favoritePaymentCards[_paymentCard.key]?.status ==
         EntryStatus.alive;
 

@@ -16,7 +16,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required LoadedAccount account,
   required Encrypter encrypter,
   required HistoryFile history,
-  required Favorites favorites,
+  required FavoritesFile favorites,
   Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
@@ -161,9 +161,12 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
-            await history.reload();
+            await Future.wait([
+              history.reload(),
+              favorites.reload(),
+            ]);
             Map<String, dynamic> historyJson = history.value.toJson();
-            Map<String, dynamic> favoritesJson = favorites.toJson();
+            Map<String, dynamic> favoritesJson = favorites.value.toJson();
             String historyHash =
                 getPassyHash(jsonEncode(historyJson)).toString();
             String favoritesHash =
@@ -256,11 +259,12 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           case 'getFavoritesEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
+            await favorites.reload();
             List<EntryType> entryTypes;
             entryTypes = util.getEntryTypes(check['entryTypes']);
             Map<String, dynamic> result = {};
             for (EntryType type in entryTypes) {
-              result[type.name] = favorites
+              result[type.name] = favorites.value
                   .getEvents(type)
                   .values
                   .map<Map<String, dynamic>>((value) => value.toJson())
@@ -272,6 +276,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           case 'setFavoritesEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
+            await favorites.reload();
             Map<EntryType, Map<String, EntryEvent>> favoritesEntries =
                 util.getTypedEntryEvents(check['favoritesEntries']);
             for (MapEntry<EntryType,
@@ -282,7 +287,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
                   favoritesEntries[entryType];
               if (typeFavoritesEntries == null) continue;
               Map<String, EntryEvent> localFavoritesEntries =
-                  favorites.getEvents(entryType);
+                  favorites.value.getEvents(entryType);
               for (EntryEvent entryEvent
                   in favoritesEntriesEntry.value.values) {
                 localFavoritesEntries[entryEvent.key] = entryEvent;

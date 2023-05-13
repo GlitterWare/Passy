@@ -174,7 +174,7 @@ class _EntryInfo with JsonConvertable {
 class Synchronization {
   final LoadedAccount _loadedAccount;
   final HistoryFile _history;
-  final Favorites _favorites;
+  final FavoritesFile _favorites;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
       SynchronizationResults();
@@ -196,7 +196,7 @@ class Synchronization {
 
   Synchronization(this._loadedAccount,
       {required HistoryFile history,
-      required Favorites favorites,
+      required FavoritesFile favorites,
       required Encrypter encrypter,
       required RSAKeypair rsaKeypair,
       void Function(SynchronizationResults)? onComplete,
@@ -1126,7 +1126,8 @@ class Synchronization {
               }
             }
           }
-          Map<String, dynamic> favoritesJson = _favorites.toJson();
+          await _favorites.reload();
+          Map<String, dynamic> favoritesJson = _favorites.value.toJson();
           _syncLog += 'done.\nComparing favorites hashes... ';
           if (remoteFavoritesHash !=
               getPassyHash(jsonEncode(favoritesJson)).toString()) {
@@ -1172,8 +1173,9 @@ class Synchronization {
               return;
             }
             Map<EntryType, Map<String, EntryEvent>> localFavoritesEntries = {};
+            await _favorites.reload();
             for (EntryType type in entryTypes) {
-              localFavoritesEntries[type] = _favorites.getEvents(type);
+              localFavoritesEntries[type] = _favorites.value.getEvents(type);
             }
             _syncLog += 'done.\nComparing favorites entries... ';
             util.EntriesToSynchronize entriesToSynchronize;
@@ -1195,7 +1197,7 @@ class Synchronization {
                   'favoritesEntries': entriesToSynchronize.entriesToSend
                       .map<String, dynamic>((entryType, keyList) {
                     Map<String, EntryEvent> localFavorites =
-                        _favorites.getEvents(entryType);
+                        _favorites.value.getEvents(entryType);
                     List<dynamic> val = [];
                     for (String key in keyList) {
                       EntryEvent? entryEvent = localFavorites[key];
@@ -1216,6 +1218,7 @@ class Synchronization {
               }
             }
             if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
+              await _favorites.reload();
               _syncLog += 'done.\nSaving favorites entries... ';
               for (MapEntry<EntryType, List<String>> entriesToRetrieveEntry
                   in entriesToSynchronize.entriesToRetrieve.entries) {
@@ -1224,7 +1227,7 @@ class Synchronization {
                     favoritesEntries[entryType];
                 if (typeFavoritesEntries == null) continue;
                 Map<String, EntryEvent> localFavoritesEntries =
-                    _favorites.getEvents(entryType);
+                    _favorites.value.getEvents(entryType);
                 for (String entryKey in entriesToRetrieveEntry.value) {
                   EntryEvent? favoritesEntry = typeFavoritesEntries[entryKey];
                   if (favoritesEntry == null) continue;

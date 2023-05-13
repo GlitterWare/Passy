@@ -75,6 +75,7 @@ class _NoteScreen extends State<NoteScreen> {
   @override
   Widget build(BuildContext context) {
     final Note _note = ModalRoute.of(context)!.settings.arguments as Note;
+    _account.reloadFavoritesSync();
     isFavorite = _account.favoriteNotes[_note.key]?.status == EntryStatus.alive;
 
     return Scaffold(
