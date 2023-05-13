@@ -521,13 +521,13 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           dynamic entries =
               favoritesFile.value.toJson()[entryTypeToNamePlural(entryType)];
           if (entries is! Map<String, dynamic>) {
-            log('');
+            log('', id: id);
             return;
           }
           for (dynamic value in entries.values) {
             result.add(jsonEncode(value));
           }
-          log(result.join('\n'));
+          log(result.join('\n'), id: id);
           return;
         case 'toggle':
           if (command.length < 6) break;
