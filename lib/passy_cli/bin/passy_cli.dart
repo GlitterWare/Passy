@@ -76,6 +76,11 @@ Commands:
         - Toggle a favorite.
           The allowed value for toggle is `true` or `false`.
 
+  Installation
+    install temp
+        - Copy the executable to a temporary directory and assign it a random name
+          Returns the file path on success.
+
   Development
     native_messaging start
         - Start in native messaging mode.
@@ -566,6 +571,45 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             return;
           }
           log(true, id: id);
+          return;
+      }
+      break;
+    case 'install':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'temp':
+          File copy;
+          try {
+            Directory copyDir = Directory(Directory.systemTemp.path +
+                Platform.pathSeparator +
+                'passy_cli' +
+                Platform.pathSeparator +
+                'bin' +
+                Platform.pathSeparator +
+                'passy_cli');
+            if (await copyDir.exists()) {
+              List<FileSystemEntity> files = await copyDir.list().toList();
+              for (FileSystemEntity file in files) {
+                try {
+                  // Write to test if the file is locked (required on Unix systems)
+                  await File(file.path).writeAsString('');
+                  await file.delete();
+                } catch (_) {}
+              }
+            } else {
+              await copyDir.create(recursive: true);
+            }
+            String copyPath = copyDir.path +
+                Platform.pathSeparator +
+                'passy_cli_' +
+                DateTime.now().toIso8601String();
+            if (Platform.isWindows) copyPath += '.exe';
+            copy = await File(Platform.resolvedExecutable).copy(copyPath);
+          } catch (e, s) {
+            log('passy:install:temp:Failed to install executable:\n$e\n$s');
+            return;
+          }
+          log(copy.path);
           return;
       }
       break;
