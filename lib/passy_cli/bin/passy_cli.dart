@@ -198,11 +198,11 @@ Future<void> onInterrupt() async {
 StreamSubscription<List<int>> startInteractive() {
   return stdin.listen((List<int> event) async {
     _shouldMoveLine = false;
-    String commandEncoded = utf8.decode(event);
+    String commandEncoded;
     List<String> command;
     if (_isNativeMessaging) {
-      if (commandEncoded.length < 5) return;
-      commandEncoded = commandEncoded.substring(4);
+      if (event.length < 5) return;
+      commandEncoded = utf8.decode(event.sublist(4), allowMalformed: true);
       dynamic commandJson;
       try {
         commandJson = jsonDecode(commandEncoded)['command'];
@@ -210,6 +210,7 @@ StreamSubscription<List<int>> startInteractive() {
       if (commandJson is! List<dynamic>) return;
       command = commandJson.map((e) => e.toString()).toList();
     } else {
+      commandEncoded = utf8.decode(event);
       commandEncoded = commandEncoded.replaceAll('\n', '').replaceAll('\r', '');
       command = parseCommand(commandEncoded);
     }
