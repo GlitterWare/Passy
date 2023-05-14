@@ -83,7 +83,7 @@ String entryTypeToFilename(EntryType type) {
     case EntryType.note:
       return 'notes.enc';
     case EntryType.idCard:
-      return 'idCards.enc';
+      return 'id_card.enc';
     case EntryType.identity:
       return 'identities.enc';
   }
