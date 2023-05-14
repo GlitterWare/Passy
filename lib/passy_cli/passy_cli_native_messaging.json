@@ -1,0 +1,12 @@
+{
+  "name": "io.github.glitterware.passy_cli",
+  "description": "Passy CLI",
+  "path": "",
+  "type": "stdio",
+  "allowed_extensions": [
+    "glitterware.passy_browser_extension@github.io"
+  ],
+  "allowed_origins": [
+    "chrome-extension://lndgiajgfcgocmgdiamhffipffjnpigl/"
+  ]
+}
