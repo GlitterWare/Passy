@@ -104,7 +104,9 @@ class SplashScreen extends StatelessWidget {
         } else {
           await copyDir.create(recursive: true);
         }
-        String date = DateTime.now().toIso8601String().replaceAll(':', ';');
+        // Note: can't use semicolons as replacement on Windows
+        // due to native messaging limitations
+        String date = DateTime.now().toIso8601String().replaceAll(':', ',');
         Directory tempCopyDir =
             Directory(copyDir.path + Platform.pathSeparator + date);
         await tempCopyDir.create();
