@@ -193,7 +193,7 @@ class SplashScreen extends StatelessWidget {
       const nativeManifestDomain = 'io.github.glitterware.passy_cli';
       for (String nativeManifestPath in const [
         'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\',
-        'HKCU\\Software\\Microsoft\\Edge\\NativeMessagingHosts',
+        'HKCU\\Software\\Microsoft\\Edge\\NativeMessagingHosts\\',
         'HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\',
         'HKCU\\Software\\BraveSoftware\\Brave\\NativeMessagingHosts\\',
       ]) {
