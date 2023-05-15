@@ -105,8 +105,9 @@ class SplashScreen extends StatelessWidget {
           await copyDir.create(recursive: true);
         }
         // Note: can't use semicolons as replacement on Windows
-        // due to native messaging limitations
-        String date = DateTime.now().toIso8601String().replaceAll(':', ',');
+        // due to native messaging limitations.
+        // Can't use commas on Firefox or Windows Chromium
+        String date = DateTime.now().toIso8601String().replaceAll(':', 'c');
         Directory tempCopyDir =
             Directory(copyDir.path + Platform.pathSeparator + date);
         await tempCopyDir.create();
@@ -197,7 +198,7 @@ class SplashScreen extends StatelessWidget {
         'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\',
         'HKCU\\Software\\Microsoft\\Edge\\NativeMessagingHosts\\',
         'HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\',
-        'HKCU\\Software\\BraveSoftware\\Brave\\NativeMessagingHosts\\',
+        'HKCU\\Software\\BraveSoftware\\Brave-Browser\\NativeMessagingHosts\\',
       ]) {
         try {
           await Process.run('reg', [
