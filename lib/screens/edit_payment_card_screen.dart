@@ -93,8 +93,8 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             cvv: _cvv,
             exp: _exp,
           );
-          await _account.setPaymentCard(_paymentCardArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
+          await _account.setPaymentCard(_paymentCardArgs);
           Navigator.popUntil(
               context, (r) => r.settings.name == MainScreen.routeName);
           Navigator.pushNamed(context, PaymentCardsScreen.routeName);

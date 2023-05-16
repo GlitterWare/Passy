@@ -52,8 +52,8 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             title: _title,
             note: _note,
           );
-          await _account.setNote(_noteArgs);
           Navigator.pushNamed(context, SplashScreen.routeName);
+          await _account.setNote(_noteArgs);
           Navigator.popUntil(
               context, (r) => r.settings.name == MainScreen.routeName);
           Navigator.pushNamed(context, NotesScreen.routeName);

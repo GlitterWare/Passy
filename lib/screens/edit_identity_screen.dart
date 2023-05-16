@@ -67,8 +67,8 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         city: _city,
         country: _country,
       );
-      await _account.setIdentity(_identityArgs);
       Navigator.pushNamed(context, SplashScreen.routeName);
+      await _account.setIdentity(_identityArgs);
       Navigator.popUntil(
           context, (r) => r.settings.name == MainScreen.routeName);
       Navigator.pushNamed(context, IdentitiesScreen.routeName);
