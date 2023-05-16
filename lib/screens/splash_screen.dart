@@ -48,7 +48,6 @@ class SplashScreen extends StatelessWidget {
     }
 
     Future<File?> _getTemporaryCliExecutable() async {
-      //TODO: create and return script instead of executable
       String suffix = Platform.isWindows ? '.exe' : '';
       String scriptSuffix = Platform.isWindows ? '.bat' : '.sh';
       Directory installDir = File(Platform.resolvedExecutable).parent;

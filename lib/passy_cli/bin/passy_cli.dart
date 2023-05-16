@@ -34,6 +34,12 @@ Commands:
     help           Display this message.
     exit           Exit the interactive mode.
 
+  Version
+    version shell  Show shell version.
+    version passy  Show Passy version.
+    version data   Show account data version.
+    version sync   Show synchronization version.
+
   Accounts
     accounts list
         - List available account credentials.
@@ -266,6 +272,30 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
     case 'exit':
       log('Have a splendid day!\n', id: id);
       cleanup();
+      return;
+    case 'version':
+      if (command.length == 1) break;
+      String? version;
+      switch (command[1]) {
+        case 'shell':
+          version = passyShellVersion;
+          break;
+        case 'passy':
+          version = passyVersion;
+          break;
+        case 'data':
+          version = accountVersion;
+          break;
+        case 'sync':
+          version = syncVersion;
+          break;
+      }
+      if (version == null) {
+        log('passy:version:Unknown version type provided: ${command[1]}.',
+            id: id);
+        return;
+      }
+      log('v$version', id: id);
       return;
     case 'accounts':
       if (command.length == 1) break;
