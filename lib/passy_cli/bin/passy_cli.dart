@@ -206,7 +206,7 @@ StreamSubscription<List<int>> startInteractive() {
     _shouldMoveLine = false;
     String commandEncoded;
     List<String> command;
-    String? key;
+    String? id;
     if (_isNativeMessaging) {
       if (event.length < 5) return;
       commandEncoded = utf8.decode(event.sublist(4), allowMalformed: true);
@@ -214,7 +214,7 @@ StreamSubscription<List<int>> startInteractive() {
       try {
         dynamic commandDecoded = jsonDecode(commandEncoded);
         commandJson = commandDecoded['command'];
-        key = commandDecoded['key'];
+        id = commandDecoded['id'];
       } catch (_) {}
       if (commandJson is! List<dynamic>) return;
       command = commandJson.map((e) => e.toString()).toList();
@@ -228,7 +228,7 @@ StreamSubscription<List<int>> startInteractive() {
       _isBusy = true;
       try {
         await executeCommand(command,
-            id: key ?? getPassyHash(jsonEncode(command)).toString());
+            id: id ?? getPassyHash(jsonEncode(command)).toString());
       } catch (_) {}
       _isBusy = false;
     }
