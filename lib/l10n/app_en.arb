@@ -220,5 +220,15 @@
     "csvImportMessage1":"Select CSV field values to match the entry variables",
     "csvImportMessage2": "This template will be used for all CSV entries",
     "@csvImportMessage1": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" },
-    "@csvImportMessage2": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" }
+    "@csvImportMessage2": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" },
+    "noConnectorFound": "No connector found",
+    "pleaseDownloadAndInstallTheMainPassyApplication": "Please download and install the main Passy application",
+    "download": "Download",
+    "report": "Report",
+    "failedToLoad": "Failed to load",
+    "autofill": "Autofill",
+    "pleaseOpenTheDesktopApplicationAndAddAnAccount": "Please open the desktop application to add an account",
+    "passyBrowserExtension": "Passy Browser Extension",
+    "extensionSettingsNote": "For full feature set, including synchronization, automatic backups and entry sharing, visit the Passy desktop application",
+    "requestAFeature": "Request a feature"
 }
