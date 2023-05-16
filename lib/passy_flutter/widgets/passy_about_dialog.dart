@@ -22,7 +22,7 @@ class PassyAboutDialog extends StatelessWidget {
           Center(
               child: SvgPicture.asset(
             logoSvg,
-            color: Colors.purple,
+            colorFilter: const ColorFilter.mode(Colors.purple, BlendMode.srcIn),
             width: 128,
           )),
           const SizedBox(height: 32),
@@ -67,7 +67,8 @@ class PassyAboutDialog extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                color: PassyTheme.lightContentColor,
+                colorFilter: const ColorFilter.mode(
+                    PassyTheme.lightContentColor, BlendMode.srcIn),
               ),
             ),
             center: const Text('GitHub'),

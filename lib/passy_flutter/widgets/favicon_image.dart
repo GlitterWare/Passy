@@ -3,16 +3,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:passy/common/assets.dart';
 import 'package:favicon/favicon.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:websafe_svg/websafe_svg.dart';
+
+import '../../common/assets.dart';
+import '../passy_flutter.dart';
 
 bool _isFaviconManagerStarted = false;
 Completer _faviconManagerCompleter = Completer();
 Map<String, dynamic> _favicons = {};
+Map<String, Future<Favicon?>> _faviconFutures = {};
 bool _saveRequested = false;
 
 class FavIconImage extends StatelessWidget {
@@ -52,50 +55,57 @@ class FavIconImage extends StatelessWidget {
           _favicons = favicons;
         }
         _faviconManagerCompleter.complete();
-        Future<void> _faviconManager() async {
+        Future<void> faviconManager() async {
           if (_saveRequested) {
             file.writeAsStringSync(jsonEncode({'favicons': _favicons}));
           }
-          Future.delayed(const Duration(seconds: 5), _faviconManager);
+          Future.delayed(const Duration(seconds: 5), faviconManager);
         }
 
-        _faviconManager();
+        faviconManager();
       });
     }
-    String _url = address;
-    SvgPicture _placeholder = SvgPicture.asset(
+    String url = address;
+    Widget placeholder = WebsafeSvg.asset(
       logoCircleSvg,
-      color: Colors.white,
+      colorFilter:
+          const ColorFilter.mode(PassyTheme.lightContentColor, BlendMode.srcIn),
       width: width,
     );
-    _url = 'http://' + _url.replaceFirst(RegExp('https://|http://'), '');
+    url = 'http://${url.replaceFirst(RegExp('https://|http://'), '')}';
     return FutureBuilder(
       future: Future(() async {
         await _faviconManagerCompleter.future;
-        dynamic _imageURL = _favicons[_url];
-        if (_imageURL is String) return Favicon(_imageURL);
+        dynamic imageURL = _favicons[url];
+        if (imageURL is String) return Favicon(imageURL);
         Favicon? icon;
         try {
-          icon = await FaviconFinder.getBest(_url,
-              suffixes: ['png', 'jpg', 'jpeg', 'ico']);
+          Future<Favicon?>? faviconFuture = _faviconFutures[url];
+          faviconFuture ??= compute<String, Favicon?>(
+              (url) async => await FaviconFinder.getBest(url,
+                  suffixes: ['png', 'jpg', 'jpeg', 'ico']),
+              url);
+          icon = await faviconFuture;
+          _faviconFutures.remove(url);
         } catch (_) {
+          _faviconFutures.remove(url);
           return null;
         }
         if (icon == null) return null;
-        _favicons[_url] = icon.url;
+        _favicons[url] = icon.url;
         _saveRequested = true;
         return icon;
       }),
       builder: (BuildContext context, AsyncSnapshot<Favicon?> snapshot) {
         Favicon? favicon = snapshot.data;
-        if (favicon == null) return _placeholder;
+        if (favicon == null) return placeholder;
         return CachedNetworkImage(
           imageUrl: favicon.url,
-          placeholder: (context, _url) => _placeholder,
+          placeholder: (context, _) => placeholder,
           errorWidget: (ctx, obj, s) {
-            _favicons.remove(_url);
+            _favicons.remove(url);
             _saveRequested = true;
-            return _placeholder;
+            return placeholder;
           },
           width: width,
           fit: BoxFit.fill,

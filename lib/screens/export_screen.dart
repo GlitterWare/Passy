@@ -125,7 +125,8 @@ class _ExportScreen extends State<ExportScreen> {
             child: SvgPicture.asset(
               logoCircleSvg,
               width: 30,
-              color: PassyTheme.lightContentColor,
+              colorFilter: const ColorFilter.mode(
+                  PassyTheme.lightContentColor, BlendMode.srcIn),
             ),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),

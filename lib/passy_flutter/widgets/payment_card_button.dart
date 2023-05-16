@@ -42,7 +42,8 @@ class PaymentCardButton extends StatelessWidget {
                         cardType: CardType.otherBrand,
                         cardImage: SvgPicture.asset(
                           'assets/images/logo_circle.svg',
-                          color: Colors.purple,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.purple, BlendMode.srcIn),
                           width: 50,
                         ))
                   ],

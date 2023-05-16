@@ -30,7 +30,8 @@ class SplashScreen extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                color: PassyTheme.lightContentColor,
+                colorFilter: const ColorFilter.mode(
+                    PassyTheme.lightContentColor, BlendMode.srcIn),
               ),
             ),
             center: const Text('Download'),

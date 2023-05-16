@@ -39,7 +39,8 @@ class LogScreen extends StatelessWidget {
                 splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: SvgPicture.asset(
                   'assets/images/github_icon.svg',
-                  color: PassyTheme.lightContentColor,
+                  colorFilter: const ColorFilter.mode(
+                      PassyTheme.lightContentColor, BlendMode.srcIn),
                 ),
                 tooltip: localizations.submitAnIssue,
                 onPressed: () =>
