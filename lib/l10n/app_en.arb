@@ -230,5 +230,6 @@
     "pleaseOpenTheDesktopApplicationAndAddAnAccount": "Please open the desktop application to add an account",
     "passyBrowserExtension": "Passy Browser Extension",
     "extensionSettingsNote": "For full feature set, including synchronization, automatic backups and entry sharing, visit the Passy desktop application",
-    "requestAFeature": "Request a feature"
+    "requestAFeature": "Request a feature",
+    "privacyPolicy": "Privacy policy"
 }
