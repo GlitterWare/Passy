@@ -247,6 +247,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                                     obscureText: true,
                                     onChanged: (a) =>
                                         setState(() => _password = a),
+                                    onSubmitted: (s) => login(),
                                     decoration: InputDecoration(
                                       hintText: localizations.password,
                                     ),

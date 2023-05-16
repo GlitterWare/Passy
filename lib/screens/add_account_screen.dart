@@ -185,6 +185,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     ),
                                     onChanged: (a) =>
                                         setState(() => _confirmPassword = a),
+                                    onSubmitted: (value) => _addAccount(),
                                     inputFormatters: [
                                       LengthLimitingTextInputFormatter(32),
                                     ],

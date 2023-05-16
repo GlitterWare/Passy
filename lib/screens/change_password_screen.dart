@@ -114,6 +114,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                         obscureText: true,
                         onChanged: (s) =>
                             setState(() => _newPasswordConfirm = s),
+                        onFieldSubmitted: (s) => _onConfirmPressed(),
                         onPressed: _onConfirmPressed,
                         buttonIcon: const Icon(Icons.arrow_forward_ios_rounded),
                       ),

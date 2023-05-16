@@ -8,7 +8,8 @@ class ButtonedTextFormField extends StatelessWidget {
   final bool obscureText;
   final Widget? buttonIcon;
   final void Function()? onTap;
-  final void Function(String)? onChanged;
+  final void Function(String value)? onChanged;
+  final void Function(String value)? onFieldSubmitted;
   final void Function()? onPressed;
   final FocusNode? focusNode;
   final List<TextInputFormatter>? inputFormatters;
@@ -23,6 +24,7 @@ class ButtonedTextFormField extends StatelessWidget {
     this.buttonIcon,
     this.onTap,
     this.onChanged,
+    this.onFieldSubmitted,
     this.onPressed,
     this.focusNode,
     this.inputFormatters,
@@ -42,6 +44,7 @@ class ButtonedTextFormField extends StatelessWidget {
             decoration: InputDecoration(labelText: labelText),
             onTap: onTap,
             onChanged: onChanged,
+            onFieldSubmitted: onFieldSubmitted,
             focusNode: focusNode,
             inputFormatters: inputFormatters,
           ),

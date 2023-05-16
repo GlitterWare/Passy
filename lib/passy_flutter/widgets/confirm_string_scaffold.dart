@@ -67,6 +67,7 @@ class _ConfirmStringScaffold extends State<ConfirmStringScaffold> {
                   labelText: widget.labelText,
                   obscureText: widget.obscureText,
                   onChanged: (s) => setState(() => _input = s),
+                  onFieldSubmitted: (s) => _onConfirmPressed?.call(),
                   onPressed: _onConfirmPressed,
                   buttonIcon: widget.confirmIcon,
                 ),
