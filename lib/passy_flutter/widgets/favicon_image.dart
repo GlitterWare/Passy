@@ -85,6 +85,7 @@ class FavIconImage extends StatelessWidget {
               (url) async => await FaviconFinder.getBest(url,
                   suffixes: ['png', 'jpg', 'jpeg', 'ico']),
               url);
+          _faviconFutures[url] = faviconFuture;
           icon = await faviconFuture;
           _faviconFutures.remove(url);
         } catch (_) {
