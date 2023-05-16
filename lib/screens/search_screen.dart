@@ -5,7 +5,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class SearchScreenArgs {
   String? title;
-  Widget Function(String) builder;
+  Widget Function(String terms) builder;
 
   SearchScreenArgs({
     this.title,
@@ -25,6 +25,8 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreen extends State<SearchScreen> {
   bool _initialized = false;
   Widget _widget = const Text('');
+  TextEditingController queryController = TextEditingController();
+  FocusNode queryFocus = FocusNode()..requestFocus();
 
   @override
   void initState() {
@@ -33,11 +35,11 @@ class _SearchScreen extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SearchScreenArgs _args =
+    SearchScreenArgs args =
         ModalRoute.of(context)!.settings.arguments as SearchScreenArgs;
-    Widget Function(String terms) _builder = _args.builder;
+    Widget Function(String terms) builder = args.builder;
     if (!_initialized) {
-      _widget = _builder('');
+      _widget = builder(queryController.text);
       _initialized = true;
     }
     return Scaffold(
@@ -48,20 +50,33 @@ class _SearchScreen extends State<SearchScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(_args.title ?? localizations.search),
+        title: Text(args.title ?? localizations.search),
         centerTitle: true,
       ),
       body: Column(
         children: [
           PassyPadding(TextFormField(
-              autofocus: true,
+              controller: queryController,
+              focusNode: queryFocus,
               decoration: InputDecoration(
                 label: Text(localizations.search),
                 hintText: 'github human@example.com',
               ),
+              onTap: () {
+                if (!queryFocus.hasFocus) {
+                  queryFocus.requestFocus();
+                  queryController.selection = TextSelection(
+                      baseOffset: 0,
+                      extentOffset: queryController.value.text.length);
+                }
+              },
               onChanged: (s) {
                 setState(() {
-                  _widget = _builder(s);
+                  int baseOffset = queryController.selection.baseOffset;
+                  queryController.text = s;
+                  queryController.selection = TextSelection(
+                      baseOffset: baseOffset, extentOffset: baseOffset);
+                  _widget = builder(s);
                 });
               })),
           Expanded(
