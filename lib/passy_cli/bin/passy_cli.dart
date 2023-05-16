@@ -206,12 +206,15 @@ StreamSubscription<List<int>> startInteractive() {
     _shouldMoveLine = false;
     String commandEncoded;
     List<String> command;
+    String? key;
     if (_isNativeMessaging) {
       if (event.length < 5) return;
       commandEncoded = utf8.decode(event.sublist(4), allowMalformed: true);
       dynamic commandJson;
       try {
-        commandJson = jsonDecode(commandEncoded)['command'];
+        dynamic commandDecoded = jsonDecode(commandEncoded);
+        commandJson = commandDecoded['command'];
+        key = commandDecoded['key'];
       } catch (_) {}
       if (commandJson is! List<dynamic>) return;
       command = commandJson.map((e) => e.toString()).toList();
@@ -224,7 +227,8 @@ StreamSubscription<List<int>> startInteractive() {
       if (_isBusy) return;
       _isBusy = true;
       try {
-        await executeCommand(command, id: getPassyHash(jsonEncode(command)));
+        await executeCommand(command,
+            id: key ?? getPassyHash(jsonEncode(command)).toString());
       } catch (_) {}
       _isBusy = false;
     }
