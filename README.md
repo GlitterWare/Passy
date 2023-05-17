@@ -26,8 +26,7 @@ Submissions will be finished until June 1 2023.
         - [Installer (Recommended)](#installer-recommended)
         - [Portable](#portable)
     - [Android](#android)
-        - [F-Droid (Recommended)](#f-droid-recommended)
-        - [APK](#apk)
+        - [F-Droid](#f-droid)
     - [Linux](#linux)
         - [SnapCraft (Recommended)](#snapcraft-recommended)
         - [Flathub](#flathub)
@@ -75,15 +74,9 @@ Passy can be removed by running its uninstaller from Programs and Features in th
 
 ### Android
 
-#### F-Droid (Recommended)
+#### F-Droid
 
 <a href="https://f-droid.org/en/packages/com.glitterware.passy"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75"></a>
-
-#### APK
-
-1. Download the archive from [latest release](https://github.com/GlitterWare/Passy/releases/latest). APK archives are named in format `Passy-<version>-Android-Apk.zip`.
-2. Extract the `.apk` file inside the archive.
-3. Install the extracted `.apk`.
 
 ### Linux
 
