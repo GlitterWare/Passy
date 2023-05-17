@@ -71,6 +71,53 @@ class LoadedAccount {
       await _settings.value.rsaKeypairCompleter.future;
       await _settings.save();
     });
+    bool shouldSaveHistory = false;
+    {
+      List<String> passwordKeys = this.passwordKeys;
+      for (EntryEvent value in _history.value.passwords.values) {
+        if (value.status == EntryStatus.removed) continue;
+        if (passwordKeys.contains(value.key)) continue;
+        value.status = EntryStatus.removed;
+        shouldSaveHistory = true;
+      }
+    }
+    {
+      List<String> paymentCardKeys = this.paymentCardKeys;
+      for (EntryEvent value in _history.value.paymentCards.values) {
+        if (value.status == EntryStatus.removed) continue;
+        if (paymentCardKeys.contains(value.key)) continue;
+        value.status = EntryStatus.removed;
+        shouldSaveHistory = true;
+      }
+    }
+    {
+      List<String> notesKeys = this.notesKeys;
+      for (EntryEvent value in _history.value.notes.values) {
+        if (value.status == EntryStatus.removed) continue;
+        if (notesKeys.contains(value.key)) continue;
+        value.status = EntryStatus.removed;
+        shouldSaveHistory = true;
+      }
+    }
+    {
+      List<String> idCardsKeys = this.idCardsKeys;
+      for (EntryEvent value in _history.value.idCards.values) {
+        if (value.status == EntryStatus.removed) continue;
+        if (idCardsKeys.contains(value.key)) continue;
+        value.status = EntryStatus.removed;
+        shouldSaveHistory = true;
+      }
+    }
+    {
+      List<String> identitiesKeys = this.identitiesKeys;
+      for (EntryEvent value in _history.value.identities.values) {
+        if (value.status == EntryStatus.removed) continue;
+        if (identitiesKeys.contains(value.key)) continue;
+        value.status = EntryStatus.removed;
+        shouldSaveHistory = true;
+      }
+    }
+    if (shouldSaveHistory) _history.saveSync();
   }
 
   factory LoadedAccount.fromDirectory({
