@@ -73,3 +73,18 @@ String entryTypeToNamePlural(EntryType type) {
       return 'identities';
   }
 }
+
+String entryTypeToFilename(EntryType type) {
+  switch (type) {
+    case EntryType.password:
+      return 'passwords.enc';
+    case EntryType.paymentCard:
+      return 'payment_cards.enc';
+    case EntryType.note:
+      return 'notes.enc';
+    case EntryType.idCard:
+      return 'id_cards.enc';
+    case EntryType.identity:
+      return 'identities.enc';
+  }
+}

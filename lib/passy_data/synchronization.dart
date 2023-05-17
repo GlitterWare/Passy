@@ -173,8 +173,8 @@ class _EntryInfo with JsonConvertable {
 
 class Synchronization {
   final LoadedAccount _loadedAccount;
-  final History _history;
-  final Favorites _favorites;
+  final HistoryFile _history;
+  final FavoritesFile _favorites;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
       SynchronizationResults();
@@ -195,8 +195,8 @@ class Synchronization {
   get entriesRemoved => _entriesRemoved;
 
   Synchronization(this._loadedAccount,
-      {required History history,
-      required Favorites favorites,
+      {required HistoryFile history,
+      required FavoritesFile favorites,
       required Encrypter encrypter,
       required RSAKeypair rsaKeypair,
       void Function(SynchronizationResults)? onComplete,
@@ -244,7 +244,7 @@ class Synchronization {
                 jsonEncode(_EntryData(
                     key: key,
                     type: entryType,
-                    event: _history.getEvents(entryType)[key]!,
+                    event: _history.value.getEvents(entryType)[key]!,
                     value: _loadedAccount.getEntry(entryType)(key)?.toCSV())),
                 encrypter: _encrypter) +
             '\u0000'));
@@ -263,6 +263,7 @@ class Synchronization {
   }
 
   Future<void> _decryptEntries(List<List<int>> entries) async {
+    await _history.reload();
     for (List<int> entry in entries) {
       _EntryData _entryData;
       try {
@@ -275,7 +276,8 @@ class Synchronization {
       }
 
       try {
-        Map<String, EntryEvent> _events = _history.getEvents(_entryData.type);
+        Map<String, EntryEvent> _events =
+            _history.value.getEvents(_entryData.type);
 
         if (_entryData.event.status == EntryStatus.removed) {
           if (_events.containsKey(_entryData.key)) {
@@ -352,6 +354,7 @@ class Synchronization {
     void Function()? onConnected,
     Map<EntryType, List<String>>? sharedEntryKeys,
   }) async {
+    await _history.reload();
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
@@ -446,7 +449,7 @@ class Synchronization {
                   EntryType.identity,
                 ]) {
                   Map<String, EntryEvent> _localEvents =
-                      _history.getEvents(entryType);
+                      _history.value.getEvents(entryType);
                   Map<String, EntryEvent> _shortLocalEvents =
                       _info.history.getEvents(entryType);
                   List<String> _localRequestKeys =
@@ -537,7 +540,7 @@ class Synchronization {
 
             Future<void> _sendHistoryHash() {
               _syncLog += 'done.\nSending history hash... ';
-              Map<String, dynamic> _localHistory = _history.toJson();
+              Map<String, dynamic> _localHistory = _history.value.toJson();
               socket.add(utf8.encode(
                   getPassyHash(jsonEncode(_localHistory)).toString() +
                       '\u0000'));
@@ -677,6 +680,7 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) async {
+    await _history.reload();
     void _onConnected(Socket socket) {
       _isConnected = true;
       bool _serviceInfoHandled = false;
@@ -763,7 +767,7 @@ class Synchronization {
 
       void _handleHistoryHash(List<int> data) {
         _syncLog += 'done.\nDecoding history hash... ';
-        String _historyJson = jsonEncode(_history.toJson());
+        String _historyJson = jsonEncode(_history.value.toJson());
         bool _same = true;
         try {
           _same = getPassyHash(_historyJson) == Digest(data);
@@ -934,7 +938,7 @@ class Synchronization {
                 await util.processTypedExchangeEntries(
                   entries: sharedEntries,
                   account: _loadedAccount,
-                  history: _history,
+                  history: _history.value,
                   onSetEntry: () => _entriesAdded++,
                   onRemoveEntry: () => _entriesAdded++,
                 );
@@ -994,7 +998,7 @@ class Synchronization {
             _handleApiException('Received malformed favorites hashes', e);
             return;
           }
-          Map<String, dynamic> historyJson = _history.toJson();
+          Map<String, dynamic> historyJson = _history.value.toJson();
           _syncLog += 'done.\nComparing history hashes... ';
           if (remoteHistoryHash !=
               getPassyHash(jsonEncode(historyJson)).toString()) {
@@ -1039,7 +1043,7 @@ class Synchronization {
             }
             Map<EntryType, Map<String, EntryEvent>> localHistoryEntries = {};
             for (EntryType type in entryTypes) {
-              localHistoryEntries[type] = _history.getEvents(type);
+              localHistoryEntries[type] = _history.value.getEvents(type);
             }
             _syncLog += 'done.\nComparing history entries... ';
             util.EntriesToSynchronize entriesToSynchronize;
@@ -1061,7 +1065,7 @@ class Synchronization {
                   'entries': entriesToSynchronize.entriesToSend
                       .map((entryType, entryKeys) {
                     Map<String, EntryEvent> historyEntries =
-                        _history.getEvents(entryType);
+                        _history.value.getEvents(entryType);
                     PassyEntry? Function(String) getEntry =
                         _loadedAccount.getEntry(entryType);
                     return MapEntry(
@@ -1108,10 +1112,11 @@ class Synchronization {
               }
               _syncLog += 'done.\nProcessing entries... ';
               try {
+                await _history.reload();
                 await util.processTypedExchangeEntries(
                   entries: entries,
                   account: _loadedAccount,
-                  history: _history,
+                  history: _history.value,
                   onRemoveEntry: () => _entriesRemoved++,
                   onSetEntry: () => _entriesAdded++,
                 );
@@ -1121,7 +1126,8 @@ class Synchronization {
               }
             }
           }
-          Map<String, dynamic> favoritesJson = _favorites.toJson();
+          await _favorites.reload();
+          Map<String, dynamic> favoritesJson = _favorites.value.toJson();
           _syncLog += 'done.\nComparing favorites hashes... ';
           if (remoteFavoritesHash !=
               getPassyHash(jsonEncode(favoritesJson)).toString()) {
@@ -1167,8 +1173,9 @@ class Synchronization {
               return;
             }
             Map<EntryType, Map<String, EntryEvent>> localFavoritesEntries = {};
+            await _favorites.reload();
             for (EntryType type in entryTypes) {
-              localFavoritesEntries[type] = _favorites.getEvents(type);
+              localFavoritesEntries[type] = _favorites.value.getEvents(type);
             }
             _syncLog += 'done.\nComparing favorites entries... ';
             util.EntriesToSynchronize entriesToSynchronize;
@@ -1190,7 +1197,7 @@ class Synchronization {
                   'favoritesEntries': entriesToSynchronize.entriesToSend
                       .map<String, dynamic>((entryType, keyList) {
                     Map<String, EntryEvent> localFavorites =
-                        _favorites.getEvents(entryType);
+                        _favorites.value.getEvents(entryType);
                     List<dynamic> val = [];
                     for (String key in keyList) {
                       EntryEvent? entryEvent = localFavorites[key];
@@ -1211,6 +1218,7 @@ class Synchronization {
               }
             }
             if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
+              await _favorites.reload();
               _syncLog += 'done.\nSaving favorites entries... ';
               for (MapEntry<EntryType, List<String>> entriesToRetrieveEntry
                   in entriesToSynchronize.entriesToRetrieve.entries) {
@@ -1219,7 +1227,7 @@ class Synchronization {
                     favoritesEntries[entryType];
                 if (typeFavoritesEntries == null) continue;
                 Map<String, EntryEvent> localFavoritesEntries =
-                    _favorites.getEvents(entryType);
+                    _favorites.value.getEvents(entryType);
                 for (String entryKey in entriesToRetrieveEntry.value) {
                   EntryEvent? favoritesEntry = typeFavoritesEntries[entryKey];
                   if (favoritesEntry == null) continue;

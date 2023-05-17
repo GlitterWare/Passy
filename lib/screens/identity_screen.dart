@@ -32,6 +32,7 @@ class _IdentityScreen extends State<IdentityScreen> {
   Widget build(BuildContext context) {
     final Identity _identity =
         ModalRoute.of(context)!.settings.arguments as Identity;
+    _account.reloadFavoritesSync();
     isFavorite =
         _account.favoriteIdentities[_identity.key]?.status == EntryStatus.alive;
 

@@ -93,3 +93,17 @@ install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   CONFIGURATIONS Profile;Release
   COMPONENT Runtime)
+
+# Build and install Passy CLI
+get_filename_component(APP_SOURCE_DIR ${PROJECT_BUILD_DIR} DIRECTORY)
+set(CLI_LIB_DIR "${APP_SOURCE_DIR}/lib/passy_cli")
+set(CLI_BIN_DIR "${CLI_LIB_DIR}/bin")
+set(CLI_BIN_SOURCE_FILE "${CLI_BIN_DIR}/passy_cli.dart")
+set(CLI_BIN_FILE "${CLI_BIN_DIR}/passy_cli.exe")
+set(CLI_NATIVE_MESSAGING "${CLI_BIN_DIR}/passy_cli_native_messaging.bat")
+set(CLI_NATIVE_MESSAGING_MANIFEST "${CLI_LIB_DIR}/passy_cli_native_messaging.json")
+execute_process(COMMAND "dart" "compile" "exe" "${CLI_BIN_SOURCE_FILE}" "-o" "${CLI_BIN_FILE}" RESULT_VARIABLE ret)
+if(ret AND NOT ret EQUAL 0)
+  message(FATAL_ERROR "Building Passy CLI: Bad exit status")
+endif()
+install(FILES "${CLI_BIN_FILE}" "${CLI_NATIVE_MESSAGING}" "${CLI_NATIVE_MESSAGING_MANIFEST}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

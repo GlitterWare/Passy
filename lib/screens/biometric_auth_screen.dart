@@ -50,7 +50,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
         await FlutterLocker.delete(_username);
       }
       setState(() => data.loadedAccount!.bioAuthEnabled = value);
-      data.loadedAccount!.saveSync();
+      await data.loadedAccount!.reloadHistory();
+      await data.loadedAccount!.save();
     }
 
     return Scaffold(
