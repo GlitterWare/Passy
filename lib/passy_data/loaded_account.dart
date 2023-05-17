@@ -218,8 +218,8 @@ class LoadedAccount {
     if (rsaKeypair == null) return null;
     return Synchronization(
       this,
-      history: _history.value,
-      favorites: _favorites.value,
+      history: _history,
+      favorites: _favorites,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
       onComplete: onComplete,
@@ -332,6 +332,8 @@ class LoadedAccount {
   // History wrappers
   void clearRemovedHistory() => _history.value.clearRemoved();
   void renewHistory() => _history.value.renew();
+  Future<void> reloadHistory() => _history.reload();
+  void reloadHistorySync() => _history.reloadSync();
   Future<void> saveHistory() => _history.save();
   void saveHistorySync() => _history.saveSync();
   Digest get historyHash => getPassyHash(jsonEncode(_history.value.toJson()));
@@ -339,6 +341,8 @@ class LoadedAccount {
   // Favorites wrappers
   void clearRemovedFavorites() => _favorites.value.clearRemoved();
   void renewFavorites() => _favorites.value.renew();
+  Future<void> reloadFavorites() => _favorites.reload();
+  void reloadFavoritesSync() => _favorites.reloadSync();
   Future<void> saveFavorites() => _favorites.save();
   void saveFavoritesSync() => _favorites.saveSync();
   int get favoritesLength => _favorites.value.length;
@@ -372,6 +376,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoritePassword(String key) async {
+    await _favorites.reload();
     if (getPassword(key) == null) return;
     _favorites.value.passwords[key] = EntryEvent(
       key,
@@ -382,6 +387,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoritePassword(String key) async {
+    await _favorites.reload();
     EntryEvent? _password = _favorites.value.passwords[key];
     if (_password == null) return;
     if (_password.status == EntryStatus.removed) return;
@@ -391,6 +397,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoritePaymentCard(String key) async {
+    await _favorites.reload();
     if (getPaymentCard(key) == null) return;
     _favorites.value.paymentCards[key] = EntryEvent(
       key,
@@ -401,6 +408,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoritePaymentCard(String key) async {
+    await _favorites.reload();
     EntryEvent? _paymentCard = _favorites.value.paymentCards[key];
     if (_paymentCard == null) return;
     if (_paymentCard.status == EntryStatus.removed) return;
@@ -410,6 +418,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoriteNote(String key) async {
+    await _favorites.reload();
     if (getNote(key) == null) return;
     _favorites.value.notes[key] = EntryEvent(
       key,
@@ -420,6 +429,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteNote(String key) async {
+    await _favorites.reload();
     EntryEvent? _note = _favorites.value.notes[key];
     if (_note == null) return;
     if (_note.status == EntryStatus.removed) return;
@@ -429,6 +439,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoriteIDCard(String key) async {
+    await _favorites.reload();
     if (getIDCard(key) == null) return;
     _favorites.value.idCards[key] = EntryEvent(
       key,
@@ -439,6 +450,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteIDCard(String key) async {
+    await _favorites.reload();
     EntryEvent? _idCard = _favorites.value.idCards[key];
     if (_idCard == null) return;
     if (_idCard.status == EntryStatus.removed) return;
@@ -448,6 +460,7 @@ class LoadedAccount {
   }
 
   Future<void> addFavoriteIdentity(String key) async {
+    await _favorites.reload();
     if (getIdentity(key) == null) return;
     _favorites.value.identities[key] = EntryEvent(
       key,
@@ -458,6 +471,7 @@ class LoadedAccount {
   }
 
   Future<void> removeFavoriteIdentity(String key) async {
+    await _favorites.reload();
     EntryEvent? _identity = _favorites.value.identities[key];
     if (_identity == null) return;
     if (_identity.status == EntryStatus.removed) return;
@@ -496,9 +510,10 @@ class LoadedAccount {
     }
   }
 
-  void removeDeletedFavorites() {
-    // TODO: optimize IO
+  void removeDeletedFavorites() async {
+    // TODO: optimize IO + await on each statement
     // multiple entries should be requested via one get command per entry type
+    await _favorites.reload();
     _favorites.value.passwords.forEach((key, value) {
       if (getPassword(key) == null) removeFavoritePassword(key);
     });
@@ -518,13 +533,28 @@ class LoadedAccount {
 
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
-  Map<String, PasswordMeta> get passwordsMetadata =>
-      _passwords.metadata.map((key, e) => MapEntry(key, e as PasswordMeta));
+  Map<String, PasswordMeta> get passwordsMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, PasswordMeta> result = _passwords.metadata.map((key, e) {
+      PasswordMeta meta = e as PasswordMeta;
+      if (!_history.value.passwords.containsKey(key)) {
+        _history.value.passwords[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, Password> get passwords => _passwords.entries;
 
   Password? getPassword(String key) => _passwords.getEntry(key);
 
   Future<void> setPassword(Password password) async {
+    await _history.reload();
     _history.value.passwords[password.key] = EntryEvent(password.key,
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     Future<void> _saveFuture =
@@ -534,6 +564,7 @@ class LoadedAccount {
   }
 
   Future<void> removePassword(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.passwords[key];
     if (_event == null) return;
     _event
@@ -547,13 +578,28 @@ class LoadedAccount {
 
   // Notes wrappers
   List<String> get notesKeys => _notes.keys;
-  Map<String, NoteMeta> get notesMetadata =>
-      _notes.metadata.map((key, e) => MapEntry(key, e as NoteMeta));
+  Map<String, NoteMeta> get notesMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, NoteMeta> result = _notes.metadata.map((key, e) {
+      NoteMeta meta = e as NoteMeta;
+      if (!_history.value.notes.containsKey(key)) {
+        _history.value.notes[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, Note> get notes => _notes.entries;
 
   Note? getNote(String key) => _notes.getEntry(key);
 
   Future<void> setNote(Note note) async {
+    await _history.reload();
     _history.value.notes[note.key] = EntryEvent(
       note.key,
       status: EntryStatus.alive,
@@ -565,6 +611,7 @@ class LoadedAccount {
   }
 
   Future<void> removeNote(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.notes[key];
     if (_event == null) return;
     _event
@@ -578,14 +625,28 @@ class LoadedAccount {
 
   // Payment Cards wrappers
   List<String> get paymentCardKeys => _paymentCards.keys;
-  Map<String, PaymentCardMeta> get paymentCardsMetadata =>
-      _paymentCards.metadata
-          .map((key, e) => MapEntry(key, e as PaymentCardMeta));
+  Map<String, PaymentCardMeta> get paymentCardsMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, PaymentCardMeta> result = _paymentCards.metadata.map((key, e) {
+      PaymentCardMeta meta = e as PaymentCardMeta;
+      if (!_history.value.paymentCards.containsKey(key)) {
+        _history.value.paymentCards[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, PaymentCard> get paymentCards => _paymentCards.entries;
 
   PaymentCard? getPaymentCard(String key) => _paymentCards.getEntry(key);
 
   Future<void> setPaymentCard(PaymentCard paymentCard) async {
+    await _history.reload();
     _history.value.paymentCards[paymentCard.key] = EntryEvent(
       paymentCard.key,
       status: EntryStatus.alive,
@@ -598,6 +659,7 @@ class LoadedAccount {
   }
 
   Future<void> removePaymentCard(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.paymentCards[key];
     if (_event == null) return;
     _event
@@ -611,13 +673,28 @@ class LoadedAccount {
 
   // ID Cards wrappers
   List<String> get idCardsKeys => _idCards.keys;
-  Map<String, IDCardMeta> get idCardsMetadata =>
-      _idCards.metadata.map((key, e) => MapEntry(key, e as IDCardMeta));
+  Map<String, IDCardMeta> get idCardsMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, IDCardMeta> result = _idCards.metadata.map((key, e) {
+      IDCardMeta meta = e as IDCardMeta;
+      if (!_history.value.idCards.containsKey(key)) {
+        _history.value.idCards[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, IDCard> get idCards => _idCards.entries;
 
   IDCard? getIDCard(String key) => _idCards.getEntry(key);
 
   Future<void> setIDCard(IDCard idCard) async {
+    await _history.reload();
     _history.value.idCards[idCard.key] = EntryEvent(
       idCard.key,
       status: EntryStatus.alive,
@@ -628,6 +705,7 @@ class LoadedAccount {
   }
 
   Future<void> removeIDCard(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.idCards[key];
     if (_event == null) return;
     _event
@@ -641,13 +719,28 @@ class LoadedAccount {
 
   // Identities wrappers
   List<String> get identitiesKeys => _identities.keys;
-  Map<String, IdentityMeta> get identitiesMetadata =>
-      _identities.metadata.map((key, e) => MapEntry(key, e as IdentityMeta));
+  Map<String, IdentityMeta> get identitiesMetadata {
+    bool _isHistoryChanged = false;
+    _history.reloadSync();
+    Map<String, IdentityMeta> result = _identities.metadata.map((key, e) {
+      IdentityMeta meta = e as IdentityMeta;
+      if (!_history.value.identities.containsKey(key)) {
+        _history.value.identities[key] = EntryEvent(key,
+            status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+        _isHistoryChanged = true;
+      }
+      return MapEntry(key, meta);
+    });
+    if (_isHistoryChanged) _history.saveSync();
+    return result;
+  }
+
   Map<String, Identity> get identities => _identities.entries;
 
   Identity? getIdentity(String key) => _identities.getEntry(key);
 
   Future<void> setIdentity(Identity identity) async {
+    await _history.reload();
     _history.value.identities[identity.key] = EntryEvent(
       identity.key,
       status: EntryStatus.alive,
@@ -660,6 +753,7 @@ class LoadedAccount {
   }
 
   Future<void> removeIdentity(String key) async {
+    await _history.reload();
     EntryEvent? _event = _history.value.identities[key];
     if (_event == null) return;
     _event
@@ -803,14 +897,17 @@ class JSONLoadedAccount {
     localSettings ??= LocalSettings.fromFile(
         File(path + Platform.pathSeparator + 'local_settings.json'));
     settings ??= JsonFile(_settingsFile,
+        fromJson: AccountSettings.fromJson,
         value: AccountSettings.fromFile(_settingsFile, encrypter: encrypter)
             .value);
     history ??= JsonFile<History>(_historyFile,
+        fromJson: History.fromJson,
         value: History.fromFile(
                 File(path + Platform.pathSeparator + 'history.enc'),
                 encrypter: encrypter)
             .value);
     favorites ??= JsonFile<Favorites>(_favoritesFile,
+        fromJson: Favorites.fromJson,
         value: Favorites.fromFile(
                 File(path + Platform.pathSeparator + 'favorites.enc'),
                 encrypter: encrypter)

@@ -11,8 +11,13 @@ import 'saveable_file_base.dart';
 class JsonFile<T extends JsonConvertable> with SaveableFileBase {
   final T value;
   final File _file;
+  final T Function(Map<String, dynamic> json) _fromJson;
 
-  JsonFile(this._file, {required this.value});
+  JsonFile(
+    this._file, {
+    required T Function(Map<String, dynamic> json) fromJson,
+    required this.value,
+  }) : _fromJson = fromJson;
 
   factory JsonFile.fromFile(
     File file, {
@@ -22,11 +27,16 @@ class JsonFile<T extends JsonConvertable> with SaveableFileBase {
     if (file.existsSync()) {
       return JsonFile<T>(
         file,
+        fromJson: fromJson,
         value: fromJson(jsonDecode(file.readAsStringSync())),
       );
     }
     file.createSync(recursive: true);
-    JsonFile<T> _file = JsonFile<T>(file, value: constructor());
+    JsonFile<T> _file = JsonFile<T>(
+      file,
+      fromJson: fromJson,
+      value: constructor(),
+    );
     _file.saveSync();
     return _file;
   }
@@ -37,5 +47,10 @@ class JsonFile<T extends JsonConvertable> with SaveableFileBase {
   void saveSync() => _file.writeAsStringSync(jsonEncode(value));
 
   EncryptedJsonFile<T> toEncryptedJSONFile(Encrypter encrypter) =>
-      EncryptedJsonFile<T>(_file, encrypter: encrypter, value: value);
+      EncryptedJsonFile<T>(
+        _file,
+        encrypter: encrypter,
+        fromJson: _fromJson,
+        value: value,
+      );
 }

@@ -3,7 +3,6 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_meta.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
@@ -124,7 +123,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
   Future<void> setEntry(String key, {T? entry}) async {
     File _tempFile;
     {
-      String _tempPath = (await getTemporaryDirectory()).path +
+      String _tempPath = (Directory.systemTemp).path +
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');

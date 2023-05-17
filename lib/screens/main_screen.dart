@@ -224,6 +224,7 @@ class _MainScreen extends State<MainScreen>
     Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
     Map<String, PaymentCardMeta> paymentCardsMetadata =
         _account.paymentCardsMetadata;
+    _account.reloadFavoritesSync();
     for (EntryEvent event in _account.favoriteIDCards.values) {
       if (event.status == EntryStatus.removed) continue;
       IDCardMeta? idCard = idCardsMetadata[event.key];
@@ -436,11 +437,16 @@ class _MainScreen extends State<MainScreen>
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
         center: Text(localizations.favorites),
-        onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
-            arguments: SearchScreenArgs(
-              title: localizations.favorites,
-              builder: _favoritesSearchBuilder,
-            )),
+        onPressed: () async {
+          await _account.reloadFavorites();
+          if (mounted) {
+            Navigator.pushNamed(context, SearchScreen.routeName,
+                arguments: SearchScreenArgs(
+                  title: localizations.favorites,
+                  builder: _favoritesSearchBuilder,
+                ));
+          }
+        },
       )),
       PassyPadding(ThreeWidgetButton(
         left: const Padding(

@@ -151,6 +151,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    data.refreshAccounts();
     if (!widget.autofillLogin) {
       if (Platform.isAndroid) {
         FlutterSecureScreen.singleton.setAndroidScreenSecure(true);

@@ -153,6 +153,7 @@ class _PasswordScreen extends State<PasswordScreen> {
       password = ModalRoute.of(context)!.settings.arguments as Password;
       if (password!.tfa != null) generateTFA = _generateTFA(password!.tfa!);
     }
+    _account.reloadFavoritesSync();
     isFavorite =
         _account.favoritePasswords[password!.key]?.status == EntryStatus.alive;
 
