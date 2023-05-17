@@ -37,6 +37,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   String _password = '';
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
+  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -87,6 +88,10 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
       );
+      setState(() {
+        _password = '';
+        _passwordController.text = '';
+      });
       return;
     }
     data.info.value.lastUsername = _username;
@@ -244,6 +249,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                               children: [
                                 Expanded(
                                   child: TextField(
+                                    controller: _passwordController,
                                     obscureText: true,
                                     onChanged: (a) =>
                                         setState(() => _password = a),

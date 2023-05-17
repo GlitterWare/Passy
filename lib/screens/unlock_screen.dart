@@ -25,6 +25,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   bool _shouldPop = false;
   String _password = '';
   FloatingActionButton? _bioAuthButton;
+  final TextEditingController _passwordController = TextEditingController();
 
   void _logOut() {
     Navigator.popUntil(
@@ -65,6 +66,10 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
           Icons.lock_rounded,
           color: PassyTheme.darkContentColor,
         ));
+    setState(() {
+      _password = '';
+      _passwordController.text = '';
+    });
     return;
   }
 
@@ -138,6 +143,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                   ),
                   PassyPadding(
                     ButtonedTextFormField(
+                      controller: _passwordController,
                       labelText: localizations.password,
                       obscureText: true,
                       onChanged: (a) => setState(() => _password = a),
