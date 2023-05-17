@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'dart:html';
 
 import 'package:flutter/material.dart';
@@ -5,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
 import 'package:passy_website/widgets/about_passy_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:passy_website/widgets/downloads_dialog.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/';
@@ -67,9 +68,9 @@ class _MainScreen extends State<MainScreen> {
                   ),
                   center: const Text('Downloads'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => const DownloadsDialog()),
+                  onPressed: () => () => window.open(
+                      'https://github.com/GlitterWare/Passy/blob/dev/DOWNLOADS.md',
+                      'Downloads'),
                 )),
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
