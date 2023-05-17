@@ -25,17 +25,17 @@ class ThreeWidgetButton extends StatelessWidget {
         ),
       ),
       child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Row(
           children: [
             if (left != null) left!,
             Flexible(
-              child: center,
               fit: FlexFit.tight,
+              child: center,
             ),
             if (right != null) right!,
           ],
         ),
-        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
       ),
     );
   }

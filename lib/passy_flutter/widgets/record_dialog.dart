@@ -21,16 +21,16 @@ class RecordDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content;
     if (highlightSpecial) {
-      List<InlineSpan> _children = [];
-      Iterator<String> _iterator = value.characters.iterator;
-      while (_iterator.moveNext()) {
-        if (_iterator.current.contains(RegExp(r'[a-z]|[A-Z]'))) {
-          _children.add(TextSpan(
-              text: _iterator.current,
+      List<InlineSpan> children = [];
+      Iterator<String> iterator = value.characters.iterator;
+      while (iterator.moveNext()) {
+        if (iterator.current.contains(RegExp(r'[a-z]|[A-Z]'))) {
+          children.add(TextSpan(
+              text: iterator.current,
               style: const TextStyle(fontFamily: 'FiraCode')));
         } else {
-          _children.add(TextSpan(
-              text: _iterator.current,
+          children.add(TextSpan(
+              text: iterator.current,
               style: TextStyle(
                 fontFamily: 'FiraCode',
                 color: specialColor,
@@ -38,7 +38,7 @@ class RecordDialog extends StatelessWidget {
         }
       }
       content = SelectableText.rich(
-        TextSpan(text: '', children: _children),
+        TextSpan(text: '', children: children),
         textAlign: textAlign,
       );
     } else {

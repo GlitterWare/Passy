@@ -19,33 +19,33 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<DropdownMenuItem<T>> _menuItems = [];
+    List<DropdownMenuItem<T>> menuItems = [];
     for (T value in values) {
-      String _name;
+      String name;
       switch (textCapitalization) {
         case (TextCapitalization.characters):
-          _name = value.name.toUpperCase();
+          name = value.name.toUpperCase();
           break;
         case (TextCapitalization.none):
-          _name = value.name;
+          name = value.name;
           break;
         case (TextCapitalization.sentences):
-          _name = capitalize(value.name);
+          name = capitalize(value.name);
           break;
         case (TextCapitalization.words):
-          _name = capitalize(value.name);
+          name = capitalize(value.name);
           break;
         default:
-          _name = value.name;
+          name = value.name;
           break;
       }
-      _menuItems.add(DropdownMenuItem(
-        child: Text(_name),
+      menuItems.add(DropdownMenuItem(
         value: value,
+        child: Text(name),
       ));
     }
     return DropdownButtonFormField(
-      items: _menuItems,
+      items: menuItems,
       value: value,
       decoration: decoration,
       onChanged: onChanged,

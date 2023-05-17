@@ -5,20 +5,20 @@ import 'package:passy_website/passy_flutter/passy_theme.dart';
 
 String capitalize(String string) {
   if (string.isEmpty) return '';
-  String _firstLetter = string[0].toUpperCase();
-  if (string.length == 1) return _firstLetter;
-  return '$_firstLetter${string.substring(1)}';
+  String firstLetter = string[0].toUpperCase();
+  if (string.length == 1) return firstLetter;
+  return '$firstLetter${string.substring(1)}';
 }
 
 String beautifyCardNumber(String cardNumber) {
   if (cardNumber.isEmpty) {
     return '';
   }
-  String _value = cardNumber.trim();
-  cardNumber = _value[0];
-  for (int i = 1; i < _value.length; i++) {
+  String value = cardNumber.trim();
+  cardNumber = value[0];
+  for (int i = 1; i < value.length; i++) {
     if (i % 4 == 0) cardNumber += ' ';
-    cardNumber += _value[i];
+    cardNumber += value[i];
   }
   return cardNumber;
 }
