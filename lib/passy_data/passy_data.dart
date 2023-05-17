@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/foundation.dart';
 import 'package:passy/passy_data/auto_backup_settings.dart';
 
 import 'package:passy/passy_data/legacy/legacy.dart';
@@ -163,12 +164,15 @@ class PassyData {
         .deleteSync(recursive: true);
   }
 
-  LoadedAccount loadAccount(String username, Encrypter encrypter) {
-    _loadedAccount = loadLegacyAccount(
-      path: accountsPath + Platform.pathSeparator + username,
-      encrypter: encrypter,
-      credentials: _accounts[username],
-    );
+  Future<LoadedAccount> loadAccount(
+      String username, Encrypter encrypter) async {
+    _loadedAccount = await compute(
+        (message) => loadLegacyAccount(
+              path: accountsPath + Platform.pathSeparator + username,
+              encrypter: encrypter,
+              credentials: _accounts[username],
+            ),
+        null);
     _loadedAccountEncrypter = encrypter;
     return _loadedAccount!;
   }

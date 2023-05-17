@@ -7,8 +7,8 @@ void synchronizationTest({
   void Function()? onConnected,
   void Function(SynchronizationResults results)? onComplete,
   void Function(String error)? onError,
-}) {
-  LoadedAccount syn = data.loadAccount('syn', getPassyEncrypter('syn'));
+}) async {
+  LoadedAccount syn = await data.loadAccount('syn', getPassyEncrypter('syn'));
   syn.getSynchronization()!.host().then((value) => syn
       .getSynchronization(
           onConnected: onConnected, onComplete: onComplete, onError: onError)!
