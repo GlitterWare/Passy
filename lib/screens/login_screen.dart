@@ -13,6 +13,7 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/common/assets.dart';
+import 'package:passy/screens/splash_screen.dart';
 
 import 'add_account_screen.dart';
 import 'common.dart';
@@ -95,12 +96,14 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       return;
     }
     data.info.value.lastUsername = _username;
+    Navigator.pushNamed(context, SplashScreen.routeName);
     data.info.save().whenComplete(() async {
       try {
-        LoadedAccount _account = data.loadAccount(
+        LoadedAccount _account = await data.loadAccount(
             data.info.value.lastUsername, getPassyEncrypter(_password));
+        Navigator.pop(context);
         if (widget.autofillLogin) {
-          Navigator.pushNamed(
+          Navigator.pushReplacementNamed(
             context,
             SearchScreen.routeName,
             arguments: SearchScreenArgs(builder: _buildPasswords),
