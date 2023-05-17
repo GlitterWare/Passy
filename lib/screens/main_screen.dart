@@ -68,7 +68,7 @@ class _MainScreen extends State<MainScreen> {
                   ),
                   center: const Text('Downloads'),
                   right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => () => window.open(
+                  onPressed: () => window.open(
                       'https://github.com/GlitterWare/Passy/blob/dev/DOWNLOADS.md',
                       'Downloads'),
                 )),
