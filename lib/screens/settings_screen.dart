@@ -6,6 +6,7 @@ import 'package:passy/screens/security_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:websafe_svg/websafe_svg.dart';
 
 import 'automatic_backup_screen.dart';
 import 'backup_and_restore_screen.dart';
@@ -111,6 +112,22 @@ class _SettingsScreen extends State<SettingsScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () =>
                   Navigator.pushNamed(context, CredentialsScreen.routeName))),
+          PassyPadding(ThreeWidgetButton(
+            left: Padding(
+              padding: const EdgeInsets.only(right: 30),
+              child: WebsafeSvg.asset(
+                'assets/images/github_icon.svg',
+                width: 26,
+                colorFilter: const ColorFilter.mode(
+                    PassyTheme.lightContentColor, BlendMode.srcIn),
+              ),
+            ),
+            center: Text(localizations.requestAFeature),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => openUrl(
+              'https://github.com/GlitterWare/Passy/issues',
+            ),
+          )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.privacyPolicy),
             left: const Padding(
