@@ -32,11 +32,11 @@ If you are familiar with Git and GitHub, you may fork the https://github.com/Gli
 
 When you're done, head to the end of the `main.dart` file in `Passy/lib` and insert support for your localization into the supported locales list like so:
 ```dart
-      supportedLocales: const [
-        Locale('en'),
-        Locale('it'),
-        Locale('>>> Your localization code goes here <<<'),
-      ],
+const List<Locale> supportedLocales = [
+  Locale('en'),
+  Locale('it'),
+  Locale('>>> Your localization code goes here <<<'),
+];
 ```
 
 After this, you may commit and push your changes to your fork and submit a pull request at https://github.com/GlitterWare/Passy/pulls.
