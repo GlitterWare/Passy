@@ -88,7 +88,7 @@ Future<bool> bioAuth(String username) async {
       data.getPasswordHash(username)) return false;
   data.info.value.lastUsername = username;
   await data.info.save();
-  data.loadAccount(username, getPassyEncrypter(_bioData.password));
+  await data.loadAccount(username, getPassyEncrypter(_bioData.password));
   return true;
 }
 

@@ -147,6 +147,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                       labelText: localizations.password,
                       obscureText: true,
                       onChanged: (a) => setState(() => _password = a),
+                      onFieldSubmitted: (value) => _unlock(),
                       onPressed: _unlock,
                       buttonIcon: const Icon(Icons.arrow_forward_ios_rounded),
                     ),

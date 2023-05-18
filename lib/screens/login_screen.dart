@@ -106,7 +106,10 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           Navigator.pushReplacementNamed(
             context,
             SearchScreen.routeName,
-            arguments: SearchScreenArgs(builder: _buildPasswords),
+            arguments: SearchScreenArgs(
+              builder: _buildPasswords,
+              isAutofill: true,
+            ),
           );
           return;
         }
@@ -223,14 +226,15 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                           children: [
                             Row(
                               children: [
-                                FloatingActionButton(
-                                  onPressed: () =>
-                                      Navigator.pushReplacementNamed(
-                                          context, AddAccountScreen.routeName),
-                                  child: const Icon(Icons.add_rounded),
-                                  tooltip: localizations.addAccount,
-                                  heroTag: 'addAccountBtn',
-                                ),
+                                if (!widget.autofillLogin)
+                                  FloatingActionButton(
+                                    onPressed: () =>
+                                        Navigator.pushReplacementNamed(context,
+                                            AddAccountScreen.routeName),
+                                    child: const Icon(Icons.add_rounded),
+                                    tooltip: localizations.addAccount,
+                                    heroTag: 'addAccountBtn',
+                                  ),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
                                     borderRadius: const BorderRadius.all(

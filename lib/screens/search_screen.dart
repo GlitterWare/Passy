@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
@@ -6,10 +7,12 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 class SearchScreenArgs {
   String? title;
   Widget Function(String terms) builder;
+  bool isAutofill;
 
   SearchScreenArgs({
     this.title,
     required this.builder,
+    this.isAutofill = false,
   });
 }
 
@@ -48,7 +51,9 @@ class _SearchScreen extends State<SearchScreen> {
           padding: PassyTheme.appBarButtonPadding,
           splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.pop(context),
+          onPressed: args.isAutofill
+              ? SystemNavigator.pop
+              : () => Navigator.pop(context),
         ),
         title: Text(args.title ?? localizations.search),
         centerTitle: true,
