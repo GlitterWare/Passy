@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
@@ -20,7 +21,7 @@ class NoAccountsScreen extends StatelessWidget {
                 PassyPadding(Text(localizations.noAccounts)),
                 PassyPadding(FloatingActionButton(
                   child: const Icon(Icons.close_rounded),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => SystemNavigator.pop(),
                 )),
                 const Spacer(),
               ],

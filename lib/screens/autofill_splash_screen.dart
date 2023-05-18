@@ -24,15 +24,12 @@ class _AutofillSplashScreen extends State<AutofillSplashScreen> {
     super.initState();
     loadPassyData().then((value) async {
       data = value;
+      loadLocalizations(context);
       if (value.noAccounts) {
-        Navigator.pushReplacementNamed(context, NoAccountsScreen.routeName)
-            .then((value) => SystemNavigator.pop());
+        Navigator.pushReplacementNamed(context, NoAccountsScreen.routeName);
         return;
       }
-      Navigator.pushReplacementNamed(context, LoginScreen.routeName)
-          .then((value) async {
-        SystemNavigator.pop();
-      });
+      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
     });
   }
 
