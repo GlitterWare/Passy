@@ -67,7 +67,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       onPressed: (password) async {
         _found.remove(password);
         _found.insert(0, password);
-        for (PasswordMeta _password in _found) {
+        int max = _found.length < 5 ? _found.length : 5;
+        for (int i = 0; i != max; i++) {
+          PasswordMeta _password = _found[i];
           _dataSets.add(PwDataset(
             label: _password.nickname,
             username: _password.username,
