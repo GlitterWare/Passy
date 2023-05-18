@@ -91,10 +91,7 @@ void autofillEntryPoint() {
     ],
     // LOCALIZATION TEST
     //locale: const Locale('it'),
-    supportedLocales: const [
-      Locale('en'),
-      Locale('it'),
-    ],
+    supportedLocales: supportedLocales,
   ));
 }
 
@@ -180,11 +177,13 @@ class Passy extends StatelessWidget {
       ],
       // LOCALIZATION TEST
       //locale: const Locale('it'),
-      supportedLocales: const [
-        Locale('en'),
-        Locale('it'),
-        Locale('ru'),
-      ],
+      supportedLocales: supportedLocales,
     );
   }
 }
+
+const List<Locale> supportedLocales = [
+  Locale('en'),
+  Locale('it'),
+  Locale('ru'),
+];
