@@ -5,6 +5,8 @@ import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
+import 'common.dart';
+
 class GlobalSettingsScreen extends StatefulWidget {
   static const String routeName = '/globalSettings';
 
@@ -44,6 +46,17 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
                 },
               ),
             ),
+          if (!Platform.isAndroid && !Platform.isIOS)
+            PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.passyBrowserExtension),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.extension_rounded),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () => openUrl(
+                  'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
+            )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.about),
             left: const Padding(
