@@ -83,6 +83,18 @@ void autofillEntryPoint() {
       SearchScreen.routeName: (context) => const SearchScreen(),
       UnlockScreen.routeName: (context) => const UnlockScreen(),
     },
+    localizationsDelegates: const [
+      AppLocalizations.delegate, // Add this line
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    // LOCALIZATION TEST
+    //locale: const Locale('it'),
+    supportedLocales: const [
+      Locale('en'),
+      Locale('it'),
+    ],
   ));
 }
 
