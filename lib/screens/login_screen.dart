@@ -159,13 +159,26 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
       if (Platform.isAndroid) {
         FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
       }
-      _floatingActionButton = FloatingActionButton(
-        child: const Icon(Icons.settings_rounded),
-        tooltip: localizations.settings,
-        heroTag: null,
-        onPressed: () =>
-            Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
-      );
+      _floatingActionButton =
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        FloatingActionButton(
+          child: const Icon(Icons.settings_rounded),
+          tooltip: localizations.settings,
+          heroTag: null,
+          onPressed: () =>
+              Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: PassyTheme.passyPadding.left),
+          child: FloatingActionButton(
+            child: const Icon(Icons.extension_rounded),
+            tooltip: localizations.passyBrowserExtension,
+            heroTag: null,
+            onPressed: () => openUrl(
+                'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
+          ),
+        ),
+      ]);
     }
     WidgetsBinding.instance.addObserver(this);
     if (didRun) return;
