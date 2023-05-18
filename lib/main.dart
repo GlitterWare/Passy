@@ -183,6 +183,7 @@ class Passy extends StatelessWidget {
       supportedLocales: const [
         Locale('en'),
         Locale('it'),
+        Locale('ru'),
       ],
     );
   }
