@@ -118,6 +118,20 @@ class _IDCardsScreen extends State<IDCardsScreen> {
               ],
             )
           : IDCardButtonListView(
+              topWidgets: [
+                PassyPadding(
+                  ThreeWidgetButton(
+                    left: const Icon(Icons.add_rounded),
+                    center: Text(
+                      localizations.addIDCard,
+                      textAlign: TextAlign.center,
+                    ),
+                    right: const Icon(Icons.arrow_forward_ios_rounded),
+                    onPressed: () => Navigator.pushNamed(
+                        context, EditIDCardScreen.routeName),
+                  ),
+                ),
+              ],
               idCards: _idCards,
               shouldSort: true,
               onPressed: (idCard) => Navigator.pushNamed(

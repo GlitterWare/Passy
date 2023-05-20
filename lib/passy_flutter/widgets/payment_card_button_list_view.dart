@@ -6,12 +6,14 @@ class PaymentCardButtonListView extends StatelessWidget {
   final List<PaymentCardMeta> paymentCards;
   final bool shouldSort;
   final void Function(PaymentCardMeta paymentCard)? onPressed;
+  final List<Widget>? topWidgets;
 
   const PaymentCardButtonListView({
     Key? key,
     required this.paymentCards,
     this.shouldSort = false,
     this.onPressed,
+    this.topWidgets,
   }) : super(key: key);
 
   @override
@@ -19,6 +21,7 @@ class PaymentCardButtonListView extends StatelessWidget {
     if (shouldSort) PassySort.sortPaymentCards(paymentCards);
     return ListView(
       children: [
+        if (topWidgets != null) ...topWidgets!,
         for (PaymentCardMeta paymentCard in paymentCards)
           PassyPadding(PaymentCardButton(
             paymentCard: paymentCard,

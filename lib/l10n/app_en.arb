@@ -231,5 +231,10 @@
     "passyBrowserExtension": "Passy Browser Extension",
     "extensionSettingsNote": "For full feature set, including synchronization, automatic backups and entry sharing, visit the Passy desktop application",
     "requestAFeature": "Request a feature",
-    "privacyPolicy": "Privacy policy"
+    "privacyPolicy": "Privacy policy",
+    "addPassword": "Add password",
+    "addPaymentCard": "Add payment card",
+    "addNote": "Add note",
+    "addIDCard": "Add ID card",
+    "addIdentity": "Add identity"
 }

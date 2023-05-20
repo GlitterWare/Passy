@@ -111,6 +111,20 @@ class _NotesScreen extends State<NotesScreen> {
               ],
             )
           : NoteButtonListView(
+              topWidgets: [
+                PassyPadding(
+                  ThreeWidgetButton(
+                    left: const Icon(Icons.add_rounded),
+                    center: Text(
+                      localizations.addNote,
+                      textAlign: TextAlign.center,
+                    ),
+                    right: const Icon(Icons.arrow_forward_ios_rounded),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, EditNoteScreen.routeName),
+                  ),
+                ),
+              ],
               notes: _notes,
               shouldSort: true,
               onPressed: (note) => Navigator.pushNamed(

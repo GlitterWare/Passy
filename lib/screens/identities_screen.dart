@@ -118,6 +118,20 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
               ],
             )
           : IdentityButtonListView(
+              topWidgets: [
+                PassyPadding(
+                  ThreeWidgetButton(
+                    left: const Icon(Icons.add_rounded),
+                    center: Text(
+                      localizations.addIdentity,
+                      textAlign: TextAlign.center,
+                    ),
+                    right: const Icon(Icons.arrow_forward_ios_rounded),
+                    onPressed: () => Navigator.pushNamed(
+                        context, EditIdentityScreen.routeName),
+                  ),
+                ),
+              ],
               identities: _identities,
               shouldSort: true,
               onPressed: (identity) => Navigator.pushNamed(

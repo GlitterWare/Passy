@@ -8,6 +8,7 @@ class NoteButtonListView extends StatelessWidget {
   final void Function(NoteMeta note)? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(
       BuildContext context, NoteMeta noteMeta)? popupMenuItemBuilder;
+  final List<Widget>? topWidgets;
 
   const NoteButtonListView({
     Key? key,
@@ -15,6 +16,7 @@ class NoteButtonListView extends StatelessWidget {
     this.shouldSort = false,
     this.onPressed,
     this.popupMenuItemBuilder,
+    this.topWidgets,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,7 @@ class NoteButtonListView extends StatelessWidget {
     if (shouldSort) PassySort.sortNotes(notes);
     return ListView(
       children: [
+        if (topWidgets != null) ...topWidgets!,
         for (NoteMeta note in notes)
           PassyPadding(NoteButton(
             note: note,
