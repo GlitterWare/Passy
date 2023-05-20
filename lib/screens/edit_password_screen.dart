@@ -113,13 +113,15 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setPassword(_passwordArgs);
           if (isAutofill) {
-            await AutofillService().resultWithDataset(
-              label: _passwordArgs.nickname,
-              username: _passwordArgs.username.isNotEmpty
-                  ? _passwordArgs.username
-                  : _passwordArgs.email,
-              password: _passwordArgs.password,
-            );
+            await AutofillService().resultWithDatasets([
+              PwDataset(
+                label: _passwordArgs.nickname,
+                username: _passwordArgs.username.isNotEmpty
+                    ? _passwordArgs.username
+                    : _passwordArgs.email,
+                password: _passwordArgs.password,
+              ),
+            ]);
             Navigator.pop(context);
             Navigator.pop(context);
           }

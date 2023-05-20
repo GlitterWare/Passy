@@ -118,7 +118,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
             data.info.value.lastUsername, getPassyEncrypter(_password));
         Navigator.pop(context);
         if (isAutofill) {
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamed(
             context,
             SearchScreen.routeName,
             arguments: SearchScreenArgs(

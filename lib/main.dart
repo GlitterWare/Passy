@@ -77,6 +77,7 @@ void autofillEntryPoint() {
     ],
     routes: {
       AutofillSplashScreen.routeName: (context) => const AutofillSplashScreen(),
+      EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
       LogScreen.routeName: (context) => const LogScreen(),
       LoginScreen.routeName: (context) => const LoginScreen(),
       NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
