@@ -96,6 +96,20 @@ class _PasswordsScreen extends State<PasswordsScreen> {
               ],
             )
           : PasswordButtonListView(
+              topWidgets: [
+                PassyPadding(
+                  ThreeWidgetButton(
+                    left: const Icon(Icons.add_rounded),
+                    center: Text(
+                      localizations.addPassword,
+                      textAlign: TextAlign.center,
+                    ),
+                    right: const Icon(Icons.arrow_forward_ios_rounded),
+                    onPressed: () => Navigator.pushNamed(
+                        context, EditPasswordScreen.routeName),
+                  ),
+                ),
+              ],
               passwords: _passwords.toList(),
               onPressed: (password) => Navigator.pushNamed(
                   context, PasswordScreen.routeName,
