@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
@@ -7,6 +8,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'edit_custom_field_screen.dart';
 import 'password_screen.dart';
@@ -110,6 +112,17 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           );
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setPassword(_passwordArgs);
+          if (isAutofill) {
+            await AutofillService().resultWithDataset(
+              label: _passwordArgs.nickname,
+              username: _passwordArgs.username.isNotEmpty
+                  ? _passwordArgs.username
+                  : _passwordArgs.email,
+              password: _passwordArgs.password,
+            );
+            Navigator.pop(context);
+            Navigator.pop(context);
+          }
           Navigator.popUntil(
               context, (r) => r.settings.name == MainScreen.routeName);
           Navigator.pushNamed(context, PasswordsScreen.routeName);
