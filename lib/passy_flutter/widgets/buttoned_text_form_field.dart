@@ -14,6 +14,7 @@ class ButtonedTextFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final List<TextInputFormatter>? inputFormatters;
   final String? tooltip;
+  final bool autofocus;
 
   const ButtonedTextFormField({
     Key? key,
@@ -29,6 +30,7 @@ class ButtonedTextFormField extends StatelessWidget {
     this.focusNode,
     this.inputFormatters,
     this.tooltip,
+    this.autofocus = false,
   }) : super(key: key);
 
   @override
@@ -47,6 +49,7 @@ class ButtonedTextFormField extends StatelessWidget {
             onFieldSubmitted: onFieldSubmitted,
             focusNode: focusNode,
             inputFormatters: inputFormatters,
+            autofocus: autofocus,
           ),
         ),
         FloatingActionButton(
