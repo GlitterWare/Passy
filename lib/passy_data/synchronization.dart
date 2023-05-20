@@ -870,22 +870,10 @@ class Synchronization {
           }
           Encrypter usernameEncrypter =
               getPassyEncrypter(_loadedAccount.username);
-          String apiVersion = DateTime.now()
-                  .toUtc()
-                  .isBefore(synchronization2d0d0DeprecationDate)
-              ? '2d0d0'
-              : '2d0d1';
-          bool useNewAuth = // true
-              apiVersion == '2d0d1';
+          String apiVersion = '2d0d1';
 
           Map<String, dynamic> auth() {
             return {
-              'account': useNewAuth
-                  ? null
-                  : {
-                      'username': username,
-                      'passwordHash': _loadedAccount.passwordHash,
-                    },
               'auth': util.generateAuth(
                   encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
             };
@@ -895,7 +883,7 @@ class Synchronization {
           Map<String, dynamic> authResponse =
               _checkResponse(await _safeSync2d0d0Client.runModule([
             apiVersion,
-            useNewAuth ? 'authenticate' : 'checkAccount',
+            'authenticate',
             jsonEncode(auth()),
           ]));
           if (authResponse.containsKey('error')) {
@@ -950,14 +938,12 @@ class Synchronization {
               continue;
             }
           }
-          if (useNewAuth) {
-            try {
-              util.verifyAuth(authResponse['auth'],
-                  encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
-            } catch (e) {
-              _handleApiException('Failed to verify host auth', e);
-              return;
-            }
+          try {
+            util.verifyAuth(authResponse['auth'],
+                encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
+          } catch (e) {
+            _handleApiException('Failed to verify host auth', e);
+            return;
           }
           // 1. Receive hashes
           _syncLog += 'done.\nReceiving hashes... ';

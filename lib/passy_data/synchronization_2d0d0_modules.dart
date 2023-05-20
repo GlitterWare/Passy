@@ -23,12 +23,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
 }) {
   history.reloadSync();
   Encrypter usernameEncrypter = getPassyEncrypter(account.username);
-  String apiVersion =
-      DateTime.now().toUtc().isBefore(synchronization2d0d0DeprecationDate)
-          ? '2d0d0'
-          : '2d0d1';
-  bool useNewAuth = // true
-      apiVersion == '2d0d1';
+  String apiVersion = '2d0d1';
   String generateAuth() {
     return util.generateAuth(
         encrypter: encrypter, usernameEncrypter: usernameEncrypter);
@@ -87,59 +82,12 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               },
             };
           }
-          if (useNewAuth) {
-            try {
-              util.verifyAuth(decoded['auth'],
-                  encrypter: encrypter, usernameEncrypter: usernameEncrypter);
-            } catch (e) {
-              if (e is Map<String, dynamic>) return e;
-              rethrow;
-            }
-            return decoded;
-          }
-          dynamic _account = decoded['account'];
-          if (_account is! Map<String, dynamic>) {
-            throw {
-              'error': {
-                'type': 'Malformed account',
-                'description':
-                    'Expected type `Map<String, dynamic>`, received type `${_account.runtimeType.toString()}`',
-              },
-            };
-          }
-          dynamic username = _account['username'];
-          if (username is! String) {
-            throw {
-              'error': {
-                'type': 'Malformed username',
-                'description':
-                    'Expected type `String`, received type `${username.runtimeType.toString()}`',
-              },
-            };
-          }
-          dynamic passwordHash = _account['passwordHash'];
-          if (passwordHash is! String) {
-            throw {
-              'error': {
-                'type': 'Malformed password hash',
-                'description':
-                    'Expected type `String`, received type `${passwordHash.runtimeType.toString()}`',
-              },
-            };
-          }
-          if (username != account.username) {
-            return {
-              'error': {'type': 'Invalid credentials'},
-              'description':
-                  'Make sure that both accounts have the same username and password. The only viable synchronization option between different accounts is entry sharing.',
-            };
-          }
-          if (passwordHash != account.passwordHash) {
-            return {
-              'error': {'type': 'Invalid credentials'},
-              'description':
-                  'Make sure that both accounts have the same username and password. The only viable synchronization option between different accounts is entry sharing.',
-            };
+          try {
+            util.verifyAuth(decoded['auth'],
+                encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+          } catch (e) {
+            if (e is Map<String, dynamic>) return e;
+            rethrow;
           }
           return decoded;
         }
