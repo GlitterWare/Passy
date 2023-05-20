@@ -322,7 +322,11 @@ class LoadedAccount {
   set protectScreen(bool value) => _settings.value.protectScreen = value;
   bool get autoScreenLock => _settings.value.autoScreenLock;
   set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
-  bool get isRSAKeypairLoaded => _settings.value.rsaKeypair != null;
+  bool get isRSAKeypairLoaded {
+    _settings.reloadSync();
+    return _settings.value.rsaKeypair != null;
+  }
+
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
 
