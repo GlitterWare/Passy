@@ -17,6 +17,7 @@ import 'package:passy/screens/splash_screen.dart';
 
 import 'add_account_screen.dart';
 import 'common.dart';
+import 'edit_password_screen.dart';
 import 'global_settings_screen.dart';
 import 'main_screen.dart';
 import 'log_screen.dart';
@@ -61,6 +62,18 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
     List<PwDataset> _dataSets = [];
     return PasswordButtonListView(
+      topWidgets: [
+        ThreeWidgetButton(
+          left: const Icon(Icons.add_rounded),
+          center: Text(
+            localizations.addPassword,
+            textAlign: TextAlign.center,
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () =>
+              Navigator.pushNamed(context, EditPasswordScreen.routeName),
+        ),
+      ],
       passwords: _found,
       onPressed: (password) async {
         _found.remove(password);
