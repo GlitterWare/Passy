@@ -36,6 +36,8 @@ import 'password_screen.dart';
 import 'passwords_screen.dart';
 import 'payment_card_screen.dart';
 
+bool isAutofill = false;
+
 const screenToRouteName = {
   Screen.main: MainScreen.routeName,
   Screen.passwords: PasswordsScreen.routeName,

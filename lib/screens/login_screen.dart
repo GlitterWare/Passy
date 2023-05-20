@@ -22,9 +22,7 @@ import 'main_screen.dart';
 import 'log_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final bool autofillLogin;
-
-  const LoginScreen({Key? key, this.autofillLogin = false}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   static const routeName = '/login';
 
@@ -106,7 +104,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         LoadedAccount _account = await data.loadAccount(
             data.info.value.lastUsername, getPassyEncrypter(_password));
         Navigator.pop(context);
-        if (widget.autofillLogin) {
+        if (isAutofill) {
           Navigator.pushReplacementNamed(
             context,
             SearchScreen.routeName,
@@ -140,7 +138,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
 
   void updateBioAuthButton() {
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (widget.autofillLogin) return;
+    if (isAutofill) return;
     if (data.getBioAuthEnabled(_username) == true) {
       _bioAuthButton = FloatingActionButton(
         onPressed: () => _bioAuth(),
@@ -159,7 +157,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     data.refreshAccounts();
-    if (!widget.autofillLogin) {
+    if (!isAutofill) {
       if (Platform.isAndroid) {
         FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
       }
@@ -244,7 +242,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                           children: [
                             Row(
                               children: [
-                                if (!widget.autofillLogin)
+                                if (!isAutofill)
                                   FloatingActionButton(
                                     onPressed: () =>
                                         Navigator.pushReplacementNamed(context,
