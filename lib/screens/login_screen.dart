@@ -63,7 +63,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     List<PwDataset> _dataSets = [];
     return PasswordButtonListView(
       topWidgets: [
-        ThreeWidgetButton(
+        PassyPadding(ThreeWidgetButton(
           left: const Icon(Icons.add_rounded),
           center: Text(
             localizations.addPassword,
@@ -72,7 +72,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () =>
               Navigator.pushNamed(context, EditPasswordScreen.routeName),
-        ),
+        )),
       ],
       passwords: _found,
       onPressed: (password) async {
