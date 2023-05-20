@@ -51,6 +51,7 @@ Submissions will be finished until June 1 2023.
 - 🖐️ Biometrics – Quickly unlock the app using your fingerprint.
 - 📚 Multipurpose – Store passwords, payment cards, notes, id cards and identities, all in one place.
 - ⚡ Autofill – Quickly fill fields in apps and websites without having to open the app.
+- 🧩 Browser extension - Use autofill and add new entries on the fly right from your browser. (See https://github.com/GlitterWare/Passy-Browser-Extension)
 
 ## Installing
 
