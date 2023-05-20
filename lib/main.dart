@@ -16,6 +16,7 @@ import 'package:passy/screens/no_accounts_screen.dart';
 import 'common/common.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/change_username_screen.dart';
+import 'screens/common.dart';
 import 'screens/confirm_restore_screen.dart';
 import 'screens/credentials_screen.dart';
 import 'screens/csv_import_screen.dart';
@@ -66,6 +67,7 @@ void main() => runApp(const Passy());
 
 @pragma('vm:entry-point')
 void autofillEntryPoint() {
+  isAutofill = true;
   runApp(MaterialApp(
     title: 'Passy',
     theme: theme,
@@ -76,9 +78,7 @@ void autofillEntryPoint() {
     routes: {
       AutofillSplashScreen.routeName: (context) => const AutofillSplashScreen(),
       LogScreen.routeName: (context) => const LogScreen(),
-      LoginScreen.routeName: (context) => const LoginScreen(
-            autofillLogin: true,
-          ),
+      LoginScreen.routeName: (context) => const LoginScreen(),
       NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
       SearchScreen.routeName: (context) => const SearchScreen(),
       UnlockScreen.routeName: (context) => const UnlockScreen(),
