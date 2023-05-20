@@ -9,8 +9,6 @@ import 'dart:io';
 const String passyVersion = '1.4.1';
 const String syncVersion = '2.0.0';
 const String accountVersion = '2.2.0';
-//TODO: remove after 20th of May
-final DateTime synchronization2d0d0DeprecationDate = DateTime(2023, 5, 20);
 
 /// Returns false if version2 is lower, true if version2 is higher and null if both versions are the same
 bool? compareVersions(version1, version2) {
