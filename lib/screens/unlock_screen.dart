@@ -150,6 +150,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                       onFieldSubmitted: (value) => _unlock(),
                       onPressed: _unlock,
                       buttonIcon: const Icon(Icons.arrow_forward_ios_rounded),
+                      autofocus: true,
                     ),
                   ),
                   const Spacer(
