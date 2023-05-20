@@ -70,10 +70,12 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         int max = _found.length < 5 ? _found.length : 5;
         for (int i = 0; i != max; i++) {
           PasswordMeta _password = _found[i];
+          Password? _pass = data.loadedAccount!.getPassword(_password.key);
+          if (_pass == null) continue;
           _dataSets.add(PwDataset(
             label: _password.nickname,
-            username: _password.username,
-            password: data.loadedAccount!.getPassword(_password.key)!.password,
+            username: _pass.username.isNotEmpty ? _pass.username : _pass.email,
+            password: _pass.password,
           ));
         }
         await AutofillService().resultWithDatasets(_dataSets);
