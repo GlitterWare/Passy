@@ -39,7 +39,7 @@ class _ExportScreen extends State<ExportScreen> {
                   text: localizations.confirmExport2Highlighted,
                   style: const TextStyle(
                       color: PassyTheme.lightContentSecondaryColor)),
-              TextSpan(text: '.\n\n${localizations.confirmImport3}.'),
+              TextSpan(text: '.\n\n${localizations.confirmExport3}.'),
             ],
           ),
           textAlign: TextAlign.center,
