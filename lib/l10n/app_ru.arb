@@ -220,7 +220,7 @@
     "csvImportMessage1":"Выберите значения полей CSV в соответствии с вводными переменными",
     "csvImportMessage2": "Этот шаблон будет использоваться для всех записей в формате CSV",
     "@csvImportMessage1": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" },
-    "@csvImportMessage2": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" }
+    "@csvImportMessage2": { "description": "csvImportMessage1 and csvImportMessage2 make up a single message used in the CSV import entries screen" },
     "noConnectorFound": "Коннектор не найден",
     "pleaseDownloadAndInstallTheMainPassyApplication": "Загрузите и установите основное приложение Passy.",
     "download": "Загрузить",
