@@ -64,6 +64,17 @@ class _MainScreen extends State<MainScreen> {
                 PassyPadding(ThreeWidgetButton(
                   left: const Padding(
                     padding: EdgeInsets.only(right: 30),
+                    child: Icon(Icons.extension_rounded),
+                  ),
+                  center: const Text('Browser Extension'),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: () => window.open(
+                      'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md',
+                      'Browser Extension'),
+                )),
+                PassyPadding(ThreeWidgetButton(
+                  left: const Padding(
+                    padding: EdgeInsets.only(right: 30),
                     child: Icon(Icons.download_rounded),
                   ),
                   center: const Text('Downloads'),
