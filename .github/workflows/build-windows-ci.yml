@@ -1,0 +1,32 @@
+name: Build Passy for Windows
+on:
+  workflow_dispatch:
+jobs:
+  build_windows:
+    name: Build Passy for Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.7.12'
+          channel: 'stable'
+      - name: Configure flutter
+        shell: bash
+        run: flutter config --no-analytics
+      - name: Build Passy for Windows
+        shell: bash
+        run: ./build_windows_with_updates_popup.bat
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          mkdir -p build/windows-portable/Passy
+          cp -r Passy/build/windows/runner/Release/. build/windows-portable/Passy
+      - name: Upload Windows portable build
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-portable
+          path: D:\a\Passy\build\windows-portable
