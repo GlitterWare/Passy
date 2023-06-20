@@ -184,8 +184,9 @@ void refreshAccounts() {
 }
 
 Future<void> load() async {
-  _passyDataPath =
-      Locator.getPlatformSpecificCachePath() + Platform.pathSeparator + 'Passy';
+  _passyDataPath = await Locator.getPlatformSpecificCachePath() +
+      Platform.pathSeparator +
+      'Passy';
   _accountsPath = _passyDataPath + Platform.pathSeparator + 'accounts';
   refreshAccounts();
 }

@@ -1,4 +1,6 @@
-import 'dart:io' show Directory, FileSystemEntity, Platform;
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:path/path.dart' as path_lib;
 
 /// Static helper class for determining platform's app data path.
@@ -8,11 +10,11 @@ import 'package:path/path.dart' as path_lib;
 /// StackOverflow answers. Submit a PR if you believe these are
 /// wrong.
 class Locator {
-  static String getPlatformSpecificCachePath() {
+  static Future<String> getPlatformSpecificCachePath() async {
     var os = Platform.operatingSystem;
     switch (os) {
       case 'windows':
-        return _verify(_findWindows());
+        return _verify(await _findWindows());
       case 'linux':
         return _verify(_findLinux());
       case 'macos':
@@ -34,8 +36,33 @@ class Locator {
         'The user application path for this platform ("$path") does not exist on this system');
   }
 
-  static String _findWindows() {
-    return path_lib.join(Platform.environment['UserProfile']!, 'Documents');
+  static Future<String> _findWindows() async {
+    ProcessResult regResult = await Process.run('reg', [
+      'query',
+      'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders',
+      '/v',
+      'Personal',
+    ]);
+    dynamic result = regResult.stdout;
+    if (result is! String) {
+      return path_lib.join(Platform.environment['UserProfile']!, 'Documents');
+    }
+    return result
+        .split('Personal')[1]
+        .split('    ')[2]
+        .replaceAll('\r', '')
+        .replaceAll('\n', '')
+        .split('\\')
+        .map((element) {
+          if (element.length < 3) return element;
+          if (element[0] != '%') return element;
+          if (element[element.length - 1] != '%') return element;
+          return Platform
+                  .environment[element.substring(1, element.length - 1)] ??
+              element.substring(1, element.length);
+        })
+        .toList()
+        .join('\\');
   }
 
   static String _findLinux() {
@@ -66,12 +93,15 @@ class AppData {
   late String _path;
   late Directory _directory;
 
-  AppData.findOrCreate(this.name) {
-    _findOrCreate();
+  AppData._(this.name);
+  static Future<AppData> findOrCreate(String name) async {
+    AppData appdata = AppData._(name);
+    await appdata._findOrCreate();
+    return appdata;
   }
 
-  void _findOrCreate() {
-    final cachePath = Locator.getPlatformSpecificCachePath();
+  Future<void> _findOrCreate() async {
+    final cachePath = await Locator.getPlatformSpecificCachePath();
     _path = path_lib.join(cachePath, name);
 
     _directory = Directory(_path);
