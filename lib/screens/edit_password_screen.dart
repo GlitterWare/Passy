@@ -186,8 +186,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(32.0)),
                                 color: PassyTheme.darkPassyPurple),
-                            child: PassyPadding(Row(
-                              children: const [
+                            child: const PassyPadding(Row(
+                              children: [
                                 Padding(
                                   padding: EdgeInsets.only(left: 5),
                                   child: Icon(Icons.security),
