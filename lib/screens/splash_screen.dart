@@ -10,7 +10,6 @@ import 'package:passy/screens/add_account_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'login_screen.dart';
 
@@ -63,17 +62,18 @@ class SplashScreen extends StatelessWidget {
         if (!(await original.exists())) return null;
         if (!(await originalScript.exists())) return null;
         Directory copyDir = Directory(
-            (await getApplicationDocumentsDirectory()).path +
-                Platform.pathSeparator +
-                'Passy' +
-                Platform.pathSeparator +
-                'passy_cli' +
-                Platform.pathSeparator +
-                'temp' +
-                Platform.pathSeparator +
-                'bin' +
-                Platform.pathSeparator +
-                'passy_cli');
+          (await getDocumentsDirectory()).path +
+              Platform.pathSeparator +
+              'Passy' +
+              Platform.pathSeparator +
+              'passy_cli' +
+              Platform.pathSeparator +
+              'temp' +
+              Platform.pathSeparator +
+              'bin' +
+              Platform.pathSeparator +
+              'passy_cli',
+        );
         if (await copyDir.exists()) {
           List<FileSystemEntity> files =
               await copyDir.list(recursive: true).toList();
@@ -138,7 +138,7 @@ class SplashScreen extends StatelessWidget {
         contentsDecoded['path'] = cliTempPath;
         contents = jsonEncode(contentsDecoded);
         Directory copyDir = Directory(
-          (await getApplicationDocumentsDirectory()).path +
+          (await getDocumentsDirectory()).path +
               Platform.pathSeparator +
               'Passy' +
               Platform.pathSeparator +
