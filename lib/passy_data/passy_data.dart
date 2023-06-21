@@ -166,13 +166,11 @@ class PassyData {
 
   Future<LoadedAccount> loadAccount(
       String username, Encrypter encrypter) async {
-    _loadedAccount = await compute(
-        (message) => loadLegacyAccount(
-              path: accountsPath + Platform.pathSeparator + username,
-              encrypter: encrypter,
-              credentials: _accounts[username],
-            ),
-        null);
+    _loadedAccount = loadLegacyAccount(
+      path: accountsPath + Platform.pathSeparator + username,
+      encrypter: encrypter,
+      credentials: _accounts[username],
+    );
     _loadedAccountEncrypter = encrypter;
     return _loadedAccount!;
   }
