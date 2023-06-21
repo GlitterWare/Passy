@@ -166,6 +166,10 @@ class SplashScreen extends StatelessWidget {
       } catch (_) {
         return;
       }
+      String? home = Platform.environment['HOME'];
+      if (home == null || home.contains('/snap/passy/')) {
+        home = path_lib.join('/', 'home', Platform.environment['USER']);
+      }
       for (String nativeManifestPath in const [
         '.mozilla/native-messaging-hosts',
         '.config/microsoft-edge/NativeMessagingHosts',
@@ -173,11 +177,8 @@ class SplashScreen extends StatelessWidget {
         '.config/chromium/NativeMessagingHosts',
         '.config/BraveSoftware/Brave-Browser/NativeMessagingHosts',
       ]) {
-        Directory nativeManifestDir = Directory(path_lib.join(
-          'home',
-          Platform.environment['HOME'],
-          nativeManifestPath,
-        ));
+        Directory nativeManifestDir =
+            Directory(path_lib.join(home, nativeManifestPath));
         File nativeManifestFile = File(path_lib.join(
           nativeManifestDir.path,
           nativeManifestNewFilename,
