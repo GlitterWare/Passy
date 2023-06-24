@@ -148,7 +148,7 @@ Available options:
 
 ## Privacy Policy
 
-[1 MAY, 2023](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
+[24 JUNE, 2023](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
 
 ## Links & Mentions
 
