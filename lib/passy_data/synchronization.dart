@@ -909,34 +909,33 @@ class Synchronization {
               _handleException(
                   '2.0.0+ synchronization host error:\n${jsonEncode(authResponse)}');
               return;
-            } else {
-              _syncLog += 'done.\nProcessing shared entries... ';
-              String nowString = DateTime.now().toUtc().toIso8601String();
-              int i = 0;
-              for (List<util.ExchangeEntry> sharedEntriesEntry
-                  in sharedEntries.values) {
-                for (util.ExchangeEntry exchangeEntry in sharedEntriesEntry) {
-                  exchangeEntry.key = '$nowString-shared-$i';
-                  i++;
-                  if (i == 15) break;
-                }
+            }
+            _syncLog += 'done.\nProcessing shared entries... ';
+            String nowString = DateTime.now().toUtc().toIso8601String();
+            int i = 0;
+            for (List<util.ExchangeEntry> sharedEntriesEntry
+                in sharedEntries.values) {
+              for (util.ExchangeEntry exchangeEntry in sharedEntriesEntry) {
+                exchangeEntry.key = '$nowString-shared-$i';
+                i++;
                 if (i == 15) break;
               }
-              try {
-                await util.processTypedExchangeEntries(
-                  entries: sharedEntries,
-                  account: _loadedAccount,
-                  history: _history.value,
-                  onSetEntry: () => _entriesAdded++,
-                  onRemoveEntry: () => _entriesAdded++,
-                );
-              } catch (e) {
-                _handleApiException('Failed to process shared entries', e);
-                return;
-              }
-              _synchronizationResults.sharedEntries = sharedEntries;
-              continue;
+              if (i == 15) break;
             }
+            try {
+              await util.processTypedExchangeEntries(
+                entries: sharedEntries,
+                account: _loadedAccount,
+                history: _history.value,
+                onSetEntry: () => _entriesAdded++,
+                onRemoveEntry: () => _entriesAdded++,
+              );
+            } catch (e) {
+              _handleApiException('Failed to process shared entries', e);
+              return;
+            }
+            _synchronizationResults.sharedEntries = sharedEntries;
+            continue;
           }
           try {
             util.verifyAuth(authResponse['auth'],
