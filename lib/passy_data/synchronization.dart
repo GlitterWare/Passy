@@ -910,6 +910,7 @@ class Synchronization {
                   '2.0.0+ synchronization host error:\n${jsonEncode(authResponse)}');
               return;
             }
+
             _syncLog += 'done.\nProcessing shared entries... ';
             String nowString = DateTime.now().toUtc().toIso8601String();
             int i = 0;
