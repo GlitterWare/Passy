@@ -120,17 +120,6 @@ class SplashScreen extends StatelessWidget {
             'passy_cli_native_messaging' +
             scriptSuffix;
         scriptCopy = await originalScript.copy(scriptCopyPath);
-        if (Platform.isLinux) {
-          if (Platform.environment['SNAP_NAME'] == 'passy') {
-            String snapCopyPath = tempCopyDir.path +
-                Platform.pathSeparator +
-                'snap_native_messaging_launcher.sh';
-            return await File(original.parent.path +
-                    Platform.pathSeparator +
-                    'snap_native_messaging_launcher.sh')
-                .copy(snapCopyPath);
-          }
-        }
       } catch (_) {
         return null;
       }
