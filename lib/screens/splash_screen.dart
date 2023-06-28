@@ -120,6 +120,17 @@ class SplashScreen extends StatelessWidget {
             'passy_cli_native_messaging' +
             scriptSuffix;
         scriptCopy = await originalScript.copy(scriptCopyPath);
+        if (Platform.isLinux) {
+          if (Platform.environment['SNAP_NAME'] == 'passy') {
+            String snapCopyPath = tempCopyDir.path +
+                Platform.pathSeparator +
+                'snap_native_messaging_launcher.sh';
+            return await File(original.parent.path +
+                    Platform.pathSeparator +
+                    'snap_native_messaging_launcher.sh')
+                .copy(snapCopyPath);
+          }
+        }
       } catch (_) {
         return null;
       }
@@ -166,10 +177,8 @@ class SplashScreen extends StatelessWidget {
       } catch (_) {
         return;
       }
-      String? home = Platform.environment['HOME'];
-      if (home == null || home.contains('/snap/passy/')) {
-        home = path_lib.join('/', 'home', Platform.environment['USER']);
-      }
+      String? home = Platform.environment['SNAP_REAL_HOME'];
+      home ??= Platform.environment['HOME']!;
       for (String nativeManifestPath in const [
         '.mozilla/native-messaging-hosts',
         '.config/microsoft-edge/NativeMessagingHosts',

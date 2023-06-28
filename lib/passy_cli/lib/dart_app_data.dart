@@ -65,7 +65,11 @@ class Locator {
   }
 
   static String _findLinux() {
-    return path_lib.join('home', Platform.environment['HOME'], 'Documents');
+    String? snapHome = Platform.environment['SNAP_REAL_HOME'];
+    if (snapHome == null) {
+      return '${Platform.environment['HOME']}/Documents';
+    }
+    return '$snapHome/Documents';
   }
 }
 
