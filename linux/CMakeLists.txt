@@ -143,7 +143,7 @@ set(CLI_LIB_DIR "${APP_SOURCE_DIR}/lib/passy_cli")
 set(CLI_BIN_DIR "${CLI_LIB_DIR}/bin")
 
 # Install linux assets
-set(LOGO_FILE "${APP_SOURCE_DIR}/logo.svg")
+set(LOGO_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.svg")
 set(APPSTREAM_METADATA_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.appdata.xml")
 set(DOT_DESKTOP_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.desktop")
 set(PASSY_LAUNCHER_FILE "${LINUX_ASSETS_DIR}/passy_launcher.sh")
