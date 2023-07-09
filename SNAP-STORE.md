@@ -18,7 +18,7 @@ With the Ubuntu/Debian store app installed, you can use it to install Passy.
 
 If you are interested in using **Passy browser extension**, don't forget to check the [Enabling Browser Extension Support](#enabling-browser-extension-support) after the installation is complete.
 
-1. Open the Ubunut/Debian store app (if you can't find it in your application drawer, see [Command-line](#command-line):  
+1. Open the Ubunut/Debian store app (if you can't find it in your application drawer, see [Command-line](#command-line)):  
 ![Open the Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/ad9266d4-1800-4ff1-a6ce-e88a99e6ea3d)
 2. Find Passy in Ubuntu/Debian store app and click on the search result:  
 ![Finding Passy in Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/c1ddb72c-82c6-433b-b62b-463a3b5723e7)
