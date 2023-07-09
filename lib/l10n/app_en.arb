@@ -236,5 +236,7 @@
     "addPaymentCard": "Add payment card",
     "addNote": "Add note",
     "addIDCard": "Add ID card",
-    "addIdentity": "Add identity"
+    "addIdentity": "Add identity",
+    "newVersionAvailable": "New version available",
+    "unableToConnectBrowserExtension": "Unable to connect browser extension"
 }
