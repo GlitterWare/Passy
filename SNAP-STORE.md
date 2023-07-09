@@ -18,9 +18,11 @@ With the Ubuntu/Debian store app installed, you can use it to install Passy.
 
 If you are interested in using **Passy browser extension**, don't forget to check the [Enabling Browser Extension Support](#enabling-browser-extension-support) after the installation is complete.
 
-1. Find Passy in Ubuntu/Debian store app and click on the search result:
+1. Open the Ubunut/Debian store app (if you can't find it in your application drawer, see [Command-line](#command-line):  
+![Open the Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/ad9266d4-1800-4ff1-a6ce-e88a99e6ea3d)
+1. Find Passy in Ubuntu/Debian store app and click on the search result:  
 ![Finding Passy in Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/c1ddb72c-82c6-433b-b62b-463a3b5723e7)
-2. Once on Passy's application page, press the `Install` button:
+2. Once on Passy's application page, press the `Install` button:  
 ![Press `Install` to install Passy](https://github.com/GlitterWare/Passy/assets/101527589/fc2dcfde-b64b-4d77-b882-8038adcf49bc)
 3. When the installation completes, you should be able to find Passy in your application drawer.
 4. [Enable browser extension support](#enabling-browser-extension-support) (Optional).
@@ -40,11 +42,11 @@ By default, Passy Snap package requires additional permissions to allow for the 
 
 If you have Ubuntu/Debian store app installed, you can make use of it to enable browser extension support.
 
-1. On Passy's application page in Ubuntu/Debian store, use the `Permissions` button:
+1. On Passy's application page in Ubuntu/Debian store, use the `Permissions` button:  
 ![Use the `Permissions` button in Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/4a34b7fa-99e2-4341-8ae9-561cce17dbee)
-2. Click the knob next to `personal-files` to toggle it:
+2. Click the knob next to `personal-files` to toggle it:  
 ![Toggle the personal files interface permission knob](https://github.com/GlitterWare/Passy/assets/101527589/5d1a4501-e4f9-4ee5-8264-d0385b7ecc0d)
-3. You may need to enter your system user password to allow the Snap client to connect the interface:
+3. You may need to enter your system user password to allow the Snap client to connect the interface:  
 ![Enter your system user password to connect the interface](https://github.com/GlitterWare/Passy/assets/101527589/b4c476e1-8710-4ca9-91e1-2d68f62a9874)
 
 ### Command-line
