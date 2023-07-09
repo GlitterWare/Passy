@@ -214,12 +214,73 @@ class SplashScreen extends StatelessWidget {
       }
     }
 
+    Future<bool> _testNativeMessagingHostsInterfaceAccess() async {
+      const nativeManifestDomain = 'io.github.glitterware.passy_cli';
+      const nativeManifestNewFilename = '$nativeManifestDomain.test';
+      String? home = Platform.environment['SNAP_REAL_HOME'];
+      home ??= Platform.environment['HOME']!;
+      Directory? nativeManifestDir;
+      for (String nativeManifestPath in const [
+        '.mozilla/native-messaging-hosts',
+        '.config/microsoft-edge/NativeMessagingHosts',
+        '.config/google-chrome/NativeMessagingHosts',
+        '.config/chromium/NativeMessagingHosts',
+        '.config/BraveSoftware/Brave-Browser/NativeMessagingHosts',
+      ]) {
+        Directory testDir = Directory(path_lib.join(home, nativeManifestPath));
+        bool exists;
+        try {
+          exists = await testDir.exists();
+        } catch (_) {
+          continue;
+        }
+        if (exists) {
+          nativeManifestDir = testDir;
+          break;
+        }
+      }
+      if (nativeManifestDir == null) return true;
+      File testManifestFile =
+          File(nativeManifestDir.path + '/' + nativeManifestNewFilename);
+      try {
+        await testManifestFile.create();
+        if (await testManifestFile.exists()) {
+          await testManifestFile.delete();
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+
     Future<void> _copyExtensionFiles() async {
       File? passyCliTemp = await _getTemporaryCliExecutable();
       if (passyCliTemp == null) return;
       File? manifest = await _prepareManifest(passyCliTemp.path);
       if (manifest == null) return;
       if (Platform.isLinux) {
+        if (isSnap()) {
+          dynamic hasAccess = await _testNativeMessagingHostsInterfaceAccess();
+          if (hasAccess != true) {
+            if (context.mounted) {
+              showSnackBar(
+                context,
+                message: localizations.unableToConnectBrowserExtension,
+                icon: const Icon(Icons.extension_rounded,
+                    color: PassyTheme.lightContentColor),
+                duration: const Duration(seconds: 10),
+                action: SnackBarAction(
+                  textColor: PassyTheme.lightContentColor,
+                  label: localizations.details,
+                  onPressed: () => openUrl(
+                      'https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md#enabling-browser-extension-support'),
+                ),
+                textStyle: const TextStyle(color: PassyTheme.lightContentColor),
+                backgroundColor: const Color.fromRGBO(255, 82, 82, 1),
+              );
+            }
+            return;
+          }
+        }
         _copyManifestLinux(manifest);
         return;
       }
