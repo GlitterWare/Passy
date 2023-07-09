@@ -27,7 +27,7 @@ class SplashScreen extends StatelessWidget {
         context: context,
         builder: (context) => AlertDialog(
           shape: PassyTheme.dialogShape,
-          title: const Text('New version available'),
+          title: Text(localizations.newVersionAvailable),
           content: ThreeWidgetButton(
             left: Padding(
               padding: const EdgeInsets.only(right: 30),
@@ -38,7 +38,7 @@ class SplashScreen extends StatelessWidget {
                     PassyTheme.lightContentColor, BlendMode.srcIn),
               ),
             ),
-            center: const Text('Download'),
+            center: Text(localizations.download),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () =>
                 openUrl('https://github.com/GlitterWare/Passy/releases/latest'),
