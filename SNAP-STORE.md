@@ -12,13 +12,15 @@
 
 ## Installing Passy
 
+Some popular Linux distributions (Ubuntu, Manjaro, KDE Neon) come with Snap pre-installed. If you do not have Snap installed on your system you can see [Passy latest release](https://github.com/GlitterWare/Passy/releases/latest) for Linux AppImage and Bundle downloads, use our [Flathub package](https://flathub.org/apps/details/io.github.glitterware.Passy) or check [get set up for snaps](https://snapcraft.io/docs/installing-snapd) for Snap installation guide.
+
 ### The GUI Way (Recommended)
 
 With the Ubuntu/Debian store app installed, you can use it to install Passy.
 
 If you are interested in using **Passy browser extension**, don't forget to check the [Enabling Browser Extension Support](#enabling-browser-extension-support) section after the installation is complete.
 
-1. Open the Ubunut/Debian store app (if you can't find it in your application drawer, see [Command-line](#command-line)):  
+1. Open the Ubuntu/Debian store app (if you can't find it in your application drawer, see [Command-line](#command-line)):  
 ![Open the Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/ad9266d4-1800-4ff1-a6ce-e88a99e6ea3d)
 2. Find Passy in Ubuntu/Debian store app and click on the search result:  
 ![Finding Passy in Ubuntu/Debian store app](https://github.com/GlitterWare/Passy/assets/101527589/c1ddb72c-82c6-433b-b62b-463a3b5723e7)
