@@ -227,6 +227,7 @@ class SplashScreen extends StatelessWidget {
     }
 
     Future<void> _load() async {
+      await Future.delayed(const Duration(milliseconds: 5));
       if (Platform.isWindows || Platform.isLinux) _copyExtensionFiles();
       data = await loadPassyData();
       loaded = true;
