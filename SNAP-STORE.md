@@ -12,7 +12,7 @@
 
 ## Installing Passy
 
-Some popular Linux distributions (Ubuntu, Manjaro, KDE Neon) come with Snap pre-installed. If you do not have Snap installed on your system you can see [Passy latest release](https://github.com/GlitterWare/Passy/releases/latest) for Linux AppImage and Bundle downloads, use our [Flathub package](https://flathub.org/apps/details/io.github.glitterware.Passy) or check [get set up for snaps](https://snapcraft.io/docs/installing-snapd) for Snap installation guide.
+Some popular Linux distributions (Ubuntu, Manjaro, KDE Neon) come with Snap pre-installed. If you do not have Snap installed on your system you can see [Passy latest release](https://github.com/GlitterWare/Passy/releases/latest) for Linux AppImage and Bundle downloads, use our [Flathub package](https://flathub.org/apps/details/io.github.glitterware.Passy) or check https://snapcraft.io/docs/installing-snapd for Snap installation guide.
 
 ### The GUI Way (Recommended)
 
