@@ -219,17 +219,26 @@ Result? qrResultFromImage(imglib.Image image) {
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
   BuildContext context, {
   required String message,
+  TextStyle? textStyle,
   required Widget icon,
   SnackBarAction? action,
+  Duration duration = const Duration(milliseconds: 4000),
+  Color? backgroundColor,
 }) {
   ScaffoldMessenger.of(context).clearSnackBars();
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Row(children: [
       icon,
       const SizedBox(width: 20),
-      Expanded(child: Text(message)),
+      Expanded(
+          child: Text(
+        message,
+        style: textStyle,
+      )),
     ]),
     action: action,
+    duration: duration,
+    backgroundColor: backgroundColor,
   ));
 }
 
