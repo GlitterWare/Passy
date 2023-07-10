@@ -8,7 +8,7 @@ Passy is an offline password manager with cross-platfrom synchronization. 🔒
 
 [![Github Latest Release](https://img.shields.io/github/release/GlitterWare/Passy.svg?logo=github&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://github.com/GlitterWare/Passy/releases/latest) [![F-Droid Latest Release](https://img.shields.io/f-droid/v/com.glitterware.passy.svg?logo=F-Droid&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://f-droid.org/en/packages/com.glitterware.passy) [![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy) [![AUR Latest Release](https://img.shields.io/aur/version/passy?logo=Arch%20Linux&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://aur.archlinux.org/packages/passy)
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md)
 
 Passy is currently being submitted to:
 - ✔️ SnapCraft
