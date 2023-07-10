@@ -58,7 +58,7 @@ class Locator {
           if (element[element.length - 1] != '%') return element;
           return Platform
                   .environment[element.substring(1, element.length - 1)] ??
-              element.substring(1, element.length);
+              element.substring(1, element.length - 1);
         })
         .toList()
         .join('\\');
