@@ -87,8 +87,6 @@ For instructions on how to easily set up Passy using Ubuntu/Debian software app 
 
 #### Flathub
 
-*Important notice: browser extension connector is only available since Passy v1.5.1 (The Little Things) under Flathub installations due to sandboxing issues. You may have to wait or choose a different installation method if Passy v1.5.1 is still under way.*
-
 [![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy)
 
 #### AUR
