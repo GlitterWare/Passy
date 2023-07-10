@@ -37,6 +37,7 @@ body:
       label: App version
       description: Select the app version. You can find it in the app settings under the `About` section.
       options:
+        - v1.5.1 - The Little Things
         - v1.5.0 - Browser Extension
         - v1.4.1 - Quality Patch
         - v1.4.0 - Sharing is Caring

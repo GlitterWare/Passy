@@ -8,16 +8,47 @@ import 'package:passy/passy_data/passy_data.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:path/path.dart' as path_lib;
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 late PassyData data;
 late AppLocalizations localizations;
 
+Future<Directory> getDocumentsDirectory() async {
+  if (Platform.isLinux) {
+    Directory documentsDir;
+
+    Future<Directory> createFallback() async {
+      documentsDir = Directory(path_lib.join(
+        (Platform.environment['HOME'] ??
+            path_lib.join(
+              '/',
+              'home',
+              Platform.environment['USER'],
+            )),
+        'Documents',
+      ));
+      if (!(await documentsDir.exists())) {
+        await documentsDir.create(recursive: true);
+      }
+      return documentsDir;
+    }
+
+    try {
+      documentsDir = await getApplicationDocumentsDirectory();
+    } catch (_) {
+      return createFallback();
+    }
+    if (!(await documentsDir.exists())) return createFallback();
+    return documentsDir;
+  }
+  return await getApplicationDocumentsDirectory();
+}
+
 Future<PassyData> loadPassyData() async {
-  return PassyData((await getApplicationDocumentsDirectory()).path +
-      Platform.pathSeparator +
-      'Passy');
+  return PassyData(
+      (await getDocumentsDirectory()).path + Platform.pathSeparator + 'Passy');
 }
 
 void loadLocalizations(BuildContext context) {
@@ -36,4 +67,8 @@ Future<String> getLatestVersion() async {
   } catch (_) {
     return passyVersion;
   }
+}
+
+bool isSnap() {
+  return Platform.environment['SNAP_NAME'] == 'passy';
 }

@@ -85,9 +85,8 @@ Passy can be removed by running its uninstaller from Programs and Features in th
 
 #### SnapCraft (Recommended)
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/passy)
 
-[Get set up for snaps](https://snapcraft.io/docs/installing-snapd).
+For instructions on how to easily set up Passy using Ubuntu/Debian software app or Snap command-line, see https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md.
 
 #### Flathub
 
@@ -148,7 +147,7 @@ Available options:
 
 ## Privacy Policy
 
-[1 MAY, 2023](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
+[24 JUNE, 2023](https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md)
 
 ## Links & Mentions
 

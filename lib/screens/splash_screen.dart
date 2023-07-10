@@ -10,7 +10,6 @@ import 'package:passy/screens/add_account_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'login_screen.dart';
 
@@ -28,7 +27,7 @@ class SplashScreen extends StatelessWidget {
         context: context,
         builder: (context) => AlertDialog(
           shape: PassyTheme.dialogShape,
-          title: const Text('New version available'),
+          title: Text(localizations.newVersionAvailable),
           content: ThreeWidgetButton(
             left: Padding(
               padding: const EdgeInsets.only(right: 30),
@@ -39,7 +38,7 @@ class SplashScreen extends StatelessWidget {
                     PassyTheme.lightContentColor, BlendMode.srcIn),
               ),
             ),
-            center: const Text('Download'),
+            center: Text(localizations.download),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () =>
                 openUrl('https://github.com/GlitterWare/Passy/releases/latest'),
@@ -63,17 +62,18 @@ class SplashScreen extends StatelessWidget {
         if (!(await original.exists())) return null;
         if (!(await originalScript.exists())) return null;
         Directory copyDir = Directory(
-            (await getApplicationDocumentsDirectory()).path +
-                Platform.pathSeparator +
-                'Passy' +
-                Platform.pathSeparator +
-                'passy_cli' +
-                Platform.pathSeparator +
-                'temp' +
-                Platform.pathSeparator +
-                'bin' +
-                Platform.pathSeparator +
-                'passy_cli');
+          (await getDocumentsDirectory()).path +
+              Platform.pathSeparator +
+              'Passy' +
+              Platform.pathSeparator +
+              'passy_cli' +
+              Platform.pathSeparator +
+              'temp' +
+              Platform.pathSeparator +
+              'bin' +
+              Platform.pathSeparator +
+              'passy_cli',
+        );
         if (await copyDir.exists()) {
           List<FileSystemEntity> files =
               await copyDir.list(recursive: true).toList();
@@ -138,7 +138,7 @@ class SplashScreen extends StatelessWidget {
         contentsDecoded['path'] = cliTempPath;
         contents = jsonEncode(contentsDecoded);
         Directory copyDir = Directory(
-          (await getApplicationDocumentsDirectory()).path +
+          (await getDocumentsDirectory()).path +
               Platform.pathSeparator +
               'Passy' +
               Platform.pathSeparator +
@@ -166,10 +166,8 @@ class SplashScreen extends StatelessWidget {
       } catch (_) {
         return;
       }
-      String? home = Platform.environment['HOME'];
-      if (home == null || home.contains('/snap/passy/')) {
-        home = path_lib.join('/', 'home', Platform.environment['USER']);
-      }
+      String? home = Platform.environment['SNAP_REAL_HOME'];
+      home ??= Platform.environment['HOME']!;
       for (String nativeManifestPath in const [
         '.mozilla/native-messaging-hosts',
         '.config/microsoft-edge/NativeMessagingHosts',
@@ -216,12 +214,73 @@ class SplashScreen extends StatelessWidget {
       }
     }
 
+    Future<bool> _testNativeMessagingHostsInterfaceAccess() async {
+      const nativeManifestDomain = 'io.github.glitterware.passy_cli';
+      const nativeManifestNewFilename = '$nativeManifestDomain.test';
+      String? home = Platform.environment['SNAP_REAL_HOME'];
+      home ??= Platform.environment['HOME']!;
+      Directory? nativeManifestDir;
+      for (String nativeManifestPath in const [
+        '.mozilla/native-messaging-hosts',
+        '.config/microsoft-edge/NativeMessagingHosts',
+        '.config/google-chrome/NativeMessagingHosts',
+        '.config/chromium/NativeMessagingHosts',
+        '.config/BraveSoftware/Brave-Browser/NativeMessagingHosts',
+      ]) {
+        Directory testDir = Directory(path_lib.join(home, nativeManifestPath));
+        bool exists;
+        try {
+          exists = await testDir.exists();
+        } catch (_) {
+          continue;
+        }
+        if (exists) {
+          nativeManifestDir = testDir;
+          break;
+        }
+      }
+      if (nativeManifestDir == null) return true;
+      File testManifestFile =
+          File(nativeManifestDir.path + '/' + nativeManifestNewFilename);
+      try {
+        await testManifestFile.create();
+        if (await testManifestFile.exists()) {
+          await testManifestFile.delete();
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+
     Future<void> _copyExtensionFiles() async {
       File? passyCliTemp = await _getTemporaryCliExecutable();
       if (passyCliTemp == null) return;
       File? manifest = await _prepareManifest(passyCliTemp.path);
       if (manifest == null) return;
       if (Platform.isLinux) {
+        if (isSnap()) {
+          dynamic hasAccess = await _testNativeMessagingHostsInterfaceAccess();
+          if (hasAccess != true) {
+            if (context.mounted) {
+              showSnackBar(
+                context,
+                message: localizations.unableToConnectBrowserExtension,
+                icon: const Icon(Icons.extension_rounded,
+                    color: PassyTheme.lightContentColor),
+                duration: const Duration(seconds: 10),
+                action: SnackBarAction(
+                  textColor: PassyTheme.lightContentColor,
+                  label: localizations.details,
+                  onPressed: () => openUrl(
+                      'https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md#enabling-browser-extension-support'),
+                ),
+                textStyle: const TextStyle(color: PassyTheme.lightContentColor),
+                backgroundColor: const Color.fromRGBO(255, 82, 82, 1),
+              );
+            }
+            return;
+          }
+        }
         _copyManifestLinux(manifest);
         return;
       }
@@ -229,6 +288,7 @@ class SplashScreen extends StatelessWidget {
     }
 
     Future<void> _load() async {
+      await Future.delayed(const Duration(milliseconds: 5));
       if (Platform.isWindows || Platform.isLinux) _copyExtensionFiles();
       data = await loadPassyData();
       loaded = true;

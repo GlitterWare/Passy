@@ -6,7 +6,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
-const String passyVersion = '1.5.0';
+const String passyVersion = '1.5.1';
 const String syncVersion = '2.0.0';
 const String accountVersion = '2.2.0';
 
@@ -106,10 +106,12 @@ bool? boolFromString(String value) {
 }
 
 Encrypter getPassyEncrypter(String password) {
-  if (password.length > 32) {
-    throw Exception('Password is longer than 32 characters');
+  int byteSize = utf8.encode(password).length;
+  if (byteSize > 32) {
+    throw Exception(
+        'Password is longer than 32 bytes. If you\'re using 32 characters, try using 16 and then 8 characters.');
   }
-  int a = 32 - password.length;
+  int a = 32 - byteSize;
   password += ' ' * a;
   return Encrypter(AES(Key.fromUtf8(password)));
 }

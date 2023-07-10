@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart';
 import 'package:passy/passy_data/auto_backup_settings.dart';
 
 import 'package:passy/passy_data/legacy/legacy.dart';
