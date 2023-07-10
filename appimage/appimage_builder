@@ -60,10 +60,7 @@ function create_appdir() {
 }
 
 function after_bundle() {
-  cp ../build/linux/x64/release/bundle/assistant ../build/appimage/$appName.AppDir
-  cp -r ../build/linux/x64/release/bundle/lib/ ../build/appimage/$appName.AppDir/lib
-  cp -r ../build/linux/x64/release/bundle/data ../build/appimage/$appName.AppDir
-  cp -r ../build/linux/x64/release/bundle/passy ../build/appimage/$appName.AppDir
+  cp -r ../build/linux/x64/release/bundle/* ../build/appimage/$appName.AppDir
   # cp $appIcon AppDir/usr/share/icons/
 
   # cp -r build/linux/*/release/bundle/ $appName.AppDir
