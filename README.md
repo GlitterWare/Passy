@@ -81,14 +81,13 @@ Passy can be removed by running its uninstaller from Programs and Features in th
 
 ### Linux
 
-*Important notice: browser extension connector is currently unavailable under SnapCraft and Flathub installations due to sandboxing issues. We are doing our best to resolve this problem as soon as possible (for updates on this, see https://github.com/GlitterWare/Passy/issues/44).*
-
 #### SnapCraft (Recommended)
-
 
 For instructions on how to easily set up Passy using Ubuntu/Debian software app or Snap command-line, see https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md.
 
 #### Flathub
+
+*Important notice: browser extension connector is only available since Passy v1.5.1 (The Little Things) under Flathub installations due to sandboxing issues. You may have to wait or choose a different installation method if Passy v1.5.1 is still under way.*
 
 [![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy)
 
