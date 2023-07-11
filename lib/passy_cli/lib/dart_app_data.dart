@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as path_lib;
@@ -36,32 +37,39 @@ class Locator {
   }
 
   static Future<String> _findWindows() async {
-    ProcessResult regResult = await Process.run('reg', [
-      'query',
-      'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders',
-      '/v',
-      'Personal',
-    ]);
-    dynamic result = regResult.stdout;
-    if (result is! String) {
-      return path_lib.join(Platform.environment['UserProfile']!, 'Documents');
-    }
-    return result
-        .split('Personal')[1]
-        .split('    ')[2]
-        .replaceAll('\r', '')
-        .replaceAll('\n', '')
-        .split('\\')
-        .map((element) {
-          if (element.length < 3) return element;
-          if (element[0] != '%') return element;
-          if (element[element.length - 1] != '%') return element;
-          return Platform
-                  .environment[element.substring(1, element.length - 1)] ??
-              element.substring(1, element.length - 1);
-        })
-        .toList()
-        .join('\\');
+    ProcessResult regResult = await Process.run(
+      'cmd',
+      [
+        '/C',
+        'chcp',
+        '65001',
+        '&',
+        'reg',
+        'query',
+        'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders',
+        '/v',
+        'Personal',
+      ],
+      stdoutEncoding: null,
+    );
+    String result = utf8.decode(regResult.stdout);
+    List<String> resultSplit = result.split(':\\');
+    return resultSplit[0][resultSplit[0].length - 1] +
+        ':\\' +
+        resultSplit[1]
+            .replaceAll('\r', '')
+            .replaceAll('\n', '')
+            .split('\\')
+            .map((element) {
+              if (element.length < 3) return element;
+              if (element[0] != '%') return element;
+              if (element[element.length - 1] != '%') return element;
+              return Platform
+                      .environment[element.substring(1, element.length - 1)] ??
+                  element.substring(1, element.length - 1);
+            })
+            .toList()
+            .join('\\');
   }
 
   static String _findLinux() {
