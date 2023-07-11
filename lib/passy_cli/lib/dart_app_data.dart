@@ -52,24 +52,32 @@ class Locator {
       ],
       stdoutEncoding: null,
     );
-    String result = utf8.decode(regResult.stdout);
+    String rawResult = utf8.decode(regResult.stdout);
+    String result = '';
+    bool isParsingVariable = false;
+    String curVar = '';
+    for (int i = 0; i != rawResult.length; i++) {
+      String char = rawResult[i];
+      if (char == '%') {
+        if (isParsingVariable) {
+          isParsingVariable = false;
+          result += Platform.environment[curVar] ?? curVar;
+          curVar = '';
+          continue;
+        }
+        isParsingVariable = true;
+        continue;
+      }
+      if (isParsingVariable) {
+        curVar += char;
+        continue;
+      }
+      result += char;
+    }
     List<String> resultSplit = result.split(':\\');
     return resultSplit[0][resultSplit[0].length - 1] +
         ':\\' +
-        resultSplit[1]
-            .replaceAll('\r', '')
-            .replaceAll('\n', '')
-            .split('\\')
-            .map((element) {
-              if (element.length < 3) return element;
-              if (element[0] != '%') return element;
-              if (element[element.length - 1] != '%') return element;
-              return Platform
-                      .environment[element.substring(1, element.length - 1)] ??
-                  element.substring(1, element.length - 1);
-            })
-            .toList()
-            .join('\\');
+        resultSplit[1].replaceAll('\r', '').replaceAll('\n', '');
   }
 
   static String _findLinux() {
