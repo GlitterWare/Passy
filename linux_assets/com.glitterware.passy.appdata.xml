@@ -41,7 +41,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
-		<release version="v1.5.1" date="2023-07-10">
+		<release version="v1.5.2" date="2023-07-11">
 		</release>
 	</releases>
 </component>
