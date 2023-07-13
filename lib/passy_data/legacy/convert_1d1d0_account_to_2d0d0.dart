@@ -14,8 +14,8 @@ void convert1_1_0AccountTo2_0_0({
   // 4. Per entry, do the following:
   // - 4.1. Retrieve the entry key from the first CSV value.
   // - 4.2. Encrypt the entry.
-  // - 4.3. Join, separating with a comma (,), the entry key from 3.1 and the encrypted entry data from 3.2, adding a newline at the end.
-  // - 4.4. Append the result of 3.3 to the entries file.
+  // - 4.3. Join, separating with a comma (,), the entry key from 4.1 and the encrypted entry data from 4.2, adding a newline at the end.
+  // - 4.4. Append the result of 4.3 to the entries file.
   void _convert(File file) {
     String _decrypted = decrypt(file.readAsStringSync(), encrypter: encrypter);
     List<String> _split = _decrypted.split('\n');
