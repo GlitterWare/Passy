@@ -1043,28 +1043,30 @@ class Synchronization {
             }
             if (entriesToSynchronize.entriesToSend.isNotEmpty) {
               _syncLog += 'done.\nSending entries... ';
+              Map<String, List<Map<String, dynamic>>> entries =
+                  entriesToSynchronize.entriesToSend
+                      .map((entryType, entryKeys) {
+                Map<String, EntryEvent> historyEntries =
+                    _history.value.getEvents(entryType);
+                PassyEntry? Function(String) getEntry =
+                    _loadedAccount.getEntry(entryType);
+                return MapEntry(
+                  entryType.name,
+                  entryKeys.map<Map<String, dynamic>>((e) {
+                    return {
+                      'key': e,
+                      'historyEntry': historyEntries[e],
+                      'entry': getEntry(e),
+                    };
+                  }).toList(),
+                );
+              });
               response = _checkResponse(await _safeSync2d0d0Client.runModule([
                 apiVersion,
                 'setEntries',
                 jsonEncode({
                   ...auth(),
-                  'entries': entriesToSynchronize.entriesToSend
-                      .map((entryType, entryKeys) {
-                    Map<String, EntryEvent> historyEntries =
-                        _history.value.getEvents(entryType);
-                    PassyEntry? Function(String) getEntry =
-                        _loadedAccount.getEntry(entryType);
-                    return MapEntry(
-                      entryType.name,
-                      entryKeys.map<Map<String, dynamic>>((e) {
-                        return {
-                          'key': e,
-                          'historyEntry': historyEntries[e],
-                          'entry': getEntry(e),
-                        };
-                      }).toList(),
-                    );
-                  }),
+                  'entries': entries,
                 }),
               ]));
               if (response.containsKey('error')) {
