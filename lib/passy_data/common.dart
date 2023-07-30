@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
+import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
@@ -114,6 +116,25 @@ Encrypter getPassyEncrypter(String password) {
   int a = 32 - byteSize;
   password += ' ' * a;
   return Encrypter(AES(Key.fromUtf8(password)));
+}
+
+Future<Encrypter> getPassyEncrypterV2(
+  String password, {
+  Salt? salt,
+  int parallelism = 4,
+  int memory = 64,
+  int iterations = 2,
+}) async {
+  salt ??= Salt.newSalt();
+  DArgon2Result result = await argon2.hashPasswordString(
+    password,
+    salt: salt,
+    parallelism: parallelism,
+    memory: memory,
+    iterations: iterations,
+    length: 32,
+  );
+  return Encrypter(AES(Key(Uint8List.fromList(result.rawBytes))));
 }
 
 Digest getPassyHash(String value) => sha512.convert(utf8.encode(value));

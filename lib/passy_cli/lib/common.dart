@@ -1,3 +1,8 @@
+import 'dart:typed_data';
+
+import 'package:encrypt/encrypt.dart';
+import 'package:dargon2/dargon2.dart';
+
 String getBoxMessage(String message) {
   List<String> msgSplit = message.split('\n');
   int maxLength = 0;
@@ -61,4 +66,23 @@ List<String> parseCommand(String command) {
   }
   if (curStr != '') result.add(curStr);
   return result;
+}
+
+Future<Encrypter> getPassyEncrypterV2Dart(
+  String password, {
+  Salt? salt,
+  int parallelism = 4,
+  int memory = 64,
+  int iterations = 2,
+}) async {
+  salt ??= Salt.newSalt();
+  DArgon2Result result = await argon2.hashPasswordString(
+    password,
+    salt: salt,
+    parallelism: parallelism,
+    memory: memory,
+    iterations: iterations,
+    length: 32,
+  );
+  return Encrypter(AES(Key(Uint8List.fromList(result.rawBytes))));
 }

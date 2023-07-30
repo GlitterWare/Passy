@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -63,7 +64,10 @@ final ThemeData theme = ThemeData(
   textSelectionTheme: PassyTheme.theme.textSelectionTheme,
 );
 
-void main() => runApp(const Passy());
+void main() {
+  DArgon2Flutter.init();
+  runApp(const Passy());
+}
 
 @pragma('vm:entry-point')
 void autofillEntryPoint() {
