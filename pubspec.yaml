@@ -63,6 +63,7 @@ dependencies:
   csv: ^5.0.2
   dargon2_flutter: ^3.3.0
   dargon2: ^3.2.1
+  dargon2_interface: ^1.1.1
 
 
 dev_dependencies:

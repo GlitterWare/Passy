@@ -370,7 +370,7 @@ packages:
     source: hosted
     version: "3.2.0"
   dargon2_interface:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dargon2_interface
       sha256: e352efec19afac3fba5b4c1d4833bec7825ac43bdec88f33117cd68dfccfca40
