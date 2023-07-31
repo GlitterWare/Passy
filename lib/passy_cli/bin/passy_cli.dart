@@ -7,7 +7,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
-import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/common.dart' as pcommon;
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
@@ -229,7 +229,7 @@ StreamSubscription<List<int>> startInteractive() {
       _isBusy = true;
       try {
         await executeCommand(command,
-            id: id ?? getPassyHash(jsonEncode(command)).toString());
+            id: id ?? pcommon.getPassyHash(jsonEncode(command)).toString());
       } catch (_) {}
       _isBusy = false;
     }
@@ -286,13 +286,13 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           version = passyShellVersion;
           break;
         case 'passy':
-          version = passyVersion;
+          version = pcommon.passyVersion;
           break;
         case 'data':
-          version = accountVersion;
+          version = pcommon.accountVersion;
           break;
         case 'sync':
-          version = syncVersion;
+          version = pcommon.syncVersion;
           break;
       }
       if (version == null) {
@@ -324,8 +324,8 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             return;
           }
           String password = command[3];
-          bool match =
-              _credentials.passwordHash == getPassyHash(password).toString();
+          bool match = _credentials.passwordHash ==
+              pcommon.getPassyHash(password).toString();
           log(match.toString(), id: id);
           return;
         case 'login':
@@ -338,9 +338,11 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             return;
           }
           String password = command[3];
-          bool match =
-              _credentials.passwordHash == getPassyHash(password).toString();
-          if (match) _encrypters[accountName] = getPassyEncrypter(password);
+          bool match = _credentials.passwordHash ==
+              pcommon.getPassyHash(password).toString();
+          if (match) {
+            _encrypters[accountName] = pcommon.getPassyEncrypter(password);
+          }
           log(match.toString(), id: id);
           return;
         case 'is_logged_in':
@@ -441,7 +443,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           PassyEntry entry;
           try {
             entry = PassyEntry.fromCSV(entryType)(
-                csvDecode(csvEntry, recursive: true));
+                pcommon.csvDecode(csvEntry, recursive: true));
           } catch (e, s) {
             log('passy:entries:set:Failed to decode entry:\n$e\n$s', id: id);
             return;
@@ -590,7 +592,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             return;
           }
           String entryKey = command[4];
-          bool? toggle = boolFromString(command[5]);
+          bool? toggle = pcommon.boolFromString(command[5]);
           if (toggle == null) {
             log('passy:favorites:toggle:Invalid toggle value provided: expected `true` or `false`, received ${command[4]}.',
                 id: id);
@@ -681,7 +683,6 @@ void main(List<String> arguments) {
     });
     return;
   }
-
   log('''
        ____                     
       |  _ \\ __ _ ___ ___ _   _ 
@@ -700,9 +701,9 @@ Welcome to Passy interactive shell!
 ${DateTime.now().toUtc().toString()} UTC.
 
 Shell v$passyShellVersion
-Passy v$passyVersion
-Account data v$accountVersion
-Synchronization v$syncVersion''')}
+Passy v${pcommon.passyVersion}
+Account data v${pcommon.accountVersion}
+Synchronization v${pcommon.syncVersion}''')}
 
 Type `help` for guidance.
 Type `exit` to quit.

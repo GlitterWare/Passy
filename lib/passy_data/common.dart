@@ -118,22 +118,36 @@ Encrypter getPassyEncrypter(String password) {
   return Encrypter(AES(Key.fromUtf8(password)));
 }
 
-Future<Encrypter> getPassyEncrypterV2(
-  String password, {
-  Salt? salt,
+Future<DArgon2Result> argon2ifyString(
+  String s, {
+  required Salt salt,
   int parallelism = 4,
   int memory = 64,
   int iterations = 2,
 }) async {
-  salt ??= Salt.newSalt();
   DArgon2Result result = await argon2.hashPasswordString(
-    password,
+    s,
     salt: salt,
     parallelism: parallelism,
     memory: memory,
     iterations: iterations,
     length: 32,
   );
+  return result;
+}
+
+Future<Encrypter> getPassyEncrypterV2(
+  String password, {
+  required Salt salt,
+  int parallelism = 4,
+  int memory = 64,
+  int iterations = 2,
+}) async {
+  DArgon2Result result = await argon2ifyString(password,
+      salt: salt,
+      parallelism: parallelism,
+      memory: memory,
+      iterations: iterations);
   return Encrypter(AES(Key(Uint8List.fromList(result.rawBytes))));
 }
 
