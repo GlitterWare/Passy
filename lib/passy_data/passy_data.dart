@@ -189,17 +189,17 @@ class PassyData {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
     Salt _salt = Salt.newSalt();
     int _memory = SysInfo.getFreePhysicalMemory();
-    if (_memory > 64) {
+    if (_memory > 67108864) {
       _memory = 64;
-    } else if (_memory > 32) {
+    } else if (_memory > 33554432) {
       _memory = 32;
-    } else if (_memory > 16) {
+    } else if (_memory > 16777216) {
       _memory = 16;
-    } else if (_memory > 8) {
+    } else if (_memory > 8388608) {
       _memory = 8;
-    } else if (_memory > 4) {
+    } else if (_memory > 4194304) {
       _memory = 4;
-    } else if (_memory > 2) {
+    } else if (_memory > 2097152) {
       _memory = 2;
     }
     DArgon2Result result =
