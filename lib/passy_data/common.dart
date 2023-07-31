@@ -118,6 +118,14 @@ Encrypter getPassyEncrypter(String password) {
   return Encrypter(AES(Key.fromUtf8(password)));
 }
 
+Encrypter getPassyEncrypterFromBytes(Uint8List password) {
+  if (password.length > 32) {
+    throw Exception(
+        'Password is longer than 32 bytes. If you\'re using 32 characters, try using 16 and then 8 characters.');
+  }
+  return Encrypter(AES(Key(password)));
+}
+
 Future<DArgon2Result> argon2ifyString(
   String s, {
   required Salt salt,
