@@ -1,6 +1,6 @@
 import 'argon2_info.dart';
 import 'json_convertable.dart';
-import 'hashing_type.dart';
+import 'key_derivation_type.dart';
 
 abstract class KeyDerivationInfo with JsonConvertable {
   static KeyDerivationInfo Function(Map<String, dynamic> json)? fromJson(
