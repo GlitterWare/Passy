@@ -1,6 +1,6 @@
 import 'hashing_info.dart';
 
-class Argon2Info extends HashingInfo {
+class Argon2Info extends KeyDerivationInfo {
   int parallelism;
   int memory;
   int iterations;

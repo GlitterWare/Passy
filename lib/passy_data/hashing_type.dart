@@ -1,14 +1,14 @@
-enum HashingType {
+enum KeyDerivationType {
   none,
   argon2,
 }
 
-HashingType? hashingTypeFromName(String name) {
+KeyDerivationType? keyDerivationTypeFromName(String name) {
   switch (name) {
     case 'none':
-      return HashingType.none;
+      return KeyDerivationType.none;
     case 'argon2':
-      return HashingType.argon2;
+      return KeyDerivationType.argon2;
   }
   return null;
 }
