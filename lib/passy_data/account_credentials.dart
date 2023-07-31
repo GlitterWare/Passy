@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'hashing_type.dart';
+import 'key_derivation_type.dart';
 import 'common.dart';
-import 'hashing_info.dart';
+import 'key_derivation_info.dart';
 import 'json_convertable.dart';
 import 'json_file.dart';
 

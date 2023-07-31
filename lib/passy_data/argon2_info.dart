@@ -1,4 +1,4 @@
-import 'hashing_info.dart';
+import 'key_derivation_info.dart';
 
 class Argon2Info extends KeyDerivationInfo {
   int parallelism;
