@@ -46,7 +46,7 @@ class PassyData {
 
   Salt? getArgon2Salt(String username) =>
       getKeyDerivationType(username) == KeyDerivationType.argon2
-          ? (_accounts[username]?.value.keyDerivationData as Argon2Info).salt
+          ? (_accounts[username]?.value.keyDerivationInfo as Argon2Info).salt
           : null;
 
   Future<DArgon2Result>? getArgon2Key(
@@ -58,7 +58,7 @@ class PassyData {
     if (account.value.keyDerivationType != KeyDerivationType.argon2) {
       return null;
     }
-    Argon2Info info = account.value.keyDerivationData as Argon2Info;
+    Argon2Info info = account.value.keyDerivationInfo as Argon2Info;
     return argon2ifyString(
       password,
       salt: info.salt,

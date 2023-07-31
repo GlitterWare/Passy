@@ -13,7 +13,7 @@ class AccountCredentials with JsonConvertable {
   String passwordHash;
   bool bioAuthEnabled;
   KeyDerivationType keyDerivationType;
-  KeyDerivationInfo? keyDerivationData;
+  KeyDerivationInfo? keyDerivationInfo;
 
   set password(String value) => passwordHash = getPassyHash(value).toString();
 
@@ -22,7 +22,7 @@ class AccountCredentials with JsonConvertable {
       required this.passwordHash,
       this.bioAuthEnabled = false,
       this.keyDerivationType = KeyDerivationType.none,
-      this.keyDerivationData});
+      this.keyDerivationInfo});
 
   AccountCredentials.fromJson(Map<String, dynamic> json)
       : username = json['username'] ?? '',
@@ -32,11 +32,11 @@ class AccountCredentials with JsonConvertable {
         keyDerivationType =
             keyDerivationTypeFromName(json['keyDerivationType'] ?? 'none') ??
                 KeyDerivationType.none,
-        keyDerivationData = KeyDerivationInfo.fromJson(
+        keyDerivationInfo = KeyDerivationInfo.fromJson(
                 keyDerivationTypeFromName(
                         json['keyDerivationType'] ?? 'none') ??
                     KeyDerivationType.none)
-            ?.call(json['keyDerivationData']);
+            ?.call(json['keyDerivationInfo']);
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -44,7 +44,7 @@ class AccountCredentials with JsonConvertable {
         'passwordHash': passwordHash,
         'bioAuthEnabled': bioAuthEnabled.toString(),
         'keyDerivationType': keyDerivationType.name,
-        'keyDerivationData': keyDerivationData?.toJson(),
+        'keyDerivationInfo': keyDerivationInfo?.toJson(),
       };
 
   static AccountCredentialsFile fromFile(File file,
