@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
@@ -116,7 +117,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           _isPasswordWrong = true;
           break;
         }
-        if (getPassyHash(_password).toString() !=
+        if (sha512.convert(_derivedPassword).toString() !=
             data.getPasswordHash(_username)) {
           _isPasswordWrong = true;
         }

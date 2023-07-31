@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -52,8 +51,10 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     Navigator.pop(context);
   }
 
-  void _unlock() {
-    String _passwordHash = getPassyHash(_password).toString();
+  void _unlock() async {
+    String _passwordHash =
+        (await data.createPasswordHash(_account.username, password: _password))
+            .toString();
     _password = '';
     if (_passwordHash == data.getPasswordHash(_account.username)) {
       _shouldPop = true;

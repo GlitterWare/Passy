@@ -15,8 +15,6 @@ class AccountCredentials with JsonConvertable {
   KeyDerivationType keyDerivationType;
   KeyDerivationInfo? keyDerivationInfo;
 
-  set password(String value) => passwordHash = getPassyHash(value).toString();
-
   AccountCredentials(
       {required this.username,
       required this.passwordHash,

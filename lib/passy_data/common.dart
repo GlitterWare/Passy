@@ -5,8 +5,12 @@ import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
+
+import 'key_derivation_type.dart';
 
 const String passyVersion = '1.5.2';
 const String syncVersion = '2.0.0';
@@ -329,4 +333,62 @@ Future<void> processLinesAsync(
     if (_line == null) return;
     if (await onLine(_line, _eofReached) == true) return;
   } while (!_eofReached);
+}
+
+Future<Digest> getArgon2Hash(
+  String password, {
+  required Salt salt,
+  int parallelism = 4,
+  int memory = 64,
+  int iterations = 2,
+}) async {
+  List<int> derivedPassword = (await argon2ifyString(
+    password,
+    salt: salt,
+    parallelism: parallelism,
+    memory: memory,
+    iterations: iterations,
+  ))
+      .rawBytes;
+  return sha512.convert(derivedPassword);
+}
+
+Future<Digest> getPasswordHash(
+  String password, {
+  required KeyDerivationType derivationType,
+  KeyDerivationInfo? derivationInfo,
+}) async {
+  switch (derivationType) {
+    case KeyDerivationType.none:
+      return getPassyHash(password);
+    case KeyDerivationType.argon2:
+      Argon2Info info = derivationInfo as Argon2Info;
+      return await getArgon2Hash(
+        password,
+        salt: info.salt,
+        parallelism: info.parallelism,
+        memory: info.memory,
+        iterations: info.iterations,
+      );
+  }
+}
+
+Future<Encrypter> getPasswordEncrypter(
+  String password, {
+  required KeyDerivationType derivationType,
+  KeyDerivationInfo? derivationInfo,
+}) async {
+  switch (derivationType) {
+    case KeyDerivationType.none:
+      return getPassyEncrypter(password);
+    case KeyDerivationType.argon2:
+      Argon2Info info = derivationInfo as Argon2Info;
+      return getPassyEncrypterV2(
+        password,
+        salt: info.salt,
+        parallelism: info.parallelism,
+        memory: info.memory,
+        iterations: info.iterations,
+      );
+  }
 }

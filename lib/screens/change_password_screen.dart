@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
@@ -24,9 +23,10 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   String _newPassword = '';
   String _newPasswordConfirm = '';
 
-  void _onConfirmPressed() {
-    if (getPassyHash(_password).toString() !=
-        data.getPasswordHash(_account.username)) {
+  void _onConfirmPressed() async {
+    if ((await data.createPasswordHash(_account.username,
+            password: _password)) !=
+        _account.passwordHash) {
       showSnackBar(context,
           message: localizations.incorrectPassword,
           icon: const Icon(
@@ -55,7 +55,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     Navigator.pushNamed(context, SplashScreen.routeName);
     _account.reloadHistorySync();
-    _account.setAccountPassword(_newPassword);
+    await _account.setAccountPassword(_newPassword);
     _account.save().then((value) {
       Navigator.popUntil(context,
           (route) => route.settings.name == CredentialsScreen.routeName);

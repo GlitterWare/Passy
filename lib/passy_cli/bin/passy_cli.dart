@@ -20,6 +20,8 @@ import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
 
+// TODO: implement Argon2 support
+
 const String helpMsg = '''
 
 Passy Password Manager CLI.

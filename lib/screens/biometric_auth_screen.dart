@@ -3,7 +3,6 @@ import 'package:flutter_locker/flutter_locker.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
@@ -28,7 +27,8 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
       BiometricStorageData _bioData;
       String _username = data.loadedAccount!.username;
       if (value == true) {
-        if (getPassyHash(_password).toString() !=
+        if ((await data.createPasswordHash(_username, password: _password))
+                .toString() !=
             data.loadedAccount!.passwordHash) {
           showSnackBar(context,
               message: localizations.incorrectPassword,

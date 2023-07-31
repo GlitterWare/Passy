@@ -178,9 +178,18 @@ class LoadedAccount {
         identities: identities);
   }
 
-  void setAccountPassword(String password) {
-    _credentials.value.password = password;
-    _encrypter = getPassyEncrypter(password);
+  Future<void> setAccountPassword(String password) async {
+    _credentials.value.passwordHash = (await getPasswordHash(
+      password,
+      derivationType: _credentials.value.keyDerivationType,
+      derivationInfo: _credentials.value.keyDerivationInfo,
+    ))
+        .toString();
+    _encrypter = await getPasswordEncrypter(
+      password,
+      derivationType: _credentials.value.keyDerivationType,
+      derivationInfo: _credentials.value.keyDerivationInfo,
+    );
     _settings.encrypter = _encrypter;
     _history.encrypter = _encrypter;
     _favorites.encrypter = _encrypter;
