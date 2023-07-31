@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:archive/archive_io.dart';
+import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/auto_backup_settings.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 
 import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/local_settings.dart';
@@ -36,6 +39,33 @@ class PassyData {
   void setBioAuthEnabledSync(String username, bool value) {
     _accounts[username]?.value.bioAuthEnabled = value;
     _accounts[username]?.saveSync();
+  }
+
+  KeyDerivationType? getKeyDerivationType(String username) =>
+      _accounts[username]?.value.keyDerivationType;
+
+  Salt? getArgon2Salt(String username) =>
+      getKeyDerivationType(username) == KeyDerivationType.argon2
+          ? (_accounts[username]?.value.keyDerivationData as Argon2Info).salt
+          : null;
+
+  Future<DArgon2Result>? getArgon2Key(
+    String username, {
+    required String password,
+  }) {
+    AccountCredentialsFile? account = _accounts[username];
+    if (account == null) return null;
+    if (account.value.keyDerivationType != KeyDerivationType.argon2) {
+      return null;
+    }
+    Argon2Info info = account.value.keyDerivationData as Argon2Info;
+    return argon2ifyString(
+      password,
+      salt: info.salt,
+      parallelism: info.parallelism,
+      memory: info.memory,
+      iterations: info.iterations,
+    );
   }
 
   bool hasAccount(String username) => _accounts.containsKey(username);

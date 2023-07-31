@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
 import 'package:passy/screens/remove_account_screen.dart';
@@ -96,8 +96,36 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     );
   }
 
-  void login() {
-    if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
+  void login() async {
+    List<int>? _derivedPassword;
+    bool _isPasswordWrong = false;
+    switch (data.getKeyDerivationType(_username)) {
+      case KeyDerivationType.none:
+        if (getPassyHash(_password).toString() !=
+            data.getPasswordHash(_username)) {
+          _isPasswordWrong = true;
+        }
+        break;
+      case KeyDerivationType.argon2:
+        try {
+          _derivedPassword =
+              (await data.getArgon2Key(_username, password: _password))!
+                  .rawBytes;
+        } catch (_) {
+          // TODO: show an error log
+          _isPasswordWrong = true;
+          break;
+        }
+        if (getPassyHash(_password).toString() !=
+            data.getPasswordHash(_username)) {
+          _isPasswordWrong = true;
+        }
+        break;
+      default:
+        _isPasswordWrong = true;
+        break;
+    }
+    if (_isPasswordWrong) {
       showSnackBar(
         context,
         message: localizations.incorrectPassword,
@@ -115,7 +143,11 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     data.info.save().whenComplete(() async {
       try {
         LoadedAccount _account = await data.loadAccount(
-            data.info.value.lastUsername, getPassyEncrypter(_password));
+            data.info.value.lastUsername,
+            _derivedPassword == null
+                ? getPassyEncrypter(_password)
+                : getPassyEncrypterFromBytes(
+                    Uint8List.fromList(_derivedPassword)));
         Navigator.pop(context);
         if (isAutofill) {
           Navigator.pushNamed(
