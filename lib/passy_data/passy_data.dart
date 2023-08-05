@@ -190,17 +190,17 @@ class PassyData {
     Salt _salt = Salt.newSalt();
     int _memory = SysInfo.getFreePhysicalMemory();
     if (_memory > 67108864) {
-      _memory = 64;
+      _memory = 65536;
     } else if (_memory > 33554432) {
-      _memory = 32;
+      _memory = 32768;
     } else if (_memory > 16777216) {
-      _memory = 16;
+      _memory = 16384;
     } else if (_memory > 8388608) {
-      _memory = 8;
+      _memory = 8192;
     } else if (_memory > 4194304) {
-      _memory = 4;
+      _memory = 4096;
     } else if (_memory > 2097152) {
-      _memory = 2;
+      _memory = 2048;
     }
     DArgon2Result result =
         await common.argon2ifyString(password, salt: _salt, memory: _memory);

@@ -13,7 +13,7 @@ class Argon2Info extends KeyDerivationInfo {
   Argon2Info({
     required this.salt,
     this.parallelism = 4,
-    this.memory = 64,
+    this.memory = 65536,
     this.iterations = 2,
   });
 

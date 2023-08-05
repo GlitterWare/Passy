@@ -72,7 +72,7 @@ Future<DArgon2Result> argon2ifyString(
   String s, {
   required Salt salt,
   int parallelism = 4,
-  int memory = 64,
+  int memory = 65536,
   int iterations = 2,
 }) async {
   DArgon2Result result = await argon2.hashPasswordString(
@@ -90,7 +90,7 @@ Future<Encrypter> getPassyEncrypterV2Dart(
   String password, {
   required Salt salt,
   int parallelism = 4,
-  int memory = 64,
+  int memory = 65536,
   int iterations = 2,
 }) async {
   DArgon2Result result = await argon2ifyString(password,
