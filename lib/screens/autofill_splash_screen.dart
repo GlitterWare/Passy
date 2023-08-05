@@ -4,6 +4,8 @@ import 'package:passy/common/common.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/no_accounts_screen.dart';
 
+import 'common.dart';
+
 class AutofillSplashScreen extends StatefulWidget {
   static const routeName = '/';
 
@@ -34,6 +36,7 @@ class _AutofillSplashScreen extends State<AutofillSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    setOnError(context);
     return Scaffold(
       body: Center(
         child: logo60Purple,

@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
-import 'package:dargon2_flutter/dargon2_flutter.dart';
+import 'package:passy/main.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -23,6 +24,7 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     loadLocalizations(context);
+    setOnError(context);
     Future<void> showUpdateDialog() {
       return showDialog<void>(
         context: context,

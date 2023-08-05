@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
+import 'package:passy/main.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
@@ -630,4 +632,41 @@ String genderToReadableName(Gender gender) {
     case Gender.other:
       return localizations.other;
   }
+}
+
+setOnError(BuildContext context) {
+  FlutterError.onError = (e) {
+    FlutterError.presentError(e);
+    try {
+      showSnackBar(
+        navigatorKey.currentContext!,
+        message: localizations.somethingWentWrong,
+        icon: const Icon(Icons.error_outline_rounded,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(
+              navigatorKey.currentContext!, LogScreen.routeName,
+              arguments: e.exception.toString() + '\n' + e.stack.toString()),
+        ),
+      );
+    } catch (_) {}
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    try {
+      showSnackBar(
+        navigatorKey.currentContext!,
+        message: localizations.somethingWentWrong,
+        icon: const Icon(Icons.error_outline_rounded,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(
+              navigatorKey.currentContext!, LogScreen.routeName,
+              arguments: error.toString() + '\n' + stack.toString()),
+        ),
+      );
+    } catch (_) {}
+    return false;
+  };
 }

@@ -238,5 +238,6 @@
     "addIDCard": "Add ID card",
     "addIdentity": "Add identity",
     "newVersionAvailable": "New version available",
-    "unableToConnectBrowserExtension": "Unable to connect browser extension"
+    "unableToConnectBrowserExtension": "Unable to connect browser extension",
+    "somethingWentWrong": "Something went wrong"
 }
