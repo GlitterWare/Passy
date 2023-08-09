@@ -72,6 +72,37 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     );
   }
 
+  Future<void> setEncrypter(Encrypter encrypter) async {
+    File _tempFile;
+    {
+      String _tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-entries-${entryTypeFromType(T)}-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      _tempFile = await _file.copy(_tempPath);
+    }
+    await _file.writeAsString('');
+    RandomAccessFile _raf = await _file.open(mode: FileMode.append);
+    RandomAccessFile _tempRaf = await _tempFile.open();
+
+    await processLinesAsync(_tempRaf, lineDelimiter: ',',
+        onLine: (_key, eofReached) async {
+      if (eofReached) return true;
+      String? _entry = readLine(_tempRaf, lineDelimiter: '\n');
+      if (_entry == null) return true;
+      List<String> _decoded = _entry.split(',');
+      _entry = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      IV _iv = IV.fromSecureRandom(16);
+      _entry = encrypt(_entry, encrypter: encrypter, iv: _iv);
+      await _raf.writeString('$_key,${_iv.base64},$_entry\n');
+      return null;
+    });
+    await _raf.close();
+    await _tempRaf.close();
+    await _tempFile.delete();
+  }
+
   String _encodeEntryForSaving(List<dynamic> _entry) {
     String _key = _entry[0];
     IV _iv = IV.fromSecureRandom(16);
