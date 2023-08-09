@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
+import 'package:passy/main.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +13,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
 
+import 'log_screen.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -22,6 +25,40 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     loadLocalizations(context);
+    FlutterError.onError = (e) {
+      try {
+        FlutterError.presentError(e);
+        showSnackBar(
+          navigatorKey.currentContext!,
+          message: 'Something went wrong',
+          icon: const Icon(Icons.error_outline_rounded,
+              color: PassyTheme.darkContentColor),
+          action: SnackBarAction(
+            label: localizations.details,
+            onPressed: () => Navigator.pushNamed(
+                navigatorKey.currentContext!, LogScreen.routeName,
+                arguments: e.exception.toString() + '\n' + e.stack.toString()),
+          ),
+        );
+      } catch (_) {}
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      try {
+        showSnackBar(
+          navigatorKey.currentContext!,
+          message: 'Something went wrong',
+          icon: const Icon(Icons.error_outline_rounded,
+              color: PassyTheme.darkContentColor),
+          action: SnackBarAction(
+            label: localizations.details,
+            onPressed: () => Navigator.pushNamed(
+                navigatorKey.currentContext!, LogScreen.routeName,
+                arguments: error.toString() + '\n' + stack.toString()),
+          ),
+        );
+      } catch (_) {}
+      return false;
+    };
     Future<void> showUpdateDialog() {
       return showDialog<void>(
         context: context,
