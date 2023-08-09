@@ -143,7 +143,8 @@ String csvEncode(List object) {
           .replaceAll('\\', '\\\\')
           .replaceAll('\n', '\\n')
           .replaceAll(',', '\\,')
-          .replaceAll('[', '\\[');
+          .replaceAll('[', '\\[')
+          .replaceAll(']', '\\]');
     }
     if (record is List) {
       String _encoded = '[';
@@ -205,19 +206,17 @@ List csvDecode(String source,
           _depth++;
           while (_characters.moveNext()) {
             _entry[v] += _characters.current;
-            if (_characters.current == ']') {
-              _depth--;
-              if (_depth == 0) break;
-            }
             if (_characters.current == '\\') {
-              _escapeDetected = true;
-            }
-            if (_escapeDetected) {
-              _escapeDetected = false;
+              if (!_characters.moveNext()) break;
+              _entry[v] += _characters.current;
               continue;
             }
             if (_characters.current == '[') {
               _depth++;
+            }
+            if (_characters.current == ']') {
+              _depth--;
+              if (_depth == 0) break;
             }
           }
           if (recursive) {
@@ -249,6 +248,7 @@ List csvDecode(String source,
     return _entry;
   }
 
+  print(source);
   return _decode(source);
 }
 
