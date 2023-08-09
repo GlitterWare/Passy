@@ -1,5 +1,6 @@
 import 'package:passy/passy_data/entry_meta.dart';
 
+import 'common.dart';
 import 'csv_convertable.dart';
 import 'entry_type.dart';
 import 'id_card.dart';
@@ -51,6 +52,44 @@ abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
       default:
         throw Exception(
             'CSV conversion not supported for EntryType \'${entryType.name}\'');
+    }
+  }
+
+  static PassyEntry fromCSVString<T>(String csvEntry) {
+    EntryType entryType = entryTypeFromType(T)!;
+    List<String> decoded1 = csvEntry.split(',');
+    String key = decoded1[0];
+    try {
+      List<dynamic> decoded2 = csvDecode(csvEntry, recursive: true);
+      return PassyEntry.fromCSV(entryType)(decoded2);
+    } catch (_) {
+      switch (entryType) {
+        case EntryType.password:
+          return Password(
+              key: key,
+              nickname: 'Recovered entry',
+              additionalInfo: 'Data recovered from corrupted entry: $csvEntry');
+        case EntryType.paymentCard:
+          return PaymentCard(
+              key: key,
+              nickname: 'Recovered entry',
+              additionalInfo: 'Data recovered from corrupted entry: $csvEntry');
+        case EntryType.note:
+          return Note(
+              key: key,
+              title: 'Recovered entry',
+              note: 'Data recovered from corrupted entry: $csvEntry');
+        case EntryType.idCard:
+          return IDCard(
+              key: key,
+              nickname: 'Recovered entry',
+              additionalInfo: 'Data recovered from corrupted entry: $csvEntry');
+        case EntryType.identity:
+          return Identity(
+              key: key,
+              nickname: 'Recovered entry',
+              additionalInfo: 'Data recovered from corrupted entry: $csvEntry');
+      }
     }
   }
 }
