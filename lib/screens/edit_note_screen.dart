@@ -65,7 +65,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
       body: ListView(children: [
         //TODO: Add markdown related strings to localizations
         PassyPadding(ThreeWidgetButton(
-          center: const Text('Display in markdown'),
+          center: const Text('Enable Markdown'),
           left: const Padding(
             padding: EdgeInsets.only(right: 30),
             child: Icon(Icons.save_outlined),
