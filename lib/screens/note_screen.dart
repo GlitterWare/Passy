@@ -121,9 +121,10 @@ class _NoteScreen extends State<NoteScreen> {
               valueAlign: TextAlign.left,
             )),
         if (_note.isMarkdown)
-          const PassyPadding(Text(
-            'Note',
-            style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+          PassyPadding(Text(
+            localizations.note,
+            style:
+                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
           )),
         if (_note.isMarkdown)
           Padding(
