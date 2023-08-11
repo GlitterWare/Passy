@@ -110,17 +110,23 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
           )),
         if (_isMarkdown)
-          PassyPadding(MarkdownBody(
-            data: _note,
-            selectable: true,
-            extensionSet: md.ExtensionSet(
-              md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-              <md.InlineSyntax>[
-                md.EmojiSyntax(),
-                ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-              ],
-            ),
-          )),
+          Padding(
+              padding: EdgeInsets.fromLTRB(
+                  20,
+                  PassyTheme.passyPadding.top,
+                  PassyTheme.passyPadding.right,
+                  PassyTheme.passyPadding.bottom),
+              child: MarkdownBody(
+                data: _note,
+                selectable: true,
+                extensionSet: md.ExtensionSet(
+                  md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                  <md.InlineSyntax>[
+                    md.EmojiSyntax(),
+                    ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+                  ],
+                ),
+              )),
       ]),
     );
   }
