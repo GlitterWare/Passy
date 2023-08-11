@@ -81,7 +81,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
       _tempFile = await _file.copy(_tempPath);
     }
-    await _file.writeAsString('');
+    bool isNotCorrupted = false;
     RandomAccessFile _raf = await _file.open(mode: FileMode.append);
     RandomAccessFile _tempRaf = await _tempFile.open();
 
@@ -95,6 +95,12 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
       IV _iv = IV.fromSecureRandom(16);
       _entry = encrypt(_entry, encrypter: encrypter, iv: _iv);
+      if (!isNotCorrupted) {
+        isNotCorrupted = true;
+        await _raf.close();
+        await _file.writeAsString('');
+        _raf = await _file.open(mode: FileMode.append);
+      }
       await _raf.writeString('$_key,${_iv.base64},$_entry\n');
       return null;
     });
