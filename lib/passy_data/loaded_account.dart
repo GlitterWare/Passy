@@ -178,7 +178,10 @@ class LoadedAccount {
         identities: identities);
   }
 
-  Future<void> setAccountPassword(String password) async {
+  Future<void> setAccountPassword(
+    String password, {
+    bool doNotReencryptEntries = false,
+  }) async {
     _credentials.value.password = password;
     await _credentials.save();
     _encrypter = getPassyEncrypter(password);
@@ -191,6 +194,14 @@ class LoadedAccount {
     await _favorites.reload();
     _favorites.encrypter = _encrypter;
     await _favorites.save();
+    if (doNotReencryptEntries) {
+      _passwords.encrypter = _encrypter;
+      _notes.encrypter = _encrypter;
+      _paymentCards.encrypter = _encrypter;
+      _idCards.encrypter = _encrypter;
+      _identities.encrypter = _encrypter;
+      return;
+    }
     await _passwords.setEncrypter(_encrypter);
     await _notes.setEncrypter(_encrypter);
     await _paymentCards.setEncrypter(_encrypter);
