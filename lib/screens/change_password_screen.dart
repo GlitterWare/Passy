@@ -55,8 +55,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     Navigator.pushNamed(context, SplashScreen.routeName);
     _account.reloadHistorySync();
-    _account.setAccountPassword(_newPassword);
-    _account.save().then((value) {
+    _account.setAccountPassword(_newPassword).then((value) {
       Navigator.popUntil(context,
           (route) => route.settings.name == CredentialsScreen.routeName);
     });
