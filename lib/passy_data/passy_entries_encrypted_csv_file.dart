@@ -101,6 +101,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.close();
     await _tempFile.delete();
+    _encrypter = encrypter;
   }
 
   String _encodeEntryForSaving(List<dynamic> _entry) {
