@@ -10,6 +10,8 @@ import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
+import 'key_derivation_type.dart';
+
 const String passyVersion = '1.6.0';
 const String syncVersion = '2.0.1';
 const String accountVersion = '2.3.0';
