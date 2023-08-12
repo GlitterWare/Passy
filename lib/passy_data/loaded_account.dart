@@ -21,6 +21,8 @@ import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
+import 'key_derivation_info.dart';
+import 'key_derivation_type.dart';
 import 'note.dart';
 import 'password.dart';
 import 'passy_entries.dart';
@@ -216,6 +218,17 @@ class LoadedAccount {
     await _paymentCards.setEncrypter(_encrypter);
     await _idCards.setEncrypter(_encrypter);
     await _identities.setEncrypter(_encrypter);
+  }
+
+  Future<void> setKeyDerivation(
+    String password, {
+    required KeyDerivationType type,
+    required KeyDerivationInfo info,
+  }) async {
+    _credentials.value.keyDerivationType = type;
+    _credentials.value.keyDerivationInfo = info;
+    await _credentials.save();
+    await setAccountPassword(password);
   }
 
   Future<void> save() => Future.wait([
