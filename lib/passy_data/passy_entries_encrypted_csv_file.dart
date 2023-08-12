@@ -31,10 +31,9 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     }
     processLines(_raf, onLine: (entry, eofReached) {
       List<String> _decoded = entry.split(',');
-      PassyEntry<T> _entry = PassyEntry.fromCSV(entryTypeFromType(T))(csvDecode(
-          decrypt(_decoded[1],
-              encrypter: _encrypter, iv: IV.fromBase64(_decoded[0])),
-          recursive: true)) as T;
+      String _decrypted = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      PassyEntry<T> _entry = PassyEntry.fromCSVString<T>(_decrypted) as T;
       _meta[_entry.key] = _entry.metadata;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -48,12 +47,9 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     RandomAccessFile _raf = _file.openSync();
     processLines(_raf, onLine: (line, eofReached) {
       List<String> _decoded1 = line.split(',');
-      List<dynamic> _decoded2 = csvDecode(
-          decrypt(_decoded1[2],
-              encrypter: _encrypter, iv: IV.fromBase64(_decoded1[1])),
-          recursive: true);
-      _entries[_decoded1[0]] =
-          (PassyEntry.fromCSV(entryTypeFromType(T)!)(_decoded2) as T);
+      String _decrypted = decrypt(_decoded1[2],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded1[1]));
+      _entries[_decoded1[0]] = PassyEntry.fromCSVString<T>(_decrypted) as T;
       return null;
     });
     _raf.closeSync();
@@ -74,6 +70,44 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       file,
       encrypter: encrypter,
     );
+  }
+
+  Future<void> setEncrypter(Encrypter encrypter) async {
+    File _tempFile;
+    {
+      String _tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-entries-${entryTypeFromType(T)}-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      _tempFile = await _file.copy(_tempPath);
+    }
+    bool isNotCorrupted = false;
+    RandomAccessFile _raf = await _file.open(mode: FileMode.append);
+    RandomAccessFile _tempRaf = await _tempFile.open();
+
+    await processLinesAsync(_tempRaf, lineDelimiter: ',',
+        onLine: (_key, eofReached) async {
+      if (eofReached) return true;
+      String? _entry = readLine(_tempRaf, lineDelimiter: '\n');
+      if (_entry == null) return true;
+      List<String> _decoded = _entry.split(',');
+      _entry = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      IV _iv = IV.fromSecureRandom(16);
+      _entry = encrypt(_entry, encrypter: encrypter, iv: _iv);
+      if (!isNotCorrupted) {
+        isNotCorrupted = true;
+        await _raf.close();
+        await _file.writeAsString('');
+        _raf = await _file.open(mode: FileMode.append);
+      }
+      await _raf.writeString('$_key,${_iv.base64},$_entry\n');
+      return null;
+    });
+    await _raf.close();
+    await _tempRaf.close();
+    await _tempFile.delete();
+    _encrypter = encrypter;
   }
 
   String _encodeEntryForSaving(List<dynamic> _entry) {
@@ -105,7 +139,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
   List<dynamic>? getEntryCSV(String key) {
     String? _entryString = getEntryString(key);
     if (_entryString == null) return null;
-    return csvDecode(_entryString, recursive: true);
+    return PassyEntry.fromCSVString<T>(_entryString).toCSV();
   }
 
   T? getEntry(String key) {

@@ -178,26 +178,44 @@ class LoadedAccount {
         identities: identities);
   }
 
-  Future<void> setAccountPassword(String password) async {
+  Future<void> setAccountPassword(
+    String password, {
+    bool doNotReencryptEntries = false,
+  }) async {
     _credentials.value.passwordHash = (await getPasswordHash(
       password,
       derivationType: _credentials.value.keyDerivationType,
       derivationInfo: _credentials.value.keyDerivationInfo,
     ))
         .toString();
+    await _credentials.save();
     _encrypter = await getPasswordEncrypter(
       password,
       derivationType: _credentials.value.keyDerivationType,
       derivationInfo: _credentials.value.keyDerivationInfo,
     );
+    await _settings.reload();
     _settings.encrypter = _encrypter;
+    await _settings.save();
+    await _history.reload();
     _history.encrypter = _encrypter;
+    await _history.save();
+    await _favorites.reload();
     _favorites.encrypter = _encrypter;
-    _passwords.encrypter = _encrypter;
-    _notes.encrypter = _encrypter;
-    _paymentCards.encrypter = _encrypter;
-    _idCards.encrypter = _encrypter;
-    _identities.encrypter = _encrypter;
+    await _favorites.save();
+    if (doNotReencryptEntries) {
+      _passwords.encrypter = _encrypter;
+      _notes.encrypter = _encrypter;
+      _paymentCards.encrypter = _encrypter;
+      _idCards.encrypter = _encrypter;
+      _identities.encrypter = _encrypter;
+      return;
+    }
+    await _passwords.setEncrypter(_encrypter);
+    await _notes.setEncrypter(_encrypter);
+    await _paymentCards.setEncrypter(_encrypter);
+    await _idCards.setEncrypter(_encrypter);
+    await _identities.setEncrypter(_encrypter);
   }
 
   Future<void> save() => Future.wait([

@@ -13,6 +13,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
 
+import 'log_screen.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatelessWidget {

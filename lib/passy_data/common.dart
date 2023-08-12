@@ -10,11 +10,9 @@ import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
-import 'key_derivation_type.dart';
-
-const String passyVersion = '1.5.2';
-const String syncVersion = '2.0.0';
-const String accountVersion = '2.2.0';
+const String passyVersion = '1.6.0';
+const String syncVersion = '2.0.1';
+const String accountVersion = '2.3.0';
 
 /// Returns false if version2 is lower, true if version2 is higher and null if both versions are the same
 bool? compareVersions(version1, version2) {
@@ -190,7 +188,8 @@ String csvEncode(List object) {
           .replaceAll('\\', '\\\\')
           .replaceAll('\n', '\\n')
           .replaceAll(',', '\\,')
-          .replaceAll('[', '\\[');
+          .replaceAll('[', '\\[')
+          .replaceAll(']', '\\]');
     }
     if (record is List) {
       String _encoded = '[';
@@ -252,19 +251,17 @@ List csvDecode(String source,
           _depth++;
           while (_characters.moveNext()) {
             _entry[v] += _characters.current;
-            if (_characters.current == ']') {
-              _depth--;
-              if (_depth == 0) break;
-            }
             if (_characters.current == '\\') {
-              _escapeDetected = true;
-            }
-            if (_escapeDetected) {
-              _escapeDetected = false;
+              if (!_characters.moveNext()) break;
+              _entry[v] += _characters.current;
               continue;
             }
             if (_characters.current == '[') {
               _depth++;
+            }
+            if (_characters.current == ']') {
+              _depth--;
+              if (_depth == 0) break;
             }
           }
           if (recursive) {

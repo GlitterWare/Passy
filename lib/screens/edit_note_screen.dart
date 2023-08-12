@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
@@ -26,6 +28,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
   String? _key;
   String _title = '';
   String _note = '';
+  bool _isMarkdown = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +40,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         _key = _noteArgs.key;
         _title = _noteArgs.title;
         _note = _noteArgs.note;
+        _isMarkdown = _noteArgs.isMarkdown;
       }
       _isLoaded = true;
     }
@@ -48,10 +52,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
           Note _noteArgs = Note(
-            key: _key,
-            title: _title,
-            note: _note,
-          );
+              key: _key, title: _title, note: _note, isMarkdown: _isMarkdown);
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setNote(_noteArgs);
           Navigator.popUntil(
@@ -62,6 +63,20 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
+        //TODO: Add markdown related strings to localizations
+        PassyPadding(ThreeWidgetButton(
+          center: const Text('Enable Markdown'),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.save_outlined),
+          ),
+          right: Switch(
+            activeColor: Colors.greenAccent,
+            value: _isMarkdown,
+            onChanged: (value) => setState(() => _isMarkdown = value),
+          ),
+          onPressed: () => setState(() => _isMarkdown = !_isMarkdown),
+        )),
         PassyPadding(TextFormField(
           initialValue: _title,
           decoration: InputDecoration(labelText: localizations.title),
@@ -89,6 +104,29 @@ class _EditNoteScreen extends State<EditNoteScreen> {
           ),
           onChanged: (value) => setState(() => _note = value),
         )),
+        if (_isMarkdown)
+          const PassyPadding(Text(
+            'Markdown preview',
+            style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+          )),
+        if (_isMarkdown)
+          Padding(
+              padding: EdgeInsets.fromLTRB(
+                  20,
+                  PassyTheme.passyPadding.top,
+                  PassyTheme.passyPadding.right,
+                  PassyTheme.passyPadding.bottom),
+              child: MarkdownBody(
+                data: _note,
+                selectable: true,
+                extensionSet: md.ExtensionSet(
+                  md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                  <md.InlineSyntax>[
+                    md.EmojiSyntax(),
+                    ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+                  ],
+                ),
+              )),
       ]),
     );
   }
