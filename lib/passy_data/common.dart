@@ -7,7 +7,7 @@ import 'package:path/path.dart' as path;
 import 'dart:io';
 
 const String passyVersion = '1.6.0';
-const String syncVersion = '2.0.0';
+const String syncVersion = '2.0.1';
 const String accountVersion = '2.3.0';
 
 /// Returns false if version2 is lower, true if version2 is higher and null if both versions are the same
