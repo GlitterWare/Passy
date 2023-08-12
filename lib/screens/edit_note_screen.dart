@@ -63,9 +63,8 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
-        //TODO: Add markdown related strings to localizations
         PassyPadding(ThreeWidgetButton(
-          center: const Text('Enable Markdown'),
+          center: Text(localizations.enableMarkdown),
           left: const Padding(
             padding: EdgeInsets.only(right: 30),
             child: Icon(Icons.save_outlined),
@@ -105,9 +104,10 @@ class _EditNoteScreen extends State<EditNoteScreen> {
           onChanged: (value) => setState(() => _note = value),
         )),
         if (_isMarkdown)
-          const PassyPadding(Text(
-            'Markdown preview',
-            style: TextStyle(color: PassyTheme.lightContentSecondaryColor),
+          PassyPadding(Text(
+            localizations.markdownPreview,
+            style:
+                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
           )),
         if (_isMarkdown)
           Padding(

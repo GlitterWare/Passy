@@ -239,5 +239,9 @@
     "addIdentity": "Add identity",
     "newVersionAvailable": "New version available",
     "unableToConnectBrowserExtension": "Unable to connect browser extension",
-    "somethingWentWrong": "Something went wrong"
+    "somethingWentWrong": "Something went wrong",
+    "twoFactorAuthentication": "Two-Factor Authentication",
+    "advancedSettings": "Advanced settings",
+    "enableMarkdown": "Enable Markdown",
+    "markdownPreview": "Markdown preview"
 }

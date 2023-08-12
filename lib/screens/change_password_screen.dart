@@ -146,17 +146,18 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(32.0)),
                                       color: PassyTheme.darkPassyPurple),
-                                  child: const PassyPadding(Row(
+                                  child: PassyPadding(Row(
                                     children: [
-                                      Padding(
+                                      const Padding(
                                         padding: EdgeInsets.only(left: 5),
                                         child:
                                             Icon(Icons.error_outline_rounded),
                                       ),
                                       Padding(
-                                          padding: EdgeInsets.only(left: 15),
-                                          //TODO: Move 'Advanced settings' to localizations
-                                          child: Text('Advanced settings')),
+                                          padding:
+                                              const EdgeInsets.only(left: 15),
+                                          child: Text(
+                                              localizations.advancedSettings)),
                                     ],
                                   ))));
                         },

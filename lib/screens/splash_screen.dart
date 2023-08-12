@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:passy/main.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,7 +11,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
 
-import 'log_screen.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatelessWidget {

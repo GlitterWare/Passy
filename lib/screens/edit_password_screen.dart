@@ -186,16 +186,16 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(32.0)),
                                 color: PassyTheme.darkPassyPurple),
-                            child: const PassyPadding(Row(
+                            child: PassyPadding(Row(
                               children: [
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.only(left: 5),
                                   child: Icon(Icons.security),
                                 ),
                                 Padding(
-                                    padding: EdgeInsets.only(left: 15),
-                                    //TODO: Move 'Two-Factor Authentication' to localizations
-                                    child: Text('Two-Factor Authentication')),
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Text(
+                                        localizations.twoFactorAuthentication)),
                               ],
                             ))));
                   },
