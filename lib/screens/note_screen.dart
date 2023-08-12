@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
@@ -112,11 +114,34 @@ class _NoteScreen extends State<NoteScreen> {
           PassyPadding(
               RecordButton(title: localizations.title, value: _note.title)),
         if (_note.note != '')
-          PassyPadding(RecordButton(
-            title: localizations.note,
-            value: _note.note,
-            valueAlign: TextAlign.left,
+          if (!_note.isMarkdown)
+            PassyPadding(RecordButton(
+              title: localizations.note,
+              value: _note.note,
+              valueAlign: TextAlign.left,
+            )),
+        if (_note.isMarkdown)
+          PassyPadding(Text(
+            localizations.note,
+            style:
+                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
           )),
+        if (_note.isMarkdown)
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, PassyTheme.passyPadding.top,
+                PassyTheme.passyPadding.right, PassyTheme.passyPadding.bottom),
+            child: MarkdownBody(
+              data: _note.note,
+              selectable: true,
+              extensionSet: md.ExtensionSet(
+                md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                <md.InlineSyntax>[
+                  md.EmojiSyntax(),
+                  ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+                ],
+              ),
+            ),
+          ),
       ]),
     );
   }

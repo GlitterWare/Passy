@@ -1,3 +1,4 @@
+import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_meta.dart';
 
 import 'passy_entries.dart';
@@ -23,11 +24,13 @@ class NoteMeta extends EntryMeta {
 class Note extends PassyEntry<Note> {
   String title;
   String note;
+  bool isMarkdown;
 
   Note({
     String? key,
     this.title = '',
     this.note = '',
+    this.isMarkdown = false,
   }) : super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
@@ -36,12 +39,19 @@ class Note extends PassyEntry<Note> {
   Note.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? '',
         note = json['note'] ?? '',
+        isMarkdown = json['isMarkdown'] ?? false,
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  Note.fromCSV(List csv)
+  Note._fromCSV(List csv)
       : title = csv[1] ?? '',
         note = csv[2] ?? '',
+        isMarkdown = boolFromString(csv[3] ?? 'false') ?? false,
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
+
+  factory Note.fromCSV(List csv) {
+    if (csv.length == 3) csv.add('false');
+    return Note._fromCSV(csv);
+  }
 
   @override
   int compareTo(Note other) => title.compareTo(other.title);
@@ -51,6 +61,7 @@ class Note extends PassyEntry<Note> {
         'key': key,
         'title': title,
         'note': note,
+        'isMarkdown': isMarkdown,
       };
 
   @override
@@ -58,5 +69,6 @@ class Note extends PassyEntry<Note> {
         key,
         title,
         note,
+        isMarkdown.toString(),
       ];
 }

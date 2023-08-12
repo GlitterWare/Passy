@@ -23,6 +23,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   String _password = '';
   String _newPassword = '';
   String _newPasswordConfirm = '';
+  bool _advancedSettingsIsExpanded = false;
+  bool _doNotReencryptEntries = false;
 
   void _onConfirmPressed() {
     if (getPassyHash(_password).toString() !=
@@ -55,8 +57,10 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     Navigator.pushNamed(context, SplashScreen.routeName);
     _account.reloadHistorySync();
-    _account.setAccountPassword(_newPassword);
-    _account.save().then((value) {
+    _account
+        .setAccountPassword(_newPassword,
+            doNotReencryptEntries: _doNotReencryptEntries)
+        .then((value) {
       Navigator.popUntil(context,
           (route) => route.settings.name == CredentialsScreen.routeName);
     });
@@ -123,6 +127,63 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                   ),
                 ),
               ),
+              ExpansionPanelList(
+                  expandedHeaderPadding: EdgeInsets.zero,
+                  expansionCallback: (panelIndex, isExpanded) =>
+                      setState(() => _advancedSettingsIsExpanded = !isExpanded),
+                  elevation: 0,
+                  dividerColor: PassyTheme.lightContentSecondaryColor,
+                  children: [
+                    ExpansionPanel(
+                        backgroundColor: PassyTheme.darkContentColor,
+                        isExpanded: _advancedSettingsIsExpanded,
+                        canTapOnHeader: true,
+                        headerBuilder: (context, isExpanded) {
+                          return Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Container(
+                                  decoration: const BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(32.0)),
+                                      color: PassyTheme.darkPassyPurple),
+                                  child: const PassyPadding(Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 5),
+                                        child:
+                                            Icon(Icons.error_outline_rounded),
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(left: 15),
+                                          //TODO: Move 'Advanced settings' to localizations
+                                          child: Text('Advanced settings')),
+                                    ],
+                                  ))));
+                        },
+                        body: Column(
+                          children: [
+                            PassyPadding(DropdownButtonFormField(
+                              items: [
+                                DropdownMenuItem(
+                                  child: Text(localizations.true_),
+                                  value: true,
+                                ),
+                                DropdownMenuItem(
+                                  child: Text(
+                                      '${localizations.false_} (${localizations.recommended.toLowerCase()})'),
+                                  value: false,
+                                ),
+                              ],
+                              value: _doNotReencryptEntries,
+                              decoration: const InputDecoration(
+                                  labelText:
+                                      'Disable entry re-encryption (Maintenance use only)'),
+                              onChanged: (value) => setState(
+                                  () => _doNotReencryptEntries = value as bool),
+                            )),
+                          ],
+                        ))
+                  ]),
               const Spacer(),
             ]),
           ),

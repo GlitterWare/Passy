@@ -25,6 +25,7 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     loadLocalizations(context);
+    //TODO: move the 'Something went wrong' message to localizations
     FlutterError.onError = (e) {
       try {
         FlutterError.presentError(e);

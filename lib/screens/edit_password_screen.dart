@@ -194,6 +194,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                                 ),
                                 Padding(
                                     padding: EdgeInsets.only(left: 15),
+                                    //TODO: Move 'Two-Factor Authentication' to localizations
                                     child: Text('Two-Factor Authentication')),
                               ],
                             ))));
