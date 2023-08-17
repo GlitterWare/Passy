@@ -927,7 +927,7 @@ class Synchronization {
               await util.processTypedExchangeEntries(
                 entries: sharedEntries,
                 account: _loadedAccount,
-                history: _history.value,
+                history: _history,
                 onSetEntry: () => _entriesAdded++,
                 onRemoveEntry: () => _entriesAdded++,
               );
@@ -1104,7 +1104,7 @@ class Synchronization {
                 await util.processTypedExchangeEntries(
                   entries: entries,
                   account: _loadedAccount,
-                  history: _history.value,
+                  history: _history,
                   onRemoveEntry: () => _entriesRemoved++,
                   onSetEntry: () => _entriesAdded++,
                 );

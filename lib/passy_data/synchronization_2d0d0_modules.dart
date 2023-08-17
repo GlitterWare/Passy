@@ -197,7 +197,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             await util.processTypedExchangeEntries(
               entries: exchangeEntries,
               account: account,
-              history: history.value,
+              history: history,
               onRemoveEntry: onRemoveEntry,
               onSetEntry: onSetEntry,
             );

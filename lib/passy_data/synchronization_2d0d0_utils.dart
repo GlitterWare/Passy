@@ -433,7 +433,7 @@ Future<void> processExchangeEntry({
   required EntryType entryType,
   required ExchangeEntry entry,
   required LoadedAccount account,
-  required History history,
+  required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
@@ -444,8 +444,8 @@ Future<void> processExchangeEntry({
   if (historyEntry.status == EntryStatus.removed) {
     await account.removeEntry(entryType)(historyEntry.key);
     onRemoveEntry?.call();
-    history.getEvents(entryType)[historyEntry.key] = historyEntry;
-    await account.saveHistory();
+    history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
+    await history.save();
     return;
   }
   PassyEntry? passyEntry = entry.entry;
@@ -454,15 +454,15 @@ Future<void> processExchangeEntry({
   }
   await account.setEntry(entryType)(passyEntry);
   onSetEntry?.call();
-  history.getEvents(entryType)[historyEntry.key] = historyEntry;
-  await account.saveHistory();
+  history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
+  await history.save();
 }
 
 Future<void> processExchangeEntries({
   required EntryType entryType,
   required List<ExchangeEntry> entries,
   required LoadedAccount account,
-  required History history,
+  required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
@@ -481,7 +481,7 @@ Future<void> processExchangeEntries({
 Future<void> processTypedExchangeEntries({
   required Map<EntryType, List<ExchangeEntry>> entries,
   required LoadedAccount account,
-  required History history,
+  required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
