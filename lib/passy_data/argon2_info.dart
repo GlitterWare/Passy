@@ -36,4 +36,15 @@ class Argon2Info extends KeyDerivationInfo {
       'iterations': iterations,
     };
   }
+
+  @override
+  List toCSV() {
+    String saltEncoded = base64Encode(salt.bytes);
+    return [
+      saltEncoded,
+      parallelism,
+      memory,
+      iterations,
+    ];
+  }
 }

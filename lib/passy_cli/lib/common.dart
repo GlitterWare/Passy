@@ -1,7 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:dargon2/dargon2.dart';
+import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/common.dart' as pcommon;
+import 'package:passy/passy_data/key_derivation_info.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 
 String getBoxMessage(String message) {
   List<String> msgSplit = message.split('\n');
@@ -99,4 +104,77 @@ Future<Encrypter> getPassyEncrypterV2Dart(
       memory: memory,
       iterations: iterations);
   return Encrypter(AES(Key(Uint8List.fromList(result.rawBytes))));
+}
+
+Future<Digest> getArgon2Hash(
+  String password, {
+  required Salt salt,
+  int parallelism = 4,
+  int memory = 65536,
+  int iterations = 2,
+}) async {
+  List<int> derivedPassword = (await argon2ifyString(
+    password,
+    salt: salt,
+    parallelism: parallelism,
+    memory: memory,
+    iterations: iterations,
+  ))
+      .rawBytes;
+  return sha512.convert(derivedPassword);
+}
+
+Future<Digest> getPasswordHash(
+  String password, {
+  required KeyDerivationType derivationType,
+  KeyDerivationInfo? derivationInfo,
+}) async {
+  switch (derivationType) {
+    case KeyDerivationType.none:
+      return pcommon.getPassyHash(password);
+    case KeyDerivationType.argon2:
+      Argon2Info info = derivationInfo as Argon2Info;
+      return await getArgon2Hash(
+        password,
+        salt: info.salt,
+        parallelism: info.parallelism,
+        memory: info.memory,
+        iterations: info.iterations,
+      );
+  }
+}
+
+Future<Encrypter> getPassyEncrypterV2(
+  String password, {
+  required Salt salt,
+  int parallelism = 4,
+  int memory = 65536,
+  int iterations = 2,
+}) async {
+  DArgon2Result result = await argon2ifyString(password,
+      salt: salt,
+      parallelism: parallelism,
+      memory: memory,
+      iterations: iterations);
+  return Encrypter(AES(Key(Uint8List.fromList(result.rawBytes))));
+}
+
+Future<Encrypter> getPasswordEncrypter(
+  String password, {
+  required KeyDerivationType derivationType,
+  KeyDerivationInfo? derivationInfo,
+}) async {
+  switch (derivationType) {
+    case KeyDerivationType.none:
+      return pcommon.getPassyEncrypter(password);
+    case KeyDerivationType.argon2:
+      Argon2Info info = derivationInfo as Argon2Info;
+      return getPassyEncrypterV2(
+        password,
+        salt: info.salt,
+        parallelism: info.parallelism,
+        memory: info.memory,
+        iterations: info.iterations,
+      );
+  }
 }

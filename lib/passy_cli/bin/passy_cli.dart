@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:passy/passy_cli/lib/common.dart' as cn;
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
@@ -19,8 +20,6 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
-
-// TODO: implement Argon2 support
 
 const String helpMsg = '''
 
@@ -311,8 +310,8 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           refreshAccounts();
           log(
               _accounts.values
-                  .map<String>(
-                      (e) => '${e.value.username},${e.value.passwordHash}')
+                  .map<String>((e) =>
+                      '${e.value.username},${e.value.passwordHash},${e.value.keyDerivationType.name},${e.value.keyDerivationInfo == null ? null : '[${pcommon.csvEncode(e.value.keyDerivationInfo!.toCSV())}]'}')
                   .join('\n'),
               id: id);
           return;
@@ -327,7 +326,10 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           }
           String password = command[3];
           bool match = _credentials.passwordHash ==
-              pcommon.getPassyHash(password).toString();
+              (await cn.getPasswordHash(password,
+                      derivationType: _credentials.keyDerivationType,
+                      derivationInfo: _credentials.keyDerivationInfo))
+                  .toString();
           log(match.toString(), id: id);
           return;
         case 'login':
@@ -341,9 +343,16 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           }
           String password = command[3];
           bool match = _credentials.passwordHash ==
-              pcommon.getPassyHash(password).toString();
+              (await cn.getPasswordHash(password,
+                      derivationType: _credentials.keyDerivationType,
+                      derivationInfo: _credentials.keyDerivationInfo))
+                  .toString();
           if (match) {
-            _encrypters[accountName] = pcommon.getPassyEncrypter(password);
+            _encrypters[accountName] = await cn.getPasswordEncrypter(
+              password,
+              derivationType: _credentials.keyDerivationType,
+              derivationInfo: _credentials.keyDerivationInfo,
+            );
           }
           log(match.toString(), id: id);
           return;
