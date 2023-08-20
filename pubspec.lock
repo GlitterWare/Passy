@@ -316,10 +316,11 @@ packages:
   dargon2:
     dependency: "direct main"
     description:
-      name: dargon2
-      sha256: f1fd17183943166e08063ac0eb37ad3c5b485ca3e058d2e1a40ddcf02dd4fc3c
-      url: "https://pub.dev"
-    source: hosted
+      path: dargon2
+      ref: "011ba63fa78ea33d319acdcc5c576edde6daa908"
+      resolved-ref: "011ba63fa78ea33d319acdcc5c576edde6daa908"
+      url: "https://github.com/GlitterWare/dargon2.git"
+    source: git
     version: "3.2.1"
   dargon2_core:
     dependency: transitive
@@ -346,7 +347,7 @@ packages:
     source: hosted
     version: "3.2.0"
   dargon2_flutter_mobile:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dargon2_flutter_mobile
       sha256: "22b1b5229371c229cb55ca214262c6cb2189d40f7ef4ab87c1bea75bc2c582bf"

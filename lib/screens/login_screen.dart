@@ -148,7 +148,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
             _derivedPassword == null
                 ? getPassyEncrypter(_password)
                 : getPassyEncrypterFromBytes(
-                    Uint8List.fromList(_derivedPassword)));
+                    Uint8List.fromList(_derivedPassword)),
+            await data.getSyncEncrypter(
+                username: _username, password: _password));
         Navigator.pop(context);
         if (isAutofill) {
           Navigator.pushNamed(

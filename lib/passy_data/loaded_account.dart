@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
@@ -32,6 +33,7 @@ import 'synchronization.dart';
 
 class LoadedAccount {
   Encrypter _encrypter;
+  Encrypter _syncEncrypter;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
   final LocalSettingsFile _localSettings;
@@ -46,6 +48,7 @@ class LoadedAccount {
 
   LoadedAccount({
     required Encrypter encrypter,
+    required Encrypter syncEncrypter,
     required File versionFile,
     required AccountCredentialsFile credentials,
     required LocalSettingsFile localSettings,
@@ -58,6 +61,7 @@ class LoadedAccount {
     required IDCardsFile idCards,
     required IdentitiesFile identities,
   })  : _encrypter = encrypter,
+        _syncEncrypter = syncEncrypter,
         _versionFile = versionFile,
         _credentials = credentials,
         _localSettings = localSettings,
@@ -125,6 +129,7 @@ class LoadedAccount {
   factory LoadedAccount.fromDirectory({
     required String path,
     required Encrypter encrypter,
+    required Encrypter syncEncrypter,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -167,6 +172,7 @@ class LoadedAccount {
         encrypter: encrypter);
     return LoadedAccount(
         encrypter: encrypter,
+        syncEncrypter: syncEncrypter,
         versionFile: versionFile,
         credentials: credentials,
         localSettings: localSettings,
@@ -183,7 +189,13 @@ class LoadedAccount {
   Future<void> setAccountPassword(
     String password, {
     bool doNotReencryptEntries = false,
+    KeyDerivationType? derivationType,
+    KeyDerivationInfo? derivationInfo,
   }) async {
+    if (derivationType != null) {
+      _credentials.value.keyDerivationType = derivationType;
+      _credentials.value.keyDerivationInfo = derivationInfo;
+    }
     _credentials.value.passwordHash = (await getPasswordHash(
       password,
       derivationType: _credentials.value.keyDerivationType,
@@ -191,6 +203,7 @@ class LoadedAccount {
     ))
         .toString();
     await _credentials.save();
+    Encrypter oldEncrypter = _encrypter;
     _encrypter = await getPasswordEncrypter(
       password,
       derivationType: _credentials.value.keyDerivationType,
@@ -213,22 +226,30 @@ class LoadedAccount {
       _identities.encrypter = _encrypter;
       return;
     }
-    await _passwords.setEncrypter(_encrypter);
-    await _notes.setEncrypter(_encrypter);
-    await _paymentCards.setEncrypter(_encrypter);
-    await _idCards.setEncrypter(_encrypter);
-    await _identities.setEncrypter(_encrypter);
+    await _passwords.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _notes.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _paymentCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _idCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _identities.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
   }
 
-  Future<void> setKeyDerivation(
-    String password, {
-    required KeyDerivationType type,
-    required KeyDerivationInfo info,
-  }) async {
-    _credentials.value.keyDerivationType = type;
-    _credentials.value.keyDerivationInfo = info;
-    await _credentials.save();
-    await setAccountPassword(password);
+  KeyDerivationType get keyDerivationType =>
+      _credentials.value.keyDerivationType;
+
+  KeyDerivationInfo? get keyDerivationInfo {
+    KeyDerivationType type = _credentials.value.keyDerivationType;
+    switch (type) {
+      case KeyDerivationType.none:
+        return null;
+      case KeyDerivationType.argon2:
+        Argon2Info info = _credentials.value.keyDerivationInfo as Argon2Info;
+        return Argon2Info(
+          salt: info.salt,
+          parallelism: info.parallelism,
+          memory: info.memory,
+          iterations: info.iterations,
+        );
+    }
   }
 
   Future<void> save() => Future.wait([
@@ -260,7 +281,7 @@ class LoadedAccount {
       this,
       history: _history,
       favorites: _favorites,
-      encrypter: _encrypter,
+      encrypter: _syncEncrypter,
       rsaKeypair: rsaKeypair,
       onComplete: onComplete,
       onError: onError,
@@ -995,9 +1016,11 @@ class JSONLoadedAccount {
     );
   }
 
-  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter) {
+  LoadedAccount toEncryptedCSVLoadedAccount(
+      Encrypter encrypter, Encrypter syncEncrypter) {
     return LoadedAccount(
       encrypter: encrypter,
+      syncEncrypter: syncEncrypter,
       versionFile: _versionFile,
       credentials: _credentials,
       localSettings: _localSettings,

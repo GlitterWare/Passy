@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/backup_and_restore_screen.dart';
 import 'package:passy/screens/common.dart';
@@ -46,7 +45,7 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
         confirmIcon: const Icon(Icons.settings_backup_restore_rounded),
         onBackPressed: (context) => Navigator.pop(context),
         onConfirmPressed: (context, value) {
-          data.restoreAccount(_path, encrypter: getPassyEncrypter(value)).then(
+          data.restoreAccount(_path, password: value).then(
             (value) {
               Navigator.popUntil(context,
                   (route) => route.settings.name == MainScreen.routeName);

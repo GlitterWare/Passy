@@ -12,6 +12,7 @@ import 'package:passy/screens/export_and_import_screen.dart';
 import 'package:passy/screens/export_screen.dart';
 import 'package:passy/screens/global_settings_screen.dart';
 import 'package:passy/screens/import_screen.dart';
+import 'package:passy/screens/key_derivation_screen.dart';
 import 'package:passy/screens/no_accounts_screen.dart';
 
 import 'common/common.dart';
@@ -157,6 +158,7 @@ class Passy extends StatelessWidget {
         IdentitiesScreen.routeName: (context) => const IdentitiesScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         ImportScreen.routeName: (context) => const ImportScreen(),
+        KeyDerivationScreen.routeName: (context) => const KeyDerivationScreen(),
         LogScreen.routeName: (context) => const LogScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         MainScreen.routeName: (context) => const MainScreen(),

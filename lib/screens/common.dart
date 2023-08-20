@@ -12,7 +12,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/main.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -93,7 +92,12 @@ Future<bool> bioAuth(String username) async {
       data.getPasswordHash(username)) return false;
   data.info.value.lastUsername = username;
   await data.info.save();
-  await data.loadAccount(username, getPassyEncrypter(_bioData.password));
+  await data.loadAccount(
+    username,
+    (await data.getEncrypter(username, password: _bioData.password))!,
+    await data.getSyncEncrypter(
+        username: username, password: _bioData.password),
+  );
   return true;
 }
 

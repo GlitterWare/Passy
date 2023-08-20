@@ -72,7 +72,9 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     );
   }
 
-  Future<void> setEncrypter(Encrypter encrypter) async {
+  Future<void> setEncrypter(Encrypter encrypter,
+      {Encrypter? oldEncrypter}) async {
+    Encrypter oldEncrypterA = oldEncrypter ?? _encrypter;
     File _tempFile;
     {
       String _tempPath = (Directory.systemTemp).path +
@@ -92,7 +94,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       if (_entry == null) return true;
       List<String> _decoded = _entry.split(',');
       _entry = decrypt(_decoded[1],
-          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+          encrypter: oldEncrypterA, iv: IV.fromBase64(_decoded[0]));
       IV _iv = IV.fromSecureRandom(16);
       _entry = encrypt(_entry, encrypter: encrypter, iv: _iv);
       if (!isNotCorrupted) {

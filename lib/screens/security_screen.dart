@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/screens/splash_screen.dart';
+import 'package:passy/screens/key_derivation_screen.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 
 import 'biometric_auth_screen.dart';
@@ -63,11 +64,8 @@ class _SecurityScreen extends State<SecurityScreen> {
                 child: Icon(Icons.fingerprint_rounded),
               ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () {
-                Navigator.pushNamed(context, SplashScreen.routeName);
-                Navigator.pushReplacementNamed(
-                    context, BiometricAuthScreen.routeName);
-              },
+              onPressed: () =>
+                  Navigator.pushNamed(context, BiometricAuthScreen.routeName),
             )),
           if (Platform.isAndroid)
             PassyPadding(ThreeWidgetButton(
@@ -97,6 +95,22 @@ class _SecurityScreen extends State<SecurityScreen> {
               ),
               onPressed: () => setAutoScreenLock(!loadedAccount.autoScreenLock),
             )),
+          PassyPadding(ThreeWidgetButton(
+            color: loadedAccount.keyDerivationType == KeyDerivationType.none
+                ? const Color.fromRGBO(255, 82, 82, 1)
+                : null,
+            center: Text(localizations.keyDerivation),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.key_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, KeyDerivationScreen.routeName)
+                    .then(
+              (value) => setState(() {}),
+            ),
+          )),
         ],
       ),
     );

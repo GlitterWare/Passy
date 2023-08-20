@@ -92,7 +92,10 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     data.info.value.lastUsername = _username;
     data.loadAccount(
-        _username, (await data.getEncrypter(_username, password: _password))!);
+        _username,
+        (await data.getEncrypter(_username, password: _password))!,
+        (await data.getSyncEncrypter(
+            username: _username, password: _password)));
     data.info.save().then((value) {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, SetupScreen.routeName);

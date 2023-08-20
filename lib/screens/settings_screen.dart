@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/screens/security_screen.dart';
 
 import 'package:passy/common/common.dart';
@@ -25,6 +27,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,16 +97,19 @@ class _SettingsScreen extends State<SettingsScreen> {
                 context, ExportAndImportScreen.routeName,
                 arguments: data.loadedAccount!.username),
           )),
-          if (Platform.isAndroid || Platform.isIOS)
-            PassyPadding(ThreeWidgetButton(
-                center: Text(localizations.security),
-                left: const Padding(
-                  padding: EdgeInsets.only(right: 30),
-                  child: Icon(Icons.lock_rounded),
-                ),
-                right: const Icon(Icons.arrow_forward_ios_rounded),
-                onPressed: () =>
-                    Navigator.pushNamed(context, SecurityScreen.routeName))),
+          PassyPadding(ThreeWidgetButton(
+              color: _account.keyDerivationType == KeyDerivationType.none
+                  ? const Color.fromRGBO(255, 82, 82, 1)
+                  : null,
+              center: Text(localizations.security),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.lock_rounded),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, SecurityScreen.routeName)
+                      .then((value) => setState(() {})))),
           PassyPadding(ThreeWidgetButton(
               center: Text(localizations.credentials),
               left: const Padding(

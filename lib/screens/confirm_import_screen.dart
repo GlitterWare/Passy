@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -19,11 +19,16 @@ class ConfirmImportScreen extends StatefulWidget {
 }
 
 class _ConfirmImportScreen extends State<ConfirmImportScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
   String _path = '';
 
   Future<void> _onConfirmPressed(BuildContext context, String value) async {
     try {
-      await data.importAccount(_path, encrypter: getPassyEncrypter(value));
+      await data.importAccount(_path,
+          encrypter:
+              (await data.getEncrypter(_account.username, password: value))!,
+          syncEncrypter: (await data.getSyncEncrypter(
+              username: _account.username, password: value)));
       Navigator.popUntil(
           context, (route) => route.settings.name == MainScreen.routeName);
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);

@@ -243,5 +243,17 @@
     "twoFactorAuthentication": "Two-Factor Authentication",
     "advancedSettings": "Advanced settings",
     "enableMarkdown": "Enable Markdown",
-    "markdownPreview": "Markdown preview"
+    "markdownPreview": "Markdown preview",
+    "keyDerivation": "Key derivation",
+    "keyDerivationType": "Key derivation type",
+    "keyDerivationDescription": "Key derivation can significantly improve your account security by making your password harder to guess.",
+    "keyDerivationWarning1": "It is highly recommended to use key derivation.",
+    "keyDerivationWarning2": "All your devices need to have the same key derivation type for synchronization to work properly.",
+    "keyDerivationWarning3": "If you don't see this menu on other devices, please make sure that all of your devices are updated to the latest Passy version.",
+    "@keyDerivationWarning1": { "description": "keyDerivationWarning1, keyDerivationWarning2 and keyDerivationWarning3 make up a single message used in the key derivation screen" },
+    "@keyDerivationWarning2": { "description": "keyDerivationWarning1, keyDerivationWarning2 and keyDerivationWarning3 make up a single message used in the key derivation screen" },
+    "@keyDerivationWarning3": { "description": "keyDerivationWarning1, keyDerivationWarning2 and keyDerivationWarning3 make up a single message used in the key derivation screen" },
+    "youAreChangingKeyDerivationFor": "You're changing key derivation for ",
+    "@youAreChangingKeyDerivationFor": { "description": "This message is followed by a username in the key derivation screen" },
+    "none": "None"
 }

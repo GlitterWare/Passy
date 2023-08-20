@@ -8,6 +8,7 @@ import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
@@ -27,6 +28,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
+import 'key_derivation_screen.dart';
 import 'payment_cards_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
@@ -529,6 +531,19 @@ class _MainScreen extends State<MainScreen>
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
+      if (_account.keyDerivationType == KeyDerivationType.none)
+        PassyPadding(ThreeWidgetButton(
+          color: const Color.fromRGBO(255, 82, 82, 1),
+          center: Text(localizations.keyDerivation),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.key_rounded),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () =>
+              Navigator.pushNamed(context, KeyDerivationScreen.routeName)
+                  .then((value) => setState(() {})),
+        )),
     ];
 
     return WillPopScope(
@@ -583,7 +598,8 @@ class _MainScreen extends State<MainScreen>
               padding: PassyTheme.appBarButtonPadding,
               tooltip: localizations.settings,
               onPressed: () =>
-                  Navigator.pushNamed(context, SettingsScreen.routeName),
+                  Navigator.pushNamed(context, SettingsScreen.routeName)
+                      .then((value) => setState(() {})),
               icon: const Icon(Icons.settings),
               splashRadius: PassyTheme.appBarButtonSplashRadius,
             ),
@@ -614,6 +630,7 @@ class _MainScreen extends State<MainScreen>
                   children: [
                     _screenButtons[6],
                     _screenButtons[7],
+                    if (_screenButtons.length == 9) _screenButtons[8],
                   ],
                 ))
               ]);
@@ -626,6 +643,7 @@ class _MainScreen extends State<MainScreen>
                     _screenButtons[1],
                     _screenButtons[2],
                     _screenButtons[3],
+                    if (_screenButtons.length == 9) _screenButtons[8],
                   ]),
                 ),
                 Expanded(
