@@ -7,6 +7,7 @@ void runProcess(String path, List<String> args) async {
       path + suffix, args.isEmpty ? const [] : args.sublist(1));
   proc.stdin.addStream(stdin);
   stdout.addStream(proc.stdout);
+  stderr.addStream(proc.stderr);
   await proc.exitCode;
 }
 
