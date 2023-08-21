@@ -1,5 +1,4 @@
 #include <string>
-#include <iostream>
 #include <unistd.h>
 #include "my_application.h"
 
@@ -15,7 +14,6 @@ int main(int argc, char** argv) {
       args[0] = pathptr;
       for (int i = 2; i != argc; i++) {
         args[i - 1] = argv[i];
-        std::cout << args[i - 1];
       }
       args[argc - 1] = (char*)0;
       execv(pathptr, args);
