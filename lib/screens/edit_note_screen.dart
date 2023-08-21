@@ -67,7 +67,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
           center: Text(localizations.enableMarkdown),
           left: const Padding(
             padding: EdgeInsets.only(right: 30),
-            child: Icon(Icons.save_outlined),
+            child: Icon(Icons.arrow_downward_rounded),
           ),
           right: Switch(
             activeColor: Colors.greenAccent,
