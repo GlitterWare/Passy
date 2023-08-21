@@ -2,10 +2,17 @@ import 'dart:io';
 
 final String suffix = Platform.isWindows ? '.exe' : '';
 
-void runProcess(String path, List<String> args) async {
+void runProcess(
+  String path,
+  List<String> args, {
+  ProcessStartMode? mode,
+}) async {
+  mode ??= Platform.isWindows
+      ? ProcessStartMode.detached
+      : ProcessStartMode.inheritStdio;
   final Process proc = await Process.start(
       path + suffix, args.isEmpty ? const [] : args.sublist(1),
-      mode: ProcessStartMode.inheritStdio);
+      mode: mode);
   await proc.exitCode;
 }
 
@@ -14,7 +21,8 @@ void runPassy(Directory root, List<String> args) async {
 }
 
 void runCli(Directory root, List<String> args) async {
-  runProcess(root.path + Platform.pathSeparator + 'passy_cli', args);
+  runProcess(root.path + Platform.pathSeparator + 'passy_cli', args,
+      mode: ProcessStartMode.inheritStdio);
 }
 
 void main(List<String> args) {
