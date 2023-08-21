@@ -50,7 +50,7 @@ add_subdirectory("runner")
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
-
+set(BINARY_NAME "passy_flutter.exe")
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can
 # run in place. This is done instead of making a separate bundle (as on Linux)
@@ -107,3 +107,12 @@ if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Passy CLI: Bad exit status")
 endif()
 install(FILES "${CLI_BIN_FILE}" "${CLI_NATIVE_MESSAGING}" "${CLI_NATIVE_MESSAGING_MANIFEST}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+# Build and install Passy launcher
+set(LAUNCHER_BIN_SOURCE_FILE "${LAUNCHER_BIN_DIR}/passy_launcher.dart")
+set(LAUNCHER_BIN_FILE "${LAUNCHER_BIN_DIR}/passy.exe")
+execute_process(COMMAND "dart" "compile" "exe" "${LAUNCHER_BIN_SOURCE_FILE}" "-o" "${LAUNCHER_BIN_FILE}" RESULT_VARIABLE ret)
+if(ret AND NOT ret EQUAL 0)
+  message(FATAL_ERROR "Building Passy launcher: Bad exit status")
+endif()
+install(FILES "${LAUNCHER_BIN_FILE}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
