@@ -56,6 +56,7 @@ pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
+set(BINARY_NAME "passy_flutter")
 # Define the application target. To change its name, change BINARY_NAME above,
 # not the value here, or `flutter run` will no longer work.
 #
@@ -141,6 +142,8 @@ get_filename_component(APP_SOURCE_DIR ${PROJECT_BUILD_DIR} DIRECTORY)
 set(LINUX_ASSETS_DIR "${APP_SOURCE_DIR}/linux_assets")
 set(CLI_LIB_DIR "${APP_SOURCE_DIR}/lib/passy_cli")
 set(CLI_BIN_DIR "${CLI_LIB_DIR}/bin")
+set(LAUNCHER_LIB_DIR "${APP_SOURCE_DIR}/lib/passy_launcher")
+set(LAUNCHER_BIN_DIR "${LAUNCHER_LIB_DIR}/bin")
 
 # Install linux assets
 set(LOGO_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.svg")
@@ -160,3 +163,12 @@ if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Passy CLI: Bad exit status")
 endif()
 install(FILES "${CLI_BIN_FILE}" "${CLI_NATIVE_MESSAGING}" "${CLI_NATIVE_MESSAGING_MANIFEST}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+# Build and install Passy launcher
+set(LAUNCHER_BIN_SOURCE_FILE "${LAUNCHER_BIN_DIR}/passy_launcher.dart")
+set(LAUNCHER_BIN_FILE "${LAUNCHER_BIN_DIR}/passy")
+execute_process(COMMAND "dart" "compile" "exe" "${LAUNCHER_BIN_SOURCE_FILE}" "-o" "${LAUNCHER_BIN_FILE}" RESULT_VARIABLE ret)
+if(ret AND NOT ret EQUAL 0)
+  message(FATAL_ERROR "Building Passy launcher: Bad exit status")
+endif()
+install(FILES "${LAUNCHER_BIN_FILE}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
