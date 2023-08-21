@@ -4,10 +4,8 @@ final String suffix = Platform.isWindows ? '.exe' : '';
 
 void runProcess(String path, List<String> args) async {
   final Process proc = await Process.start(
-      path + suffix, args.isEmpty ? const [] : args.sublist(1));
-  proc.stdin.addStream(stdin);
-  stdout.addStream(proc.stdout);
-  stderr.addStream(proc.stderr);
+      path + suffix, args.isEmpty ? const [] : args.sublist(1),
+      mode: ProcessStartMode.inheritStdio);
   await proc.exitCode;
 }
 
