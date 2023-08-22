@@ -67,7 +67,7 @@ dependencies:
     git:
       url: https://github.com/GlitterWare/dargon2.git
       path: dargon2
-      ref: 011ba63fa78ea33d319acdcc5c576edde6daa908
+      ref: b79a5aa10633ab702eeb039c51680a6a1b5008bf
   dargon2_interface: ^1.1.1
   system_info2: ^4.0.0
   flutter_markdown: ^0.6.17+1
