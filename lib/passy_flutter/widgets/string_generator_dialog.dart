@@ -14,6 +14,8 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   static const String _numbers = '1234567890';
   static const String _symbols = '.,;#&()^*_-';
+  static const double _minSpecial = 8 / 25;
+  static const double _halfMinSpecial = 4 / 25;
 
   String _value = '';
   int _length = 18;
@@ -26,7 +28,52 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   }
 
   void _generatePassword() {
-    _value = PassyGen.generateString(_characterSet, _length);
+    int minSpecial;
+    if (_numbersEnabled && _symbolsEnabled) {
+      minSpecial = (_halfMinSpecial * _length).round();
+      while (true) {
+        _value = PassyGen.generateString(_characterSet, _length);
+        int numCount = 0;
+        int symCount = 0;
+        for (String c in _value.characters) {
+          if (_numbers.contains(c)) {
+            numCount++;
+            continue;
+          }
+          if (_symbols.contains(c)) {
+            symCount++;
+            continue;
+          }
+        }
+        if (numCount >= minSpecial) {
+          if (symCount >= minSpecial) {
+            break;
+          }
+        }
+      }
+    } else if (_numbersEnabled || _symbolsEnabled) {
+      minSpecial = (_minSpecial * _length).round();
+      String special;
+      if (_numbersEnabled) {
+        special = _numbers;
+      } else {
+        special = _symbols;
+      }
+      while (true) {
+        _value = PassyGen.generateString(_characterSet, _length);
+        int specialCount = 0;
+        for (String c in _value.characters) {
+          if (special.contains(c)) {
+            specialCount++;
+            continue;
+          }
+        }
+        if (specialCount >= minSpecial) break;
+      }
+    } else {
+      _value = PassyGen.generateString(_characterSet, _length);
+      return;
+    }
   }
 
   void _buildCharacterSet() {
