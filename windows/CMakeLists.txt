@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(passy LANGUAGES CXX)
 
-set(BINARY_NAME "passy_flutter")
+set(BINARY_NAME "passy")
 
 cmake_policy(SET CMP0063 NEW)
 
@@ -106,14 +106,3 @@ if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Passy CLI: Bad exit status")
 endif()
 install(FILES "${CLI_BIN_FILE}" "${CLI_NATIVE_MESSAGING}" "${CLI_NATIVE_MESSAGING_MANIFEST}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-# Build and install Passy launcher
-set(LAUNCHER_LIB_DIR "${APP_SOURCE_DIR}/lib/passy_launcher")
-set(LAUNCHER_BIN_DIR "${LAUNCHER_LIB_DIR}/bin")
-set(LAUNCHER_BIN_SOURCE_FILE "${LAUNCHER_BIN_DIR}/passy_launcher.dart")
-set(LAUNCHER_BIN_FILE "${LAUNCHER_BIN_DIR}/passy.exe")
-execute_process(COMMAND "dart" "compile" "exe" "${LAUNCHER_BIN_SOURCE_FILE}" "-o" "${LAUNCHER_BIN_FILE}" RESULT_VARIABLE ret)
-if(ret AND NOT ret EQUAL 0)
-  message(FATAL_ERROR "Building Passy launcher: Bad exit status")
-endif()
-install(FILES "${LAUNCHER_BIN_FILE}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
