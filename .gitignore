@@ -55,6 +55,3 @@ app.*.map.json
 # Passy CLI
 lib/passy_cli/bin/passy_cli
 
-# Passy launcher
-lib/passy_launcher/bin/passy_launcher
-lib/passy_launcher/bin/passy
