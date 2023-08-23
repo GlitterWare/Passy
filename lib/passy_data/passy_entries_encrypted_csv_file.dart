@@ -202,4 +202,55 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _tempRaf.close();
     await _tempFile.delete();
   }
+
+  Future<void> setEntries(Map<String, T?> entries) async {
+    File _tempFile;
+    {
+      String _tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-entries-${entryTypeFromType(T)}-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      _tempFile = await _file.copy(_tempPath);
+    }
+    await _file.writeAsString('');
+    RandomAccessFile _raf = await _file.open(mode: FileMode.append);
+    RandomAccessFile _tempRaf = await _tempFile.open();
+    bool _isEntrySet = false;
+    void _onEOF() {
+      if (_isEntrySet) return;
+      for (T? entry in entries.values) {
+        if (entry == null) continue;
+        _raf.writeStringSync(_encodeEntryForSaving(entry.toCSV()));
+      }
+      _isEntrySet = true;
+    }
+
+    await processLinesAsync(_tempRaf, lineDelimiter: ',',
+        onLine: (_key, eofReached) async {
+      if (eofReached) {
+        _onEOF();
+        return true;
+      }
+      if (entries.containsKey(_key)) {
+        T? entry = entries[_key];
+        entries.remove(_key);
+        skipLine(_tempRaf, lineDelimiter: '\n', onEOF: _onEOF);
+        _isEntrySet = true;
+        if (entry == null) return null;
+        await _raf.writeString(_encodeEntryForSaving(entry.toCSV()));
+        return null;
+      }
+      String? _entry = readLine(_tempRaf, lineDelimiter: '\n', onEOF: _onEOF);
+      if (_entry == null) {
+        _onEOF();
+        return true;
+      }
+      await _raf.writeString('$_key,$_entry\n');
+      return null;
+    });
+    _onEOF();
+    await _raf.close();
+    await _tempRaf.close();
+    await _tempFile.delete();
+  }
 }
