@@ -7,8 +7,10 @@ import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:intranet_ip/intranet_ip.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
 
 import 'favorites.dart';
+import 'passy_entries_encrypted_csv_file.dart';
 import 'synchronization_2d0d0_modules.dart';
 import 'common.dart';
 import 'entry_event.dart';
@@ -16,7 +18,6 @@ import 'entry_type.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'json_convertable.dart';
-import 'loaded_account.dart';
 import 'passy_entry.dart';
 import 'passy_stream_subscription.dart';
 import 'glare/glare_client.dart';
@@ -172,7 +173,8 @@ class _EntryInfo with JsonConvertable {
 }
 
 class Synchronization {
-  final LoadedAccount _loadedAccount;
+  final String _username;
+  final FullPassyEntriesFileCollection _passyEntries;
   final HistoryFile _history;
   final FavoritesFile _favorites;
   final Encrypter _encrypter;
@@ -194,14 +196,18 @@ class Synchronization {
   get entriesAdded => _entriesAdded;
   get entriesRemoved => _entriesRemoved;
 
-  Synchronization(this._loadedAccount,
-      {required HistoryFile history,
-      required FavoritesFile favorites,
-      required Encrypter encrypter,
-      required RSAKeypair rsaKeypair,
-      void Function(SynchronizationResults)? onComplete,
-      void Function(String log)? onError})
-      : _history = history,
+  Synchronization({
+    required String username,
+    required FullPassyEntriesFileCollection passyEntries,
+    required HistoryFile history,
+    required FavoritesFile favorites,
+    required Encrypter encrypter,
+    required RSAKeypair rsaKeypair,
+    void Function(SynchronizationResults)? onComplete,
+    void Function(String log)? onError,
+  })  : _username = username,
+        _passyEntries = passyEntries,
+        _history = history,
         _favorites = favorites,
         _encrypter = encrypter,
         _rsaKeypair = rsaKeypair,
@@ -239,13 +245,14 @@ class Synchronization {
       EntryType.idCard,
       EntryType.identity,
     ]) {
+      PassyEntriesEncryptedCSVFile file = _passyEntries.getEntries(entryType);
       for (String key in request.getKeys(entryType)) {
         _data.add(utf8.encode(encrypt(
                 jsonEncode(_EntryData(
                     key: key,
                     type: entryType,
                     event: _history.value.getEvents(entryType)[key]!,
-                    value: _loadedAccount.getEntry(entryType)(key)?.toCSV())),
+                    value: file.getEntry(key)?.toCSV())),
                 encrypter: _encrypter) +
             '\u0000'));
       }
@@ -274,6 +281,8 @@ class Synchronization {
             'Could not decode an entry.\n${e.toString()}\n${s.toString()}');
         return;
       }
+      PassyEntriesEncryptedCSVFile file =
+          _passyEntries.getEntries(_entryData.type);
 
       try {
         Map<String, EntryEvent> _events =
@@ -282,7 +291,7 @@ class Synchronization {
         if (_entryData.event.status == EntryStatus.removed) {
           if (_events.containsKey(_entryData.key)) {
             if (_events[_entryData.key]!.status == EntryStatus.alive) {
-              await _loadedAccount.removeEntry(_entryData.type)(_entryData.key);
+              await file.setEntry(_entryData.key);
             }
           }
           _events[_entryData.key] = _entryData.event;
@@ -297,8 +306,8 @@ class Synchronization {
           _events[_entryData.key] = _entryData.event;
           continue;
         }
-        await _loadedAccount.setEntry(_entryData.type)(
-            PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
+        await file.setEntry(_entryData.key,
+            entry: PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
         _events[_entryData.key] = _entryData.event;
         _entriesAdded += 1;
       } catch (e, s) {
@@ -307,7 +316,7 @@ class Synchronization {
         return;
       }
     }
-    return _loadedAccount.save();
+    return _history.save();
   }
 
   Future<List<List<int>>> _handleEntries(
@@ -611,7 +620,8 @@ class Synchronization {
                 port: 0,
                 keypair: _rsaKeypair,
                 modules: buildSynchronization2d0d0Modules(
-                  account: _loadedAccount,
+                  username: _username,
+                  passyEntries: _passyEntries,
                   encrypter: _encrypter,
                   history: _history,
                   favorites: _favorites,
@@ -646,7 +656,7 @@ class Synchronization {
               }
               try {
                 _data = decrypt(decrypt(_data, encrypter: _encrypter),
-                    encrypter: getPassyEncrypter(_loadedAccount.username));
+                    encrypter: getPassyEncrypter(_username));
               } catch (e, s) {
                 _handleException(
                     'Could not decrypt hello. Make sure that local and remote username and password are the same.\n${e.toString()}\n${s.toString()}');
@@ -848,7 +858,7 @@ class Synchronization {
         _syncLog += 'done.\nReceiving users list... ';
         Map<String, dynamic> response;
         dynamic users = [
-          {'username': _loadedAccount.username}
+          {'username': _username}
         ];
         for (dynamic user in users) {
           _syncLog += 'done.\nProcessing next user... ';
@@ -863,13 +873,12 @@ class Synchronization {
                 'Malformed username. Expected type `String`, received type `${username.runtimeType.toString()}`.');
             return;
           }
-          if (username != _loadedAccount.username) {
+          if (username != _username) {
             _handleException(
                 'No shared accounts found. Please make sure that your main and/or shared accounts are added on both ends and have the same usernames and passwords.');
             return;
           }
-          Encrypter usernameEncrypter =
-              getPassyEncrypter(_loadedAccount.username);
+          Encrypter usernameEncrypter = getPassyEncrypter(_username);
           String apiVersion = '2d0d1';
 
           Map<String, dynamic> auth() {
@@ -926,7 +935,7 @@ class Synchronization {
             try {
               await util.processTypedExchangeEntries(
                 entries: sharedEntries,
-                account: _loadedAccount,
+                passyEntries: _passyEntries,
                 history: _history,
                 onSetEntry: () => _entriesAdded++,
                 onRemoveEntry: () => _entriesAdded++,
@@ -1049,7 +1058,7 @@ class Synchronization {
                 Map<String, EntryEvent> historyEntries =
                     _history.value.getEvents(entryType);
                 PassyEntry? Function(String) getEntry =
-                    _loadedAccount.getEntry(entryType);
+                    _passyEntries.getEntries(entryType).getEntry;
                 return MapEntry(
                   entryType.name,
                   entryKeys.map<Map<String, dynamic>>((e) {
@@ -1103,7 +1112,7 @@ class Synchronization {
                 await _history.reload();
                 await util.processTypedExchangeEntries(
                   entries: entries,
-                  account: _loadedAccount,
+                  passyEntries: _passyEntries,
                   history: _history,
                   onRemoveEntry: () => _entriesRemoved++,
                   onSetEntry: () => _entriesAdded++,
@@ -1222,7 +1231,7 @@ class Synchronization {
                   localFavoritesEntries[entryKey] = favoritesEntry;
                 }
               }
-              await _loadedAccount.saveFavorites();
+              await _favorites.save();
             }
           }
         }
@@ -1299,8 +1308,7 @@ class Synchronization {
         _syncLog += 'done.\nReceiving history hash... ';
         _sub.onData(_handleHistoryHash);
         _sendHello(encrypt(
-            encrypt(_hello,
-                encrypter: getPassyEncrypter(_loadedAccount.username)),
+            encrypt(_hello, encrypter: getPassyEncrypter(_username)),
             encrypter: _encrypter));
       }
 

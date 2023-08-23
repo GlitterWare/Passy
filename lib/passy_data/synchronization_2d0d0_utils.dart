@@ -1,9 +1,15 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/note.dart';
+import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:passy/passy_data/payment_card.dart';
 
 import 'history.dart';
-import 'loaded_account.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -429,10 +435,9 @@ EntriesToSynchronize findEntriesToSynchronize({
   );
 }
 
-Future<void> processExchangeEntry({
+Future<PassyEntry?> processExchangeEntry({
   required EntryType entryType,
   required ExchangeEntry entry,
-  required LoadedAccount account,
   required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
@@ -442,61 +447,87 @@ Future<void> processExchangeEntry({
     throw {'error': 'History entry not provided'};
   }
   if (historyEntry.status == EntryStatus.removed) {
-    await account.removeEntry(entryType)(historyEntry.key);
     onRemoveEntry?.call();
     history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
-    await history.save();
-    return;
+    return null;
   }
   PassyEntry? passyEntry = entry.entry;
   if (passyEntry == null) {
     throw {'error': 'Passy entry not provided'};
   }
-  await account.setEntry(entryType)(passyEntry);
-  onSetEntry?.call();
   history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
-  await history.save();
+  onSetEntry?.call();
+  return passyEntry;
 }
 
 Future<void> processExchangeEntries({
   required EntryType entryType,
   required List<ExchangeEntry> entries,
-  required LoadedAccount account,
+  required PassyEntriesEncryptedCSVFile entriesFile,
   required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
+  Map<String, PassyEntry?> passyEntries = {};
   for (ExchangeEntry entry in entries) {
-    await processExchangeEntry(
+    PassyEntry? passyEntry = await processExchangeEntry(
       entryType: entryType,
       entry: entry,
-      account: account,
       history: history,
       onRemoveEntry: onRemoveEntry,
       onSetEntry: onSetEntry,
     );
+    passyEntries[entry.key] = passyEntry;
+  }
+  switch (entryType) {
+    case EntryType.password:
+      await entriesFile.setEntries(passyEntries.map<String, Password?>(
+          (key, value) => MapEntry(key, value as Password?)));
+      break;
+    case EntryType.paymentCard:
+      await entriesFile.setEntries(passyEntries.map<String, PaymentCard?>(
+          (key, value) => MapEntry(key, value as PaymentCard?)));
+      break;
+    case EntryType.note:
+      await entriesFile.setEntries(passyEntries
+          .map<String, Note?>((key, value) => MapEntry(key, value as Note?)));
+      break;
+    case EntryType.idCard:
+      await entriesFile.setEntries(passyEntries.map<String, IDCard?>(
+          (key, value) => MapEntry(key, value as IDCard?)));
+      break;
+    case EntryType.identity:
+      await entriesFile.setEntries(passyEntries.map<String, Identity?>(
+          (key, value) => MapEntry(key, value as Identity?)));
+      break;
   }
 }
 
 Future<void> processTypedExchangeEntries({
   required Map<EntryType, List<ExchangeEntry>> entries,
-  required LoadedAccount account,
+  required FullPassyEntriesFileCollection passyEntries,
   required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
-  for (MapEntry<EntryType, List<ExchangeEntry>> exchangeEntriesEntry
-      in entries.entries) {
-    EntryType entryType = exchangeEntriesEntry.key;
-    List<ExchangeEntry> exchangeEntries = exchangeEntriesEntry.value;
-    await processExchangeEntries(
-      entryType: entryType,
-      entries: exchangeEntries,
-      account: account,
-      history: history,
-      onRemoveEntry: onRemoveEntry,
-      onSetEntry: onSetEntry,
-    );
+  try {
+    for (MapEntry<EntryType, List<ExchangeEntry>> exchangeEntriesEntry
+        in entries.entries) {
+      EntryType entryType = exchangeEntriesEntry.key;
+      List<ExchangeEntry> exchangeEntries = exchangeEntriesEntry.value;
+      await processExchangeEntries(
+        entryType: entryType,
+        entries: exchangeEntries,
+        entriesFile: passyEntries.getEntries(entryType),
+        history: history,
+        onRemoveEntry: onRemoveEntry,
+        onSetEntry: onSetEntry,
+      );
+    }
+    await history.save();
+  } catch (e) {
+    await history.reload();
+    rethrow;
   }
 }
 

@@ -9,6 +9,7 @@ import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -278,7 +279,14 @@ class LoadedAccount {
     RSAKeypair? rsaKeypair = _settings.value.rsaKeypair;
     if (rsaKeypair == null) return null;
     return Synchronization(
-      this,
+      username: username,
+      passyEntries: FullPassyEntriesFileCollection(
+        passwords: _passwords,
+        notes: _notes,
+        paymentCards: _paymentCards,
+        idCards: _idCards,
+        identities: _identities,
+      ),
       history: _history,
       favorites: _favorites,
       encrypter: _syncEncrypter,
