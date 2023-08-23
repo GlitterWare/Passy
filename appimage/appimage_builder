@@ -81,7 +81,7 @@ function after_bundle() {
 
 function create_apprun() {
   touch ../build/appimage/$appName.AppDir/AppRun
-  echo -e '#!/bin/sh\n\ncd "$(dirname "$0")"\nexec ./'$appExec'' > ../build/appimage/$appName.AppDir/AppRun
+  echo -e '#!/bin/sh\n\ncd "$(dirname "$0")"\n./'$appExec' "$@"' > ../build/appimage/$appName.AppDir/AppRun
   chmod +x ../build/appimage/$appName.AppDir/AppRun
 }
 
