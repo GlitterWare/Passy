@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:flutter_locker/flutter_locker.dart';
 
@@ -24,9 +25,11 @@ class BiometricStorageData with JsonConvertable {
                   RetrieveSecretRequest(
                       key: key,
                       androidPrompt: AndroidPrompt(
-                          title: 'Authenticate', cancelLabel: 'Cancel'),
+                          title: localizations.authenticate,
+                          cancelLabel: localizations.cancel),
                       iOsPrompt: IOsPrompt(
-                          touchIdText: 'Authenticate'))))['password'] ??
+                          touchIdText:
+                              localizations.authenticate))))['password'] ??
               '');
     } catch (e) {
       return BiometricStorageData(key: key);
