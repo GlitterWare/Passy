@@ -244,14 +244,16 @@ class Synchronization {
       EntryType.idCard,
       EntryType.identity,
     ]) {
-      PassyEntriesEncryptedCSVFile file = _passyEntries.getEntries(entryType);
-      for (String key in request.getKeys(entryType)) {
+      List<String> keys = request.getKeys(entryType);
+      Map<String, PassyEntry> entries =
+          _passyEntries.getEntries(entryType).getEntries(keys);
+      for (String key in keys) {
         _data.add(utf8.encode(encrypt(
                 jsonEncode(_EntryData(
                     key: key,
                     type: entryType,
                     event: _history.value.getEvents(entryType)[key]!,
-                    value: file.getEntry(key)?.toCSV())),
+                    value: entries[key]?.toCSV())),
                 encrypter: _encrypter) +
             '\u0000'));
       }
@@ -1056,15 +1058,15 @@ class Synchronization {
                       .map((entryType, entryKeys) {
                 Map<String, EntryEvent> historyEntries =
                     _history.value.getEvents(entryType);
-                PassyEntry? Function(String) getEntry =
-                    _passyEntries.getEntries(entryType).getEntry;
+                Map<String, PassyEntry> entries =
+                    _passyEntries.getEntries(entryType).getEntries(entryKeys);
                 return MapEntry(
                   entryType.name,
                   entryKeys.map<Map<String, dynamic>>((e) {
                     return {
                       'key': e,
                       'historyEntry': historyEntries[e],
-                      'entry': getEntry(e),
+                      'entry': entries[e],
                     };
                   }).toList(),
                 );

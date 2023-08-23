@@ -34,15 +34,15 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   Map<String, dynamic> sharedEntries =
       sharedEntryKeys.map((entryType, entryKeys) {
     Map<String, EntryEvent> historyEntries = history.value.getEvents(entryType);
-    PassyEntry? Function(String) getEntry =
-        passyEntries.getEntries(entryType).getEntry;
+    Map<String, PassyEntry> entries =
+        passyEntries.getEntries(entryType).getEntries(entryKeys);
     return MapEntry(
       entryType.name,
       entryKeys.map<Map<String, dynamic>>((e) {
         return {
           'key': e,
           'historyEntry': historyEntries[e],
-          'entry': getEntry(e),
+          'entry': entries[e],
         };
       }).toList(),
     );
@@ -172,15 +172,15 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               'entries': entryKeys.map((entryType, entryKeys) {
                 Map<String, EntryEvent> historyEntries =
                     history.value.getEvents(entryType);
-                PassyEntry? Function(String) getEntry =
-                    passyEntries.getEntries(entryType).getEntry;
+                Map<String, PassyEntry> entries =
+                    passyEntries.getEntries(entryType).getEntries(entryKeys);
                 return MapEntry(
                   entryType.name,
                   entryKeys.map<Map<String, dynamic>>((e) {
                     return {
                       'key': e,
                       'historyEntry': historyEntries[e],
-                      'entry': getEntry(e),
+                      'entry': entries[e],
                     };
                   }).toList(),
                 );
