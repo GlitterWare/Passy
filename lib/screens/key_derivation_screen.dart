@@ -76,15 +76,43 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
             hasScrollBody: false,
             child: Column(children: [
               const Spacer(),
-              Text(localizations.keyDerivationDescription),
-              const SizedBox(height: 24),
               Text(
+                localizations.keyDerivationDescription,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              PassyPadding(Text(
                 localizations.keyDerivationWarning1,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                     color: PassyTheme.lightContentSecondaryColor),
-              ),
-              Text(localizations.keyDerivationWarning2),
-              Text(localizations.keyDerivationWarning3),
+              )),
+              const SizedBox(height: 24),
+              PassyPadding(RichText(
+                text: TextSpan(children: [
+                  const WidgetSpan(
+                      child: Icon(
+                    Icons.sync_rounded,
+                    size: 15,
+                  )),
+                  TextSpan(text: '  ${localizations.keyDerivationWarning2}'),
+                ]),
+                textAlign: TextAlign.center,
+                textScaleFactor: 1.2,
+              )),
+              const SizedBox(height: 24),
+              PassyPadding(RichText(
+                text: TextSpan(children: [
+                  const WidgetSpan(
+                      child: Icon(
+                    Icons.update,
+                    size: 15,
+                  )),
+                  TextSpan(text: '  ${localizations.keyDerivationWarning3}'),
+                ]),
+                textAlign: TextAlign.center,
+                textScaleFactor: 1.2,
+              )),
               const SizedBox(height: 24),
               Container(
                 child: PassyPadding(DropdownButtonFormField<KeyDerivationType>(
