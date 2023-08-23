@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
@@ -322,7 +321,7 @@ class Synchronization {
   Future<List<List<int>>> _handleEntries(
     PassyStreamSubscription subscription, {
     required int entryCount,
-    VoidCallback? onFirstReceive,
+    void Function()? onFirstReceive,
   }) {
     List<List<int>> _entries = [];
     Completer<List<List<int>>> _completer = Completer<List<List<int>>>();
