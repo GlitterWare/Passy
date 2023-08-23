@@ -42,8 +42,8 @@ dependencies:
   otp: ^3.0.2
   qr_flutter: ^4.0.0
   file_picker: ^5.1.0
-  flutter_web_browser: "^0.17.1"
-  flutter_locker: 
+  flutter_web_browser: ^0.17.1
+  flutter_locker: ^2.1.2
   cached_network_image: ^3.2.1
   flutter_credit_card: ^3.0.1
   flutter_date_pickers: ^0.4.0

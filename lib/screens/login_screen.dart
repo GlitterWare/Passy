@@ -46,6 +46,17 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         if (await bioAuth(_username)) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
+          if (isAutofill) {
+            Navigator.pushNamed(
+              context,
+              SearchScreen.routeName,
+              arguments: SearchScreenArgs(
+                builder: _buildPasswords,
+                isAutofill: true,
+              ),
+            );
+            return;
+          }
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
@@ -76,7 +87,13 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         )),
       ],
       passwords: _found,
-      onPressed: (password) async {
+      onPressed: (passwordMeta) async {
+        PasswordMeta password = PasswordMeta(
+            key: passwordMeta.key,
+            tags: passwordMeta.tags,
+            nickname: '>>> ${passwordMeta.nickname} <<<<',
+            username: passwordMeta.username,
+            website: passwordMeta.website);
         _found.remove(password);
         _found.insert(0, password);
         int max = _found.length < 5 ? _found.length : 5;
@@ -186,7 +203,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
 
   void updateBioAuthButton() {
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (isAutofill) return;
     if (data.getBioAuthEnabled(_username) == true) {
       _bioAuthButton = FloatingActionButton(
         onPressed: () => _bioAuth(),

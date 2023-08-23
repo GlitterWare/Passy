@@ -520,10 +520,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_locker
-      sha256: "6fae6a6959879d88a717adec720b8858ef71f80c3ed6c86a4675a316c1e637bc"
+      sha256: "4d7d209952a150f199b6c6b37cb6e9807df98a850c81e02b9c2a888aaa0a9ee1"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0+1"
+    version: "2.1.2"
   flutter_markdown:
     dependency: "direct main"
     description:
