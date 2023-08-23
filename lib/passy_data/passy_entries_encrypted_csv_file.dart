@@ -138,10 +138,41 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     return _entry;
   }
 
+  Map<String, String> getEntryStrings(List<String> keys) {
+    Map<String, String> result = {};
+    RandomAccessFile raf = _file.openSync();
+    processLines(raf, lineDelimiter: ',', onLine: (key, eofReached) {
+      if (eofReached) return true;
+      if (keys.contains(key)) {
+        String? entry = readLine(raf);
+        if (entry == null) return true;
+        List<String> decoded = entry.split(',');
+        entry = decrypt(decoded[1],
+            encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
+        result[key] = entry;
+        return null;
+      }
+      if (skipLine(raf) == -1) return true;
+      return null;
+    });
+    raf.closeSync();
+    return result;
+  }
+
   List<dynamic>? getEntryCSV(String key) {
     String? _entryString = getEntryString(key);
     if (_entryString == null) return null;
     return PassyEntry.fromCSVString<T>(_entryString).toCSV();
+  }
+
+  Map<String, List<dynamic>> getEntryCSVs(List<String> keys) {
+    Map<String, List<dynamic>> result = {};
+    Map<String, String> entryStrings = getEntryStrings(keys);
+    for (MapEntry<String, String> entryString in entryStrings.entries) {
+      result[entryString.key] =
+          PassyEntry.fromCSVString<T>(entryString.value).toCSV();
+    }
+    return result;
   }
 
   T? getEntry(String key) {
@@ -150,10 +181,29 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     return PassyEntry.fromCSV(entryTypeFromType(T)!)(_entryCSV) as T;
   }
 
+  Map<String, T> getEntries(List<String> keys) {
+    Map<String, T> result = {};
+    Map<String, List<dynamic>> entryCSVs = getEntryCSVs(keys);
+    for (MapEntry<String, List<dynamic>> entryCSV in entryCSVs.entries) {
+      T entry = PassyEntry.fromCSV(entryTypeFromType(T)!)(entryCSV.value) as T;
+      result[entryCSV.key] = entry;
+    }
+    return result;
+  }
+
   EntryMeta? getEntryMetadata(String key) {
     T? _entry = getEntry(key);
     if (_entry == null) return null;
     return _entry.metadata;
+  }
+
+  Map<String, EntryMeta> getEntriesMetadata(List<String> key) {
+    Map<String, EntryMeta> result = {};
+    Map<String, T> entries = getEntries(keys);
+    for (MapEntry<String, T> entry in entries.entries) {
+      result[entry.key] = entry.value.metadata;
+    }
+    return result;
   }
 
   Future<void> setEntry(String key, {T? entry}) async {
