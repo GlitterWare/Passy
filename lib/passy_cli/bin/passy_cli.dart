@@ -8,18 +8,22 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
+import 'package:passy/passy_data/account_settings.dart';
 import 'package:passy/passy_data/common.dart' as pcommon;
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
 import 'package:passy/passy_data/history.dart';
+import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
+import 'package:passy/passy_data/synchronization.dart';
 
 const String helpMsg = '''
 
@@ -91,6 +95,12 @@ Commands:
   Development
     native_messaging start
         - Start in native messaging mode.
+
+  Synchronization
+    sync host classic <address> <port> <username>
+        - Host the default synchronization server used in Passy.
+          Can only synchronize one account.
+          Supports one connection over its lifetime, stops once first synchronization is finished.
 ''';
 
 const String passyShellVersion = '1.0.0';
@@ -103,6 +113,8 @@ bool _isBigEndian = Endian.host == Endian.big;
 bool _isBusy = false;
 bool _isInteractive = false;
 bool _isNativeMessaging = false;
+final bool _stdinEchoMode = stdin.echoMode;
+final bool _stdinLineMode = stdin.lineMode;
 
 bool _shouldMoveLine = false;
 bool _logDisabled = false;
@@ -110,6 +122,7 @@ late String _passyDataPath;
 late String _accountsPath;
 Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
+Map<String, Encrypter> _syncEncrypters = {};
 
 void nativeMessagingLog(dynamic id, String msg) {
   List<String> msgSplit = [];
@@ -194,6 +207,8 @@ Future<void> load() async {
 
 Future<void> cleanup() async {
   _logDisabled = true;
+  stdin.echoMode = _stdinEchoMode;
+  stdin.lineMode = _stdinLineMode;
   exit(0);
 }
 
@@ -203,8 +218,15 @@ Future<void> onInterrupt() async {
   cleanup();
 }
 
+Function(List<int>)? _secondaryInput;
+bool _pauseMainInput = false;
+
 StreamSubscription<List<int>> startInteractive() {
+  stdin.lineMode = true;
+  stdin.echoMode = true;
   return stdin.listen((List<int> event) async {
+    _secondaryInput?.call(event);
+    if (_pauseMainInput) return;
     _shouldMoveLine = false;
     String commandEncoded;
     List<String> command;
@@ -353,6 +375,11 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               derivationType: _credentials.keyDerivationType,
               derivationInfo: _credentials.keyDerivationInfo,
             );
+            _syncEncrypters[accountName] = await cn.getSyncEncrypter(
+              password,
+              derivationType: _credentials.keyDerivationType,
+              derivationInfo: _credentials.keyDerivationInfo,
+            );
           }
           log(match.toString(), id: id);
           return;
@@ -369,6 +396,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           if (command.length == 2) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
+          _syncEncrypters.remove(accountName);
           log('true', id: id);
           return;
         case 'logout_all':
@@ -630,6 +658,109 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           }
           log(true, id: id);
           return;
+      }
+      break;
+    case 'sync':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'host':
+          if (command.length == 2) break;
+          switch (command[2]) {
+            case 'classic':
+              if (command.length != 6) break;
+              String accountName = command[5];
+              Encrypter? encrypter = _encrypters[accountName];
+              Encrypter? syncEncrypter = _syncEncrypters[accountName];
+              if (encrypter == null || syncEncrypter == null) {
+                log('passy:host:classic:No account credentials provided, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
+              String host = command[3];
+              int port;
+              try {
+                port = int.parse(command[4]);
+              } catch (_) {
+                log('passy:host:classic:Supplied port is not a valid integer.',
+                    id: id);
+                return;
+              }
+              String accPath = _accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator;
+              AccountSettingsFile settings = AccountSettings.fromFile(
+                  File('${accPath}settings.enc'),
+                  encrypter: encrypter);
+              Completer<void> syncCompleter = Completer();
+              Completer<void> detachedCompleter = Completer();
+              Synchronization server = Synchronization(
+                encrypter: syncEncrypter,
+                username: accountName,
+                passyEntries: FullPassyEntriesFileCollection(
+                  idCards: IDCards.fromFile(File('${accPath}idCards.enc'),
+                      encrypter: encrypter),
+                  identities: Identities.fromFile(
+                      File('${accPath}identities.enc'),
+                      encrypter: encrypter),
+                  notes: Notes.fromFile(File('${accPath}notes.enc'),
+                      encrypter: encrypter),
+                  passwords: Passwords.fromFile(File('${accPath}passwords.enc'),
+                      encrypter: encrypter),
+                  paymentCards: PaymentCards.fromFile(
+                      File('${accPath}paymentCards.enc'),
+                      encrypter: encrypter),
+                ),
+                history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
+                    encrypter: encrypter),
+                rsaKeypair: await settings.value.rsaKeypairCompleter.future,
+                onError: (err) {
+                  if (detachedCompleter.isCompleted) return;
+                  log('Synchronization error:');
+                  log(err);
+                },
+                onComplete: (p0) {
+                  if (detachedCompleter.isCompleted) return;
+                  log('Synchronization server stopped.');
+                  syncCompleter.complete();
+                },
+              );
+              HostAddress? addr = await server.host(
+                  address: host == '0' ? null : host, port: port);
+              if (addr == null) {
+                log('passy:host:classic:Server failed to start, unknown error.',
+                    id: id);
+                return;
+              }
+              log('Server started, running at `${addr.ip.address}:${addr.port}`.',
+                  id: id);
+              log('Hotkeys | `c` - close server | `d` - detach', id: id);
+              _pauseMainInput = true;
+              stdin.lineMode = false;
+              stdin.echoMode = false;
+              void syncServerCli(List<int> event) async {
+                String command = utf8.decode(event);
+                if (command == 'c') {
+                  log('Server close requested.');
+                  server.close();
+                }
+                if (command == 'd') {
+                  detachedCompleter.complete();
+                  _secondaryInput = null;
+                  log('Detached.');
+                }
+              }
+              _secondaryInput = syncServerCli;
+              await Future.any(
+                  [syncCompleter.future, detachedCompleter.future]);
+              stdin.lineMode = true;
+              stdin.echoMode = true;
+              _pauseMainInput = false;
+              return;
+          }
+          break;
       }
       break;
     case 'install':
