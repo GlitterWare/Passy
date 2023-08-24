@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:passy/main.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,8 +25,9 @@ class SplashScreen extends StatelessWidget {
     loadLocalizations(context);
     setOnError(context);
     Future<void> showUpdateDialog() {
+      Future.delayed(const Duration(milliseconds: 500));
       return showDialog<void>(
-        context: context,
+        context: navigatorKey.currentContext ?? context,
         builder: (context) => AlertDialog(
           shape: PassyTheme.dialogShape,
           title: Text(localizations.newVersionAvailable),
