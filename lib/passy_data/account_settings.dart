@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart';
+import 'package:compute/compute.dart';
 import 'dart:io';
 
 import 'encrypted_json_file.dart';
