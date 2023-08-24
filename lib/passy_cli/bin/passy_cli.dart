@@ -98,10 +98,11 @@ Commands:
         - Start in native messaging mode.
 
   Synchronization
-    sync host classic <address> <port> <username>
+    sync host classic <address> <port> <username> [detached]
         - Host the default synchronization server used in Passy.
           Can only synchronize one account.
           Supports one connection over its lifetime, stops once first synchronization is finished.
+          The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
 
     sync report get <address>:<port>
         - Get synchronization report JSON for the specified server.
@@ -676,7 +677,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           if (command.length == 2) break;
           switch (command[2]) {
             case 'classic':
-              if (command.length != 6) break;
+              if (command.length < 6) break;
               String accountName = command[5];
               Encrypter? encrypter = _encrypters[accountName];
               Encrypter? syncEncrypter = _syncEncrypters[accountName];
@@ -686,13 +687,27 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 return;
               }
               String host = command[3];
+              String portString = command[4];
               int port;
               try {
-                port = int.parse(command[4]);
+                port = int.parse(portString);
               } catch (_) {
-                log('passy:host:classic:Supplied port is not a valid integer.',
+                log('passy:host:classic:`$portString` is not a valid integer.',
                     id: id);
                 return;
+              }
+              bool detached;
+              if (command.length < 7) {
+                detached = false;
+              } else {
+                String detachedString = command[6];
+                try {
+                  detached = pcommon.boolFromString(command[6])!;
+                } catch (_) {
+                  log('passy:host:classic:`$detachedString` is not a valid boolean.',
+                      id: id);
+                  return;
+                }
               }
               String accPath = _accountsPath +
                   Platform.pathSeparator +
@@ -727,12 +742,12 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                     encrypter: encrypter),
                 rsaKeypair: await settings.value.rsaKeypairCompleter.future,
                 onError: (err) {
-                  if (detachedCompleter.isCompleted) return;
+                  if (detached) return;
                   log('Synchronization error:', id: id);
                   log(err, id: id);
                 },
                 onComplete: (p0) {
-                  if (detachedCompleter.isCompleted) return;
+                  if (detached) return;
                   log('Synchronization server stopped.', id: id);
                   log('Entries set: ${serverNullable!.entriesAdded}', id: id);
                   log('Entries removed: ${serverNullable.entriesRemoved}',
@@ -755,6 +770,10 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   ...server.getReport().toJson(),
                 };
               };
+              if (detached) {
+                log(fullAddr, id: id);
+                return;
+              }
               log('', id: id);
               qr.generate(fullAddr, typeNumber: 2, small: true);
               log('Server started, running at `$fullAddr`.', id: id);
@@ -770,6 +789,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 }
                 if (command == 'd') {
                   detachedCompleter.complete();
+                  detached = true;
                   _secondaryInput = null;
                   log('Detached.', id: id);
                 }
