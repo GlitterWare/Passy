@@ -363,32 +363,38 @@ class Synchronization {
   Future<HostAddress?> host({
     void Function()? onConnected,
     Map<EntryType, List<String>>? sharedEntryKeys,
+    String? address,
+    int port = 0,
   }) async {
     await _history.reload();
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
-    try {
-      List<NetworkInterface> _interfaces =
-          await NetworkInterface.list(type: InternetAddressType.IPv4);
-      for (NetworkInterface _interface in _interfaces) {
-        for (InternetAddress _address in _interface.addresses) {
-          String _strAddress = _address.address;
-          if (_strAddress.startsWith('192.168.1.')) {
-            _ip = _strAddress;
-            break;
+    if (address == null) {
+      try {
+        List<NetworkInterface> _interfaces =
+            await NetworkInterface.list(type: InternetAddressType.IPv4);
+        for (NetworkInterface _interface in _interfaces) {
+          for (InternetAddress _address in _interface.addresses) {
+            String _strAddress = _address.address;
+            if (_strAddress.startsWith('192.168.1.')) {
+              _ip = _strAddress;
+              break;
+            }
           }
         }
+        if (_ip == '') _ip = (await intranetIpv4()).address;
+      } catch (_) {
+        _ip = '127.0.0.1';
       }
-      if (_ip == '') _ip = (await intranetIpv4()).address;
-    } catch (_) {
-      _ip = '127.0.0.1';
+    } else {
+      _ip = address;
     }
     try {
       if (_server != null) await _server?.close();
       _syncLog += 'done. \nListening... ';
 
-      await ServerSocket.bind(_ip, 0).then((server) {
+      await ServerSocket.bind(_ip, port).then((server) {
         _server = server;
         _address = HostAddress(InternetAddress(_ip), server.port);
         server.listen(
