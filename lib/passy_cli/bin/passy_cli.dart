@@ -104,6 +104,10 @@ Commands:
           Supports one connection over its lifetime, stops once first synchronization is finished.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
 
+    sync close <address>:<port>
+        - Close synchronization server.
+          Returns `false` if server is not running, `true` otherwise.
+
     sync report get <address>:<port>
         - Get synchronization report JSON for the specified server.
           Returns `false` if no report was found.
@@ -133,6 +137,7 @@ Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
 Map<String, Encrypter> _syncEncrypters = {};
 Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
+Map<String, Future Function()> _syncCloseMethods = {};
 
 void nativeMessagingLog(dynamic id, String msg) {
   List<String> msgSplit = [];
@@ -718,6 +723,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   encrypter: encrypter);
               Completer<void> syncCompleter = Completer();
               Completer<void> detachedCompleter = Completer();
+              HostAddress? addr;
               Synchronization? serverNullable;
               serverNullable = Synchronization(
                 encrypter: syncEncrypter,
@@ -747,16 +753,17 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   log(err, id: id);
                 },
                 onComplete: (p0) {
+                  _syncCloseMethods.remove('${addr!.ip.address}:${addr.port}');
+                  syncCompleter.complete();
                   if (detached) return;
                   log('Synchronization server stopped.', id: id);
                   log('Entries set: ${serverNullable!.entriesAdded}', id: id);
                   log('Entries removed: ${serverNullable.entriesRemoved}',
                       id: id);
-                  syncCompleter.complete();
                 },
               );
               Synchronization server = serverNullable;
-              HostAddress? addr = await server.host(
+              addr = await server.host(
                   address: host == '0' ? null : host, port: port);
               if (addr == null) {
                 log('passy:host:classic:Server failed to start, unknown error.',
@@ -770,6 +777,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   ...server.getReport().toJson(),
                 };
               };
+              _syncCloseMethods[fullAddr] = server.close;
               if (detached) {
                 log(fullAddr, id: id);
                 return;
@@ -803,6 +811,16 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               return;
           }
           break;
+        case 'close':
+          if (command.length == 2) break;
+          Future<void> Function()? close = _syncCloseMethods[command[2]];
+          if (close == null) {
+            log('false', id: id);
+            return;
+          }
+          await close();
+          log('true', id: id);
+          return;
         case 'report':
           if (command.length == 2) break;
           switch (command[2]) {
