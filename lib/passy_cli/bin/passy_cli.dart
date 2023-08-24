@@ -694,7 +694,8 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   encrypter: encrypter);
               Completer<void> syncCompleter = Completer();
               Completer<void> detachedCompleter = Completer();
-              Synchronization server = Synchronization(
+              Synchronization? serverNullable;
+              serverNullable = Synchronization(
                 encrypter: syncEncrypter,
                 username: accountName,
                 passyEntries: FullPassyEntriesFileCollection(
@@ -724,9 +725,12 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 onComplete: (p0) {
                   if (detachedCompleter.isCompleted) return;
                   log('Synchronization server stopped.');
+                  log('Entries set: ${serverNullable!.entriesAdded}');
+                  log('Entries removed: ${serverNullable.entriesRemoved}');
                   syncCompleter.complete();
                 },
               );
+              Synchronization server = serverNullable;
               HostAddress? addr = await server.host(
                   address: host == '0' ? null : host, port: port);
               if (addr == null) {
