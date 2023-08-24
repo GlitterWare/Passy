@@ -1359,12 +1359,12 @@ class Synchronization {
                 'Failed to connect.\n${e.toString()}\n${s.toString()}'));
   }
 
-  void close() {
+  Future<void> close() async {
     if (!_isConnected) {
-      _server?.close();
+      await _server?.close();
       _socket?.destroy();
-      _sync2d0d0Host?.stop();
-      _sync2d0d0Client?.disconnect();
+      await _sync2d0d0Host?.stop();
+      await _sync2d0d0Client?.disconnect();
       _callOnComplete();
     } else {
       _handleException('Synchronization requested to close while connected.');
