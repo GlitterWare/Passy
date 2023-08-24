@@ -171,6 +171,27 @@ class _EntryInfo with JsonConvertable {
       };
 }
 
+class SynchronizationReport with JsonConvertable {
+  final bool isCompleted;
+  final int entriesSet;
+  final int entriesRemoved;
+
+  SynchronizationReport({
+    required this.isCompleted,
+    required this.entriesSet,
+    required this.entriesRemoved,
+  });
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'isCompleted': isCompleted,
+      'entriesSet': entriesSet,
+      'entriesRemoved': entriesRemoved,
+    };
+  }
+}
+
 class Synchronization {
   final String _username;
   final FullPassyEntriesFileCollection _passyEntries;
@@ -212,6 +233,14 @@ class Synchronization {
         _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
         _onError = onError;
+
+  SynchronizationReport getReport() {
+    return SynchronizationReport(
+      isCompleted: _isOnCompleteCalled,
+      entriesSet: _entriesAdded,
+      entriesRemoved: _entriesRemoved,
+    );
+  }
 
   void _callOnComplete() {
     if (_isOnCompleteCalled) return;
