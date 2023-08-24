@@ -155,9 +155,13 @@ class SynchronizationWrapper {
                 height: 350,
                 child: Column(
                   children: [
-                    QrImage(
+                    QrImageView(
                       data: value.toString(),
-                      foregroundColor: Colors.blue[50],
+                      eyeStyle: QrEyeStyle(
+                          eyeShape: QrEyeShape.square, color: Colors.blue[50]),
+                      dataModuleStyle: QrDataModuleStyle(
+                          dataModuleShape: QrDataModuleShape.square,
+                          color: Colors.blue[50]),
                     ),
                     Expanded(
                       child: Center(

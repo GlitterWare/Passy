@@ -24,6 +24,7 @@ import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
+import 'package:qr_terminal/qr_terminal.dart' as qr;
 
 const String helpMsg = '''
 
@@ -738,8 +739,10 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                     id: id);
                 return;
               }
-              log('Server started, running at `${addr.ip.address}:${addr.port}`.',
-                  id: id);
+              String fullAddr = '${addr.ip.address}:${addr.port}';
+              log('');
+              qr.generate(fullAddr, typeNumber: 2, small: true);
+              log('Server started, running at `$fullAddr`.', id: id);
               log('Hotkeys | `c` - close server | `d` - detach', id: id);
               _pauseMainInput = true;
               stdin.lineMode = false;
