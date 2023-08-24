@@ -69,7 +69,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) _bioAuth();
   }
 
-  Widget _buildPasswords(String terms) {
+  Widget _buildPasswords(String terms, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
         passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
     List<PwDataset> _dataSets = [];

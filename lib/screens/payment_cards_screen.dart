@@ -25,7 +25,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
-      builder: (String terms) {
+      builder: (String terms, void Function() rebuild) {
         final List<PaymentCardMeta> _found = [];
         final List<String> _terms = terms.trim().toLowerCase().split(' ');
         for (PaymentCardMeta _paymentCard

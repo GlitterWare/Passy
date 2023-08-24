@@ -27,8 +27,8 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
 
   void _onSearchPressed() {
-    Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: SearchScreenArgs(builder: (String terms) {
+    Navigator.pushNamed(context, SearchScreen.routeName, arguments:
+        SearchScreenArgs(builder: (String terms, void Function() rebuild) {
       final List<IdentityMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (IdentityMeta _identity in _account.identitiesMetadata.values) {

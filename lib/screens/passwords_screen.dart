@@ -28,7 +28,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
 
-  Widget _buildPasswords(String terms) {
+  Widget _buildPasswords(String terms, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
         passwords: _account.passwordsMetadata.values, terms: terms);
     if (_found.isEmpty) {

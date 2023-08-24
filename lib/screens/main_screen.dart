@@ -52,7 +52,7 @@ class _MainScreen extends State<MainScreen>
   final LoadedAccount _account = data.loadedAccount!;
   bool _unlockScreenOn = false;
 
-  Widget _searchBuilder(String terms) {
+  Widget _searchBuilder(String terms, void Function() rebuild) {
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     final List<SearchEntryData> _searchEntries = [];
@@ -192,7 +192,7 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Widget _favoritesSearchBuilder(String terms) {
+  Widget _favoritesSearchBuilder(String terms, void Function() setState) {
     if (!_account.hasFavorites) {
       return CustomScrollView(
         slivers: [
@@ -326,23 +326,28 @@ class _MainScreen extends State<MainScreen>
         switch (entry.type) {
           case EntryType.idCard:
             Navigator.pushNamed(context, IDCardScreen.routeName,
-                arguments: _account.getIDCard(entry.meta.key));
+                    arguments: _account.getIDCard(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.identity:
             Navigator.pushNamed(context, IdentityScreen.routeName,
-                arguments: _account.getIdentity(entry.meta.key));
+                    arguments: _account.getIdentity(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.note:
             Navigator.pushNamed(context, NoteScreen.routeName,
-                arguments: _account.getNote(entry.meta.key));
+                    arguments: _account.getNote(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.password:
             Navigator.pushNamed(context, PasswordScreen.routeName,
-                arguments: _account.getPassword(entry.meta.key));
+                    arguments: _account.getPassword(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.paymentCard:
             Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                arguments: _account.getPaymentCard(entry.meta.key));
+                    arguments: _account.getPaymentCard(entry.meta.key))
+                .then((value) => setState());
             return;
         }
       },
