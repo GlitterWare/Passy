@@ -584,24 +584,37 @@ class LoadedAccount {
   }
 
   void removeDeletedFavorites() async {
-    // TODO: optimize IO + await on each statement
-    // multiple entries should be requested via one get command per entry type
     await _favorites.reload();
-    _favorites.value.passwords.forEach((key, value) {
-      if (getPassword(key) == null) removeFavoritePassword(key);
-    });
-    _favorites.value.paymentCards.forEach((key, value) {
-      if (getPaymentCard(key) == null) removeFavoritePaymentCard(key);
-    });
-    _favorites.value.notes.forEach((key, value) {
-      if (getNote(key) == null) removeFavoriteNote(key);
-    });
-    _favorites.value.idCards.forEach((key, value) {
-      if (getIDCard(key) == null) removeFavoriteIDCard(key);
-    });
-    _favorites.value.identities.forEach((key, value) {
-      if (getIdentity(key) == null) removeFavoriteIdentity(key);
-    });
+    {
+      List<String> keys = _passwords.keys;
+      _favorites.value.passwords.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoritePassword(key);
+      });
+    }
+    {
+      List<String> keys = _paymentCards.keys;
+      _favorites.value.paymentCards.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoritePaymentCard(key);
+      });
+    }
+    {
+      List<String> keys = _notes.keys;
+      _favorites.value.notes.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoriteNote(key);
+      });
+    }
+    {
+      List<String> keys = _idCards.keys;
+      _favorites.value.idCards.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoriteIDCard(key);
+      });
+    }
+    {
+      List<String> keys = _identities.keys;
+      _favorites.value.identities.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoriteIdentity(key);
+      });
+    }
   }
 
   // Passwords wrappers
