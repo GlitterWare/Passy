@@ -720,14 +720,15 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 rsaKeypair: await settings.value.rsaKeypairCompleter.future,
                 onError: (err) {
                   if (detachedCompleter.isCompleted) return;
-                  log('Synchronization error:');
-                  log(err);
+                  log('Synchronization error:', id: id);
+                  log(err, id: id);
                 },
                 onComplete: (p0) {
                   if (detachedCompleter.isCompleted) return;
-                  log('Synchronization server stopped.');
-                  log('Entries set: ${serverNullable!.entriesAdded}');
-                  log('Entries removed: ${serverNullable.entriesRemoved}');
+                  log('Synchronization server stopped.', id: id);
+                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
+                  log('Entries removed: ${serverNullable.entriesRemoved}',
+                      id: id);
                   syncCompleter.complete();
                 },
               );
@@ -740,7 +741,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 return;
               }
               String fullAddr = '${addr.ip.address}:${addr.port}';
-              log('');
+              log('', id: id);
               qr.generate(fullAddr, typeNumber: 2, small: true);
               log('Server started, running at `$fullAddr`.', id: id);
               log('Hotkeys | `c` - close server | `d` - detach', id: id);
@@ -750,13 +751,13 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               void syncServerCli(List<int> event) async {
                 String command = utf8.decode(event);
                 if (command == 'c') {
-                  log('Server close requested.');
+                  log('Server close requested.', id: id);
                   server.close();
                 }
                 if (command == 'd') {
                   detachedCompleter.complete();
                   _secondaryInput = null;
-                  log('Detached.');
+                  log('Detached.', id: id);
                 }
               }
               _secondaryInput = syncServerCli;
@@ -802,10 +803,11 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
             if (Platform.isWindows) copyPath += '.exe';
             copy = await File(Platform.resolvedExecutable).copy(copyPath);
           } catch (e, s) {
-            log('passy:install:temp:Failed to install executable:\n$e\n$s');
+            log('passy:install:temp:Failed to install executable:\n$e\n$s',
+                id: id);
             return;
           }
-          log(copy.path);
+          log(copy.path, id: id);
           return;
       }
       break;
