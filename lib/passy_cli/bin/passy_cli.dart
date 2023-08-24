@@ -114,8 +114,8 @@ bool _isBigEndian = Endian.host == Endian.big;
 bool _isBusy = false;
 bool _isInteractive = false;
 bool _isNativeMessaging = false;
-final bool _stdinEchoMode = stdin.echoMode;
-final bool _stdinLineMode = stdin.lineMode;
+bool _stdinEchoMode = stdin.echoMode;
+bool _stdinLineMode = stdin.lineMode;
 
 bool _shouldMoveLine = false;
 bool _logDisabled = false;
@@ -825,6 +825,8 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
 }
 
 void main(List<String> arguments) {
+  _stdinEchoMode = stdin.echoMode;
+  _stdinLineMode = stdin.lineMode;
   if (arguments.isNotEmpty) {
     load().then((value) async {
       await executeCommand(arguments);
