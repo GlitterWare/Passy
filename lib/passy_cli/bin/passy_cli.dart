@@ -102,6 +102,13 @@ Commands:
         - Host the default synchronization server used in Passy.
           Can only synchronize one account.
           Supports one connection over its lifetime, stops once first synchronization is finished.
+
+    sync report get <address>:<port>
+        - Get synchronization report JSON for the specified server.
+          Returns `false` if no report was found.
+    sync report del <address>:<port>
+        - Delete synchronization report for the specified server.
+
 ''';
 
 const String passyShellVersion = '1.0.0';
@@ -124,6 +131,7 @@ late String _accountsPath;
 Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
 Map<String, Encrypter> _syncEncrypters = {};
+Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 
 void nativeMessagingLog(dynamic id, String msg) {
   List<String> msgSplit = [];
@@ -741,6 +749,12 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 return;
               }
               String fullAddr = '${addr.ip.address}:${addr.port}';
+              _syncReportGetters[fullAddr] = () {
+                return {
+                  'mode': 'classic',
+                  ...server.getReport().toJson(),
+                };
+              };
               log('', id: id);
               qr.generate(fullAddr, typeNumber: 2, small: true);
               log('Server started, running at `$fullAddr`.', id: id);
@@ -766,6 +780,26 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               stdin.lineMode = true;
               stdin.echoMode = true;
               _pauseMainInput = false;
+              return;
+          }
+          break;
+        case 'report':
+          if (command.length == 2) break;
+          switch (command[2]) {
+            case 'get':
+              if (command.length == 3) break;
+              Map<String, dynamic> Function()? report =
+                  _syncReportGetters[command[3]];
+              if (report == null) {
+                log('false', id: id);
+                return;
+              }
+              log(jsonEncode(report()), id: id);
+              return;
+            case 'del':
+              if (command.length == 3) break;
+              _syncReportGetters.remove(command[3]);
+              log('true', id: id);
               return;
           }
           break;
