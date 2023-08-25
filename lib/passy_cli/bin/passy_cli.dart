@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/common.dart';
@@ -13,6 +14,8 @@ import 'package:passy/passy_data/common.dart' as pcommon;
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
+import 'package:passy/passy_data/glare/glare_module.dart';
+import 'package:passy/passy_data/glare/glare_server.dart';
 import 'package:passy/passy_data/history.dart';
 import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -25,6 +28,7 @@ import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
+import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
 import 'package:qr_terminal/qr_terminal.dart' as qr;
 
 const String helpMsg = '''
@@ -104,6 +108,13 @@ Commands:
         - Host the default synchronization server used in Passy.
           Can only synchronize one account.
           Supports one connection over its lifetime, stops once first synchronization is finished.
+          The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
+    sync host 2p0p0 <address> <port> [detached]
+        - Host the pure 2.0.0+ Passy synchronization server.
+          Supports multiple accounts and unlimited connections over its lifetime.
+          The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
+    sync connect 2p0p0 <address> <port> <username> <password> [detached]
+        - Connect to a pure 2.0.0+ Passy synchronization server.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
 
     sync close <address>:<port>
@@ -809,6 +820,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               String fullAddr = '${addr.ip.address}:${addr.port}';
               _syncReportGetters[fullAddr] = () {
                 return {
+                  'command': 'host',
                   'mode': 'classic',
                   ...server.getReport().toJson(),
                 };
@@ -844,6 +856,204 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               stdin.lineMode = true;
               stdin.echoMode = true;
               _pauseMainInput = false;
+              return;
+            case '2d0d0':
+              if (command.length < 5) break;
+              String host = command[3];
+              String portString = command[4];
+              int port;
+              try {
+                port = int.parse(portString);
+              } catch (_) {
+                log('passy:host:2d0d0:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              bool detached;
+              if (command.length < 6) {
+                detached = false;
+              } else {
+                String detachedString = command[5];
+                try {
+                  detached = pcommon.boolFromString(detachedString)!;
+                } catch (_) {
+                  log('passy:host:2d0d0:`$detachedString` is not a valid boolean.',
+                      id: id);
+                  return;
+                }
+              }
+              GlareServer glareHost = await GlareServer.bind(
+                address: host,
+                port: port,
+                keypair: RSAKeypair.fromRandom(keySize: 4096),
+                modules: {
+                  'login': GlareModule(
+                    name: 'login',
+                    target: (args, {required addModule}) async {
+                      if (args.length < 5) {
+                        throw {
+                          'error': {'type': 'Missing arguments'},
+                        };
+                      }
+                      String username = args[3];
+                      String password = args[4];
+                      String result = await _login(username, password);
+                      if (result != 'true') {
+                        throw {
+                          'error': {'type': 'Failed to login'},
+                        };
+                      }
+                      Encrypter? encrypter = _encrypters[username]!;
+                      Encrypter? syncEncrypter = _syncEncrypters[username]!;
+                      String accPath = _accountsPath +
+                          Platform.pathSeparator +
+                          username +
+                          Platform.pathSeparator;
+                      Map<String, GlareModule> syncModules =
+                          buildSynchronization2d0d0Modules(
+                        username: username,
+                        passyEntries: FullPassyEntriesFileCollection(
+                          idCards: IDCards.fromFile(
+                              File('${accPath}idCards.enc'),
+                              encrypter: encrypter),
+                          identities: Identities.fromFile(
+                              File('${accPath}identities.enc'),
+                              encrypter: encrypter),
+                          notes: Notes.fromFile(File('${accPath}notes.enc'),
+                              encrypter: encrypter),
+                          passwords: Passwords.fromFile(
+                              File('${accPath}passwords.enc'),
+                              encrypter: encrypter),
+                          paymentCards: PaymentCards.fromFile(
+                              File('${accPath}paymentCards.enc'),
+                              encrypter: encrypter),
+                        ),
+                        encrypter: syncEncrypter,
+                        history: History.fromFile(File('${accPath}history.enc'),
+                            encrypter: encrypter),
+                        favorites: Favorites.fromFile(
+                            File('${accPath}favorites.enc'),
+                            encrypter: encrypter),
+                      );
+                      for (MapEntry<String, GlareModule> module
+                          in syncModules.entries) {
+                        addModule('${module.key}_$username', module.value);
+                      }
+                      return {
+                        'status': {'type': 'Success'},
+                      };
+                    },
+                  ),
+                },
+                serviceInfo:
+                    'Passy cross-platform password manager entry synchronization server v${pcommon.syncVersion}',
+              );
+              _syncCloseMethods[host] = glareHost.stop;
+              return;
+          }
+          break;
+        case 'connect':
+          if (command.length == 2) break;
+          switch (command[2]) {
+            case '2d0d0':
+              if (command.length == 6) break;
+              Synchronization? serverNullable;
+              String portString = command[4];
+              int port;
+              try {
+                port = int.parse(portString);
+              } catch (_) {
+                log('passy:connect:2d0d0:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              String hostString = command[3];
+              HostAddress host;
+              try {
+                InternetAddress addr = InternetAddress(hostString);
+                host = HostAddress(addr, port);
+              } catch (e) {
+                log('passy:connect:2d0d0:`$hostString` is not a valid address:$e',
+                    id: id);
+                return;
+              }
+              bool detached;
+              if (command.length < 8) {
+                detached = false;
+              } else {
+                String detachedString = command[7];
+                try {
+                  detached = pcommon.boolFromString(detachedString)!;
+                } catch (_) {
+                  log('passy:connect:2d0d0:`$detachedString` is not a valid boolean.',
+                      id: id);
+                  return;
+                }
+              }
+              String accountName = command[5];
+              String password = command[6];
+              String loginResponse = await _login(accountName, password);
+              if (loginResponse != 'true') {
+                log('passy:connect:2d0d0:Failed to login:$loginResponse',
+                    id: id);
+                return;
+              }
+              Encrypter encrypter = _encrypters[accountName]!;
+              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
+              String accPath = _accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator;
+              AccountSettingsFile settings = AccountSettings.fromFile(
+                  File('${accPath}settings.enc'),
+                  encrypter: encrypter);
+              serverNullable = Synchronization(
+                encrypter: syncEncrypter,
+                username: accountName,
+                passyEntries: FullPassyEntriesFileCollection(
+                  idCards: IDCards.fromFile(File('${accPath}idCards.enc'),
+                      encrypter: encrypter),
+                  identities: Identities.fromFile(
+                      File('${accPath}identities.enc'),
+                      encrypter: encrypter),
+                  notes: Notes.fromFile(File('${accPath}notes.enc'),
+                      encrypter: encrypter),
+                  passwords: Passwords.fromFile(File('${accPath}passwords.enc'),
+                      encrypter: encrypter),
+                  paymentCards: PaymentCards.fromFile(
+                      File('${accPath}paymentCards.enc'),
+                      encrypter: encrypter),
+                ),
+                history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
+                    encrypter: encrypter),
+                rsaKeypair: await settings.value.rsaKeypairCompleter.future,
+                onError: (err) {
+                  if (detached) return;
+                  log('Synchronization error:', id: id);
+                  log(err, id: id);
+                },
+                onComplete: (p0) {
+                  if (detached) return;
+                  log('Synchronization client stopped.', id: id);
+                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
+                  log('Entries removed: ${serverNullable.entriesRemoved}',
+                      id: id);
+                },
+              );
+              Synchronization client = serverNullable;
+              String fullAddr = '${host.ip.address}:${host.port}';
+              _syncReportGetters[fullAddr] = () {
+                return {
+                  'command': 'connect',
+                  'mode': '2d0d0',
+                  ...client.getReport().toJson(),
+                };
+              };
+              if (detached) log(fullAddr, id: id);
+              await client.connect2d0d0(host,
+                  username: accountName, password: password);
               return;
           }
           break;
