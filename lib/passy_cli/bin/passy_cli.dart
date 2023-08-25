@@ -379,6 +379,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           lines = contents.split('\n');
         }
         for (String line in lines) {
+          if (line.startsWith('//')) continue;
           commands.add(parseCommand(line));
         }
       } catch (e, s) {
