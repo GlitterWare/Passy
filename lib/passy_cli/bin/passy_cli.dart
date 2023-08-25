@@ -1185,7 +1185,6 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 }
                 return;
               }
-              encrypter = encrypter!;
               Encrypter syncEncrypter = _syncEncrypters[accountName]!;
               String accPath = _accountsPath +
                   Platform.pathSeparator +
