@@ -888,11 +888,51 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   return;
                 }
               }
+              Map<String, GlareModule> loadedModules = {};
+              for (MapEntry<String, Encrypter> encrypterEntry
+                  in _encrypters.entries) {
+                String username = encrypterEntry.key;
+                String accPath = _accountsPath +
+                    Platform.pathSeparator +
+                    username +
+                    Platform.pathSeparator;
+                Encrypter encrypter = encrypterEntry.value;
+                Encrypter syncEncrypter = _syncEncrypters[encrypterEntry.key]!;
+                Map<String, GlareModule> syncModules =
+                    buildSynchronization2d0d0Modules(
+                  username: username,
+                  passyEntries: FullPassyEntriesFileCollection(
+                    idCards: IDCards.fromFile(File('${accPath}idCards.enc'),
+                        encrypter: encrypter),
+                    identities: Identities.fromFile(
+                        File('${accPath}identities.enc'),
+                        encrypter: encrypter),
+                    notes: Notes.fromFile(File('${accPath}notes.enc'),
+                        encrypter: encrypter),
+                    passwords: Passwords.fromFile(
+                        File('${accPath}passwords.enc'),
+                        encrypter: encrypter),
+                    paymentCards: PaymentCards.fromFile(
+                        File('${accPath}paymentCards.enc'),
+                        encrypter: encrypter),
+                  ),
+                  encrypter: syncEncrypter,
+                  history: History.fromFile(File('${accPath}history.enc'),
+                      encrypter: encrypter),
+                  favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
+                      encrypter: encrypter),
+                );
+                for (MapEntry<String, GlareModule> module
+                    in syncModules.entries) {
+                  syncModules['${module.key}_$username'] = module.value;
+                }
+              }
               GlareServer glareHost = await GlareServer.bind(
                 address: host,
                 port: port,
                 keypair: RSAKeypair.fromRandom(keySize: 4096),
                 modules: {
+                  ...loadedModules,
                   'login': GlareModule(
                     name: 'login',
                     target: (args, {required addModule}) async {
