@@ -510,6 +510,7 @@ Future<void> processTypedExchangeEntries({
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
+  await history.reload();
   try {
     for (MapEntry<EntryType, List<ExchangeEntry>> exchangeEntriesEntry
         in entries.entries) {
