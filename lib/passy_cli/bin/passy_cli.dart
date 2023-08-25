@@ -1182,8 +1182,9 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 if (loginResponse != 'true') {
                   log('passy:sync:connect:2d0d0:Failed to login:$loginResponse',
                       id: id);
+                  return;
                 }
-                return;
+                encrypter = _encrypters[accountName]!;
               }
               Encrypter syncEncrypter = _syncEncrypters[accountName]!;
               String accPath = _accountsPath +
