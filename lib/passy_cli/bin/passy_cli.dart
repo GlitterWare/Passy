@@ -17,6 +17,7 @@ import 'package:passy/passy_data/history.dart';
 import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
@@ -419,6 +420,15 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               derivationType: _credentials.keyDerivationType,
               derivationInfo: _credentials.keyDerivationInfo,
             );
+            try {
+              loadLegacyAccount(
+                  path: _accountsPath + Platform.pathSeparator + accountName,
+                  encrypter: _encrypters[accountName]!,
+                  syncEncrypter: _syncEncrypters[accountName]!);
+            } catch (e, s) {
+              log('accounts:login:Failed to load account:\n$e\n$s', id: id);
+              return;
+            }
           }
           log(match.toString(), id: id);
           return;
