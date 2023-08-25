@@ -309,6 +309,39 @@ PassyEntriesEncryptedCSVFile getEntriesFile(File file,
   }
 }
 
+Future<String> _login(String username, String password) async {
+  AccountCredentials? _credentials = _accounts[username]?.value;
+  if (_credentials == null) {
+    return 'false';
+  }
+  bool match = _credentials.passwordHash ==
+      (await cn.getPasswordHash(password,
+              derivationType: _credentials.keyDerivationType,
+              derivationInfo: _credentials.keyDerivationInfo))
+          .toString();
+  if (match) {
+    _encrypters[username] = await cn.getPasswordEncrypter(
+      password,
+      derivationType: _credentials.keyDerivationType,
+      derivationInfo: _credentials.keyDerivationInfo,
+    );
+    _syncEncrypters[username] = await cn.getSyncEncrypter(
+      password,
+      derivationType: _credentials.keyDerivationType,
+      derivationInfo: _credentials.keyDerivationInfo,
+    );
+    try {
+      loadLegacyAccount(
+          path: _accountsPath + Platform.pathSeparator + username,
+          encrypter: _encrypters[username]!,
+          syncEncrypter: _syncEncrypters[username]!);
+    } catch (e, s) {
+      return 'accounts:login:Failed to load account:\n$e\n$s';
+    }
+  }
+  return match.toString();
+}
+
 Future<void> executeCommand(List<String> command, {dynamic id}) async {
   switch (command[0]) {
     case 'help':
@@ -398,39 +431,8 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           refreshAccounts();
           if (command.length < 4) break;
           String accountName = command[2];
-          AccountCredentials? _credentials = _accounts[accountName]?.value;
-          if (_credentials == null) {
-            log('false', id: id);
-            return;
-          }
           String password = command[3];
-          bool match = _credentials.passwordHash ==
-              (await cn.getPasswordHash(password,
-                      derivationType: _credentials.keyDerivationType,
-                      derivationInfo: _credentials.keyDerivationInfo))
-                  .toString();
-          if (match) {
-            _encrypters[accountName] = await cn.getPasswordEncrypter(
-              password,
-              derivationType: _credentials.keyDerivationType,
-              derivationInfo: _credentials.keyDerivationInfo,
-            );
-            _syncEncrypters[accountName] = await cn.getSyncEncrypter(
-              password,
-              derivationType: _credentials.keyDerivationType,
-              derivationInfo: _credentials.keyDerivationInfo,
-            );
-            try {
-              loadLegacyAccount(
-                  path: _accountsPath + Platform.pathSeparator + accountName,
-                  encrypter: _encrypters[accountName]!,
-                  syncEncrypter: _syncEncrypters[accountName]!);
-            } catch (e, s) {
-              log('accounts:login:Failed to load account:\n$e\n$s', id: id);
-              return;
-            }
-          }
-          log(match.toString(), id: id);
+          log(await _login(accountName, password), id: id);
           return;
         case 'is_logged_in':
           if (command.length == 2) break;
@@ -741,7 +743,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               } else {
                 String detachedString = command[6];
                 try {
-                  detached = pcommon.boolFromString(command[6])!;
+                  detached = pcommon.boolFromString(detachedString)!;
                 } catch (_) {
                   log('passy:host:classic:`$detachedString` is not a valid boolean.',
                       id: id);
