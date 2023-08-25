@@ -6,7 +6,6 @@ import 'dart:typed_data';
 import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_cli/lib/common.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
@@ -21,6 +20,7 @@ import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/legacy/legacy.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
@@ -277,7 +277,7 @@ StreamSubscription<List<int>> startInteractive() {
     } else {
       commandEncoded = utf8.decode(event);
       commandEncoded = commandEncoded.replaceAll('\n', '').replaceAll('\r', '');
-      command = parseCommand(commandEncoded);
+      command = cn.parseCommand(commandEncoded);
     }
     if (command.isNotEmpty) {
       if (_isBusy) return;
@@ -325,7 +325,9 @@ PassyEntriesEncryptedCSVFile getEntriesFile(File file,
 }
 
 Future<String> _login(String username, String password) async {
-  AccountCredentials? _credentials = _accounts[username]?.value;
+  refreshAccounts();
+  AccountCredentialsFile? _credentialsFile = _accounts[username];
+  AccountCredentials? _credentials = _credentialsFile?.value;
   if (_credentials == null) {
     return 'false';
   }
@@ -346,10 +348,14 @@ Future<String> _login(String username, String password) async {
       derivationInfo: _credentials.keyDerivationInfo,
     );
     try {
-      loadLegacyAccount(
+      LoadedAccount acc = loadLegacyAccount(
           path: _accountsPath + Platform.pathSeparator + username,
           encrypter: _encrypters[username]!,
-          syncEncrypter: _syncEncrypters[username]!);
+          syncEncrypter: _syncEncrypters[username]!,
+          credentials: _credentialsFile!)!;
+      while (!acc.isRSAKeypairLoaded) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
     } catch (e, s) {
       return 'accounts:login:Failed to load account:\n$e\n$s';
     }
@@ -380,7 +386,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
         }
         for (String line in lines) {
           if (line.startsWith('//')) continue;
-          commands.add(parseCommand(line));
+          commands.add(cn.parseCommand(line));
         }
       } catch (e, s) {
         log('passy:run:Could not parse file:\n$e\n$s', id: id);
@@ -444,7 +450,6 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
           log(match.toString(), id: id);
           return;
         case 'login':
-          refreshAccounts();
           if (command.length < 4) break;
           String accountName = command[2];
           String password = command[3];
@@ -798,7 +803,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
-                rsaKeypair: await settings.value.rsaKeypairCompleter.future,
+                rsaKeypair: settings.value.rsaKeypair!,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -924,7 +929,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 );
                 for (MapEntry<String, GlareModule> module
                     in syncModules.entries) {
-                  syncModules['${module.key}_$username'] = module.value;
+                  loadedModules['${module.key}_$username'] = module.value;
                 }
               }
               GlareServer glareHost = await GlareServer.bind(
@@ -943,19 +948,35 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                       }
                       String username = args[3];
                       String password = args[4];
-                      Encrypter? encrypter = _encrypters[username];
-                      if (encrypter != null) {
+                      if (loadedModules.containsKey('2d0d1_$username')) {
+                        AccountCredentialsFile creds = _accounts[username]!;
+                        if (creds.value.passwordHash == password) {
+                          return {
+                            'status': {'type': 'Success'},
+                          };
+                        }
+                        if (creds.value.passwordHash ==
+                            (await cn.getPasswordHash(password,
+                                    derivationType:
+                                        creds.value.keyDerivationType,
+                                    derivationInfo:
+                                        creds.value.keyDerivationInfo))
+                                .toString()) {
+                          return {
+                            'status': {'type': 'Success'},
+                          };
+                        }
                         return {
-                          'status': {'type': 'Success'},
+                          'error': {'type': 'Failed to login'},
                         };
                       }
                       String result = await _login(username, password);
                       if (result != 'true') {
-                        throw {
+                        return {
                           'error': {'type': 'Failed to login'},
                         };
                       }
-                      encrypter = _encrypters[username]!;
+                      Encrypter encrypter = _encrypters[username]!;
                       Encrypter syncEncrypter = _syncEncrypters[username]!;
                       String accPath = _accountsPath +
                           Platform.pathSeparator +
@@ -987,6 +1008,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                             File('${accPath}favorites.enc'),
                             encrypter: encrypter),
                       );
+                      loadedModules.addAll(syncModules);
                       for (MapEntry<String, GlareModule> module
                           in syncModules.entries) {
                         addModule('${module.key}_$username', module.value);
@@ -1085,7 +1107,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
-                rsaKeypair: await settings.value.rsaKeypairCompleter.future,
+                rsaKeypair: settings.value.rsaKeypair!,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -1154,13 +1176,16 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               }
               String accountName = command[5];
               String password = command[6];
-              String loginResponse = await _login(accountName, password);
-              if (loginResponse != 'true') {
-                log('passy:sync:connect:2d0d0:Failed to login:$loginResponse',
-                    id: id);
-                return;
+              Encrypter? encrypter = _encrypters[accountName];
+              if (encrypter == null) {
+                String loginResponse = await _login(accountName, password);
+                if (loginResponse != 'true') {
+                  log('passy:sync:connect:2d0d0:Failed to login:$loginResponse',
+                      id: id);
+                  return;
+                }
               }
-              Encrypter encrypter = _encrypters[accountName]!;
+              encrypter = encrypter!;
               Encrypter syncEncrypter = _syncEncrypters[accountName]!;
               String accPath = _accountsPath +
                   Platform.pathSeparator +
@@ -1190,7 +1215,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
-                rsaKeypair: await settings.value.rsaKeypairCompleter.future,
+                rsaKeypair: settings.value.rsaKeypair!,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -1333,7 +1358,7 @@ void main(List<String> arguments) {
    with military grade security. 🔒
 
   https://glitterware.github.io/Passy
-${getBoxMessage('''
+${cn.getBoxMessage('''
 
 Welcome to Passy interactive shell!
 ${DateTime.now().toUtc().toString()} UTC.

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
@@ -74,8 +75,12 @@ class LoadedAccount {
         _idCards = idCards,
         _identities = identities {
     Future(() async {
-      await _settings.value.rsaKeypairCompleter.future;
-      await _settings.save();
+      if (_settings.value.rsaKeypair == null) {
+        RSAKeypair keypair = await compute(
+            (message) => RSAKeypair.fromRandom(keySize: 4096), null);
+        _settings.value.rsaKeypair = keypair;
+        await _settings.save();
+      }
     });
     bool shouldSaveHistory = false;
     {
@@ -391,7 +396,6 @@ class LoadedAccount {
   bool get autoScreenLock => _settings.value.autoScreenLock;
   set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
   bool get isRSAKeypairLoaded {
-    _settings.reloadSync();
     return _settings.value.rsaKeypair != null;
   }
 
