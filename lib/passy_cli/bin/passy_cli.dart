@@ -39,6 +39,7 @@ Commands:
   General
     help           Display this message.
     exit           Exit the interactive mode.
+    run <file>     Execute commands separated by newlines from file.
 
   Version
     version shell  Show shell version.
@@ -315,6 +316,29 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
     case 'exit':
       log('Have a splendid day!\n', id: id);
       cleanup();
+      return;
+    case 'run':
+      if (command.length == 1) break;
+      File file = File(command[1]);
+      List<List<String>> commands = [];
+      try {
+        String contents = await file.readAsString();
+        List<String> lines;
+        if (contents.contains('\r\n')) {
+          lines = contents.split('\r\n');
+        } else {
+          lines = contents.split('\n');
+        }
+        for (String line in lines) {
+          commands.add(parseCommand(line));
+        }
+      } catch (e, s) {
+        log('passy:run:Could not parse file:\n$e\n$s', id: id);
+        return;
+      }
+      for (List<String> command in commands) {
+        await executeCommand(command);
+      }
       return;
     case 'version':
       if (command.length == 1) break;
