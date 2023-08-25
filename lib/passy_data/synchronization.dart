@@ -941,6 +941,7 @@ class Synchronization {
         _handleApiException('Received malformed favorites hashes', e);
         return;
       }
+      await _history.reload();
       Map<String, dynamic> historyJson = _history.value.toJson();
       _syncLog += 'done.\nComparing history hashes... ';
       if (remoteHistoryHash !=
@@ -1054,7 +1055,6 @@ class Synchronization {
           }
           _syncLog += 'done.\nProcessing entries... ';
           try {
-            await _history.reload();
             await util.processTypedExchangeEntries(
               entries: entries,
               passyEntries: _passyEntries,
