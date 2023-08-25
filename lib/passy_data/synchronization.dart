@@ -1173,7 +1173,7 @@ class Synchronization {
     }
   }
 
-  Future<void> connectNew(HostAddress address) async {
+  Future<void> connect2d0d0(HostAddress address) async {
     return _synchronization2d0d0("${address.ip.address}:${address.port}");
   }
 
