@@ -265,14 +265,11 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _file.writeAsString('');
     RandomAccessFile _raf = await _file.open(mode: FileMode.append);
     RandomAccessFile _tempRaf = await _tempFile.open();
-    bool _isEntrySet = false;
     void _onEOF() {
-      if (_isEntrySet) return;
       for (T? entry in entries.values) {
         if (entry == null) continue;
         _raf.writeStringSync(_encodeEntryForSaving(entry.toCSV()));
       }
-      _isEntrySet = true;
     }
 
     await processLinesAsync(_tempRaf, lineDelimiter: ',',
@@ -285,7 +282,6 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
         T? entry = entries[_key];
         entries.remove(_key);
         skipLine(_tempRaf, lineDelimiter: '\n', onEOF: _onEOF);
-        _isEntrySet = true;
         if (entry == null) return null;
         await _raf.writeString(_encodeEntryForSaving(entry.toCSV()));
         return null;
