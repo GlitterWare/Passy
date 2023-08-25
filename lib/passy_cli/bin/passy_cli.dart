@@ -113,6 +113,10 @@ Commands:
         - Host the pure 2.0.0+ Passy synchronization server.
           Supports multiple accounts and unlimited connections over its lifetime.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
+
+    sync connect classic <address> <port> <username> [detached]
+        - Connect to the default synchronization server used in Passy.
+          The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
     sync connect 2p0p0 <address> <port> <username> <password> [detached]
         - Connect to a pure 2.0.0+ Passy synchronization server.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
@@ -734,7 +738,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               Encrypter? encrypter = _encrypters[accountName];
               Encrypter? syncEncrypter = _syncEncrypters[accountName];
               if (encrypter == null || syncEncrypter == null) {
-                log('passy:host:classic:No account credentials provided, please use `accounts login` first.',
+                log('passy:sync:host:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
                 return;
               }
@@ -744,7 +748,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               try {
                 port = int.parse(portString);
               } catch (_) {
-                log('passy:host:classic:`$portString` is not a valid integer.',
+                log('passy:sync:host:classic:`$portString` is not a valid integer.',
                     id: id);
                 return;
               }
@@ -756,7 +760,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 try {
                   detached = pcommon.boolFromString(detachedString)!;
                 } catch (_) {
-                  log('passy:host:classic:`$detachedString` is not a valid boolean.',
+                  log('passy:sync:host:classic:`$detachedString` is not a valid boolean.',
                       id: id);
                   return;
                 }
@@ -813,7 +817,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               addr = await server.host(
                   address: host == '0' ? null : host, port: port);
               if (addr == null) {
-                log('passy:host:classic:Server failed to start, unknown error.',
+                log('passy:sync:host:classic:Server failed to start, unknown error.',
                     id: id);
                 return;
               }
@@ -865,10 +869,11 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               try {
                 port = int.parse(portString);
               } catch (_) {
-                log('passy:host:2d0d0:`$portString` is not a valid integer.',
+                log('passy:sync:host:2d0d0:`$portString` is not a valid integer.',
                     id: id);
                 return;
               }
+              Completer<void> onStop = Completer<void>();
               bool detached;
               if (command.length < 6) {
                 detached = false;
@@ -877,7 +882,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 try {
                   detached = pcommon.boolFromString(detachedString)!;
                 } catch (_) {
-                  log('passy:host:2d0d0:`$detachedString` is not a valid boolean.',
+                  log('passy:sync:host:2d0d0:`$detachedString` is not a valid boolean.',
                       id: id);
                   return;
                 }
@@ -948,22 +953,35 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 serviceInfo:
                     'Passy cross-platform password manager entry synchronization server v${pcommon.syncVersion}',
               );
-              _syncCloseMethods[host] = glareHost.stop;
+              if (!detached) {
+                _syncCloseMethods[host] = () async {
+                  await glareHost.stop();
+                  onStop.complete();
+                };
+                await onStop.future;
+              }
               return;
           }
           break;
         case 'connect':
           if (command.length == 2) break;
           switch (command[2]) {
-            case '2d0d0':
-              if (command.length == 6) break;
-              Synchronization? serverNullable;
+            case 'classic':
+              if (command.length == 5) break;
+              String accountName = command[5];
+              Encrypter? encrypter = _encrypters[accountName];
+              Encrypter? syncEncrypter = _syncEncrypters[accountName];
+              if (encrypter == null || syncEncrypter == null) {
+                log('passy:sync:connect:classic:No account credentials provided, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
               String portString = command[4];
               int port;
               try {
                 port = int.parse(portString);
               } catch (_) {
-                log('passy:connect:2d0d0:`$portString` is not a valid integer.',
+                log('passy:sync:host:classic:`$portString` is not a valid integer.',
                     id: id);
                 return;
               }
@@ -973,7 +991,104 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 InternetAddress addr = InternetAddress(hostString);
                 host = HostAddress(addr, port);
               } catch (e) {
-                log('passy:connect:2d0d0:`$hostString` is not a valid address:$e',
+                log('passy:sync:connect:classic:`$hostString` is not a valid address:$e',
+                    id: id);
+                return;
+              }
+              bool detached;
+              if (command.length < 7) {
+                detached = false;
+              } else {
+                String detachedString = command[6];
+                try {
+                  detached = pcommon.boolFromString(detachedString)!;
+                } catch (_) {
+                  log('passy:sync:connect:classic:`$detachedString` is not a valid boolean.',
+                      id: id);
+                  return;
+                }
+              }
+              String accPath = _accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator;
+              AccountSettingsFile settings = AccountSettings.fromFile(
+                  File('${accPath}settings.enc'),
+                  encrypter: encrypter);
+              Completer<void> syncCompleter = Completer();
+              Synchronization? serverNullable;
+              serverNullable = Synchronization(
+                encrypter: syncEncrypter,
+                username: accountName,
+                passyEntries: FullPassyEntriesFileCollection(
+                  idCards: IDCards.fromFile(File('${accPath}idCards.enc'),
+                      encrypter: encrypter),
+                  identities: Identities.fromFile(
+                      File('${accPath}identities.enc'),
+                      encrypter: encrypter),
+                  notes: Notes.fromFile(File('${accPath}notes.enc'),
+                      encrypter: encrypter),
+                  passwords: Passwords.fromFile(File('${accPath}passwords.enc'),
+                      encrypter: encrypter),
+                  paymentCards: PaymentCards.fromFile(
+                      File('${accPath}paymentCards.enc'),
+                      encrypter: encrypter),
+                ),
+                history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
+                    encrypter: encrypter),
+                rsaKeypair: await settings.value.rsaKeypairCompleter.future,
+                onError: (err) {
+                  if (detached) return;
+                  log('Synchronization error:', id: id);
+                  log(err, id: id);
+                },
+                onComplete: (p0) {
+                  syncCompleter.complete();
+                  if (detached) return;
+                  log('Synchronization client stopped.', id: id);
+                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
+                  log('Entries removed: ${serverNullable.entriesRemoved}',
+                      id: id);
+                },
+              );
+              Synchronization server = serverNullable;
+              String fullAddr = '${host.ip.address}:${host.port}';
+              _syncReportGetters[fullAddr] = () {
+                return {
+                  'command': 'connect',
+                  'mode': 'classic',
+                  ...server.getReport().toJson(),
+                };
+              };
+              if (detached) {
+                server.connect(host);
+                log(fullAddr, id: id);
+                return;
+              } else {
+                await server.connect(host);
+              }
+              return;
+            case '2d0d0':
+              if (command.length == 6) break;
+              Synchronization? serverNullable;
+              String portString = command[4];
+              int port;
+              try {
+                port = int.parse(portString);
+              } catch (_) {
+                log('passy:sync:connect:2d0d0:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              String hostString = command[3];
+              HostAddress host;
+              try {
+                InternetAddress addr = InternetAddress(hostString);
+                host = HostAddress(addr, port);
+              } catch (e) {
+                log('passy:sync:connect:2d0d0:`$hostString` is not a valid address:$e',
                     id: id);
                 return;
               }
@@ -985,7 +1100,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 try {
                   detached = pcommon.boolFromString(detachedString)!;
                 } catch (_) {
-                  log('passy:connect:2d0d0:`$detachedString` is not a valid boolean.',
+                  log('passy:sync:connect:2d0d0:`$detachedString` is not a valid boolean.',
                       id: id);
                   return;
                 }
@@ -994,7 +1109,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
               String password = command[6];
               String loginResponse = await _login(accountName, password);
               if (loginResponse != 'true') {
-                log('passy:connect:2d0d0:Failed to login:$loginResponse',
+                log('passy:sync:connect:2d0d0:Failed to login:$loginResponse',
                     id: id);
                 return;
               }
@@ -1051,9 +1166,14 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                   ...client.getReport().toJson(),
                 };
               };
-              if (detached) log(fullAddr, id: id);
-              await client.connect2d0d0(host,
-                  username: accountName, password: password);
+              if (detached) {
+                client.connect2d0d0(host,
+                    username: accountName, password: password);
+                log(fullAddr, id: id);
+              } else {
+                await client.connect2d0d0(host,
+                    username: accountName, password: password);
+              }
               return;
           }
           break;
