@@ -943,14 +943,20 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                       }
                       String username = args[3];
                       String password = args[4];
+                      Encrypter? encrypter = _encrypters[username];
+                      if (encrypter != null) {
+                        return {
+                          'status': {'type': 'Success'},
+                        };
+                      }
                       String result = await _login(username, password);
                       if (result != 'true') {
                         throw {
                           'error': {'type': 'Failed to login'},
                         };
                       }
-                      Encrypter? encrypter = _encrypters[username]!;
-                      Encrypter? syncEncrypter = _syncEncrypters[username]!;
+                      encrypter = _encrypters[username]!;
+                      Encrypter syncEncrypter = _syncEncrypters[username]!;
                       String accPath = _accountsPath +
                           Platform.pathSeparator +
                           username +
