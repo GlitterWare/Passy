@@ -117,7 +117,7 @@ Commands:
     sync connect classic <address> <port> <username> [detached]
         - Connect to the default synchronization server used in Passy.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
-    sync connect 2p0p0 <address> <port> <username> <password> [detached]
+    sync connect 2d0d0 <address> <port> <username> <password> [detached]
         - Connect to a pure 2.0.0+ Passy synchronization server.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
 
