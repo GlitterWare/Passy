@@ -50,7 +50,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   return {
     apiVersion: GlareModule(
       name: 'Passy 2.0.0+ Synchronization Modules',
-      target: (args) async {
+      target: (args, {server}) async {
         if (args.length == 3) {
           return {
             'commands': [

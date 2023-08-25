@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/bio_starge.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -46,7 +47,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   Future<void> _bioAuth() async {
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!_account.bioAuthEnabled) return;
-    if (!await bioAuth(_account.username)) return;
+    if (!await BioStorage.authenticate(_account.username)) return;
     _shouldPop = true;
     Navigator.pop(context);
   }

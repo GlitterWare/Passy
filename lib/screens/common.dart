@@ -11,7 +11,6 @@ import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/main.dart';
-import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -79,27 +78,6 @@ String entryTypeToEntryRouteName(EntryType entryType) {
 }
 
 final bool _isMobile = Platform.isAndroid || Platform.isIOS;
-
-Future<bool> bioAuth(String username) async {
-  BiometricStorageData _bioData;
-  try {
-    _bioData = await BiometricStorageData.fromLocker(username);
-  } catch (e) {
-    return false;
-  }
-  if ((await data.createPasswordHash(username, password: _bioData.password))
-          .toString() !=
-      data.getPasswordHash(username)) return false;
-  data.info.value.lastUsername = username;
-  await data.info.save();
-  await data.loadAccount(
-    username,
-    (await data.getEncrypter(username, password: _bioData.password))!,
-    await data.getSyncEncrypter(
-        username: username, password: _bioData.password),
-  );
-  return true;
-}
 
 void openUrl(String url) {
   if (_isMobile) {

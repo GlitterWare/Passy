@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:passy/passy_data/bio_starge.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
@@ -43,7 +44,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
       if (data.getBioAuthEnabled(_username) ?? false) {
-        if (await bioAuth(_username)) {
+        if ((await BioStorage.authenticate(_username))) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
           if (isAutofill) {

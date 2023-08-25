@@ -5,7 +5,6 @@ import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/argon2_info.dart';
-import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
@@ -398,9 +397,6 @@ class LoadedAccount {
 
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
-
-  Future<BiometricStorageData> get biometricStorageData =>
-      BiometricStorageData.fromLocker(_credentials.value.username);
 
   // History wrappers
   void clearRemovedHistory() => _history.value.clearRemoved();
