@@ -21,7 +21,6 @@ class GlareServer {
     required ServerSocket serverSocket,
     required Map<String, GlareServerSocket> sockets,
     Function(String)? log,
-    required Map<String, GlareModule> modules,
   })  : _serverSocket = serverSocket,
         _sockets = sockets,
         _log = log;
@@ -60,7 +59,6 @@ class GlareServer {
       serverSocket: serverSocket,
       sockets: _sockets,
       log: log,
-      modules: modules,
     );
     return _result;
   }

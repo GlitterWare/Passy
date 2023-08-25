@@ -725,7 +725,12 @@ class Synchronization {
     return null;
   }
 
-  Future<void> _synchronization2d0d0(String address, {Socket? socket}) async {
+  Future<void> _synchronization2d0d0(
+    String address, {
+    Socket? socket,
+    String? username,
+    String? password,
+  }) async {
     void _handleApiException(String message, Object exception) {
       if (exception is Map<String, dynamic>) {
         _handleException('$message: ${jsonEncode(exception)}');
@@ -794,13 +799,13 @@ class Synchronization {
             'Malformed user information. Expected type `Map<String, dynamic>`, received type `${users.runtimeType.toString()}`.');
         return;
       }
-      dynamic username = user['username'];
-      if (username is! String) {
+      dynamic userName = user['username'];
+      if (userName is! String) {
         _handleException(
-            'Malformed username. Expected type `String`, received type `${username.runtimeType.toString()}`.');
+            'Malformed username. Expected type `String`, received type `${userName.runtimeType.toString()}`.');
         return;
       }
-      if (username != _username) {
+      if (userName != _username) {
         _handleException(
             'No shared accounts found. Please make sure that your main and/or shared accounts are added on both ends and have the same usernames and passwords.');
         return;
@@ -813,6 +818,21 @@ class Synchronization {
           'auth': util.generateAuth(
               encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
         };
+      }
+
+      _syncLog += 'done.\nLogging in... ';
+      if (username != null && password != null) {
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'login',
+          username,
+          password,
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        apiVersion += '_$username';
       }
 
       _syncLog += 'done.\nAuthenticating... ';
@@ -1165,16 +1185,24 @@ class Synchronization {
               .toJson()) +
           '\u0000'));
       socket.flush();
-      _callOnComplete();
       Future.delayed(const Duration(milliseconds: 500), () {
         socket.destroy();
         _syncLog += 'done.';
       });
     }
+    _callOnComplete();
   }
 
-  Future<void> connect2d0d0(HostAddress address) async {
-    return _synchronization2d0d0("${address.ip.address}:${address.port}");
+  Future<void> connect2d0d0(
+    HostAddress address, {
+    String? username,
+    String? password,
+  }) async {
+    return _synchronization2d0d0(
+      "${address.ip.address}:${address.port}",
+      username: username,
+      password: password,
+    );
   }
 
   Future<void> connect(HostAddress address) async {

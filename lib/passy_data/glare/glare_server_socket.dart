@@ -85,7 +85,8 @@ class GlareServerSocket {
     }
     _lastEvent = DateTime.now().toUtc();
     try {
-      Map<String, dynamic>? result = await module.run(args);
+      Map<String, dynamic>? result = await module.run(args,
+          addModule: (key, module) => _modules[key] = module);
       return {
         'type': 'commandResponse',
         'arguments': args,

@@ -1,10 +1,8 @@
-import 'package:passy/passy_data/glare/glare_server.dart';
-
 class GlareModule {
   final String name;
   final Future<Map<String, dynamic>?> Function(
     List<String> args, {
-    GlareServer? server,
+    required void Function(String key, GlareModule module) addModule,
   }) target;
 
   GlareModule({
@@ -20,7 +18,7 @@ class GlareModule {
 
   Future<Map<String, dynamic>?> run(
     List<String> args, {
-    GlareServer? server,
+    required void Function(String key, GlareModule module) addModule,
   }) =>
-      target(args, server: server);
+      target(args, addModule: addModule);
 }
