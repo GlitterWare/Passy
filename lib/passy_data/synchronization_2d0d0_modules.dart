@@ -195,7 +195,6 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             if (check.containsKey('error')) return check;
             Map<EntryType, List<util.ExchangeEntry>> exchangeEntries;
             exchangeEntries = util.getEntries(check['entries']);
-            await history.reload();
             await util.processTypedExchangeEntries(
               entries: exchangeEntries,
               passyEntries: passyEntries,
