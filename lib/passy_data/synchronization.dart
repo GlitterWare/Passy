@@ -821,16 +821,18 @@ class Synchronization {
       }
 
       _syncLog += 'done.\nLogging in... ';
-      if (username != null && password != null) {
-        response = _checkResponse(await _safeSync2d0d0Client.runModule([
-          'login',
-          username,
-          password,
-        ]));
-        if (response.containsKey('error')) {
-          _handleException(
-              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-          return;
+      if (username != null) {
+        if (password != null) {
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            'login',
+            username,
+            password,
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
         }
         apiVersion += '_$username';
       }
