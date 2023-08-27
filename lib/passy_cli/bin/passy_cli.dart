@@ -363,7 +363,8 @@ Future<String> _login(String username, String password) async {
   return match.toString();
 }
 
-Future<void> executeCommand(List<String> command, {dynamic id}) async {
+Future<void> executeCommand(List<String> command,
+    {dynamic id, void Function(Object? object, {dynamic id}) log = log}) async {
   switch (command[0]) {
     case 'help':
       log(helpMsg, id: id);
