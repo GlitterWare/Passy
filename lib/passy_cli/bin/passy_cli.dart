@@ -377,6 +377,59 @@ Future<String> _login(String username, String password) async {
   return match.toString();
 }
 
+Future<void> _ipcConnect(
+    dynamic host, int port, void Function(Object object) log) async {
+  Completer<void> onDone = Completer<void>();
+  Socket clientSocket = await Socket.connect(host, port);
+  LineByteStreamSubscription subscription =
+      LineByteStreamSubscription(clientSocket.listen(null, onError: (e, s) {
+    log('IPC server error:\n$e\ns');
+    if (!onDone.isCompleted) onDone.complete();
+  }, onDone: () {
+    log('IPC connection closed.');
+    if (!onDone.isCompleted) onDone.complete();
+  }));
+  bool serverInfoReceived = false;
+  subscription.onData((event) {
+    String eventString = utf8.decode(event);
+    if (!serverInfoReceived) {
+      serverInfoReceived = true;
+      log(eventString);
+      if (_isInteractive) log('[ipc]\$ ');
+      return;
+    }
+    Map<String, dynamic> eventJson = jsonDecode(eventString);
+    String? response = eventJson['response'];
+    if (response != null) log(response);
+    if (_isInteractive) {
+      if (eventJson['inputAvailable'] == true) {
+        log('[ipc]\$ ');
+      }
+    }
+  });
+  _pauseMainInput = true;
+  _secondaryInput = (List<int> event) async {
+    if (event.isNotEmpty) {
+      try {
+        String command =
+            utf8.decode(event).replaceAll('\n', '').replaceAll('\r', '');
+        if (command == 'ipc server disconnect') {
+          _secondaryInput = null;
+          onDone.complete();
+          subscription.cancel();
+          clientSocket.destroy();
+          return;
+        }
+        List<String> commandParsed = cn.parseCommand(command);
+        clientSocket.writeln(jsonEncode({'command': commandParsed}));
+      } catch (_) {}
+    }
+  };
+  await onDone.future;
+  _secondaryInput = null;
+  _pauseMainInput = false;
+}
+
 Future<void> executeCommand(List<String> command,
     {dynamic id, void Function(Object? object, {dynamic id}) log = log}) async {
   switch (command[0]) {
@@ -1423,59 +1476,7 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
-              Completer<void> onDone = Completer<void>();
-              Socket clientSocket = await Socket.connect(host, port);
-              LineByteStreamSubscription subscription =
-                  LineByteStreamSubscription(
-                      clientSocket.listen(null, onError: (e, s) {
-                log('IPC server error:\n$e\ns');
-                if (!onDone.isCompleted) onDone.complete();
-              }, onDone: () {
-                log('IPC connection closed.');
-                if (!onDone.isCompleted) onDone.complete();
-              }));
-              bool serverInfoReceived = false;
-              subscription.onData((event) {
-                String eventString = utf8.decode(event);
-                if (!serverInfoReceived) {
-                  serverInfoReceived = true;
-                  log(eventString, id: id);
-                  log('[ipc]\$ ', id: id);
-                  return;
-                }
-                Map<String, dynamic> eventJson = jsonDecode(eventString);
-                String? response = eventJson['response'];
-                if (response != null) log(response, id: id);
-                if (_isInteractive) {
-                  if (eventJson['inputAvailable'] == true) {
-                    log('[ipc]\$ ', id: id);
-                  }
-                }
-              });
-              _pauseMainInput = true;
-              _secondaryInput = (List<int> event) async {
-                if (event.isNotEmpty) {
-                  try {
-                    String command = utf8
-                        .decode(event)
-                        .replaceAll('\n', '')
-                        .replaceAll('\r', '');
-                    if (command == 'ipc server disconnect') {
-                      _secondaryInput = null;
-                      onDone.complete();
-                      subscription.cancel();
-                      clientSocket.destroy();
-                      return;
-                    }
-                    List<String> commandParsed = cn.parseCommand(command);
-                    clientSocket
-                        .writeln(jsonEncode({'command': commandParsed}));
-                  } catch (_) {}
-                }
-              };
-              await onDone.future;
-              _secondaryInput = null;
-              _pauseMainInput = false;
+              await _ipcConnect(host, port, (object) => log(object, id: id));
               return;
           }
           break;
