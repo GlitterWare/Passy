@@ -1384,15 +1384,20 @@ Future<void> executeCommand(List<String> command,
                     ipcLog('IPC:Could not decode command JSON.');
                     return;
                   }
-                  String ipcCommand = eventJson['command'];
-                  _secondaryInput?.call(utf8.encode(ipcCommand));
-                  if (_pauseMainInput) return;
-                  List<String> commandDecoded = cn.parseCommand(ipcCommand);
-                  if (commandDecoded.isEmpty) {
+                  dynamic ipcCommand = eventJson['command'];
+                  if (ipcCommand is! List<dynamic>) {
                     socket.writeln(jsonEncode({'inputAvailable': true}));
                     return;
                   }
-                  await executeCommand(commandDecoded, log: ipcLog);
+                  ipcCommand =
+                      ipcCommand.map<String>((e) => e.toString()).toList();
+                  _secondaryInput?.call(utf8.encode(ipcCommand.join(' ')));
+                  if (_pauseMainInput) return;
+                  if (ipcCommand.isEmpty) {
+                    socket.writeln(jsonEncode({'inputAvailable': true}));
+                    return;
+                  }
+                  await executeCommand(ipcCommand as List<String>, log: ipcLog);
                   socket.writeln(jsonEncode({'inputAvailable': true}));
                 });
                 socket
@@ -1462,7 +1467,9 @@ Future<void> executeCommand(List<String> command,
                       clientSocket.destroy();
                       return;
                     }
-                    clientSocket.writeln(jsonEncode({'command': command}));
+                    List<String> commandParsed = cn.parseCommand(command);
+                    clientSocket
+                        .writeln(jsonEncode({'command': commandParsed}));
                   } catch (_) {}
                 }
               };
