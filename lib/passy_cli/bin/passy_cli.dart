@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
+import 'package:passy/passy_cli/lib/qr.dart' as qr;
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
@@ -29,7 +30,6 @@ import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
-import 'package:qr_terminal/qr_terminal.dart' as qr;
 
 const String helpMsg = '''
 
@@ -109,7 +109,7 @@ Commands:
           Can only synchronize one account.
           Supports one connection over its lifetime, stops once first synchronization is finished.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
-    sync host 2p0p0 <address> <port> [detached]
+    sync host 2d0d0 <address> <port> [detached]
         - Host the pure 2.0.0+ Passy synchronization server.
           Supports multiple accounts and unlimited connections over its lifetime.
           The [detached] argument is `false` by default, if `true` then the server starts in detached mode.
@@ -840,8 +840,7 @@ Future<void> executeCommand(List<String> command, {dynamic id}) async {
                 log(fullAddr, id: id);
                 return;
               }
-              log('', id: id);
-              qr.generate(fullAddr, typeNumber: 2, small: true);
+              log(qr.generate(fullAddr, typeNumber: 2, small: true));
               log('Server started, running at `$fullAddr`.', id: id);
               log('Hotkeys | `c` - close server | `d` - detach', id: id);
               _pauseMainInput = true;
