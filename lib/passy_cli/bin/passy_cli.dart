@@ -256,10 +256,10 @@ Future<void> load() async {
 
 Future<void> cleanup() async {
   _logDisabled = true;
-  if (!_isNativeMessaging) {
+  try {
     stdin.echoMode = _stdinEchoMode;
     stdin.lineMode = _stdinLineMode;
-  }
+  } catch (_) {}
   exit(0);
 }
 
@@ -273,10 +273,10 @@ Function(List<int>)? _secondaryInput;
 bool _pauseMainInput = false;
 
 StreamSubscription<List<int>> startInteractive() {
-  if (!_isNativeMessaging) {
+  try {
     stdin.lineMode = true;
     stdin.echoMode = true;
-  }
+  } catch (_) {}
   return stdin.listen((List<int> event) async {
     _secondaryInput?.call(event);
     if (_pauseMainInput) return;
@@ -1538,10 +1538,10 @@ Future<void> executeCommand(List<String> command,
 }
 
 void main(List<String> arguments) {
-  if (!_isNativeMessaging) {
+  try {
     _stdinEchoMode = stdin.echoMode;
     _stdinLineMode = stdin.lineMode;
-  }
+  } catch (_) {}
   if (arguments.isNotEmpty) {
     load().then((value) async {
       await executeCommand(arguments);
