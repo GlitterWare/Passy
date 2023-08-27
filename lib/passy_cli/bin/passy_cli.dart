@@ -143,6 +143,9 @@ Commands:
     ipc server connect <address>:<port>
         - Connect to a default IPC server.
           Allows sending commands to another CLI instance.
+    ipc server run <address>:<port> <command>
+        - Run specified command on a default IPC server.
+          Disconnects when command completes.
     ipc server disconnect
         - Disconnect from an IPC server.
 ''';
@@ -378,7 +381,11 @@ Future<String> _login(String username, String password) async {
 }
 
 Future<void> _ipcConnect(
-    dynamic host, int port, void Function(Object object) log) async {
+  dynamic host,
+  int port, {
+  required void Function(Object object) log,
+  List<List<String>> commandsOnJoin = const [],
+}) async {
   Completer<void> onDone = Completer<void>();
   Socket clientSocket = await Socket.connect(host, port);
   LineByteStreamSubscription subscription =
@@ -395,15 +402,28 @@ Future<void> _ipcConnect(
     if (!serverInfoReceived) {
       serverInfoReceived = true;
       log(eventString);
+      if (commandsOnJoin.isNotEmpty) {
+        List<String> command = commandsOnJoin.removeAt(0);
+        clientSocket.writeln(jsonEncode({'command': command}));
+      }
       if (_isInteractive) log('[ipc]\$ ');
       return;
     }
     Map<String, dynamic> eventJson = jsonDecode(eventString);
     String? response = eventJson['response'];
     if (response != null) log(response);
-    if (_isInteractive) {
-      if (eventJson['inputAvailable'] == true) {
-        log('[ipc]\$ ');
+    if (eventJson['inputAvailable'] == true) {
+      if (_isInteractive) log('[ipc]\$ ');
+      if (commandsOnJoin.isNotEmpty) {
+        List<String> command = commandsOnJoin.removeAt(0);
+        if (command.join(' ') == 'ipc server disconnect') {
+          _secondaryInput = null;
+          onDone.complete();
+          subscription.cancel();
+          clientSocket.destroy();
+          return;
+        }
+        clientSocket.writeln(jsonEncode({'command': command}));
       }
     }
   });
@@ -1476,7 +1496,32 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
-              await _ipcConnect(host, port, (object) => log(object, id: id));
+              await _ipcConnect(host, port,
+                  log: (object) => log(object, id: id));
+              return;
+            case 'run':
+              if (command.length < 5) break;
+              List<String> arg4 = command[3].split(':');
+              if (arg4.length < 2) {
+                log('passy:ipc:server:run:Invalid address provided.', id: id);
+                return;
+              }
+              String host = arg4.first;
+              String portString = arg4[1];
+              int port;
+              try {
+                port = int.parse(portString);
+              } catch (_) {
+                log('passy:ipc:server:run:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              await _ipcConnect(host, port,
+                  log: (object) => log(object, id: id),
+                  commandsOnJoin: [
+                    command.sublist(4),
+                    ['ipc', 'server', 'disconnect'],
+                  ]);
               return;
           }
           break;
