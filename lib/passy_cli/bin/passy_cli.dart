@@ -16,6 +16,7 @@ import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
 import 'package:passy/passy_data/glare/glare_module.dart';
 import 'package:passy/passy_data/glare/glare_server.dart';
+import 'package:passy/passy_data/glare/line_stream_subscription.dart';
 import 'package:passy/passy_data/history.dart';
 import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -131,6 +132,19 @@ Commands:
     sync report del <address>:<port>
         - Delete synchronization report for the specified server.
 
+  Interprocess Communication
+    ipc server start [save]
+        - Start the default IPC server.
+          Returns the server address on success, `false` otherwise.
+          `save` argument:
+              - `false` - default, save off.
+              - `true` - saves server address as `.ipc-address` in same directory as CLI executable's.
+              - Any other string is used as custom path for the save.
+    ipc server connect <address>:<port>
+        - Connect to a default IPC server.
+          Allows sending commands to another CLI instance.
+    ipc server disconnect
+        - Disconnect from an IPC server.
 ''';
 
 const String passyShellVersion = '1.0.0';
@@ -850,8 +864,10 @@ Future<void> executeCommand(List<String> command,
               void syncServerCli(List<int> event) async {
                 String command = utf8.decode(event);
                 if (command == 'c') {
+                  _secondaryInput = null;
                   log('Server close requested.', id: id);
                   server.close();
+                  return;
                 }
                 if (command == 'd') {
                   detachedCompleter.complete();
@@ -1328,6 +1344,134 @@ Future<void> executeCommand(List<String> command,
           _isNativeMessaging = true;
           startInteractive();
           return;
+      }
+      break;
+    case 'ipc':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'server':
+          if (command.length == 2) break;
+          switch (command[2]) {
+            case 'start':
+              ServerSocket serverSocket =
+                  await ServerSocket.bind('127.0.0.1', 0);
+              serverSocket.listen((Socket socket) {
+                socket.done.catchError((Object error) {});
+                LineByteStreamSubscription subscription =
+                    LineByteStreamSubscription(
+                        socket.listen(null, onError: (Object error) {}));
+                subscription.onData((event) async {
+                  void ipcLog(Object? object, {dynamic id}) {
+                    try {
+                      socket.writeln(jsonEncode({
+                        'inputAvailable': _secondaryInput != null,
+                        'response': object.toString(),
+                      }));
+                    } catch (_) {}
+                  }
+
+                  String eventString;
+                  try {
+                    eventString = utf8.decode(event);
+                  } catch (e) {
+                    ipcLog('IPC:Could not decode command string.');
+                    return;
+                  }
+                  Map<String, dynamic> eventJson;
+                  try {
+                    eventJson = jsonDecode(eventString);
+                  } catch (e) {
+                    ipcLog('IPC:Could not decode command JSON.');
+                    return;
+                  }
+                  String ipcCommand = eventJson['command'];
+                  _secondaryInput?.call(utf8.encode(ipcCommand));
+                  if (_pauseMainInput) return;
+                  List<String> commandDecoded = cn.parseCommand(ipcCommand);
+                  if (commandDecoded.isEmpty) {
+                    socket.writeln(jsonEncode({'inputAvailable': true}));
+                    return;
+                  }
+                  await executeCommand(commandDecoded, log: ipcLog);
+                  socket.writeln(jsonEncode({'inputAvailable': true}));
+                });
+                socket
+                    .writeln('Passy CLI Shell v$passyShellVersion IPC server.');
+              }, onError: (Object error) => {});
+              log("${serverSocket.address.address}:${serverSocket.port}",
+                  id: id);
+              return;
+            case 'connect':
+              if (command.length == 3) break;
+              List<String> arg4 = command[3].split(':');
+              if (arg4.length < 2) {
+                log('passy:ipc:server:start:Invalid address provided.', id: id);
+                return;
+              }
+              String host = arg4.first;
+              String portString = arg4[1];
+              int port;
+              try {
+                port = int.parse(portString);
+              } catch (_) {
+                log('passy:ipc:server:start:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              Completer<void> onDone = Completer<void>();
+              Socket clientSocket = await Socket.connect(host, port);
+              LineByteStreamSubscription subscription =
+                  LineByteStreamSubscription(
+                      clientSocket.listen(null, onError: (e, s) {
+                log('IPC server error:\n$e\ns');
+                if (!onDone.isCompleted) onDone.complete();
+              }, onDone: () {
+                log('IPC connection closed.');
+                if (!onDone.isCompleted) onDone.complete();
+              }));
+              bool serverInfoReceived = false;
+              subscription.onData((event) {
+                String eventString = utf8.decode(event);
+                if (!serverInfoReceived) {
+                  serverInfoReceived = true;
+                  log(eventString, id: id);
+                  log('[ipc]\$ ', id: id);
+                  return;
+                }
+                Map<String, dynamic> eventJson = jsonDecode(eventString);
+                String? response = eventJson['response'];
+                if (response != null) log(response, id: id);
+                if (_isInteractive) {
+                  if (eventJson['inputAvailable'] == true) {
+                    log('[ipc]\$ ', id: id);
+                  }
+                }
+              });
+              _pauseMainInput = true;
+              _secondaryInput = (List<int> event) async {
+                if (event.isNotEmpty) {
+                  try {
+                    String command = utf8
+                        .decode(event)
+                        .replaceAll('\n', '')
+                        .replaceAll('\r', '');
+                    if (command == 'ipc server disconnect') {
+                      _secondaryInput = null;
+                      onDone.complete();
+                      subscription.cancel();
+                      clientSocket.destroy();
+                      return;
+                    }
+                    clientSocket.writeln(jsonEncode({'command': command}));
+                  } catch (_) {}
+                }
+              };
+              await onDone.future;
+              _secondaryInput = null;
+              _pauseMainInput = false;
+              return;
+          }
+          break;
       }
       break;
   }
