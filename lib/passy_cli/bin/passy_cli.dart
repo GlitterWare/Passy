@@ -160,8 +160,8 @@ bool _isBigEndian = Endian.host == Endian.big;
 bool _isBusy = false;
 bool _isInteractive = false;
 bool _isNativeMessaging = false;
-bool _stdinEchoMode = stdin.echoMode;
-bool _stdinLineMode = stdin.lineMode;
+bool _stdinEchoMode = false;
+bool _stdinLineMode = false;
 
 bool _shouldMoveLine = false;
 bool _logDisabled = false;
@@ -256,8 +256,10 @@ Future<void> load() async {
 
 Future<void> cleanup() async {
   _logDisabled = true;
-  stdin.echoMode = _stdinEchoMode;
-  stdin.lineMode = _stdinLineMode;
+  if (!_isNativeMessaging) {
+    stdin.echoMode = _stdinEchoMode;
+    stdin.lineMode = _stdinLineMode;
+  }
   exit(0);
 }
 
@@ -271,8 +273,10 @@ Function(List<int>)? _secondaryInput;
 bool _pauseMainInput = false;
 
 StreamSubscription<List<int>> startInteractive() {
-  stdin.lineMode = true;
-  stdin.echoMode = true;
+  if (!_isNativeMessaging) {
+    stdin.lineMode = true;
+    stdin.echoMode = true;
+  }
   return stdin.listen((List<int> event) async {
     _secondaryInput?.call(event);
     if (_pauseMainInput) return;
@@ -1534,8 +1538,10 @@ Future<void> executeCommand(List<String> command,
 }
 
 void main(List<String> arguments) {
-  _stdinEchoMode = stdin.echoMode;
-  _stdinLineMode = stdin.lineMode;
+  if (!_isNativeMessaging) {
+    _stdinEchoMode = stdin.echoMode;
+    _stdinLineMode = stdin.lineMode;
+  }
   if (arguments.isNotEmpty) {
     load().then((value) async {
       await executeCommand(arguments);
