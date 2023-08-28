@@ -47,6 +47,8 @@ Commands:
     exit           Exit the interactive mode.
     run <file>     Execute commands separated by newlines from file.
     sleep <ms>     Pause execution for <ms> milliseconds.
+    exec <command> [[arguments]]
+        - Execute native command in detached mode.
 
   Version
     version shell  Show shell version.
@@ -521,6 +523,17 @@ Future<void> executeCommand(List<String> command,
         return;
       }
       await Future.delayed(Duration(milliseconds: ms));
+      return;
+    case 'exec':
+      if (command.length == 1) break;
+      String program = command[1];
+      List<String> args;
+      if (command.length == 2) {
+        args = [];
+      } else {
+        args = command.sublist(2);
+      }
+      await Process.start(program, args);
       return;
     case 'version':
       if (command.length == 1) break;
