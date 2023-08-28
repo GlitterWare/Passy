@@ -636,7 +636,7 @@ Future<void> executeCommand(List<String> command,
       } else {
         args = command.sublist(2);
       }
-      await Process.start(program, args);
+      await Process.start(program, args, mode: ProcessStartMode.detached);
       return;
     case '\$0':
       log(Platform.resolvedExecutable, id: id);
