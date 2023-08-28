@@ -99,6 +99,8 @@ Commands:
     install temp
         - Copy the executable to a temporary directory and assign it a random name
           Returns the file path on success.
+    install full <path>
+        - Copy all Passy CLI files to the specified path.
 
   Development
     native_messaging start
@@ -1411,6 +1413,21 @@ Future<void> executeCommand(List<String> command,
             return;
           }
           log(copy.path, id: id);
+          return;
+        case 'full':
+          if (command.length == 2) break;
+          String installPath = command[2];
+          File exe;
+          try {
+            exe = await pcommon.copyPassyCLI(
+                File(Platform.resolvedExecutable).parent,
+                Directory(installPath));
+          } catch (e, s) {
+            log('passy:install:temp:Failed to install executable:\n$e\n$s',
+                id: id);
+            return;
+          }
+          log(exe.path, id: id);
           return;
       }
       break;
