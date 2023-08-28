@@ -102,6 +102,11 @@ Commands:
     install full <path>
         - Copy all Passy CLI files to the specified path.
 
+    uninstall full <path>
+        - Remove all Passy CLI files from the specified path.
+    uninstall dir <path>
+        - Recursively delete a directory.
+
   Development
     native_messaging start
         - Start in native messaging mode.
@@ -479,6 +484,7 @@ Future<void> executeCommand(List<String> command,
           lines = contents.split('\n');
         }
         for (String line in lines) {
+          if (line.isEmpty) continue;
           if (line.startsWith('//')) continue;
           commands.add(cn.parseCommand(line));
         }
@@ -1423,11 +1429,37 @@ Future<void> executeCommand(List<String> command,
                 File(Platform.resolvedExecutable).parent,
                 Directory(installPath));
           } catch (e, s) {
-            log('passy:install:temp:Failed to install executable:\n$e\n$s',
+            log('passy:install:full:Failed to install executable:\n$e\n$s',
                 id: id);
             return;
           }
           log(exe.path, id: id);
+          return;
+      }
+      break;
+    case 'uninstall':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'full':
+          if (command.length == 2) break;
+          Directory installPath = Directory(command[2]);
+          try {
+            await pcommon.removePassyCLI(installPath);
+          } catch (e, s) {
+            log('passy:uninstall:full:Failed to uninstall:\n$e\n$s');
+          }
+          log('true', id: id);
+          return;
+        case 'dir':
+          if (command.length == 2) break;
+          Directory installPath = Directory(command[2]);
+          try {
+            await installPath.delete(recursive: true);
+          } catch (e, s) {
+            log('passy:uninstall:full:Failed to uninstall:\n$e\n$s');
+            return;
+          }
+          log('true', id: id);
           return;
       }
       break;
