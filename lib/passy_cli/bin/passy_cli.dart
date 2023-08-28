@@ -46,6 +46,7 @@ Commands:
     help           Display this message.
     exit           Exit the interactive mode.
     run <file>     Execute commands separated by newlines from file.
+    sleep <ms>     Pause execution for <ms> milliseconds.
 
   Version
     version shell  Show shell version.
@@ -495,6 +496,18 @@ Future<void> executeCommand(List<String> command,
       for (List<String> command in commands) {
         await executeCommand(command);
       }
+      return;
+    case 'sleep':
+      if (command.length == 1) break;
+      String msString = command[1];
+      int ms;
+      try {
+        ms = int.parse(msString);
+      } catch (_) {
+        log('passy:sleep:`$msString` is not a valid integer.', id: id);
+        return;
+      }
+      await Future.delayed(Duration(milliseconds: ms));
       return;
     case 'version':
       if (command.length == 1) break;
