@@ -114,15 +114,15 @@ class SplashScreen extends StatelessWidget {
         Directory tempCopyDir =
             Directory(copyDir.path + Platform.pathSeparator + date);
         await tempCopyDir.create();
-        String filename = 'passy_cli';
-        String copyPath =
-            tempCopyDir.path + Platform.pathSeparator + filename + suffix;
-        await original.copy(copyPath);
-        String scriptCopyPath = tempCopyDir.path +
+        try {
+          await copyPassyCLI(installDir, tempCopyDir);
+        } catch (_) {
+          return null;
+        }
+        scriptCopy = File(tempCopyDir.path +
             Platform.pathSeparator +
             'passy_cli_native_messaging' +
-            scriptSuffix;
-        scriptCopy = await originalScript.copy(scriptCopyPath);
+            scriptSuffix);
       } catch (_) {
         return null;
       }

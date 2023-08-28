@@ -405,3 +405,57 @@ Future<Encrypter> getSyncEncrypter(
   }
   return getPassyEncrypter(password);
 }
+
+Future<File> copyPassyCLI(Directory from, Directory to) async {
+  List<String> files = [
+    'passy_cli' + (Platform.isWindows ? '.exe' : ''),
+    'passy_cli_native_messaging' + (Platform.isWindows ? '.bat' : '.sh'),
+    'passy_cli_native_messaging.json',
+    Platform.isWindows
+        ? 'argon2.dll'
+        : (Platform.isLinux ? 'lib/libargon2.so' : ''),
+  ];
+  Future<void> cleanup() async {
+    for (String fileName in files) {
+      if (fileName.isEmpty) continue;
+      File toFile = File(to.path + Platform.pathSeparator + fileName);
+      Directory toParent = toFile.parent;
+      if (toParent.absolute.path == to.absolute.path) {
+        try {
+          await toFile.delete();
+        } catch (_) {}
+        continue;
+      }
+      try {
+        await toParent.delete(recursive: true);
+      } catch (_) {}
+    }
+  }
+
+  if (!await to.exists()) {
+    await to.create(recursive: true);
+  }
+  for (String fileName in files) {
+    File fromFile = File(from.path + Platform.pathSeparator + fileName);
+    File toFile = File(to.path + Platform.pathSeparator + fileName);
+    if (await toFile.exists()) {
+      try {
+        await toFile.delete();
+      } catch (_) {}
+    } else if (!await toFile.parent.exists()) {
+      try {
+        await toFile.parent.create(recursive: true);
+      } catch (_) {
+        cleanup();
+        rethrow;
+      }
+    }
+    try {
+      await fromFile.copy(toFile.path);
+    } catch (_) {
+      cleanup();
+      rethrow;
+    }
+  }
+  return File(to.path + Platform.pathSeparator + files.first);
+}
