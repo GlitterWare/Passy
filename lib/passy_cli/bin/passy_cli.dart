@@ -254,12 +254,25 @@ void refreshAccounts() {
   }
 }
 
+Future<void> _autorun() async {
+  File autorun = File(File(Platform.resolvedExecutable).parent.path +
+      Platform.pathSeparator +
+      'autorun.pcli');
+  if (!await autorun.exists()) return;
+  await executeCommand(['run', autorun.path]);
+}
+
 Future<void> load() async {
   _passyDataPath = await Locator.getPlatformSpecificCachePath() +
       Platform.pathSeparator +
       'Passy';
   _accountsPath = _passyDataPath + Platform.pathSeparator + 'accounts';
   refreshAccounts();
+  try {
+    stdin.lineMode = true;
+    stdin.echoMode = true;
+  } catch (_) {}
+  await _autorun();
 }
 
 Future<void> cleanup() async {
@@ -1642,7 +1655,7 @@ Type `exit` to quit.
     ProcessSignal.sigterm.watch().listen((event) => onInterrupt());
   }
   load().then((value) {
+    log('[passy]\$ ');
     return startInteractive();
   });
-  log('[passy]\$ ');
 }
