@@ -49,6 +49,9 @@ Commands:
     sleep <ms>     Pause execution for <ms> milliseconds.
     exec <command> [[arguments]]
         - Execute native command in detached mode.
+    \$0             Get current executable path.
+    dirname <path>
+        - Remove file suffix from path.
 
   Version
     version shell  Show shell version.
@@ -619,6 +622,22 @@ Future<void> executeCommand(List<String> command,
         args = command.sublist(2);
       }
       await Process.start(program, args);
+      return;
+    case '\$0':
+      log(Platform.resolvedExecutable, id: id);
+      return;
+    case 'dirname':
+      if (command.length == 1) break;
+      File file = File(command[1]);
+      try {
+        if (await file.exists()) {
+          log(file.parent.path, id: id);
+          return;
+        }
+        log('.', id: id);
+      } catch (_) {
+        log('.', id: id);
+      }
       return;
     case 'version':
       if (command.length == 1) break;
