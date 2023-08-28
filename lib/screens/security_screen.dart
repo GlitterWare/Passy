@@ -81,20 +81,19 @@ class _SecurityScreen extends State<SecurityScreen> {
               ),
               onPressed: () => setProtectScreen(!loadedAccount.protectScreen),
             )),
-          if (Platform.isAndroid)
-            PassyPadding(ThreeWidgetButton(
-              center: Text(localizations.automaticScreenLock),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.security),
-              ),
-              right: Switch(
-                activeColor: Colors.greenAccent,
-                value: loadedAccount.autoScreenLock,
-                onChanged: (value) => setAutoScreenLock(value),
-              ),
-              onPressed: () => setAutoScreenLock(!loadedAccount.autoScreenLock),
-            )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.automaticScreenLock),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.security),
+            ),
+            right: Switch(
+              activeColor: Colors.greenAccent,
+              value: loadedAccount.autoScreenLock,
+              onChanged: (value) => setAutoScreenLock(value),
+            ),
+            onPressed: () => setAutoScreenLock(!loadedAccount.autoScreenLock),
+          )),
           PassyPadding(ThreeWidgetButton(
             color: loadedAccount.keyDerivationType == KeyDerivationType.none
                 ? const Color.fromRGBO(255, 82, 82, 1)
