@@ -260,6 +260,12 @@ Future<List<String>> parseCommand(List<String> command) async {
       case '\$\$>':
         parsedCommand.add('\$>');
         continue;
+      case '&&&':
+        parsedCommand.add('&&');
+        continue;
+      case ';;':
+        parsedCommand.add(';');
+        continue;
     }
     if (!isCommand) {
       if (insertRight) {
@@ -1744,8 +1750,25 @@ void main(List<String> arguments) {
     _stdinLineMode = stdin.lineMode;
   } catch (_) {}
   if (arguments.isNotEmpty) {
+    List<List<String>> commands = [[]];
+    int commandsIndex = 0;
+    for (String arg in arguments) {
+      switch (arg) {
+        case ';':
+          commands.add([]);
+          commandsIndex++;
+          continue;
+        case '&&':
+          commands.add([]);
+          commandsIndex++;
+          continue;
+      }
+      commands[commandsIndex].add(arg);
+    }
     load().then((value) async {
-      await executeCommand(arguments);
+      for (List<String> command in commands) {
+        await executeCommand(command);
+      }
       if (!_isNativeMessaging) log('');
     });
     return;
