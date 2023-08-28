@@ -183,6 +183,86 @@ Map<String, Encrypter> _syncEncrypters = {};
 Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
 
+Future<List<String>> parseCommand(List<String> command) async {
+  List<String> parsedCommand = [];
+  bool isCommand = false;
+  bool insertLeft = false;
+  bool insertRight = false;
+  String commandWord = '';
+
+  Future<String> _execute() async {
+    String execResult = '';
+    try {
+      await executeCommand(
+        await parseCommand(cn.parseCommand(commandWord)[0]),
+        log: (object, {id}) {
+          execResult += object.toString();
+        },
+      );
+    } catch (e) {
+      execResult = e.toString();
+    }
+    return execResult;
+  }
+
+  for (String word in command) {
+    switch (word) {
+      case '\$':
+        if (!isCommand) {
+          isCommand = true;
+          continue;
+        }
+        String execResult = await _execute();
+        if (insertLeft) {
+          if (parsedCommand.isNotEmpty) {
+            parsedCommand.last += execResult;
+            isCommand = false;
+            continue;
+          }
+        }
+        parsedCommand.add(execResult);
+        isCommand = false;
+        continue;
+      case '<\$':
+        if (isCommand) {
+          parsedCommand.add('passy:Incorrect use of the `<\$` operator.');
+          continue;
+        }
+        insertLeft = true;
+        isCommand = true;
+        continue;
+      case '\$>':
+        if (!isCommand) {
+          parsedCommand.add('passy:Incorrect use of the `\$>` operator.');
+          continue;
+        }
+        String execResult = await _execute();
+        insertRight = true;
+        if (insertLeft) {
+          if (parsedCommand.isNotEmpty) {
+            parsedCommand.last += execResult;
+            isCommand = false;
+            continue;
+          }
+        }
+        parsedCommand.add(execResult);
+        isCommand = false;
+        continue;
+    }
+    if (!isCommand) {
+      if (insertRight) {
+        parsedCommand.last += word;
+        insertRight = false;
+        continue;
+      }
+      parsedCommand.add(word);
+      continue;
+    }
+    commandWord = word;
+  }
+  return parsedCommand;
+}
+
 void nativeMessagingLog(dynamic id, String msg) {
   List<String> msgSplit = [];
   if (msg.length < maxNativeMessageLength) {
@@ -483,6 +563,7 @@ Future<void> _ipcConnect(
 
 Future<void> executeCommand(List<String> command,
     {dynamic id, void Function(Object? object, {dynamic id}) log = log}) async {
+  command = await parseCommand(command);
   switch (command[0]) {
     case 'help':
       log(helpMsg, id: id);
