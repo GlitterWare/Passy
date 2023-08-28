@@ -55,17 +55,17 @@ List<List<String>> parseCommand(String command) {
     if (!isDoubleQuoted && !isSingleQuoted) {
       if (c == ' ') {
         if (curStr != '') {
-          if (curStr == '&&') {
-            curStr = '';
-            result.add([]);
-            resultIndex++;
-            continue;
-          }
-          if (curStr == ';') {
-            curStr = '';
-            result.add([]);
-            resultIndex++;
-            continue;
+          switch (curStr) {
+            case '&&':
+              curStr = '';
+              result.add([]);
+              resultIndex++;
+              continue;
+            case ';':
+              curStr = '';
+              result.add([]);
+              resultIndex++;
+              continue;
           }
           result[resultIndex].add(curStr);
           curStr = '';
