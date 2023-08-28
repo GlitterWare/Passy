@@ -305,7 +305,7 @@ StreamSubscription<List<int>> startInteractive() {
     if (_pauseMainInput) return;
     _shouldMoveLine = false;
     String commandEncoded;
-    List<String> command;
+    List<List<String>> commands = [];
     String? id;
     if (_isNativeMessaging) {
       if (event.length < 5) return;
@@ -317,18 +317,20 @@ StreamSubscription<List<int>> startInteractive() {
         id = commandDecoded['id'];
       } catch (_) {}
       if (commandJson is! List<dynamic>) return;
-      command = commandJson.map((e) => e.toString()).toList();
+      commands.add(commandJson.map((e) => e.toString()).toList());
     } else {
       commandEncoded = utf8.decode(event);
       commandEncoded = commandEncoded.replaceAll('\n', '').replaceAll('\r', '');
-      command = cn.parseCommand(commandEncoded);
+      commands = cn.parseCommand(commandEncoded);
     }
-    if (command.isNotEmpty) {
+    if (commands.isNotEmpty) {
       if (_isBusy) return;
       _isBusy = true;
       try {
-        await executeCommand(command,
-            id: id ?? pcommon.getPassyHash(jsonEncode(command)).toString());
+        for (List<String> command in commands) {
+          await executeCommand(command,
+              id: id ?? pcommon.getPassyHash(jsonEncode(commands)).toString());
+        }
       } catch (_) {}
       _isBusy = false;
     }
@@ -467,8 +469,10 @@ Future<void> _ipcConnect(
           clientSocket.destroy();
           return;
         }
-        List<String> commandParsed = cn.parseCommand(command);
-        clientSocket.writeln(jsonEncode({'command': commandParsed}));
+        List<List<String>> commandsParsed = cn.parseCommand(command);
+        for (List<String> command in commandsParsed) {
+          clientSocket.writeln(jsonEncode({'command': command}));
+        }
       } catch (_) {}
     }
   };
@@ -502,7 +506,7 @@ Future<void> executeCommand(List<String> command,
         for (String line in lines) {
           if (line.isEmpty) continue;
           if (line.startsWith('//')) continue;
-          commands.add(cn.parseCommand(line));
+          commands.addAll(cn.parseCommand(line));
         }
       } catch (e, s) {
         log('passy:run:Could not parse file:\n$e\n$s', id: id);

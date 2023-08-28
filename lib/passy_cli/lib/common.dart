@@ -23,10 +23,11 @@ String getBoxMessage(String message) {
   return result;
 }
 
-List<String> parseCommand(String command) {
+List<List<String>> parseCommand(String command) {
   bool isEscaped = false;
   String curStr = '';
-  List<String> result = [];
+  List<List<String>> result = [[]];
+  int resultIndex = 0;
   bool isSingleQuoted = false;
   bool isDoubleQuoted = false;
   for (int i = 0; i != command.length; i++) {
@@ -54,7 +55,19 @@ List<String> parseCommand(String command) {
     if (!isDoubleQuoted && !isSingleQuoted) {
       if (c == ' ') {
         if (curStr != '') {
-          result.add(curStr);
+          if (curStr == '&&') {
+            curStr = '';
+            result.add([]);
+            resultIndex++;
+            continue;
+          }
+          if (curStr == ';') {
+            curStr = '';
+            result.add([]);
+            resultIndex++;
+            continue;
+          }
+          result[resultIndex].add(curStr);
           curStr = '';
         }
         continue;
@@ -62,7 +75,7 @@ List<String> parseCommand(String command) {
     }
     curStr += c;
   }
-  if (curStr != '') result.add(curStr);
+  if (curStr != '') result[resultIndex].add(curStr);
   return result;
 }
 
