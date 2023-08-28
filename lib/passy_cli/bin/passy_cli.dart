@@ -251,6 +251,15 @@ Future<List<String>> parseCommand(List<String> command) async {
         parsedCommand.add(execResult);
         isCommand = false;
         continue;
+      case '\$\$':
+        parsedCommand.add('\$');
+        continue;
+      case '<\$\$':
+        parsedCommand.add('<\$');
+        continue;
+      case '\$\$>':
+        parsedCommand.add('\$>');
+        continue;
     }
     if (!isCommand) {
       if (insertRight) {
