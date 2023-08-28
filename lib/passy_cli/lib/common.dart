@@ -42,20 +42,12 @@ List<String> parseCommand(String command) {
     if (!isDoubleQuoted) {
       if (c == '\'') {
         isSingleQuoted = !isSingleQuoted;
-        if (curStr != '') {
-          result.add(curStr);
-          curStr = '';
-        }
         continue;
       }
     }
     if (!isSingleQuoted) {
       if (c == '"') {
         isDoubleQuoted = !isDoubleQuoted;
-        if (curStr != '') {
-          result.add(curStr);
-          curStr = '';
-        }
         continue;
       }
     }
