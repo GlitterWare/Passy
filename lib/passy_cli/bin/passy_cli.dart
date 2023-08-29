@@ -1481,6 +1481,7 @@ Future<void> executeCommand(List<String> command,
                 return;
               } else {
                 await server.connect(host);
+                log('', id: id);
               }
               return;
             case '2d0d0':
