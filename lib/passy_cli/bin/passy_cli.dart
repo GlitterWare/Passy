@@ -43,7 +43,7 @@ If no command is supplied, Passy CLI starts in interactive mode.
 Commands:
 
   General
-    help           Display this message.
+    help [page]    Display this message.
     exit           Exit the interactive mode.
     run <file> [index]
         - Execute commands separated by newlines from file.
@@ -652,7 +652,39 @@ Future<void> executeCommand(List<String> command,
   command = await parseCommand(command);
   switch (command[0]) {
     case 'help':
-      log(helpMsg, id: id);
+      int index;
+      if (command.length == 1) {
+        log(helpMsg, id: id);
+        return;
+      } else {
+        String indexString = command[1];
+        try {
+          index = int.parse(indexString);
+        } catch (_) {
+          log('passy:help:`$indexString` is not a valid integer.', id: id);
+          return;
+        }
+      }
+      List<String> helpList = helpMsg.split('\n');
+      int maxIndex = (helpList.length.toDouble() / 30.toDouble()).ceil();
+      if (index < 1) {
+        log('passy:help:Index must be 1 or bigger.', id: id);
+        return;
+      }
+      if (index > maxIndex) {
+        log('passy:help:Maximum page index exceeded: $index > $maxIndex.',
+            id: id);
+        return;
+      }
+      int upToIndex = index * 30;
+      String help = '';
+      for (int i = upToIndex - 30;
+          (i != upToIndex) && (i != helpList.length);
+          i++) {
+        help += helpList[i] + '\n';
+      }
+      help += '\n[Page $index/$maxIndex]';
+      log(help, id: id);
       return;
     case 'exit':
       log('Have a splendid day!\n', id: id);
@@ -1913,7 +1945,7 @@ Future<void> executeCommand(List<String> command,
   }
   if (_isNativeMessaging) return;
   log('passy:Unknown command:${command.join(' ')}.', id: id);
-  if (!_isInteractive) log(helpMsg, id: id);
+  if (!_isInteractive) log('Use `help` for guidance.', id: id);
 }
 
 void main(List<String> arguments) {
