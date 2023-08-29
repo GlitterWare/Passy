@@ -569,7 +569,9 @@ Future<void> _ipcConnect(
         List<String> command = commandsOnJoin.removeAt(0);
         clientSocket.writeln(jsonEncode({'command': command}));
       }
-      if (_isInteractive) log('[ipc]\$ ');
+      if (_isInteractive) {
+        log('\nYou\'re now executing commands remotely.\nTo log out of the IPC server, use `ipc server disconnect`.\nUsing `exit` while logged in will terminate the remote IPC server.\n\n[ipc]\$ ');
+      }
       return;
     }
     Map<String, dynamic> eventJson = jsonDecode(eventString);
