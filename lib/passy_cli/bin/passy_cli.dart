@@ -1769,7 +1769,9 @@ Future<void> executeCommand(List<String> command,
                 String detachedString = command[3];
                 try {
                   if (pcommon.boolFromString(detachedString)!) {
-                    save = File('.ipc-address');
+                    save = File(File(Platform.resolvedExecutable).parent.path +
+                        Platform.pathSeparator +
+                        '.ipc-address');
                   }
                 } catch (_) {
                   save = File(detachedString);
