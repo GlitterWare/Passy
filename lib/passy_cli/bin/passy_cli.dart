@@ -170,7 +170,7 @@ Commands:
         - Disconnect from an IPC server.
 ''';
 
-List<String> upgradeCommands = [
+final List<String> upgradeCommands = [
   'sleep',
   '500',
   ';',
@@ -180,6 +180,7 @@ List<String> upgradeCommands = [
   ';',
   'exec',
   Platform.resolvedExecutable,
+  '--no-autorun',
   'sleep',
   '500',
   ';;',
@@ -391,6 +392,7 @@ Future<void> _autorun() async {
   await executeCommand(['run', autorun.path]);
 }
 
+bool _isAutorunEnabled = true;
 Future<void> load() async {
   _passyDataPath = await Locator.getPlatformSpecificCachePath() +
       Platform.pathSeparator +
@@ -401,7 +403,7 @@ Future<void> load() async {
     stdin.lineMode = true;
     stdin.echoMode = true;
   } catch (_) {}
-  await _autorun();
+  if (_isAutorunEnabled) await _autorun();
 }
 
 Future<void> cleanup() async {
@@ -1867,10 +1869,17 @@ void main(List<String> arguments) {
     _stdinEchoMode = stdin.echoMode;
     _stdinLineMode = stdin.lineMode;
   } catch (_) {}
-  if (arguments.isNotEmpty) {
+  List<String> args = List<String>.from(arguments);
+  if (args.isNotEmpty) {
+    if (args.first == '--no-autorun') {
+      _isAutorunEnabled = false;
+      args.removeAt(0);
+    }
+  }
+  if (args.isNotEmpty) {
     List<List<String>> commands = [[]];
     int commandsIndex = 0;
-    for (String arg in arguments) {
+    for (String arg in args) {
       switch (arg) {
         case ';':
           commands.add([]);
