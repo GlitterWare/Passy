@@ -68,7 +68,3 @@ Future<String> getLatestVersion() async {
     return passyVersion;
   }
 }
-
-bool isSnap() {
-  return Platform.environment['SNAP_NAME'] == 'passy';
-}

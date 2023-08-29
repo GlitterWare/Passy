@@ -17,6 +17,10 @@ const String passyVersion = '1.6.0';
 const String syncVersion = '2.0.1';
 const String accountVersion = '2.3.0';
 
+bool isSnap() {
+  return Platform.environment['SNAP_NAME'] == 'passy';
+}
+
 /// Returns false if version2 is lower, true if version2 is higher and null if both versions are the same
 bool? compareVersions(version1, version2) {
   List<int> version1Split =
