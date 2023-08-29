@@ -31,6 +31,7 @@ import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
+import 'package:passy/passy_data/autostart.dart';
 
 const String helpMsg = '''
 
@@ -173,6 +174,14 @@ Commands:
           Disconnects when command completes.
     ipc server disconnect
         - Disconnect from an IPC server.
+
+  Autostart
+    autostart add <name> <path>
+        - Add the specified path to autostart.
+          Returns `true` on success.
+    autostart del <name>
+        - Remove path from autostart by name.
+          Returns `true` on success.
 ''';
 
 final List<String> upgradeCommands = [
@@ -1989,6 +1998,38 @@ Future<void> executeCommand(List<String> command,
               return;
           }
           break;
+      }
+      break;
+    case 'autostart':
+      if (_isNativeMessaging) break;
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'add':
+          if (command.length < 4) break;
+          String name = command[2];
+          String path = command[3];
+          Autostart autostart = Autostart()
+            ..setup(appName: name, appPath: path);
+          try {
+            await autostart.enable();
+          } catch (e, s) {
+            log('passy:autostart:add:Failed to enable autostart:\n$e\n$s');
+            return;
+          }
+          log('true');
+          return;
+        case 'del':
+          if (command.length == 2) break;
+          String name = command[2];
+          Autostart autostart = Autostart()..setup(appName: name, appPath: '');
+          try {
+            await autostart.disable();
+          } catch (e, s) {
+            log('passy:autostart:del:Failed to disable autostart:\n$e\n$s');
+            return;
+          }
+          log('true');
+          return;
       }
       break;
   }

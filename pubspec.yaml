@@ -72,6 +72,7 @@ dependencies:
   system_info2: ^4.0.0
   flutter_markdown: ^0.6.17+1
   compute: ^1.0.2
+  launch_at_startup: ^0.2.2
 
 dev_dependencies:
   flutter_test:
