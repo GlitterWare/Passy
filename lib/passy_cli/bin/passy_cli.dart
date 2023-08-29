@@ -553,7 +553,7 @@ Future<void> _ipcConnect(
   Socket clientSocket = await Socket.connect(host, port);
   LineByteStreamSubscription subscription =
       LineByteStreamSubscription(clientSocket.listen(null, onError: (e, s) {
-    log('IPC server error:\n$e\ns');
+    log('IPC server error:\n$e\n$s');
     if (!onDone.isCompleted) onDone.complete();
   }, onDone: () {
     log('IPC connection closed.');
@@ -1869,8 +1869,13 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
-              await _ipcConnect(host, port,
-                  log: (object) => log(object, id: id));
+              try {
+                await _ipcConnect(host, port,
+                    log: (object) => log(object, id: id));
+              } catch (e, s) {
+                log('passy:ipc:server:connect:Failed to connect to IPC server:\n$e\n$s');
+                return;
+              }
               return;
             case 'run':
               if (command.length < 5) break;
@@ -1889,12 +1894,17 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
-              await _ipcConnect(host, port,
-                  log: (object) => log(object, id: id),
-                  commandsOnJoin: [
-                    command.sublist(4),
-                    ['ipc', 'server', 'disconnect'],
-                  ]);
+              try {
+                await _ipcConnect(host, port,
+                    log: (object) => log(object, id: id),
+                    commandsOnJoin: [
+                      command.sublist(4),
+                      ['ipc', 'server', 'disconnect'],
+                    ]);
+              } catch (e, s) {
+                log('passy:ipc:server:run:Failed to connect to IPC server:\n$e\n$s');
+                return;
+              }
               return;
           }
           break;
