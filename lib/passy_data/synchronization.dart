@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:intranet_ip/intranet_ip.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 
 import 'favorites.dart';
@@ -400,22 +399,7 @@ class Synchronization {
     HostAddress? _address;
     String _ip = '';
     if (address == null) {
-      try {
-        List<NetworkInterface> _interfaces =
-            await NetworkInterface.list(type: InternetAddressType.IPv4);
-        for (NetworkInterface _interface in _interfaces) {
-          for (InternetAddress _address in _interface.addresses) {
-            String _strAddress = _address.address;
-            if (_strAddress.startsWith('192.168.1.')) {
-              _ip = _strAddress;
-              break;
-            }
-          }
-        }
-        if (_ip == '') _ip = (await intranetIpv4()).address;
-      } catch (_) {
-        _ip = '127.0.0.1';
-      }
+      _ip = await getInternetAddress();
     } else {
       _ip = address;
     }

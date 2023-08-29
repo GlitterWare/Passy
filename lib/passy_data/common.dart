@@ -5,6 +5,7 @@ import 'package:characters/characters.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:intranet_ip/intranet_ip.dart';
 import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:path/path.dart' as path;
@@ -404,6 +405,27 @@ Future<Encrypter> getSyncEncrypter(
         memory: memory > 65536 ? 65536 : memory);
   }
   return getPassyEncrypter(password);
+}
+
+Future<String> getInternetAddress() async {
+  try {
+    String ip = '';
+    List<NetworkInterface> _interfaces =
+        await NetworkInterface.list(type: InternetAddressType.IPv4);
+    for (NetworkInterface _interface in _interfaces) {
+      for (InternetAddress _address in _interface.addresses) {
+        String _strAddress = _address.address;
+        if (_strAddress.startsWith('192.168.1.')) {
+          ip = _strAddress;
+          break;
+        }
+      }
+    }
+    if (ip == '') ip = (await intranetIpv4()).address;
+    return ip;
+  } catch (_) {
+    return '127.0.0.1';
+  }
 }
 
 List<String> _cliFiles = [

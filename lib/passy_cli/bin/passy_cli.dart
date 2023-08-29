@@ -1139,6 +1139,11 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               String host = command[3];
+              if (_isNativeMessaging) {
+                host = await pcommon.getInternetAddress();
+              } else if (host == '0') {
+                host = await pcommon.getInternetAddress();
+              }
               String portString = command[4];
               int port;
               try {
@@ -1266,6 +1271,11 @@ Future<void> executeCommand(List<String> command,
             case '2d0d0':
               if (command.length < 5) break;
               String host = command[3];
+              if (_isNativeMessaging) {
+                host = await pcommon.getInternetAddress();
+              } else if (host == '0') {
+                host = await pcommon.getInternetAddress();
+              }
               String portString = command[4];
               int port;
               try {
