@@ -153,7 +153,7 @@ Commands:
     ipc server start [save]
         - Start the default IPC server.
           Returns the server address on success, `false` otherwise.
-          `save` argument:
+          [save] argument:
               - `false` - default, save off.
               - `true` - saves server address as `.ipc-address` in same directory as CLI executable's.
               - Any other string is used as custom path for the save.
@@ -1689,6 +1689,19 @@ Future<void> executeCommand(List<String> command,
           if (command.length == 2) break;
           switch (command[2]) {
             case 'start':
+              File? save;
+              if (command.length == 3) {
+                save = null;
+              } else {
+                String detachedString = command[3];
+                try {
+                  if (pcommon.boolFromString(detachedString)!) {
+                    save = File('.ipc-address');
+                  }
+                } catch (_) {
+                  save = File(detachedString);
+                }
+              }
               ServerSocket serverSocket =
                   await ServerSocket.bind('127.0.0.1', 0);
               serverSocket.listen((Socket socket) {
@@ -1739,6 +1752,19 @@ Future<void> executeCommand(List<String> command,
                 socket
                     .writeln('Passy CLI Shell v$passyShellVersion IPC server.');
               }, onError: (Object error) => {});
+              if (save != null) {
+                try {
+                  await save.writeAsString(
+                      "${serverSocket.address.address}:${serverSocket.port}");
+                } catch (e, s) {
+                  log('passy:ipc:server:start:Failed to save to file:\n$e\n$s',
+                      id: id);
+                  try {
+                    await serverSocket.close();
+                  } catch (_) {}
+                  return;
+                }
+              }
               log("${serverSocket.address.address}:${serverSocket.port}",
                   id: id);
               return;
