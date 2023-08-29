@@ -1146,6 +1146,11 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
+              if (port < 0) {
+                log('passy:sync:host:classic:Port must be 0 or bigger.',
+                    id: id);
+                return;
+              }
               bool detached;
               if (command.length < 7) {
                 detached = false;
@@ -1266,6 +1271,10 @@ Future<void> executeCommand(List<String> command,
               } catch (_) {
                 log('passy:sync:host:2d0d0:`$portString` is not a valid integer.',
                     id: id);
+                return;
+              }
+              if (port < 0) {
+                log('passy:sync:host:2d0d0:Port must be 0 or bigger.', id: id);
                 return;
               }
               Completer<void> onStop = Completer<void>();
@@ -1440,7 +1449,12 @@ Future<void> executeCommand(List<String> command,
               try {
                 port = int.parse(portString);
               } catch (_) {
-                log('passy:sync:host:classic:`$portString` is not a valid integer.',
+                log('passy:sync:connect:classic:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              if (port < 0) {
+                log('passy:sync:connect:classic:Port must be 0 or bigger.',
                     id: id);
                 return;
               }
@@ -1539,6 +1553,11 @@ Future<void> executeCommand(List<String> command,
                 port = int.parse(portString);
               } catch (_) {
                 log('passy:sync:connect:2d0d0:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              if (port < 0) {
+                log('passy:sync:connect:2d0d0:Port must be 0 or bigger.',
                     id: id);
                 return;
               }
@@ -1711,6 +1730,10 @@ Future<void> executeCommand(List<String> command,
           } catch (_) {
             log('passy:install:server:`$portString` is not a valid integer.',
                 id: id);
+            return;
+          }
+          if (port < 0) {
+            log('passy:install:server:Port must be 0 or bigger.', id: id);
             return;
           }
           String path = command[2];
@@ -1888,7 +1911,8 @@ Future<void> executeCommand(List<String> command,
               if (command.length == 3) break;
               List<String> arg4 = command[3].split(':');
               if (arg4.length < 2) {
-                log('passy:ipc:server:start:Invalid address provided.', id: id);
+                log('passy:ipc:server:connect:Invalid address provided.',
+                    id: id);
                 return;
               }
               String host = arg4.first;
@@ -1897,7 +1921,12 @@ Future<void> executeCommand(List<String> command,
               try {
                 port = int.parse(portString);
               } catch (_) {
-                log('passy:ipc:server:start:`$portString` is not a valid integer.',
+                log('passy:ipc:server:connect:`$portString` is not a valid integer.',
+                    id: id);
+                return;
+              }
+              if (port < 0) {
+                log('passy:ipc:server:connect:Port must be 0 or bigger.',
                     id: id);
                 return;
               }
@@ -1924,6 +1953,10 @@ Future<void> executeCommand(List<String> command,
               } catch (_) {
                 log('passy:ipc:server:run:`$portString` is not a valid integer.',
                     id: id);
+                return;
+              }
+              if (port < 0) {
+                log('passy:ipc:server:run:Port must be 0 or bigger.', id: id);
                 return;
               }
               try {
