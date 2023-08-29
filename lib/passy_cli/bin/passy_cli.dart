@@ -1371,13 +1371,14 @@ Future<void> executeCommand(List<String> command,
                 serviceInfo:
                     'Passy cross-platform password manager entry synchronization server v${pcommon.syncVersion}',
               );
+              _syncCloseMethods['$host:$port'] = () async {
+                await glareHost.stop();
+                onStop.complete();
+              };
               if (!detached) {
-                _syncCloseMethods[host] = () async {
-                  await glareHost.stop();
-                  onStop.complete();
-                };
                 await onStop.future;
               }
+              log('$host:$port');
               return;
           }
           break;
