@@ -109,6 +109,9 @@ Commands:
           Returns the file path on success.
     install full <path>
         - Copy all Passy CLI files to the specified path.
+    install server <path> <address> <port>
+        - Copy all Passy CLI files to the specified path and include a server autorun script.
+          Recommended port: 5592.
 
     uninstall full <path>
         - Remove all Passy CLI files from the specified path.
@@ -1656,6 +1659,34 @@ Future<void> executeCommand(List<String> command,
             return;
           }
           log(exe.path, id: id);
+          return;
+        case 'server':
+          if (command.length < 5) break;
+          String address = command[3];
+          String portString = command[4];
+          int port;
+          try {
+            port = int.parse(portString);
+          } catch (_) {
+            log('passy:install:server:`$portString` is not a valid integer.',
+                id: id);
+            return;
+          }
+          String path = command[2];
+          File exeFile;
+          try {
+            exeFile = await pcommon.copyPassyCLIServer(
+              from: File(Platform.resolvedExecutable).parent,
+              to: Directory(path),
+              address: address,
+              port: port,
+            );
+          } catch (e, s) {
+            log('passy:install:server:Failed to install executable:\n$e\n$s',
+                id: id);
+            return;
+          }
+          log(exeFile.path, id: id);
           return;
       }
       break;

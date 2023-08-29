@@ -460,3 +460,25 @@ Future<File> copyPassyCLI(Directory from, Directory to) async {
   }
   return File(to.path + Platform.pathSeparator + _cliFiles.first);
 }
+
+const String _passyServerAutorun = '''
+upgrade full "\$INSTALL_PATH"
+sync host 2d0d0 \$SERVER_ADDRESS \$SERVER_PORT true
+ipc server start true
+''';
+
+Future<File> copyPassyCLIServer({
+  required Directory from,
+  required Directory to,
+  required String address,
+  int port = 5592,
+}) async {
+  File copy = await copyPassyCLI(from, to);
+  File autorunFile =
+      File(copy.parent.path + Platform.pathSeparator + 'autorun.pcli');
+  await autorunFile.writeAsString(_passyServerAutorun
+      .replaceFirst('\$INSTALL_PATH', from.path)
+      .replaceFirst('\$SERVER_ADDRESS', address)
+      .replaceFirst('\$SERVER_PORT', port.toString()));
+  return copy;
+}
