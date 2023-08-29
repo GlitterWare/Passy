@@ -118,6 +118,7 @@ Commands:
     upgrade <path>
         - Replace self with files from the specified path.
           CLI will exit during this process.
+          If part of the `run` command, CLI will be relaunched to execute the remaining `run` commands.
 
   Development
     native_messaging start
@@ -187,8 +188,6 @@ List<String> upgradeCommands = [
   '\$',
   'dirname \$ \$0 \$',
   '\$',
-  ';;',
-  'exit'
 ];
 
 const String passyShellVersion = '1.0.0';
@@ -213,6 +212,8 @@ Map<String, Encrypter> _encrypters = {};
 Map<String, Encrypter> _syncEncrypters = {};
 Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
+String _curRunFile = '';
+int _curRunIndex = 0;
 
 Future<List<String>> parseCommand(List<String> command) async {
   List<String> parsedCommand = [];
@@ -690,9 +691,14 @@ Future<void> executeCommand(List<String> command,
           return;
         }
       }
+      _curRunFile = file.path;
+      _curRunIndex = index;
       for (List<String> command in commands) {
+        _curRunIndex++;
         await executeCommand(command);
       }
+      _curRunFile = '';
+      _curRunIndex = 0;
       return;
     case 'sleep':
       if (command.length == 1) break;
@@ -1689,7 +1695,17 @@ Future<void> executeCommand(List<String> command,
                 id: id);
             return;
           }
-          await Process.start(copy.path, upgradeCommands,
+          await Process.start(
+              copy.path,
+              [
+                ...upgradeCommands,
+                if (_curRunFile.isNotEmpty) ...[
+                  ';;',
+                  'run',
+                  _curRunFile,
+                  _curRunIndex.toString(),
+                ],
+              ],
               mode: ProcessStartMode.detached);
           log(copy.path + '\n', id: id);
           cleanup();
