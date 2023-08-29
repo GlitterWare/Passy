@@ -113,6 +113,10 @@ Commands:
     uninstall dir <path>
         - Recursively delete a directory.
 
+    upgrade <path>
+        - Replace self with files from the specified path.
+          CLI will exit during this process.
+
   Development
     native_messaging start
         - Start in native messaging mode.
@@ -162,6 +166,28 @@ Commands:
     ipc server disconnect
         - Disconnect from an IPC server.
 ''';
+
+List<String> upgradeCommands = [
+  'sleep',
+  '500',
+  ';',
+  'install',
+  'full',
+  File(Platform.resolvedExecutable).parent.path,
+  ';',
+  'exec',
+  Platform.resolvedExecutable,
+  'sleep',
+  '500',
+  ';;',
+  'uninstall',
+  'dir',
+  '\$',
+  'dirname \$ \$0 \$',
+  '\$',
+  ';;',
+  'exit'
+];
 
 const String passyShellVersion = '1.0.0';
 // Worst case scenario: all characters weigh 4 bytes and each is escaped
@@ -577,6 +603,36 @@ Future<void> _ipcConnect(
   await onDone.future;
   _secondaryInput = null;
   _pauseMainInput = false;
+}
+
+Future<File> installCLITemp({Directory? from}) async {
+  from ??= File(Platform.resolvedExecutable).parent;
+  File copy;
+  Directory copyDir = Directory(Directory.systemTemp.path +
+      Platform.pathSeparator +
+      'passy_cli' +
+      Platform.pathSeparator +
+      'bin' +
+      Platform.pathSeparator +
+      'passy_cli');
+  if (await copyDir.exists()) {
+    List<FileSystemEntity> files = await copyDir.list().toList();
+    for (FileSystemEntity file in files) {
+      try {
+        // Write to test if the file is locked (required on Unix systems)
+        await File(file.path).writeAsString('');
+        await file.delete();
+      } catch (_) {}
+    }
+  } else {
+    await copyDir.create(recursive: true);
+  }
+  String copyPath = copyDir.path +
+      Platform.pathSeparator +
+      'passy_cli_' +
+      DateTime.now().toIso8601String().replaceAll(':', ';');
+  copy = await pcommon.copyPassyCLI(from, Directory(copyPath));
+  return copy;
 }
 
 Future<void> executeCommand(List<String> command,
@@ -1544,33 +1600,9 @@ Future<void> executeCommand(List<String> command,
       if (command.length == 1) break;
       switch (command[1]) {
         case 'temp':
-          File? copy;
-          Directory copyDir = Directory(Directory.systemTemp.path +
-              Platform.pathSeparator +
-              'passy_cli' +
-              Platform.pathSeparator +
-              'bin' +
-              Platform.pathSeparator +
-              'passy_cli');
-          if (await copyDir.exists()) {
-            List<FileSystemEntity> files = await copyDir.list().toList();
-            for (FileSystemEntity file in files) {
-              try {
-                // Write to test if the file is locked (required on Unix systems)
-                await File(file.path).writeAsString('');
-                await file.delete();
-              } catch (_) {}
-            }
-          } else {
-            await copyDir.create(recursive: true);
-          }
-          String copyPath = copyDir.path +
-              Platform.pathSeparator +
-              'passy_cli_' +
-              DateTime.now().toIso8601String().replaceAll(':', ';');
+          File copy;
           try {
-            copy = await pcommon.copyPassyCLI(
-                File(Platform.resolvedExecutable).parent, Directory(copyPath));
+            copy = await installCLITemp();
           } catch (e, s) {
             log('passy:install:temp:Failed to install executable:\n$e\n$s',
                 id: id);
@@ -1614,10 +1646,30 @@ Future<void> executeCommand(List<String> command,
           try {
             await installPath.delete(recursive: true);
           } catch (e, s) {
-            log('passy:uninstall:full:Failed to uninstall:\n$e\n$s');
+            log('passy:uninstall:dir:Failed to uninstall:\n$e\n$s');
             return;
           }
           log('true', id: id);
+          return;
+      }
+      break;
+    case 'upgrade':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'full':
+          if (command.length == 2) break;
+          File copy;
+          try {
+            copy = await installCLITemp(from: Directory(command[2]));
+          } catch (e, s) {
+            log('passy:upgrade:full:Failed to install executable:\n$e\n$s',
+                id: id);
+            return;
+          }
+          await Process.start(copy.path, upgradeCommands,
+              mode: ProcessStartMode.detached);
+          log(copy.path + '\n', id: id);
+          cleanup();
           return;
       }
       break;
