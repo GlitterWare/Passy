@@ -54,6 +54,8 @@ Commands:
     \$0             Get current executable path.
     dirname <path>
         - Remove file suffix from path.
+    echo [[arguments]]
+        - Print out supplied arguments.
 
   Version
     version shell  Show shell version.
@@ -743,6 +745,10 @@ Future<void> executeCommand(List<String> command,
       } catch (_) {
         log('.', id: id);
       }
+      return;
+    case 'echo':
+      if (command.length == 1) break;
+      log(command.sublist(1).join(' '), id: id);
       return;
     case 'version':
       if (command.length == 1) break;
