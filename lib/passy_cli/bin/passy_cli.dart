@@ -45,7 +45,9 @@ Commands:
   General
     help           Display this message.
     exit           Exit the interactive mode.
-    run <file>     Execute commands separated by newlines from file.
+    run <file> [index]
+        - Execute commands separated by newlines from file.
+          Skips all commands before [index], if specified
     sleep <ms>     Pause execution for <ms> milliseconds.
     exec <command> [[arguments]]
         - Execute native command in detached mode.
@@ -649,6 +651,18 @@ Future<void> executeCommand(List<String> command,
     case 'run':
       if (command.length == 1) break;
       File file = File(command[1]);
+      int index;
+      if (command.length == 2) {
+        index = 0;
+      } else {
+        String indexString = command[2];
+        try {
+          index = int.parse(indexString);
+        } catch (_) {
+          log('passy:run:`$indexString` is not a valid integer.', id: id);
+          return;
+        }
+      }
       List<List<String>> commands = [];
       try {
         String contents = await file.readAsString();
@@ -666,6 +680,15 @@ Future<void> executeCommand(List<String> command,
       } catch (e, s) {
         log('passy:run:Could not parse file:\n$e\n$s', id: id);
         return;
+      }
+      if (index != 0) {
+        if (index < commands.length) {
+          commands = commands.sublist(index);
+        } else {
+          log('passy:run:Specified index is same as or bigger than commands length: $index >= ${commands.length}.',
+              id: id);
+          return;
+        }
       }
       for (List<String> command in commands) {
         await executeCommand(command);
