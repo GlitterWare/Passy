@@ -205,7 +205,7 @@ final List<String> upgradeCommands = [
   '\$',
 ];
 
-const String passyShellVersion = '1.0.0';
+const String passyShellVersion = '2.0.0';
 // Worst case scenario: all characters weigh 4 bytes and each is escaped
 // (1000000/4)/2
 // + minus the extra messaging space
