@@ -691,6 +691,7 @@ Future<void> executeCommand(List<String> command,
       cleanup();
       return;
     case 'run':
+      if (_isNativeMessaging) break;
       if (command.length == 1) break;
       File file = File(command[1]);
       int index;
@@ -754,6 +755,7 @@ Future<void> executeCommand(List<String> command,
       await Future.delayed(Duration(milliseconds: ms));
       return;
     case 'exec':
+      if (_isNativeMessaging) break;
       if (command.length == 1) break;
       String program = command[1];
       List<String> args;
@@ -1692,6 +1694,7 @@ Future<void> executeCommand(List<String> command,
       }
       break;
     case 'install':
+      if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
         case 'temp':
@@ -1755,6 +1758,7 @@ Future<void> executeCommand(List<String> command,
       }
       break;
     case 'uninstall':
+      if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
         case 'full':
@@ -1781,6 +1785,7 @@ Future<void> executeCommand(List<String> command,
       }
       break;
     case 'upgrade':
+      if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
         case 'full':
@@ -1820,6 +1825,7 @@ Future<void> executeCommand(List<String> command,
       }
       break;
     case 'ipc':
+      if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
         case 'server':
