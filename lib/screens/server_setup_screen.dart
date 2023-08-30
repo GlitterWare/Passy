@@ -120,9 +120,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       );
       return;
     }
-    GlareClient? client;
     try {
-      client = await connectTo2d0d0Server(address, _port);
+      await _account.testSynchronizationConnection2d0d0(address, _port);
     } catch (e, s) {
       showSnackBar(
         context,
@@ -140,9 +139,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       setState(() => _connectionChecked = false);
       return;
     }
-    try {
-      await client.disconnect();
-    } catch (_) {}
     setState(() => _connectionChecked = true);
   }
 

@@ -19,6 +19,7 @@ import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'favorites.dart';
+import 'glare/glare_client.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
@@ -298,6 +299,18 @@ class LoadedAccount {
       onComplete: onComplete,
       onError: onError,
     );
+  }
+
+  Future<void> testSynchronizationConnection2d0d0(
+      String address, int port) async {
+    GlareClient? client;
+    client = await connectTo2d0d0Server(address, port,
+        keypair: _settings.value.rsaKeypair);
+    try {
+      await client.disconnect();
+    } catch (_) {
+      return;
+    }
   }
 
   Future<HostAddress?> host({
