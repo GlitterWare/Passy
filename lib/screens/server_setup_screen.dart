@@ -430,7 +430,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
-                                text: ' Synchronization server ',
+                                text: ' Synchronization servers ',
                                 style: TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
