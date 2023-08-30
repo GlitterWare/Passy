@@ -121,7 +121,7 @@ Commands:
     uninstall dir <path>
         - Recursively delete a directory.
 
-    upgrade <path>
+    upgrade full <path>
         - Replace self with files from the specified path.
           CLI will exit during this process.
           If part of the `run` command, CLI will be relaunched to execute the remaining `run` commands.
