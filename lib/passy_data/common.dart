@@ -455,8 +455,8 @@ List<String> _cliFiles = [
 Future<void> removePassyCLI(Directory directory) async {
   List<String> files = [
     ..._cliFiles,
-    'autostart_add' + (Platform.isWindows ? '.bat' : '.sh'),
-    'autostart_del' + (Platform.isWindows ? '.bat' : '.sh'),
+    'autostart_add' + (Platform.isWindows ? '.bat' : ''),
+    'autostart_del' + (Platform.isWindows ? '.bat' : ''),
   ];
   for (String fileName in files) {
     if (fileName.isEmpty) continue;
