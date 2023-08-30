@@ -78,6 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
       std::wstring command = L"start " + path + cliArgs;
       std::string commandShort = wchar_to_UTF8(command.c_str());
       std::system(commandShort.c_str());
+      ::CoUninitialize();
       return EXIT_SUCCESS;
     }
   }
