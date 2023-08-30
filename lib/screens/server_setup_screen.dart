@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/glare/glare_client.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
@@ -24,6 +25,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
   final LoadedAccount _account = data.loadedAccount!;
   String? _address;
   int _port = 5592;
+  bool _connectionChecked = false;
 
   Future<void> _onInstallPressed() async {
     String? address = _address;
@@ -87,6 +89,61 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       );
       return;
     }
+  }
+
+  Future<void> _onCheckPressed() async {
+    String? address = _address;
+    if (address == null) {
+      showSnackBar(
+        context,
+        message: 'Host address is empty',
+        icon: const Icon(Icons.desktop_windows_rounded,
+            color: PassyTheme.darkContentColor),
+      );
+      return;
+    }
+    if (address.isEmpty) {
+      showSnackBar(
+        context,
+        message: 'Host address is empty',
+        icon: const Icon(Icons.desktop_windows_rounded,
+            color: PassyTheme.darkContentColor),
+      );
+      return;
+    }
+    if (_port == 0) {
+      showSnackBar(
+        context,
+        message: 'Invalid port specified',
+        icon: const Icon(Icons.numbers_rounded,
+            color: PassyTheme.darkContentColor),
+      );
+      return;
+    }
+    GlareClient? client;
+    try {
+      client = await connectTo2d0d0Server(address, _port);
+    } catch (e, s) {
+      showSnackBar(
+        context,
+        message: "Could not connect to server",
+        icon: const Icon(
+          Icons.cast_rounded,
+          color: PassyTheme.darkContentColor,
+        ),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
+      setState(() => _connectionChecked = false);
+      return;
+    }
+    try {
+      await client.disconnect();
+    } catch (_) {}
+    setState(() => _connectionChecked = true);
   }
 
   @override
@@ -249,7 +306,53 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           textScaleFactor: 1.25,
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            text: '4. (Optional) ',
+                            text: '4. ',
+                            children: [
+                              TextSpan(
+                                text: 'Check connection:',
+                                style: TextStyle(
+                                    color:
+                                        PassyTheme.lightContentSecondaryColor),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                              child: PassyPadding(ThreeWidgetButton(
+                                  center: Text('Check connection'),
+                                  left: const Padding(
+                                    padding: EdgeInsets.only(right: 30),
+                                    child: Icon(Icons.cast_rounded),
+                                  ),
+                                  right: const Icon(
+                                      Icons.arrow_forward_ios_rounded),
+                                  onPressed: () => _onCheckPressed()))),
+                          if (!_connectionChecked)
+                            const Flexible(
+                                child: PassyPadding(Icon(
+                              Icons.close,
+                              color: Colors.red,
+                              size: 35,
+                            ))),
+                          if (_connectionChecked)
+                            const Flexible(
+                                child: PassyPadding(Icon(
+                              Icons.check,
+                              color: Colors.green,
+                              size: 35,
+                            ))),
+                        ],
+                      ),
+                      PassyPadding(
+                        RichText(
+                          textScaleFactor: 1.25,
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: '5. (Optional) ',
                             children: [
                               TextSpan(
                                 text: 'Add server to autostart:',
@@ -283,7 +386,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           textScaleFactor: 1.25,
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            text: '5. ',
+                            text: '6. ',
                             children: [
                               TextSpan(
                                 text: 'Connect to server:',

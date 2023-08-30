@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:characters/characters.dart';
+import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
+import 'package:crypton/crypton.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:intranet_ip/intranet_ip.dart';
@@ -11,6 +13,7 @@ import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
+import 'glare/glare_client.dart';
 import 'key_derivation_type.dart';
 
 const String passyVersion = '1.6.0';
@@ -577,4 +580,17 @@ Future<File> copyPassyCLIServer({
     rethrow;
   }
   return copy;
+}
+
+Future<GlareClient> connectTo2d0d0Server(String address, int port,
+    {RSAKeypair? keypair}) async {
+  keypair ??= await compute<dynamic, RSAKeypair>(
+      (message) => RSAKeypair.fromRandom(keySize: 2048), null);
+  GlareClient? client;
+  client = await GlareClient.connect(
+    host: address,
+    port: port,
+    keypair: keypair,
+  );
+  return client;
 }
