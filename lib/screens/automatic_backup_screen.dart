@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/auto_backup_settings.dart';
+import 'package:passy/passy_flutter/common/backup_interval_unit.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'common.dart';
@@ -16,75 +17,36 @@ class AutomaticBackupScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _AutomaticBackupScreen();
 }
 
-enum _BackupIntervalUnit {
-  years,
-  months,
-  weeks,
-  days,
-  hours,
-  minutes,
-  seconds,
-}
-
-abstract class _BackupIntervalUnitsInMilliseconds {
-  static const int year = 31556952000;
-  static const int month = 2629746000;
-  static const int week = 604800000;
-  static const int day = 86400000;
-  static const int hour = 3600000;
-  static const int minute = 60000;
-  static const int second = 1000;
-
-  static int getByUnit(_BackupIntervalUnit unit) {
-    switch (unit) {
-      case _BackupIntervalUnit.years:
-        return year;
-      case _BackupIntervalUnit.months:
-        return month;
-      case _BackupIntervalUnit.weeks:
-        return week;
-      case _BackupIntervalUnit.days:
-        return day;
-      case _BackupIntervalUnit.hours:
-        return hour;
-      case _BackupIntervalUnit.minutes:
-        return minute;
-      case _BackupIntervalUnit.seconds:
-        return second;
-    }
-  }
-}
-
 class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
   final _account = data.loadedAccount!;
   int _buInterval = 1;
-  _BackupIntervalUnit _buIntervalUnits = _BackupIntervalUnit.weeks;
+  BackupIntervalUnit _buIntervalUnits = BackupIntervalUnit.weeks;
 
   Future<void> _onBuIntervalChanged(String value) async {
     if (value == '') return;
     setState(() => _buInterval = int.parse(value));
     int _val = _buInterval;
     switch (_buIntervalUnits) {
-      case _BackupIntervalUnit.years:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.year;
+      case BackupIntervalUnit.years:
+        _val = _val * BackupIntervalUnitsInMilliseconds.year;
         break;
-      case _BackupIntervalUnit.months:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.month;
+      case BackupIntervalUnit.months:
+        _val = _val * BackupIntervalUnitsInMilliseconds.month;
         break;
-      case _BackupIntervalUnit.weeks:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.week;
+      case BackupIntervalUnit.weeks:
+        _val = _val * BackupIntervalUnitsInMilliseconds.week;
         break;
-      case _BackupIntervalUnit.days:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.day;
+      case BackupIntervalUnit.days:
+        _val = _val * BackupIntervalUnitsInMilliseconds.day;
         break;
-      case _BackupIntervalUnit.hours:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.hour;
+      case BackupIntervalUnit.hours:
+        _val = _val * BackupIntervalUnitsInMilliseconds.hour;
         break;
-      case _BackupIntervalUnit.minutes:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.minute;
+      case BackupIntervalUnit.minutes:
+        _val = _val * BackupIntervalUnitsInMilliseconds.minute;
         break;
-      case _BackupIntervalUnit.seconds:
-        _val = _val * _BackupIntervalUnitsInMilliseconds.second;
+      case BackupIntervalUnit.seconds:
+        _val = _val * BackupIntervalUnitsInMilliseconds.second;
         break;
     }
     _account.autoBackup!.lastBackup = DateTime.now().toUtc();
@@ -93,7 +55,7 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
     data.refreshAccounts();
   }
 
-  Future<void> _onBuIntervalUnitsChanged(_BackupIntervalUnit? value) async {
+  Future<void> _onBuIntervalUnitsChanged(BackupIntervalUnit? value) async {
     if (value == null) return;
     setState(() => _buIntervalUnits = value);
     await _onBuIntervalChanged(_buInterval.toString());
@@ -138,9 +100,9 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
     super.initState();
     if (_account.autoBackup == null) return;
     int _intervalMs = _account.autoBackup!.backupInterval;
-    bool _setInterval(_BackupIntervalUnit unit) {
+    bool _setInterval(BackupIntervalUnit unit) {
       double _interval = _intervalMs.toDouble() /
-          _BackupIntervalUnitsInMilliseconds.getByUnit(unit);
+          BackupIntervalUnitsInMilliseconds.getByUnit(unit);
       int _intervalInt = _interval.toInt();
       if (_intervalInt != _interval) return false;
       _buIntervalUnits = unit;
@@ -148,13 +110,13 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
       return true;
     }
 
-    if (_setInterval(_BackupIntervalUnit.years)) return;
-    if (_setInterval(_BackupIntervalUnit.months)) return;
-    if (_setInterval(_BackupIntervalUnit.weeks)) return;
-    if (_setInterval(_BackupIntervalUnit.days)) return;
-    if (_setInterval(_BackupIntervalUnit.hours)) return;
-    if (_setInterval(_BackupIntervalUnit.minutes)) return;
-    if (_setInterval(_BackupIntervalUnit.seconds)) return;
+    if (_setInterval(BackupIntervalUnit.years)) return;
+    if (_setInterval(BackupIntervalUnit.months)) return;
+    if (_setInterval(BackupIntervalUnit.weeks)) return;
+    if (_setInterval(BackupIntervalUnit.days)) return;
+    if (_setInterval(BackupIntervalUnit.hours)) return;
+    if (_setInterval(BackupIntervalUnit.minutes)) return;
+    if (_setInterval(BackupIntervalUnit.seconds)) return;
   }
 
   @override
@@ -202,9 +164,9 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
                   ),
                 ),
                 Flexible(
-                  child: EnumDropDownButtonFormField<_BackupIntervalUnit>(
+                  child: EnumDropDownButtonFormField<BackupIntervalUnit>(
                     value: _buIntervalUnits,
-                    values: _BackupIntervalUnit.values,
+                    values: BackupIntervalUnit.values,
                     onChanged: _onBuIntervalUnitsChanged,
                   ),
                 )
