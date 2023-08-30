@@ -1,4 +1,4 @@
-enum BackupIntervalUnit {
+enum IntervalUnit {
   years,
   months,
   weeks,
@@ -8,7 +8,7 @@ enum BackupIntervalUnit {
   seconds,
 }
 
-abstract class BackupIntervalUnitsInMilliseconds {
+abstract class IntervalUnitsInMilliseconds {
   static const int year = 31556952000;
   static const int month = 2629746000;
   static const int week = 604800000;
@@ -17,21 +17,21 @@ abstract class BackupIntervalUnitsInMilliseconds {
   static const int minute = 60000;
   static const int second = 1000;
 
-  static int getByUnit(BackupIntervalUnit unit) {
+  static int getByUnit(IntervalUnit unit) {
     switch (unit) {
-      case BackupIntervalUnit.years:
+      case IntervalUnit.years:
         return year;
-      case BackupIntervalUnit.months:
+      case IntervalUnit.months:
         return month;
-      case BackupIntervalUnit.weeks:
+      case IntervalUnit.weeks:
         return week;
-      case BackupIntervalUnit.days:
+      case IntervalUnit.days:
         return day;
-      case BackupIntervalUnit.hours:
+      case IntervalUnit.hours:
         return hour;
-      case BackupIntervalUnit.minutes:
+      case IntervalUnit.minutes:
         return minute;
-      case BackupIntervalUnit.seconds:
+      case IntervalUnit.seconds:
         return second;
     }
   }
