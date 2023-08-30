@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/auto_backup_settings.dart';
-import 'package:passy/passy_flutter/common/backup_interval_unit.dart';
+import 'package:passy/passy_flutter/common/interval_unit.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import 'common.dart';
