@@ -309,7 +309,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '4. ',
                             children: [
                               TextSpan(
-                                text: 'Check connection:',
+                                text: 'Test connection:',
                                 style: TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
@@ -323,7 +323,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         children: [
                           Flexible(
                               child: PassyPadding(ThreeWidgetButton(
-                                  center: Text('Check connection'),
+                                  center: Text('Test connection'),
                                   left: const Padding(
                                     padding: EdgeInsets.only(right: 30),
                                     child: Icon(Icons.cast_rounded),
