@@ -98,7 +98,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                   TextSpan(text: '  ${localizations.keyDerivationWarning2}'),
                 ]),
                 textAlign: TextAlign.center,
-                textScaleFactor: 1.2,
+                textScaleFactor: 1.25,
               )),
               const SizedBox(height: 24),
               PassyPadding(RichText(
@@ -111,7 +111,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                   TextSpan(text: '  ${localizations.keyDerivationWarning3}'),
                 ]),
                 textAlign: TextAlign.center,
-                textScaleFactor: 1.2,
+                textScaleFactor: 1.25,
               )),
               const SizedBox(height: 24),
               Container(
