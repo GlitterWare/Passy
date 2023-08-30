@@ -35,4 +35,23 @@ abstract class IntervalUnitsInMilliseconds {
         return second;
     }
   }
+
+  static int toMilliseconds({required int value, required IntervalUnit unit}) {
+    switch (unit) {
+      case IntervalUnit.years:
+        return value * IntervalUnitsInMilliseconds.year;
+      case IntervalUnit.months:
+        return value * IntervalUnitsInMilliseconds.month;
+      case IntervalUnit.weeks:
+        return value * IntervalUnitsInMilliseconds.week;
+      case IntervalUnit.days:
+        return value * IntervalUnitsInMilliseconds.day;
+      case IntervalUnit.hours:
+        return value * IntervalUnitsInMilliseconds.hour;
+      case IntervalUnit.minutes:
+        return value * IntervalUnitsInMilliseconds.minute;
+      case IntervalUnit.seconds:
+        return value * IntervalUnitsInMilliseconds.second;
+    }
+  }
 }

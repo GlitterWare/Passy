@@ -26,29 +26,8 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
     if (value == '') return;
     setState(() => _buInterval = int.parse(value));
     int _val = _buInterval;
-    switch (_buIntervalUnits) {
-      case IntervalUnit.years:
-        _val = _val * IntervalUnitsInMilliseconds.year;
-        break;
-      case IntervalUnit.months:
-        _val = _val * IntervalUnitsInMilliseconds.month;
-        break;
-      case IntervalUnit.weeks:
-        _val = _val * IntervalUnitsInMilliseconds.week;
-        break;
-      case IntervalUnit.days:
-        _val = _val * IntervalUnitsInMilliseconds.day;
-        break;
-      case IntervalUnit.hours:
-        _val = _val * IntervalUnitsInMilliseconds.hour;
-        break;
-      case IntervalUnit.minutes:
-        _val = _val * IntervalUnitsInMilliseconds.minute;
-        break;
-      case IntervalUnit.seconds:
-        _val = _val * IntervalUnitsInMilliseconds.second;
-        break;
-    }
+    _val = IntervalUnitsInMilliseconds.toMilliseconds(
+        value: _val, unit: _buIntervalUnits);
     _account.autoBackup!.lastBackup = DateTime.now().toUtc();
     _account.autoBackup!.backupInterval = _val;
     await _account.saveLocalSettings();
