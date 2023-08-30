@@ -24,6 +24,7 @@ import 'screens/credentials_screen.dart';
 import 'screens/csv_import_screen.dart';
 import 'screens/csv_import_entries_screen.dart';
 import 'screens/remove_account_screen.dart';
+import 'screens/server_setup_screen.dart';
 import 'screens/setup_screen.dart';
 import 'screens/security_screen.dart';
 import 'screens/edit_note_screen.dart';
@@ -171,6 +172,7 @@ class Passy extends StatelessWidget {
         RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),
         SearchScreen.routeName: (context) => const SearchScreen(),
         SecurityScreen.routeName: (context) => const SecurityScreen(),
+        ServerSetupScreen.routeName: (context) => const ServerSetupScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SetupScreen.routeName: (context) => const SetupScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
