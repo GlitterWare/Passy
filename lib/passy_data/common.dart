@@ -43,6 +43,17 @@ bool isLineDelimiter(String priorChar, String char, String lineDelimiter) {
   return '$priorChar$char' == lineDelimiter;
 }
 
+Future<bool> chmod(List<String> args) async {
+  ProcessResult result = Process.runSync('/usr/bin/chmod', args);
+  if (result.stderr.isNotEmpty) return false;
+  if (result.exitCode > 0) return false;
+  return true;
+}
+
+Future<bool> setExecutionEnabled(String path, bool permission) {
+  return chmod(['${permission ? '+' : '-'}x', path]);
+}
+
 /// Reads one line and returns its contents.
 ///
 /// If end-of-file has been reached and the line is empty null is returned.
@@ -442,7 +453,12 @@ List<String> _cliFiles = [
 ];
 
 Future<void> removePassyCLI(Directory directory) async {
-  for (String fileName in _cliFiles) {
+  List<String> files = [
+    ..._cliFiles,
+    'autostart_add' + (Platform.isWindows ? '.bat' : '.sh'),
+    'autostart_del' + (Platform.isWindows ? '.bat' : '.sh'),
+  ];
+  for (String fileName in files) {
     if (fileName.isEmpty) continue;
     File toFile = File(directory.path + Platform.pathSeparator + fileName);
     Directory toParent = toFile.parent;
@@ -493,6 +509,16 @@ sync host 2d0d0 \$SERVER_ADDRESS \$SERVER_PORT true
 ipc server start true
 ''';
 
+String _serverAutostartScriptLinux = '''
+cd \$(dirname \$0)
+./passy_cli --no-autorun autostart add Passy-CLI-Server "\$PWD/passy_cli"
+''';
+
+String _serverAutostartScriptWindows = '''
+SET "PASSY_PATH=%~dp0passy_cli.exe"
+call "%%PASSY_PATH%%" --no-autorun autostart add Passy-CLI-Server "%%PASSY_PATH%%"
+''';
+
 Future<File> copyPassyCLIServer({
   required Directory from,
   required Directory to,
@@ -502,9 +528,53 @@ Future<File> copyPassyCLIServer({
   File copy = await copyPassyCLI(from, to);
   File autorunFile =
       File(copy.parent.path + Platform.pathSeparator + 'autorun.pcli');
-  await autorunFile.writeAsString(_passyServerAutorun
-      .replaceFirst('\$INSTALL_PATH', from.path)
-      .replaceFirst('\$SERVER_ADDRESS', address)
-      .replaceFirst('\$SERVER_PORT', port.toString()));
+  try {
+    await autorunFile.writeAsString(_passyServerAutorun
+        .replaceFirst('\$INSTALL_PATH', from.path)
+        .replaceFirst('\$SERVER_ADDRESS', address)
+        .replaceFirst('\$SERVER_PORT', port.toString()));
+  } catch (_) {
+    await removePassyCLI(to);
+    rethrow;
+  }
+  try {
+    File autostartAdd = File(to.path +
+        Platform.pathSeparator +
+        'autostart_add' +
+        (Platform.isWindows ? '.bat' : '.sh'));
+    File autostartDel = File(to.path +
+        Platform.pathSeparator +
+        'autostart_del' +
+        (Platform.isWindows ? '.bat' : '.sh'));
+    if (await autostartAdd.exists()) {
+      try {
+        await autostartAdd.delete();
+      } catch (_) {}
+    }
+    if (await autostartDel.exists()) {
+      try {
+        await autostartDel.delete();
+      } catch (_) {}
+    }
+    try {
+      String script = Platform.isWindows
+          ? _serverAutostartScriptWindows
+          : _serverAutostartScriptLinux;
+      await autostartAdd.create();
+      await autostartDel.create();
+      await autostartAdd.writeAsString(script);
+      await autostartDel.writeAsString(script.replaceFirst('add', 'del'));
+      if (Platform.isLinux) {
+        await setExecutionEnabled(autostartAdd.path, true);
+        await setExecutionEnabled(autostartDel.path, true);
+      }
+    } catch (_) {
+      await removePassyCLI(to);
+      rethrow;
+    }
+  } catch (_) {
+    await removePassyCLI(to);
+    rethrow;
+  }
   return copy;
 }
