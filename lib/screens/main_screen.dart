@@ -404,11 +404,13 @@ class _MainScreen extends State<MainScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (!MainScreen.shouldLockScreen) return;
+    if (data.loadedAccount == null) return;
     if (_unlockScreenOn) return;
     if (data.loadedAccount?.autoScreenLock == false) return;
     _unlockScreenOn = true;
-    Navigator.pushNamed(context, UnlockScreen.routeName)
-        .then((value) => _unlockScreenOn = false);
+    Navigator.pushNamed(context, UnlockScreen.routeName).then((value) =>
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => _unlockScreenOn = false));
   }
 
   @override

@@ -28,6 +28,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   static const routeName = '/login';
+  static bool isAuthenticating = false;
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
@@ -40,7 +41,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
-  bool _lastBioAuthCancelled = false;
 
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -61,8 +61,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           }
           data.loadedAccount!.startAutoSync(_password);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
-        } else {
-          setState(() => _lastBioAuthCancelled = true);
         }
       }
     }
@@ -71,8 +69,15 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (_lastBioAuthCancelled) return;
-    if (state == AppLifecycleState.resumed) _bioAuth();
+    print(state);
+    if (state == AppLifecycleState.resumed) {
+      if (LoginScreen.isAuthenticating) {
+        LoginScreen.isAuthenticating = false;
+        return;
+      }
+      LoginScreen.isAuthenticating = true;
+      _bioAuth();
+    }
   }
 
   Widget _buildPasswords(String terms, void Function() rebuild) {

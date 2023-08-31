@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -26,7 +27,6 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   String _password = '';
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
-  bool _lastBioAuthCancelled = false;
 
   void _logOut() {
     Navigator.popUntil(
@@ -46,10 +46,14 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _bioAuth() async {
+    if (!mounted) return;
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!_account.bioAuthEnabled) return;
-    if (!await BioStorage.authenticate(_account.username)) {
-      setState(() => _lastBioAuthCancelled = true);
+    try {
+      BiometricStorageData data =
+          await BioStorage.fromLocker(_account.username);
+      if (data.password.isEmpty) return;
+    } catch (e) {
       return;
     }
     _shouldPop = true;
@@ -107,8 +111,11 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state != AppLifecycleState.resumed) return;
-    if (_lastBioAuthCancelled) return;
+    if (LoginScreen.isAuthenticating) return;
+    LoginScreen.isAuthenticating = true;
     _bioAuth();
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => LoginScreen.isAuthenticating = false);
   }
 
   @override
