@@ -656,6 +656,7 @@ class Synchronization {
                   encrypter: _encrypter,
                   history: _history,
                   favorites: _favorites,
+                  settings: _settings,
                   sharedEntryKeys: sharedEntryKeys,
                   onSetEntry: () => _entriesAdded++,
                   onRemoveEntry: () => _entriesRemoved++,
