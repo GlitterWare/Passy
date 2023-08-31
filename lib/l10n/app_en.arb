@@ -282,5 +282,11 @@
     "couldNotConnectToServer": "Could not connect to server",
     "intervalIsLessThan": "Interval is less than ",
     "@intervalIsLessThan": { "description": "This message is followed by a time interval and units for that interval" },
-    "seconds": "Second(s)"
+    "seconds": "Second(s)",
+    "minutes": "Minute(s)",
+    "hours": "Hours(s)",
+    "days": "Days(s)",
+    "weeks": "Weeks(s)",
+    "months": "Months(s)",
+    "years": "Years(s)"
 }

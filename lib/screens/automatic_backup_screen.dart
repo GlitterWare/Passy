@@ -146,6 +146,24 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
                   child: EnumDropDownButtonFormField<IntervalUnit>(
                     value: _buIntervalUnits,
                     values: IntervalUnit.values,
+                    getName: (unit) {
+                      switch (unit) {
+                        case IntervalUnit.years:
+                          return localizations.years.toLowerCase();
+                        case IntervalUnit.months:
+                          return localizations.months.toLowerCase();
+                        case IntervalUnit.weeks:
+                          return localizations.weeks.toLowerCase();
+                        case IntervalUnit.days:
+                          return localizations.days.toLowerCase();
+                        case IntervalUnit.hours:
+                          return localizations.hours.toLowerCase();
+                        case IntervalUnit.minutes:
+                          return localizations.minutes.toLowerCase();
+                        case IntervalUnit.seconds:
+                          return localizations.seconds.toLowerCase();
+                      }
+                    },
                     onChanged: _onBuIntervalUnitsChanged,
                   ),
                 )

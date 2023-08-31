@@ -4,7 +4,7 @@ import 'package:passy/passy_flutter/common/common.dart';
 class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
   final T value;
   final List<T> values;
-  final Function(T gender)? getName;
+  final Function(T object)? getName;
   final InputDecoration? decoration;
   final TextCapitalization textCapitalization;
   final void Function(T? value)? onChanged;
