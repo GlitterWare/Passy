@@ -46,14 +46,20 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _bioAuth() async {
+    if (LoginScreen.isAuthenticating) return;
     if (!mounted) return;
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!_account.bioAuthEnabled) return;
+    LoginScreen.isAuthenticating = true;
     try {
       BiometricStorageData data =
           await BioStorage.fromLocker(_account.username);
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => LoginScreen.isAuthenticating = false);
       if (data.password.isEmpty) return;
     } catch (e) {
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => LoginScreen.isAuthenticating = false);
       return;
     }
     _shouldPop = true;
@@ -111,11 +117,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state != AppLifecycleState.resumed) return;
-    if (LoginScreen.isAuthenticating) return;
-    LoginScreen.isAuthenticating = true;
     await _bioAuth();
-    Future.delayed(const Duration(seconds: 2))
-        .then((value) => LoginScreen.isAuthenticating = false);
   }
 
   @override

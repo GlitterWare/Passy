@@ -404,6 +404,7 @@ class _MainScreen extends State<MainScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (!MainScreen.shouldLockScreen) return;
+    if (LoginScreen.isAuthenticating) return;
     if (data.loadedAccount == null) return;
     if (_unlockScreenOn) return;
     if (data.loadedAccount?.autoScreenLock == false) return;

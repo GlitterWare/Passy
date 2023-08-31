@@ -43,7 +43,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _bioAuth() async {
+    if (LoginScreen.isAuthenticating) return;
     if (Platform.isAndroid || Platform.isIOS) {
+      LoginScreen.isAuthenticating = true;
       if (data.getBioAuthEnabled(_username) ?? false) {
         if ((await BioStorage.authenticate(_username))) {
           Navigator.popUntil(
@@ -63,6 +65,8 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => LoginScreen.isAuthenticating = false);
     }
   }
 
@@ -70,8 +74,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      LoginScreen.isAuthenticating = true;
-      _bioAuth().then((value) => LoginScreen.isAuthenticating = false);
+      _bioAuth();
     }
   }
 
