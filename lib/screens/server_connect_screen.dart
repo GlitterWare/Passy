@@ -8,8 +8,6 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:passy/screens/servers_screen.dart';
-import 'package:passy/screens/settings_screen.dart';
-import 'package:passy/screens/splash_screen.dart';
 
 class ServerConnectScreen extends StatefulWidget {
   const ServerConnectScreen({Key? key}) : super(key: key);
@@ -31,14 +29,14 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (!testRun) {
       if (_nickname.isEmpty) {
         showSnackBar(context,
-            message: 'Nickname can\'t be empty',
+            message: localizations.nicknameCanNotBeEmpty,
             icon: const Icon(Icons.desktop_windows_rounded,
                 color: PassyTheme.darkContentColor));
         return;
       }
       if (_account.sync2d0d0ServerInfo.keys.contains(_nickname)) {
         showSnackBar(context,
-            message: 'Nickname already in use',
+            message: localizations.nicknameAlreadyInUse,
             icon: const Icon(Icons.desktop_windows_rounded,
                 color: PassyTheme.darkContentColor));
         return;
@@ -48,7 +46,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (address == null) {
       showSnackBar(
         context,
-        message: 'Host address is empty',
+        message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -57,7 +55,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (address.isEmpty) {
       showSnackBar(
         context,
-        message: 'Host address is empty',
+        message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -66,7 +64,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (_port == 0) {
       showSnackBar(
         context,
-        message: 'Invalid port specified',
+        message: localizations.invalidPortSpecified,
         icon: const Icon(Icons.numbers_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -77,7 +75,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     } catch (e, s) {
       showSnackBar(
         context,
-        message: "Could not connect to server",
+        message: localizations.couldNotConnectToServer,
         icon: const Icon(
           Icons.cast_rounded,
           color: PassyTheme.darkContentColor,
@@ -97,7 +95,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
       Sync2d0d0ServerInfo(nickname: _nickname, address: address, port: _port)
     ]);
     await _account.saveSettings();
-    //TODO: change to ServersScreen.routeName
     Navigator.popUntil(
         context, (route) => route.settings.name == ServersScreen.routeName);
   }
@@ -118,7 +115,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Connect to synchronization server'),
+        title: Text(localizations.connectToSynchronizationServer),
         centerTitle: true,
       ),
       body: CustomScrollView(
@@ -146,8 +143,9 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             text: '1. ',
                             children: [
                               TextSpan(
-                                text: 'Choose host address and port:',
-                                style: TextStyle(
+                                text:
+                                    '${localizations.chooseHostAddressAndPort}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -183,7 +181,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                                 child: TextFormField(
                                   initialValue: _port.toString(),
                                   decoration: InputDecoration(
-                                    labelText: 'Port',
+                                    labelText: localizations.port,
                                   ),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
@@ -206,8 +204,8 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             text: '2. ',
                             children: [
                               TextSpan(
-                                text: 'Test connection:',
-                                style: TextStyle(
+                                text: '${localizations.testConnection}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -220,7 +218,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                         children: [
                           Flexible(
                               child: PassyPadding(ThreeWidgetButton(
-                                  center: Text('Test connection'),
+                                  center: Text(localizations.testConnection),
                                   left: const Padding(
                                     padding: EdgeInsets.only(right: 30),
                                     child: Icon(Icons.cast_rounded),
@@ -253,8 +251,8 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             text: '3. ',
                             children: [
                               TextSpan(
-                                text: 'Connect to server:',
-                                style: TextStyle(
+                                text: '${localizations.connectToServer}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -270,7 +268,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                         onChanged: (value) => setState(() => _nickname = value),
                       )),
                       PassyPadding(ThreeWidgetButton(
-                          center: Text('Connect to server'),
+                          center: Text(localizations.connectToServer),
                           left: const Padding(
                             padding: EdgeInsets.only(right: 30),
                             child: Icon(Icons.cast_rounded),

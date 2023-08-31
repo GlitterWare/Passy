@@ -288,5 +288,8 @@
     "days": "Days(s)",
     "weeks": "Weeks(s)",
     "months": "Months(s)",
-    "years": "Years(s)"
+    "years": "Years(s)",
+    "connectToSynchronizationServer": "Connect to synchronization server",
+    "nicknameCanNotBeEmpty": "Nickname can't be empty",
+    "nicknameAlreadyInUse": "Nickname already in use"
 }
