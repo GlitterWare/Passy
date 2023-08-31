@@ -170,7 +170,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         ExpansionPanelList(
             expandedHeaderPadding: EdgeInsets.zero,
             expansionCallback: (panelIndex, isExpanded) =>
-                setState(() => _tfaIsExpanded = !isExpanded),
+                setState(() => _tfaIsExpanded = isExpanded),
             elevation: 0,
             dividerColor: PassyTheme.lightContentSecondaryColor,
             children: [

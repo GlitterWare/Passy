@@ -130,7 +130,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
               ExpansionPanelList(
                   expandedHeaderPadding: EdgeInsets.zero,
                   expansionCallback: (panelIndex, isExpanded) =>
-                      setState(() => _advancedSettingsIsExpanded = !isExpanded),
+                      setState(() => _advancedSettingsIsExpanded = isExpanded),
                   elevation: 0,
                   dividerColor: PassyTheme.lightContentSecondaryColor,
                   children: [
