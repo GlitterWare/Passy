@@ -69,14 +69,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    print(state);
     if (state == AppLifecycleState.resumed) {
-      if (LoginScreen.isAuthenticating) {
-        LoginScreen.isAuthenticating = false;
-        return;
-      }
       LoginScreen.isAuthenticating = true;
-      _bioAuth();
+      _bioAuth().then((value) => LoginScreen.isAuthenticating = false);
     }
   }
 
