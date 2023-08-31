@@ -291,5 +291,6 @@
     "years": "Years(s)",
     "connectToSynchronizationServer": "Connect to synchronization server",
     "nicknameCanNotBeEmpty": "Nickname can't be empty",
-    "nicknameAlreadyInUse": "Nickname already in use"
+    "nicknameAlreadyInUse": "Nickname already in use",
+    "lastSynchronization": "Last synchronization"
 }

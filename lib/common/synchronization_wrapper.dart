@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/screens/common.dart';
@@ -61,6 +62,8 @@ class SynchronizationWrapper {
           }
         }
       }
+      data.loadedAccount?.lastSyncDate = DateTime.now().toUtc();
+      data.loadedAccount?.saveSettings();
     }
     showDialog(
         context: _context,

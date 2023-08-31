@@ -51,6 +51,7 @@ class _MainScreen extends State<MainScreen>
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
   bool _unlockScreenOn = false;
+  String _lastSyncDate = 'NaN';
 
   Widget _searchBuilder(String terms, void Function() rebuild) {
     final List<SearchEntryData> _found = [];
@@ -427,6 +428,19 @@ class _MainScreen extends State<MainScreen>
     routeObserver.unsubscribe(this);
   }
 
+  void _mainLoop() {
+    if (!mounted) return;
+    DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
+    if (lastSyncDate != null) {
+      String newLastSyncDate =
+          '${lastSyncDate.hour}:${lastSyncDate.minute} | ${lastSyncDate.day}/${lastSyncDate.month}/${lastSyncDate.year}';
+      if (_lastSyncDate != newLastSyncDate) {
+        setState(() => _lastSyncDate = newLastSyncDate);
+      }
+    }
+    Future.delayed(const Duration(seconds: 5)).then((value) => _mainLoop());
+  }
+
   @override
   void initState() {
     super.initState();
@@ -435,6 +449,12 @@ class _MainScreen extends State<MainScreen>
           .setAndroidScreenSecure(_account.protectScreen);
     }
     WidgetsBinding.instance.addObserver(this);
+    DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
+    if (lastSyncDate != null) {
+      _lastSyncDate =
+          '${lastSyncDate.hour}:${lastSyncDate.minute} | ${lastSyncDate.day}/${lastSyncDate.month}/${lastSyncDate.year}';
+    }
+    _mainLoop();
   }
 
   @override
@@ -613,60 +633,73 @@ class _MainScreen extends State<MainScreen>
             ),
           ],
         ),
-        body: LayoutBuilder(
-          builder: (ctx, constr) {
-            if (constr.maxWidth >= 1100) {
-              return Row(children: [
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[0],
-                    _screenButtons[1],
-                    _screenButtons[2],
-                  ],
-                )),
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[3],
-                    _screenButtons[4],
-                    _screenButtons[5],
-                  ],
-                )),
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[6],
-                    _screenButtons[7],
-                    if (_screenButtons.length == 9) _screenButtons[8],
-                  ],
-                ))
-              ]);
-            }
-            if (constr.maxWidth >= 700) {
-              return Row(children: [
-                Expanded(
-                  child: ListView(children: [
-                    _screenButtons[0],
-                    _screenButtons[1],
-                    _screenButtons[2],
-                    _screenButtons[3],
-                    if (_screenButtons.length == 9) _screenButtons[8],
-                  ]),
-                ),
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[4],
-                    _screenButtons[5],
-                    _screenButtons[6],
-                    _screenButtons[7],
-                  ],
-                )),
-              ]);
-            }
-            return ListView(children: _screenButtons);
-          },
+        body: Column(
+          children: [
+            Flexible(
+              fit: FlexFit.tight,
+              child: LayoutBuilder(
+                builder: (ctx, constr) {
+                  if (constr.maxWidth >= 1100) {
+                    return Row(children: [
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[0],
+                          _screenButtons[1],
+                          _screenButtons[2],
+                        ],
+                      )),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[3],
+                          _screenButtons[4],
+                          _screenButtons[5],
+                        ],
+                      )),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[6],
+                          _screenButtons[7],
+                          if (_screenButtons.length == 9) _screenButtons[8],
+                        ],
+                      ))
+                    ]);
+                  }
+                  if (constr.maxWidth >= 700) {
+                    return Row(children: [
+                      Expanded(
+                        child: ListView(children: [
+                          _screenButtons[0],
+                          _screenButtons[1],
+                          _screenButtons[2],
+                          _screenButtons[3],
+                          if (_screenButtons.length == 9) _screenButtons[8],
+                        ]),
+                      ),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[4],
+                          _screenButtons[5],
+                          _screenButtons[6],
+                          _screenButtons[7],
+                        ],
+                      )),
+                    ]);
+                  }
+                  return ListView(children: _screenButtons);
+                },
+              ),
+            ),
+            PassyPadding(Text(
+              '${localizations.lastSynchronization}: $_lastSyncDate',
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            )),
+          ],
         ),
       ),
     );

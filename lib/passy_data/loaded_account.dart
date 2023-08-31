@@ -352,13 +352,19 @@ class LoadedAccount {
       }
       for (Sync2d0d0ServerInfo info in sync2d0d0ServerInfo.values) {
         Synchronization? syncClient = getSynchronization();
+        bool isSuccess = false;
         if (syncClient == null) continue;
         try {
           await syncClient.connect2d0d0(
               HostAddress(InternetAddress(info.address), info.port),
               username: username,
               password: passwordDecrypted);
+          isSuccess = true;
         } catch (_) {}
+        if (isSuccess) {
+          _settings.value.lastSyncDate = DateTime.now().toUtc();
+          await saveSettings();
+        }
       }
     }
     await Future.delayed(
