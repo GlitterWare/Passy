@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_locker/flutter_locker.dart';
-import 'package:passy/passy_data/loaded_account.dart';
 
 import '../common/common.dart';
 import 'biometric_storage_data.dart';
