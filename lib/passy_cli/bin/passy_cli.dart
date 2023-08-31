@@ -1212,6 +1212,7 @@ Future<void> executeCommand(List<String> command,
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
+                settings: settings,
                 rsaKeypair: settings.value.rsaKeypair!,
                 onError: (err) {
                   if (detached) return;
@@ -1532,6 +1533,7 @@ Future<void> executeCommand(List<String> command,
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
+                settings: settings,
                 rsaKeypair: settings.value.rsaKeypair!,
                 onError: (err) {
                   if (detached) return;
@@ -1646,6 +1648,7 @@ Future<void> executeCommand(List<String> command,
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
+                settings: settings,
                 rsaKeypair: settings.value.rsaKeypair!,
                 onError: (err) {
                   if (detached) return;

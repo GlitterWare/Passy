@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/account_settings.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 
 import 'favorites.dart';
@@ -196,6 +197,7 @@ class Synchronization {
   final FullPassyEntriesFileCollection _passyEntries;
   final HistoryFile _history;
   final FavoritesFile _favorites;
+  final AccountSettingsFile _settings;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
       SynchronizationResults();
@@ -220,6 +222,7 @@ class Synchronization {
     required FullPassyEntriesFileCollection passyEntries,
     required HistoryFile history,
     required FavoritesFile favorites,
+    required AccountSettingsFile settings,
     required Encrypter encrypter,
     required RSAKeypair rsaKeypair,
     void Function(SynchronizationResults)? onComplete,
@@ -228,6 +231,7 @@ class Synchronization {
         _passyEntries = passyEntries,
         _history = history,
         _favorites = favorites,
+        _settings = settings,
         _encrypter = encrypter,
         _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
@@ -451,6 +455,10 @@ class Synchronization {
                   _socket = null;
                   socket.destroy();
                   server.close();
+                  _settings.reload().then((value) async {
+                    _settings.value.lastSyncDate = DateTime.now().toUtc();
+                    await _settings.save();
+                  });
                   _callOnComplete();
                   return;
                 }
@@ -560,6 +568,9 @@ class Synchronization {
                   // Cleanup
                   _syncLog += 'done.';
                   _isConnected = false;
+                  await _settings.reload();
+                  _settings.value.lastSyncDate = DateTime.now().toUtc();
+                  await _settings.save();
                   _callOnComplete();
                 });
                 _sendInfo(_info);
@@ -1176,6 +1187,9 @@ class Synchronization {
         _syncLog += 'done.';
       });
     }
+    await _settings.reload();
+    _settings.value.lastSyncDate = DateTime.now().toUtc();
+    await _settings.save();
     _callOnComplete();
   }
 
@@ -1265,6 +1279,9 @@ class Synchronization {
             _socket = null;
             await _decryptEntriesCompleter.future;
             _syncLog += 'done.';
+            await _settings.reload();
+            _settings.value.lastSyncDate = DateTime.now().toUtc();
+            await _settings.save();
             _callOnComplete();
           });
         }
