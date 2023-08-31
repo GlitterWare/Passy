@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
@@ -112,15 +114,16 @@ class _ServersScreen extends State<ServersScreen> {
           SliverFillRemaining(
             child: Column(
               children: [
-                PassyPadding(ThreeWidgetButton(
-                    center: Text(localizations.serverSetup),
-                    left: const Padding(
-                      padding: EdgeInsets.only(right: 30),
-                      child: Icon(Icons.install_desktop_rounded),
-                    ),
-                    right: const Icon(Icons.arrow_forward_ios_rounded),
-                    onPressed: () => Navigator.pushNamed(
-                        context, ServerSetupScreen.routeName))),
+                if (!Platform.isAndroid && !Platform.isIOS)
+                  PassyPadding(ThreeWidgetButton(
+                      center: Text(localizations.serverSetup),
+                      left: const Padding(
+                        padding: EdgeInsets.only(right: 30),
+                        child: Icon(Icons.install_desktop_rounded),
+                      ),
+                      right: const Icon(Icons.arrow_forward_ios_rounded),
+                      onPressed: () => Navigator.pushNamed(
+                          context, ServerSetupScreen.routeName))),
                 PassyPadding(ThreeWidgetButton(
                     center: Text(localizations.connectToServer),
                     left: const Padding(
