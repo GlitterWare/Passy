@@ -63,18 +63,18 @@ class _ServersScreen extends State<ServersScreen> {
       _syncInterval = int.parse(_syncIntervalString);
     }
     if (_syncInterval < 1) {
-      //TODO: localize
       showSnackBar(context,
-          message: 'Interval is less than 5 seconds',
+          message:
+              '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
           icon:
               const Icon(Icons.timelapse, color: PassyTheme.darkContentColor));
       return;
     }
     if (_syncIntervalUnits == IntervalUnit.seconds) {
       if (_syncInterval < 5) {
-        //TODO: localize
         showSnackBar(context,
-            message: 'Interval is less than 5 seconds',
+            message:
+                '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
             icon: const Icon(Icons.timelapse,
                 color: PassyTheme.darkContentColor));
         return;
@@ -104,7 +104,7 @@ class _ServersScreen extends State<ServersScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Synchronization servers'),
+        title: Text(localizations.synchronizationServers),
         centerTitle: true,
       ),
       body: CustomScrollView(
@@ -113,7 +113,7 @@ class _ServersScreen extends State<ServersScreen> {
             child: Column(
               children: [
                 PassyPadding(ThreeWidgetButton(
-                    center: Text('Server setup'),
+                    center: Text(localizations.serverSetup),
                     left: const Padding(
                       padding: EdgeInsets.only(right: 30),
                       child: Icon(Icons.install_desktop_rounded),
@@ -122,7 +122,7 @@ class _ServersScreen extends State<ServersScreen> {
                     onPressed: () => Navigator.pushNamed(
                         context, ServerSetupScreen.routeName))),
                 PassyPadding(ThreeWidgetButton(
-                    center: Text('Connect to server'),
+                    center: Text(localizations.connectToServer),
                     left: const Padding(
                       padding: EdgeInsets.only(right: 30),
                       child: Icon(Icons.cast_rounded),
@@ -133,7 +133,7 @@ class _ServersScreen extends State<ServersScreen> {
                         .then((value) => setState(() {})))),
                 if (_account.sync2d0d0ServerInfo.isNotEmpty)
                   PassyPadding(ThreeWidgetButton(
-                      center: Text('Remove servers'),
+                      center: Text(localizations.removeServers),
                       left: const Padding(
                         padding: EdgeInsets.only(right: 30),
                         child: Icon(Icons.delete_rounded),
@@ -150,7 +150,7 @@ class _ServersScreen extends State<ServersScreen> {
                         key: _syncIntervalKey,
                         initialValue: _syncIntervalString,
                         decoration: InputDecoration(
-                            labelText: 'Synchronization interval'),
+                            labelText: localizations.synchronizationInterval),
                         onChanged: (value) =>
                             setState(() => _syncIntervalString = value),
                         inputFormatters: [
@@ -170,17 +170,15 @@ class _ServersScreen extends State<ServersScreen> {
                     ),
                     FloatingActionButton(
                       heroTag: null,
-                      child: Icon(Icons.close),
+                      child: const Icon(Icons.close),
                       onPressed: _resetSyncIntervalUnits,
-                      //TODO: localize
-                      tooltip: 'Reset',
+                      tooltip: localizations.reset,
                     ),
                     FloatingActionButton(
                       heroTag: null,
-                      child: Icon(Icons.save),
+                      child: const Icon(Icons.save),
                       onPressed: _saveSyncIntervalUnits,
-                      //TODO: localize
-                      tooltip: 'Save',
+                      tooltip: localizations.save,
                     ),
                   ],
                 )),

@@ -256,6 +256,10 @@
     "youAreChangingKeyDerivationFor": "You're changing key derivation for ",
     "@youAreChangingKeyDerivationFor": { "description": "This message is followed by a username in the key derivation screen" },
     "synchronizationServers": "Synchronization servers",
+    "serverSetup": "Server setup",
+    "removeServers": "Remove servers",
+    "synchronizationInterval": "Synchronization interval",
+    "reset": "Reset",
     "synchronizationServerSetup": "Synchronization server setup",
     "connectToServer": "Connect to server",
     "none": "None",
@@ -275,5 +279,8 @@
     "couldNotInstallServer": "Could not install server",
     "hostAddressIsEmpty": "Host address is empty",
     "invalidPortSpecified": "Invalid port specified",
-    "couldNotConnectToServer": "Could not connect to server"
+    "couldNotConnectToServer": "Could not connect to server",
+    "intervalIsLessThan": "Interval is less than ",
+    "@intervalIsLessThan": { "description": "This message is followed by a time interval and units for that interval" },
+    "seconds": "Second(s)"
 }

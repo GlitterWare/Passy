@@ -121,15 +121,16 @@ class _SettingsScreen extends State<SettingsScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () =>
                   Navigator.pushNamed(context, CredentialsScreen.routeName))),
-          PassyPadding(ThreeWidgetButton(
-              center: Text('Synchronization servers'),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.desktop_windows_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, ServersScreen.routeName))),
+          if (!Platform.isAndroid)
+            PassyPadding(ThreeWidgetButton(
+                center: Text(localizations.synchronizationServers),
+                left: const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Icon(Icons.desktop_windows_rounded),
+                ),
+                right: const Icon(Icons.arrow_forward_ios_rounded),
+                onPressed: () =>
+                    Navigator.pushNamed(context, ServersScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
             left: Padding(
               padding: const EdgeInsets.only(right: 30),
