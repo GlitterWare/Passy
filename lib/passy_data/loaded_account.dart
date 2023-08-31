@@ -31,6 +31,7 @@ import 'password.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
 import 'payment_card.dart';
+import 'sync_2d0d0_server_info.dart';
 import 'synchronization.dart';
 
 class LoadedAccount {
@@ -313,6 +314,33 @@ class LoadedAccount {
     }
   }
 
+  Synchronization getSynchronization2d0d0({
+    void Function()? onConnected,
+    void Function(SynchronizationResults results)? onComplete,
+    void Function(String log)? onError,
+  }) {
+    Synchronization synchronization;
+    synchronization = Synchronization(
+      encrypter: _syncEncrypter,
+      username: username,
+      passyEntries: FullPassyEntriesFileCollection(
+        idCards: _idCards,
+        identities: _identities,
+        notes: _notes,
+        passwords: _passwords,
+        paymentCards: _paymentCards,
+      ),
+      history: _history,
+      favorites: _favorites,
+      rsaKeypair: _settings.value.rsaKeypair!,
+      onError: (err) {
+        onError?.call('Synchronization error: $err');
+      },
+      onComplete: (_) {},
+    );
+    return synchronization;
+  }
+
   Future<HostAddress?> host({
     void Function()? onConnected,
     void Function(SynchronizationResults results)? onComplete,
@@ -410,6 +438,29 @@ class LoadedAccount {
   set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
   bool get isRSAKeypairLoaded {
     return _settings.value.rsaKeypair != null;
+  }
+
+  int get serverSyncInterval => _settings.value.serverSyncInterval;
+  set serverSyncInterval(int value) =>
+      _settings.value.serverSyncInterval = value;
+  Map<String, Sync2d0d0ServerInfo> get sync2d0d0ServerInfo =>
+      _settings.value.serverInfo.map((key, value) => MapEntry(
+          key,
+          Sync2d0d0ServerInfo(
+            nickname: value.nickname,
+            address: value.address,
+            port: value.port,
+          )));
+  void addSync2d0d0ServerInfo(Iterable<Sync2d0d0ServerInfo> info) =>
+      _settings.value.serverInfo.addEntries(info.map((e) => MapEntry(
+          e.nickname,
+          Sync2d0d0ServerInfo(
+            nickname: e.nickname,
+            address: e.address,
+            port: e.port,
+          ))));
+  void removeSync2d0d0ServerInfo(String nickname) {
+    _settings.value.serverInfo.remove(nickname);
   }
 
   Future<void> saveSettings() => _settings.save();
