@@ -113,7 +113,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     if (state != AppLifecycleState.resumed) return;
     if (LoginScreen.isAuthenticating) return;
     LoginScreen.isAuthenticating = true;
-    _bioAuth();
+    await _bioAuth();
     Future.delayed(const Duration(seconds: 2))
         .then((value) => LoginScreen.isAuthenticating = false);
   }
