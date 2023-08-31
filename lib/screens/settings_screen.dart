@@ -8,7 +8,6 @@ import 'package:passy/screens/security_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
-import 'package:passy/screens/server_connect_screen.dart';
 import 'package:passy/screens/servers_screen.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 

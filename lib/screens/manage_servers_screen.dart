@@ -3,8 +3,6 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-import 'server_connect_screen.dart';
-import 'server_setup_screen.dart';
 import 'servers_screen.dart';
 
 class ManageServersScreen extends StatefulWidget {
@@ -61,7 +59,7 @@ class _ManageServersScreen extends State<ManageServersScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Synchronization servers'),
+        title: Text(localizations.synchronizationServers),
         centerTitle: true,
       ),
       body: CustomScrollView(
