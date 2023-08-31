@@ -8,6 +8,8 @@ import 'package:passy/screens/security_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/server_connect_screen.dart';
+import 'package:passy/screens/servers_screen.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
 import 'automatic_backup_screen.dart';
@@ -119,6 +121,15 @@ class _SettingsScreen extends State<SettingsScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () =>
                   Navigator.pushNamed(context, CredentialsScreen.routeName))),
+          PassyPadding(ThreeWidgetButton(
+              center: Text('Synchronization servers'),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.desktop_windows_rounded),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, ServersScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
             left: Padding(
               padding: const EdgeInsets.only(right: 30),

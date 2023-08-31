@@ -9,12 +9,12 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/log_screen.dart';
+import 'package:passy/screens/servers_screen.dart';
 
 class ServerSetupScreen extends StatefulWidget {
   const ServerSetupScreen({Key? key}) : super(key: key);
 
-  //TODO: placeholder routename, change once dedicated server screen is implemented
-  static const routeName = '/serverSetup';
+  static const routeName = '${ServersScreen.routeName}/setup';
 
   @override
   State<StatefulWidget> createState() => _ServerSetupScreen();

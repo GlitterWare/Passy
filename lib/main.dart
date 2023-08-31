@@ -13,7 +13,10 @@ import 'package:passy/screens/export_screen.dart';
 import 'package:passy/screens/global_settings_screen.dart';
 import 'package:passy/screens/import_screen.dart';
 import 'package:passy/screens/key_derivation_screen.dart';
+import 'package:passy/screens/manage_servers_screen.dart';
 import 'package:passy/screens/no_accounts_screen.dart';
+import 'package:passy/screens/server_connect_screen.dart';
+import 'package:passy/screens/servers_screen.dart';
 
 import 'common/common.dart';
 import 'screens/change_password_screen.dart';
@@ -163,6 +166,7 @@ class Passy extends StatelessWidget {
         LogScreen.routeName: (context) => const LogScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         MainScreen.routeName: (context) => const MainScreen(),
+        ManageServersScreen.routeName: (context) => const ManageServersScreen(),
         NoteScreen.routeName: (context) => const NoteScreen(),
         NotesScreen.routeName: (context) => const NotesScreen(),
         PasswordScreen.routeName: (context) => const PasswordScreen(),
@@ -172,7 +176,9 @@ class Passy extends StatelessWidget {
         RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),
         SearchScreen.routeName: (context) => const SearchScreen(),
         SecurityScreen.routeName: (context) => const SecurityScreen(),
+        ServerConnectScreen.routeName: (context) => const ServerConnectScreen(),
         ServerSetupScreen.routeName: (context) => const ServerSetupScreen(),
+        ServersScreen.routeName: (context) => const ServersScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SetupScreen.routeName: (context) => const SetupScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
