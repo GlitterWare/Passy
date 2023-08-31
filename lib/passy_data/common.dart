@@ -513,6 +513,7 @@ ipc server start true
 ''';
 
 String _serverAutostartScriptLinux = '''
+#!/bin/bash
 cd \$(dirname \$0)
 ./passy_cli --no-autorun autostart add Passy-CLI-Server "\$PWD/passy_cli"
 ''';
