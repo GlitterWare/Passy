@@ -296,6 +296,8 @@ class PassyData {
   }
 
   void unloadAccount() {
+    LoadedAccount? acc = _loadedAccount;
+    if (acc != null) acc.stopAutoSync();
     _loadedAccount = null;
     _loadedAccountEncrypter = null;
   }

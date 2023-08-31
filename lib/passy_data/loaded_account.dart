@@ -48,6 +48,7 @@ class LoadedAccount {
   final PaymentCardsFile _paymentCards;
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
+  Completer<void>? _autoSyncCompleter;
 
   LoadedAccount({
     required Encrypter encrypter,
@@ -314,33 +315,6 @@ class LoadedAccount {
     }
   }
 
-  Synchronization getSynchronization2d0d0({
-    void Function()? onConnected,
-    void Function(SynchronizationResults results)? onComplete,
-    void Function(String log)? onError,
-  }) {
-    Synchronization synchronization;
-    synchronization = Synchronization(
-      encrypter: _syncEncrypter,
-      username: username,
-      passyEntries: FullPassyEntriesFileCollection(
-        idCards: _idCards,
-        identities: _identities,
-        notes: _notes,
-        passwords: _passwords,
-        paymentCards: _paymentCards,
-      ),
-      history: _history,
-      favorites: _favorites,
-      rsaKeypair: _settings.value.rsaKeypair!,
-      onError: (err) {
-        onError?.call('Synchronization error: $err');
-      },
-      onComplete: (_) {},
-    );
-    return synchronization;
-  }
-
   Future<HostAddress?> host({
     void Function()? onConnected,
     void Function(SynchronizationResults results)? onComplete,
@@ -362,6 +336,50 @@ class LoadedAccount {
     return await getSynchronization(
             onConnected: onConnected, onComplete: onComplete, onError: onError)
         ?.connect(address);
+  }
+
+  Future<void> _autoSyncCycle(
+      String password, Completer<void> completer) async {
+    if (sync2d0d0ServerInfo.isNotEmpty) {
+      String passwordDecrypted;
+      try {
+        passwordDecrypted = decrypt(password, encrypter: _encrypter);
+      } catch (_) {
+        await Future.delayed(
+            Duration(milliseconds: _settings.value.serverSyncInterval));
+        if (!completer.isCompleted) _autoSyncCycle(password, completer);
+        return;
+      }
+      for (Sync2d0d0ServerInfo info in sync2d0d0ServerInfo.values) {
+        Synchronization? syncClient = getSynchronization();
+        if (syncClient == null) continue;
+        try {
+          await syncClient.connect2d0d0(
+              HostAddress(InternetAddress(info.address), info.port),
+              username: username,
+              password: passwordDecrypted);
+        } catch (_) {}
+      }
+    }
+    await Future.delayed(
+        Duration(milliseconds: _settings.value.serverSyncInterval));
+    if (!completer.isCompleted) _autoSyncCycle(password, completer);
+  }
+
+  void startAutoSync(String password) {
+    String passwordEncrypted = encrypt(password, encrypter: _encrypter);
+    if (_autoSyncCompleter != null) return;
+    Completer completer = Completer<void>();
+    _autoSyncCompleter = completer;
+    _autoSyncCycle(passwordEncrypted, completer);
+  }
+
+  void stopAutoSync() {
+    Completer<void>? completer = _autoSyncCompleter;
+    if (completer == null) return;
+    if (completer.isCompleted) return;
+    completer.complete();
+    _autoSyncCompleter = null;
   }
 
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
