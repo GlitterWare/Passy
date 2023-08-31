@@ -58,6 +58,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
             );
             return;
           }
+          data.loadedAccount!.startAutoSync(_password);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
@@ -169,7 +170,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
                     Uint8List.fromList(_derivedPassword)),
             await data.getSyncEncrypter(
                 username: _username, password: _password));
-        _account.startAutoSync(_password);
         Navigator.pop(context);
         if (isAutofill) {
           Navigator.pushNamed(
@@ -182,6 +182,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           );
           return;
         }
+        _account.startAutoSync(_password);
         if (Platform.isAndroid) {
           FlutterSecureScreen.singleton
               .setAndroidScreenSecure(_account.protectScreen);
