@@ -544,11 +544,11 @@ Future<File> copyPassyCLIServer({
     File autostartAdd = File(to.path +
         Platform.pathSeparator +
         'autostart_add' +
-        (Platform.isWindows ? '.bat' : '.sh'));
+        (Platform.isWindows ? '.bat' : ''));
     File autostartDel = File(to.path +
         Platform.pathSeparator +
         'autostart_del' +
-        (Platform.isWindows ? '.bat' : '.sh'));
+        (Platform.isWindows ? '.bat' : ''));
     if (await autostartAdd.exists()) {
       try {
         await autostartAdd.delete();
