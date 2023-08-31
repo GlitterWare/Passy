@@ -26,6 +26,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   String _password = '';
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
+  bool _lastBioAuthCancelled = false;
 
   void _logOut() {
     Navigator.popUntil(
@@ -47,7 +48,10 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   Future<void> _bioAuth() async {
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!_account.bioAuthEnabled) return;
-    if (!await BioStorage.authenticate(_account.username)) return;
+    if (!await BioStorage.authenticate(_account.username)) {
+      setState(() => _lastBioAuthCancelled = true);
+      return;
+    }
     _shouldPop = true;
     Navigator.pop(context);
   }
@@ -103,6 +107,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state != AppLifecycleState.resumed) return;
+    if (_lastBioAuthCancelled) return;
     _bioAuth();
   }
 
