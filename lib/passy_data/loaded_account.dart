@@ -481,6 +481,9 @@ class LoadedAccount {
     _settings.value.serverInfo.remove(nickname);
   }
 
+  set lastSyncDate(DateTime? value) => _settings.value.lastSyncDate = value;
+  DateTime? get lastSyncDate => _settings.value.lastSyncDate;
+
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
 

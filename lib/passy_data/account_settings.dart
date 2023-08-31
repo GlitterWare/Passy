@@ -14,6 +14,7 @@ class AccountSettings with JsonConvertable {
   RSAKeypair? rsaKeypair;
   int serverSyncInterval;
   Map<String, Sync2d0d0ServerInfo> serverInfo;
+  DateTime? lastSyncDate;
 
   AccountSettings.fromJson(Map<String, dynamic> json)
       : protectScreen = json['protectScreen'] ?? true,
@@ -29,7 +30,10 @@ class AccountSettings with JsonConvertable {
                 Sync2d0d0ServerInfo info = Sync2d0d0ServerInfo.fromJson(e);
                 return MapEntry(info.nickname, info);
               }))
-            : {};
+            : {},
+        lastSyncDate = json.containsKey('lastSyncDate')
+            ? DateTime.parse(json['lastSyncDate'])
+            : null;
 
   AccountSettings({
     this.protectScreen = true,
@@ -37,6 +41,7 @@ class AccountSettings with JsonConvertable {
     RSAPrivateKey? rsaPrivateKey,
     this.serverSyncInterval = 15000,
     Map<String, Sync2d0d0ServerInfo>? serverInfo,
+    this.lastSyncDate,
   })  : rsaKeypair =
             rsaPrivateKey is RSAPrivateKey ? RSAKeypair(rsaPrivateKey) : null,
         serverInfo = serverInfo ?? {};
@@ -48,6 +53,7 @@ class AccountSettings with JsonConvertable {
         'rsaPrivateKey': rsaKeypair?.privateKey.toPEM(),
         'serverSyncInterval': serverSyncInterval.toString(),
         'serverInfo': serverInfo.values.map((e) => e.toJson()).toList(),
+        'lastSyncDate': lastSyncDate?.toIso8601String(),
       };
 
   static AccountSettingsFile fromFile(
