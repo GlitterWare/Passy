@@ -31,7 +31,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (address == null) {
       showSnackBar(
         context,
-        message: 'Host address is empty',
+        message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -40,7 +40,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (address.isEmpty) {
       showSnackBar(
         context,
-        message: 'Host address is empty',
+        message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -49,7 +49,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (_port == 0) {
       showSnackBar(
         context,
-        message: 'Invalid port specified',
+        message: localizations.invalidPortSpecified,
         icon: const Icon(Icons.numbers_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -58,7 +58,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     String? dirResult;
     try {
       dirResult = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Install server',
+        dialogTitle: localizations.installServer,
         lockParentWindow: true,
       );
       if (dirResult == null) return;
@@ -70,14 +70,14 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       );
       showSnackBar(
         context,
-        message: "Server installed",
+        message: localizations.serverInstalled,
         icon: const Icon(Icons.install_desktop_rounded,
             color: PassyTheme.darkContentColor),
       );
     } catch (e, s) {
       showSnackBar(
         context,
-        message: "Could not install server",
+        message: localizations.couldNotInstallServer,
         icon: const Icon(Icons.install_desktop_rounded,
             color: PassyTheme.darkContentColor),
         action: SnackBarAction(
@@ -95,7 +95,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (address == null) {
       showSnackBar(
         context,
-        message: 'Host address is empty',
+        message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -104,7 +104,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (address.isEmpty) {
       showSnackBar(
         context,
-        message: 'Host address is empty',
+        message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -113,7 +113,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (_port == 0) {
       showSnackBar(
         context,
-        message: 'Invalid port specified',
+        message: localizations.invalidPortSpecified,
         icon: const Icon(Icons.numbers_rounded,
             color: PassyTheme.darkContentColor),
       );
@@ -124,7 +124,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     } catch (e, s) {
       showSnackBar(
         context,
-        message: "Could not connect to server",
+        message: localizations.couldNotConnectToServer,
         icon: const Icon(
           Icons.cast_rounded,
           color: PassyTheme.darkContentColor,
@@ -157,7 +157,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Synchronization server setup'),
+        title: Text(localizations.synchronizationServerSetup),
         centerTitle: true,
       ),
       body: CustomScrollView(
@@ -177,6 +177,10 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                       Spacer(),
                     ]
                   : [
+                      PassyPadding(Text(
+                        localizations.syncServerSetupInfo,
+                        textAlign: TextAlign.center,
+                      )),
                       PassyPadding(
                         RichText(
                           textScaleFactor: 1.25,
@@ -185,8 +189,9 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '1. ',
                             children: [
                               TextSpan(
-                                text: 'Choose host address and port:',
-                                style: TextStyle(
+                                text:
+                                    '${localizations.chooseHostAddressAndPort}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -222,7 +227,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                                 child: TextFormField(
                                   initialValue: _port.toString(),
                                   decoration: InputDecoration(
-                                    labelText: 'Port',
+                                    labelText: localizations.port,
                                   ),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
@@ -245,8 +250,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '2. ',
                             children: [
                               TextSpan(
-                                text: 'Install server:',
-                                style: TextStyle(
+                                text: '${localizations.installServer}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -255,7 +260,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         ),
                       ),
                       PassyPadding(ThreeWidgetButton(
-                          center: Text('Install server'),
+                          center: Text(localizations.installServer),
                           left: const Padding(
                             padding: EdgeInsets.only(right: 30),
                             child: Icon(Icons.install_desktop_rounded),
@@ -270,8 +275,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '3. ',
                             children: [
                               TextSpan(
-                                text: 'Start server:',
-                                style: TextStyle(
+                                text: '${localizations.startServer}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -283,16 +288,15 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         textScaleFactor: 1.25,
                         textAlign: TextAlign.center,
                         text: TextSpan(
-                          text:
-                              'Navigate to the specified install directory in your file manager and double-click ',
+                          text: localizations.doubleClickMessage,
                           children: [
                             TextSpan(
                               text: 'passy_cli' +
                                   (Platform.isWindows ? '.exe' : ''),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: PassyTheme.lightContentSecondaryColor),
                             ),
-                            TextSpan(text: '.'),
+                            const TextSpan(text: '.'),
                           ],
                         ),
                       ),
@@ -304,8 +308,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '4. ',
                             children: [
                               TextSpan(
-                                text: 'Test connection:',
-                                style: TextStyle(
+                                text: '${localizations.testConnection}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -318,7 +322,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         children: [
                           Flexible(
                               child: PassyPadding(ThreeWidgetButton(
-                                  center: Text('Test connection'),
+                                  center: Text(localizations.testConnection),
                                   left: const Padding(
                                     padding: EdgeInsets.only(right: 30),
                                     child: Icon(Icons.cast_rounded),
@@ -347,11 +351,11 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           textScaleFactor: 1.25,
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            text: '5. (Optional) ',
+                            text: '5. (${localizations.optional}) ',
                             children: [
                               TextSpan(
-                                text: 'Add server to autostart:',
-                                style: TextStyle(
+                                text: '${localizations.addServerToAutostart}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -363,16 +367,15 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         textScaleFactor: 1.25,
                         textAlign: TextAlign.center,
                         text: TextSpan(
-                          text:
-                              'Navigate to the specified install directory in your file manager and double-click ',
+                          text: localizations.doubleClickMessage,
                           children: [
                             TextSpan(
                               text: 'autostart_add' +
                                   (Platform.isWindows ? '.bat' : ''),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: PassyTheme.lightContentSecondaryColor),
                             ),
-                            TextSpan(text: '.'),
+                            const TextSpan(text: '.'),
                           ],
                         ),
                       ),
@@ -384,8 +387,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '6. ',
                             children: [
                               TextSpan(
-                                text: 'Connect to server:',
-                                style: TextStyle(
+                                text: '${localizations.connectToServer}:',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
@@ -398,53 +401,54 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           textScaleFactor: 1.25,
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            text: 'On client device: ',
+                            text: '${localizations.onClientDevices}: ',
                             children: [
-                              WidgetSpan(
+                              const WidgetSpan(
                                   child: Icon(
                                 Icons.settings_rounded,
                                 size: 14,
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
-                                text: ' Settings ',
-                                style: TextStyle(
+                                text: ' ${localizations.settings} ',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
-                              WidgetSpan(
+                              const WidgetSpan(
                                   child: Icon(
                                 Icons.arrow_forward_ios_rounded,
                                 size: 14,
                               )),
-                              TextSpan(text: '  '),
-                              WidgetSpan(
+                              const TextSpan(text: '  '),
+                              const WidgetSpan(
                                   child: Icon(
                                 Icons.desktop_windows_rounded,
                                 size: 14,
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
-                                text: ' Synchronization servers ',
-                                style: TextStyle(
+                                text:
+                                    ' ${localizations.synchronizationServers} ',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
-                              WidgetSpan(
+                              const WidgetSpan(
                                   child: Icon(
                                 Icons.arrow_forward_ios_rounded,
                                 size: 14,
                               )),
-                              TextSpan(text: '  '),
-                              WidgetSpan(
+                              const TextSpan(text: '  '),
+                              const WidgetSpan(
                                   child: Icon(
                                 Icons.cast,
                                 size: 14,
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
-                                text: ' Connect to server ',
-                                style: TextStyle(
+                                text: ' ${localizations.connectToServer} ',
+                                style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
                               ),
