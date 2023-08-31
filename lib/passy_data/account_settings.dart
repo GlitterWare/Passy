@@ -25,7 +25,7 @@ class AccountSettings with JsonConvertable {
             ? (int.tryParse(json['serverSyncInterval']) ?? 15000)
             : 15000,
         serverInfo = json.containsKey('serverInfo')
-            ? Map.fromIterable((json['serverInfo'] as List<dynamic>).map((e) {
+            ? Map.fromEntries((json['serverInfo'] as List<dynamic>).map((e) {
                 Sync2d0d0ServerInfo info = Sync2d0d0ServerInfo.fromJson(e);
                 return MapEntry(info.nickname, info);
               }))
