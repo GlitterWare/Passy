@@ -91,6 +91,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     }
     setState(() => _connectionChecked = true);
     if (testRun) return;
+    _account.trustServer(address, _port);
     _account.addSync2d0d0ServerInfo([
       Sync2d0d0ServerInfo(nickname: _nickname, address: address, port: _port)
     ]);

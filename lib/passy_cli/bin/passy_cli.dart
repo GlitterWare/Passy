@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypton/crypton.dart';
@@ -28,11 +29,13 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
+import 'package:passy/passy_data/passy_info.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
 import 'package:passy/passy_data/autostart.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
+import 'package:passy/passy_data/trusted_connection_data.dart';
 
 const String helpMsg = '''
 
@@ -538,10 +541,13 @@ Future<String> _login(String username, String password) async {
       derivationInfo: _credentials.keyDerivationInfo,
     );
     try {
+      PassyInfoFile infoFile = PassyInfo.fromFile(
+          File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
       LoadedAccount acc = loadLegacyAccount(
           path: _accountsPath + Platform.pathSeparator + username,
           encrypter: _encrypters[username]!,
           syncEncrypter: _syncEncrypters[username]!,
+          deviceId: infoFile.value.deviceId,
           credentials: _credentialsFile!)!;
       while (!acc.isRSAKeypairLoaded) {
         await Future.delayed(const Duration(milliseconds: 500));
@@ -1497,6 +1503,157 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  'getDeviceId': GlareModule(
+                    name: 'getDeviceId',
+                    target: (args, {required addModule}) async {
+                      PassyInfoFile infoFile = PassyInfo.fromFile(File(
+                          _passyDataPath +
+                              Platform.pathSeparator +
+                              'passy.json'));
+                      if (infoFile.value.deviceId.isEmpty) {
+                        Random random = Random.secure();
+                        infoFile.value.deviceId =
+                            '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
+                        await infoFile.save();
+                      }
+                      return {
+                        'hostDeviceId': infoFile.value.deviceId,
+                      };
+                    },
+                  ),
+                  'getTrustedConnection': GlareModule(
+                    name: 'getTrustedConnection',
+                    target: (args, {required addModule}) async {
+                      if (args.length < 5) {
+                        throw {
+                          'error': {'type': 'Missing arguments'},
+                        };
+                      }
+                      dynamic username = args[3];
+                      dynamic deviceId = args[4];
+                      if (username is! String) {
+                        throw {
+                          'error': {'type': 'Username is not of type String'},
+                        };
+                      }
+                      if (deviceId is! String) {
+                        throw {
+                          'error': {'type': 'Device id is not of type String'},
+                        };
+                      }
+                      if (deviceId.length < 16) {
+                        throw {
+                          'error': {'type': 'Invalid device id'},
+                        };
+                      }
+                      PassyInfoFile infoFile = PassyInfo.fromFile(File(
+                          _passyDataPath +
+                              Platform.pathSeparator +
+                              'passy.json'));
+                      if (infoFile.value.deviceId.isEmpty) {
+                        Random random = Random.secure();
+                        infoFile.value.deviceId =
+                            '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
+                        await infoFile.save();
+                      }
+                      File hashFile = File(_accountsPath +
+                          Platform.pathSeparator +
+                          username +
+                          Platform.pathSeparator +
+                          'trusted_connections' +
+                          Platform.pathSeparator +
+                          '${infoFile.value.deviceId}--$deviceId');
+                      String? fileData;
+                      if (await hashFile.exists()) {
+                        fileData = await hashFile.readAsString();
+                      }
+                      return {
+                        'hostDeviceId': infoFile.value.deviceId,
+                        'connectionData': fileData,
+                      };
+                    },
+                  ),
+                  'setTrustedConnection': GlareModule(
+                    name: 'setTrustedConnection',
+                    target: (args, {required addModule}) async {
+                      if (args.length < 7) {
+                        throw {
+                          'error': {'type': 'Missing arguments'},
+                        };
+                      }
+                      dynamic username = args[3];
+                      dynamic deviceId = args[4];
+                      dynamic auth = args[5];
+                      dynamic connectionData = args[6];
+                      if (username is! String) {
+                        throw {
+                          'error': {'type': 'Username is not of type String'},
+                        };
+                      }
+                      if (deviceId is! String) {
+                        throw {
+                          'error': {'type': 'Device id is not of type String'},
+                        };
+                      }
+                      if (auth is! String) {
+                        throw {
+                          'error': {'type': 'Auth is not of type String'},
+                        };
+                      }
+                      if (connectionData is! String) {
+                        throw {
+                          'error': {
+                            'type': 'Connection data is not of type String'
+                          },
+                        };
+                      }
+                      if (deviceId.length < 16) {
+                        throw {
+                          'error': {'type': 'Invalid device id'},
+                        };
+                      }
+                      Encrypter? encrypter = _syncEncrypters[username];
+                      Encrypter usernameEncrypter =
+                          pcommon.getPassyEncrypter(username);
+                      if (encrypter == null) {
+                        return {
+                          'error': {'type': 'Failed to authenticate'},
+                        };
+                      }
+                      try {
+                        util.verifyAuth(auth,
+                            encrypter: encrypter,
+                            usernameEncrypter: usernameEncrypter,
+                            withIV: true);
+                      } catch (_) {
+                        return {
+                          'error': {'type': 'Failed to authenticate'},
+                        };
+                      }
+                      PassyInfoFile infoFile = PassyInfo.fromFile(File(
+                          _passyDataPath +
+                              Platform.pathSeparator +
+                              'passy.json'));
+                      File hashFile = File(_accountsPath +
+                          Platform.pathSeparator +
+                          username +
+                          Platform.pathSeparator +
+                          'trusted_connections' +
+                          Platform.pathSeparator +
+                          '${infoFile.value.deviceId}--$deviceId');
+                      TrustedConnectionData connectionDataDecrypted =
+                          TrustedConnectionData.fromEncrypted(
+                              data: connectionData, encrypter: encrypter);
+                      if (!await hashFile.exists()) {
+                        await hashFile.create(recursive: true);
+                      }
+                      await hashFile.writeAsString(
+                          connectionDataDecrypted.toEncrypted(encrypter));
+                      return {
+                        'status': {'type': 'Success'},
+                      };
+                    },
+                  ),
                 },
                 serviceInfo:
                     'Passy cross-platform password manager entry synchronization server v${pcommon.syncVersion}',
@@ -1731,11 +1888,19 @@ Future<void> executeCommand(List<String> command,
                   ...client.getReport().toJson(),
                 };
               };
+              PassyInfoFile infoFile = PassyInfo.fromFile(
+                  File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               if (detached) {
-                client.connect2d0d0(host, password: password);
+                client.connect2d0d0(host,
+                    password: password,
+                    deviceId: infoFile.value.deviceId,
+                    verifyTrustedConnectionData: true);
                 log(fullAddr, id: id);
               } else {
-                await client.connect2d0d0(host, password: password);
+                await client.connect2d0d0(host,
+                    password: password,
+                    deviceId: infoFile.value.deviceId,
+                    verifyTrustedConnectionData: true);
               }
               return;
           }

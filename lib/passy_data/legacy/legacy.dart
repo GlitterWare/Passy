@@ -96,6 +96,7 @@ LoadedAccount? loadLegacyAccount({
   required String path,
   required Encrypter encrypter,
   required Encrypter syncEncrypter,
+  required String deviceId,
   AccountCredentialsFile? credentials,
 }) {
   convertLegacyAccount(path: path, encrypter: encrypter);
@@ -103,6 +104,7 @@ LoadedAccount? loadLegacyAccount({
     path: path,
     encrypter: encrypter,
     syncEncrypter: syncEncrypter,
+    deviceId: deviceId,
     credentials: credentials,
   );
 }

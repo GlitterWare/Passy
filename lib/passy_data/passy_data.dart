@@ -252,6 +252,7 @@ class PassyData {
       ..createSync()
       ..writeAsStringSync(common.accountVersion);
     _accounts[username] = _file;
+    await info.reload();
     LoadedAccount.fromDirectory(
       path: _accountPath,
       credentials: _file,
@@ -259,6 +260,7 @@ class PassyData {
           .getPassyEncrypterFromBytes(Uint8List.fromList(result.rawBytes)),
       syncEncrypter:
           await getSyncEncrypter(username: username, password: password),
+      deviceId: info.value.deviceId,
     );
   }
 
@@ -294,10 +296,12 @@ class PassyData {
 
   Future<LoadedAccount> loadAccount(
       String username, Encrypter encrypter, Encrypter syncEncrypter) async {
+    await info.reload();
     _loadedAccount = loadLegacyAccount(
       path: accountsPath + Platform.pathSeparator + username,
       encrypter: encrypter,
       syncEncrypter: syncEncrypter,
+      deviceId: info.value.deviceId,
       credentials: _accounts[username],
     );
     _loadedAccountEncrypter = encrypter;
@@ -374,9 +378,11 @@ class PassyData {
       Encrypter syncEncrypter = await common.getSyncEncrypter(password,
           derivationInfo: creds.value.keyDerivationInfo,
           derivationType: creds.value.keyDerivationType);
+      await info.reload();
       LoadedAccount _account = loadLegacyAccount(
           path: _tempAccountPath,
           encrypter: encrypter,
+          deviceId: info.value.deviceId,
           syncEncrypter: syncEncrypter)!;
       _account.bioAuthEnabled = false;
       _account.clearRemovedHistory();
@@ -432,8 +438,11 @@ class PassyData {
         Directory(accountsPath + Platform.pathSeparator + username);
     await common.copyDirectory(_accDir, _tempAccDir);
     {
+      await info.reload();
       JSONLoadedAccount _jsonAcc = JSONLoadedAccount.fromEncryptedCSVDirectory(
-          path: _tempAccPath, encrypter: encrypter);
+          path: _tempAccPath,
+          encrypter: encrypter,
+          deviceId: info.value.deviceId);
       await _tempAccDir.delete(recursive: true);
       await _tempAccDir.create();
       _jsonAcc.saveSync();
@@ -489,9 +498,10 @@ class PassyData {
     _tempAccountPath = _tempPath + Platform.pathSeparator + _username;
     Directory _tempAccountDir = Directory(_tempAccountPath);
     {
-      LoadedAccount _account =
-          JSONLoadedAccount.fromDirectory(path: _tempAccountPath)
-              .toEncryptedCSVLoadedAccount(encrypter, syncEncrypter);
+      await info.reload();
+      LoadedAccount _account = JSONLoadedAccount.fromDirectory(
+              path: _tempAccountPath, deviceId: info.value.deviceId)
+          .toEncryptedCSVLoadedAccount(encrypter, syncEncrypter);
       await _tempAccountDir.delete(recursive: true);
       await _tempAccountDir.create();
       _account.bioAuthEnabled = false;

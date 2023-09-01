@@ -7,6 +7,7 @@ import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/account_settings.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:passy/passy_data/trusted_connection_data.dart';
 
 import 'favorites.dart';
 import 'passy_entries_encrypted_csv_file.dart';
@@ -725,6 +726,9 @@ class Synchronization {
     String address, {
     Socket? socket,
     String? password,
+    String? deviceId,
+    bool verifyTrustedConnectionData = false,
+    Directory? trustedConnectionsDir,
   }) async {
     void _handleApiException(String message, Object exception) {
       if (exception is Map<String, dynamic>) {
@@ -815,6 +819,42 @@ class Synchronization {
         };
       }
 
+      if (verifyTrustedConnectionData) {
+        if (deviceId != null && trustedConnectionsDir != null) {
+          _syncLog += 'done.\nVerifying trusted connection data... ';
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            'getTrustedConnection',
+            _username,
+            deviceId,
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          try {
+            File connectionFile = File(trustedConnectionsDir.path +
+                Platform.pathSeparator +
+                '${response['hostDeviceId']}--$deviceId');
+            TrustedConnectionData local = TrustedConnectionData.fromEncrypted(
+                data: await connectionFile.readAsString(),
+                encrypter: _encrypter);
+            TrustedConnectionData remote = TrustedConnectionData.fromEncrypted(
+                data: response['connectionData'], encrypter: _encrypter);
+            if (local.deviceId != remote.deviceId) {
+              _handleException('Trusted connection data does not match');
+              return;
+            }
+            if (!local.version.isAtSameMomentAs(remote.version)) {
+              _handleException('Trusted connection data does not match');
+              return;
+            }
+          } catch (e) {
+            _handleApiException('Failed to verify trusted connection data', e);
+            return;
+          }
+        }
+      }
       if (password != null) {
         _syncLog += 'done.\nLogging in... ';
         bool loggedIn = false;
@@ -854,6 +894,49 @@ class Synchronization {
           apiVersion += '_$_username';
           password = '';
         }
+      }
+      if (deviceId != null && trustedConnectionsDir != null) {
+        _syncLog += 'done.\nUpdating trusted connection data... ';
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'getDeviceId',
+          _username,
+          deviceId,
+        ]));
+        dynamic hostDeviceId = response['hostDeviceId'];
+        if (hostDeviceId is! String) {
+          _handleException('Host did not provide their device id.');
+          return;
+        }
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        TrustedConnectionData trustedConnectionData = TrustedConnectionData(
+            deviceId: deviceId, version: DateTime.now().toUtc());
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'setTrustedConnection',
+          _username,
+          deviceId,
+          util.generateAuth(
+              encrypter: _encrypter,
+              usernameEncrypter: usernameEncrypter,
+              withIV: true),
+          trustedConnectionData.toEncrypted(_encrypter),
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        File connectionFile = File(trustedConnectionsDir.path +
+            Platform.pathSeparator +
+            '$hostDeviceId--$deviceId');
+        if (!await connectionFile.exists()) {
+          await connectionFile.create(recursive: true);
+        }
+        await connectionFile
+            .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
       }
       _syncLog += 'done.\nAuthenticating... ';
       Map<String, dynamic> authResponse =
@@ -1219,10 +1302,16 @@ class Synchronization {
   Future<void> connect2d0d0(
     HostAddress address, {
     String? password,
+    String? deviceId,
+    bool verifyTrustedConnectionData = false,
+    Directory? trustedConnectionsDir,
   }) async {
     return _synchronization2d0d0(
       "${address.ip.address}:${address.port}",
       password: password,
+      deviceId: deviceId,
+      verifyTrustedConnectionData: verifyTrustedConnectionData,
+      trustedConnectionsDir: trustedConnectionsDir,
     );
   }
 

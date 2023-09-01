@@ -37,6 +37,7 @@ import 'synchronization.dart';
 class LoadedAccount {
   Encrypter _encrypter;
   Encrypter _syncEncrypter;
+  final String _deviceId;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
   final LocalSettingsFile _localSettings;
@@ -49,10 +50,12 @@ class LoadedAccount {
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
   Completer<void>? _autoSyncCompleter;
+  final Map<String, int> _serversToTrust = {};
 
   LoadedAccount({
     required Encrypter encrypter,
     required Encrypter syncEncrypter,
+    required String deviceId,
     required File versionFile,
     required AccountCredentialsFile credentials,
     required LocalSettingsFile localSettings,
@@ -64,7 +67,8 @@ class LoadedAccount {
     required PaymentCardsFile paymentCards,
     required IDCardsFile idCards,
     required IdentitiesFile identities,
-  })  : _encrypter = encrypter,
+  })  : _deviceId = deviceId,
+        _encrypter = encrypter,
         _syncEncrypter = syncEncrypter,
         _versionFile = versionFile,
         _credentials = credentials,
@@ -138,6 +142,7 @@ class LoadedAccount {
     required String path,
     required Encrypter encrypter,
     required Encrypter syncEncrypter,
+    required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -181,6 +186,7 @@ class LoadedAccount {
     return LoadedAccount(
         encrypter: encrypter,
         syncEncrypter: syncEncrypter,
+        deviceId: deviceId,
         versionFile: versionFile,
         credentials: credentials,
         localSettings: localSettings,
@@ -339,6 +345,8 @@ class LoadedAccount {
         ?.connect(address);
   }
 
+  void trustServer(String address, int port) => _serversToTrust[address] = port;
+
   Future<void> _autoSyncCycle(
       String password, Completer<void> completer) async {
     if (sync2d0d0ServerInfo.isNotEmpty) {
@@ -355,9 +363,21 @@ class LoadedAccount {
         Synchronization? syncClient = getSynchronization();
         if (syncClient == null) continue;
         try {
+          bool verifyTrustedConnectionData;
+          if (_serversToTrust[info.address] == info.port) {
+            verifyTrustedConnectionData = false;
+            _serversToTrust.remove(info.address);
+          } else {
+            verifyTrustedConnectionData = true;
+          }
           await syncClient.connect2d0d0(
               HostAddress(InternetAddress(info.address), info.port),
-              password: passwordDecrypted);
+              password: passwordDecrypted,
+              deviceId: _deviceId,
+              verifyTrustedConnectionData: verifyTrustedConnectionData,
+              trustedConnectionsDir: Directory(_versionFile.parent.path +
+                  Platform.pathSeparator +
+                  'trusted_connections'));
         } catch (_) {}
       }
     }
@@ -938,6 +958,7 @@ class LoadedAccount {
 }
 
 class JSONLoadedAccount {
+  final String _deviceId;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
   final LocalSettingsFile _localSettings;
@@ -951,6 +972,7 @@ class JSONLoadedAccount {
   final PassyEntriesJSONFile<Identity> _identities;
 
   JSONLoadedAccount({
+    required String deviceId,
     required File versionFile,
     required AccountCredentialsFile credentials,
     required LocalSettingsFile localSettings,
@@ -962,7 +984,8 @@ class JSONLoadedAccount {
     required PassyEntriesJSONFile<PaymentCard> paymentCards,
     required PassyEntriesJSONFile<IDCard> idCards,
     required PassyEntriesJSONFile<Identity> identities,
-  })  : _versionFile = versionFile,
+  })  : _deviceId = deviceId,
+        _versionFile = versionFile,
         _credentials = credentials,
         _localSettings = localSettings,
         _settings = settings,
@@ -976,6 +999,7 @@ class JSONLoadedAccount {
 
   factory JSONLoadedAccount.fromDirectory({
     required String path,
+    required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -1024,6 +1048,7 @@ class JSONLoadedAccount {
       File(path + Platform.pathSeparator + 'identities.enc'),
     );
     return JSONLoadedAccount(
+        deviceId: deviceId,
         versionFile: versionFile,
         credentials: credentials,
         localSettings: localSettings,
@@ -1040,6 +1065,7 @@ class JSONLoadedAccount {
   factory JSONLoadedAccount.fromEncryptedCSVDirectory({
     required String path,
     required Encrypter encrypter,
+    required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -1110,6 +1136,7 @@ class JSONLoadedAccount {
     return JSONLoadedAccount(
       versionFile: versionFile,
       credentials: credentials,
+      deviceId: deviceId,
       localSettings: localSettings,
       settings: settings,
       history: history,
@@ -1128,6 +1155,7 @@ class JSONLoadedAccount {
       encrypter: encrypter,
       syncEncrypter: syncEncrypter,
       versionFile: _versionFile,
+      deviceId: _deviceId,
       credentials: _credentials,
       localSettings: _localSettings,
       settings: _settings.toEncryptedJSONFile(encrypter),
