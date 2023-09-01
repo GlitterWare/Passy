@@ -1894,13 +1894,17 @@ Future<void> executeCommand(List<String> command,
                 client.connect2d0d0(host,
                     password: password,
                     deviceId: infoFile.value.deviceId,
-                    verifyTrustedConnectionData: true);
+                    verifyTrustedConnectionData: true,
+                    trustedConnectionsDir:
+                        Directory('${accPath}trusted_connections'));
                 log(fullAddr, id: id);
               } else {
                 await client.connect2d0d0(host,
                     password: password,
                     deviceId: infoFile.value.deviceId,
-                    verifyTrustedConnectionData: true);
+                    verifyTrustedConnectionData: true,
+                    trustedConnectionsDir:
+                        Directory('${accPath}trusted_connections'));
               }
               return;
           }
