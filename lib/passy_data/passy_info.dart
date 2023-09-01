@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'dart:io';
 
 import 'common.dart';
@@ -7,43 +6,27 @@ import 'json_file.dart';
 
 typedef PassyInfoFile = JsonFile<PassyInfo>;
 
-const _themeModeToJson = {
-  ThemeMode.system: 'system',
-  ThemeMode.dark: 'dark',
-  ThemeMode.light: 'light',
-};
-
-const _themeModeFromJson = {
-  'system': ThemeMode.system,
-  'dark': ThemeMode.dark,
-  'light': ThemeMode.light,
-};
-
 class PassyInfo with JsonConvertable {
   String version;
   String lastUsername;
   String deviceId;
-  ThemeMode themeMode;
 
   PassyInfo({
     this.version = passyVersion,
     this.lastUsername = '',
     this.deviceId = '',
-    this.themeMode = ThemeMode.dark,
   });
 
   PassyInfo.fromJson(Map<String, dynamic> json)
       : version = json['version'] ?? '0.0.0',
         lastUsername = json['lastUsername'] ?? '',
-        deviceId = json['deviceId'] ?? '',
-        themeMode = _themeModeFromJson[json['themeMode']] ?? ThemeMode.dark;
+        deviceId = json['deviceId'] ?? '';
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'version': version,
         'lastUsername': lastUsername,
         'deviceId': deviceId,
-        'themeMode': _themeModeToJson[themeMode],
       };
 
   static PassyInfoFile fromFile(File file) => PassyInfoFile.fromFile(file,
