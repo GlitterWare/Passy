@@ -22,23 +22,27 @@ const _themeModeFromJson = {
 class PassyInfo with JsonConvertable {
   String version;
   String lastUsername;
+  String deviceId;
   ThemeMode themeMode;
 
   PassyInfo({
     this.version = passyVersion,
     this.lastUsername = '',
+    this.deviceId = '',
     this.themeMode = ThemeMode.dark,
   });
 
   PassyInfo.fromJson(Map<String, dynamic> json)
       : version = json['version'] ?? '0.0.0',
         lastUsername = json['lastUsername'] ?? '',
+        deviceId = json['deviceId'] ?? '',
         themeMode = _themeModeFromJson[json['themeMode']] ?? ThemeMode.dark;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'version': version,
         'lastUsername': lastUsername,
+        'deviceId': deviceId,
         'themeMode': _themeModeToJson[themeMode],
       };
 

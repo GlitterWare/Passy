@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:archive/archive_io.dart';
 import 'package:crypto/crypto.dart';
@@ -142,10 +143,18 @@ class PassyData {
         accountsPath = path + Platform.pathSeparator + 'accounts',
         info = PassyInfo.fromFile(
             File(path + Platform.pathSeparator + 'passy.json')) {
+    bool isInfoChanged = false;
     if (info.value.version != common.passyVersion) {
       info.value.version = common.passyVersion;
-      info.saveSync();
+      isInfoChanged = true;
     }
+    if (info.value.deviceId.isEmpty) {
+      Random random = Random.secure();
+      info.value.deviceId =
+          '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
+      isInfoChanged = true;
+    }
+    if (isInfoChanged) info.saveSync();
     refreshAccounts();
     if (!_accounts.containsKey(info.value.lastUsername)) {
       if (_accounts.isEmpty) {
