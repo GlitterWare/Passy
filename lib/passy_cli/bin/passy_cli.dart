@@ -1346,6 +1346,9 @@ Future<void> executeCommand(List<String> command,
                       encrypter: encrypter),
                   favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                       encrypter: encrypter),
+                  settings: AccountSettings.fromFile(
+                      File('${accPath}idCards.enc'),
+                      encrypter: encrypter),
                 );
                 for (MapEntry<String, GlareModule> module
                     in syncModules.entries) {
@@ -1426,6 +1429,9 @@ Future<void> executeCommand(List<String> command,
                             encrypter: encrypter),
                         favorites: Favorites.fromFile(
                             File('${accPath}favorites.enc'),
+                            encrypter: encrypter),
+                        settings: AccountSettings.fromFile(
+                            File('${accPath}idCards.enc'),
                             encrypter: encrypter),
                       );
                       loadedModules.addAll(syncModules);

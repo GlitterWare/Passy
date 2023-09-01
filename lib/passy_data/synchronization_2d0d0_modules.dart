@@ -19,7 +19,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required Encrypter encrypter,
   required HistoryFile history,
   required FavoritesFile favorites,
-  AccountSettingsFile? settings,
+  required AccountSettingsFile settings,
   Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
@@ -204,11 +204,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               onRemoveEntry: onRemoveEntry,
               onSetEntry: onSetEntry,
             );
-            if (settings != null) {
-              await settings.reload();
-              settings.value.lastSyncDate = DateTime.now().toUtc();
-              await settings.save();
-            }
+            await settings.reload();
+            settings.value.lastSyncDate = DateTime.now().toUtc();
+            await settings.save();
             return {
               'status': {'type': 'Success'}
             };
