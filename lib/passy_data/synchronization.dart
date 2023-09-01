@@ -822,12 +822,16 @@ class Synchronization {
           'authenticate',
           _username,
           util.generateAuth(
-              encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
+              encrypter: _encrypter,
+              usernameEncrypter: usernameEncrypter,
+              withIV: true),
         ]));
         if (!response.containsKey('error')) {
           try {
             util.verifyAuth(response['auth'],
-                encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
+                encrypter: _encrypter,
+                usernameEncrypter: usernameEncrypter,
+                withIV: true);
           } catch (e) {
             _handleApiException('Failed to verify host auth', e);
             return;

@@ -1393,7 +1393,8 @@ Future<void> executeCommand(List<String> command,
                       try {
                         util.verifyAuth(auth,
                             encrypter: encrypter,
-                            usernameEncrypter: usernameEncrypter);
+                            usernameEncrypter: usernameEncrypter,
+                            withIV: true);
                       } catch (_) {
                         return {
                           'error': {'type': 'Failed to authenticate'},
@@ -1403,7 +1404,8 @@ Future<void> executeCommand(List<String> command,
                         'status': {'type': 'Success'},
                         'auth': util.generateAuth(
                             encrypter: encrypter,
-                            usernameEncrypter: usernameEncrypter),
+                            usernameEncrypter: usernameEncrypter,
+                            withIV: true),
                       };
                     },
                   ),

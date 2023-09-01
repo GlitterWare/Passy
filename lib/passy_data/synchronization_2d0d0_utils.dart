@@ -532,16 +532,30 @@ Future<void> processTypedExchangeEntries({
   }
 }
 
-String generateAuth(
-    {required Encrypter encrypter, required Encrypter usernameEncrypter}) {
-  return encrypt(
+String generateAuth({
+  required Encrypter encrypter,
+  required Encrypter usernameEncrypter,
+  bool withIV = false,
+}) {
+  IV? iv = withIV ? IV.fromSecureRandom(16) : null;
+  String auth = encrypt(
       encrypt(jsonEncode({'date': DateTime.now().toUtc().toIso8601String()}),
           encrypter: usernameEncrypter),
-      encrypter: encrypter);
+      encrypter: encrypter,
+      iv: iv);
+  if (iv == null) {
+    return auth;
+  } else {
+    return '${iv.base64},$auth';
+  }
 }
 
-void verifyAuth(dynamic auth,
-    {required Encrypter encrypter, required Encrypter usernameEncrypter}) {
+void verifyAuth(
+  dynamic auth, {
+  required Encrypter encrypter,
+  required Encrypter usernameEncrypter,
+  bool withIV = false,
+}) {
   if (auth is! String) {
     throw {
       'error': {
@@ -551,8 +565,23 @@ void verifyAuth(dynamic auth,
       },
     };
   }
+  IV? iv;
+  if (withIV) {
+    try {
+      List<String> authSplit = auth.split(',');
+      iv = IV.fromBase64(authSplit[0]);
+      auth = authSplit[1];
+    } catch (_) {
+      throw {
+        'error': {
+          'type': 'Malformed auth',
+          'description': 'Expected one IV, found none'
+        },
+      };
+    }
+  }
   try {
-    auth = decrypt(decrypt(auth, encrypter: encrypter),
+    auth = decrypt(decrypt(auth, encrypter: encrypter, iv: iv),
         encrypter: usernameEncrypter);
   } catch (e) {
     throw {
