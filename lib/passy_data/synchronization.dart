@@ -815,9 +815,9 @@ class Synchronization {
         };
       }
 
-      _syncLog += 'done.\nLogging in... ';
-      bool loggedIn = false;
       if (password != null) {
+        _syncLog += 'done.\nLogging in... ';
+        bool loggedIn = false;
         response = _checkResponse(await _safeSync2d0d0Client.runModule([
           'authenticate',
           _username,
@@ -840,9 +840,7 @@ class Synchronization {
           loggedIn = true;
           password = '';
         }
-      }
-      if (!loggedIn) {
-        if (password != null) {
+        if (!loggedIn) {
           response = _checkResponse(await _safeSync2d0d0Client.runModule([
             'login',
             _username,
