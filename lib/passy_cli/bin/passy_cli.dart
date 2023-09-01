@@ -32,6 +32,7 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
 import 'package:passy/passy_data/autostart.dart';
+import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
 
 const String helpMsg = '''
 
@@ -1361,6 +1362,51 @@ Future<void> executeCommand(List<String> command,
                 keypair: RSAKeypair.fromRandom(keySize: 4096),
                 modules: {
                   ...loadedModules,
+                  'authenticate': GlareModule(
+                    name: 'authenticate',
+                    target: (args, {required addModule}) async {
+                      if (args.length < 5) {
+                        throw {
+                          'error': {'type': 'Missing arguments'},
+                        };
+                      }
+                      dynamic username = args[3];
+                      dynamic auth = args[4];
+                      if (username is! String) {
+                        throw {
+                          'error': {'type': 'Username is not of type String'},
+                        };
+                      }
+                      if (auth is! String) {
+                        throw {
+                          'error': {'type': 'Auth is not of type String'},
+                        };
+                      }
+                      Encrypter? encrypter = _syncEncrypters[username];
+                      if (encrypter == null) {
+                        return {
+                          'error': {'type': 'Failed to authenticate'},
+                        };
+                      }
+                      Encrypter usernameEncrypter =
+                          pcommon.getPassyEncrypter(username);
+                      try {
+                        util.verifyAuth(auth,
+                            encrypter: encrypter,
+                            usernameEncrypter: usernameEncrypter);
+                      } catch (_) {
+                        return {
+                          'error': {'type': 'Failed to authenticate'},
+                        };
+                      }
+                      return {
+                        'status': {'type': 'Success'},
+                        'auth': util.generateAuth(
+                            encrypter: encrypter,
+                            usernameEncrypter: usernameEncrypter),
+                      };
+                    },
+                  ),
                   'login': GlareModule(
                     name: 'login',
                     target: (args, {required addModule}) async {
@@ -1369,15 +1415,20 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Missing arguments'},
                         };
                       }
-                      String username = args[3];
-                      String password = args[4];
+                      dynamic username = args[3];
+                      dynamic password = args[4];
+                      if (username is! String) {
+                        throw {
+                          'error': {'type': 'Username is not of type String'},
+                        };
+                      }
+                      if (password is! String) {
+                        throw {
+                          'error': {'type': 'Password is not of type String'},
+                        };
+                      }
                       if (loadedModules.containsKey('2d0d1_$username')) {
                         AccountCredentialsFile creds = _accounts[username]!;
-                        if (creds.value.passwordHash == password) {
-                          return {
-                            'status': {'type': 'Success'},
-                          };
-                        }
                         if (creds.value.passwordHash ==
                             (await cn.getPasswordHash(password,
                                     derivationType:
@@ -1434,9 +1485,9 @@ Future<void> executeCommand(List<String> command,
                             File('${accPath}settings.enc'),
                             encrypter: encrypter),
                       );
-                      loadedModules.addAll(syncModules);
                       for (MapEntry<String, GlareModule> module
                           in syncModules.entries) {
+                        loadedModules['${module.key}_$username'] = module.value;
                         addModule('${module.key}_$username', module.value);
                       }
                       return {
@@ -1679,12 +1730,10 @@ Future<void> executeCommand(List<String> command,
                 };
               };
               if (detached) {
-                client.connect2d0d0(host,
-                    username: accountName, password: password);
+                client.connect2d0d0(host, password: password);
                 log(fullAddr, id: id);
               } else {
-                await client.connect2d0d0(host,
-                    username: accountName, password: password);
+                await client.connect2d0d0(host, password: password);
               }
               return;
           }

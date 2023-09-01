@@ -357,7 +357,6 @@ class LoadedAccount {
         try {
           await syncClient.connect2d0d0(
               HostAddress(InternetAddress(info.address), info.port),
-              username: username,
               password: passwordDecrypted);
         } catch (_) {}
       }

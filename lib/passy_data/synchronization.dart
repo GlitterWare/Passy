@@ -724,7 +724,6 @@ class Synchronization {
   Future<void> _synchronization2d0d0(
     String address, {
     Socket? socket,
-    String? username,
     String? password,
   }) async {
     void _handleApiException(String message, Object exception) {
@@ -817,11 +816,32 @@ class Synchronization {
       }
 
       _syncLog += 'done.\nLogging in... ';
-      if (username != null) {
+      bool loggedIn = false;
+      if (password != null) {
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'authenticate',
+          _username,
+          util.generateAuth(
+              encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
+        ]));
+        if (!response.containsKey('error')) {
+          try {
+            util.verifyAuth(response['auth'],
+                encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
+          } catch (e) {
+            _handleApiException('Failed to verify host auth', e);
+            return;
+          }
+          apiVersion += '_$_username';
+          loggedIn = true;
+          password = '';
+        }
+      }
+      if (!loggedIn) {
         if (password != null) {
           response = _checkResponse(await _safeSync2d0d0Client.runModule([
             'login',
-            username,
+            _username,
             password,
           ]));
           if (response.containsKey('error')) {
@@ -829,10 +849,10 @@ class Synchronization {
                 '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
             return;
           }
+          apiVersion += '_$_username';
+          password = '';
         }
-        apiVersion += '_$username';
       }
-
       _syncLog += 'done.\nAuthenticating... ';
       Map<String, dynamic> authResponse =
           _checkResponse(await _safeSync2d0d0Client.runModule([
@@ -1196,12 +1216,10 @@ class Synchronization {
 
   Future<void> connect2d0d0(
     HostAddress address, {
-    String? username,
     String? password,
   }) async {
     return _synchronization2d0d0(
       "${address.ip.address}:${address.port}",
-      username: username,
       password: password,
     );
   }
