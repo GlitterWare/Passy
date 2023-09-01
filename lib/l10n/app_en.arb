@@ -268,7 +268,7 @@
     "port": "Port",
     "installServer": "Install server",
     "doubleClickMessage": "Using your file manager, navigate to the specified install directory and double-click ",
-    "doubleClickMessage1": "You may need to right click the file and select `Run as a Program` if double-clicking opens it in a text editor.",
+    "doubleClickMessage1": "You may need to right-click the file and select `Run as a Program` if double-clicking opens it in a text editor.",
     "@installMessage": { "description": "This message is followed by an executable file name that the user has to double-click" },
     "startServer": "Start server",
     "testConnection": "Test connection",
