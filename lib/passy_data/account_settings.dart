@@ -31,9 +31,9 @@ class AccountSettings with JsonConvertable {
                 return MapEntry(info.nickname, info);
               }))
             : {},
-        lastSyncDate = json.containsKey('lastSyncDate')
-            ? DateTime.parse(json['lastSyncDate'])
-            : null;
+        lastSyncDate = json['lastSyncDate'] == null
+            ? null
+            : DateTime.parse(json['lastSyncDate']);
 
   AccountSettings({
     this.protectScreen = true,
