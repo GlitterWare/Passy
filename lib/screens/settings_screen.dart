@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -127,8 +128,18 @@ class _SettingsScreen extends State<SettingsScreen> {
                 child: Icon(Icons.desktop_windows_rounded),
               ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, ServersScreen.routeName))),
+              onPressed: () {
+                if (!data.loadedAccount!.isRSAKeypairLoaded) {
+                  showSnackBar(
+                    context,
+                    message: localizations.settingUpSynchronization,
+                    icon: const Icon(CupertinoIcons.clock_solid,
+                        color: PassyTheme.darkContentColor),
+                  );
+                  return;
+                }
+                Navigator.pushNamed(context, ServersScreen.routeName);
+              })),
           PassyPadding(ThreeWidgetButton(
             left: Padding(
               padding: const EdgeInsets.only(right: 30),
