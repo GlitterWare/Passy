@@ -300,6 +300,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           ],
                         ),
                       ),
+                      Text(localizations.doubleClickMessage1),
                       PassyPadding(
                         RichText(
                           textScaleFactor: 1.25,
