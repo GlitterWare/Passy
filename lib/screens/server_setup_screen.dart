@@ -371,7 +371,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           children: [
                             TextSpan(
                               text: 'autostart_add' +
-                                  (Platform.isWindows ? '.bat' : ''),
+                                  (Platform.isWindows ? '.bat' : '.sh'),
                               style: const TextStyle(
                                   color: PassyTheme.lightContentSecondaryColor),
                             ),

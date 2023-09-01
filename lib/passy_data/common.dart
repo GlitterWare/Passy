@@ -458,8 +458,8 @@ List<String> _cliFiles = [
 Future<void> removePassyCLI(Directory directory) async {
   List<String> files = [
     ..._cliFiles,
-    'autostart_add' + (Platform.isWindows ? '.bat' : ''),
-    'autostart_del' + (Platform.isWindows ? '.bat' : ''),
+    'autostart_add' + (Platform.isWindows ? '.bat' : '.sh'),
+    'autostart_del' + (Platform.isWindows ? '.bat' : '.sh'),
   ];
   for (String fileName in files) {
     if (fileName.isEmpty) continue;
@@ -545,11 +545,11 @@ Future<File> copyPassyCLIServer({
     File autostartAdd = File(to.path +
         Platform.pathSeparator +
         'autostart_add' +
-        (Platform.isWindows ? '.bat' : ''));
+        (Platform.isWindows ? '.bat' : '.sh'));
     File autostartDel = File(to.path +
         Platform.pathSeparator +
         'autostart_del' +
-        (Platform.isWindows ? '.bat' : ''));
+        (Platform.isWindows ? '.bat' : '.sh'));
     if (await autostartAdd.exists()) {
       try {
         await autostartAdd.delete();
