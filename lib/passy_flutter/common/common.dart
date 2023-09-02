@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:http/http.dart' as http;
 
 String capitalize(String string) {
   if (string.isEmpty) return '';
@@ -95,4 +96,13 @@ Widget getCardTypeImage(CardType? cardType) {
     width: 48,
     package: 'flutter_credit_card',
   );
+}
+
+Future<bool> confirmUrlStatusCode(String url, {int statusCode = 200}) async {
+  try {
+    Uri uri = Uri.parse(url);
+    http.Response response = await http.get(uri);
+    if (response.statusCode == statusCode) return true;
+  } catch (_) {}
+  return false;
 }
