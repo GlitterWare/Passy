@@ -19,6 +19,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/splash_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'add_account_screen.dart';
 import 'common.dart';
@@ -46,6 +47,7 @@ class _LoginScreen extends State<LoginScreen> {
 
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
+      UnlockScreen.isAuthenticating = true;
       if (data.getBioAuthEnabled(_username) ?? false) {
         BiometricStorageData storageData =
             await BioStorage.fromLocker(_username);
@@ -85,6 +87,8 @@ class _LoginScreen extends State<LoginScreen> {
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => UnlockScreen.isAuthenticating = false);
     }
   }
 
