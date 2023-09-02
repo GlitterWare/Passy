@@ -102,7 +102,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     } catch (e, s) {
       showSnackBar(
         context,
-        message: localizations.somethingWentWrong,
+        message: localizations.couldNotConnectToServer,
         icon:
             const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
         action: SnackBarAction(
