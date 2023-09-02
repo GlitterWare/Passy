@@ -29,8 +29,12 @@ const String _sameHistoryHash = 'same';
 
 class SynchronizationResults {
   Map<EntryType, List<util.ExchangeEntry>>? sharedEntries;
+  String log;
 
-  SynchronizationResults({this.sharedEntries});
+  SynchronizationResults({
+    this.sharedEntries,
+    required this.log,
+  });
 }
 
 class SynchronizationSignalData with JsonConvertable {
@@ -201,7 +205,7 @@ class Synchronization {
   final AccountSettingsFile _settings;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
-      SynchronizationResults();
+      SynchronizationResults(log: '');
   final void Function(SynchronizationResults)? _onComplete;
   bool _isOnCompleteCalled = false;
   final void Function(String log)? _onError;
@@ -249,6 +253,7 @@ class Synchronization {
   void _callOnComplete() {
     if (_isOnCompleteCalled) return;
     _isOnCompleteCalled = true;
+    _synchronizationResults.log = _syncLog;
     _onComplete?.call(_synchronizationResults);
   }
 
