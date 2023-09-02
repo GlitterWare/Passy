@@ -619,6 +619,7 @@ String genderToReadableName(Gender gender) {
 setOnError(BuildContext context) {
   FlutterError.onError = (e) {
     FlutterError.presentError(e);
+    if (e is HttpException) return;
     try {
       showSnackBar(
         navigatorKey.currentContext!,
@@ -635,6 +636,7 @@ setOnError(BuildContext context) {
     } catch (_) {}
   };
   PlatformDispatcher.instance.onError = (error, stack) {
+    if (error is HttpException) return false;
     try {
       showSnackBar(
         navigatorKey.currentContext!,
