@@ -32,25 +32,38 @@ class GlareServer {
     required Map<String, GlareModule> modules,
     Function(dynamic object)? log,
     String serviceInfo = 'Glare server protocol v$version',
+    int maxBindTries = 1,
+    Duration bindTryInterval = const Duration(seconds: 10),
   }) async {
     GlareServer _result;
     Map<String, GlareServerSocket> _sockets = {};
-    ServerSocket serverSocket = await ServerSocket.bind(address, port)
-      ..listen((Socket socket) {
-        String address = '${socket.remoteAddress.address}:${socket.remotePort}';
-        log?.call('I:Client $address connected.');
-        socket.done.catchError((Object error) {});
-        socket.writeln(serviceInfo);
-        _sockets[address] = GlareServerSocket(socket,
-            keypair: keypair,
-            maxIdleMs: maxIdleMs,
-            onDone: () {
-              _sockets.remove(address);
-              log?.call('I:Client $address disconnected.');
-            },
-            onError: (Object error) => {},
-            modules: modules);
-      }, onError: (Object error) => {});
+    ServerSocket serverSocket;
+    int bindTryCount = maxBindTries == 0 ? 1 : 0;
+    while (true) {
+      if (maxBindTries != 0) bindTryCount++;
+      try {
+        serverSocket = await ServerSocket.bind(address, port);
+        break;
+      } catch (_) {
+        if (bindTryCount == maxBindTries) rethrow;
+        await Future.delayed(bindTryInterval);
+      }
+    }
+    serverSocket.listen((Socket socket) {
+      String address = '${socket.remoteAddress.address}:${socket.remotePort}';
+      log?.call('I:Client $address connected.');
+      socket.done.catchError((Object error) {});
+      socket.writeln(serviceInfo);
+      _sockets[address] = GlareServerSocket(socket,
+          keypair: keypair,
+          maxIdleMs: maxIdleMs,
+          onDone: () {
+            _sockets.remove(address);
+            log?.call('I:Client $address disconnected.');
+          },
+          onError: (Object error) => {},
+          modules: modules);
+    }, onError: (Object error) => {});
     log?.call(
         'I:Glare server started at ${serverSocket.address.address}:${serverSocket.port}.');
     _result = GlareServer._(

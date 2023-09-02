@@ -1363,6 +1363,7 @@ Future<void> executeCommand(List<String> command,
                 }
               }
               GlareServer glareHost = await GlareServer.bind(
+                maxBindTries: 0,
                 address: host,
                 port: port,
                 keypair: RSAKeypair.fromRandom(keySize: 4096),
