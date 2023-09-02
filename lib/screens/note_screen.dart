@@ -140,6 +140,10 @@ class _NoteScreen extends State<NoteScreen> {
                   ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
                 ],
               ),
+              onTapLink: (text, url, title) {
+                if (url == null) return;
+                openUrl(url);
+              },
             ),
           ),
       ]),

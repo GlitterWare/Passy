@@ -6,6 +6,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/common.dart';
 
 import 'note_screen.dart';
 import 'notes_screen.dart';
@@ -126,6 +127,10 @@ class _EditNoteScreen extends State<EditNoteScreen> {
                     ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
                   ],
                 ),
+                onTapLink: (text, url, title) {
+                  if (url == null) return;
+                  openUrl(url);
+                },
               )),
       ]),
     );
