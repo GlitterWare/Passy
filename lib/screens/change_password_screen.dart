@@ -60,9 +60,13 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     _account
         .setAccountPassword(_newPassword,
             doNotReencryptEntries: _doNotReencryptEntries)
-        .then((value) {
-      Navigator.popUntil(context,
-          (route) => route.settings.name == CredentialsScreen.routeName);
+        .then((value) async {
+      _account.bioAuthEnabled = false;
+      await _account.saveCredentials();
+      if (mounted) {
+        Navigator.popUntil(context,
+            (route) => route.settings.name == CredentialsScreen.routeName);
+      }
     });
   }
 
