@@ -51,9 +51,15 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
             }
             Navigator.pushReplacementNamed(context, SplashScreen.routeName);
             data.changeAccountUsername(_account.username, value).then(
-                  (_) => Navigator.pushReplacementNamed(
-                      context, LoginScreen.routeName),
-                );
+              (_) async {
+                _account.bioAuthEnabled = false;
+                await _account.saveCredentials();
+                if (mounted) {
+                  return Navigator.pushReplacementNamed(
+                      context, LoginScreen.routeName);
+                }
+              },
+            );
             return true;
           },
         );
