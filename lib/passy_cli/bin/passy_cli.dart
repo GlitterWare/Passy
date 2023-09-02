@@ -1656,7 +1656,7 @@ Future<void> executeCommand(List<String> command,
                   ),
                 },
                 serviceInfo:
-                    'Passy cross-platform password manager entry synchronization server v${pcommon.syncVersion}',
+                    'Passy cross-platform password manager dedicated entry synchronization server v${pcommon.syncVersion}',
               );
               _syncCloseMethods['$host:$port'] = () async {
                 await glareHost.stop();
