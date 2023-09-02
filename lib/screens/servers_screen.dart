@@ -112,6 +112,7 @@ class _ServersScreen extends State<ServersScreen> {
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 if (!Platform.isAndroid && !Platform.isIOS)
@@ -162,6 +163,7 @@ class _ServersScreen extends State<ServersScreen> {
                       ),
                     ),
                     Flexible(
+                      flex: 2,
                       child: EnumDropDownButtonFormField<IntervalUnit>(
                         value: _syncIntervalUnits,
                         values: IntervalUnit.values,

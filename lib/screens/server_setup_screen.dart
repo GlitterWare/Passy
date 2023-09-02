@@ -163,6 +163,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: _address == null
                   ? const [
@@ -199,48 +200,45 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           ),
                         ),
                       ),
-                      Flexible(
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                    left: PassyTheme.passyPadding.right,
-                                    top: PassyTheme.passyPadding.top,
-                                    bottom: PassyTheme.passyPadding.bottom),
-                                child: TextFormField(
-                                  initialValue: _address,
-                                  decoration: InputDecoration(
-                                    labelText: localizations.hostAddress,
-                                  ),
-                                  onChanged: (s) =>
-                                      setState(() => _address = s),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: PassyTheme.passyPadding.right,
+                                  top: PassyTheme.passyPadding.top,
+                                  bottom: PassyTheme.passyPadding.bottom),
+                              child: TextFormField(
+                                initialValue: _address,
+                                decoration: InputDecoration(
+                                  labelText: localizations.hostAddress,
                                 ),
+                                onChanged: (s) => setState(() => _address = s),
                               ),
                             ),
-                            Flexible(
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                    left: PassyTheme.passyPadding.right,
-                                    top: PassyTheme.passyPadding.top,
-                                    bottom: PassyTheme.passyPadding.bottom),
-                                child: TextFormField(
-                                  initialValue: _port.toString(),
-                                  decoration: InputDecoration(
-                                    labelText: localizations.port,
-                                  ),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
-                                  onChanged: (s) {
-                                    setState(() =>
-                                        _port = s.isEmpty ? 0 : int.parse(s));
-                                  },
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: PassyTheme.passyPadding.right,
+                                  top: PassyTheme.passyPadding.top,
+                                  bottom: PassyTheme.passyPadding.bottom),
+                              child: TextFormField(
+                                initialValue: _port.toString(),
+                                decoration: InputDecoration(
+                                  labelText: localizations.port,
                                 ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (s) {
+                                  setState(() =>
+                                      _port = s.isEmpty ? 0 : int.parse(s));
+                                },
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       PassyPadding(
                         RichText(
