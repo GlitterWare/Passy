@@ -293,5 +293,7 @@
     "connectToSynchronizationServer": "Connect to synchronization server",
     "nicknameCanNotBeEmpty": "Nickname can't be empty",
     "nicknameAlreadyInUse": "Nickname already in use",
-    "lastSynchronization": "Last synchronization"
+    "lastSynchronization": "Last synchronization",
+    "connecting": "Connecting",
+    "connectionEstablished": "Connection established"
 }

@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'package:crypto/crypto.dart';
+import 'package:encrypt/encrypt.dart' as enc;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/biometric_storage_data.dart';
+import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
@@ -47,7 +50,17 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     if (Platform.isAndroid || Platform.isIOS) {
       LoginScreen.isAuthenticating = true;
       if (data.getBioAuthEnabled(_username) ?? false) {
-        if ((await BioStorage.authenticate(_username))) {
+        BiometricStorageData storageData =
+            await BioStorage.fromLocker(_username);
+        KeyDerivationType derivationType =
+            data.getKeyDerivationType(_username)!;
+        KeyDerivationInfo derivationInfo =
+            data.getKeyDerivationInfo(_username)!;
+        if (data.getPasswordHash(_username) ==
+            (await getPasswordHash(storageData.password,
+                    derivationType: derivationType,
+                    derivationInfo: derivationInfo))
+                .toString()) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
           if (isAutofill) {
@@ -61,7 +74,17 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
             );
             return;
           }
-          data.loadedAccount!.startAutoSync(_password);
+          enc.Encrypter encrypter = await getPasswordEncrypter(
+              storageData.password,
+              derivationType: derivationType,
+              derivationInfo: derivationInfo);
+          enc.Encrypter syncEncrypter = await getSyncEncrypter(
+              storageData.password,
+              derivationType: derivationType,
+              derivationInfo: derivationInfo);
+          LoadedAccount account =
+              await data.loadAccount(_username, encrypter, syncEncrypter);
+          account.startAutoSync(storageData.password);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }

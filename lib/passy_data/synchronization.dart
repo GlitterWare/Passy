@@ -729,6 +729,8 @@ class Synchronization {
     String? deviceId,
     bool verifyTrustedConnectionData = false,
     Directory? trustedConnectionsDir,
+    void Function()? onTrustSaveComplete,
+    void Function()? onTrustSaveFailed,
   }) async {
     void _handleApiException(String message, Object exception) {
       if (exception is Map<String, dynamic>) {
@@ -828,6 +830,7 @@ class Synchronization {
             deviceId,
           ]));
           if (response.containsKey('error')) {
+            onTrustSaveFailed?.call();
             _handleException(
                 '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
             return;
@@ -842,14 +845,17 @@ class Synchronization {
             TrustedConnectionData remote = TrustedConnectionData.fromEncrypted(
                 data: response['connectionData'], encrypter: _encrypter);
             if (local.deviceId != remote.deviceId) {
+              onTrustSaveFailed?.call();
               _handleException('Trusted connection data does not match');
               return;
             }
             if (!local.version.isAtSameMomentAs(remote.version)) {
+              onTrustSaveFailed?.call();
               _handleException('Trusted connection data does not match');
               return;
             }
           } catch (e) {
+            onTrustSaveFailed?.call();
             _handleApiException('Failed to verify trusted connection data', e);
             return;
           }
@@ -873,6 +879,7 @@ class Synchronization {
                 usernameEncrypter: usernameEncrypter,
                 withIV: true);
           } catch (e) {
+            onTrustSaveFailed?.call();
             _handleApiException('Failed to verify host auth', e);
             return;
           }
@@ -887,6 +894,7 @@ class Synchronization {
             password,
           ]));
           if (response.containsKey('error')) {
+            onTrustSaveFailed?.call();
             _handleException(
                 '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
             return;
@@ -904,10 +912,12 @@ class Synchronization {
         ]));
         dynamic hostDeviceId = response['hostDeviceId'];
         if (hostDeviceId is! String) {
+          onTrustSaveFailed?.call();
           _handleException('Host did not provide their device id.');
           return;
         }
         if (response.containsKey('error')) {
+          onTrustSaveFailed?.call();
           _handleException(
               '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
           return;
@@ -925,6 +935,7 @@ class Synchronization {
           trustedConnectionData.toEncrypted(_encrypter),
         ]));
         if (response.containsKey('error')) {
+          onTrustSaveFailed?.call();
           _handleException(
               '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
           return;
@@ -937,6 +948,7 @@ class Synchronization {
         }
         await connectionFile
             .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
+        onTrustSaveComplete?.call();
       }
       _syncLog += 'done.\nAuthenticating... ';
       Map<String, dynamic> authResponse =
@@ -1305,13 +1317,17 @@ class Synchronization {
     String? deviceId,
     bool verifyTrustedConnectionData = false,
     Directory? trustedConnectionsDir,
-  }) async {
+    void Function()? onTrustSaveComplete,
+    void Function()? onTrustSaveFailed,
+  }) {
     return _synchronization2d0d0(
       "${address.ip.address}:${address.port}",
       password: password,
       deviceId: deviceId,
       verifyTrustedConnectionData: verifyTrustedConnectionData,
       trustedConnectionsDir: trustedConnectionsDir,
+      onTrustSaveComplete: onTrustSaveComplete,
+      onTrustSaveFailed: onTrustSaveFailed,
     );
   }
 

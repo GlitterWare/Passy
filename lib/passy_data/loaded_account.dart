@@ -50,7 +50,8 @@ class LoadedAccount {
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
   Completer<void>? _autoSyncCompleter;
-  final Map<String, int> _serversToTrust = {};
+  final Map<String, Sync2d0d0ServerInfo> _serversToTrust = {};
+  final Map<String, Completer<void>> _serversToTrustCompleters = {};
 
   LoadedAccount({
     required Encrypter encrypter,
@@ -345,11 +346,18 @@ class LoadedAccount {
         ?.connect(address);
   }
 
-  void trustServer(String address, int port) => _serversToTrust[address] = port;
+  Future<void> trustServer(Sync2d0d0ServerInfo server) async {
+    _serversToTrust[server.nickname] = server;
+    Completer<void> completer = Completer<void>();
+    _serversToTrustCompleters[server.nickname] = completer;
+    await completer.future;
+  }
 
   Future<void> _autoSyncCycle(
       String password, Completer<void> completer) async {
-    if (sync2d0d0ServerInfo.isNotEmpty) {
+    Map<String, Sync2d0d0ServerInfo> serverInfo = sync2d0d0ServerInfo;
+    serverInfo.addAll(_serversToTrust);
+    if (serverInfo.isNotEmpty) {
       String passwordDecrypted;
       try {
         passwordDecrypted = decrypt(password, encrypter: _encrypter);
@@ -359,14 +367,17 @@ class LoadedAccount {
         if (!completer.isCompleted) _autoSyncCycle(password, completer);
         return;
       }
-      for (Sync2d0d0ServerInfo info in sync2d0d0ServerInfo.values) {
+      for (Sync2d0d0ServerInfo info in serverInfo.values) {
         Synchronization? syncClient = getSynchronization();
         if (syncClient == null) continue;
         try {
           bool verifyTrustedConnectionData;
-          if (_serversToTrust[info.address] == info.port) {
+          Completer? trustCompleter;
+          if (_serversToTrust.containsKey(info.nickname)) {
             verifyTrustedConnectionData = false;
             _serversToTrust.remove(info.address);
+            trustCompleter = _serversToTrustCompleters[info.nickname];
+            _serversToTrustCompleters.remove(info.nickname);
           } else {
             verifyTrustedConnectionData = true;
           }
@@ -377,7 +388,10 @@ class LoadedAccount {
               verifyTrustedConnectionData: verifyTrustedConnectionData,
               trustedConnectionsDir: Directory(_versionFile.parent.path +
                   Platform.pathSeparator +
-                  'trusted_connections'));
+                  'trusted_connections'),
+              onTrustSaveComplete: () => trustCompleter?.complete(),
+              onTrustSaveFailed: () => trustCompleter?.completeError(
+                  'Failed to complete server trust saving procedures.'));
         } catch (_) {}
       }
     }

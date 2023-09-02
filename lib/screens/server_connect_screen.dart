@@ -91,13 +91,37 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     }
     setState(() => _connectionChecked = true);
     if (testRun) return;
-    _account.trustServer(address, _port);
+    showSnackBar(
+      context,
+      message: localizations.connecting,
+      icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
+    );
+    try {
+      await _account.trustServer(Sync2d0d0ServerInfo(
+          nickname: _nickname, address: address, port: _port));
+    } catch (e, s) {
+      showSnackBar(
+        context,
+        message: localizations.somethingWentWrong,
+        icon:
+            const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
+      return;
+    }
     _account.addSync2d0d0ServerInfo([
       Sync2d0d0ServerInfo(nickname: _nickname, address: address, port: _port)
     ]);
     await _account.saveSettings();
-    Navigator.popUntil(
-        context, (route) => route.settings.name == ServersScreen.routeName);
+    showSnackBar(
+      context,
+      message: localizations.connectionEstablished,
+      icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
+    );
   }
 
   @override
