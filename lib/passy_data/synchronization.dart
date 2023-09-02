@@ -854,7 +854,7 @@ class Synchronization {
               _handleException('Trusted connection data does not match');
               return;
             }
-            if (!local.version.isAtSameMomentAs(remote.version)) {
+            if (!local.version.isBefore(remote.version)) {
               onTrustSaveFailed?.call();
               _handleException('Trusted connection data does not match');
               return;

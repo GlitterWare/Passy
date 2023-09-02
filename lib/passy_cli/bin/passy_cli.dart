@@ -1645,6 +1645,9 @@ Future<void> executeCommand(List<String> command,
                       TrustedConnectionData connectionDataDecrypted =
                           TrustedConnectionData.fromEncrypted(
                               data: connectionData, encrypter: encrypter);
+                      connectionDataDecrypted.version = connectionDataDecrypted
+                          .version
+                          .add(const Duration(milliseconds: 1));
                       if (!await hashFile.exists()) {
                         await hashFile.create(recursive: true);
                       }
