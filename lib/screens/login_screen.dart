@@ -31,13 +31,12 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   static const routeName = '/login';
-  static bool isAuthenticating = false;
 
   @override
   State<LoginScreen> createState() => _LoginScreen();
 }
 
-class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
+class _LoginScreen extends State<LoginScreen> {
   static bool didRun = false;
   Widget? _floatingActionButton;
   String _password = '';
@@ -46,9 +45,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _bioAuth() async {
-    if (LoginScreen.isAuthenticating) return;
     if (Platform.isAndroid || Platform.isIOS) {
-      LoginScreen.isAuthenticating = true;
       if (data.getBioAuthEnabled(_username) ?? false) {
         BiometricStorageData storageData =
             await BioStorage.fromLocker(_username);
@@ -88,16 +85,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
-      Future.delayed(const Duration(seconds: 2))
-          .then((value) => LoginScreen.isAuthenticating = false);
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      _bioAuth();
     }
   }
 
@@ -280,16 +267,9 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           ),
       ]);
     }
-    WidgetsBinding.instance.addObserver(this);
     if (didRun) return;
     didRun = true;
     _bioAuth();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override

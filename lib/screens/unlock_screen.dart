@@ -15,6 +15,8 @@ import 'common.dart';
 class UnlockScreen extends StatefulWidget {
   static const String routeName = '/unlock';
 
+  static bool isAuthenticating = false;
+
   const UnlockScreen({Key? key}) : super(key: key);
 
   @override
@@ -46,20 +48,20 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _bioAuth() async {
-    if (LoginScreen.isAuthenticating) return;
+    if (UnlockScreen.isAuthenticating) return;
     if (!mounted) return;
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!_account.bioAuthEnabled) return;
-    LoginScreen.isAuthenticating = true;
+    UnlockScreen.isAuthenticating = true;
     try {
       BiometricStorageData data =
           await BioStorage.fromLocker(_account.username);
       Future.delayed(const Duration(seconds: 2))
-          .then((value) => LoginScreen.isAuthenticating = false);
+          .then((value) => UnlockScreen.isAuthenticating = false);
       if (data.password.isEmpty) return;
     } catch (e) {
       Future.delayed(const Duration(seconds: 2))
-          .then((value) => LoginScreen.isAuthenticating = false);
+          .then((value) => UnlockScreen.isAuthenticating = false);
       return;
     }
     _shouldPop = true;
