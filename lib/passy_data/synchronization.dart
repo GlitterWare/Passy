@@ -656,6 +656,7 @@ class Synchronization {
                 address: _ip,
                 port: 0,
                 keypair: _rsaKeypair,
+                maxTotalConnections: 1,
                 modules: buildSynchronization2d0d0Modules(
                   username: _username,
                   passyEntries: _passyEntries,
