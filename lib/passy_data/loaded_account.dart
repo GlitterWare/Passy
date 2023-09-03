@@ -308,6 +308,10 @@ class LoadedAccount {
       rsaKeypair: rsaKeypair,
       authWithIV:
           _credentials.value.keyDerivationType != KeyDerivationType.none,
+      synchronizationType:
+          _credentials.value.keyDerivationType == KeyDerivationType.none
+              ? SynchronizationType.classic
+              : SynchronizationType.v2d0d0,
       onComplete: onComplete,
       onError: onError,
     );

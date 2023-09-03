@@ -197,6 +197,11 @@ class SynchronizationReport with JsonConvertable {
   }
 }
 
+enum SynchronizationType {
+  classic,
+  v2d0d0,
+}
+
 class Synchronization {
   final String _username;
   final FullPassyEntriesFileCollection _passyEntries;
@@ -217,6 +222,7 @@ class Synchronization {
   int _entriesRemoved = 0;
   final RSAKeypair _rsaKeypair;
   final bool _authWithIV;
+  final SynchronizationType _synchronizationType;
   GlareClient? _sync2d0d0Client;
   GlareServer? _sync2d0d0Host;
 
@@ -232,6 +238,7 @@ class Synchronization {
     required Encrypter encrypter,
     required RSAKeypair rsaKeypair,
     required bool authWithIV,
+    required SynchronizationType synchronizationType,
     void Function(SynchronizationResults)? onComplete,
     void Function(String log)? onError,
   })  : _username = username,
@@ -243,7 +250,8 @@ class Synchronization {
         _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
         _onError = onError,
-        _authWithIV = authWithIV;
+        _authWithIV = authWithIV,
+        _synchronizationType = synchronizationType;
 
   SynchronizationReport getReport() {
     return SynchronizationReport(
@@ -415,6 +423,36 @@ class Synchronization {
       _ip = await getInternetAddress();
     } else {
       _ip = address;
+    }
+    if (_synchronizationType == SynchronizationType.v2d0d0) {
+      GlareServer host = await GlareServer.bind(
+        address: _ip,
+        port: 0,
+        keypair: _rsaKeypair,
+        maxTotalConnections: 1,
+        modules: buildSynchronization2d0d0Modules(
+          username: _username,
+          passyEntries: _passyEntries,
+          encrypter: _encrypter,
+          history: _history,
+          favorites: _favorites,
+          settings: _settings,
+          sharedEntryKeys: sharedEntryKeys,
+          authWithIV: _authWithIV,
+          onSetEntry: () => _entriesAdded++,
+          onRemoveEntry: () => _entriesRemoved++,
+        ),
+        serviceInfo:
+            'Passy cross-platform password manager entry synchronization server v$syncVersion',
+        onStop: () async {
+          _isConnected = false;
+          await close();
+        },
+      );
+      _sync2d0d0Host = host;
+      _address = HostAddress(host.address, host.port);
+      print(_address);
+      return _address;
     }
     try {
       if (_server != null) await _server?.close();
@@ -1346,6 +1384,9 @@ class Synchronization {
   }
 
   Future<void> connect(HostAddress address) async {
+    if (_synchronizationType == SynchronizationType.v2d0d0) {
+      return await connect2d0d0(address);
+    }
     await _history.reload();
     void _onConnected(Socket socket) {
       _isConnected = true;

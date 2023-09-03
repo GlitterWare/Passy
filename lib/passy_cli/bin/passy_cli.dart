@@ -1224,6 +1224,11 @@ Future<void> executeCommand(List<String> command,
                 rsaKeypair: settings.value.rsaKeypair!,
                 authWithIV: _accounts[accountName]!.value.keyDerivationType !=
                     KeyDerivationType.none,
+                synchronizationType:
+                    _accounts[accountName]!.value.keyDerivationType ==
+                            KeyDerivationType.none
+                        ? SynchronizationType.classic
+                        : SynchronizationType.v2d0d0,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -1765,6 +1770,11 @@ Future<void> executeCommand(List<String> command,
                 rsaKeypair: settings.value.rsaKeypair!,
                 authWithIV: _accounts[accountName]!.value.keyDerivationType !=
                     KeyDerivationType.none,
+                synchronizationType:
+                    _accounts[accountName]!.value.keyDerivationType ==
+                            KeyDerivationType.none
+                        ? SynchronizationType.classic
+                        : SynchronizationType.v2d0d0,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -1882,6 +1892,11 @@ Future<void> executeCommand(List<String> command,
                 rsaKeypair: settings.value.rsaKeypair!,
                 authWithIV: _accounts[accountName]!.value.keyDerivationType !=
                     KeyDerivationType.none,
+                synchronizationType:
+                    _accounts[accountName]!.value.keyDerivationType ==
+                            KeyDerivationType.none
+                        ? SynchronizationType.classic
+                        : SynchronizationType.v2d0d0,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);

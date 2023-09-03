@@ -15,6 +15,7 @@ class GlareServer {
   final Map<String, GlareServerSocket> _sockets;
   final int maxTotalConnections;
   final Function(String)? _log;
+  final void Function()? _onStop;
   bool _isStopped = false;
 
   GlareServer._({
@@ -24,9 +25,11 @@ class GlareServer {
     required Map<String, GlareServerSocket> sockets,
     this.maxTotalConnections = 0,
     Function(String)? log,
+    void Function()? onStop,
   })  : _serverSocket = serverSocket,
         _sockets = sockets,
-        _log = log;
+        _log = log,
+        _onStop = onStop;
 
   static Future<GlareServer> bind({
     required dynamic address,
@@ -35,6 +38,7 @@ class GlareServer {
     required Map<String, GlareModule> modules,
     int maxTotalConnections = 0,
     Function(dynamic object)? log,
+    void Function()? onStop,
     String serviceInfo = 'Glare server protocol v$version',
     int maxBindTries = 1,
     Duration bindTryInterval = const Duration(seconds: 10),
@@ -84,12 +88,14 @@ class GlareServer {
       sockets: _sockets,
       maxTotalConnections: maxTotalConnections,
       log: log,
+      onStop: onStop,
     );
     return _result;
   }
 
   Future<void> stop() async {
     if (_isStopped) return;
+    _onStop?.call();
     _isStopped = true;
     await _serverSocket.close();
     _log?.call('I:Glare server stopped.');
