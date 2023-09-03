@@ -50,11 +50,11 @@ class FavIconImage extends StatelessWidget {
           try {
             contents = jsonDecode(file.readAsStringSync());
           } catch (_) {
-            contents = {};
+            contents = <String, dynamic>{};
           }
           dynamic favicons = contents['favicons'];
           if (favicons is! Map<String, dynamic>) {
-            favicons = {};
+            favicons = <String, dynamic>{};
             contents['favicons'] = favicons;
             file.writeAsStringSync(jsonEncode(contents));
           }
