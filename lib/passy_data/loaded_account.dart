@@ -11,7 +11,6 @@ import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
-import 'package:nice_json/nice_json.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';

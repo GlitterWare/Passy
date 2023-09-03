@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
-import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/main_screen.dart';
 
@@ -82,10 +80,12 @@ class _ExportScreen extends State<ExportScreen> {
         lockParentWindow: true,
       );
       if (_expDir == null) return;
-      if (type == _ExportType.passy)
+      if (type == _ExportType.passy) {
         await _account.exportPassy(outputDirectory: Directory(_expDir));
-      if (type == _ExportType.csv)
+      }
+      if (type == _ExportType.csv) {
         await _account.exportCSV(outputDirectory: Directory(_expDir));
+      }
       showSnackBar(context,
           message: localizations.exportSaved,
           icon: const Icon(Icons.ios_share_rounded,

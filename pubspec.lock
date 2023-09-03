@@ -774,14 +774,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  nice_json:
-    dependency: "direct main"
-    description:
-      name: nice_json
-      sha256: "22b18c2d31af0eeb4f182071d13d7a5e6ae8451ba360a8dc691507bb4a4cb017"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   octo_image:
     dependency: transitive
     description:
