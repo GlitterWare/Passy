@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
@@ -25,6 +26,8 @@ class ExportScreen extends StatefulWidget {
 }
 
 class _ExportScreen extends State<ExportScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
+
   Future<bool?> _showExportWarningDialog() {
     return showDialog<bool>(
       context: context,
@@ -74,7 +77,7 @@ class _ExportScreen extends State<ExportScreen> {
         lockParentWindow: true,
       );
       if (_expDir == null) return;
-      await data.exportLoadedAccount(outputDirectoryPath: _expDir);
+      await _account.exportPassy(outputDirectory: Directory(_expDir));
       showSnackBar(context,
           message: localizations.exportSaved,
           icon: const Icon(Icons.ios_share_rounded,

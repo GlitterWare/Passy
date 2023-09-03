@@ -10,6 +10,7 @@ import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:archive/archive_io.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -425,6 +426,44 @@ class LoadedAccount {
     if (completer.isCompleted) return;
     completer.complete();
     _autoSyncCompleter = null;
+  }
+
+  Future<String> exportPassy({
+    required Directory outputDirectory,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectory.path +
+          Platform.pathSeparator +
+          'passy-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectory.path + Platform.pathSeparator + fileName;
+    }
+    Directory _tempDir = Directory(Directory.systemTemp.path +
+        Platform.pathSeparator +
+        'passy-export-' +
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';'));
+    Directory _tempAccDir =
+        Directory(_tempDir.path + Platform.pathSeparator + username);
+    if (await _tempDir.exists()) {
+      await _tempDir.delete(recursive: true);
+    }
+    await _tempAccDir.create(recursive: true);
+    Directory _accDir = Directory(_versionFile.parent.path);
+    await copyDirectory(_accDir, _tempAccDir);
+    {
+      JSONLoadedAccount _jsonAcc = JSONLoadedAccount.fromEncryptedCSVDirectory(
+          path: _tempAccDir.path, encrypter: _encrypter, deviceId: _deviceId);
+      await _tempAccDir.delete(recursive: true);
+      await _tempAccDir.create();
+      _jsonAcc.saveSync();
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempDir.delete(recursive: true);
+    return fileName;
   }
 
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
