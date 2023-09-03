@@ -295,5 +295,11 @@
     "nicknameAlreadyInUse": "Nickname already in use",
     "lastSynchronization": "Last synchronization",
     "connecting": "Connecting",
-    "connectionEstablished": "Connection established"
+    "connectionEstablished": "Connection established",
+    "syncError": "Sync error",
+    "invalidAddressFormat": "Invalid address format",
+    "connectionFailed": "Connection failed",
+    "synchronizationComplete": "Synchronization complete",
+    "entriesAdded": "Entries added",
+    "entriesRemoved": "Entries removed"
 }
