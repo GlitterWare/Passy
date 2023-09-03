@@ -224,6 +224,11 @@ class LoadedAccount {
       derivationType: _credentials.value.keyDerivationType,
       derivationInfo: _credentials.value.keyDerivationInfo,
     );
+    _syncEncrypter = await getSyncEncrypter(
+      password,
+      derivationType: _credentials.value.keyDerivationType,
+      derivationInfo: _credentials.value.keyDerivationInfo,
+    );
     await _settings.reload();
     _settings.encrypter = _encrypter;
     await _settings.save();
