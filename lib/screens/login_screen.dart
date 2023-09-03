@@ -53,8 +53,8 @@ class _LoginScreen extends State<LoginScreen> {
             await BioStorage.fromLocker(_username);
         KeyDerivationType derivationType =
             data.getKeyDerivationType(_username)!;
-        KeyDerivationInfo derivationInfo =
-            data.getKeyDerivationInfo(_username)!;
+        KeyDerivationInfo? derivationInfo =
+            data.getKeyDerivationInfo(_username);
         if (data.getPasswordHash(_username) ==
             (await getPasswordHash(storageData.password,
                     derivationType: derivationType,
