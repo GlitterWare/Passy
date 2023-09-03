@@ -1447,22 +1447,38 @@ Future<void> executeCommand(List<String> command,
                         };
                       }
                       if (loadedModules.containsKey('2d0d1_$username')) {
-                        AccountCredentialsFile creds = _accounts[username]!;
-                        if (creds.value.passwordHash ==
-                            (await cn.getPasswordHash(password,
-                                    derivationType:
-                                        creds.value.keyDerivationType,
-                                    derivationInfo:
-                                        creds.value.keyDerivationInfo))
-                                .toString()) {
+                        AccountCredentialsFile oldCreds = _accounts[username]!;
+                        refreshAccounts();
+                        AccountCredentialsFile? creds = _accounts[username];
+                        if (creds == null) {
+                          loadedModules.remove('2d0d1_$username');
                           return {
-                            'status': {'type': 'Success'},
+                            'error': {
+                              'type': 'Failed to login',
+                            },
                           };
                         }
-                        return {
-                          'error': {'type': 'Failed to login'},
-                        };
+                        if (oldCreds.value.passwordHash ==
+                            creds.value.passwordHash) {
+                          if (creds.value.passwordHash ==
+                              (await cn.getPasswordHash(password,
+                                      derivationType:
+                                          creds.value.keyDerivationType,
+                                      derivationInfo:
+                                          creds.value.keyDerivationInfo))
+                                  .toString()) {
+                            return {
+                              'status': {'type': 'Success'},
+                            };
+                          }
+                          return {
+                            'error': {
+                              'type': 'Failed to login',
+                            },
+                          };
+                        }
                       }
+                      loadedModules.remove('2d0d1_$username');
                       String result = await _login(username, password);
                       if (result != 'true') {
                         return {
