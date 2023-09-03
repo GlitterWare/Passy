@@ -25,6 +25,11 @@ class ExportScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ExportScreen();
 }
 
+enum _ExportType {
+  passy,
+  csv,
+}
+
 class _ExportScreen extends State<ExportScreen> {
   final LoadedAccount _account = data.loadedAccount!;
 
@@ -67,7 +72,7 @@ class _ExportScreen extends State<ExportScreen> {
     );
   }
 
-  Future<void> _onPassyExport(String username) async {
+  Future<void> _onPassyExport(String username, _ExportType type) async {
     MainScreen.shouldLockScreen = false;
     try {
       bool? _isConfirmed = await _showExportWarningDialog();
@@ -77,7 +82,10 @@ class _ExportScreen extends State<ExportScreen> {
         lockParentWindow: true,
       );
       if (_expDir == null) return;
-      await _account.exportPassy(outputDirectory: Directory(_expDir));
+      if (type == _ExportType.passy)
+        await _account.exportPassy(outputDirectory: Directory(_expDir));
+      if (type == _ExportType.csv)
+        await _account.exportCSV(outputDirectory: Directory(_expDir));
       showSnackBar(context,
           message: localizations.exportSaved,
           icon: const Icon(Icons.ios_share_rounded,
@@ -122,18 +130,13 @@ class _ExportScreen extends State<ExportScreen> {
       ),
       body: ListView(children: [
         PassyPadding(ThreeWidgetButton(
-          center: Text(localizations.passyExport),
-          left: Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: SvgPicture.asset(
-              logoCircleSvg,
-              width: 30,
-              colorFilter: const ColorFilter.mode(
-                  PassyTheme.lightContentColor, BlendMode.srcIn),
-            ),
+          center: Text(localizations.csvExport),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.drive_folder_upload_outlined),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () => _onPassyExport(_username),
+          onPressed: () => _onPassyExport(_username, _ExportType.csv),
         )),
       ]),
     );

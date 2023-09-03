@@ -56,6 +56,17 @@ class _ImportScreen extends State<ImportScreen> {
         centerTitle: true,
       ),
       body: ListView(children: [
+        PassyPadding(
+          ThreeWidgetButton(
+              center: Text(localizations.csvImport),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.download_for_offline_outlined),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, CSVImportScreen.routeName)),
+        ),
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.passyImport),
           left: Padding(
@@ -70,17 +81,6 @@ class _ImportScreen extends State<ImportScreen> {
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: _onPassyImportPressed,
         )),
-        PassyPadding(
-          ThreeWidgetButton(
-              center: Text(localizations.csvImport),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.download_for_offline_outlined),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, CSVImportScreen.routeName)),
-        ),
       ]),
     );
   }

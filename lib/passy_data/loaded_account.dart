@@ -11,6 +11,7 @@ import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
+import 'package:nice_json/nice_json.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -457,6 +458,68 @@ class LoadedAccount {
       await _tempAccDir.delete(recursive: true);
       await _tempAccDir.create();
       _jsonAcc.saveSync();
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempDir.delete(recursive: true);
+    return fileName;
+  }
+
+  Future<String> exportCSV({
+    required Directory outputDirectory,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectory.path +
+          Platform.pathSeparator +
+          'passy-csv-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectory.path + Platform.pathSeparator + fileName;
+    }
+    Directory _tempDir = Directory(Directory.systemTemp.path +
+        Platform.pathSeparator +
+        'passy-csv-export-' +
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';'));
+    Directory _tempAccDir =
+        Directory(_tempDir.path + Platform.pathSeparator + username);
+    if (await _tempDir.exists()) {
+      await _tempDir.delete(recursive: true);
+    }
+    await _tempAccDir.create(recursive: true);
+    String tempPath = '${_tempAccDir.path}${Platform.pathSeparator}';
+    {
+      await _passwords.export(
+        File('${tempPath}passwords.csv'),
+        annotation:
+            '"key","customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website"',
+      );
+      await _paymentCards.export(
+        File('${tempPath}payment_cards.csv'),
+        annotation:
+            '"key","customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp"',
+      );
+      await _notes.export(
+        File('${tempPath}notes.csv'),
+        annotation: '"key","title","note","isMarkdown"',
+      );
+      await _idCards.export(
+        File('${tempPath}id_cards.csv'),
+        annotation:
+            '"key","customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country"',
+      );
+      await _identities.export(
+        File('${tempPath}identities.csv'),
+        annotation:
+            '"key","customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
+      );
+      await _versionFile.copy('${tempPath}version.txt');
+      JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+      await File('${tempPath}history.json')
+          .writeAsString(encoder.convert(_history.value.toJson()));
+      await File('${tempPath}favorites.json')
+          .writeAsString(encoder.convert(_favorites.value.toJson()));
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);

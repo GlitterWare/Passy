@@ -301,5 +301,8 @@
     "connectionFailed": "Connection failed",
     "synchronizationComplete": "Synchronization complete",
     "entriesAdded": "Entries added",
-    "entriesRemoved": "Entries removed"
+    "entriesRemoved": "Entries removed",
+    "csvExport": "CSV export",
+    "kdbxImport": "KDBX import",
+    "kdbxExport": "KDBX export"
 }

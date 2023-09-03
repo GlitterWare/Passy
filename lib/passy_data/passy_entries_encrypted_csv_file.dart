@@ -299,4 +299,29 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _tempRaf.close();
     await _tempFile.delete();
   }
+
+  Future<void> export(File file, {String? annotation}) async {
+    if (!await file.exists()) await file.create(recursive: true);
+    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile rafExport = await file.open(mode: FileMode.write);
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      _raf.closeSync();
+      return;
+    }
+    if (annotation != null) {
+      await rafExport.writeString(annotation + '\n');
+    }
+    processLines(_raf, onLine: (entry, eofReached) {
+      if (eofReached) return true;
+      List<String> _decoded = entry.split(',');
+      String _decrypted = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      rafExport
+          .writeStringSync('"' + csvDecode(_decrypted).join('","') + '"\n');
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    await _raf.close();
+    await rafExport.close();
+  }
 }
