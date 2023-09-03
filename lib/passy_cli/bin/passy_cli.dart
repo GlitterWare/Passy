@@ -22,6 +22,7 @@ import 'package:passy/passy_data/history.dart';
 import 'package:passy/passy_data/host_address.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/note.dart';
@@ -1221,6 +1222,8 @@ Future<void> executeCommand(List<String> command,
                     encrypter: encrypter),
                 settings: settings,
                 rsaKeypair: settings.value.rsaKeypair!,
+                authWithIV: _accounts[accountName]!.value.keyDerivationType !=
+                    KeyDerivationType.none,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -1356,6 +1359,8 @@ Future<void> executeCommand(List<String> command,
                   settings: AccountSettings.fromFile(
                       File('${accPath}settings.enc'),
                       encrypter: encrypter),
+                  authWithIV: _accounts[username]!.value.keyDerivationType !=
+                      KeyDerivationType.none,
                 );
                 for (MapEntry<String, GlareModule> module
                     in syncModules.entries) {
@@ -1493,6 +1498,9 @@ Future<void> executeCommand(List<String> command,
                         settings: AccountSettings.fromFile(
                             File('${accPath}settings.enc'),
                             encrypter: encrypter),
+                        authWithIV:
+                            _accounts[username]!.value.keyDerivationType !=
+                                KeyDerivationType.none,
                       );
                       for (MapEntry<String, GlareModule> module
                           in syncModules.entries) {
@@ -1755,6 +1763,8 @@ Future<void> executeCommand(List<String> command,
                     encrypter: encrypter),
                 settings: settings,
                 rsaKeypair: settings.value.rsaKeypair!,
+                authWithIV: _accounts[accountName]!.value.keyDerivationType !=
+                    KeyDerivationType.none,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);
@@ -1870,6 +1880,8 @@ Future<void> executeCommand(List<String> command,
                     encrypter: encrypter),
                 settings: settings,
                 rsaKeypair: settings.value.rsaKeypair!,
+                authWithIV: _accounts[accountName]!.value.keyDerivationType !=
+                    KeyDerivationType.none,
                 onError: (err) {
                   if (detached) return;
                   log('Synchronization error:', id: id);

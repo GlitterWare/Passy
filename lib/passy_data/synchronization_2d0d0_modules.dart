@@ -20,6 +20,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required HistoryFile history,
   required FavoritesFile favorites,
   required AccountSettingsFile settings,
+  required authWithIV,
   Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
@@ -29,7 +30,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   String apiVersion = '2d0d1';
   String generateAuth() {
     return util.generateAuth(
-        encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+        encrypter: encrypter,
+        usernameEncrypter: usernameEncrypter,
+        withIV: authWithIV);
   }
 
   sharedEntryKeys ??= {};
@@ -88,7 +91,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           }
           try {
             util.verifyAuth(decoded['auth'],
-                encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+                encrypter: encrypter,
+                usernameEncrypter: usernameEncrypter,
+                withIV: authWithIV);
           } catch (e) {
             if (e is Map<String, dynamic>) return e;
             rethrow;

@@ -216,6 +216,7 @@ class Synchronization {
   int _entriesAdded = 0;
   int _entriesRemoved = 0;
   final RSAKeypair _rsaKeypair;
+  final bool _authWithIV;
   GlareClient? _sync2d0d0Client;
   GlareServer? _sync2d0d0Host;
 
@@ -230,6 +231,7 @@ class Synchronization {
     required AccountSettingsFile settings,
     required Encrypter encrypter,
     required RSAKeypair rsaKeypair,
+    required bool authWithIV,
     void Function(SynchronizationResults)? onComplete,
     void Function(String log)? onError,
   })  : _username = username,
@@ -240,7 +242,8 @@ class Synchronization {
         _encrypter = encrypter,
         _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
-        _onError = onError;
+        _onError = onError,
+        _authWithIV = authWithIV;
 
   SynchronizationReport getReport() {
     return SynchronizationReport(
@@ -665,6 +668,7 @@ class Synchronization {
                   favorites: _favorites,
                   settings: _settings,
                   sharedEntryKeys: sharedEntryKeys,
+                  authWithIV: _authWithIV,
                   onSetEntry: () => _entriesAdded++,
                   onRemoveEntry: () => _entriesRemoved++,
                 ),
@@ -823,7 +827,9 @@ class Synchronization {
       Map<String, dynamic> auth() {
         return {
           'auth': util.generateAuth(
-              encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
+              encrypter: _encrypter,
+              usernameEncrypter: usernameEncrypter,
+              withIV: _authWithIV),
         };
       }
 
@@ -1017,7 +1023,9 @@ class Synchronization {
       }
       try {
         util.verifyAuth(authResponse['auth'],
-            encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
+            encrypter: _encrypter,
+            usernameEncrypter: usernameEncrypter,
+            withIV: _authWithIV);
       } catch (e) {
         _handleApiException('Failed to verify host auth', e);
         return;

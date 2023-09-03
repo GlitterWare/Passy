@@ -306,6 +306,8 @@ class LoadedAccount {
       settings: _settings,
       encrypter: _syncEncrypter,
       rsaKeypair: rsaKeypair,
+      authWithIV:
+          _credentials.value.keyDerivationType != KeyDerivationType.none,
       onComplete: onComplete,
       onError: onError,
     );
