@@ -62,6 +62,16 @@ class _LoginScreen extends State<LoginScreen> {
                 .toString()) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
+          enc.Encrypter encrypter = await getPasswordEncrypter(
+              storageData.password,
+              derivationType: derivationType,
+              derivationInfo: derivationInfo);
+          enc.Encrypter syncEncrypter = await getSyncEncrypter(
+              storageData.password,
+              derivationType: derivationType,
+              derivationInfo: derivationInfo);
+          LoadedAccount account =
+              await data.loadAccount(_username, encrypter, syncEncrypter);
           if (isAutofill) {
             Navigator.pushNamed(
               context,
@@ -73,16 +83,6 @@ class _LoginScreen extends State<LoginScreen> {
             );
             return;
           }
-          enc.Encrypter encrypter = await getPasswordEncrypter(
-              storageData.password,
-              derivationType: derivationType,
-              derivationInfo: derivationInfo);
-          enc.Encrypter syncEncrypter = await getSyncEncrypter(
-              storageData.password,
-              derivationType: derivationType,
-              derivationInfo: derivationInfo);
-          LoadedAccount account =
-              await data.loadAccount(_username, encrypter, syncEncrypter);
           account.startAutoSync(storageData.password);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
