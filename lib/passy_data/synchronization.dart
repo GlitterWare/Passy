@@ -451,7 +451,6 @@ class Synchronization {
       );
       _sync2d0d0Host = host;
       _address = HostAddress(host.address, host.port);
-      print(_address);
       return _address;
     }
     try {
