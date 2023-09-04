@@ -4,6 +4,7 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/automatic_backup_screen.dart';
+import 'package:passy/screens/import_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/security_screen.dart';
 
@@ -33,6 +34,16 @@ class _SetupScreen extends State<SetupScreen> {
       ),
       body: ListView(
         children: [
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.import),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.download_for_offline_outlined),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, ImportScreen.routeName),
+          )),
           PassyPadding(ThreeWidgetButton(
               center: Text(localizations.security),
               left: const Padding(

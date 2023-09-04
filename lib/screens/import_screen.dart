@@ -37,7 +37,36 @@ class _ImportScreen extends State<ImportScreen> {
         Navigator.pushNamed(
           context,
           ConfirmImportScreen.routeName,
-          arguments: _pick.files[0].path,
+          arguments: ConfirmImportScreenArgs(
+            path: _pick.files[0].path!,
+            importType: ImportType.passy,
+          ),
+        );
+      },
+    );
+  }
+
+  void _onKdbxImportPressed() {
+    MainScreen.shouldLockScreen = false;
+    FilePicker.platform
+        .pickFiles(
+      dialogTitle: localizations.importFromPassy,
+      type: FileType.custom,
+      allowedExtensions: ['kdbx'],
+      lockParentWindow: true,
+    )
+        .then(
+      (_pick) {
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => MainScreen.shouldLockScreen = true);
+        if (_pick == null) return;
+        Navigator.pushNamed(
+          context,
+          ConfirmImportScreen.routeName,
+          arguments: ConfirmImportScreenArgs(
+            path: _pick.files[0].path!,
+            importType: ImportType.kdbx,
+          ),
         );
       },
     );
@@ -68,6 +97,15 @@ class _ImportScreen extends State<ImportScreen> {
               onPressed: () =>
                   Navigator.pushNamed(context, CSVImportScreen.routeName)),
         ),
+        PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.kdbxImport),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.file_copy),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: _onKdbxImportPressed,
+        )),
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.passyImport),
           left: Padding(

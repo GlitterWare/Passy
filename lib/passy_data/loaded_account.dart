@@ -7,11 +7,13 @@ import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
+import 'package:passy/passy_data/tfa.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -594,6 +596,80 @@ class LoadedAccount {
     _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
+  }
+
+  Future<void> importKDBXPasswords(List<KdbxEntry> entries) async {
+    String keyPrefix = '${DateTime.now().toUtc().toIso8601String()}-import';
+    Map<String, Password> passwords = {};
+    for (int i = 0; i != entries.length; i++) {
+      KdbxEntry entry = entries[i];
+      List<CustomField> customFields = [];
+      String? additionalInfo;
+      String? nickname;
+      String? username;
+      String? email;
+      String? password;
+      TFA? tfa;
+      String? website;
+      for (var e in entry.stringEntries) {
+        String? val = e.value?.getText();
+        if (val == null) continue;
+        switch (e.key.key) {
+          case 'Additional Info':
+            additionalInfo = val;
+            continue;
+          case KdbxKeyCommon.KEY_TITLE:
+            nickname = val;
+            continue;
+          case KdbxKeyCommon.KEY_USER_NAME:
+            username = val;
+            continue;
+          case 'Email':
+            email = val;
+            continue;
+          case KdbxKeyCommon.KEY_PASSWORD:
+            password = val;
+            continue;
+          case KdbxKeyCommon.KEY_OTP:
+            tfa = TFA(secret: val);
+            continue;
+          case KdbxKeyCommon.KEY_URL:
+            website = val;
+            continue;
+        }
+        customFields.add(CustomField(
+          title: e.key.key,
+          value: val,
+        ));
+      }
+      String key = '$keyPrefix-$i';
+      passwords[key] = Password(
+        key: key,
+        customFields: customFields,
+        additionalInfo: additionalInfo ?? '',
+        nickname: nickname ?? '',
+        username: username ?? '',
+        email: email ?? '',
+        password: password ?? '',
+        tfa: tfa,
+        website: website ?? '',
+      );
+    }
+    await _history.reload();
+    for (Password password in passwords.values) {
+      _history.value.passwords[password.key] = EntryEvent(
+        password.key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+    }
+    try {
+      _passwords.setEntries(passwords);
+    } catch (_) {
+      await _history.reload();
+      rethrow;
+    }
+    await _history.save();
   }
 
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
