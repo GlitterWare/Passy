@@ -477,7 +477,7 @@ StreamSubscription<List<int>> startInteractive() {
       try {
         for (List<String> command in commands) {
           await executeCommand(command,
-              id: id ?? pcommon.getPassyHash(jsonEncode(commands)).toString());
+              id: id ?? pcommon.getPassyHash(jsonEncode(command)).toString());
         }
       } catch (_) {}
       _isBusy = false;
