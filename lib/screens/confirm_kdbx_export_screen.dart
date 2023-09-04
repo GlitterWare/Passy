@@ -82,7 +82,8 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
         );
       }
     }
-    MainScreen.shouldLockScreen = true;
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => MainScreen.shouldLockScreen = true);
   }
 
   @override

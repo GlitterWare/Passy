@@ -110,7 +110,8 @@ class _ExportScreen extends State<ExportScreen> {
         );
       }
     }
-    MainScreen.shouldLockScreen = true;
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => MainScreen.shouldLockScreen = true);
   }
 
   @override

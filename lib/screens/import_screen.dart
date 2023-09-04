@@ -31,7 +31,8 @@ class _ImportScreen extends State<ImportScreen> {
     )
         .then(
       (_pick) {
-        MainScreen.shouldLockScreen = true;
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => MainScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,

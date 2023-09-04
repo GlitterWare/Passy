@@ -97,7 +97,8 @@ Future<String?> backupAccount(
       dialogTitle: 'Backup Passy',
       lockParentWindow: true,
     );
-    MainScreen.shouldLockScreen = true;
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => MainScreen.shouldLockScreen = true);
     if (_buDir == null) return null;
     await data.backupAccount(
       username: username,
