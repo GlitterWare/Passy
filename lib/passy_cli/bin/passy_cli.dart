@@ -85,6 +85,17 @@ Commands:
     accounts logout_all
         - Unload all account encrypters.
 
+    accounts export json <username> <directory>
+        - Export account in JSON.
+          Returns file path on success.
+    accounts export csv <username> <directory>
+        - Export account in CSV.
+          Returns file path on success.
+    accounts export kdbx <username> <directory> <password>
+        - Export account in KDBX.
+          <password> will be used as the master password for the KDBX file.
+          Returns file path on success.
+
   Entries
     For all commands in this section, <entry type> argument is one of the following:
     password, paymentCard, note, idCard, identity.
@@ -882,6 +893,104 @@ Future<void> executeCommand(List<String> command,
           _encrypters.clear();
           log('true', id: id);
           return;
+        case 'export':
+          if (command.length == 2) break;
+          switch (command[2]) {
+            case 'json':
+              if (command.length < 5) break;
+              String accountName = command[3];
+              Encrypter? encrypter = _encrypters[accountName];
+              if (encrypter == null) {
+                log('accounts:export:json:No account credentials provided, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
+              String path = command[4];
+              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
+              PassyInfoFile infoFile = PassyInfo.fromFile(
+                  File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
+              LoadedAccount account = LoadedAccount.fromDirectory(
+                path: _accountsPath + Platform.pathSeparator + accountName,
+                encrypter: encrypter,
+                syncEncrypter: syncEncrypter,
+                deviceId: infoFile.value.deviceId,
+              );
+              String fileName;
+              try {
+                fileName =
+                    await account.exportPassy(outputDirectory: Directory(path));
+              } catch (e, s) {
+                log('accounts:export:json:Failed to export account:\n$e\n$s',
+                    id: id);
+                return;
+              }
+              log(fileName, id: id);
+              return;
+            case 'csv':
+              if (command.length < 5) break;
+              String accountName = command[3];
+              Encrypter? encrypter = _encrypters[accountName];
+              if (encrypter == null) {
+                log('accounts:export:csv:No account credentials provided, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
+              String path = command[4];
+              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
+              PassyInfoFile infoFile = PassyInfo.fromFile(
+                  File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
+              LoadedAccount account = LoadedAccount.fromDirectory(
+                path: _accountsPath + Platform.pathSeparator + accountName,
+                encrypter: encrypter,
+                syncEncrypter: syncEncrypter,
+                deviceId: infoFile.value.deviceId,
+              );
+              String fileName;
+              try {
+                fileName =
+                    await account.exportCSV(outputDirectory: Directory(path));
+              } catch (e, s) {
+                log('accounts:export:csv:Failed to export account:\n$e\n$s',
+                    id: id);
+                return;
+              }
+              log(fileName, id: id);
+              return;
+            case 'kdbx':
+              if (command.length < 6) break;
+              String accountName = command[3];
+              Encrypter? encrypter = _encrypters[accountName];
+              if (encrypter == null) {
+                log('accounts:export:kdbx:No account credentials provided, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
+              String path = command[4];
+              String password = command[5];
+              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
+              PassyInfoFile infoFile = PassyInfo.fromFile(
+                  File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
+              LoadedAccount account = LoadedAccount.fromDirectory(
+                path: _accountsPath + Platform.pathSeparator + accountName,
+                encrypter: encrypter,
+                syncEncrypter: syncEncrypter,
+                deviceId: infoFile.value.deviceId,
+              );
+              String fileName;
+              try {
+                fileName = await account.exportKdbx(
+                  password: password,
+                  outputDirectory: Directory(path),
+                );
+              } catch (e, s) {
+                log('accounts:export:kdbx:Failed to export account:\n$e\n$s',
+                    id: id);
+                return;
+              }
+              log(fileName, id: id);
+              return;
+          }
+          break;
       }
       break;
     case 'entries':
