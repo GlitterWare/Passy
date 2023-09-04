@@ -11,6 +11,7 @@ import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 import 'package:passy/screens/search_screen.dart';
 import 'package:passy/common/common.dart';
@@ -279,7 +280,9 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     updateBioAuthButton();
-    final List<DropdownMenuItem<String>> usernames = data.usernames
+    List<String> usernamesSorted = data.usernames.toList();
+    usernamesSorted.sort((a, b) => alphabeticalCompare(a, b));
+    final List<DropdownMenuItem<String>> usernames = usernamesSorted
         .map<DropdownMenuItem<String>>((_username) => DropdownMenuItem(
               child: Row(children: [
                 Expanded(child: Text(_username)),

@@ -304,5 +304,6 @@
     "entriesRemoved": "Entries removed",
     "csvExport": "CSV export",
     "kdbxImport": "KDBX import",
-    "kdbxExport": "KDBX export"
+    "kdbxExport": "KDBX export",
+    "imported": "Imported"
 }

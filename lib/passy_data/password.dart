@@ -155,7 +155,7 @@ class Password extends PassyEntry<Password> {
               value:
                   'Algorithm: ${tfa?.algorithm} ; Length: ${tfa?.length} ; Interval: ${tfa?.interval} ; Is Google: ${tfa?.isGoogle}'),
         if (additionalInfo.isNotEmpty)
-          CustomField(title: 'Additional Info', value: additionalInfo),
+          CustomField(title: 'Additional info', value: additionalInfo),
       ],
     );
   }

@@ -54,6 +54,11 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
           Navigator.popUntil(
               context, (route) => route.settings.name == MainScreen.routeName);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          showSnackBar(
+            context,
+            message: localizations.imported,
+            icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
+          );
           break;
         case ImportType.kdbx:
           KdbxFile file = await KdbxFormat().read(
@@ -63,6 +68,11 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
               .importKDBXPasswords(file.body.rootGroup.getAllEntries());
           Navigator.popUntil(context,
               (route) => route.settings.name == ImportScreen.routeName);
+          showSnackBar(
+            context,
+            message: localizations.imported,
+            icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
+          );
           break;
       }
     } catch (e, s) {

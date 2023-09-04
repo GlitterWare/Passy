@@ -615,7 +615,7 @@ class LoadedAccount {
         String? val = e.value?.getText();
         if (val == null) continue;
         switch (e.key.key) {
-          case 'Additional Info':
+          case 'Additional info':
             additionalInfo = val;
             continue;
           case KdbxKeyCommon.KEY_TITLE:
