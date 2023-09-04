@@ -86,7 +86,9 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
     ConfirmImportScreenArgs args =
         ModalRoute.of(context)!.settings.arguments as ConfirmImportScreenArgs;
     return ConfirmStringScaffold(
-        title: Text(localizations.passyImport),
+        title: Text(args.importType == ImportType.passy
+            ? localizations.passyImport
+            : localizations.kdbxImport),
         message: PassyPadding(RichText(
           text: TextSpan(
             text: localizations.confirmImport1,
