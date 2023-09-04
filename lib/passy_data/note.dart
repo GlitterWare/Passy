@@ -1,5 +1,7 @@
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/entry_meta.dart';
+import 'package:passy/passy_data/passy_kdbx_entry.dart';
 
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
@@ -71,4 +73,14 @@ class Note extends PassyEntry<Note> {
         note,
         isMarkdown.toString(),
       ];
+
+  @override
+  PassyKdbxEntry toKdbx() {
+    return PassyKdbxEntry(
+      title: title,
+      customFields: [
+        if (note.isNotEmpty) CustomField(title: 'Note', value: note),
+      ],
+    );
+  }
 }

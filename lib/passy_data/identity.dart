@@ -1,4 +1,5 @@
 import 'package:passy/passy_data/entry_meta.dart';
+import 'package:passy/passy_data/passy_kdbx_entry.dart';
 
 import 'custom_field.dart';
 import 'passy_entries.dart';
@@ -198,4 +199,36 @@ class Identity extends PassyEntry<Identity> {
         city,
         country,
       ];
+
+  @override
+  PassyKdbxEntry toKdbx() {
+    return PassyKdbxEntry(
+      title: nickname,
+      customFields: [
+        if (title.name.isNotEmpty)
+          CustomField(title: 'Personal title', value: title.name),
+        if (firstName.isNotEmpty)
+          CustomField(title: 'First name', value: firstName),
+        if (middleName.isNotEmpty)
+          CustomField(title: 'Middle name', value: middleName),
+        if (lastName.isNotEmpty)
+          CustomField(title: 'Last name', value: lastName),
+        if (gender.name.isNotEmpty)
+          CustomField(title: 'Gender', value: gender.name),
+        if (email.isNotEmpty) CustomField(title: 'Email', value: email),
+        if (number.isNotEmpty)
+          CustomField(title: 'Phone number', value: number),
+        if (firstAddressLine.isNotEmpty)
+          CustomField(title: 'First address line', value: firstAddressLine),
+        if (secondAddressLine.isNotEmpty)
+          CustomField(title: 'Second address line', value: secondAddressLine),
+        if (zipCode.isNotEmpty) CustomField(title: 'Zip code', value: zipCode),
+        if (city.isNotEmpty) CustomField(title: 'City', value: city),
+        if (country.isNotEmpty) CustomField(title: 'Country', value: country),
+        ...customFields,
+        if (additionalInfo.isNotEmpty)
+          CustomField(title: 'Additional info', value: additionalInfo),
+      ],
+    );
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:passy/passy_data/entry_meta.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
+import 'package:passy/passy_data/passy_kdbx_entry.dart';
 
 import 'custom_field.dart';
 import 'passy_entries.dart';
@@ -132,4 +133,23 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         cvv,
         exp,
       ];
+
+  @override
+  PassyKdbxEntry toKdbx() {
+    return PassyKdbxEntry(
+      title: nickname,
+      customFields: [
+        if (cardNumber.isNotEmpty)
+          CustomField(title: 'Card number', value: cardNumber, obscured: true),
+        if (cardholderName.isNotEmpty)
+          CustomField(title: 'Card holder name', value: cardholderName),
+        if (cvv.isNotEmpty)
+          CustomField(title: 'Name', value: cvv, obscured: true),
+        if (exp.isNotEmpty) CustomField(title: 'Issue date', value: exp),
+        ...customFields,
+        if (additionalInfo.isNotEmpty)
+          CustomField(title: 'Additional info', value: additionalInfo),
+      ],
+    );
+  }
 }

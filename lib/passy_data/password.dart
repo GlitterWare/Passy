@@ -4,6 +4,7 @@ import 'custom_field.dart';
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
 import 'passy_entry.dart';
+import 'passy_kdbx_entry.dart';
 import 'tfa.dart';
 
 typedef Passwords = PassyEntries<Password>;
@@ -134,4 +135,28 @@ class Password extends PassyEntry<Password> {
         tfa?.toCSV() ?? [],
         website,
       ];
+
+  @override
+  PassyKdbxEntry toKdbx() {
+    return PassyKdbxEntry(
+      title: nickname,
+      username: username.isEmpty ? email : username,
+      password: password,
+      url: website,
+      otp: tfa?.secret,
+      customFields: [
+        if (username.isNotEmpty && email.isNotEmpty)
+          CustomField(title: 'Email', value: email),
+        ...customFields,
+        if (tfa != null)
+          CustomField(
+              obscured: true,
+              title: 'TFA info',
+              value:
+                  'Algorithm: ${tfa?.algorithm} ; Length: ${tfa?.length} ; Interval: ${tfa?.interval} ; Is Google: ${tfa?.isGoogle}'),
+        if (additionalInfo.isNotEmpty)
+          CustomField(title: 'Additional Info', value: additionalInfo),
+      ],
+    );
+  }
 }

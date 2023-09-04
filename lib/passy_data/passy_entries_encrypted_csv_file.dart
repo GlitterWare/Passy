@@ -1,9 +1,12 @@
 import 'package:encrypt/encrypt.dart';
+import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_meta.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'dart:io';
+
+import 'passy_kdbx_value.dart';
 
 class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
   final File _file;
@@ -323,5 +326,29 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     });
     await _raf.close();
     await rafExport.close();
+  }
+
+  Future<void> exportKdbx(KdbxFile file, {KdbxGroup? group}) async {
+    final KdbxGroup groupFinal = group ?? file.body.rootGroup;
+    RandomAccessFile _raf = await _file.open();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      _raf.closeSync();
+      return;
+    }
+    processLines(_raf, onLine: (entry, eofReached) {
+      if (eofReached) return true;
+      List<String> _decoded = entry.split(',');
+      String _decrypted = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      PassyEntry<T> passyEntry = PassyEntry.fromCSVString<T>(_decrypted) as T;
+      final KdbxEntry kdbxEntry = KdbxEntry.create(file, groupFinal);
+      for (PassyKdbxValue passyKdbxEntry in passyEntry.toKdbx().values) {
+        kdbxEntry.setString(passyKdbxEntry.key, passyKdbxEntry.value);
+      }
+      groupFinal.addEntry(kdbxEntry);
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    await _raf.close();
   }
 }

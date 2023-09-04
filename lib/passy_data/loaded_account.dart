@@ -5,6 +5,7 @@ import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
@@ -513,6 +514,73 @@ class LoadedAccount {
         annotation:
             '"key","customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
       );
+      await _versionFile.copy('${tempPath}version.txt');
+      JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+      await File('${tempPath}history.json')
+          .writeAsString(encoder.convert(_history.value.toJson()));
+      await File('${tempPath}favorites.json')
+          .writeAsString(encoder.convert(_favorites.value.toJson()));
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempDir.delete(recursive: true);
+    return fileName;
+  }
+
+  Future<String> exportKdbx({
+    required String password,
+    required Directory outputDirectory,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectory.path +
+          Platform.pathSeparator +
+          'passy-kdbx-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectory.path + Platform.pathSeparator + fileName;
+    }
+    Directory _tempDir = Directory(Directory.systemTemp.path +
+        Platform.pathSeparator +
+        'passy-csv-export-' +
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';'));
+    Directory _tempAccDir =
+        Directory(_tempDir.path + Platform.pathSeparator + username);
+    if (await _tempDir.exists()) {
+      await _tempDir.delete(recursive: true);
+    }
+    await _tempAccDir.create(recursive: true);
+    String tempPath = '${_tempAccDir.path}${Platform.pathSeparator}';
+    {
+      final kdbx = KdbxFormat()
+          .create(Credentials(ProtectedValue.fromString(password)), username);
+      // Passwords
+      KdbxGroup passwordsGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Passwords');
+      await _passwords.exportKdbx(kdbx, group: passwordsGroup);
+      kdbx.body.rootGroup.addGroup(passwordsGroup);
+      // Payment cards
+      KdbxGroup paymentCardsGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Payment cards');
+      await _paymentCards.exportKdbx(kdbx, group: paymentCardsGroup);
+      kdbx.body.rootGroup.addGroup(paymentCardsGroup);
+      // Notes
+      KdbxGroup notesGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Notes');
+      await _notes.exportKdbx(kdbx, group: notesGroup);
+      kdbx.body.rootGroup.addGroup(notesGroup);
+      // ID Cards
+      KdbxGroup idCardsGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'ID cards');
+      await _idCards.exportKdbx(kdbx, group: idCardsGroup);
+      kdbx.body.rootGroup.addGroup(idCardsGroup);
+      // Identities
+      KdbxGroup identitiesGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Identities');
+      await _identities.exportKdbx(kdbx, group: identitiesGroup);
+      kdbx.body.rootGroup.addGroup(identitiesGroup);
+      await File('$tempPath$username.kdbx').writeAsBytes(await kdbx.save());
       await _versionFile.copy('${tempPath}version.txt');
       JsonEncoder encoder = const JsonEncoder.withIndent('  ');
       await File('${tempPath}history.json')

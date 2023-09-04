@@ -325,8 +325,8 @@ packages:
     dependency: "direct main"
     description:
       path: dargon2
-      ref: b79a5aa10633ab702eeb039c51680a6a1b5008bf
-      resolved-ref: b79a5aa10633ab702eeb039c51680a6a1b5008bf
+      ref: "180ec98990f8e1d7190a34f2c131e9d587d1a4ff"
+      resolved-ref: "180ec98990f8e1d7190a34f2c131e9d587d1a4ff"
       url: "https://github.com/GlitterWare/dargon2.git"
     source: git
     version: "3.2.1"
@@ -394,6 +394,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.4"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: ce75a1b40947fea0a0e16ce73337122a86762e38b982e1ccb909daa3b9bc4197
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.2"
   encrypt:
     dependency: "direct main"
     description:
@@ -483,10 +491,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_cache_manager
-      sha256: "32cd900555219333326a2d0653aaaf8671264c29befa65bbd9856d204a4c9fb3"
+      sha256: "8207f27539deb83732fdda03e259349046a39a4c767269285f449ade355d54ba"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "3.3.1"
   flutter_credit_card:
     dependency: "direct main"
     description:
@@ -678,6 +686,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+  isolates:
+    dependency: transitive
+    description:
+      name: isolates
+      sha256: ce89e4141b27b877326d3715be2dceac7a7ba89f3229785816d2d318a75ddf28
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3+8"
   js:
     dependency: transitive
     description:
@@ -702,6 +718,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.1"
+  kdbx:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "09fc148e80bbaa9f66e3ab7f7f32adacab6b69b1"
+      resolved-ref: "09fc148e80bbaa9f66e3ab7f7f32adacab6b69b1"
+      url: "https://github.com/GlitterWare/kdbx.dart.git"
+    source: git
+    version: "2.4.0"
   launch_at_startup:
     dependency: "direct main"
     description:
@@ -734,6 +759,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  logging_appenders:
+    dependency: transitive
+    description:
+      name: logging_appenders
+      sha256: c2ea00fb779a81e995943f1e3e6e6969d463de3882d134d78ad58e76f2b6f1b1
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   markdown:
     dependency: transitive
     description:
@@ -870,14 +903,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      sha256: "67fc27ed9639506c856c840ccce7594d0bdcd91bc8d53d6e52359449a1d50602"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.11.1"
   petitparser:
     dependency: transitive
     description:
@@ -1035,6 +1060,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  sprintf:
+    dependency: transitive
+    description:
+      name: sprintf
+      sha256: "1fc9ffe69d4df602376b52949af107d8f5703b77cda567c4d7d86a0693120f23"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   sqflite:
     dependency: transitive
     description:
@@ -1083,6 +1116,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  supercharged_dart:
+    dependency: transitive
+    description:
+      name: supercharged_dart
+      sha256: cb95edda32eacd27664089700a750120be41daa84aa6cd2aeded46227c16b867
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   synchronized:
     dependency: transitive
     description:
@@ -1207,10 +1248,10 @@ packages:
     dependency: transitive
     description:
       name: uuid
-      sha256: "2469694ad079893e3b434a627970c33f2fa5adc46dfe03c9617546969a9a8afc"
+      sha256: e03928880bdbcbf496fb415573f5ab7b1ea99b9b04f669c01104d085893c3134
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.6"
+    version: "4.0.0"
   vector_graphics:
     dependency: transitive
     description:

@@ -67,12 +67,16 @@ dependencies:
     git:
       url: https://github.com/GlitterWare/dargon2.git
       path: dargon2
-      ref: b79a5aa10633ab702eeb039c51680a6a1b5008bf
+      ref: 180ec98990f8e1d7190a34f2c131e9d587d1a4ff
   dargon2_interface: ^1.1.1
   system_info2: ^4.0.0
   flutter_markdown: ^0.6.17+1
   compute: ^1.0.2
   launch_at_startup: ^0.2.2
+  kdbx:
+    git:
+      url: https://github.com/GlitterWare/kdbx.dart.git
+      ref: 09fc148e80bbaa9f66e3ab7f7f32adacab6b69b1
 
 dev_dependencies:
   flutter_test:

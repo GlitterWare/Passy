@@ -4,10 +4,12 @@ import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
 import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
+import 'package:passy/screens/confirm_kdbx_export_screen.dart';
 import 'package:passy/screens/export_and_import_screen.dart';
 import 'package:passy/screens/export_screen.dart';
 import 'package:passy/screens/global_settings_screen.dart';
@@ -70,6 +72,7 @@ final ThemeData theme = ThemeData(
 );
 
 void main() {
+  KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
   runApp(const Passy());
 }
@@ -137,6 +140,8 @@ class Passy extends StatelessWidget {
         ChangeUsernameScreen.routeName: (context) =>
             const ChangeUsernameScreen(),
         ConfirmImportScreen.routeName: (context) => const ConfirmImportScreen(),
+        ConfirmKdbxExportScreen.routeName: (context) =>
+            const ConfirmKdbxExportScreen(),
         ConfirmRestoreScreen.routeName: (context) =>
             const ConfirmRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),

@@ -1,4 +1,5 @@
 import 'package:passy/passy_data/entry_meta.dart';
+import 'package:passy/passy_data/kdbx_convertable.dart';
 
 import 'common.dart';
 import 'csv_convertable.dart';
@@ -10,7 +11,8 @@ import 'note.dart';
 import 'password.dart';
 import 'payment_card.dart';
 
-abstract class PassyEntry<T> with JsonConvertable, CSVConvertable {
+abstract class PassyEntry<T>
+    with JsonConvertable, CSVConvertable, KdbxConvertable {
   final String key;
 
   PassyEntry(this.key);

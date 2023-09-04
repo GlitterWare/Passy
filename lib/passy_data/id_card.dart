@@ -1,4 +1,5 @@
 import 'package:passy/passy_data/entry_meta.dart';
+import 'package:passy/passy_data/passy_kdbx_entry.dart';
 
 import 'custom_field.dart';
 import 'passy_entries.dart';
@@ -136,4 +137,25 @@ class IDCard extends PassyEntry<IDCard> {
         expDate,
         country,
       ];
+
+  @override
+  PassyKdbxEntry toKdbx() {
+    return PassyKdbxEntry(
+      title: nickname,
+      customFields: [
+        if (type.isNotEmpty) CustomField(title: 'Type', value: type),
+        if (idNumber.isNotEmpty)
+          CustomField(title: 'ID number', value: idNumber, obscured: true),
+        if (name.isNotEmpty) CustomField(title: 'Name', value: name),
+        if (issDate.isNotEmpty)
+          CustomField(title: 'Issue date', value: issDate),
+        if (expDate.isNotEmpty)
+          CustomField(title: 'Expiration date', value: expDate),
+        if (country.isNotEmpty) CustomField(title: 'Country', value: country),
+        ...customFields,
+        if (additionalInfo.isNotEmpty)
+          CustomField(title: 'Additional info', value: additionalInfo),
+      ],
+    );
+  }
 }

@@ -9,6 +9,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'package:passy/screens/common.dart';
+import 'package:passy/screens/confirm_kdbx_export_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 
 import 'export_and_import_screen.dart';
@@ -23,10 +24,7 @@ class ExportScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ExportScreen();
 }
 
-enum _ExportType {
-  passy,
-  csv,
-}
+enum _ExportType { passy, csv }
 
 class _ExportScreen extends State<ExportScreen> {
   final LoadedAccount _account = data.loadedAccount!;
@@ -80,11 +78,13 @@ class _ExportScreen extends State<ExportScreen> {
         lockParentWindow: true,
       );
       if (_expDir == null) return;
-      if (type == _ExportType.passy) {
-        await _account.exportPassy(outputDirectory: Directory(_expDir));
-      }
-      if (type == _ExportType.csv) {
-        await _account.exportCSV(outputDirectory: Directory(_expDir));
+      switch (type) {
+        case _ExportType.passy:
+          await _account.exportPassy(outputDirectory: Directory(_expDir));
+          break;
+        case _ExportType.csv:
+          await _account.exportCSV(outputDirectory: Directory(_expDir));
+          break;
       }
       showSnackBar(context,
           message: localizations.exportSaved,
@@ -137,6 +137,16 @@ class _ExportScreen extends State<ExportScreen> {
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () => _onPassyExport(_username, _ExportType.csv),
+        )),
+        PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.kdbxExport),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.upload_file_outlined),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () =>
+              Navigator.pushNamed(context, ConfirmKdbxExportScreen.routeName),
         )),
       ]),
     );
