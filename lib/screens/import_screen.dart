@@ -50,7 +50,7 @@ class _ImportScreen extends State<ImportScreen> {
     MainScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
-      dialogTitle: localizations.importFromPassy,
+      dialogTitle: localizations.kdbxImport,
       type: FileType.custom,
       allowedExtensions: ['kdbx'],
       lockParentWindow: true,
