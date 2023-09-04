@@ -1,5 +1,6 @@
 import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/key_derivation_info.dart';
@@ -28,6 +29,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
   KeyDerivationInfo? _info;
   String _password = '';
   bool _isChanged = false;
+  bool _advancedSettingsIsExpanded = false;
 
   Future<void> _onConfirmPressed() async {
     if ((await data.createPasswordHash(_account.username,
@@ -150,8 +152,110 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                     ? const Color.fromRGBO(255, 82, 82, 1)
                     : null,
               ),
+              if (_type == KeyDerivationType.argon2)
+                ExpansionPanelList(
+                    expandedHeaderPadding: EdgeInsets.zero,
+                    expansionCallback: (panelIndex, isExpanded) => setState(
+                        () => _advancedSettingsIsExpanded = isExpanded),
+                    elevation: 0,
+                    dividerColor: PassyTheme.lightContentSecondaryColor,
+                    children: [
+                      ExpansionPanel(
+                          backgroundColor: PassyTheme.darkContentColor,
+                          isExpanded: _advancedSettingsIsExpanded,
+                          canTapOnHeader: true,
+                          headerBuilder: (context, isExpanded) {
+                            return Padding(
+                                padding: const EdgeInsets.only(left: 8),
+                                child: Container(
+                                    decoration: const BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(32.0)),
+                                        color: PassyTheme.darkPassyPurple),
+                                    child: PassyPadding(Row(
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 5),
+                                          child:
+                                              Icon(Icons.error_outline_rounded),
+                                        ),
+                                        Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 15),
+                                            child: Text(localizations
+                                                .advancedSettings)),
+                                      ],
+                                    ))));
+                          },
+                          body: Column(
+                            children: [
+                              PassyPadding(
+                                Text(
+                                  localizations
+                                      .backupYourAccountBeforeMakingChangesToTheseSettings,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                      color: PassyTheme
+                                          .lightContentSecondaryColor),
+                                ),
+                              ),
+                              PassyPadding(TextFormField(
+                                decoration: const InputDecoration(
+                                    labelText: 'Memory (KiB)'),
+                                initialValue:
+                                    (_info as Argon2Info).memory.toString(),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                onChanged: (value) {
+                                  if (value.isEmpty) return;
+                                  setState(() {
+                                    _isChanged = true;
+                                    (_info as Argon2Info).memory =
+                                        int.parse(value);
+                                  });
+                                },
+                              )),
+                              PassyPadding(TextFormField(
+                                decoration: const InputDecoration(
+                                    labelText: 'Iterations'),
+                                initialValue:
+                                    (_info as Argon2Info).iterations.toString(),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                onChanged: (value) {
+                                  if (value.isEmpty) return;
+                                  setState(() {
+                                    _isChanged = true;
+                                    (_info as Argon2Info).iterations =
+                                        int.parse(value);
+                                  });
+                                },
+                              )),
+                              PassyPadding(TextFormField(
+                                decoration: const InputDecoration(
+                                    labelText: 'Parallelism'),
+                                initialValue: (_info as Argon2Info)
+                                    .parallelism
+                                    .toString(),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                onChanged: (value) {
+                                  if (value.isEmpty) return;
+                                  setState(() {
+                                    _isChanged = true;
+                                    (_info as Argon2Info).parallelism =
+                                        int.parse(value);
+                                  });
+                                },
+                              )),
+                            ],
+                          ))
+                    ]),
               if (_isChanged)
-                RichText(
+                PassyPadding(RichText(
                   text: TextSpan(
                       text: localizations.youAreChangingKeyDerivationFor,
                       children: [
@@ -163,7 +267,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                         ),
                         const TextSpan(text: '.')
                       ]),
-                ),
+                )),
               if (_isChanged)
                 Expanded(
                   child: PassyPadding(

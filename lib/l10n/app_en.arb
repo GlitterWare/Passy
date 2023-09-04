@@ -305,5 +305,6 @@
     "csvExport": "CSV export",
     "kdbxImport": "KDBX import",
     "kdbxExport": "KDBX export",
-    "imported": "Imported"
+    "imported": "Imported",
+    "backupYourAccountBeforeMakingChangesToTheseSettings": "Please back up your account before making changes to these settings."
 }
