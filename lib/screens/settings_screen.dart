@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/screens/security_screen.dart';
@@ -55,6 +56,20 @@ class _SettingsScreen extends State<SettingsScreen> {
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => openUrl('https://github.com/sponsors/GlitterWare'),
           )),
+          if (Platform.isAndroid || Platform.isIOS)
+            PassyPadding(
+              ThreeWidgetButton(
+                center: Text(localizations.enableAutofill),
+                left: const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Icon(Icons.password_rounded),
+                ),
+                right: const Icon(Icons.arrow_forward_ios_rounded),
+                onPressed: () {
+                  AutofillService().requestSetAutofillService();
+                },
+              ),
+            ),
           if (!Platform.isAndroid && !Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
               center: Text(localizations.passyBrowserExtension),
