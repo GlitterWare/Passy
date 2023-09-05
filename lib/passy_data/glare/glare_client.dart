@@ -38,13 +38,15 @@ class GlareClient {
     _onDisconnect - handler;
   }
 
-  static Future<GlareClient> connect(
-      {required dynamic host,
-      required int port,
-      RSAKeypair? keypair,
-      Function(dynamic object)? log}) async {
-    RSAClientSocket socket =
-        await RSAClientSocket.connect(host, port, keypair: keypair);
+  static Future<GlareClient> connect({
+    required dynamic host,
+    required int port,
+    RSAKeypair? keypair,
+    Function(dynamic object)? log,
+    Duration? timeout,
+  }) async {
+    RSAClientSocket socket = await RSAClientSocket.connect(host, port,
+        keypair: keypair, timeout: timeout);
     return GlareClient._(
       socket: socket,
       address: socket.address,

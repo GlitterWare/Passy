@@ -37,6 +37,7 @@ class GlareServer {
     RSAKeypair? keypair,
     required Map<String, GlareModule> modules,
     int maxTotalConnections = 0,
+    Function(int totalConnections)? onConnected,
     Function(dynamic object)? log,
     void Function()? onStop,
     String serviceInfo = 'Glare server protocol v$version',
@@ -66,6 +67,8 @@ class GlareServer {
         return;
       }
       totalConnections++;
+      onConnected?.call(
+          maxTotalConnections == 0 ? totalConnections - 1 : totalConnections);
       String address = '${socket.remoteAddress.address}:${socket.remotePort}';
       log?.call('I:Client $address connected.');
       socket.done.catchError((Object error) {});

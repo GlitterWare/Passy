@@ -108,7 +108,7 @@ class RSAClientSocket {
     int sourcePort = 0,
     Duration? timeout,
   }) async {
-    Socket socket = await Socket.connect(host, port);
+    Socket socket = await Socket.connect(host, port, timeout: timeout);
     socket.done.catchError((Object error) {});
     RSAClientSocket rsaSock = RSAClientSocket._(socket, keypair: keypair);
     await rsaSock._onConnected.future;

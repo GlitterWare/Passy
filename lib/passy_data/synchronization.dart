@@ -430,6 +430,7 @@ class Synchronization {
         port: 0,
         keypair: _rsaKeypair,
         maxTotalConnections: 1,
+        onConnected: (totalConnections) => onConnected?.call(),
         modules: buildSynchronization2d0d0Modules(
           username: _username,
           passyEntries: _passyEntries,
@@ -829,6 +830,7 @@ class Synchronization {
         host: _addressSplit[0],
         port: port,
         keypair: _rsaKeypair,
+        timeout: const Duration(seconds: 10),
       );
       _sync2d0d0Client = _safeSync2d0d0Client;
     } catch (e, s) {
