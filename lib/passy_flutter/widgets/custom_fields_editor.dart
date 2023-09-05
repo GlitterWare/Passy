@@ -115,17 +115,17 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                   decoration: InputDecoration(
                     labelText: _field.title,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(28.0),
+                      borderRadius: BorderRadius.circular(30.0),
                       borderSide:
                           const BorderSide(color: PassyTheme.lightContentColor),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(28.0),
+                      borderRadius: BorderRadius.circular(30.0),
                       borderSide: const BorderSide(
                           color: PassyTheme.darkContentSecondaryColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(28.0),
+                      borderRadius: BorderRadius.circular(30.0),
                       borderSide:
                           const BorderSide(color: PassyTheme.lightContentColor),
                     ),

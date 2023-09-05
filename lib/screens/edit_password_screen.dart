@@ -296,16 +296,16 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: InputDecoration(
             labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(28.0),
+              borderRadius: BorderRadius.circular(30.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(28.0),
+              borderRadius: BorderRadius.circular(30.0),
               borderSide:
                   const BorderSide(color: PassyTheme.darkContentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(28.0),
+              borderRadius: BorderRadius.circular(30.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),
             ),
           ),
