@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:path/path.dart';
 
@@ -9,6 +10,7 @@ class FileMeta {
   final DateTime modified;
   final DateTime accessed;
   final PassyFileType type;
+  final IV iv;
 
   FileMeta({
     required this.name,
@@ -16,9 +18,11 @@ class FileMeta {
     required this.modified,
     required this.accessed,
     required this.type,
+    required this.iv,
   });
 
-  factory FileMeta.fromFile(File file) {
+  factory FileMeta.fromFile(File file, IV? iv) {
+    iv ??= IV.fromSecureRandom(16);
     FileStat stat = file.statSync();
     String name = basename(file.path);
     PassyFileType type;
@@ -55,6 +59,7 @@ class FileMeta {
       modified: stat.modified,
       accessed: stat.accessed,
       type: type,
+      iv: iv,
     );
   }
 }
