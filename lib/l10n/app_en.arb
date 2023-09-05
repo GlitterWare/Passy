@@ -309,5 +309,9 @@
     "backupYourAccountBeforeMakingChangesToTheseSettings": "Please back up your account before making changes to these settings.",
     "backupYourAccountBeforeProceeding": "Backup your account before proceeding",
     "synchronizationLogs": "Synchronization logs",
-    "noRecentActivity": "No recent activity."
+    "noRecentActivity": "No recent activity.",
+    "yourAccountWillBeStoredLocally1": "Your account will be stored locally ",
+    "yourAccountWillBeStoredLocally2Highlighted": "on this device.",
+    "@yourAccountWillBeStoredLocally1": { "description": "yourAccountWillBeStoredLocally1 and yourAccountWillBeStoredLocally2Highlighted make up a single message used in the add account screen. yourAccountWillBeStoredLocally2Highlighted is shown in a more noticeable color to increase user attention." },
+    "@yourAccountWillBeStoredLocally2Highlighted": { "description": "yourAccountWillBeStoredLocally1 and yourAccountWillBeStoredLocally2Highlighted make up a single message used in the add account screen. yourAccountWillBeStoredLocally2Highlighted is shown in a more noticeable color to increase user attention." }
 }

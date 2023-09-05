@@ -134,8 +134,22 @@ class _AddAccountScreen extends State<StatefulWidget> {
             hasScrollBody: false,
             child: Column(
               children: [
-                const Spacer(flex: 2),
+                const Spacer(flex: 5),
                 logo60Purple,
+                const Spacer(),
+                Text.rich(
+                  TextSpan(
+                    text: localizations.yourAccountWillBeStoredLocally1,
+                    children: [
+                      TextSpan(
+                          text: localizations
+                              .yourAccountWillBeStoredLocally2Highlighted,
+                          style: const TextStyle(
+                              color: PassyTheme.lightContentSecondaryColor)),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                 const Spacer(),
                 Expanded(
                   child: Row(
@@ -216,7 +230,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                       const Spacer(),
                     ],
                   ),
-                  flex: 4,
+                  flex: 10,
                 ),
               ],
             ),
