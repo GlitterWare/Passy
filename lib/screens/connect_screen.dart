@@ -38,6 +38,7 @@ class _ConnectScreen extends State<ConnectScreen> {
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(children: [
               const Spacer(),
               RichText(

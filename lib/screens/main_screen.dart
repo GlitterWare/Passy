@@ -71,6 +71,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -148,6 +149,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -198,6 +200,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -306,6 +309,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),

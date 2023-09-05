@@ -35,6 +35,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -77,6 +78,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

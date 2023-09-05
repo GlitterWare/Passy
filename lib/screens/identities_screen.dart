@@ -58,6 +58,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
         return CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(flex: 7),
@@ -99,6 +100,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

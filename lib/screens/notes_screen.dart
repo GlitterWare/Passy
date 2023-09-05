@@ -55,6 +55,7 @@ class _NotesScreen extends State<NotesScreen> {
         return CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(flex: 7),
@@ -92,6 +93,7 @@ class _NotesScreen extends State<NotesScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

@@ -61,6 +61,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           return CustomScrollView(
             slivers: [
               SliverFillRemaining(
+                hasScrollBody: false,
                 child: Column(
                   children: [
                     const Spacer(flex: 7),
@@ -105,6 +106,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

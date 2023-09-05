@@ -65,6 +65,7 @@ class _ManageServersScreen extends State<ManageServersScreen> {
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: _servers,
             ),

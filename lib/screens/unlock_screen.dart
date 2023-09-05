@@ -144,6 +144,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
         body: CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(

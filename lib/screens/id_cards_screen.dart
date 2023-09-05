@@ -59,6 +59,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         return CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(flex: 7),
@@ -99,6 +100,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),
