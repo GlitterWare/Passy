@@ -24,8 +24,18 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   String _newPasswordConfirm = '';
   bool _advancedSettingsIsExpanded = false;
   bool _doNotReencryptEntries = false;
+  bool _isBackupComplete = false;
 
   void _onConfirmPressed() async {
+    if (!_isBackupComplete) {
+      showSnackBar(context,
+          message: localizations.backupYourAccountBeforeProceeding,
+          icon: const Icon(
+            Icons.save_rounded,
+            color: PassyTheme.darkContentColor,
+          ));
+      return;
+    }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
         _account.passwordHash) {
@@ -67,6 +77,18 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
         Navigator.popUntil(context,
             (route) => route.settings.name == CredentialsScreen.routeName);
       }
+    });
+  }
+
+  Future<void> _onBackupPressed() async {
+    try {
+      String? path = await backupAccount(context, username: _account.username);
+      if (path == null) return;
+    } catch (e) {
+      return;
+    }
+    setState(() {
+      _isBackupComplete = true;
     });
   }
 
@@ -117,6 +139,28 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                             labelText: localizations.newPassword),
                         obscureText: true,
                         onChanged: (s) => setState(() => _newPassword = s),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                              child: PassyPadding(ThreeWidgetButton(
+                                  center: Text(localizations.backup),
+                                  left: const Padding(
+                                    padding: EdgeInsets.only(right: 30),
+                                    child: Icon(Icons.save_rounded),
+                                  ),
+                                  right: const Icon(
+                                      Icons.arrow_forward_ios_rounded),
+                                  onPressed: () => _onBackupPressed()))),
+                          if (_isBackupComplete)
+                            const Flexible(
+                                child: PassyPadding(Icon(
+                              Icons.check,
+                              color: Colors.green,
+                              size: 35,
+                            ))),
+                        ],
                       ),
                       ButtonedTextFormField(
                         labelText: localizations.confirmPassword,
