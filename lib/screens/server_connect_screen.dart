@@ -162,10 +162,8 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                     ]
                   : [
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '1. ',
                             children: [
                               TextSpan(
@@ -177,6 +175,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       Row(
@@ -220,10 +219,8 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                         ],
                       ),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '2. ',
                             children: [
                               TextSpan(
@@ -234,6 +231,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       Row(
@@ -267,10 +265,8 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                         ],
                       ),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '3. ',
                             children: [
                               TextSpan(
@@ -281,6 +277,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       PassyPadding(TextFormField(

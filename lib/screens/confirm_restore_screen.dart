@@ -24,8 +24,8 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
     String _path = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
         title: Text(localizations.passyRestore),
-        message: PassyPadding(RichText(
-          text: TextSpan(
+        message: PassyPadding(Text.rich(
+          TextSpan(
             text: localizations.confirmRestore1,
             children: [
               TextSpan(

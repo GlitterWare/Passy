@@ -64,9 +64,8 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
           },
         );
       },
-      message: RichText(
-        textAlign: TextAlign.center,
-        text: TextSpan(
+      message: Text.rich(
+        TextSpan(
           text: localizations.currentUsernameIs,
           children: [
             TextSpan(
@@ -78,6 +77,7 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
             TextSpan(text: '.\n\n${localizations.typeInTheNewUsername}.'),
           ],
         ),
+        textAlign: TextAlign.center,
       ),
     );
   }

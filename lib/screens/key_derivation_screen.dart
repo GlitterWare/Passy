@@ -112,8 +112,8 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                     color: PassyTheme.lightContentSecondaryColor),
               )),
               const SizedBox(height: 24),
-              PassyPadding(RichText(
-                text: TextSpan(children: [
+              PassyPadding(Text.rich(
+                TextSpan(children: [
                   const WidgetSpan(
                       child: Icon(
                     Icons.sync_rounded,
@@ -122,11 +122,10 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                   TextSpan(text: '  ${localizations.keyDerivationWarning2}'),
                 ]),
                 textAlign: TextAlign.center,
-                textScaleFactor: 1.25,
               )),
               const SizedBox(height: 24),
-              PassyPadding(RichText(
-                text: TextSpan(children: [
+              PassyPadding(Text.rich(
+                TextSpan(children: [
                   const WidgetSpan(
                       child: Icon(
                     Icons.update,
@@ -135,7 +134,6 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                   TextSpan(text: '  ${localizations.keyDerivationWarning3}'),
                 ]),
                 textAlign: TextAlign.center,
-                textScaleFactor: 1.25,
               )),
               const SizedBox(height: 24),
               Container(
@@ -300,8 +298,8 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                   ],
                 ),
               if (_isChanged)
-                PassyPadding(RichText(
-                  text: TextSpan(
+                PassyPadding(Text.rich(
+                  TextSpan(
                       text: localizations.youAreChangingKeyDerivationFor,
                       children: [
                         TextSpan(
@@ -312,6 +310,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                         ),
                         const TextSpan(text: '.')
                       ]),
+                  textAlign: TextAlign.center,
                 )),
               if (_isChanged)
                 Expanded(

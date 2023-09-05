@@ -26,9 +26,8 @@ class PassyAboutDialog extends StatelessWidget {
             width: 128,
           )),
           const SizedBox(height: 32),
-          RichText(
-            textAlign: TextAlign.center,
-            text: const TextSpan(
+          const Text.rich(
+            TextSpan(
               text: 'Passy ',
               style: TextStyle(fontFamily: 'FiraCode'),
               children: [
@@ -40,6 +39,7 @@ class PassyAboutDialog extends StatelessWidget {
                 )
               ],
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
           const Text(

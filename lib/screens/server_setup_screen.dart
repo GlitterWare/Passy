@@ -183,10 +183,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         textAlign: TextAlign.center,
                       )),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '1. ',
                             children: [
                               TextSpan(
@@ -198,6 +196,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       Row(
@@ -241,10 +240,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         ],
                       ),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '2. ',
                             children: [
                               TextSpan(
@@ -255,6 +252,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       PassyPadding(ThreeWidgetButton(
@@ -266,10 +264,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           right: const Icon(Icons.arrow_forward_ios_rounded),
                           onPressed: _onInstallPressed)),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '3. ',
                             children: [
                               TextSpan(
@@ -280,12 +276,11 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      RichText(
-                        textScaleFactor: 1.25,
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
+                      Text.rich(
+                        TextSpan(
                           text: localizations.doubleClickMessage,
                           children: [
                             TextSpan(
@@ -297,13 +292,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             const TextSpan(text: '.'),
                           ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       Text(localizations.doubleClickMessage1),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '4. ',
                             children: [
                               TextSpan(
@@ -314,6 +308,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       Row(
@@ -346,10 +341,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         ],
                       ),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '5. (${localizations.optional}) ',
                             children: [
                               TextSpan(
@@ -360,12 +353,11 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      RichText(
-                        textScaleFactor: 1.25,
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
+                      Text.rich(
+                        TextSpan(
                           text: localizations.doubleClickMessage,
                           children: [
                             TextSpan(
@@ -377,13 +369,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             const TextSpan(text: '.'),
                           ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       Text(localizations.doubleClickMessage1),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '6. ',
                             children: [
                               TextSpan(
@@ -394,13 +385,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       PassyPadding(
-                        RichText(
-                          textScaleFactor: 1.25,
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             text: '${localizations.onClientDevices}: ',
                             children: [
                               const WidgetSpan(
@@ -454,6 +444,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               ),
                             ],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],

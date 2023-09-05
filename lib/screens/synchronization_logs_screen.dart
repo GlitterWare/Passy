@@ -25,9 +25,8 @@ class _SynchronizationLogsScreen extends State<SynchronizationLogsScreen> {
     if (logs.isEmpty) {
       result = [
         const Spacer(),
-        RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
+        Text.rich(
+          TextSpan(
             children: [
               const WidgetSpan(
                   child: Icon(
@@ -37,6 +36,7 @@ class _SynchronizationLogsScreen extends State<SynchronizationLogsScreen> {
               TextSpan(text: localizations.noRecentActivity),
             ],
           ),
+          textAlign: TextAlign.center,
         ),
         const Spacer(),
       ];

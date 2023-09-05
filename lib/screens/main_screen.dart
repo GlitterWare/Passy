@@ -204,16 +204,14 @@ class _MainScreen extends State<MainScreen>
             child: Column(
               children: [
                 const Spacer(flex: 7),
-                RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                        text: '${localizations.noFavorites}.',
-                        children: [
-                          TextSpan(text: '\n\n${localizations.noFavorites1}'),
-                          const WidgetSpan(
-                              child: Icon(Icons.star_outline_rounded)),
-                          TextSpan(text: ' ${localizations.noFavorites2}.'),
-                        ])),
+                Text.rich(
+                  TextSpan(text: '${localizations.noFavorites}.', children: [
+                    TextSpan(text: '\n\n${localizations.noFavorites1}'),
+                    const WidgetSpan(child: Icon(Icons.star_outline_rounded)),
+                    TextSpan(text: ' ${localizations.noFavorites2}.'),
+                  ]),
+                  textAlign: TextAlign.center,
+                ),
                 const Spacer(flex: 7),
               ],
             ),

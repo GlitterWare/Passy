@@ -180,8 +180,8 @@ class _AutomaticBackupScreen extends State<AutomaticBackupScreen> {
             )),
           if (_account.autoBackup != null)
             PassyPadding(
-              RichText(
-                text: TextSpan(
+              Text.rich(
+                TextSpan(
                   text: localizations.backupPathColon,
                   children: [
                     TextSpan(

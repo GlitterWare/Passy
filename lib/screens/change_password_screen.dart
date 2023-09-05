@@ -111,8 +111,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
             hasScrollBody: false,
             child: Column(children: [
               const Spacer(),
-              RichText(
-                text: TextSpan(
+              Text.rich(
+                TextSpan(
                     text: localizations.youAreChangingPasswordFor,
                     children: [
                       TextSpan(
@@ -123,6 +123,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                       ),
                       const TextSpan(text: '.')
                     ]),
+                textAlign: TextAlign.center,
               ),
               Expanded(
                 child: PassyPadding(

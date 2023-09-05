@@ -35,8 +35,8 @@ class _ExportScreen extends State<ExportScreen> {
       builder: (context) => AlertDialog(
         shape: PassyTheme.dialogShape,
         title: Text(localizations.confirmExport),
-        content: RichText(
-          text: TextSpan(
+        content: Text.rich(
+          TextSpan(
             text: localizations.confirmExport1,
             children: [
               TextSpan(

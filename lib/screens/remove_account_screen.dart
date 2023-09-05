@@ -22,8 +22,8 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
     String _username = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
       title: Text(localizations.removeAccount),
-      message: PassyPadding(RichText(
-        text: TextSpan(text: localizations.confirmRemoveAccount1, children: [
+      message: PassyPadding(Text.rich(
+        TextSpan(text: localizations.confirmRemoveAccount1, children: [
           TextSpan(
             text: '\'$_username\' ',
             style:

@@ -99,8 +99,8 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
         title: Text(args.importType == ImportType.passy
             ? localizations.passyImport
             : localizations.kdbxImport),
-        message: PassyPadding(RichText(
-          text: TextSpan(
+        message: PassyPadding(Text.rich(
+          TextSpan(
             text: localizations.confirmImport1,
             children: [
               TextSpan(
