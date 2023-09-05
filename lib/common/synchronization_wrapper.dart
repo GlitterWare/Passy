@@ -102,6 +102,7 @@ class SynchronizationWrapper {
       return;
     }
 
+    Navigator.pushNamed(_context, SplashScreen.routeName);
     _sync = account.getSynchronization(
       onConnected: () => _onConnected(),
       onComplete: (SynchronizationResults results) => _onSyncComplete(
