@@ -47,7 +47,7 @@ class _SynchronizationLogsScreen extends State<SynchronizationLogsScreen> {
       DateTime date = log.key.toUtc();
       Widget widget = PassyPadding(ThreeWidgetButton(
           center: Text(
-              '${date.hour}:${date.minute} | ${date.day}/${date.month}/${date.year}'),
+              '${date.hour}:${date.minute}:${date.second} | ${date.day}/${date.month}/${date.year}'),
           left: const Padding(
             padding: EdgeInsets.only(right: 30),
             child: Icon(Icons.error_outline),
