@@ -437,7 +437,7 @@ class _MainScreen extends State<MainScreen>
     DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
     if (lastSyncDate != null) {
       String newLastSyncDate =
-          '${lastSyncDate.hour}:${lastSyncDate.minute} | ${lastSyncDate.day}/${lastSyncDate.month}/${lastSyncDate.year}';
+          '${lastSyncDate.hour < 10 ? '0' : ''}${lastSyncDate.hour}:${lastSyncDate.minute < 10 ? '0' : ''}${lastSyncDate.minute} | ${lastSyncDate.day < 10 ? '0' : ''}${lastSyncDate.day}/${lastSyncDate.month < 10 ? '0' : ''}${lastSyncDate.month}/${lastSyncDate.year}';
       if (_lastSyncDate != newLastSyncDate) {
         setState(() => _lastSyncDate = newLastSyncDate);
       }
