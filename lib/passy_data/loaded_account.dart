@@ -56,6 +56,7 @@ class LoadedAccount {
   Completer<void>? _autoSyncCompleter;
   final Map<String, Sync2d0d0ServerInfo> _serversToTrust = {};
   final Map<String, Completer<void>> _serversToTrustCompleters = {};
+  final Map<DateTime, String> _synchronizationLogs = {};
 
   LoadedAccount({
     required Encrypter encrypter,
@@ -321,10 +322,16 @@ class LoadedAccount {
           _credentials.value.keyDerivationType == KeyDerivationType.none
               ? SynchronizationType.classic
               : SynchronizationType.v2d0d0,
-      onComplete: onComplete,
+      onComplete: (results) {
+        _synchronizationLogs[DateTime.now().toUtc()] = results.log;
+        onComplete?.call(results);
+      },
       onError: onError,
     );
   }
+
+  Map<DateTime, String> get synchronizationLogs =>
+      Map.from(_synchronizationLogs);
 
   Future<void> testSynchronizationConnection2d0d0(
       String address, int port) async {

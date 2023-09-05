@@ -11,6 +11,7 @@ import 'package:passy/screens/manage_servers_screen.dart';
 import 'package:passy/screens/settings_screen.dart';
 
 import 'server_connect_screen.dart';
+import 'synchronization_logs_screen.dart';
 import 'server_setup_screen.dart';
 
 class ServersScreen extends StatefulWidget {
@@ -134,6 +135,16 @@ class _ServersScreen extends State<ServersScreen> {
                     right: const Icon(Icons.arrow_forward_ios_rounded),
                     onPressed: () => Navigator.pushNamed(
                             context, ServerConnectScreen.routeName)
+                        .then((value) => setState(() {})))),
+                PassyPadding(ThreeWidgetButton(
+                    center: Text(localizations.synchronizationLogs),
+                    left: const Padding(
+                      padding: EdgeInsets.only(right: 30),
+                      child: Icon(Icons.error_outline),
+                    ),
+                    right: const Icon(Icons.arrow_forward_ios_rounded),
+                    onPressed: () => Navigator.pushNamed(
+                            context, SynchronizationLogsScreen.routeName)
                         .then((value) => setState(() {})))),
                 if (_account.sync2d0d0ServerInfo.isNotEmpty)
                   PassyPadding(ThreeWidgetButton(

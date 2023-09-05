@@ -307,5 +307,7 @@
     "kdbxExport": "KDBX export",
     "imported": "Imported",
     "backupYourAccountBeforeMakingChangesToTheseSettings": "Please back up your account before making changes to these settings.",
-    "backupYourAccountBeforeProceeding": "Backup your account before proceeding"
+    "backupYourAccountBeforeProceeding": "Backup your account before proceeding",
+    "synchronizationLogs": "Synchronization logs",
+    "noRecentActivity": "No recent activity."
 }

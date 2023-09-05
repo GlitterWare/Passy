@@ -31,8 +31,14 @@ class LogScreen extends StatelessWidget {
                 splashRadius: PassyTheme.appBarButtonSplashRadius,
                 icon: const Icon(Icons.copy_rounded),
                 tooltip: localizations.copy,
-                onPressed: () =>
-                    Clipboard.setData(ClipboardData(text: '```\n$_log\n```')),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: '```\n$_log\n```'));
+                  showSnackBar(context,
+                      message:
+                          '${localizations.log} ${localizations.copied.toLowerCase()}',
+                      icon: const Icon(Icons.copy_rounded,
+                          color: PassyTheme.darkContentColor));
+                },
               ),
               IconButton(
                 padding: PassyTheme.appBarButtonPadding,

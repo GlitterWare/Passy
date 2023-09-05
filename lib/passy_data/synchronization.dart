@@ -1359,6 +1359,7 @@ class Synchronization {
     await _settings.reload();
     _settings.value.lastSyncDate = DateTime.now().toUtc();
     await _settings.save();
+    _syncLog += 'done.';
     _callOnComplete();
   }
 
@@ -1384,6 +1385,7 @@ class Synchronization {
 
   Future<void> connect(HostAddress address) async {
     if (_synchronizationType == SynchronizationType.v2d0d0) {
+      _syncLog += 'Connecting to a 2.0.0+ synchronization server... ';
       return await connect2d0d0(address);
     }
     await _history.reload();
