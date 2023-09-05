@@ -30,8 +30,18 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
   String _password = '';
   bool _isChanged = false;
   bool _advancedSettingsIsExpanded = false;
+  bool _isBackupComplete = false;
 
   Future<void> _onConfirmPressed() async {
+    if (!_isBackupComplete) {
+      showSnackBar(context,
+          message: localizations.backupYourAccountBeforeProceeding,
+          icon: const Icon(
+            Icons.save_rounded,
+            color: PassyTheme.darkContentColor,
+          ));
+      return;
+    }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
         _account.passwordHash) {
@@ -49,6 +59,18 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
     Navigator.popUntil(context, (route) {
       return route.settings.name == MainScreen.routeName ||
           route.settings.name == SecurityScreen.routeName;
+    });
+  }
+
+  Future<void> _onBackupPressed() async {
+    try {
+      String? path = await backupAccount(context, username: _account.username);
+      if (path == null) return;
+    } catch (e) {
+      return;
+    }
+    setState(() {
+      _isBackupComplete = true;
     });
   }
 
@@ -134,6 +156,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                       labelText: localizations.keyDerivationType),
                   onChanged: (value) {
                     if (value == null) return;
+                    if (value == _type) return;
                     setState(() {
                       _isChanged = true;
                       _type = value;
@@ -254,6 +277,28 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                             ],
                           ))
                     ]),
+              if (_isChanged)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                        child: PassyPadding(ThreeWidgetButton(
+                            center: Text(localizations.backup),
+                            left: const Padding(
+                              padding: EdgeInsets.only(right: 30),
+                              child: Icon(Icons.save_rounded),
+                            ),
+                            right: const Icon(Icons.arrow_forward_ios_rounded),
+                            onPressed: () => _onBackupPressed()))),
+                    if (_isBackupComplete)
+                      const Flexible(
+                          child: PassyPadding(Icon(
+                        Icons.check,
+                        color: Colors.green,
+                        size: 35,
+                      ))),
+                  ],
+                ),
               if (_isChanged)
                 PassyPadding(RichText(
                   text: TextSpan(
