@@ -31,7 +31,7 @@ class _SynchronizationLogsScreen extends State<SynchronizationLogsScreen> {
               const WidgetSpan(
                   child: Icon(
                 Icons.hourglass_empty,
-                size: 14,
+                size: 18,
               )),
               TextSpan(text: localizations.noRecentActivity),
             ],

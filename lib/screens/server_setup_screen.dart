@@ -396,7 +396,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               const WidgetSpan(
                                   child: Icon(
                                 Icons.settings_rounded,
-                                size: 14,
+                                size: 18,
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
@@ -408,13 +408,13 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               const WidgetSpan(
                                   child: Icon(
                                 Icons.arrow_forward_ios_rounded,
-                                size: 14,
+                                size: 18,
                               )),
                               const TextSpan(text: '  '),
                               const WidgetSpan(
                                   child: Icon(
                                 Icons.desktop_windows_rounded,
-                                size: 14,
+                                size: 18,
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
@@ -427,13 +427,13 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                               const WidgetSpan(
                                   child: Icon(
                                 Icons.arrow_forward_ios_rounded,
-                                size: 14,
+                                size: 18,
                               )),
                               const TextSpan(text: '  '),
                               const WidgetSpan(
                                   child: Icon(
                                 Icons.cast,
-                                size: 14,
+                                size: 18,
                                 color: PassyTheme.lightContentSecondaryColor,
                               )),
                               TextSpan(
