@@ -1,29 +1,32 @@
 import 'dart:io';
 
-import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:path/path.dart';
 
 class FileMeta with JsonConvertable {
+  final String key;
   final String name;
   final DateTime changed;
   final DateTime modified;
   final DateTime accessed;
   final PassyFileType type;
-  final IV iv;
+  final EntryStatus status;
 
   FileMeta({
+    String? key,
     required this.name,
     required this.changed,
     required this.modified,
     required this.accessed,
     required this.type,
-    required this.iv,
-  });
+    required this.status,
+  }) : key = key ?? DateTime.now().toUtc().toIso8601String();
 
   FileMeta.fromJson(Map<String, dynamic> json)
-      : name = json['name'] ?? '',
+      : key = json['key'] ?? DateTime.now().toUtc().toIso8601String(),
+        name = json['name'] ?? '',
         changed = json.containsKey('changed')
             ? (DateTime.tryParse(json['changed']) ?? DateTime.now())
             : DateTime.now(),
@@ -36,24 +39,24 @@ class FileMeta with JsonConvertable {
         type = json.containsKey('type')
             ? passyFileTypeFromName(json['type']) ?? PassyFileType.unknown
             : PassyFileType.unknown,
-        iv = json.containsKey('iv')
-            ? IV.fromBase64(json['iv'])
-            : IV.fromLength(16);
+        status = json.containsKey('status')
+            ? entryStatusFromText(json['status']) ?? EntryStatus.removed
+            : EntryStatus.removed;
 
   @override
   Map<String, dynamic> toJson() {
     return {
+      'key': key,
       'name': name,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
       'accessed': accessed.toIso8601String(),
       'type': type.name,
-      'iv': iv.base64,
+      'status': status.name,
     };
   }
 
-  factory FileMeta.fromFile(File file, IV? iv) {
-    iv ??= IV.fromSecureRandom(16);
+  factory FileMeta.fromFile(File file) {
     FileStat stat = file.statSync();
     String name = basename(file.path);
     PassyFileType type;
@@ -90,7 +93,7 @@ class FileMeta with JsonConvertable {
       modified: stat.modified,
       accessed: stat.accessed,
       type: type,
-      iv: iv,
+      status: EntryStatus.alive,
     );
   }
 }
