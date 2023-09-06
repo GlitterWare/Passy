@@ -211,4 +211,11 @@ class PassyBinaryFile {
     }
     await raf.close();
   }
+
+  Future<void> saveDecrypted(File file) async {
+    RandomAccessFile raf = await file.open(mode: FileMode.write);
+    await for (int byte in streamAsBytes()) {
+      await raf.writeByte(byte);
+    }
+  }
 }
