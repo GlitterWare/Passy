@@ -14,7 +14,7 @@ class PassyBinaryFile {
     required Key key,
   }) : _key = key;
 
-  Future<List<int>> readAsBytes() async {
+  Future<Uint8List> readAsBytes() async {
     RandomAccessFile raf = await file.open();
     int fileLen = await raf.length() - 1;
     int byte = await raf.readByte();
