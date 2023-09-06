@@ -98,7 +98,10 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (data.getBioAuthEnabled(_account.username) == true) {
       _bioAuthButton = FloatingActionButton(
-        onPressed: () => _bioAuth(),
+        onPressed: () {
+          UnlockScreen.isAuthenticating = false;
+          _bioAuth();
+        },
         child: const Icon(
           Icons.fingerprint_rounded,
         ),
