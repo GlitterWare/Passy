@@ -14,6 +14,65 @@ class PassyBinaryFile {
     required Key key,
   }) : _key = key;
 
+  factory PassyBinaryFile.fromDecryptedSync({
+    required File input,
+    required File output,
+    required Key key,
+    IV? iv,
+    String algorithm = 'AES/SIC/PKCS7',
+  }) {
+    iv ??= IV.fromSecureRandom(16);
+    RandomAccessFile rafIn = input.openSync();
+    if (!output.existsSync()) output.createSync(recursive: true);
+    RandomAccessFile rafOut = output.openSync(mode: FileMode.write);
+    int inLen = rafIn.lengthSync();
+    if (inLen == 0) {
+      rafOut.writeString('');
+      return PassyBinaryFile(
+        file: output,
+        key: key,
+      );
+    }
+    int fileIndex = 0;
+    int byte = 0;
+    PaddedBlockCipher _cipher = PaddedBlockCipher(algorithm);
+    _cipher.reset();
+    _cipher.init(
+        true,
+        PaddedBlockCipherParameters(
+            ParametersWithIV<KeyParameter>(KeyParameter(key.bytes), iv.bytes),
+            null));
+    rafOut.writeStringSync('${iv.base64},$inLen,$algorithm\n');
+    while (fileIndex <= inLen) {
+      Uint8List blockIn = Uint8List(16);
+      Uint8List blockOut = Uint8List(16);
+      if (byte != -1) {
+        for (int i = 0; i != 16; i++) {
+          byte = rafIn.readByteSync();
+          if (byte == -1) break;
+          blockIn[i] = byte;
+        }
+      }
+      if (fileIndex + 16 > inLen) {
+        int blockInFree = (16 - (inLen - fileIndex));
+        for (int i = 16 - blockInFree; i < 16; i++) {
+          blockIn[i] = blockInFree;
+        }
+      }
+      _cipher.processBlock(blockIn, 0, blockOut, 0);
+      for (int codeUnit in blockOut) {
+        rafOut.writeByteSync(codeUnit);
+      }
+      fileIndex += 16;
+    }
+    rafIn.closeSync();
+    rafOut.closeSync();
+    return PassyBinaryFile(
+      file: output,
+      key: key,
+    );
+  }
+
   Future<Uint8List> readAsBytes() async {
     RandomAccessFile raf = await file.open();
     int fileLen = await raf.length();
