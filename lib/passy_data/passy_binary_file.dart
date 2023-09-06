@@ -35,19 +35,20 @@ class PassyBinaryFile {
     //print('Offset: $offset');
     IV? iv;
     int length = 0;
+    String algo = '';
     if (meta.isNotEmpty) {
       String metaString = utf8.decode(meta);
       if (metaString[0] == '{') {
         Map<String, dynamic> metaJson = jsonDecode(metaString);
-        if (metaJson.containsKey('iv')) iv = IV.fromBase64(metaJson['iv']);
-        if (metaJson.containsKey('length')) {
-          length = int.parse(metaJson['length']);
-        }
+        iv = IV.fromBase64(metaJson['iv']);
+        length = int.parse(metaJson['length']);
+        algo = metaJson['algo'];
       } else {
         List<String> metaSplit = metaString.split(',');
         if (metaSplit.isNotEmpty) {
           iv = IV.fromBase64(metaSplit[0]);
           length = int.parse(metaSplit[1]);
+          algo = metaSplit[2];
         }
       }
     }
