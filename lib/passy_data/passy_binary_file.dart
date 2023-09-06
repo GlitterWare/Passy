@@ -16,7 +16,7 @@ class PassyBinaryFile {
 
   Future<Uint8List> readAsBytes() async {
     RandomAccessFile raf = await file.open();
-    int fileLen = await raf.length() - 1;
+    int fileLen = await raf.length();
     int byte = await raf.readByte();
     int jsonLen = 1;
     // Read metadata
@@ -82,6 +82,7 @@ class PassyBinaryFile {
       //print('Offset changed: $offset');
     }
     //print(utf8.decode(result));
+    await raf.close();
     return result;
   }
 }
