@@ -73,7 +73,7 @@ class PassyBinaryFile {
     );
   }
 
-  Future<Uint8List> readAsBytes() async {
+  Stream<int> streamAsBytes() async* {
     RandomAccessFile raf = await file.open();
     int fileLen = await raf.length();
     int byte = await raf.readByte();
@@ -81,13 +81,13 @@ class PassyBinaryFile {
     // Read metadata
     List<int> meta = [];
     while (byte != 10) {
-      if (byte == -1) return Uint8List(0);
+      if (byte == -1) return;
       meta.add(byte);
       byte = await raf.readByte();
       jsonLen++;
     }
     int dataLen = fileLen - jsonLen;
-    if (dataLen == 0) return Uint8List(0);
+    if (dataLen == 0) return;
     int offset = jsonLen;
     //print('File length: $fileLen');
     //print('Data length: $dataLen');
@@ -111,9 +111,7 @@ class PassyBinaryFile {
         }
       }
     }
-    if (length == 0) return Uint8List(0);
-    Uint8List result = Uint8List(length);
-    int resultIndex = 0;
+    if (length == 0) return;
     PaddedBlockCipher _cipher = PaddedBlockCipher(algo);
     _cipher.reset();
     _cipher.init(
@@ -134,14 +132,11 @@ class PassyBinaryFile {
         output = output.sublist(0, 16 - output.last);
       }
       for (int codeUnit in output) {
-        result[resultIndex] = codeUnit;
-        resultIndex++;
+        yield codeUnit;
       }
       offset += 16;
       //print('Offset changed: $offset');
     }
-    //print(utf8.decode(result));
     await raf.close();
-    return result;
   }
 }
