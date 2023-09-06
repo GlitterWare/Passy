@@ -81,7 +81,7 @@ class PassyBinaryFile {
       offset += 16;
       //print('Offset changed: $offset');
     }
-    print(utf8.decode(result));
+    //print(utf8.decode(result));
     return result;
   }
 }
