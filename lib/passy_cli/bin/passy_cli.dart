@@ -1378,8 +1378,10 @@ Future<void> executeCommand(List<String> command,
               log('Server started, running at `$fullAddr`.', id: id);
               log('Hotkeys | `c` - close server | `d` - detach', id: id);
               _pauseMainInput = true;
-              stdin.lineMode = false;
-              stdin.echoMode = false;
+              try {
+                stdin.lineMode = false;
+                stdin.echoMode = false;
+              } catch (_) {}
               void syncServerCli(List<int> event) async {
                 String command = utf8.decode(event);
                 if (command == 'c') {
@@ -1398,8 +1400,10 @@ Future<void> executeCommand(List<String> command,
               _secondaryInput = syncServerCli;
               await Future.any(
                   [syncCompleter.future, detachedCompleter.future]);
-              stdin.lineMode = true;
-              stdin.echoMode = true;
+              try {
+                stdin.lineMode = true;
+                stdin.echoMode = true;
+              } catch (_) {}
               _pauseMainInput = false;
               return;
             case '2d0d0':
