@@ -55,7 +55,7 @@ class PassyBinaryFile {
     if (length == 0) return Uint8List(0);
     Uint8List result = Uint8List(length);
     int resultIndex = 0;
-    PaddedBlockCipher _cipher = PaddedBlockCipher('AES/SIC/PKCS7');
+    PaddedBlockCipher _cipher = PaddedBlockCipher(algo);
     _cipher.reset();
     _cipher.init(
         false,
