@@ -41,7 +41,7 @@ class FileMeta with JsonConvertable {
             : IV.fromLength(16);
 
   @override
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'changed': changed.toIso8601String(),
