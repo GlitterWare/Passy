@@ -106,6 +106,17 @@ class PassyData {
     );
   }
 
+  Future<Key?> derivePassword(
+    String username, {
+    required String password,
+  }) async {
+    AccountCredentialsFile? account = _accounts[username];
+    if (account == null) return null;
+    return common.derivePassword(password,
+        derivationType: account.value.keyDerivationType,
+        derivationInfo: account.value.keyDerivationInfo);
+  }
+
   Future<Encrypter?> getEncrypter(
     String username, {
     required String password,

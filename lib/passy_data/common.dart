@@ -167,6 +167,32 @@ Future<DArgon2Result> argon2ifyString(
   return result;
 }
 
+Future<Key> derivePassword(String password,
+    {required KeyDerivationType derivationType,
+    KeyDerivationInfo? derivationInfo}) async {
+  switch (derivationType) {
+    case KeyDerivationType.none:
+      int byteSize = utf8.encode(password).length;
+      if (byteSize > 32) {
+        throw Exception(
+            'Password is longer than 32 bytes. If you\'re using 32 characters, try using 16 and then 8 characters.');
+      }
+      int a = 32 - byteSize;
+      password += ' ' * a;
+      return Key.fromUtf8(password);
+    case KeyDerivationType.argon2:
+      Argon2Info info = derivationInfo as Argon2Info;
+      return Key(Uint8List.fromList((await argon2ifyString(
+        password,
+        salt: info.salt,
+        parallelism: info.parallelism,
+        memory: info.memory,
+        iterations: info.iterations,
+      ))
+          .rawBytes));
+  }
+}
+
 Future<Encrypter> getPassyEncrypterV2(
   String password, {
   required Salt salt,
