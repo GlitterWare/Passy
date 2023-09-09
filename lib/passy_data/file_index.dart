@@ -147,6 +147,12 @@ class FileIndex {
         .readAsBytes();
   }
 
+  Future<void> saveDecrypted(String key, {required File file}) {
+    return PassyBinaryFile(
+            file: File(_saveDir.path + Platform.pathSeparator + key), key: _key)
+        .saveDecrypted(file);
+  }
+
   Future<void> removeFile(String key) {
     return File(_saveDir.path + Platform.pathSeparator + key).delete();
   }
