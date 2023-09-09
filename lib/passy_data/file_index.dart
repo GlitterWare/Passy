@@ -25,6 +25,26 @@ class FileIndex {
     if (!_file.existsSync()) _file.createSync(recursive: true);
   }
 
+  Map<String, FileMeta> get metadataSync {
+    Map<String, FileMeta> _meta = {};
+    RandomAccessFile _raf = _file.openSync();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      _raf.closeSync();
+      return _meta;
+    }
+    processLines(_raf, onLine: (entry, eofReached) {
+      List<String> decoded = entry.split(',');
+      String decrypted = decrypt(decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
+      FileMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
+      _meta[meta.key] = meta;
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    _raf.closeSync();
+    return _meta;
+  }
+
   Future<String?> getEntryString(String key) async {
     RandomAccessFile _raf = await _file.open();
     String? _entry;
