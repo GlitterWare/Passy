@@ -1,13 +1,15 @@
 import 'dart:io';
 
+import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:path/path.dart';
 
-class FileMeta with JsonConvertable {
+class FileMeta with JsonConvertable, CSVConvertable {
   final String key;
   final String name;
+  final String path;
   final DateTime changed;
   final DateTime modified;
   final DateTime accessed;
@@ -18,6 +20,7 @@ class FileMeta with JsonConvertable {
   FileMeta({
     String? key,
     required this.name,
+    required this.path,
     required this.changed,
     required this.modified,
     required this.accessed,
@@ -29,16 +32,17 @@ class FileMeta with JsonConvertable {
   FileMeta.fromJson(Map<String, dynamic> json)
       : key = json['key'] ?? DateTime.now().toUtc().toIso8601String(),
         name = json['name'] ?? '',
+        path = json['path'] ?? '',
         changed = json.containsKey('changed')
             ? (DateTime.tryParse(json['changed']) ?? DateTime.now())
             : DateTime.now(),
         modified = json.containsKey('modified')
             ? (DateTime.tryParse(json['modified']) ?? DateTime.now())
             : DateTime.now(),
-        size = json.containsKey('size') ? int.parse(json['size']) : 0,
         accessed = json.containsKey('accessed')
             ? (DateTime.tryParse(json['accessed']) ?? DateTime.now())
             : DateTime.now(),
+        size = json.containsKey('size') ? int.parse(json['size']) : 0,
         type = json.containsKey('type')
             ? passyFileTypeFromName(json['type']) ?? PassyFileType.unknown
             : PassyFileType.unknown,
@@ -46,11 +50,23 @@ class FileMeta with JsonConvertable {
             ? entryStatusFromText(json['status']) ?? EntryStatus.removed
             : EntryStatus.removed;
 
+  FileMeta.fromCSV(List<dynamic> csv)
+      : key = csv[0],
+        name = csv[1],
+        path = csv[2],
+        changed = DateTime.tryParse(csv[3]) ?? DateTime.now(),
+        modified = DateTime.tryParse(csv[4]) ?? DateTime.now(),
+        accessed = DateTime.tryParse(csv[5]) ?? DateTime.now(),
+        size = int.tryParse(csv[6]) ?? 0,
+        type = passyFileTypeFromName(csv[7]) ?? PassyFileType.unknown,
+        status = entryStatusFromText(csv[8]) ?? EntryStatus.removed;
+
   @override
   Map<String, dynamic> toJson() {
     return {
       'key': key,
       'name': name,
+      'path': path,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
       'accessed': accessed.toIso8601String(),
@@ -58,6 +74,21 @@ class FileMeta with JsonConvertable {
       'type': type.name,
       'status': status.name,
     };
+  }
+
+  @override
+  List toCSV() {
+    return [
+      key,
+      name,
+      path,
+      changed.toIso8601String(),
+      modified.toIso8601String(),
+      accessed.toIso8601String(),
+      size.toString(),
+      type.name,
+      status.name,
+    ];
   }
 
   factory FileMeta.fromFile(File file) {
@@ -93,6 +124,7 @@ class FileMeta with JsonConvertable {
     }
     return FileMeta(
       name: name,
+      path: file.path,
       changed: stat.changed,
       modified: stat.modified,
       accessed: stat.accessed,
