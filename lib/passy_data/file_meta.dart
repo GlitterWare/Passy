@@ -11,6 +11,7 @@ class FileMeta with JsonConvertable {
   final DateTime changed;
   final DateTime modified;
   final DateTime accessed;
+  final int size;
   final PassyFileType type;
   final EntryStatus status;
 
@@ -20,6 +21,7 @@ class FileMeta with JsonConvertable {
     required this.changed,
     required this.modified,
     required this.accessed,
+    required this.size,
     required this.type,
     required this.status,
   }) : key = key ?? DateTime.now().toUtc().toIso8601String();
@@ -33,6 +35,7 @@ class FileMeta with JsonConvertable {
         modified = json.containsKey('modified')
             ? (DateTime.tryParse(json['modified']) ?? DateTime.now())
             : DateTime.now(),
+        size = json.containsKey('size') ? int.parse(json['size']) : 0,
         accessed = json.containsKey('accessed')
             ? (DateTime.tryParse(json['accessed']) ?? DateTime.now())
             : DateTime.now(),
@@ -51,6 +54,7 @@ class FileMeta with JsonConvertable {
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
       'accessed': accessed.toIso8601String(),
+      'size': size.toString(),
       'type': type.name,
       'status': status.name,
     };
@@ -92,6 +96,7 @@ class FileMeta with JsonConvertable {
       changed: stat.changed,
       modified: stat.modified,
       accessed: stat.accessed,
+      size: stat.size,
       type: type,
       status: EntryStatus.alive,
     );
