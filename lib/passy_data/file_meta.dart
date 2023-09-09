@@ -10,6 +10,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
   final String key;
   final String name;
   final String path;
+  final String virtualPath;
   final DateTime changed;
   final DateTime modified;
   final DateTime accessed;
@@ -21,6 +22,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
     String? key,
     required this.name,
     required this.path,
+    required this.virtualPath,
     required this.changed,
     required this.modified,
     required this.accessed,
@@ -33,6 +35,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
       : key = json['key'] ?? DateTime.now().toUtc().toIso8601String(),
         name = json['name'] ?? '',
         path = json['path'] ?? '',
+        virtualPath = json['virtualPath'] ?? '',
         changed = json.containsKey('changed')
             ? (DateTime.tryParse(json['changed']) ?? DateTime.now())
             : DateTime.now(),
@@ -54,12 +57,13 @@ class FileMeta with JsonConvertable, CSVConvertable {
       : key = csv[0],
         name = csv[1],
         path = csv[2],
-        changed = DateTime.tryParse(csv[3]) ?? DateTime.now(),
-        modified = DateTime.tryParse(csv[4]) ?? DateTime.now(),
-        accessed = DateTime.tryParse(csv[5]) ?? DateTime.now(),
-        size = int.tryParse(csv[6]) ?? 0,
-        type = passyFileTypeFromName(csv[7]) ?? PassyFileType.unknown,
-        status = entryStatusFromText(csv[8]) ?? EntryStatus.removed;
+        virtualPath = csv[3],
+        changed = DateTime.tryParse(csv[4]) ?? DateTime.now(),
+        modified = DateTime.tryParse(csv[5]) ?? DateTime.now(),
+        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now(),
+        size = int.tryParse(csv[7]) ?? 0,
+        type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
+        status = entryStatusFromText(csv[9]) ?? EntryStatus.removed;
 
   @override
   Map<String, dynamic> toJson() {
@@ -67,6 +71,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
       'key': key,
       'name': name,
       'path': path,
+      'virtualPath': virtualPath,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
       'accessed': accessed.toIso8601String(),
@@ -82,6 +87,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
       key,
       name,
       path,
+      virtualPath,
       changed.toIso8601String(),
       modified.toIso8601String(),
       accessed.toIso8601String(),
@@ -91,7 +97,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
     ];
   }
 
-  factory FileMeta.fromFile(File file) {
+  factory FileMeta.fromFile(File file, {String? virtualParent}) {
     FileStat stat = file.statSync();
     String name = basename(file.path);
     PassyFileType type;
@@ -124,6 +130,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
     }
     return FileMeta(
       name: name,
+      virtualPath: '${virtualParent ?? ''}/$name',
       path: file.path,
       changed: stat.changed,
       modified: stat.modified,
