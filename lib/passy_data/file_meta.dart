@@ -29,10 +29,12 @@ class FileMeta with JsonConvertable, CSVConvertable {
     required this.size,
     required this.type,
     required this.status,
-  }) : key = key ?? DateTime.now().toUtc().toIso8601String();
+  }) : key = key ??
+            DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c');
 
   FileMeta.fromJson(Map<String, dynamic> json)
-      : key = json['key'] ?? DateTime.now().toUtc().toIso8601String(),
+      : key = json['key'] ??
+            DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
         name = json['name'] ?? '',
         path = json['path'] ?? '',
         virtualPath = json['virtualPath'] ?? '',
