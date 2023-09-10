@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/setup_screen.dart';
+import 'package:encrypt/encrypt.dart' as crypt;
 
 import '../common/assets.dart';
 import 'log_screen.dart';
@@ -92,11 +94,13 @@ class _AddAccountScreen extends State<StatefulWidget> {
       return;
     }
     data.info.value.lastUsername = _username;
+    crypt.Key key =
+        (await data.derivePassword(_username, password: _password))!;
     LoadedAccount account = await data.loadAccount(
         _username,
-        (await data.getEncrypter(_username, password: _password))!,
-        (await data.getSyncEncrypter(
-            username: _username, password: _password)));
+        getPassyEncrypterFromBytes(key.bytes),
+        (await data.getSyncEncrypter(username: _username, password: _password)),
+        key);
     account.startAutoSync(_password);
     data.info.save().then((value) {
       if (!mounted) return;

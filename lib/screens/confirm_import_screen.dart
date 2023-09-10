@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:encrypt/encrypt.dart' as crypt;
 import 'package:flutter/material.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
@@ -46,11 +48,13 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
     try {
       switch (args.importType) {
         case ImportType.passy:
+          crypt.Key key =
+              (await data.derivePassword(_account.username, password: value))!;
           await data.importAccount(args.path,
-              encrypter: (await data.getEncrypter(_account.username,
-                  password: value))!,
+              encrypter: getPassyEncrypterFromBytes(key.bytes),
               syncEncrypter: (await data.getSyncEncrypter(
-                  username: _account.username, password: value)));
+                  username: _account.username, password: value)),
+              key: key);
           Navigator.popUntil(
               context, (route) => route.settings.name == MainScreen.routeName);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);

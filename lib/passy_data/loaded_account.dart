@@ -8,6 +8,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_data/file_index.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
@@ -53,6 +54,7 @@ class LoadedAccount {
   final PaymentCardsFile _paymentCards;
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
+  final FileIndex _fileIndex;
   Completer<void>? _autoSyncCompleter;
   final Map<String, Sync2d0d0ServerInfo> _serversToTrust = {};
   final Map<String, Completer<void>> _serversToTrustCompleters = {};
@@ -73,6 +75,7 @@ class LoadedAccount {
     required PaymentCardsFile paymentCards,
     required IDCardsFile idCards,
     required IdentitiesFile identities,
+    required FileIndex fileIndex,
   })  : _deviceId = deviceId,
         _encrypter = encrypter,
         _syncEncrypter = syncEncrypter,
@@ -86,7 +89,8 @@ class LoadedAccount {
         _notes = notes,
         _paymentCards = paymentCards,
         _idCards = idCards,
-        _identities = identities {
+        _identities = identities,
+        _fileIndex = fileIndex {
     Future(() async {
       if (_settings.value.rsaKeypair == null) {
         RSAKeypair keypair = await compute(
@@ -148,6 +152,7 @@ class LoadedAccount {
     required String path,
     required Encrypter encrypter,
     required Encrypter syncEncrypter,
+    required Key key,
     required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
@@ -160,6 +165,7 @@ class LoadedAccount {
     PaymentCardsFile? paymentCards,
     IDCardsFile? idCards,
     IdentitiesFile? identities,
+    FileIndex? fileIndex,
   }) {
     versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
     credentials ??= AccountCredentials.fromFile(
@@ -189,6 +195,11 @@ class LoadedAccount {
     identities ??= Identities.fromFile(
         File(path + Platform.pathSeparator + 'identities.enc'),
         encrypter: encrypter);
+    fileIndex ??= FileIndex(
+        file: File(path + Platform.pathSeparator + 'file_index.enc'),
+        saveDir: Directory(path + Platform.pathSeparator + 'files'),
+        key: key,
+        encrypter: encrypter);
     return LoadedAccount(
         encrypter: encrypter,
         syncEncrypter: syncEncrypter,
@@ -203,7 +214,8 @@ class LoadedAccount {
         notes: notes,
         paymentCards: paymentCards,
         idCards: idCards,
-        identities: identities);
+        identities: identities,
+        fileIndex: fileIndex);
   }
 
   Future<void> setAccountPassword(
@@ -1427,7 +1439,7 @@ class JSONLoadedAccount {
   }
 
   LoadedAccount toEncryptedCSVLoadedAccount(
-      Encrypter encrypter, Encrypter syncEncrypter) {
+      Encrypter encrypter, Encrypter syncEncrypter, Key key) {
     return LoadedAccount(
       encrypter: encrypter,
       syncEncrypter: syncEncrypter,
@@ -1443,6 +1455,14 @@ class JSONLoadedAccount {
       paymentCards: _paymentCards.toPassyEntriesEncryptedCSVFile(encrypter),
       idCards: _idCards.toPassyEntriesEncryptedCSVFile(encrypter),
       identities: _identities.toPassyEntriesEncryptedCSVFile(encrypter),
+      fileIndex: FileIndex(
+          file: File(_versionFile.parent.path +
+              Platform.pathSeparator +
+              'file_index.enc'),
+          saveDir: Directory(
+              _versionFile.parent.path + Platform.pathSeparator + 'files'),
+          key: key,
+          encrypter: encrypter),
     );
   }
 

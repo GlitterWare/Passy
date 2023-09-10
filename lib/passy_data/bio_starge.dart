@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter_locker/flutter_locker.dart';
+import 'package:passy/passy_data/common.dart';
 
 import '../common/common.dart';
 import 'biometric_storage_data.dart';
@@ -37,11 +39,14 @@ extension BioStorage on BiometricStorageData {
         data.getPasswordHash(username)) return false;
     data.info.value.lastUsername = username;
     await data.info.save();
+    Key key =
+        (await data.derivePassword(username, password: _bioData.password))!;
     await data.loadAccount(
       username,
-      (await data.getEncrypter(username, password: _bioData.password))!,
+      getPassyEncrypterFromBytes(key.bytes),
       await data.getSyncEncrypter(
           username: username, password: _bioData.password),
+      key,
     );
     return true;
   }

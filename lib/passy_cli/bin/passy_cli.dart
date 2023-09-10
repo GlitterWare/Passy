@@ -241,6 +241,7 @@ late String _accountsPath;
 Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
 Map<String, Encrypter> _syncEncrypters = {};
+Map<String, Key> _keys = {};
 Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
 String _curRunFile = '';
@@ -542,11 +543,13 @@ Future<String> _login(String username, String password) async {
               derivationInfo: _credentials.keyDerivationInfo))
           .toString();
   if (match) {
-    _encrypters[username] = await cn.getPasswordEncrypter(
+    Key key = await cn.derivePassword(
       password,
       derivationType: _credentials.keyDerivationType,
       derivationInfo: _credentials.keyDerivationInfo,
     );
+    _keys[username] = key;
+    _encrypters[username] = pcommon.getPassyEncrypterFromBytes(key.bytes);
     _syncEncrypters[username] = await cn.getSyncEncrypter(
       password,
       derivationType: _credentials.keyDerivationType,
@@ -559,6 +562,7 @@ Future<String> _login(String username, String password) async {
           path: _accountsPath + Platform.pathSeparator + username,
           encrypter: _encrypters[username]!,
           syncEncrypter: _syncEncrypters[username]!,
+          key: key,
           deviceId: infoFile.value.deviceId,
           credentials: _credentialsFile!)!;
       while (!acc.isRSAKeypairLoaded) {
@@ -913,6 +917,7 @@ Future<void> executeCommand(List<String> command,
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
                 syncEncrypter: syncEncrypter,
+                key: _keys[accountName]!,
                 deviceId: infoFile.value.deviceId,
               );
               String fileName;
@@ -937,12 +942,14 @@ Future<void> executeCommand(List<String> command,
               }
               String path = command[4];
               Encrypter syncEncrypter = _syncEncrypters[accountName]!;
+              Key key = _keys[accountName]!;
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
                 syncEncrypter: syncEncrypter,
+                key: key,
                 deviceId: infoFile.value.deviceId,
               );
               String fileName;
@@ -974,6 +981,7 @@ Future<void> executeCommand(List<String> command,
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
                 syncEncrypter: syncEncrypter,
+                key: _keys[accountName]!,
                 deviceId: infoFile.value.deviceId,
               );
               String fileName;
