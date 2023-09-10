@@ -17,6 +17,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
   final int size;
   final PassyFileType type;
   final EntryStatus status;
+  final DateTime entryModified;
 
   FileMeta({
     String? key,
@@ -29,6 +30,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
     required this.size,
     required this.type,
     required this.status,
+    required this.entryModified,
   }) : key = key ??
             DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c');
 
@@ -39,33 +41,38 @@ class FileMeta with JsonConvertable, CSVConvertable {
         path = json['path'] ?? '',
         virtualPath = json['virtualPath'] ?? '',
         changed = json.containsKey('changed')
-            ? (DateTime.tryParse(json['changed']) ?? DateTime.now())
-            : DateTime.now(),
+            ? (DateTime.tryParse(json['changed']) ?? DateTime.now().toUtc())
+            : DateTime.now().toUtc(),
         modified = json.containsKey('modified')
-            ? (DateTime.tryParse(json['modified']) ?? DateTime.now())
-            : DateTime.now(),
+            ? (DateTime.tryParse(json['modified']) ?? DateTime.now().toUtc())
+            : DateTime.now().toUtc(),
         accessed = json.containsKey('accessed')
-            ? (DateTime.tryParse(json['accessed']) ?? DateTime.now())
-            : DateTime.now(),
+            ? (DateTime.tryParse(json['accessed']) ?? DateTime.now().toUtc())
+            : DateTime.now().toUtc(),
         size = json.containsKey('size') ? int.parse(json['size']) : 0,
         type = json.containsKey('type')
             ? passyFileTypeFromName(json['type']) ?? PassyFileType.unknown
             : PassyFileType.unknown,
         status = json.containsKey('status')
             ? entryStatusFromText(json['status']) ?? EntryStatus.removed
-            : EntryStatus.removed;
+            : EntryStatus.removed,
+        entryModified = json.containsKey('entryModified')
+            ? (DateTime.tryParse(json['entryModified']) ??
+                DateTime.now().toUtc())
+            : DateTime.now().toUtc();
 
   FileMeta.fromCSV(List<dynamic> csv)
       : key = csv[0],
         name = csv[1],
         path = csv[2],
         virtualPath = csv[3],
-        changed = DateTime.tryParse(csv[4]) ?? DateTime.now(),
-        modified = DateTime.tryParse(csv[5]) ?? DateTime.now(),
-        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now(),
+        changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
         size = int.tryParse(csv[7]) ?? 0,
         type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
-        status = entryStatusFromText(csv[9]) ?? EntryStatus.removed;
+        status = entryStatusFromText(csv[9]) ?? EntryStatus.removed,
+        entryModified = DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc();
 
   @override
   Map<String, dynamic> toJson() {
@@ -80,6 +87,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
       'size': size.toString(),
       'type': type.name,
       'status': status.name,
+      'entryModified': entryModified.toIso8601String(),
     };
   }
 
@@ -96,6 +104,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
       size.toString(),
       type.name,
       status.name,
+      entryModified.toIso8601String(),
     ];
   }
 
@@ -140,6 +149,7 @@ class FileMeta with JsonConvertable, CSVConvertable {
       size: stat.size,
       type: type,
       status: EntryStatus.alive,
+      entryModified: DateTime.now().toUtc(),
     );
   }
 }
