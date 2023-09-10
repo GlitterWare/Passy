@@ -16,8 +16,8 @@ class FileMeta with JsonConvertable, CSVConvertable {
   final DateTime accessed;
   final int size;
   final PassyFileType type;
-  final EntryStatus status;
-  final DateTime entryModified;
+  EntryStatus status;
+  DateTime entryModified;
 
   FileMeta({
     String? key,
