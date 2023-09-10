@@ -26,7 +26,7 @@ class _ManageServersScreen extends State<ManageServersScreen> {
           center: Text('${localizations.remove} $nickname'),
           left: const Padding(
             padding: EdgeInsets.only(right: 30),
-            child: Icon(Icons.delete_rounded),
+            child: Icon(Icons.delete_outline_rounded),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: () async {
