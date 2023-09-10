@@ -173,7 +173,8 @@ class FileIndex {
         .saveDecrypted(file);
   }
 
-  Future<void> removeFile(String key) {
-    return File(_saveDir.path + Platform.pathSeparator + key).delete();
+  Future<void> removeFile(String key) async {
+    await File(_saveDir.path + Platform.pathSeparator + key).delete();
+    await _setEntry(key, null);
   }
 }
