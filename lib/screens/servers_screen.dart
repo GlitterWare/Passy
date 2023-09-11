@@ -178,22 +178,22 @@ class _ServersScreen extends State<ServersScreen> {
                       child: EnumDropDownButtonFormField<IntervalUnit>(
                         value: _syncIntervalUnits,
                         values: IntervalUnit.values,
-                        getName: (unit) {
+                        itemBuilder: (unit) {
                           switch (unit) {
                             case IntervalUnit.years:
-                              return localizations.years.toLowerCase();
+                              return Text(localizations.years.toLowerCase());
                             case IntervalUnit.months:
-                              return localizations.months.toLowerCase();
+                              return Text(localizations.months.toLowerCase());
                             case IntervalUnit.weeks:
-                              return localizations.weeks.toLowerCase();
+                              return Text(localizations.weeks.toLowerCase());
                             case IntervalUnit.days:
-                              return localizations.days.toLowerCase();
+                              return Text(localizations.days.toLowerCase());
                             case IntervalUnit.hours:
-                              return localizations.hours.toLowerCase();
+                              return Text(localizations.hours.toLowerCase());
                             case IntervalUnit.minutes:
-                              return localizations.minutes.toLowerCase();
+                              return Text(localizations.minutes.toLowerCase());
                             case IntervalUnit.seconds:
-                              return localizations.seconds.toLowerCase();
+                              return Text(localizations.seconds.toLowerCase());
                           }
                         },
                         onChanged: (value) {
