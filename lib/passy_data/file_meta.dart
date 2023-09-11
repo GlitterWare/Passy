@@ -61,16 +61,16 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
                 DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'));
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : name = csv[1],
-        path = csv[2],
-        virtualPath = csv[3],
-        changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
-        modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
-        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
-        size = int.tryParse(csv[7]) ?? 0,
-        type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
-        status = entryStatusFromText(csv[9]) ?? EntryStatus.removed,
-        entryModified = DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
+      : name = csv[2],
+        path = csv[3],
+        virtualPath = csv[4],
+        changed = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
+        size = int.tryParse(csv[8]) ?? 0,
+        type = passyFileTypeFromName(csv[9]) ?? PassyFileType.unknown,
+        status = entryStatusFromText(csv[10]) ?? EntryStatus.removed,
+        entryModified = DateTime.tryParse(csv[11]) ?? DateTime.now().toUtc(),
         super(key: csv[0]);
 
   @override
@@ -94,6 +94,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   List toCSV() {
     return [
       key,
+      'f',
       name,
       path,
       virtualPath,
