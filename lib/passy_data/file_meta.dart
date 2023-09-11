@@ -56,17 +56,17 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : path = csv[3],
-        changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
-        modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
-        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
-        size = int.tryParse(csv[7]) ?? 0,
-        type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
+      : path = csv[5],
+        changed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[8]) ?? DateTime.now().toUtc(),
+        size = int.tryParse(csv[9]) ?? 0,
+        type = passyFileTypeFromName(csv[10]) ?? PassyFileType.unknown,
         super(
           key: csv[0],
-          name: csv[2],
-          status: entryStatusFromText(csv[9]) ?? EntryStatus.removed,
-          entryModified: DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
+          name: csv[1],
+          status: entryStatusFromText(csv[2]) ?? EntryStatus.removed,
+          entryModified: DateTime.tryParse(csv[3]) ?? DateTime.now().toUtc(),
         );
 
   @override
@@ -74,14 +74,14 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     return {
       'key': key,
       'name': name,
+      'status': status.name,
+      'entryModified': entryModified.toIso8601String(),
       'path': path,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
       'accessed': accessed.toIso8601String(),
       'size': size.toString(),
       'type': type.name,
-      'status': status.name,
-      'entryModified': entryModified.toIso8601String(),
     };
   }
 
@@ -89,16 +89,16 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   List toCSV() {
     return [
       key,
-      'f',
       name,
+      status.name,
+      entryModified.toIso8601String(),
+      'f',
       path,
       changed.toIso8601String(),
       modified.toIso8601String(),
       accessed.toIso8601String(),
       size.toString(),
       type.name,
-      status.name,
-      entryModified.toIso8601String(),
     ];
   }
 
