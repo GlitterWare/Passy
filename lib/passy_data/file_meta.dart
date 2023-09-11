@@ -14,11 +14,11 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   final DateTime accessed;
   final int size;
   final PassyFileType type;
-  EntryStatus status;
-  DateTime entryModified;
 
   FileMeta({
-    String? key,
+    super.key,
+    super.status = EntryStatus.alive,
+    super.entryModified,
     required this.name,
     required this.path,
     required this.changed,
@@ -26,9 +26,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     required this.accessed,
     required this.size,
     required this.type,
-    required this.status,
-    required this.entryModified,
-  }) : super(key: key);
+  });
 
   FileMeta.fromJson(Map<String, dynamic> json)
       : name = json['name'] ?? '',
@@ -46,16 +44,17 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         type = json.containsKey('type')
             ? passyFileTypeFromName(json['type']) ?? PassyFileType.unknown
             : PassyFileType.unknown,
-        status = json.containsKey('status')
-            ? entryStatusFromText(json['status']) ?? EntryStatus.removed
-            : EntryStatus.removed,
-        entryModified = json.containsKey('entryModified')
-            ? (DateTime.tryParse(json['entryModified']) ??
-                DateTime.now().toUtc())
-            : DateTime.now().toUtc(),
         super(
-            key: json['key'] ??
-                DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'));
+          key: json['key'] ??
+              DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
+          status: json.containsKey('status')
+              ? entryStatusFromText(json['status']) ?? EntryStatus.removed
+              : EntryStatus.removed,
+          entryModified: json.containsKey('entryModified')
+              ? (DateTime.tryParse(json['entryModified']) ??
+                  DateTime.now().toUtc())
+              : DateTime.now().toUtc(),
+        );
 
   FileMeta.fromCSV(List<dynamic> csv)
       : name = csv[2],
@@ -65,9 +64,11 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
         size = int.tryParse(csv[7]) ?? 0,
         type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
-        status = entryStatusFromText(csv[9]) ?? EntryStatus.removed,
-        entryModified = DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
-        super(key: csv[0]);
+        super(
+          key: csv[0],
+          status: entryStatusFromText(csv[9]) ?? EntryStatus.removed,
+          entryModified: DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
+        );
 
   @override
   Map<String, dynamic> toJson() {
