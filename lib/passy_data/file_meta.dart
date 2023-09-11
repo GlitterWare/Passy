@@ -9,7 +9,6 @@ import 'package:path/path.dart';
 class FileMeta extends PassyFsMeta with JsonConvertable {
   final String name;
   final String path;
-  final String virtualPath;
   final DateTime changed;
   final DateTime modified;
   final DateTime accessed;
@@ -22,7 +21,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     String? key,
     required this.name,
     required this.path,
-    required this.virtualPath,
     required this.changed,
     required this.modified,
     required this.accessed,
@@ -35,7 +33,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   FileMeta.fromJson(Map<String, dynamic> json)
       : name = json['name'] ?? '',
         path = json['path'] ?? '',
-        virtualPath = json['virtualPath'] ?? '',
         changed = json.containsKey('changed')
             ? (DateTime.tryParse(json['changed']) ?? DateTime.now().toUtc())
             : DateTime.now().toUtc(),
@@ -63,14 +60,13 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   FileMeta.fromCSV(List<dynamic> csv)
       : name = csv[2],
         path = csv[3],
-        virtualPath = csv[4],
-        changed = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
-        modified = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
-        accessed = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
-        size = int.tryParse(csv[8]) ?? 0,
-        type = passyFileTypeFromName(csv[9]) ?? PassyFileType.unknown,
-        status = entryStatusFromText(csv[10]) ?? EntryStatus.removed,
-        entryModified = DateTime.tryParse(csv[11]) ?? DateTime.now().toUtc(),
+        changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
+        size = int.tryParse(csv[7]) ?? 0,
+        type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
+        status = entryStatusFromText(csv[9]) ?? EntryStatus.removed,
+        entryModified = DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
         super(key: csv[0]);
 
   @override
@@ -79,7 +75,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
       'key': key,
       'name': name,
       'path': path,
-      'virtualPath': virtualPath,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
       'accessed': accessed.toIso8601String(),
@@ -97,7 +92,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
       'f',
       name,
       path,
-      virtualPath,
       changed.toIso8601String(),
       modified.toIso8601String(),
       accessed.toIso8601String(),
@@ -108,7 +102,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     ];
   }
 
-  factory FileMeta.fromFile(File file, {String? virtualParent}) {
+  factory FileMeta.fromFile(File file) {
     FileStat stat = file.statSync();
     String name = basename(file.path);
     PassyFileType type;
@@ -141,7 +135,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     }
     return FileMeta(
       name: name,
-      virtualPath: '${virtualParent ?? ''}/$name',
       path: file.path,
       changed: stat.changed,
       modified: stat.modified,

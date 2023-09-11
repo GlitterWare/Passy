@@ -151,9 +151,8 @@ class FileIndex {
     return _meta;
   }
 
-  Future<String> addFile(File file,
-      {FileMeta? meta, String? virtualParent}) async {
-    meta ??= FileMeta.fromFile(file, virtualParent: virtualParent);
+  Future<String> addFile(File file, {FileMeta? meta}) async {
+    meta ??= FileMeta.fromFile(file);
     PassyBinaryFile.fromDecryptedSync(
         input: file,
         output: File(_saveDir.path + Platform.pathSeparator + meta.key),
