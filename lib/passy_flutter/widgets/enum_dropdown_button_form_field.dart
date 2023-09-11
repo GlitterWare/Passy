@@ -8,6 +8,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
   final InputDecoration? decoration;
   final TextCapitalization textCapitalization;
   final void Function(T? value)? onChanged;
+  final TextStyle? style;
   final bool isExpanded;
   final AlignmentGeometry alignment;
 
@@ -19,6 +20,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
     this.decoration,
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
+    this.style,
     this.isExpanded = false,
     this.alignment = AlignmentDirectional.centerStart,
   }) : super(key: key);
@@ -55,8 +57,9 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
       value: value,
       decoration: decoration,
       onChanged: onChanged,
-      alignment: alignment,
+      style: style,
       isExpanded: isExpanded,
+      alignment: alignment,
     );
   }
 }
