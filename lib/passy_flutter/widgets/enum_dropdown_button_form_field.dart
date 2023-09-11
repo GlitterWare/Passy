@@ -8,6 +8,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
   final InputDecoration? decoration;
   final TextCapitalization textCapitalization;
   final void Function(T? value)? onChanged;
+  final AlignmentGeometry alignment;
 
   const EnumDropDownButtonFormField({
     Key? key,
@@ -17,6 +18,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
     this.decoration,
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
+    this.alignment = AlignmentDirectional.centerStart,
   }) : super(key: key);
 
   @override
@@ -51,6 +53,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
       value: value,
       decoration: decoration,
       onChanged: onChanged,
+      alignment: alignment,
     );
   }
 }
