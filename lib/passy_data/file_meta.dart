@@ -1,13 +1,12 @@
 import 'dart:io';
 
-import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/entry_event.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:path/path.dart';
 
-class FileMeta with JsonConvertable, CSVConvertable {
-  final String key;
+class FileMeta extends PassyFsMeta with JsonConvertable {
   final String name;
   final String path;
   final String virtualPath;
@@ -31,13 +30,10 @@ class FileMeta with JsonConvertable, CSVConvertable {
     required this.type,
     required this.status,
     required this.entryModified,
-  }) : key = key ??
-            DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c');
+  }) : super(key: key);
 
   FileMeta.fromJson(Map<String, dynamic> json)
-      : key = json['key'] ??
-            DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
-        name = json['name'] ?? '',
+      : name = json['name'] ?? '',
         path = json['path'] ?? '',
         virtualPath = json['virtualPath'] ?? '',
         changed = json.containsKey('changed')
@@ -59,11 +55,13 @@ class FileMeta with JsonConvertable, CSVConvertable {
         entryModified = json.containsKey('entryModified')
             ? (DateTime.tryParse(json['entryModified']) ??
                 DateTime.now().toUtc())
-            : DateTime.now().toUtc();
+            : DateTime.now().toUtc(),
+        super(
+            key: json['key'] ??
+                DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'));
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : key = csv[0],
-        name = csv[1],
+      : name = csv[1],
         path = csv[2],
         virtualPath = csv[3],
         changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
@@ -72,7 +70,8 @@ class FileMeta with JsonConvertable, CSVConvertable {
         size = int.tryParse(csv[7]) ?? 0,
         type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
         status = entryStatusFromText(csv[9]) ?? EntryStatus.removed,
-        entryModified = DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc();
+        entryModified = DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
+        super(key: csv[0]);
 
   @override
   Map<String, dynamic> toJson() {
