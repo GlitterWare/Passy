@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 
 import 'file_meta.dart';
 import 'common.dart';
@@ -26,8 +27,8 @@ class FileIndex {
     if (!_file.existsSync()) _file.createSync(recursive: true);
   }
 
-  Map<String, FileMeta> get metadataSync {
-    Map<String, FileMeta> _meta = {};
+  Map<String, PassyFsMeta> get metadataSync {
+    Map<String, PassyFsMeta> _meta = {};
     RandomAccessFile _raf = _file.openSync();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
       _raf.closeSync();
@@ -37,7 +38,7 @@ class FileIndex {
       List<String> decoded = entry.split(',');
       String decrypted = decrypt(decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
-      FileMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
+      PassyFsMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -73,18 +74,18 @@ class FileIndex {
     return csvDecode(_entryString);
   }
 
-  Future<FileMeta?> getEntry(String key) async {
+  Future<PassyFsMeta?> getEntry(String key) async {
     List<dynamic>? _entryJson = await getEntryCSV(key);
     if (_entryJson == null) return null;
     return FileMeta.fromCSV(_entryJson);
   }
 
-  String _encodeEntryForSaving(FileMeta _entry) {
+  String _encodeEntryForSaving(PassyFsMeta _entry) {
     IV _iv = IV.fromSecureRandom(16);
     return '${_entry.key},${_iv.base64},${encrypt(csvEncode(_entry.toCSV()), encrypter: _encrypter, iv: _iv)}\n';
   }
 
-  Future<void> _setEntry(String key, FileMeta? entry) async {
+  Future<void> _setEntry(String key, PassyFsMeta? entry) async {
     File tempFile;
     {
       String tempPath = (Directory.systemTemp).path +
@@ -131,8 +132,8 @@ class FileIndex {
     await tempFile.delete();
   }
 
-  Future<Map<String, FileMeta>> getMetadata() async {
-    Map<String, FileMeta> _meta = {};
+  Future<Map<String, PassyFsMeta>> getMetadata() async {
+    Map<String, PassyFsMeta> _meta = {};
     RandomAccessFile _raf = await _file.open();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
       await _raf.close();
@@ -142,7 +143,7 @@ class FileIndex {
       List<String> decoded = entry.split(',');
       String decrypted = decrypt(decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
-      FileMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
+      PassyFsMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -151,7 +152,7 @@ class FileIndex {
     return _meta;
   }
 
-  Future<String> addFile(File file, {FileMeta? meta}) async {
+  Future<String> addFile(File file, {PassyFsMeta? meta}) async {
     meta ??= FileMeta.fromFile(file);
     PassyBinaryFile.fromDecryptedSync(
         input: file,
@@ -175,7 +176,7 @@ class FileIndex {
 
   Future<void> removeFile(String key) async {
     await File(_saveDir.path + Platform.pathSeparator + key).delete();
-    FileMeta? meta = await getEntry(key);
+    PassyFsMeta? meta = await getEntry(key);
     if (meta == null) return;
     meta.status = EntryStatus.removed;
     meta.entryModified = DateTime.now().toUtc();
