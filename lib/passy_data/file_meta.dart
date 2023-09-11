@@ -7,7 +7,6 @@ import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:path/path.dart';
 
 class FileMeta extends PassyFsMeta with JsonConvertable {
-  final String name;
   final String path;
   final DateTime changed;
   final DateTime modified;
@@ -17,9 +16,9 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
 
   FileMeta({
     super.key,
+    required super.name,
     super.status = EntryStatus.alive,
     super.entryModified,
-    required this.name,
     required this.path,
     required this.changed,
     required this.modified,
@@ -29,8 +28,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   });
 
   FileMeta.fromJson(Map<String, dynamic> json)
-      : name = json['name'] ?? '',
-        path = json['path'] ?? '',
+      : path = json['path'] ?? '',
         changed = json.containsKey('changed')
             ? (DateTime.tryParse(json['changed']) ?? DateTime.now().toUtc())
             : DateTime.now().toUtc(),
@@ -47,6 +45,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         super(
           key: json['key'] ??
               DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
+          name: json['name'] ?? '',
           status: json.containsKey('status')
               ? entryStatusFromText(json['status']) ?? EntryStatus.removed
               : EntryStatus.removed,
@@ -57,8 +56,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : name = csv[2],
-        path = csv[3],
+      : path = csv[3],
         changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
         modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
         accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
@@ -66,6 +64,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
         super(
           key: csv[0],
+          name: csv[2],
           status: entryStatusFromText(csv[9]) ?? EntryStatus.removed,
           entryModified: DateTime.tryParse(csv[10]) ?? DateTime.now().toUtc(),
         );
