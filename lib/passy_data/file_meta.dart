@@ -91,7 +91,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
 
   factory FileMeta.fromFile(File file) {
     AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
-    ByteConversionSink input = sha1.startChunkedConversion(output);
+    ByteConversionSink input = sha256.startChunkedConversion(output);
     RandomAccessFile raf = file.openSync();
     int byte = raf.readByteSync();
     while (byte != -1) {
@@ -100,7 +100,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     }
     input.close();
     Digest digest = output.events.single;
-    String key = base64.encode(digest.bytes);
+    String key = digest.toString();
     FileStat stat = file.statSync();
     String name = basename(file.path);
     PassyFileType type;
