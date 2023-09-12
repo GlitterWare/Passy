@@ -24,7 +24,11 @@ class FileIndex {
         _saveDir = saveDir,
         _key = key,
         _encrypter = encrypter {
-    if (!_file.existsSync()) _file.createSync(recursive: true);
+    if (!_file.existsSync()) {
+      _file.createSync(recursive: true);
+      _file.writeAsStringSync(
+          _encodeEntryForSaving(FolderMeta(key: '/', name: '/')));
+    }
   }
 
   Map<String, PassyFsMeta> get metadataSync {
