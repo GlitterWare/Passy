@@ -81,6 +81,7 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
           color: PassyTheme.darkPassyPurple,
           borderRadius: BorderRadius.circular(100),
           child: InkWell(
+            splashFactory: InkRipple.splashFactory,
             splashColor: Colors.white24,
             hoverColor: Colors.white12,
             child: Container(
@@ -119,7 +120,7 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
                 ],
               )),
             ),
-            customBorder: RoundedRectangleBorder(
+            customBorder: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(100))),
             onTap: openDropdown,
           ))),
