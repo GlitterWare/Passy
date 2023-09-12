@@ -37,7 +37,7 @@ class FileIndex {
       List<String> decoded = entry.split(',');
       String decrypted = decrypt(decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
-      PassyFsMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
+      PassyFsMeta meta = PassyFsMeta.fromCSV(csvDecode(decrypted))!;
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -142,7 +142,7 @@ class FileIndex {
       List<String> decoded = entry.split(',');
       String decrypted = decrypt(decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
-      PassyFsMeta meta = FileMeta.fromCSV(csvDecode(decrypted));
+      PassyFsMeta meta = PassyFsMeta.fromCSV(csvDecode(decrypted))!;
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -151,7 +151,7 @@ class FileIndex {
     return _meta;
   }
 
-  Future<String> addFile(File file, {PassyFsMeta? meta}) async {
+  Future<String> addFile(File file, {FileMeta? meta}) async {
     meta ??= FileMeta.fromFile(file);
     PassyBinaryFile.fromDecryptedSync(
         input: file,

@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
@@ -87,6 +90,17 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   }
 
   factory FileMeta.fromFile(File file) {
+    AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
+    ByteConversionSink input = sha1.startChunkedConversion(output);
+    RandomAccessFile raf = file.openSync();
+    int byte = raf.readByteSync();
+    while (byte != -1) {
+      input.add([byte]);
+      byte = raf.readByteSync();
+    }
+    input.close();
+    Digest digest = output.events.single;
+    String key = base64.encode(digest.bytes);
     FileStat stat = file.statSync();
     String name = basename(file.path);
     PassyFileType type;
@@ -118,6 +132,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
       }
     }
     return FileMeta(
+      key: key,
       name: name,
       path: file.path,
       changed: stat.changed,
