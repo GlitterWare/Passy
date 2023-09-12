@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:compute/compute.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
@@ -158,7 +159,8 @@ class FileIndex {
     FileMeta? meta,
     String? parent,
   }) async {
-    meta ??= FileMeta.fromFile(file, virtualParent: parent);
+    meta ??= await compute<dynamic, FileMeta>(
+        (message) => FileMeta.fromFile(file, virtualParent: parent), null);
     PassyBinaryFile.fromDecryptedSync(
         input: file,
         output: File(_saveDir.path + Platform.pathSeparator + meta.key),
