@@ -95,6 +95,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   }
 
   factory FileMeta.fromFile(File file, {String? virtualParent}) {
+    if (virtualParent == '/') virtualParent = null;
     AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
     ByteConversionSink input = sha256.startChunkedConversion(output);
     RandomAccessFile raf = file.openSync();
