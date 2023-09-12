@@ -6,6 +6,7 @@ export 'double_action_button.dart';
 export 'edit_screen_appbar.dart';
 export 'entries_screen_appbar.dart';
 export 'entry_screen_appbar.dart';
+export 'enum_dropdown_button_2.dart';
 export 'enum_dropdown_button_form_field.dart';
 export 'favicon_image.dart';
 export 'id_card_button_list_view.dart';
