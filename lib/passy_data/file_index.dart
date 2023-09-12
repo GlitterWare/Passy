@@ -7,6 +7,7 @@ import 'package:passy/passy_data/passy_fs_meta.dart';
 
 import 'file_meta.dart';
 import 'common.dart';
+import 'folder_meta.dart';
 
 class FileIndex {
   final File _file;
@@ -37,7 +38,8 @@ class FileIndex {
       List<String> decoded = entry.split(',');
       String decrypted = decrypt(decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
-      PassyFsMeta meta = PassyFsMeta.fromCSV(csvDecode(decrypted))!;
+      PassyFsMeta meta =
+          PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -70,13 +72,13 @@ class FileIndex {
   Future<List<dynamic>?> getEntryCSV(String key) async {
     String? _entryString = await getEntryString(key);
     if (_entryString == null) return null;
-    return csvDecode(_entryString);
+    return csvDecode(_entryString, recursive: true);
   }
 
   Future<PassyFsMeta?> getEntry(String key) async {
     List<dynamic>? _entryJson = await getEntryCSV(key);
     if (_entryJson == null) return null;
-    return FileMeta.fromCSV(_entryJson);
+    return PassyFsMeta.fromCSV(_entryJson);
   }
 
   String _encodeEntryForSaving(PassyFsMeta _entry) {
@@ -142,7 +144,8 @@ class FileIndex {
       List<String> decoded = entry.split(',');
       String decrypted = decrypt(decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
-      PassyFsMeta meta = PassyFsMeta.fromCSV(csvDecode(decrypted))!;
+      PassyFsMeta meta =
+          PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
@@ -159,6 +162,30 @@ class FileIndex {
         key: _key);
     await _setEntry(meta.key, meta);
     return meta.key;
+  }
+
+  Future<String> addFolder(String name) async {
+    FolderMeta meta = FolderMeta(name: name);
+    await _setEntry(meta.key, meta);
+    return meta.key;
+  }
+
+  Future<void> addChild(String key, String child) async {
+    FolderMeta entry = await getEntry(key) as FolderMeta;
+    if (entry.children.contains(child)) return;
+    entry.children.add(child);
+    await _setEntry(key, entry);
+  }
+
+  Future<void> addChildren(String key, List<String> children) async {
+    FolderMeta entry = await getEntry(key) as FolderMeta;
+    List<String> result = [];
+    for (String child in children) {
+      if (entry.children.contains(child)) continue;
+      result.add(child);
+    }
+    entry.children.addAll(result);
+    await _setEntry(key, entry);
   }
 
   Future<Uint8List> readAsBytes(String key) {
