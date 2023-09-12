@@ -99,9 +99,17 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     ByteConversionSink input = sha256.startChunkedConversion(output);
     RandomAccessFile raf = file.openSync();
     int byte = raf.readByteSync();
+    List<int> chunk = [];
     while (byte != -1) {
-      input.add([byte]);
+      chunk.add(byte);
+      if (chunk.length == 256) {
+        input.add(chunk);
+        chunk.clear();
+      }
       byte = raf.readByteSync();
+    }
+    if (chunk.isNotEmpty) {
+      input.add(chunk);
     }
     input.close();
     Digest digest = output.events.single;
