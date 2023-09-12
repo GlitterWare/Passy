@@ -7,7 +7,6 @@ import 'package:passy/passy_data/passy_fs_meta.dart';
 
 import 'file_meta.dart';
 import 'common.dart';
-import 'folder_meta.dart';
 
 class FileIndex {
   final File _file;
@@ -24,11 +23,7 @@ class FileIndex {
         _saveDir = saveDir,
         _key = key,
         _encrypter = encrypter {
-    if (!_file.existsSync()) {
-      _file.createSync(recursive: true);
-      _file.writeAsStringSync(
-          _encodeEntryForSaving(FolderMeta(key: '/', name: '/')));
-    }
+    if (!_file.existsSync()) _file.createSync(recursive: true);
   }
 
   Map<String, PassyFsMeta> get metadataSync {
@@ -169,45 +164,7 @@ class FileIndex {
         output: File(_saveDir.path + Platform.pathSeparator + meta.key),
         key: _key);
     await _setEntry(meta.key, meta);
-    await addChild(parent, meta.key);
     return meta.key;
-  }
-
-  Future<String> addFolder(String name) async {
-    FolderMeta meta = FolderMeta(name: name);
-    await _setEntry(meta.key, meta);
-    return meta.key;
-  }
-
-  Future<void> addChild(String key, String child) async {
-    FolderMeta entry = await getEntry(key) as FolderMeta;
-    if (entry.children.contains(child)) return;
-    entry.children.add(child);
-    await _setEntry(key, entry);
-  }
-
-  Future<void> addChildren(String key, List<String> children) async {
-    FolderMeta entry = await getEntry(key) as FolderMeta;
-    List<String> result = [];
-    for (String child in children) {
-      if (entry.children.contains(child)) continue;
-      result.add(child);
-    }
-    entry.children.addAll(result);
-    await _setEntry(key, entry);
-  }
-
-  Future<bool> removeChild(String key, String child) async {
-    FolderMeta entry = await getEntry(key) as FolderMeta;
-    bool result = entry.children.remove(child);
-    await _setEntry(key, entry);
-    return result;
-  }
-
-  Future<void> removeChildren(String key, List<String> children) async {
-    FolderMeta entry = await getEntry(key) as FolderMeta;
-    entry.children.removeWhere(((element) => children.contains(element)));
-    await _setEntry(key, entry);
   }
 
   Future<Uint8List> readAsBytes(String key) {
