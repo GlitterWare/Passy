@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 
@@ -176,10 +175,6 @@ class FileIndex {
 
   Future<void> removeFile(String key) async {
     await File(_saveDir.path + Platform.pathSeparator + key).delete();
-    PassyFsMeta? meta = await getEntry(key);
-    if (meta == null) return;
-    meta.status = EntryStatus.removed;
-    meta.entryModified = DateTime.now().toUtc();
-    await _setEntry(key, meta);
+    await _setEntry(key, null);
   }
 }

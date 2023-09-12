@@ -17,8 +17,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   FileMeta({
     super.key,
     required super.name,
-    super.status = EntryStatus.alive,
-    super.entryModified,
     required this.path,
     required this.changed,
     required this.modified,
@@ -46,13 +44,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
           key: json['key'] ??
               DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
           name: json['name'] ?? '',
-          status: json.containsKey('status')
-              ? entryStatusFromText(json['status']) ?? EntryStatus.removed
-              : EntryStatus.removed,
-          entryModified: json.containsKey('entryModified')
-              ? (DateTime.tryParse(json['entryModified']) ??
-                  DateTime.now().toUtc())
-              : DateTime.now().toUtc(),
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
@@ -65,8 +56,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         super(
           key: csv[0],
           name: csv[1],
-          status: entryStatusFromText(csv[2]) ?? EntryStatus.removed,
-          entryModified: DateTime.tryParse(csv[3]) ?? DateTime.now().toUtc(),
         );
 
   @override
@@ -74,8 +63,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     return {
       'key': key,
       'name': name,
-      'status': status.name,
-      'entryModified': entryModified.toIso8601String(),
       'path': path,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
@@ -90,8 +77,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     return [
       key,
       name,
-      status.name,
-      entryModified.toIso8601String(),
       'f',
       path,
       changed.toIso8601String(),
@@ -141,8 +126,6 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
       accessed: stat.accessed,
       size: stat.size,
       type: type,
-      status: EntryStatus.alive,
-      entryModified: DateTime.now().toUtc(),
     );
   }
 }
