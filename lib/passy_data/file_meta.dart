@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
@@ -47,12 +46,12 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : path = csv[5],
-        changed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
-        modified = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
-        accessed = DateTime.tryParse(csv[8]) ?? DateTime.now().toUtc(),
-        size = int.tryParse(csv[9]) ?? 0,
-        type = passyFileTypeFromName(csv[10]) ?? PassyFileType.unknown,
+      : path = csv[3],
+        changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
+        size = int.tryParse(csv[7]) ?? 0,
+        type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
         super(
           key: csv[0],
           name: csv[1],
