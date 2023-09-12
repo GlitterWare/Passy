@@ -158,13 +158,18 @@ class FileIndex {
     return _meta;
   }
 
-  Future<String> addFile(File file, {FileMeta? meta}) async {
+  Future<String> addFile(
+    File file, {
+    FileMeta? meta,
+    String parent = '/',
+  }) async {
     meta ??= FileMeta.fromFile(file);
     PassyBinaryFile.fromDecryptedSync(
         input: file,
         output: File(_saveDir.path + Platform.pathSeparator + meta.key),
         key: _key);
     await _setEntry(meta.key, meta);
+    await addChild(parent, meta.key);
     return meta.key;
   }
 
@@ -189,6 +194,19 @@ class FileIndex {
       result.add(child);
     }
     entry.children.addAll(result);
+    await _setEntry(key, entry);
+  }
+
+  Future<bool> removeChild(String key, String child) async {
+    FolderMeta entry = await getEntry(key) as FolderMeta;
+    bool result = entry.children.remove(child);
+    await _setEntry(key, entry);
+    return result;
+  }
+
+  Future<void> removeChildren(String key, List<String> children) async {
+    FolderMeta entry = await getEntry(key) as FolderMeta;
+    entry.children.removeWhere(((element) => children.contains(element)));
     await _setEntry(key, entry);
   }
 
