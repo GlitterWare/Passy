@@ -34,6 +34,21 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    GlobalKey _dropdownButtonKey = GlobalKey();
+    void openDropdown() {
+      _dropdownButtonKey.currentContext?.visitChildElements((element) {
+        if (element.widget is Semantics) {
+          element.visitChildElements((element) {
+            if (element.widget is Actions) {
+              element.visitChildElements((element) {
+                Actions.invoke(element, const ActivateIntent());
+              });
+            }
+          });
+        }
+      });
+    }
+
     List<DropdownMenuItem<T>> _menuItems = [];
     for (EnumDropdownButton2Item<T> item in items) {
       _menuItems.add(DropdownMenuItem(
@@ -54,6 +69,7 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
     EnumDropdownButton2Item<T> selected =
         items.firstWhere((element) => element.value == value);
     return DropdownButton2(
+      key: _dropdownButtonKey,
       items: _menuItems,
       value: value,
       onChanged: onChanged,
@@ -61,39 +77,50 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
       isExpanded: isExpanded,
       alignment: alignment,
       underline: const SizedBox.shrink(),
-      customButton: PassyPadding(
-        Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(100),
-              color: PassyTheme.darkPassyPurple),
-          height: 44,
-          child: Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                  child: selected.icon,
-                  padding: EdgeInsets.fromLTRB(PassyTheme.passyPadding.left + 6,
-                      0, PassyTheme.passyPadding.right, 0)),
-              Expanded(
-                  child: DefaultTextStyle(
-                style: const TextStyle(
-                    color: PassyTheme.lightContentColor,
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w500),
-                child: selected.text,
+      customButton: PassyPadding(Material(
+          color: PassyTheme.darkPassyPurple,
+          borderRadius: BorderRadius.circular(100),
+          child: InkWell(
+            splashColor: Colors.white38,
+            child: Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(100)),
+              height: 44,
+              child: Center(
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                      child: selected.icon,
+                      padding: EdgeInsets.fromLTRB(
+                          PassyTheme.passyPadding.left + 6,
+                          0,
+                          PassyTheme.passyPadding.right,
+                          0)),
+                  Expanded(
+                      child: DefaultTextStyle(
+                    style: const TextStyle(
+                        color: PassyTheme.lightContentColor,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500),
+                    child: selected.text,
+                  )),
+                  Padding(
+                      child: const Icon(
+                        Icons.arrow_drop_down_circle_rounded,
+                        size: 35,
+                      ),
+                      padding: EdgeInsets.fromLTRB(
+                          PassyTheme.passyPadding.left + 6,
+                          0,
+                          PassyTheme.passyPadding.right,
+                          0)),
+                ],
               )),
-              Padding(
-                  child: const Icon(
-                    Icons.arrow_drop_down_circle_rounded,
-                    size: 35,
-                  ),
-                  padding: EdgeInsets.fromLTRB(PassyTheme.passyPadding.left + 6,
-                      0, PassyTheme.passyPadding.right, 0)),
-            ],
-          )),
-        ),
-      ),
+            ),
+            customBorder: Border.all(),
+            onTap: openDropdown,
+          ))),
     );
   }
 }
