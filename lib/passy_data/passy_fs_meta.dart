@@ -14,7 +14,7 @@ abstract class PassyFsMeta with CSVConvertable {
             DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c');
 
   static PassyFsMeta? fromCSV(List<dynamic> csv) {
-    switch (csv[2]) {
+    switch (csv[3]) {
       case 'f':
         return FileMeta.fromCSV(csv);
     }

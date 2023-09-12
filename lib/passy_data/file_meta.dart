@@ -51,12 +51,12 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : path = csv[3],
-        changed = DateTime.tryParse(csv[4]) ?? DateTime.now().toUtc(),
-        modified = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
-        accessed = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
-        size = int.tryParse(csv[7]) ?? 0,
-        type = passyFileTypeFromName(csv[8]) ?? PassyFileType.unknown,
+      : path = csv[4],
+        changed = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
+        size = int.tryParse(csv[8]) ?? 0,
+        type = passyFileTypeFromName(csv[9]) ?? PassyFileType.unknown,
         super(
           key: csv[0],
           name: csv[1],
