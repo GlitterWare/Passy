@@ -180,7 +180,8 @@ class FileIndex {
   }
 
   Future<void> removeFile(String key) async {
-    await File(_saveDir.path + Platform.pathSeparator + key).delete();
+    File file = File(_saveDir.path + Platform.pathSeparator + key);
+    if (await file.exists()) await file.delete();
     await _setEntry(key, null);
   }
 }
