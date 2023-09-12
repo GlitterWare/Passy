@@ -19,6 +19,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   FileMeta({
     super.key,
     required super.name,
+    required super.virtualPath,
     required this.path,
     required this.changed,
     required this.modified,
@@ -46,6 +47,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
           key: json['key'] ??
               DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
           name: json['name'] ?? '',
+          virtualPath: json['virtualPath'] ?? '',
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
@@ -58,6 +60,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         super(
           key: csv[0],
           name: csv[1],
+          virtualPath: csv[2],
         );
 
   @override
@@ -65,6 +68,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     return {
       'key': key,
       'name': name,
+      'virtualPath': virtualPath,
       'path': path,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),
@@ -79,6 +83,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     return [
       key,
       name,
+      virtualPath,
       'f',
       path,
       changed.toIso8601String(),
@@ -89,7 +94,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     ];
   }
 
-  factory FileMeta.fromFile(File file) {
+  factory FileMeta.fromFile(File file, {String? virtualParent}) {
     AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
     ByteConversionSink input = sha256.startChunkedConversion(output);
     RandomAccessFile raf = file.openSync();
@@ -133,6 +138,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     }
     return FileMeta(
       key: key,
+      virtualPath: '${virtualParent ?? ''}/$name',
       name: name,
       path: file.path,
       changed: stat.changed,
