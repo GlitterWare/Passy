@@ -19,7 +19,7 @@ class PassyFsMeta with CSVConvertable {
         name: csv[1],
       );
     }
-    switch (csv[4]) {
+    switch (csv[2]) {
       case 'd':
         return FolderMeta.fromCSV(csv);
       case 'f':
