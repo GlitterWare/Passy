@@ -15,7 +15,9 @@ import 'package:passy/screens/common.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  final Widget? underLogo;
+
+  const SplashScreen({Key? key, this.underLogo}) : super(key: key);
 
   static const routeName = '/';
   static bool loaded = false;
@@ -327,8 +329,22 @@ class SplashScreen extends StatelessWidget {
       _load();
     }
     return Scaffold(
-      body: Center(
-        child: logo60Purple,
+      body: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Spacer(),
+                Center(
+                  child: logo60Purple,
+                ),
+                if (underLogo != null) underLogo!,
+                const Spacer(),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
