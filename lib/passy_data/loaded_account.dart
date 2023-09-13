@@ -514,26 +514,31 @@ class LoadedAccount {
       await _passwords.export(
         File('${tempPath}passwords.csv'),
         annotation:
-            '"key","customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website"',
+            '"customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website"',
+        skipKey: true,
       );
       await _paymentCards.export(
         File('${tempPath}payment_cards.csv'),
         annotation:
-            '"key","customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp"',
+            '"customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp"',
+        skipKey: true,
       );
       await _notes.export(
         File('${tempPath}notes.csv'),
-        annotation: '"key","title","note","isMarkdown"',
+        annotation: '"title","note","isMarkdown"',
+        skipKey: true,
       );
       await _idCards.export(
         File('${tempPath}id_cards.csv'),
         annotation:
-            '"key","customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country"',
+            '"customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country"',
+        skipKey: true,
       );
       await _identities.export(
         File('${tempPath}identities.csv'),
         annotation:
-            '"key","customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
+            '"customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
+        skipKey: true,
       );
       await _versionFile.copy('${tempPath}version.txt');
       JsonEncoder encoder = const JsonEncoder.withIndent('  ');

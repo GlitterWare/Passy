@@ -303,7 +303,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _tempFile.delete();
   }
 
-  Future<void> export(File file, {String? annotation}) async {
+  Future<void> export(File file,
+      {String? annotation, bool skipKey = false}) async {
     if (!await file.exists()) await file.create(recursive: true);
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile rafExport = await file.open(mode: FileMode.write);
@@ -319,6 +320,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       List<String> _decoded = entry.split(',');
       String _decrypted = decrypt(_decoded[1],
           encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      if (skipKey) _decrypted = _decrypted.split(',').sublist(1).join(',');
       rafExport
           .writeStringSync('"' + csvDecode(_decrypted).join('","') + '"\n');
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
