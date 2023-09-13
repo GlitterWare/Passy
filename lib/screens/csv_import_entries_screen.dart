@@ -239,8 +239,22 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                 }
                 Future<void> Function(PassyEntry<dynamic>) setEntry =
                     data.loadedAccount!.setEntry(args.entryType);
+                int setIndex = 0;
                 for (PassyEntry entry in result) {
                   await setEntry(entry);
+                  Navigator.pushReplacement(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation1, animation2) =>
+                            SplashScreen(
+                          underLogo: Center(
+                              child: PassyPadding(Text(
+                                  '${setIndex.toString()}/${result.length}'))),
+                        ),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ));
+                  setIndex++;
                 }
                 Navigator.pop(context);
                 Navigator.pop(context);
