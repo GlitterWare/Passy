@@ -76,14 +76,14 @@ class PassyBinaryFile {
   Future<Uint8List> readAsBytes() async {
     RandomAccessFile raf = await file.open();
     int fileLen = await raf.length();
-    int byte = await raf.readByte();
+    int byte = raf.readByteSync();
     int jsonLen = 1;
     // Read metadata
     List<int> meta = [];
     while (byte != 10) {
       if (byte == -1) return Uint8List(0);
       meta.add(byte);
-      byte = await raf.readByte();
+      byte = raf.readByteSync();
       jsonLen++;
     }
     int dataLen = fileLen - jsonLen;
@@ -126,7 +126,7 @@ class PassyBinaryFile {
       Uint8List block = Uint8List(16);
       Uint8List output = Uint8List(16);
       for (int i = 0; i != 16; i++) {
-        byte = await raf.readByte();
+        byte = raf.readByteSync();
         block[i] = byte;
       }
       _cipher.processBlock(block, 0, output, 0);
@@ -148,14 +148,14 @@ class PassyBinaryFile {
   Stream<int> streamAsBytes() async* {
     RandomAccessFile raf = await file.open();
     int fileLen = await raf.length();
-    int byte = await raf.readByte();
+    int byte = raf.readByteSync();
     int jsonLen = 1;
     // Read metadata
     List<int> meta = [];
     while (byte != 10) {
       if (byte == -1) return;
       meta.add(byte);
-      byte = await raf.readByte();
+      byte = raf.readByteSync();
       jsonLen++;
     }
     int dataLen = fileLen - jsonLen;
@@ -196,7 +196,7 @@ class PassyBinaryFile {
       Uint8List block = Uint8List(16);
       Uint8List output = Uint8List(16);
       for (int i = 0; i != 16; i++) {
-        byte = await raf.readByte();
+        byte = raf.readByteSync();
         block[i] = byte;
       }
       _cipher.processBlock(block, 0, output, 0);
