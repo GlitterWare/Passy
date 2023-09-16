@@ -14,7 +14,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   final DateTime modified;
   final DateTime accessed;
   final int size;
-  final PassyFileType type;
+  PassyFileType type;
 
   FileMeta({
     super.key,
