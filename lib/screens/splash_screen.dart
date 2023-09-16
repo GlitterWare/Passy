@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:passy/main.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
@@ -304,7 +305,12 @@ class SplashScreen extends StatelessWidget {
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       if (const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false') {
         try {
-          String _version = await getLatestVersion();
+          String _version;
+          if (kDebugMode) {
+            _version = passyVersion;
+          } else {
+            _version = await getLatestVersion();
+          }
           if (_version == passyVersion) return;
           List<String> _newVersionSplit = _version.split('.');
           List<String> _currentVersionSplit = passyVersion.split('.');
