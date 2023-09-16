@@ -206,8 +206,8 @@ class FileIndex {
       if (eofReached) return true;
       String? _entry = readLine(tempRaf, lineDelimiter: '\n');
       if (_entry == null) return true;
-      PassyFsMeta meta =
-          PassyFsMeta.fromCSV(csvDecode(decrypt(key, encrypter: _encrypter)))!;
+      PassyFsMeta meta = PassyFsMeta.fromCSV(
+          csvDecode(decrypt(_entry, encrypter: _encrypter)))!;
       if (meta.virtualPath.startsWith(path)) {
         skipLine(tempRaf, lineDelimiter: '\n');
         return null;
