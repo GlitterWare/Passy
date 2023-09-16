@@ -84,7 +84,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      _tempFile = await _file.copy(_tempPath);
+      _tempFile = await _file.rename(_tempPath);
+      await _file.create();
     }
     bool isNotCorrupted = false;
     RandomAccessFile _raf = await _file.open(mode: FileMode.append);
@@ -216,7 +217,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      _tempFile = await _file.copy(_tempPath);
+      _tempFile = await _file.rename(_tempPath);
+      await _file.create();
     }
     await _file.writeAsString('');
     RandomAccessFile _raf = await _file.open(mode: FileMode.append);
@@ -263,7 +265,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      _tempFile = await _file.copy(_tempPath);
+      _tempFile = await _file.rename(_tempPath);
+      await _file.create();
     }
     await _file.writeAsString('');
     RandomAccessFile _raf = await _file.open(mode: FileMode.append);
