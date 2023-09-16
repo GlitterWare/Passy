@@ -204,15 +204,17 @@ class FileIndex {
     await processLinesAsync(tempRaf, lineDelimiter: ',',
         onLine: (key, eofReached) async {
       if (eofReached) return true;
-      String? _entry = readLine(tempRaf, lineDelimiter: '\n');
-      if (_entry == null) return true;
+      String? entry = readLine(tempRaf, lineDelimiter: '\n');
+      if (entry == null) return true;
+      List<String> entrySplit = entry.split(',');
+      IV iv = IV.fromBase64(entrySplit[0]);
       PassyFsMeta meta = PassyFsMeta.fromCSV(
-          csvDecode(decrypt(_entry, encrypter: _encrypter)))!;
+          csvDecode(decrypt(entrySplit[1], encrypter: _encrypter, iv: iv)))!;
       if (meta.virtualPath.startsWith(path)) {
         skipLine(tempRaf, lineDelimiter: '\n');
         return null;
       }
-      await raf.writeString('$key,$_entry\n');
+      await raf.writeString('$key,$entry\n');
       return null;
     });
     await raf.close();
