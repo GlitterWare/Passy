@@ -186,4 +186,37 @@ class FileIndex {
     if (await file.exists()) await file.delete();
     await _setEntry(key, null);
   }
+
+  Future<void> removeFolder(String path) async {
+    File tempFile;
+    {
+      String tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-file-index-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      tempFile = await _file.rename(tempPath);
+      await _file.create();
+    }
+    await _file.writeAsString('');
+    RandomAccessFile raf = await _file.open(mode: FileMode.append);
+    RandomAccessFile tempRaf = await tempFile.open();
+
+    await processLinesAsync(tempRaf, lineDelimiter: ',',
+        onLine: (key, eofReached) async {
+      if (eofReached) return true;
+      String? _entry = readLine(tempRaf, lineDelimiter: '\n');
+      if (_entry == null) return true;
+      PassyFsMeta meta =
+          PassyFsMeta.fromCSV(csvDecode(decrypt(key, encrypter: _encrypter)))!;
+      if (meta.virtualPath.startsWith(path)) {
+        skipLine(tempRaf, lineDelimiter: '\n');
+        return null;
+      }
+      await raf.writeString('$key,$_entry\n');
+      return null;
+    });
+    await raf.close();
+    await tempRaf.close();
+    await tempFile.delete();
+  }
 }
