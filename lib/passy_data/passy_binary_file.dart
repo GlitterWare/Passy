@@ -49,7 +49,6 @@ class PassyBinaryFile {
       if (byte != -1) {
         for (int i = 0; i != 16; i++) {
           byte = rafIn.readByteSync();
-          if (byte == -1) break;
           blockIn[i] = byte;
         }
       }
@@ -60,9 +59,7 @@ class PassyBinaryFile {
         }
       }
       _cipher.processBlock(blockIn, 0, blockOut, 0);
-      for (int codeUnit in blockOut) {
-        rafOut.writeByteSync(codeUnit);
-      }
+      rafOut.writeFromSync(blockOut);
       fileIndex += 16;
     }
     rafIn.closeSync();
