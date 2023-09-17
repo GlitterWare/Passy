@@ -82,6 +82,7 @@ class PassyBinaryFile {
       byte = raf.readByteSync();
       jsonLen++;
     }
+    await raf.close();
     int dataLen = fileLen - jsonLen;
     if (dataLen == 0) return Uint8List(0);
     int offset = jsonLen;
@@ -108,6 +109,7 @@ class PassyBinaryFile {
       }
     }
     if (length == 0) return Uint8List(0);
+    Uint8List contents = await file.readAsBytes();
     Uint8List result = Uint8List(length);
     int resultIndex = 0;
     PaddedBlockCipher _cipher = PaddedBlockCipher(algo);
@@ -122,7 +124,7 @@ class PassyBinaryFile {
       Uint8List block = Uint8List(16);
       Uint8List output = Uint8List(16);
       for (int i = 0; i != 16; i++) {
-        byte = raf.readByteSync();
+        byte = contents[offset + i];
         block[i] = byte;
       }
       _cipher.processBlock(block, 0, output, 0);
@@ -137,7 +139,6 @@ class PassyBinaryFile {
       //print('Offset changed: $offset');
     }
     //print(utf8.decode(result));
-    await raf.close();
     return result;
   }
 
