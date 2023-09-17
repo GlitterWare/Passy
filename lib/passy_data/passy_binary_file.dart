@@ -33,6 +33,7 @@ class PassyBinaryFile {
     copyList = Uint8List(0);
     if (inLen == 0) {
       rafOut.writeString('');
+      await rafOut.close();
       return;
     }
     int fileIndex = 0;

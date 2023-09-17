@@ -162,7 +162,7 @@ class FileIndex {
     PassyBinaryFile binaryFile = PassyBinaryFile(
         file: File(_saveDir.path + Platform.pathSeparator + meta.key),
         key: _key);
-    binaryFile.encrypt(input: file);
+    await binaryFile.encrypt(input: file);
     await _setEntry(meta.key, meta);
     return meta.key;
   }
