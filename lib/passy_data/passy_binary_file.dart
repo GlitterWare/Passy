@@ -44,6 +44,7 @@ class PassyBinaryFile {
             null));
     rafOut.writeStringSync('${iv.base64},$inLen,$algorithm\n');
     while (fileIndex <= inLen) {
+    while (fileIndex < inLen) {
       Uint8List blockIn = Uint8List(16);
       Uint8List blockOut = Uint8List(16);
       if (byte != -1) {
