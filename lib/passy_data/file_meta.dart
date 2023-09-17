@@ -1,8 +1,8 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 
-import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
@@ -94,26 +94,9 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
     ];
   }
 
-  factory FileMeta.fromFile(File file, {String? virtualParent}) {
+  static Future<FileMeta> fromFile(File file, {String? virtualParent}) async {
     if (virtualParent == '/') virtualParent = null;
-    AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
-    ByteConversionSink input = sha256.startChunkedConversion(output);
-    RandomAccessFile raf = file.openSync();
-    int byte = raf.readByteSync();
-    List<int> chunk = [];
-    while (byte != -1) {
-      chunk.add(byte);
-      if (chunk.length == 256) {
-        input.add(chunk);
-        chunk.clear();
-      }
-      byte = raf.readByteSync();
-    }
-    if (chunk.isNotEmpty) {
-      input.add(chunk);
-    }
-    input.close();
-    Digest digest = output.events.single;
+    Digest digest = await getFileChecksum(file);
     String key = digest.toString();
     FileStat stat = file.statSync();
     String name = basename(file.path);

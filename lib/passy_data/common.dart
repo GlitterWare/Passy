@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:characters/characters.dart';
 import 'package:compute/compute.dart';
+import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
@@ -620,4 +621,14 @@ Future<GlareClient> connectTo2d0d0Server(String address, int port,
     keypair: keypair,
   );
   return client;
+}
+
+Future<Digest> getFileChecksum(File file) async {
+  AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
+  ByteConversionSink input = sha256.startChunkedConversion(output);
+  await for (List<int> bytes in file.openRead()) {
+    input.add(bytes);
+  }
+  input.close();
+  return output.events.single;
 }
