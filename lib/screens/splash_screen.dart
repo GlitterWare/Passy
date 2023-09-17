@@ -341,12 +341,21 @@ class SplashScreen extends StatelessWidget {
             hasScrollBody: false,
             child: Column(
               children: [
-                const Spacer(),
+                const Spacer(flex: 5),
                 Center(
                   child: logo60Purple,
                 ),
-                if (underLogo != null) underLogo!,
-                const Spacer(),
+                underLogo ??
+                    const PassyPadding(Row(
+                      children: [
+                        Spacer(),
+                        Expanded(
+                            child: PassyPadding(
+                                LinearProgressIndicator(color: Colors.purple))),
+                        Spacer(),
+                      ],
+                    )),
+                const Spacer(flex: 5),
               ],
             ),
           )
