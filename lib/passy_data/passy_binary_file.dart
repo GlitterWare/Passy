@@ -195,9 +195,13 @@ class PassyBinaryFile {
     while (offset < fileLen) {
       Uint8List block = Uint8List(16);
       Uint8List output = Uint8List(16);
-      for (int i = 0; i != 16; i++) {
-        byte = raf.readByteSync();
-        block[i] = byte;
+      int readIndex = 0;
+      await for (List<int> bytes
+          in file.openRead(offset, offset + 16 < fileLen ? offset : fileLen)) {
+        for (byte in bytes) {
+          block[readIndex] = byte;
+        }
+        readIndex += bytes.length;
       }
       _cipher.processBlock(block, 0, output, 0);
       if (offset + 16 >= fileLen) {
