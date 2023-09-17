@@ -173,10 +173,10 @@ class FileIndex {
         .readAsBytes();
   }
 
-  Future<void> saveDecrypted(String key, {required File file}) {
-    return PassyBinaryFile(
+  Future<void> saveDecrypted(String key, {required File file}) async {
+    await file.writeAsBytes(await PassyBinaryFile(
             file: File(_saveDir.path + Platform.pathSeparator + key), key: _key)
-        .saveDecrypted(file);
+        .readAsBytes());
   }
 
   Future<void> removeFile(String key) async {
