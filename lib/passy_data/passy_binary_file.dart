@@ -22,7 +22,7 @@ class PassyBinaryFile {
     iv ??= IV.fromSecureRandom(16);
     if (!await file.exists()) await file.create(recursive: true);
     RandomAccessFile rafOut = await file.open(mode: FileMode.write);
-    int inLen = input.lengthSync();
+    int inLen = await input.length();
     Uint8List contents = await input.readAsBytes();
     Uint8List copyList =
         Uint8List(contents.length + (16 - (contents.length % 16)));
