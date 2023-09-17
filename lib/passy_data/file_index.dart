@@ -159,10 +159,10 @@ class FileIndex {
     String? parent,
   }) async {
     meta ??= await FileMeta.fromFile(file, virtualParent: parent);
-    PassyBinaryFile.fromDecryptedSync(
-        input: file,
-        output: File(_saveDir.path + Platform.pathSeparator + meta.key),
+    PassyBinaryFile binaryFile = PassyBinaryFile(
+        file: File(_saveDir.path + Platform.pathSeparator + meta.key),
         key: _key);
+    binaryFile.encrypt(input: file);
     await _setEntry(meta.key, meta);
     return meta.key;
   }
