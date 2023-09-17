@@ -127,6 +127,9 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
       } else {
         String ext = nameSplit.last;
         switch (ext) {
+          case 'csv':
+            type = PassyFileType.text;
+            break;
           case 'txt':
             type = PassyFileType.text;
             break;
