@@ -130,21 +130,7 @@ class _NoteScreen extends State<NoteScreen> {
           Padding(
             padding: EdgeInsets.fromLTRB(20, PassyTheme.passyPadding.top,
                 PassyTheme.passyPadding.right, PassyTheme.passyPadding.bottom),
-            child: MarkdownBody(
-              data: _note.note,
-              selectable: true,
-              extensionSet: md.ExtensionSet(
-                md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-                <md.InlineSyntax>[
-                  md.EmojiSyntax(),
-                  ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-                ],
-              ),
-              onTapLink: (text, url, title) {
-                if (url == null) return;
-                openUrl(url);
-              },
-            ),
+            child: PassyMarkdownBody(data: _note.note),
           ),
       ]),
     );

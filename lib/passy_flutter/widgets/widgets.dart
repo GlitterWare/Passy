@@ -20,6 +20,7 @@ export 'password_button_list_view.dart';
 export 'password_button.dart';
 export 'passy_about_dialog.dart';
 export 'passy_entry_button_list_view.dart';
+export 'passy_markdown_body.dart';
 export 'passy_padding.dart';
 export 'payment_card_button_list_view.dart';
 export 'payment_card_button_mini_list_view.dart';

@@ -123,21 +123,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
                   PassyTheme.passyPadding.top,
                   PassyTheme.passyPadding.right,
                   PassyTheme.passyPadding.bottom),
-              child: MarkdownBody(
-                data: _note,
-                selectable: true,
-                extensionSet: md.ExtensionSet(
-                  md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-                  <md.InlineSyntax>[
-                    md.EmojiSyntax(),
-                    ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-                  ],
-                ),
-                onTapLink: (text, url, title) {
-                  if (url == null) return;
-                  openUrl(url);
-                },
-              )),
+              child: PassyMarkdownBody(data: _note)),
       ]),
     );
   }
