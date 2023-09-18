@@ -131,6 +131,7 @@ flutter:
         - asset: assets/fonts/Roboto/Roboto-ThinItalic.ttf
 
   assets:
+    - assets/images/file-markdown-svgrepo-com.svg
     - assets/images/github_icon.svg
     - assets/images/icon.ico
     - assets/images/icon.png
@@ -138,6 +139,7 @@ flutter:
     - assets/images/icon.jpg
     - assets/images/logo.svg
     - assets/images/logo_circle.svg
+    - assets/images/markdown-svgrepo-com.svg
     - assets/images/payment_card_bg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

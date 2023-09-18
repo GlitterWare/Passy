@@ -7,6 +7,7 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'note_screen.dart';
 import 'notes_screen.dart';
@@ -66,9 +67,14 @@ class _EditNoteScreen extends State<EditNoteScreen> {
       body: ListView(children: [
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.enableMarkdown),
-          left: const Padding(
-            padding: EdgeInsets.only(right: 30),
-            child: Icon(Icons.arrow_downward_rounded),
+          left: Padding(
+            padding: const EdgeInsets.only(right: 30),
+            child: SvgPicture.asset(
+              'assets/images/markdown-svgrepo-com.svg',
+              width: 26,
+              colorFilter: const ColorFilter.mode(
+                  PassyTheme.lightContentColor, BlendMode.srcIn),
+            ),
           ),
           right: Switch(
             activeColor: Colors.greenAccent,
