@@ -208,7 +208,7 @@ class FileIndex {
       IV iv = IV.fromBase64(entrySplit[0]);
       PassyFsMeta meta = PassyFsMeta.fromCSV(
           csvDecode(decrypt(entrySplit[1], encrypter: _encrypter, iv: iv)))!;
-      if (meta.virtualPath.startsWith(path)) {
+      if (meta.virtualPath.startsWith('$path/')) {
         skipLine(tempRaf, lineDelimiter: '\n');
         return null;
       }
