@@ -186,6 +186,9 @@ class FileIndex {
   }
 
   Future<void> removeFolder(String path) async {
+    if (path.isNotEmpty) {
+      if (path[path.length - 1] != '/') path = path + '/';
+    }
     File tempFile;
     {
       String tempPath = (Directory.systemTemp).path +
@@ -208,7 +211,7 @@ class FileIndex {
       IV iv = IV.fromBase64(entrySplit[0]);
       PassyFsMeta meta = PassyFsMeta.fromCSV(
           csvDecode(decrypt(entrySplit[1], encrypter: _encrypter, iv: iv)))!;
-      if (meta.virtualPath.startsWith('$path/')) {
+      if (meta.virtualPath.startsWith(path)) {
         skipLine(tempRaf, lineDelimiter: '\n');
         return null;
       }
