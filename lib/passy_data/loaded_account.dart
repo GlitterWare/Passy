@@ -1253,6 +1253,33 @@ class LoadedAccount {
     await removeFavoriteIdentity(key);
     await _saveFuture;
   }
+
+  // File index wrappers
+  Future<Map<String, PassyFsMeta>> getFsMetadata() => _fileIndex.getMetadata();
+  Future<String> addFile(
+    File file, {
+    bool useIsolate = false,
+    FileMeta? meta,
+    String? parent,
+  }) {
+    if (useIsolate) {
+      return compute<FileIndex, String>(
+          (index) => index.addFile(file, meta: meta, parent: parent),
+          _fileIndex);
+    }
+    return _fileIndex.addFile(file, meta: meta, parent: parent);
+  }
+
+  Future<Uint8List> readFileAsBytes(String key, {bool useIsolate = false}) {
+    if (useIsolate) {
+      return compute<FileIndex, Uint8List>(
+          (index) => index.readAsBytes(key), _fileIndex);
+    }
+    return _fileIndex.readAsBytes(key);
+  }
+
+  Future<void> removeFile(String key) => _fileIndex.removeFile(key);
+  Future<void> removeFolder(String path) => _fileIndex.removeFolder(path);
 }
 
 class JSONLoadedAccount {
