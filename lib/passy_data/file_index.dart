@@ -260,13 +260,14 @@ class FileIndex {
     await raf.close();
     await tempRaf.close();
     await tempFile.delete();
+    Key _oldKey = _key;
     _key = key;
     _encrypter = encrypter;
     for (MapEntry<String, PassyFsMeta> meta in (await getMetadata()).entries) {
-      PassyBinaryFile file = PassyBinaryFile(
-          file: File(_saveDir.path + Platform.pathSeparator + meta.key),
-          key: _key);
-      file.encrypt(input: await file.readAsBytes());
+      File file = File(_saveDir.path + Platform.pathSeparator + meta.key);
+      PassyBinaryFile oldFile = PassyBinaryFile(file: file, key: _oldKey);
+      PassyBinaryFile newFile = PassyBinaryFile(file: file, key: key);
+      newFile.encrypt(input: await oldFile.readAsBytes());
     }
   }
 }
