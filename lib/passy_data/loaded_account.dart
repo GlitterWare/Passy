@@ -271,7 +271,7 @@ class LoadedAccount {
     await _paymentCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
     await _idCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
     await _identities.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
-    await _fileIndex.setKey(key);
+    await _fileIndex.setKey(key, oldEncrypter: oldEncrypter);
   }
 
   KeyDerivationType get keyDerivationType =>
