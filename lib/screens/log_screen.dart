@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
-import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
 
 class LogScreen extends StatelessWidget {
