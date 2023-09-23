@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
@@ -9,6 +10,7 @@ import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/file_index.dart';
+import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
@@ -35,6 +37,7 @@ import 'note.dart';
 import 'password.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
+import 'passy_fs_meta.dart';
 import 'payment_card.dart';
 import 'sync_2d0d0_server_info.dart';
 import 'synchronization.dart';
@@ -198,8 +201,7 @@ class LoadedAccount {
     fileIndex ??= FileIndex(
         file: File(path + Platform.pathSeparator + 'file_index.enc'),
         saveDir: Directory(path + Platform.pathSeparator + 'files'),
-        key: key,
-        encrypter: encrypter);
+        key: key);
     return LoadedAccount(
         encrypter: encrypter,
         syncEncrypter: syncEncrypter,
@@ -1466,8 +1468,7 @@ class JSONLoadedAccount {
               'file_index.enc'),
           saveDir: Directory(
               _versionFile.parent.path + Platform.pathSeparator + 'files'),
-          key: key,
-          encrypter: encrypter),
+          key: key),
     );
   }
 

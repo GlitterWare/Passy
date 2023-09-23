@@ -11,18 +11,17 @@ import 'common.dart';
 class FileIndex {
   final File _file;
   final Directory _saveDir;
-  final Key _key;
-  final Encrypter _encrypter;
+  Key _key;
+  Encrypter _encrypter;
 
   FileIndex({
     required File file,
     required Directory saveDir,
     required Key key,
-    required Encrypter encrypter,
   })  : _file = file,
         _saveDir = saveDir,
         _key = key,
-        _encrypter = encrypter {
+        _encrypter = Encrypter(AES(key)) {
     if (!_file.existsSync()) _file.createSync(recursive: true);
   }
 
@@ -162,7 +161,7 @@ class FileIndex {
     PassyBinaryFile binaryFile = PassyBinaryFile(
         file: File(_saveDir.path + Platform.pathSeparator + meta.key),
         key: _key);
-    await binaryFile.encrypt(input: file);
+    await binaryFile.encrypt(input: await file.readAsBytes());
     await _setEntry(meta.key, meta);
     return meta.key;
   }
@@ -221,5 +220,53 @@ class FileIndex {
     await raf.close();
     await tempRaf.close();
     await tempFile.delete();
+  }
+
+  Future<void> setKey(Key key, {Encrypter? oldEncrypter}) async {
+    Encrypter encrypter = Encrypter(AES(key));
+    Encrypter oldEncrypterA = oldEncrypter ?? _encrypter;
+    File tempFile;
+    {
+      String tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-file-index-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      tempFile = await _file.rename(tempPath);
+      await _file.create();
+    }
+    bool isNotCorrupted = false;
+    RandomAccessFile raf = await _file.open(mode: FileMode.append);
+    RandomAccessFile tempRaf = await tempFile.open();
+
+    await processLinesAsync(tempRaf, lineDelimiter: ',',
+        onLine: (_key, eofReached) async {
+      if (eofReached) return true;
+      String? entry = readLine(tempRaf, lineDelimiter: '\n');
+      if (entry == null) return true;
+      List<String> decoded = entry.split(',');
+      entry = decrypt(decoded[1],
+          encrypter: oldEncrypterA, iv: IV.fromBase64(decoded[0]));
+      IV iv = IV.fromSecureRandom(16);
+      entry = encrypt(entry, encrypter: encrypter, iv: iv);
+      if (!isNotCorrupted) {
+        isNotCorrupted = true;
+        await raf.close();
+        await _file.writeAsString('');
+        raf = await _file.open(mode: FileMode.append);
+      }
+      await raf.writeString('$_key,${iv.base64},$entry\n');
+      return null;
+    });
+    await raf.close();
+    await tempRaf.close();
+    await tempFile.delete();
+    _key = key;
+    _encrypter = encrypter;
+    for (MapEntry<String, PassyFsMeta> meta in (await getMetadata()).entries) {
+      PassyBinaryFile file = PassyBinaryFile(
+          file: File(_saveDir.path + Platform.pathSeparator + meta.key),
+          key: _key);
+      file.encrypt(input: await file.readAsBytes());
+    }
   }
 }

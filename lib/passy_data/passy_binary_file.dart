@@ -15,15 +15,15 @@ class PassyBinaryFile {
   }) : _key = key;
 
   Future<void> encrypt({
-    required File input,
+    required Uint8List input,
     IV? iv,
     String algorithm = 'AES/SIC/PKCS7',
   }) async {
     iv ??= IV.fromSecureRandom(16);
     if (!await file.exists()) await file.create(recursive: true);
     RandomAccessFile rafOut = await file.open(mode: FileMode.write);
-    int inLen = await input.length();
-    Uint8List contents = await input.readAsBytes();
+    int inLen = input.length;
+    Uint8List contents = input;
     Uint8List copyList =
         Uint8List(contents.length + (16 - (contents.length % 16)));
     for (int i = 0; i != contents.length; i++) {
