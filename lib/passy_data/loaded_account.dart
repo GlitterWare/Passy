@@ -238,11 +238,12 @@ class LoadedAccount {
         .toString();
     await _credentials.save();
     Encrypter oldEncrypter = _encrypter;
-    _encrypter = await getPasswordEncrypter(
+    Key key = await derivePassword(
       password,
       derivationType: _credentials.value.keyDerivationType,
       derivationInfo: _credentials.value.keyDerivationInfo,
     );
+    _encrypter = Encrypter(AES(key));
     _syncEncrypter = await getSyncEncrypter(
       password,
       derivationType: _credentials.value.keyDerivationType,
@@ -270,6 +271,7 @@ class LoadedAccount {
     await _paymentCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
     await _idCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
     await _identities.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _fileIndex.setKey(key);
   }
 
   KeyDerivationType get keyDerivationType =>
