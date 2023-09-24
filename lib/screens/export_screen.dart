@@ -7,6 +7,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:path/path.dart' as path;
 
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/confirm_kdbx_export_screen.dart';
@@ -73,17 +74,33 @@ class _ExportScreen extends State<ExportScreen> {
     try {
       bool? _isConfirmed = await _showExportWarningDialog();
       if (_isConfirmed != true) return;
-      String? _expDir = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: localizations.exportPassy,
-        lockParentWindow: true,
-      );
-      if (_expDir == null) return;
+      String filename;
       switch (type) {
         case _ExportType.passy:
-          await _account.exportPassy(outputDirectory: Directory(_expDir));
+          filename =
+              'passy-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
           break;
         case _ExportType.csv:
-          await _account.exportCSV(outputDirectory: Directory(_expDir));
+          filename =
+              'passy-csv-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+          break;
+      }
+      String? _expFile = await FilePicker.platform.saveFile(
+        dialogTitle: localizations.exportPassy,
+        lockParentWindow: true,
+        fileName: filename,
+      );
+      if (_expFile == null) return;
+      switch (type) {
+        case _ExportType.passy:
+          await _account.exportPassy(
+              outputDirectory: File(_expFile).parent,
+              fileName: path.basename(_expFile));
+          break;
+        case _ExportType.csv:
+          await _account.exportCSV(
+              outputDirectory: File(_expFile).parent,
+              fileName: path.basename(_expFile));
           break;
       }
       showSnackBar(context,
