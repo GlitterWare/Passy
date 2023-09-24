@@ -23,6 +23,7 @@ import 'package:passy/screens/id_cards_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/screens/payment_cards_screen.dart';
+import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zxing2/qrcode.dart';
 
@@ -91,19 +92,34 @@ void openUrl(String url) {
 Future<String?> backupAccount(
   BuildContext context, {
   required String username,
+  bool autoFilename = true,
 }) async {
   try {
     MainScreen.shouldLockScreen = false;
-    String? _buDir = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Backup Passy',
-      lockParentWindow: true,
-    );
+    String? _fileName;
+    String? _buDir;
+    if (autoFilename) {
+      _buDir = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: 'Backup Passy',
+        lockParentWindow: true,
+      );
+    } else {
+      _fileName =
+          'passy-backup-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+      _buDir = await FilePicker.platform.saveFile(
+        dialogTitle: 'Backup Passy',
+        lockParentWindow: true,
+        fileName: _fileName,
+      );
+    }
     Future.delayed(const Duration(seconds: 2))
         .then((value) => MainScreen.shouldLockScreen = true);
     if (_buDir == null) return null;
+    if (!autoFilename) _buDir = File(_buDir).parent.path;
     await data.backupAccount(
       username: username,
       outputDirectoryPath: _buDir,
+      fileName: _fileName,
     );
     showSnackBar(context,
         message: 'Backup saved',

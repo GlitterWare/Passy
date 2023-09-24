@@ -82,7 +82,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
 
   Future<void> _onBackupPressed() async {
     try {
-      String? path = await backupAccount(context, username: _account.username);
+      String? path = await backupAccount(context,
+          username: _account.username, autoFilename: false);
       if (path == null) return;
     } catch (e) {
       return;

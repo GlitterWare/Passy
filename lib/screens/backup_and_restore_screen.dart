@@ -21,9 +21,9 @@ class BackupAndRestoreScreen extends StatefulWidget {
 class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
   Future<void> _onBackupPressed(String username) async {
     try {
-      await backupAccount(context, username: username);
+      await backupAccount(context, username: username, autoFilename: false);
     } catch (e) {
-      //
+      return;
     }
   }
 
