@@ -187,6 +187,8 @@ class FileIndex {
   Future<void> removeFolder(String path) async {
     if (path.isNotEmpty) {
       if (path[path.length - 1] != '/') path = path + '/';
+    } else {
+      path = '/';
     }
     File tempFile;
     {
