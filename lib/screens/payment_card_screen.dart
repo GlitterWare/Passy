@@ -48,8 +48,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
               TextButton(
                 child: Text(
                   localizations.remove,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onPressed: () {
                   LoadedAccount _account = data.loadedAccount!;

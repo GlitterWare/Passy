@@ -57,8 +57,7 @@ class _IdentityScreen extends State<IdentityScreen> {
               TextButton(
                 child: Text(
                   localizations.remove,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, SplashScreen.routeName);

@@ -66,8 +66,7 @@ class _PassyFileScreen extends State<StatefulWidget> {
               TextButton(
                 child: Text(
                   localizations.remove,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onPressed: () => Navigator.pop(context, true),
               )
