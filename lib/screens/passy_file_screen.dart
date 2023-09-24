@@ -115,11 +115,11 @@ class _PassyFileScreen extends State<StatefulWidget> {
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
-            hasScrollBody: args.type == FileEntryType.plainText,
+            hasScrollBody: true,
             child: Column(
               children: [
                 if (args.type == FileEntryType.imageRaster) const Spacer(),
-                Expanded(
+                Flexible(
                   child: PassyPadding(PassyFileWidget(
                     path: args.key,
                     isEncrypted: true,
