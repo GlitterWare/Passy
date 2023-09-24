@@ -108,10 +108,13 @@ class _FilesScreen extends State<FilesScreen> {
 
   Future<void> _onAddFilePressed(FilesScreenArgs args,
       {FileEntryType type = FileEntryType.file}) async {
+    MainScreen.shouldLockScreen = false;
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: localizations.addFile,
       lockParentWindow: true,
     );
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => MainScreen.shouldLockScreen = true);
     if (result == null) return;
     if (result.files.isEmpty) return;
     File file = File(result.files[0].path!);
