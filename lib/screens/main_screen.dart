@@ -15,6 +15,7 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/search_entry_data.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -561,6 +562,16 @@ class _MainScreen extends State<MainScreen>
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
+      PassyPadding(ThreeWidgetButton(
+        center: Text(localizations.files),
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.description_outlined),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
+            .then((value) => setState(() {})),
+      )),
       if (_account.keyDerivationType == KeyDerivationType.none)
         PassyPadding(ThreeWidgetButton(
           color: const Color.fromRGBO(255, 82, 82, 1),
@@ -649,6 +660,7 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[0],
                           _screenButtons[1],
                           _screenButtons[2],
+                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                       Expanded(
@@ -664,7 +676,7 @@ class _MainScreen extends State<MainScreen>
                         children: [
                           _screenButtons[6],
                           _screenButtons[7],
-                          if (_screenButtons.length == 9) _screenButtons[8],
+                          _screenButtons[8],
                         ],
                       ))
                     ]);
@@ -677,16 +689,17 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[1],
                           _screenButtons[2],
                           _screenButtons[3],
-                          if (_screenButtons.length == 9) _screenButtons[8],
+                          _screenButtons[4],
                         ]),
                       ),
                       Expanded(
                           child: ListView(
                         children: [
-                          _screenButtons[4],
                           _screenButtons[5],
                           _screenButtons[6],
                           _screenButtons[7],
+                          _screenButtons[8],
+                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                     ]);

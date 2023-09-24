@@ -87,6 +87,7 @@ void openUrl(String url) {
   launchUrlString(url);
 }
 
+//TODO: localize backup
 Future<String?> backupAccount(
   BuildContext context, {
   required String username,
@@ -241,6 +242,7 @@ PopupMenuItem getIconedPopupMenuItem({
   );
 }
 
+//TODO: localize menu builders
 List<PopupMenuEntry> idCardPopupMenuBuilder(
     BuildContext context, IDCardMeta idCardMeta) {
   return [
@@ -455,6 +457,36 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
         showSnackBar(context,
             message: 'CVV copied',
             icon: const Icon(Icons.copy_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+  ];
+}
+
+List<PopupMenuEntry> filePopupMenuBuilder(
+    BuildContext context, FileEntry fileEntry,
+    {Future<void> Function()? onRemoved}) {
+  return [
+    getIconedPopupMenuItem(
+      content: Text(localizations.remove),
+      icon: const Icon(Icons.delete_outline_rounded),
+      onTap: () async {
+        if (fileEntry.type == FileEntryType.folder) {
+          await data.loadedAccount!.removeFolder(fileEntry.path);
+          await (onRemoved?.call());
+          if (!context.mounted) return;
+          showSnackBar(context,
+              message: 'Folder removed',
+              icon: const Icon(Icons.delete_outline_rounded,
+                  color: PassyTheme.darkContentColor));
+          return;
+        }
+        await data.loadedAccount!.removeFile(fileEntry.key);
+        await (onRemoved?.call());
+        if (!context.mounted) return;
+        showSnackBar(context,
+            message: 'File removed',
+            icon: const Icon(Icons.delete_outline_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),

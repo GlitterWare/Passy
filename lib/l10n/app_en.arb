@@ -313,5 +313,22 @@
     "yourAccountWillBeStoredLocally1": "Your account will be stored locally ",
     "yourAccountWillBeStoredLocally2Highlighted": "on this device.",
     "@yourAccountWillBeStoredLocally1": { "description": "yourAccountWillBeStoredLocally1 and yourAccountWillBeStoredLocally2Highlighted make up a single message used in the add account screen. yourAccountWillBeStoredLocally2Highlighted is shown in a more noticeable color to increase user attention." },
-    "@yourAccountWillBeStoredLocally2Highlighted": { "description": "yourAccountWillBeStoredLocally1 and yourAccountWillBeStoredLocally2Highlighted make up a single message used in the add account screen. yourAccountWillBeStoredLocally2Highlighted is shown in a more noticeable color to increase user attention." }
+    "@yourAccountWillBeStoredLocally2Highlighted": { "description": "yourAccountWillBeStoredLocally1 and yourAccountWillBeStoredLocally2Highlighted make up a single message used in the add account screen. yourAccountWillBeStoredLocally2Highlighted is shown in a more noticeable color to increase user attention." },
+    "files": "Files",
+    "noFiles": "No files",
+    "fileType": "File type",
+    "photo": "Photo",
+    "file": "File",
+    "folder": "Folder",
+    "unknown": "Unknown",
+    "plainText": "Plain text",
+    "markdown": "Markdown",
+    "folderName": "Folder name",
+    "fileSize": "File size",
+    "filePreview": "File preview",
+    "failedToDisplayFile": "Failed to display file",
+    "addFile": "Add file",
+    "failedToAddFile": "Failed to add file",
+    "removeFile": "Remove file",
+    "filesCanOnlyBeRestoredFromABackup": "Files can only be restored from a backup"
 }

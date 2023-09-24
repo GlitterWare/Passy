@@ -6,12 +6,15 @@ import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
 import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/confirm_kdbx_export_screen.dart';
 import 'package:passy/screens/export_and_import_screen.dart';
 import 'package:passy/screens/export_screen.dart';
+import 'package:passy/screens/passy_file_screen.dart';
+import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/global_settings_screen.dart';
 import 'package:passy/screens/import_screen.dart';
 import 'package:passy/screens/key_derivation_screen.dart';
@@ -131,6 +134,7 @@ class Passy extends StatelessWidget {
       ],
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
+        AddFileScreen.routeName: (context) => const AddFileScreen(),
         AutomaticBackupScreen.routeName: (context) =>
             const AutomaticBackupScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
@@ -161,6 +165,8 @@ class Passy extends StatelessWidget {
         ExportAndImportScreen.routeName: (context) =>
             const ExportAndImportScreen(),
         ExportScreen.routeName: (context) => const ExportScreen(),
+        FilesScreen.routeName: (context) => const FilesScreen(),
+        PassyFileScreen.routeName: (context) => const PassyFileScreen(),
         GlobalSettingsScreen.routeName: (context) =>
             const GlobalSettingsScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
