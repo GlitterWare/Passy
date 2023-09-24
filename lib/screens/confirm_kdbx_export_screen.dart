@@ -7,6 +7,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/splash_screen.dart';
+import 'package:path/path.dart' as path;
 
 import 'export_screen.dart';
 import 'log_screen.dart';
@@ -48,14 +49,19 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
     }
     try {
       MainScreen.shouldLockScreen = false;
-      String? _expDir = await FilePicker.platform.getDirectoryPath(
+      String? _expFile = await FilePicker.platform.saveFile(
         dialogTitle: localizations.exportPassy,
         lockParentWindow: true,
+        fileName:
+            'passy-kdbx-export-${_account.username}-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip',
       );
-      if (_expDir == null) return;
+      if (_expFile == null) return;
+      File _file = File(_expFile);
       Navigator.pushNamed(context, SplashScreen.routeName);
       await _account.exportKdbx(
-          outputDirectory: Directory(_expDir), password: _newPassword);
+          outputDirectory: _file.parent,
+          password: _newPassword,
+          fileName: path.basename(_file.path));
       Navigator.pop(context);
       Navigator.pop(context);
       showSnackBar(context,
