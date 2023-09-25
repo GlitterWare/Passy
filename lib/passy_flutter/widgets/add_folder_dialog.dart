@@ -27,7 +27,7 @@ class _AddFolderDialog extends State<AddFolderDialog> {
           PassyPadding(TextFormField(
             autofocus: true,
             inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'[\\/:*?"<>|]'))
+              FilteringTextInputFormatter.deny(RegExp(r'[\\\/:*?"<>|]'))
             ],
             decoration: InputDecoration(labelText: localizations.folderName),
             initialValue: _value,
