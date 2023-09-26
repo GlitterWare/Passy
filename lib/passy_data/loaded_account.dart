@@ -454,6 +454,34 @@ class LoadedAccount {
     _autoSyncCompleter = null;
   }
 
+  Future<void> _exportFiles(Directory dir) async {
+    if (await dir.exists()) {
+      List<FileSystemEntity> files = await dir.list().toList();
+      if (files.isNotEmpty) throw 'Directory is not empty';
+    } else {
+      await dir.create(recursive: true);
+    }
+    List<String> dirs = [''];
+    List<PassyFsMeta> metaValues =
+        (await _fileIndex.getMetadata()).values.toList();
+    for (PassyFsMeta meta in metaValues) {
+      List<String> pathSplit = meta.virtualPath.split('/');
+      String subDir = pathSplit
+          .sublist(0, pathSplit.length - 1)
+          .join(Platform.pathSeparator);
+      if (!dirs.contains(subDir)) {
+        String subDirPart = '';
+        for (int i = 1; i != pathSplit.length - 1; i++) {
+          subDirPart += Platform.pathSeparator + pathSplit[i];
+          await Directory(dir.path + subDirPart).create(recursive: true);
+          dirs.add(subDirPart);
+        }
+      }
+      await _fileIndex.saveDecrypted(meta.key,
+          file: File(dir.path + subDir + Platform.pathSeparator + meta.name));
+    }
+  }
+
   Future<String> exportPassy({
     required Directory outputDirectory,
     String? fileName,
@@ -483,6 +511,8 @@ class LoadedAccount {
       await _tempAccDir.delete(recursive: true);
       await _tempAccDir.create();
       _jsonAcc.saveSync();
+      await _exportFiles(
+          Directory(_tempAccDir.path + Platform.pathSeparator + 'files'));
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
@@ -550,6 +580,7 @@ class LoadedAccount {
           .writeAsString(encoder.convert(_history.value.toJson()));
       await File('${tempPath}favorites.json')
           .writeAsString(encoder.convert(_favorites.value.toJson()));
+      await _exportFiles(Directory('${tempPath}files'));
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
@@ -617,6 +648,7 @@ class LoadedAccount {
           .writeAsString(encoder.convert(_history.value.toJson()));
       await File('${tempPath}favorites.json')
           .writeAsString(encoder.convert(_favorites.value.toJson()));
+      await _exportFiles(Directory('${tempPath}files'));
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
