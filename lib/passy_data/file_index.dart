@@ -215,31 +215,35 @@ class FileIndex {
           Platform.pathSeparator +
           'passy-set-file-index-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      tempFile = await _file.rename(tempPath);
-      await _file.create();
+      tempFile = await File(tempPath).create();
     }
-    await _file.writeAsString('');
-    RandomAccessFile raf = await _file.open(mode: FileMode.append);
-    RandomAccessFile tempRaf = await tempFile.open();
+    RandomAccessFile raf = await _file.open();
+    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
 
-    await processLinesAsync(tempRaf, lineDelimiter: ',',
+    await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (key, eofReached) async {
       if (eofReached) return true;
-      String? entry = readLine(tempRaf, lineDelimiter: '\n');
+      String? entry = readLine(raf, lineDelimiter: '\n');
       if (entry == null) return true;
       List<String> entrySplit = entry.split(',');
       IV iv = IV.fromBase64(entrySplit[0]);
       PassyFsMeta meta = PassyFsMeta.fromCSV(
           csvDecode(decrypt(entrySplit[2], encrypter: _encrypter, iv: iv)))!;
       if (meta.virtualPath.startsWith(path)) {
-        skipLine(tempRaf, lineDelimiter: '\n');
+        skipLine(raf, lineDelimiter: '\n');
         return null;
       }
-      await raf.writeString('$key,$entry\n');
+      await tempRaf.writeString('$key,$entry\n');
       return null;
     });
     await raf.close();
     await tempRaf.close();
+    await _file.writeAsString('');
+    raf = await _file.open(mode: FileMode.write);
+    await for (List<int> bytes in tempFile.openRead()) {
+      await raf.writeFrom(bytes);
+    }
+    await raf.close();
     await tempFile.delete();
   }
 
