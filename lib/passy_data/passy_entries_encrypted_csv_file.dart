@@ -267,20 +267,18 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      _tempFile = await _file.rename(_tempPath);
-      await _file.create();
+      _tempFile = await File(_tempPath).create();
     }
-    await _file.writeAsString('');
-    RandomAccessFile _raf = await _file.open(mode: FileMode.append);
-    RandomAccessFile _tempRaf = await _tempFile.open();
+    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
     void _onEOF() {
       for (T? entry in entries.values) {
         if (entry == null) continue;
-        _raf.writeStringSync(_encodeEntryForSaving(entry.toCSV()));
+        _tempRaf.writeStringSync(_encodeEntryForSaving(entry.toCSV()));
       }
     }
 
-    await processLinesAsync(_tempRaf, lineDelimiter: ',',
+    await processLinesAsync(_raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
       if (eofReached) {
         _onEOF();
@@ -289,22 +287,28 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       if (entries.containsKey(_key)) {
         T? entry = entries[_key];
         entries.remove(_key);
-        skipLine(_tempRaf, lineDelimiter: '\n', onEOF: _onEOF);
+        skipLine(_raf, lineDelimiter: '\n', onEOF: _onEOF);
         if (entry == null) return null;
-        await _raf.writeString(_encodeEntryForSaving(entry.toCSV()));
+        await _tempRaf.writeString(_encodeEntryForSaving(entry.toCSV()));
         return null;
       }
-      String? _entry = readLine(_tempRaf, lineDelimiter: '\n', onEOF: _onEOF);
+      String? _entry = readLine(_raf, lineDelimiter: '\n', onEOF: _onEOF);
       if (_entry == null) {
         _onEOF();
         return true;
       }
-      await _raf.writeString('$_key,$_entry\n');
+      await _tempRaf.writeString('$_key,$_entry\n');
       return null;
     });
     _onEOF();
     await _raf.close();
     await _tempRaf.close();
+    await _file.writeAsString('');
+    _raf = await _file.open(mode: FileMode.write);
+    await for (List<int> bytes in _tempFile.openRead()) {
+      await _raf.writeFrom(bytes);
+    }
+    await _raf.close();
     await _tempFile.delete();
   }
 
