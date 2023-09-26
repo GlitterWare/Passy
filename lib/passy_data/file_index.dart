@@ -241,9 +241,11 @@ class FileIndex {
     bool isNotCorrupted = false;
     RandomAccessFile raf = await _file.open(mode: FileMode.append);
     RandomAccessFile tempRaf = await tempFile.open();
+    List<String> keys = [];
 
     await processLinesAsync(tempRaf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
+      keys.add(_key);
       if (eofReached) return true;
       String? entry = readLine(tempRaf, lineDelimiter: '\n');
       if (entry == null) return true;
@@ -267,8 +269,8 @@ class FileIndex {
     Key _oldKey = _key;
     _key = key;
     _encrypter = encrypter;
-    for (MapEntry<String, PassyFsMeta> meta in (await getMetadata()).entries) {
-      File file = File(_saveDir.path + Platform.pathSeparator + meta.key);
+    for (String fileKey in keys) {
+      File file = File(_saveDir.path + Platform.pathSeparator + fileKey);
       PassyBinaryFile oldFile = PassyBinaryFile(file: file, key: _oldKey);
       PassyBinaryFile newFile = PassyBinaryFile(file: file, key: key);
       newFile.encrypt(input: await oldFile.readAsBytes());
