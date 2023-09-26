@@ -146,6 +146,7 @@ class FileIndex {
     await for (List<int> bytes in tempFile.openRead()) {
       await raf.writeFrom(bytes);
     }
+    await raf.close();
     await tempFile.delete();
   }
 
