@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
@@ -34,7 +36,7 @@ class FileIndex {
     }
     processLines(_raf, onLine: (entry, eofReached) {
       List<String> decoded = entry.split(',');
-      String decrypted = decrypt(decoded[1],
+      String decrypted = decrypt(decoded[2],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
       PassyFsMeta meta =
           PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
@@ -59,7 +61,7 @@ class FileIndex {
       _entry = readLine(_raf);
       if (_entry == null) return true;
       List<String> _decoded = _entry!.split(',');
-      _entry = decrypt(_decoded[1],
+      _entry = decrypt(_decoded[2],
           encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
       return true;
     });
@@ -81,7 +83,7 @@ class FileIndex {
 
   String _encodeEntryForSaving(PassyFsMeta _entry) {
     IV _iv = IV.fromSecureRandom(16);
-    return '${_entry.key},${_iv.base64},${encrypt(csvEncode(_entry.toCSV()), encrypter: _encrypter, iv: _iv)}\n';
+    return '${_entry.key},${_iv.base64},${sha256.convert(utf8.encode(_entry.virtualPath)).toString()},${encrypt(csvEncode(_entry.toCSV()), encrypter: _encrypter, iv: _iv)}\n';
   }
 
   Future<void> _setEntry(String key, PassyFsMeta? entry) async {
@@ -140,7 +142,7 @@ class FileIndex {
     }
     await processLinesAsync(_raf, onLine: (entry, eofReached) async {
       List<String> decoded = entry.split(',');
-      String decrypted = decrypt(decoded[1],
+      String decrypted = decrypt(decoded[2],
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
       PassyFsMeta meta =
           PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
@@ -211,7 +213,7 @@ class FileIndex {
       List<String> entrySplit = entry.split(',');
       IV iv = IV.fromBase64(entrySplit[0]);
       PassyFsMeta meta = PassyFsMeta.fromCSV(
-          csvDecode(decrypt(entrySplit[1], encrypter: _encrypter, iv: iv)))!;
+          csvDecode(decrypt(entrySplit[2], encrypter: _encrypter, iv: iv)))!;
       if (meta.virtualPath.startsWith(path)) {
         skipLine(tempRaf, lineDelimiter: '\n');
         return null;
@@ -246,7 +248,7 @@ class FileIndex {
       String? entry = readLine(tempRaf, lineDelimiter: '\n');
       if (entry == null) return true;
       List<String> decoded = entry.split(',');
-      entry = decrypt(decoded[1],
+      entry = decrypt(decoded[2],
           encrypter: oldEncrypterA, iv: IV.fromBase64(decoded[0]));
       IV iv = IV.fromSecureRandom(16);
       entry = encrypt(entry, encrypter: encrypter, iv: iv);
@@ -256,7 +258,7 @@ class FileIndex {
         await _file.writeAsString('');
         raf = await _file.open(mode: FileMode.append);
       }
-      await raf.writeString('$_key,${iv.base64},$entry\n');
+      await raf.writeString('$_key,${iv.base64},${decoded[1]},$entry\n');
       return null;
     });
     await raf.close();
