@@ -87,49 +87,65 @@ class FileIndex {
   }
 
   Future<void> _setEntry(String key, PassyFsMeta? entry) async {
+    String? fileHash = entry == null
+        ? null
+        : sha256.convert(utf8.encode(entry.virtualPath)).toString();
     File tempFile;
     {
       String tempPath = (Directory.systemTemp).path +
           Platform.pathSeparator +
           'passy-set-file-index-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      tempFile = await _file.copy(tempPath);
+      tempFile = await File(tempPath).create();
     }
-    await _file.writeAsString('');
-    RandomAccessFile raf = await _file.open(mode: FileMode.append);
-    RandomAccessFile tempRaf = await tempFile.open();
+    RandomAccessFile raf = await _file.open();
+    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
     bool isEntrySet = false;
     void onEOF() {
       if (isEntrySet) return;
       if (entry == null) return;
-      raf.writeStringSync(_encodeEntryForSaving(entry));
+      tempRaf.writeStringSync(_encodeEntryForSaving(entry));
       isEntrySet = true;
     }
 
-    await processLinesAsync(tempRaf, lineDelimiter: ',',
+    await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
       if (eofReached) {
         onEOF();
         return true;
       }
       if (_key == key) {
-        skipLine(tempRaf, lineDelimiter: '\n', onEOF: onEOF);
-        isEntrySet = true;
-        if (entry == null) return null;
-        await raf.writeString(_encodeEntryForSaving(entry));
-        return null;
+        if (entry == null) {
+          skipLine(raf, lineDelimiter: '\n', onEOF: onEOF);
+          isEntrySet = true;
+          return null;
+        }
+        await tempRaf.close();
+        await tempFile.delete();
+        throw 'Matching key found: duplicate files not allowed.';
       }
-      String? _entry = readLine(tempRaf, lineDelimiter: '\n', onEOF: onEOF);
+      String? _entry = readLine(raf, lineDelimiter: '\n', onEOF: onEOF);
       if (_entry == null) {
         onEOF();
         return true;
       }
-      await raf.writeString('$_key,$_entry\n');
+      List<String> entrySplit = _entry.split(',');
+      if (fileHash == entrySplit[1]) {
+        await tempRaf.close();
+        await tempFile.delete();
+        throw 'Matching file path found: duplicate paths not allowed.';
+      }
+      await tempRaf.writeString('$_key,$_entry\n');
       return null;
     });
     onEOF();
     await raf.close();
     await tempRaf.close();
+    await _file.writeAsString('');
+    raf = await _file.open(mode: FileMode.write);
+    await for (List<int> bytes in tempFile.openRead()) {
+      await raf.writeFrom(bytes);
+    }
     await tempFile.delete();
   }
 
