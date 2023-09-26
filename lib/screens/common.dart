@@ -23,7 +23,6 @@ import 'package:passy/screens/id_cards_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/screens/payment_cards_screen.dart';
-import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zxing2/qrcode.dart';
 
