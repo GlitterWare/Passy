@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/main.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
@@ -84,7 +85,8 @@ class _AddFileScreen extends State<AddFileScreen> {
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
         action: SnackBarAction(
           label: localizations.details,
-          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+          onPressed: () => Navigator.pushNamed(
+              navigatorKey.currentContext!, LogScreen.routeName,
               arguments: e.toString() + '\n' + s.toString()),
         ),
       );
