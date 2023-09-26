@@ -256,36 +256,34 @@ class FileIndex {
           Platform.pathSeparator +
           'passy-set-file-index-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      tempFile = await _file.rename(tempPath);
-      await _file.create();
+      tempFile = await File(tempPath).create();
     }
-    bool isNotCorrupted = false;
-    RandomAccessFile raf = await _file.open(mode: FileMode.append);
-    RandomAccessFile tempRaf = await tempFile.open();
+    RandomAccessFile raf = await _file.open();
+    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
     List<String> keys = [];
 
-    await processLinesAsync(tempRaf, lineDelimiter: ',',
+    await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
       keys.add(_key);
       if (eofReached) return true;
-      String? entry = readLine(tempRaf, lineDelimiter: '\n');
+      String? entry = readLine(raf, lineDelimiter: '\n');
       if (entry == null) return true;
       List<String> decoded = entry.split(',');
       entry = decrypt(decoded[2],
           encrypter: oldEncrypterA, iv: IV.fromBase64(decoded[0]));
       IV iv = IV.fromSecureRandom(16);
       entry = encrypt(entry, encrypter: encrypter, iv: iv);
-      if (!isNotCorrupted) {
-        isNotCorrupted = true;
-        await raf.close();
-        await _file.writeAsString('');
-        raf = await _file.open(mode: FileMode.append);
-      }
-      await raf.writeString('$_key,${iv.base64},${decoded[1]},$entry\n');
+      await tempRaf.writeString('$_key,${iv.base64},${decoded[1]},$entry\n');
       return null;
     });
     await raf.close();
     await tempRaf.close();
+    await _file.writeAsString('');
+    raf = await _file.open(mode: FileMode.write);
+    await for (List<int> bytes in tempFile.openRead()) {
+      await raf.writeFrom(bytes);
+    }
+    await raf.close();
     await tempFile.delete();
     Key _oldKey = _key;
     _key = key;
