@@ -84,34 +84,32 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
           Platform.pathSeparator +
           'passy-set-entries-${entryTypeFromType(T)}-' +
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
-      _tempFile = await _file.rename(_tempPath);
-      await _file.create();
+      _tempFile = await File(_tempPath).create();
     }
-    bool isNotCorrupted = false;
-    RandomAccessFile _raf = await _file.open(mode: FileMode.append);
-    RandomAccessFile _tempRaf = await _tempFile.open();
+    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
 
-    await processLinesAsync(_tempRaf, lineDelimiter: ',',
+    await processLinesAsync(_raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
       if (eofReached) return true;
-      String? _entry = readLine(_tempRaf, lineDelimiter: '\n');
+      String? _entry = readLine(_raf, lineDelimiter: '\n');
       if (_entry == null) return true;
       List<String> _decoded = _entry.split(',');
       _entry = decrypt(_decoded[1],
           encrypter: oldEncrypterA, iv: IV.fromBase64(_decoded[0]));
       IV _iv = IV.fromSecureRandom(16);
       _entry = encrypt(_entry, encrypter: encrypter, iv: _iv);
-      if (!isNotCorrupted) {
-        isNotCorrupted = true;
-        await _raf.close();
-        await _file.writeAsString('');
-        _raf = await _file.open(mode: FileMode.append);
-      }
-      await _raf.writeString('$_key,${_iv.base64},$_entry\n');
+      await _tempRaf.writeString('$_key,${_iv.base64},$_entry\n');
       return null;
     });
     await _raf.close();
     await _tempRaf.close();
+    await _file.writeAsString('');
+    _raf = await _file.open(mode: FileMode.write);
+    await for (List<int> bytes in _tempFile.openRead()) {
+      await _raf.writeFrom(bytes);
+    }
+    await _raf.close();
     await _tempFile.delete();
     _encrypter = encrypter;
   }
