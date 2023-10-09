@@ -76,19 +76,33 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         return SingleChildScrollView(child: PassyMarkdownBody(data: text));
       case FileEntryType.photo:
         if (widget.name.endsWith('.svg')) {
-          return SvgPicture.memory(
-            data,
-            height: 10000000000000,
-            width: 10000000000000,
+          return MouseRegion(
+            cursor: SystemMouseCursors.zoomIn,
+            child: InteractiveViewer(
+              minScale: 1,
+              maxScale: 4,
+              child: SvgPicture.memory(
+                data,
+                height: 10000000000000,
+                width: 10000000000000,
+              ),
+            ),
           );
         }
-        return Image.memory(
-          data,
-          errorBuilder: (context, error, stackTrace) =>
-              _buildErrorWidget(error, stackTrace),
-          scale: 0.0000000000001,
-          height: 10000000000000,
-          width: 10000000000000,
+        return MouseRegion(
+          cursor: SystemMouseCursors.zoomIn,
+          child: InteractiveViewer(
+            minScale: 1,
+            maxScale: 4,
+            child: Image.memory(
+              data,
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildErrorWidget(error, stackTrace),
+              scale: 0.0000000000001,
+              height: 10000000000000,
+              width: 10000000000000,
+            ),
+          ),
         );
       case FileEntryType.folder:
         throw 'Unknown entry type.';
