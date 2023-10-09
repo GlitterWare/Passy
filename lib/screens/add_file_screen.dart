@@ -52,8 +52,8 @@ class _AddFileScreen extends State<AddFileScreen> {
       case FileEntryType.markdown:
         newFileMeta.type = PassyFileType.markdown;
         break;
-      case FileEntryType.imageRaster:
-        newFileMeta.type = PassyFileType.imageRaster;
+      case FileEntryType.photo:
+        newFileMeta.type = PassyFileType.photo;
         break;
       case FileEntryType.unknown:
         newFileMeta.type = PassyFileType.unknown;
@@ -67,7 +67,10 @@ class _AddFileScreen extends State<AddFileScreen> {
     setState(() {
       _fileMeta = newFileMeta;
       _preview = PassyFileWidget(
-          path: args.file.path, isEncrypted: false, type: args.type);
+          path: args.file.path,
+          name: basename(args.file.path),
+          isEncrypted: false,
+          type: args.type);
       _previewKey = GlobalKey();
     });
   }
@@ -172,7 +175,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                         decoration:
                             InputDecoration(labelText: localizations.fileType),
                         values: const [
-                          FileEntryType.imageRaster,
+                          FileEntryType.photo,
                           FileEntryType.plainText,
                           FileEntryType.markdown,
                           FileEntryType.file,
@@ -183,7 +186,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                               return Text(localizations.plainText);
                             case FileEntryType.markdown:
                               return Text(localizations.markdown);
-                            case FileEntryType.imageRaster:
+                            case FileEntryType.photo:
                               return Text(localizations.photo);
                             case FileEntryType.file:
                               return Text(localizations.unknown);

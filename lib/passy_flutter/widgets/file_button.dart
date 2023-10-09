@@ -23,7 +23,7 @@ class FileButton extends StatelessWidget {
           colorFilter: const ColorFilter.mode(
               PassyTheme.lightContentColor, BlendMode.srcIn),
         );
-      case FileEntryType.imageRaster:
+      case FileEntryType.photo:
         return const Icon(Icons.image_outlined);
       case FileEntryType.folder:
         return const Icon(Icons.folder);

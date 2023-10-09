@@ -82,8 +82,8 @@ class _FilesScreen extends State<FilesScreen> {
         case PassyFileType.markdown:
           type = FileEntryType.markdown;
           break;
-        case PassyFileType.imageRaster:
-          type = FileEntryType.imageRaster;
+        case PassyFileType.photo:
+          type = FileEntryType.photo;
           break;
       }
       result.add(FileEntry(
@@ -127,7 +127,7 @@ class _FilesScreen extends State<FilesScreen> {
   }
 
   Future<void> _onAddPhotoPressed(FilesScreenArgs args) =>
-      _onAddFilePressed(args, type: FileEntryType.imageRaster);
+      _onAddFilePressed(args, type: FileEntryType.photo);
 
   Future<void> _onAddPlainTextPressed(FilesScreenArgs args) =>
       _onAddFilePressed(args, type: FileEntryType.plainText);
@@ -181,7 +181,7 @@ class _FilesScreen extends State<FilesScreen> {
           icon: const Icon(Icons.add_rounded),
         ),
         EnumDropdownButton2Item(
-          value: FileEntryType.imageRaster,
+          value: FileEntryType.photo,
           text: Text(
             localizations.photo,
             textAlign: TextAlign.center,
@@ -233,7 +233,7 @@ class _FilesScreen extends State<FilesScreen> {
           case FileEntryType.unknown:
             _onAddFilePressed(args);
             return;
-          case FileEntryType.imageRaster:
+          case FileEntryType.photo:
             _onAddPhotoPressed(args);
             return;
           case FileEntryType.plainText:

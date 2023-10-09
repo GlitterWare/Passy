@@ -5,7 +5,7 @@ enum FileEntryType {
   file,
   plainText,
   markdown,
-  imageRaster,
+  photo,
   folder,
 }
 
@@ -19,8 +19,8 @@ PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
       return PassyFileType.text;
     case FileEntryType.markdown:
       return PassyFileType.markdown;
-    case FileEntryType.imageRaster:
-      return PassyFileType.imageRaster;
+    case FileEntryType.photo:
+      return PassyFileType.photo;
     case FileEntryType.folder:
       return null;
   }

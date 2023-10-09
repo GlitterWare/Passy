@@ -120,16 +120,19 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
             type = PassyFileType.markdown;
             break;
           case 'ico':
-            type = PassyFileType.imageRaster;
+            type = PassyFileType.photo;
             break;
           case 'jpeg':
-            type = PassyFileType.imageRaster;
+            type = PassyFileType.photo;
             break;
           case 'jpg':
-            type = PassyFileType.imageRaster;
+            type = PassyFileType.photo;
             break;
           case 'png':
-            type = PassyFileType.imageRaster;
+            type = PassyFileType.photo;
+            break;
+          case 'svg':
+            type = PassyFileType.photo;
             break;
           default:
             type = PassyFileType.unknown;

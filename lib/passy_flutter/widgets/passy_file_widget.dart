@@ -7,15 +7,18 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/log_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PassyFileWidget extends StatefulWidget {
   final String path;
+  final String name;
   final bool isEncrypted;
   final FileEntryType type;
 
   const PassyFileWidget({
     super.key,
     required this.path,
+    required this.name,
     required this.isEncrypted,
     required this.type,
   });
@@ -71,11 +74,21 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         String text =
             await compute<Uint8List, String>((data) => utf8.decode(data), data);
         return PassyMarkdownBody(data: text);
-      case FileEntryType.imageRaster:
+      case FileEntryType.photo:
+        if (widget.name.endsWith('.svg')) {
+          return SvgPicture.memory(
+            data,
+            height: 10000000000000,
+            width: 10000000000000,
+          );
+        }
         return Image.memory(
           data,
           errorBuilder: (context, error, stackTrace) =>
               _buildErrorWidget(error, stackTrace),
+          scale: 0.0000000000001,
+          height: 10000000000000,
+          width: 10000000000000,
         );
       case FileEntryType.folder:
         throw 'Unknown entry type.';

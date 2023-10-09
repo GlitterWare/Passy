@@ -118,16 +118,17 @@ class _PassyFileScreen extends State<StatefulWidget> {
             hasScrollBody: true,
             child: Column(
               children: [
-                if (args.type == FileEntryType.imageRaster) const Spacer(),
+                if (args.type == FileEntryType.photo) const Spacer(),
                 Flexible(
                   child: PassyPadding(PassyFileWidget(
                     path: args.key,
+                    name: args.title,
                     isEncrypted: true,
                     type: args.type,
                   )),
                   flex: 100,
                 ),
-                if (args.type == FileEntryType.imageRaster) const Spacer(),
+                if (args.type == FileEntryType.photo) const Spacer(),
               ],
             ),
           )
