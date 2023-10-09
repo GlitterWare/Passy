@@ -25,3 +25,16 @@ PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
       return null;
   }
 }
+
+FileEntryType fileEntryTypeFromPassyFileType(PassyFileType type) {
+  switch (type) {
+    case PassyFileType.unknown:
+      return FileEntryType.unknown;
+    case PassyFileType.text:
+      return FileEntryType.plainText;
+    case PassyFileType.markdown:
+      return FileEntryType.markdown;
+    case PassyFileType.photo:
+      return FileEntryType.photo;
+  }
+}

@@ -56,8 +56,10 @@ class _AddFileScreen extends State<AddFileScreen> {
         newFileMeta.type = PassyFileType.photo;
         break;
       case FileEntryType.unknown:
+        args.type = fileEntryTypeFromPassyFileType(newFileMeta.type);
         break;
       case FileEntryType.file:
+        args.type = fileEntryTypeFromPassyFileType(newFileMeta.type);
         break;
       case FileEntryType.folder:
         break;
