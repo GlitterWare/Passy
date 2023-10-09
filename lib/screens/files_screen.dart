@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/file_meta.dart';
@@ -126,15 +125,6 @@ class _FilesScreen extends State<FilesScreen> {
     );
   }
 
-  Future<void> _onAddPhotoPressed(FilesScreenArgs args) =>
-      _onAddFilePressed(args, type: FileEntryType.photo);
-
-  Future<void> _onAddPlainTextPressed(FilesScreenArgs args) =>
-      _onAddFilePressed(args, type: FileEntryType.plainText);
-
-  Future<void> _onAddMarkdownPressed(FilesScreenArgs args) =>
-      _onAddFilePressed(args, type: FileEntryType.markdown);
-
   void _onOpenFolderPressed(FilesScreenArgs args, String? path) async {
     if (path == null) {
       path = await showDialog(
@@ -181,35 +171,6 @@ class _FilesScreen extends State<FilesScreen> {
           icon: const Icon(Icons.add_rounded),
         ),
         EnumDropdownButton2Item(
-          value: FileEntryType.photo,
-          text: Text(
-            localizations.photo,
-            textAlign: TextAlign.center,
-          ),
-          icon: const Icon(Icons.image_outlined),
-        ),
-        EnumDropdownButton2Item(
-          value: FileEntryType.plainText,
-          text: Text(
-            localizations.plainText,
-            textAlign: TextAlign.center,
-          ),
-          icon: const Icon(Icons.description_outlined),
-        ),
-        EnumDropdownButton2Item(
-          value: FileEntryType.markdown,
-          text: Text(
-            localizations.markdown,
-            textAlign: TextAlign.center,
-          ),
-          icon: SvgPicture.asset(
-            'assets/images/file-markdown-svgrepo-com.svg',
-            width: 26,
-            colorFilter: const ColorFilter.mode(
-                PassyTheme.lightContentColor, BlendMode.srcIn),
-          ),
-        ),
-        EnumDropdownButton2Item(
           value: FileEntryType.file,
           text: Text(
             localizations.file,
@@ -230,23 +191,11 @@ class _FilesScreen extends State<FilesScreen> {
       onChanged: (value) {
         if (value == null) return;
         switch (value) {
-          case FileEntryType.unknown:
-            _onAddFilePressed(args);
-            return;
-          case FileEntryType.photo:
-            _onAddPhotoPressed(args);
-            return;
-          case FileEntryType.plainText:
-            _onAddPlainTextPressed(args);
-            return;
-          case FileEntryType.markdown:
-            _onAddMarkdownPressed(args);
-            return;
-          case FileEntryType.file:
-            _onAddFilePressed(args);
-            return;
           case FileEntryType.folder:
             _onOpenFolderPressed(args, null);
+            return;
+          default:
+            _onAddFilePressed(args);
             return;
         }
       },
@@ -277,40 +226,6 @@ class _FilesScreen extends State<FilesScreen> {
                       PassyPadding(Text(localizations.cancel)),
                     ],
                   ),
-                ),
-                PopupMenuItem(
-                  child: Row(
-                    children: [
-                      const PassyPadding(Icon(Icons.image_outlined)),
-                      PassyPadding(Text(localizations.photo)),
-                    ],
-                  ),
-                  onTap: () => _onAddPhotoPressed(args),
-                ),
-                PopupMenuItem(
-                  child: Row(
-                    children: [
-                      const PassyPadding(Icon(Icons.description_outlined)),
-                      PassyPadding(Text(localizations.plainText)),
-                    ],
-                  ),
-                  onTap: () => _onAddPlainTextPressed(args),
-                ),
-                PopupMenuItem(
-                  child: Row(
-                    children: [
-                      PassyPadding(
-                        SvgPicture.asset(
-                          'assets/images/file-markdown-svgrepo-com.svg',
-                          width: 26,
-                          colorFilter: const ColorFilter.mode(
-                              PassyTheme.lightContentColor, BlendMode.srcIn),
-                        ),
-                      ),
-                      PassyPadding(Text(localizations.markdown)),
-                    ],
-                  ),
-                  onTap: () => _onAddMarkdownPressed(args),
                 ),
                 PopupMenuItem(
                   child: Row(
