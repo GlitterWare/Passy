@@ -35,6 +35,7 @@ import 'note_screen.dart';
 import 'password_screen.dart';
 import 'passwords_screen.dart';
 import 'payment_card_screen.dart';
+import 'splash_screen.dart';
 
 bool isAutofill = false;
 
@@ -486,10 +487,41 @@ List<PopupMenuEntry> filePopupMenuBuilder(
       content: Text(localizations.remove),
       icon: const Icon(Icons.delete_outline_rounded),
       onTap: () async {
+        bool? result = await showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                shape: PassyTheme.dialogShape,
+                title: Text(localizations.removeFile),
+                content:
+                    Text('${localizations.filesCanOnlyBeRestoredFromABackup}.'),
+                actions: [
+                  TextButton(
+                    child: Text(
+                      localizations.cancel,
+                      style: const TextStyle(
+                          color: PassyTheme.lightContentSecondaryColor),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  TextButton(
+                    child: Text(
+                      localizations.remove,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                  )
+                ],
+              );
+            });
+        if (result != true) return;
+        Navigator.pushNamed(context, SplashScreen.routeName);
+        await Future.delayed(const Duration(milliseconds: 200));
         if (fileEntry.type == FileEntryType.folder) {
           await data.loadedAccount!.removeFolder(fileEntry.path);
           await (onRemoved?.call());
           if (!context.mounted) return;
+          Navigator.pop(context);
           showSnackBar(context,
               message: 'Folder removed',
               icon: const Icon(Icons.delete_outline_rounded,
@@ -499,6 +531,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         await data.loadedAccount!.removeFile(fileEntry.key);
         await (onRemoved?.call());
         if (!context.mounted) return;
+        Navigator.pop(context);
         showSnackBar(context,
             message: 'File removed',
             icon: const Icon(Icons.delete_outline_rounded,
