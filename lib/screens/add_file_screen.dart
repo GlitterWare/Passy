@@ -178,7 +178,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                           FileEntryType.photo,
                           FileEntryType.plainText,
                           FileEntryType.markdown,
-                          FileEntryType.file,
+                          FileEntryType.unknown,
                         ],
                         itemBuilder: (object) {
                           switch (object) {
