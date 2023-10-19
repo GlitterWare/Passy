@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path/path.dart' as path_lib;
+import 'package:xdg_directories/xdg_directories.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -17,6 +18,15 @@ late AppLocalizations localizations;
 
 Future<Directory> getDocumentsDirectory() async {
   if (Platform.isLinux) {
+    Directory? xdgDir = getUserDirectory('DOCUMENTS');
+    if (xdgDir != null) {
+      try {
+        if (!await xdgDir.exists()) {
+          await xdgDir.create();
+        }
+        return xdgDir;
+      } catch (_) {}
+    }
     Directory documentsDir;
 
     Future<Directory> createFallback() async {
