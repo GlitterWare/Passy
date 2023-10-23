@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as path_lib;
+import 'package:xdg_directories/xdg_directories.dart';
 
 /// Static helper class for determining platform's app data path.
 ///
@@ -81,6 +82,8 @@ class Locator {
   }
 
   static String _findLinux() {
+    Directory? xdgDir = getUserDirectory('DOCUMENTS');
+    if (xdgDir != null) return xdgDir.path;
     String? snapHome = Platform.environment['SNAP_REAL_HOME'];
     if (snapHome == null) {
       return '${Platform.environment['HOME']}/Documents';
