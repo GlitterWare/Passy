@@ -7,6 +7,7 @@ class FileButtonListView extends StatelessWidget {
   final void Function(FileEntry file)? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(
       BuildContext context, FileEntry file)? popupMenuItemBuilder;
+  final Widget Function(BuildContext context, FileEntry file)? buttonBuilder;
   final List<Widget>? topWidgets;
 
   const FileButtonListView({
@@ -15,6 +16,7 @@ class FileButtonListView extends StatelessWidget {
     this.shouldSort = false,
     this.onPressed,
     this.popupMenuItemBuilder,
+    this.buttonBuilder,
     this.topWidgets,
   }) : super(key: key);
 
@@ -26,13 +28,33 @@ class FileButtonListView extends StatelessWidget {
       children: [
         if (topWidgets != null) ...topWidgets!,
         for (FileEntry file in files)
-          PassyPadding(FileButton(
-            file: file,
-            onPressed: onPressed == null ? null : () => onPressed!(file),
-            popupMenuItemBuilder: popupMenuItemBuilder == null
-                ? null
-                : (context) => popupMenuItemBuilder!(context, file),
-          )),
+          Row(
+            children: [
+              Expanded(
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          PassyTheme.passyPadding.left,
+                          PassyTheme.passyPadding.top,
+                          0,
+                          PassyTheme.passyPadding.bottom),
+                      child: FileButton(
+                        file: file,
+                        onPressed:
+                            onPressed == null ? null : () => onPressed!(file),
+                        popupMenuItemBuilder: popupMenuItemBuilder == null
+                            ? null
+                            : (context) => popupMenuItemBuilder!(context, file),
+                      ))),
+              if (buttonBuilder != null)
+                Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        0,
+                        PassyTheme.passyPadding.top,
+                        PassyTheme.passyPadding.right,
+                        PassyTheme.passyPadding.bottom),
+                    child: buttonBuilder!.call(context, file)),
+            ],
+          ),
       ],
     );
   }
