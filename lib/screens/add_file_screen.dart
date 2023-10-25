@@ -93,6 +93,7 @@ class _AddFileScreen extends State<AddFileScreen> {
               arguments: e.toString() + '\n' + s.toString()),
         ),
       );
+      return;
     }
     Navigator.pop(context);
     Navigator.pop(context);
