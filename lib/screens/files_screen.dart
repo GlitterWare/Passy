@@ -153,18 +153,14 @@ class _FilesScreen extends State<FilesScreen> {
         ModalRoute.of(context)!.settings.arguments as FilesScreenArgs? ??
             FilesScreenArgs();
     if (_title == null) {
-      String title = args.path;
       if (args.path == '/sync') {
-        if (args.path == '/sync/attach') {
-          title = localizations.attachments;
-        } else {
-          title = localizations.synchronizedFiles;
-        }
+        _title = localizations.synchronizedFiles;
+      } else if (args.path == '/sync/attach') {
+        _title = localizations.attachments;
       } else {
-        title =
+        _title ??=
             args.path == '/' ? localizations.files : args.path.split('/').last;
       }
-      _title = title;
       listFiles(args.path).then((value) => setState(() => _files = value));
     }
 
