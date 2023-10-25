@@ -154,8 +154,8 @@ class _FilesScreen extends State<FilesScreen> {
             FilesScreenArgs();
     if (_title == null) {
       String title = args.path;
-      if (args.path.startsWith('/sync')) {
-        if (args.path.startsWith('/sync/attach')) {
+      if (args.path == '/sync') {
+        if (args.path == '/sync/attach') {
           title = localizations.attachments;
         } else {
           title = localizations.synchronizedFiles;
