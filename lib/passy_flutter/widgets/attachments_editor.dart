@@ -8,10 +8,14 @@ import 'package:passy/screens/passy_file_screen.dart';
 
 class AttachmentsEditor extends StatefulWidget {
   final List<String> files;
+  final void Function(String key)? onFileAdded;
+  final void Function(String key)? onFileRemoved;
 
   const AttachmentsEditor({
     super.key,
     required this.files,
+    this.onFileAdded,
+    this.onFileRemoved,
   });
 
   @override
@@ -59,8 +63,7 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                 tooltip: localizations.remove,
                 child: const Icon(Icons.remove_rounded),
                 onPressed: () {
-                  widget.files.remove(file.key);
-                  _refresh();
+                  widget.onFileRemoved?.call(file.key);
                 },
               ),
             ),
@@ -100,8 +103,7 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                         .then((value) {
                       if (value is! FilesScreenResult) return _refresh();
                       if (widget.files.contains(value.key)) return _refresh();
-                      setState(() => widget.files.add(value.key));
-                      _refresh();
+                      widget.onFileAdded?.call(value.key);
                     });
                   },
                 ),
