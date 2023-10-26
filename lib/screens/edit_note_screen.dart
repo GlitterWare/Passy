@@ -28,6 +28,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
   String _title = '';
   String _note = '';
   bool _isMarkdown = false;
+  List<String> _attachments = [];
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +41,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         _title = _noteArgs.title;
         _note = _noteArgs.note;
         _isMarkdown = _noteArgs.isMarkdown;
+        _attachments = List.from(_noteArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -51,7 +53,12 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         onSave: () async {
           final LoadedAccount _account = data.loadedAccount!;
           Note _noteArgs = Note(
-              key: _key, title: _title, note: _note, isMarkdown: _isMarkdown);
+            key: _key,
+            title: _title,
+            note: _note,
+            isMarkdown: _isMarkdown,
+            attachments: _attachments,
+          );
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setNote(_noteArgs);
           Navigator.popUntil(
@@ -62,6 +69,12 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
+        AttachmentsEditor(
+          key: UniqueKey(),
+          files: _attachments,
+          onFileAdded: (key) => setState(() => _attachments.add(key)),
+          onFileRemoved: (key) => setState(() => _attachments.remove(key)),
+        ),
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.enableMarkdown),
           left: Padding(

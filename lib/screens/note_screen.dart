@@ -110,6 +110,8 @@ class _NoteScreen extends State<NoteScreen> {
         if (_note.title != '')
           PassyPadding(
               RecordButton(title: localizations.title, value: _note.title)),
+        if (_note.attachments.isNotEmpty)
+          AttachmentsListView(files: _note.attachments),
         if (_note.note != '')
           if (!_note.isMarkdown)
             PassyPadding(RecordButton(
