@@ -364,7 +364,8 @@ class _FilesScreen extends State<FilesScreen> {
               onPressed: (file) {
                 switch (file.type) {
                   case FileEntryType.folder:
-                    _onOpenFolderPressed(args, file.name);
+                    _onOpenFolderPressed(
+                        args, file.path.split(Platform.pathSeparator).last);
                     return;
                   default:
                     _push(
