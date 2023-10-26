@@ -9,7 +9,10 @@ import 'package:passy/screens/passy_file_screen.dart';
 class AttachmentsEditor extends StatefulWidget {
   final List<String> files;
 
-  const AttachmentsEditor({super.key, required this.files});
+  const AttachmentsEditor({
+    super.key,
+    required this.files,
+  });
 
   @override
   State<StatefulWidget> createState() => _AttachmentsEditor();
@@ -18,13 +21,12 @@ class AttachmentsEditor extends StatefulWidget {
 class _AttachmentsEditor extends State<AttachmentsEditor> {
   final LoadedAccount _account = data.loadedAccount!;
   bool _isLoaded = false;
-  List<String> _files = [];
   List<Widget>? _attachments;
 
   Future<void> _refresh() async {
     if (!mounted) return;
     setState(() => _attachments = null);
-    List<FileMeta> meta = (await _account.getFsEntries(_files))
+    List<FileMeta> meta = (await _account.getFsEntries(widget.files))
         .values
         .map((e) => e as FileMeta)
         .toList();
@@ -57,19 +59,13 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                 tooltip: localizations.remove,
                 child: const Icon(Icons.remove_rounded),
                 onPressed: () {
-                  _files.remove(file.key);
+                  widget.files.remove(file.key);
                   _refresh();
                 },
               ),
             ),
           ),
         ]);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _files = List<String>.from(widget.files);
   }
 
   @override
@@ -80,7 +76,7 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
     }
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: _attachments == null && _files.isNotEmpty
+      children: _attachments == null && widget.files.isNotEmpty
           ? const [
               Center(
                 child: CircularProgressIndicator(
@@ -103,8 +99,8 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                                 path: '/sync/attach', attach: true))
                         .then((value) {
                       if (value is! FilesScreenResult) return _refresh();
-                      if (_files.contains(value.key)) return _refresh();
-                      _files.add(value.key);
+                      if (widget.files.contains(value.key)) return _refresh();
+                      setState(() => widget.files.add(value.key));
                       _refresh();
                     });
                   },
