@@ -70,11 +70,13 @@ class _PassyFileWidget extends State<PassyFileWidget> {
       case FileEntryType.plainText:
         String text = await compute<Uint8List, String>(
             (data) => utf8.decode(data, allowMalformed: true), data);
-        return SelectableText(text);
+        return SingleChildScrollView(
+            child: Center(child: SelectableText(text)));
       case FileEntryType.markdown:
         String text =
             await compute<Uint8List, String>((data) => utf8.decode(data), data);
-        return SingleChildScrollView(child: PassyMarkdownBody(data: text));
+        return SingleChildScrollView(
+            child: Center(child: PassyMarkdownBody(data: text)));
       case FileEntryType.photo:
         if (widget.name.endsWith('.svg')) {
           return InkWell(
