@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -76,11 +77,20 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         return SingleChildScrollView(child: PassyMarkdownBody(data: text));
       case FileEntryType.photo:
         if (widget.name.endsWith('.svg')) {
-          return MouseRegion(
-            cursor: SystemMouseCursors.zoomIn,
+          return InkWell(
+            onTap: () => showSnackBar(context,
+                message: localizations.scrollOrPinchToZoom,
+                icon: const Icon(
+                  Icons.zoom_in,
+                  color: PassyTheme.darkContentColor,
+                )),
+            splashFactory: InkRipple.splashFactory,
+            splashColor: Colors.white24,
+            hoverColor: Colors.transparent,
+            mouseCursor: SystemMouseCursors.zoomIn,
             child: InteractiveViewer(
               minScale: 1,
-              maxScale: 4,
+              maxScale: 100,
               child: SvgPicture.memory(
                 data,
                 height: 10000000000000,
@@ -89,11 +99,20 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             ),
           );
         }
-        return MouseRegion(
-          cursor: SystemMouseCursors.zoomIn,
+        return InkWell(
+          onTap: () => showSnackBar(context,
+              message: localizations.scrollOrPinchToZoom,
+              icon: const Icon(
+                Icons.zoom_in,
+                color: PassyTheme.darkContentColor,
+              )),
+          splashFactory: InkRipple.splashFactory,
+          splashColor: Colors.white24,
+          hoverColor: Colors.transparent,
+          mouseCursor: SystemMouseCursors.zoomIn,
           child: InteractiveViewer(
             minScale: 1,
-            maxScale: 4,
+            maxScale: 100,
             child: Image.memory(
               data,
               errorBuilder: (context, error, stackTrace) =>

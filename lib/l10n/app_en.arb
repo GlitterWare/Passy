@@ -333,5 +333,6 @@
     "filesCanOnlyBeRestoredFromABackup": "Files can only be restored from a backup",
     "attachFile": "Attach file",
     "attachments": "Attachments",
-    "synchronizedFiles": "Synchronized files"
+    "synchronizedFiles": "Synchronized files",
+    "scrollOrPinchToZoom": "Scroll or pinch to zoom"
 }
