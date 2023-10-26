@@ -330,5 +330,8 @@
     "addFile": "Add file",
     "failedToAddFile": "Failed to add file",
     "removeFile": "Remove file",
-    "filesCanOnlyBeRestoredFromABackup": "Files can only be restored from a backup"
+    "filesCanOnlyBeRestoredFromABackup": "Files can only be restored from a backup",
+    "attachFile": "Attach file",
+    "attachments": "Attachments",
+    "synchronizedFiles": "Synchronized files"
 }

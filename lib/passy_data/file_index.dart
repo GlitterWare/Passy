@@ -69,16 +69,57 @@ class FileIndex {
     return _entry;
   }
 
+  Future<Map<String, String>> getEntryStrings(List<String> keys) async {
+    Map<String, String> result = {};
+    RandomAccessFile raf = await _file.open();
+    await processLinesAsync(raf, lineDelimiter: ',',
+        onLine: (key, eofReached) async {
+      if (eofReached) return true;
+      if (keys.contains(key)) {
+        String? entry = readLine(raf);
+        if (entry == null) return true;
+        List<String> decoded = entry.split(',');
+        entry = decrypt(decoded[2],
+            encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
+        result[key] = entry;
+        return null;
+      }
+      if (skipLine(raf) == -1) return true;
+      return null;
+    });
+    await raf.close();
+    return result;
+  }
+
   Future<List<dynamic>?> getEntryCSV(String key) async {
     String? _entryString = await getEntryString(key);
     if (_entryString == null) return null;
     return csvDecode(_entryString, recursive: true);
   }
 
+  Future<Map<String, List<dynamic>>> getEntryCSVs(List<String> keys) async {
+    Map<String, List<dynamic>> result = {};
+    Map<String, String> entryStrings = await getEntryStrings(keys);
+    for (MapEntry<String, String> entryString in entryStrings.entries) {
+      result[entryString.key] = csvDecode(entryString.value);
+    }
+    return result;
+  }
+
   Future<PassyFsMeta?> getEntry(String key) async {
     List<dynamic>? _entryJson = await getEntryCSV(key);
     if (_entryJson == null) return null;
     return PassyFsMeta.fromCSV(_entryJson);
+  }
+
+  Future<Map<String, PassyFsMeta>> getEntries(List<String> keys) async {
+    Map<String, PassyFsMeta> result = {};
+    Map<String, List<dynamic>> entryCSVs = await getEntryCSVs(keys);
+    for (MapEntry<String, List<dynamic>> entryCSV in entryCSVs.entries) {
+      PassyFsMeta entry = PassyFsMeta.fromCSV(entryCSV.value) as PassyFsMeta;
+      result[entryCSV.key] = entry;
+    }
+    return result;
   }
 
   String _encodeEntryForSaving(PassyFsMeta _entry) {

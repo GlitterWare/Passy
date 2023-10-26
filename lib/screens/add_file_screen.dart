@@ -14,6 +14,18 @@ import 'common.dart';
 import 'files_screen.dart';
 import 'log_screen.dart';
 
+class AddFileScreenResult {
+  final String title;
+  final String key;
+  final PassyFileType type;
+
+  AddFileScreenResult({
+    required this.title,
+    required this.key,
+    required this.type,
+  });
+}
+
 class AddFileScreen extends StatefulWidget {
   const AddFileScreen({Key? key}) : super(key: key);
 
@@ -78,8 +90,10 @@ class _AddFileScreen extends State<AddFileScreen> {
   Future<void> _onAddPressed(
       BuildContext context, AddFileScreenArgs args) async {
     Navigator.pushNamed(context, SplashScreen.routeName);
+    String key;
     try {
-      await _account.addFile(args.file, useIsolate: true, meta: _fileMeta);
+      key =
+          await _account.addFile(args.file, useIsolate: true, meta: _fileMeta);
     } catch (e, s) {
       showSnackBar(
         context,
@@ -93,10 +107,15 @@ class _AddFileScreen extends State<AddFileScreen> {
               arguments: e.toString() + '\n' + s.toString()),
         ),
       );
+      Navigator.pop(context);
       return;
     }
+    if (!mounted) return;
     Navigator.pop(context);
-    Navigator.pop(context);
+    Navigator.pop(
+        context,
+        AddFileScreenResult(
+            key: key, title: _fileMeta!.name, type: _fileMeta!.type));
   }
 
   @override

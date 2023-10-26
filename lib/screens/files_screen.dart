@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
+import 'package:passy/main.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
@@ -25,9 +26,19 @@ class FilesScreen extends StatefulWidget {
 
 class FilesScreenArgs {
   final String path;
+  final bool attach;
 
   FilesScreenArgs({
     this.path = '/',
+    this.attach = false,
+  });
+}
+
+class FilesScreenResult {
+  final String key;
+
+  FilesScreenResult({
+    required this.key,
   });
 }
 
@@ -46,6 +57,7 @@ class _FilesScreen extends State<FilesScreen> {
     } else {
       selfPathSplit = path.split('/');
     }
+    bool namedDirectoriesAdded = path != '/' && path != '/sync';
     for (dynamic meta in filesMeta) {
       meta = meta as FileMeta;
       List<String> filePathSplit = meta.virtualPath.split('/');
@@ -62,10 +74,20 @@ class _FilesScreen extends State<FilesScreen> {
             filePathSplit.sublist(0, selfPathSplit.length + 1).join('/');
         if (folders.contains(folderPath)) continue;
         folders.add(folderPath);
+        String name;
+        if (folderPath == '/sync') {
+          namedDirectoriesAdded = true;
+          name = localizations.synchronizedFiles;
+        } else if (folderPath == '/sync/attach') {
+          namedDirectoriesAdded = true;
+          name = localizations.attachments;
+        } else {
+          name = filePathSplit[selfPathSplit.length];
+        }
         result.add(FileEntry(
-          key: meta.key,
+          key: '',
           path: folderPath,
-          name: filePathSplit[selfPathSplit.length],
+          name: name,
           type: FileEntryType.folder,
         ));
         continue;
@@ -92,16 +114,64 @@ class _FilesScreen extends State<FilesScreen> {
         type: type,
       ));
     }
+    if (!namedDirectoriesAdded) {
+      String name;
+      String vPath;
+      if (path == '/') {
+        name = localizations.synchronizedFiles;
+        vPath = '/sync';
+        namedDirectoriesAdded = true;
+      } else {
+        name = localizations.attachments;
+        vPath = '/sync/attach';
+        namedDirectoriesAdded = true;
+      }
+      result.add(FileEntry(
+        key: '',
+        path: vPath,
+        name: name,
+        type: FileEntryType.folder,
+      ));
+    }
     return result;
   }
 
   void _push(FilesScreenArgs args, BuildContext context, String screenName,
       dynamic screenArgs) {
+    if (screenName == PassyFileScreen.routeName) {
+      if (args.attach) {
+        FilesScreenResult result =
+            FilesScreenResult(key: (screenArgs as PassyFileScreenArgs).key);
+        Navigator.pop(context, result);
+        return;
+      }
+    }
     Navigator.pushNamed(context, screenName, arguments: screenArgs)
         .then((value) async {
       _files = await listFiles(args.path);
       if (!mounted) return;
       setState(() {});
+
+      if (value == null) return;
+      switch (screenName) {
+        case FilesScreen.routeName:
+          if (value is! FilesScreenResult) return;
+          Navigator.pop(context, value);
+          return;
+        case AddFileScreen.routeName:
+          if (value is! AddFileScreenResult) return;
+          if (args.attach) {
+            Navigator.pop(context, FilesScreenResult(key: value.key));
+            return;
+          }
+          Navigator.pushNamed(context, PassyFileScreen.routeName,
+              arguments: PassyFileScreenArgs(
+                  title: value.title,
+                  key: value.key,
+                  type: fileEntryTypeFromPassyFileType(value.type)));
+          return;
+      }
+      return;
     });
   }
 
@@ -143,7 +213,7 @@ class _FilesScreen extends State<FilesScreen> {
       args,
       context,
       FilesScreen.routeName,
-      FilesScreenArgs(path: path),
+      FilesScreenArgs(path: path, attach: args.attach),
     );
   }
 

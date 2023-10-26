@@ -1,4 +1,5 @@
 export 'add_folder_dialog.dart';
+export 'attachments_editor.dart';
 export 'buttoned_text_form_field.dart';
 export 'confirm_string_scaffold.dart';
 export 'custom_field_button.dart';

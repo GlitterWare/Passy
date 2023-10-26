@@ -1288,6 +1288,8 @@ class LoadedAccount {
 
   // File index wrappers
   Future<Map<String, PassyFsMeta>> getFsMetadata() => _fileIndex.getMetadata();
+  Future<Map<String, PassyFsMeta>> getFsEntries(List<String> keys) =>
+      _fileIndex.getEntries(keys);
   Future<String> addFile(
     File file, {
     bool useIsolate = false,
