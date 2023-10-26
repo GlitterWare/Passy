@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/main.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
