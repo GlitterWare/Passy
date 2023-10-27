@@ -6,6 +6,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/files_screen.dart';
+import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
 class PassyFileScreen extends StatefulWidget {
@@ -33,11 +34,14 @@ class _PassyFileScreen extends State<StatefulWidget> {
   final LoadedAccount _account = data.loadedAccount!;
 
   Future<void> _onExportPressed(PassyFileScreenArgs args) async {
+    MainScreen.shouldLockScreen = false;
     String? expFile = await FilePicker.platform.saveFile(
       fileName: args.title,
       dialogTitle: localizations.export,
       lockParentWindow: true,
     );
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => MainScreen.shouldLockScreen = true);
     if (expFile == null) return;
     Navigator.pushNamed(context, SplashScreen.routeName);
     await Future.delayed(const Duration(milliseconds: 200));
