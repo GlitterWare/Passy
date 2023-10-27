@@ -383,7 +383,7 @@ class _FilesScreen extends State<FilesScreen> {
               popupMenuItemBuilder: (context, file) => filePopupMenuBuilder(
                 context,
                 file,
-                onRemoved: () async {
+                onChanged: () async {
                   _files = await listFiles(args.path);
                   if (!mounted) return;
                   setState(() {});

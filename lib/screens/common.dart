@@ -481,8 +481,28 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
 
 List<PopupMenuEntry> filePopupMenuBuilder(
     BuildContext context, FileEntry fileEntry,
-    {Future<void> Function()? onRemoved}) {
+    {Future<void> Function()? onChanged}) {
   return [
+    if (fileEntry.type != FileEntryType.folder)
+      getIconedPopupMenuItem(
+        content: Text(localizations.rename),
+        icon: const Icon(Icons.edit_outlined),
+        onTap: () async {
+          String? result = await showDialog(
+              context: context, builder: (context) => const RenameFileDialog());
+          if (result == null) return;
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await Future.delayed(const Duration(milliseconds: 200));
+          //await data.loadedAccount!.renameFile(fileEntry.key, result);
+          await (onChanged?.call());
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          showSnackBar(context,
+              message: 'File renamed',
+              icon: const Icon(Icons.edit_outlined,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
     getIconedPopupMenuItem(
       content: Text(localizations.remove),
       icon: const Icon(Icons.delete_outline_rounded),
@@ -519,7 +539,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         await Future.delayed(const Duration(milliseconds: 200));
         if (fileEntry.type == FileEntryType.folder) {
           await data.loadedAccount!.removeFolder(fileEntry.path);
-          await (onRemoved?.call());
+          await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
           showSnackBar(context,
@@ -529,7 +549,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           return;
         }
         await data.loadedAccount!.removeFile(fileEntry.key);
-        await (onRemoved?.call());
+        await (onChanged?.call());
         if (!context.mounted) return;
         Navigator.pop(context);
         showSnackBar(context,

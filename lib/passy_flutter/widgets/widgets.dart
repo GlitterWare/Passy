@@ -34,5 +34,6 @@ export 'payment_card_button_mini.dart';
 export 'payment_card_button.dart';
 export 'record_button.dart';
 export 'record_dialog.dart';
+export 'rename_file_dialog.dart';
 export 'string_generator_dialog.dart';
 export 'three_widget_button.dart';
