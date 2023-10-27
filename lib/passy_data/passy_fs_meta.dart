@@ -3,7 +3,7 @@ import 'package:passy/passy_data/file_meta.dart';
 
 abstract class PassyFsMeta with CSVConvertable {
   final String key;
-  final String name;
+  String name;
   final String virtualPath;
 
   PassyFsMeta({

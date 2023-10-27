@@ -1314,6 +1314,8 @@ class LoadedAccount {
 
   Future<void> removeFile(String key) => _fileIndex.removeFile(key);
   Future<void> removeFolder(String path) => _fileIndex.removeFolder(path);
+  Future<void> renameFile(String key, {required String name}) =>
+      _fileIndex.renameFile(key, name: name);
   Future<void> exportFile(String key, {required File file}) =>
       _fileIndex.saveDecrypted(key, file: file);
 }

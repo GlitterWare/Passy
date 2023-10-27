@@ -489,11 +489,12 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         icon: const Icon(Icons.edit_outlined),
         onTap: () async {
           String? result = await showDialog(
-              context: context, builder: (context) => const RenameFileDialog());
+              context: context,
+              builder: (context) => RenameFileDialog(name: fileEntry.name));
           if (result == null) return;
           Navigator.pushNamed(context, SplashScreen.routeName);
           await Future.delayed(const Duration(milliseconds: 200));
-          //await data.loadedAccount!.renameFile(fileEntry.key, result);
+          await data.loadedAccount!.renameFile(fileEntry.key, name: result);
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);

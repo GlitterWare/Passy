@@ -4,7 +4,12 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class RenameFileDialog extends StatefulWidget {
-  const RenameFileDialog({Key? key}) : super(key: key);
+  final String name;
+
+  const RenameFileDialog({
+    Key? key,
+    required this.name,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _RenameFileDialog();
@@ -15,6 +20,12 @@ class _RenameFileDialog extends State<RenameFileDialog> {
 
   void _onNameChanged(String val) {
     setState(() => _value = val);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.name;
   }
 
   @override

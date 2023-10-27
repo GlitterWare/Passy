@@ -288,6 +288,46 @@ class FileIndex {
     await tempFile.delete();
   }
 
+  Future<void> renameFile(String key, {required String name}) async {
+    File tempFile;
+    {
+      String tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-file-index-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      tempFile = await File(tempPath).create();
+    }
+    RandomAccessFile raf = await _file.open();
+    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
+
+    await processLinesAsync(raf, lineDelimiter: ',',
+        onLine: (_key, eofReached) async {
+      if (eofReached) return true;
+      String? entry = readLine(raf, lineDelimiter: '\n');
+      if (entry == null) return true;
+      List<String> entrySplit = entry.split(',');
+      if (_key == key) {
+        PassyFsMeta? meta = PassyFsMeta.fromCSV(csvDecode(decrypt(entrySplit[2],
+            encrypter: _encrypter, iv: IV.fromBase64(entrySplit[0]))));
+        if (meta == null) return true;
+        meta.name = name;
+        await tempRaf.writeString(_encodeEntryForSaving(meta));
+        return null;
+      }
+      await tempRaf.writeString('$_key,$entry\n');
+      return null;
+    });
+    await raf.close();
+    await tempRaf.close();
+    await _file.writeAsString('');
+    raf = await _file.open(mode: FileMode.write);
+    await for (List<int> bytes in tempFile.openRead()) {
+      await raf.writeFrom(bytes);
+    }
+    await raf.close();
+    await tempFile.delete();
+  }
+
   Future<void> setKey(Key key, {Encrypter? oldEncrypter}) async {
     Encrypter encrypter = Encrypter(AES(key));
     Encrypter oldEncrypterA = oldEncrypter ?? _encrypter;
