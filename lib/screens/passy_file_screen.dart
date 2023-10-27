@@ -9,6 +9,8 @@ import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
+import 'common.dart';
+
 class PassyFileScreen extends StatefulWidget {
   static const String routeName = '${FilesScreen.routeName}/file';
 
@@ -47,6 +49,10 @@ class _PassyFileScreen extends State<StatefulWidget> {
     await Future.delayed(const Duration(milliseconds: 200));
     await _account.exportFile(args.key, file: File(expFile));
     Navigator.pop(context);
+    showSnackBar(context,
+        message: localizations.exportSaved,
+        icon: const Icon(Icons.ios_share_rounded,
+            color: PassyTheme.darkContentColor));
   }
 
   Future<void> _onRemovePressed(PassyFileScreenArgs args) async {
