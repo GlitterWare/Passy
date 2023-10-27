@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/passy_file_screen.dart';
@@ -30,10 +32,23 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
   Future<void> _refresh() async {
     if (!mounted) return;
     setState(() => _attachments = null);
-    List<FileMeta> meta = (await _account.getFsEntries(widget.files))
-        .values
-        .map((e) => e as FileMeta)
-        .toList();
+    Map<String, PassyFsMeta> fsEntries =
+        await _account.getFsEntries(widget.files);
+    List<FileMeta> meta = fsEntries.values.map((e) => e as FileMeta).toList();
+    for (String key in widget.files) {
+      if (fsEntries.containsKey(key)) continue;
+      meta.add(FileMeta(
+        key: key,
+        name: localizations.missingFile,
+        virtualPath: 'NULL',
+        path: 'NULL',
+        changed: DateTime.fromMicrosecondsSinceEpoch(0),
+        modified: DateTime.fromMicrosecondsSinceEpoch(0),
+        accessed: DateTime.fromMicrosecondsSinceEpoch(0),
+        size: 0,
+        type: PassyFileType.unknown,
+      ));
+    }
     if (!mounted) return;
     setState(() => _attachments = [
           FileButtonListView(
