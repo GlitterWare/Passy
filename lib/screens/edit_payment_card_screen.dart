@@ -34,6 +34,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
   String _cardholderName = '';
   String _cvv = '';
   String _exp = '';
+  List<String> _attachments = [];
 
   @override
   void initState() {
@@ -72,6 +73,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
         _cardholderName = _paymentCardArgs.cardholderName;
         _cvv = _paymentCardArgs.cvv;
         _exp = _paymentCardArgs.exp;
+        _attachments = List.from(_paymentCardArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -92,6 +94,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             cardholderName: _cardholderName,
             cvv: _cvv,
             exp: _exp,
+            attachments: _attachments,
           );
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setPaymentCard(_paymentCardArgs);
@@ -117,6 +120,12 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             obscureCardNumber: false,
             obscureCardCvv: false,
             isSwipeGestureEnabled: false,
+          ),
+          AttachmentsEditor(
+            key: UniqueKey(),
+            files: _attachments,
+            onFileAdded: (key) => setState(() => _attachments.add(key)),
+            onFileRemoved: (key) => setState(() => _attachments.remove(key)),
           ),
           PassyPadding(TextFormField(
             initialValue: _nickname,

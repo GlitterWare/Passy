@@ -117,6 +117,8 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           obscureCardCvv: false,
           isSwipeGestureEnabled: false,
         ),
+        if (_paymentCard.attachments.isNotEmpty)
+          AttachmentsListView(files: _paymentCard.attachments),
         if (_paymentCard.nickname != '')
           PassyPadding(RecordButton(
             title: localizations.nickname,

@@ -44,6 +44,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
   String cardholderName;
   String cvv;
   String exp;
+  List<String> attachments;
 
   PaymentCard({
     String? key,
@@ -55,7 +56,9 @@ class PaymentCard extends PassyEntry<PaymentCard> {
     this.cardholderName = '',
     this.cvv = '',
     this.exp = '',
-  })  : customFields = customFields ?? [],
+    List<String>? attachments,
+  })  : attachments = attachments ?? [],
+        customFields = customFields ?? [],
         tags = tags ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
@@ -90,9 +93,14 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         cardholderName = json['cardholderName'] ?? '',
         cvv = json['cvv'] ?? '',
         exp = json['exp'] ?? '',
+        attachments = json['attachments'] == null
+            ? []
+            : (json['attachments'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList(),
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  PaymentCard.fromCSV(List csv)
+  PaymentCard._fromCSV(List csv)
       : customFields =
             (csv[1] as List?)?.map((e) => CustomField.fromCSV(e)).toList() ??
                 [],
@@ -103,7 +111,14 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         cardholderName = csv[6] ?? '',
         cvv = csv[7] ?? '',
         exp = csv[8] ?? '',
+        attachments =
+            (csv[9] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
+
+  factory PaymentCard.fromCSV(List csv) {
+    if (csv.length == 9) csv.add([]);
+    return PaymentCard._fromCSV(csv);
+  }
 
   @override
   int compareTo(PaymentCard other) => nickname.compareTo(other.nickname);
@@ -119,6 +134,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         'cardholderName': cardholderName,
         'cvv': cvv,
         'exp': exp,
+        'attachments': attachments,
       };
 
   @override
@@ -132,6 +148,7 @@ class PaymentCard extends PassyEntry<PaymentCard> {
         cardholderName,
         cvv,
         exp,
+        attachments,
       ];
 
   @override
