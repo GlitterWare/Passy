@@ -113,6 +113,8 @@ class _IdentityScreen extends State<IdentityScreen> {
       ),
       body: ListView(
         children: [
+          if (_identity.attachments.isNotEmpty)
+            AttachmentsListView(files: _identity.attachments),
           if (_identity.nickname != '')
             PassyPadding(RecordButton(
               title: localizations.nickname,

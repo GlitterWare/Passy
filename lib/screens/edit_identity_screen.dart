@@ -42,6 +42,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
   String _zipCode = '';
   String _city = '';
   String _country = '';
+  List<String> _attachments = [];
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +67,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         zipCode: _zipCode,
         city: _city,
         country: _country,
+        attachments: _attachments,
       );
       Navigator.pushNamed(context, SplashScreen.routeName);
       await _account.setIdentity(_identityArgs);
@@ -105,6 +107,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         _zipCode = _identityArgs.zipCode;
         _city = _identityArgs.city;
         _country = _identityArgs.country;
+        _attachments = List.from(_identityArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -116,6 +119,12 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         onSave: _onSave,
       ),
       body: ListView(children: [
+        AttachmentsEditor(
+          key: UniqueKey(),
+          files: _attachments,
+          onFileAdded: (key) => setState(() => _attachments.add(key)),
+          onFileRemoved: (key) => setState(() => _attachments.remove(key)),
+        ),
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(labelText: localizations.nickname),

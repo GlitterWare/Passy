@@ -82,6 +82,7 @@ class Identity extends PassyEntry<Identity> {
   String zipCode;
   String city;
   String country;
+  List<String> attachments;
 
   Identity({
     String? key,
@@ -101,8 +102,10 @@ class Identity extends PassyEntry<Identity> {
     this.zipCode = '',
     this.city = '',
     this.country = '',
+    List<String>? attachments,
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
+        attachments = attachments ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
@@ -132,9 +135,14 @@ class Identity extends PassyEntry<Identity> {
         zipCode = json['zipCode'] ?? '',
         city = json['city'] ?? '',
         country = json['country'] ?? '',
+        attachments = json['attachments'] == null
+            ? []
+            : (json['attachments'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList(),
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  Identity.fromCSV(List csv)
+  Identity._fromCSV(List csv)
       : customFields =
             (csv[1] as List?)?.map((e) => CustomField.fromCSV(e)).toList() ??
                 [],
@@ -153,7 +161,14 @@ class Identity extends PassyEntry<Identity> {
         zipCode = csv[14] ?? '',
         city = csv[15] ?? '',
         country = csv[16] ?? '',
+        attachments =
+            (csv[17] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
+
+  factory Identity.fromCSV(List csv) {
+    if (csv.length == 17) csv.add([]);
+    return Identity._fromCSV(csv);
+  }
 
   @override
   int compareTo(Identity other) => nickname.compareTo(other.nickname);
