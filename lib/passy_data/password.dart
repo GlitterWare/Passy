@@ -46,6 +46,7 @@ class Password extends PassyEntry<Password> {
   String password;
   TFA? tfa;
   String website;
+  List<String> attachments;
 
   Password({
     String? key,
@@ -59,8 +60,10 @@ class Password extends PassyEntry<Password> {
     this.password = '',
     this.tfa,
     this.website = '',
+    List<String>? attachments,
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
+        attachments = attachments ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
@@ -85,9 +88,14 @@ class Password extends PassyEntry<Password> {
         password = json['password'] ?? '',
         tfa = json['tfa'] != null ? TFA.fromJson(json['tfa']) : null,
         website = json['website'] ?? '',
+        attachments = json['attachments'] == null
+            ? []
+            : (json['attachments'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList(),
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  Password.fromCSV(List csv)
+  Password._fromCSV(List csv)
       : customFields = (csv[1] as List<dynamic>?)
                 ?.map((e) => CustomField.fromCSV(e))
                 .toList() ??
@@ -101,7 +109,14 @@ class Password extends PassyEntry<Password> {
         password = csv[8] ?? '',
         tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9]) : null,
         website = csv[10] ?? '',
+        attachments =
+            (csv[11] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
+
+  factory Password.fromCSV(List csv) {
+    if (csv.length == 11) csv.add([]);
+    return Password._fromCSV(csv);
+  }
 
   @override
   int compareTo(Password other) => nickname.compareTo(other.nickname);
@@ -119,6 +134,7 @@ class Password extends PassyEntry<Password> {
         'password': password,
         'tfa': tfa?.toJson(),
         'website': website,
+        'attachments': attachments,
       };
 
   @override
@@ -134,6 +150,7 @@ class Password extends PassyEntry<Password> {
         password,
         tfa?.toCSV() ?? [],
         website,
+        attachments,
       ];
 
   @override

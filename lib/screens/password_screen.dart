@@ -187,6 +187,8 @@ class _PasswordScreen extends State<PasswordScreen> {
       ),
       body: ListView(
         children: [
+          if (password!.attachments.isNotEmpty)
+            AttachmentsListView(files: password!.attachments),
           if (password!.nickname != '')
             PassyPadding(RecordButton(
               title: localizations.nickname,

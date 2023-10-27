@@ -46,6 +46,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   bool _tfaIsGoogle = true;
   bool _tfaIsExpanded = false;
   String _website = '';
+  List<String> _attachments = [];
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +80,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           _tfaIsGoogle = _tfa.isGoogle;
         }
         _website = _passwordArgs.website;
+        _attachments = List.from(_passwordArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -109,6 +111,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                     isGoogle: _tfaIsGoogle,
                   ),
             website: _website,
+            attachments: _attachments,
           );
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setPassword(_passwordArgs);
@@ -133,6 +136,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
+        AttachmentsEditor(
+          key: UniqueKey(),
+          files: _attachments,
+          onFileAdded: (key) => setState(() => _attachments.add(key)),
+          onFileRemoved: (key) => setState(() => _attachments.remove(key)),
+        ),
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(
