@@ -120,7 +120,6 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
       ),
       body: ListView(children: [
         AttachmentsEditor(
-          key: UniqueKey(),
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),

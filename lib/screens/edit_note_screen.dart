@@ -70,7 +70,6 @@ class _EditNoteScreen extends State<EditNoteScreen> {
       ),
       body: ListView(children: [
         AttachmentsEditor(
-          key: UniqueKey(),
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),

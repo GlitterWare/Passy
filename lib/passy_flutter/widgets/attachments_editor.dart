@@ -79,6 +79,7 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                 child: const Icon(Icons.remove_rounded),
                 onPressed: () {
                   widget.onFileRemoved?.call(file.key);
+                  _refresh();
                 },
               ),
             ),
@@ -119,6 +120,7 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                       if (value is! FilesScreenResult) return _refresh();
                       if (widget.files.contains(value.key)) return _refresh();
                       widget.onFileAdded?.call(value.key);
+                      _refresh();
                     });
                   },
                 ),
