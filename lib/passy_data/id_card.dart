@@ -43,6 +43,7 @@ class IDCard extends PassyEntry<IDCard> {
   String issDate;
   String expDate;
   String country;
+  List<String> attachments;
 
   IDCard({
     String? key,
@@ -57,9 +58,11 @@ class IDCard extends PassyEntry<IDCard> {
     this.issDate = '',
     this.expDate = '',
     this.country = '',
+    List<String>? attachments,
   })  : pictures = pictures ?? [],
         customFields = customFields ?? [],
         tags = tags ?? [],
+        attachments = attachments ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
@@ -84,9 +87,14 @@ class IDCard extends PassyEntry<IDCard> {
         issDate = json['issDate'] ?? '',
         expDate = json['expDate'] ?? '',
         country = json['country'] ?? '',
+        attachments = json['attachments'] == null
+            ? []
+            : (json['attachments'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList(),
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
-  IDCard.fromCSV(List csv)
+  IDCard._fromCSV(List csv)
       : customFields =
             (csv[1] as List?)?.map((e) => CustomField.fromCSV(e)).toList() ??
                 [],
@@ -101,7 +109,14 @@ class IDCard extends PassyEntry<IDCard> {
         issDate = csv[9] ?? '',
         expDate = csv[10] ?? '',
         country = csv[11] ?? '',
+        attachments =
+            (csv[12] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
+
+  factory IDCard.fromCSV(List csv) {
+    if (csv.length == 12) csv.add([]);
+    return IDCard._fromCSV(csv);
+  }
 
   @override
   int compareTo(IDCard other) => nickname.compareTo(other.nickname);
@@ -120,6 +135,7 @@ class IDCard extends PassyEntry<IDCard> {
         'issDate': issDate,
         'expDate': expDate,
         'country': country,
+        'attachments': attachments,
       };
 
   @override
@@ -136,6 +152,7 @@ class IDCard extends PassyEntry<IDCard> {
         issDate,
         expDate,
         country,
+        attachments,
       ];
 
   @override

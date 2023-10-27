@@ -38,6 +38,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
   String _issDate = '';
   String _expDate = '';
   String _country = '';
+  List<String> _attachments = [];
 
   void _onSave() async {
     IDCard _idCardArgs = IDCard(
@@ -53,6 +54,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
       issDate: _issDate,
       expDate: _expDate,
       country: _country,
+      attachments: _attachments,
     );
     Navigator.pushNamed(context, SplashScreen.routeName);
     await _account.setIDCard(_idCardArgs);
@@ -88,6 +90,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
         _issDate = _idCardArgs.issDate;
         _expDate = _idCardArgs.expDate;
         _country = _idCardArgs.country;
+        _attachments = List.from(_idCardArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -99,6 +102,12 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
         isNew: _isNew,
       ),
       body: ListView(children: [
+        AttachmentsEditor(
+          key: UniqueKey(),
+          files: _attachments,
+          onFileAdded: (key) => setState(() => _attachments.add(key)),
+          onFileRemoved: (key) => setState(() => _attachments.remove(key)),
+        ),
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(labelText: localizations.nickname),
