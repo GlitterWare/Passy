@@ -504,6 +504,32 @@ List<PopupMenuEntry> filePopupMenuBuilder(
                   color: PassyTheme.darkContentColor));
         },
       ),
+    if (fileEntry.type != FileEntryType.folder)
+      getIconedPopupMenuItem(
+        content: Text(localizations.export),
+        icon: const Icon(Icons.ios_share_rounded),
+        onTap: () async {
+          await Future.delayed(const Duration(milliseconds: 200));
+          String? expFile = await FilePicker.platform.saveFile(
+            fileName: fileEntry.name,
+            dialogTitle: localizations.export,
+            lockParentWindow: true,
+          );
+          if (expFile == null) return;
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await Future.delayed(const Duration(milliseconds: 200));
+          await data.loadedAccount!
+              .exportFile(fileEntry.key, file: File(expFile));
+          Navigator.pop(context);
+          await (onChanged?.call());
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          showSnackBar(context,
+              message: localizations.exportSaved,
+              icon: const Icon(Icons.ios_share_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
     getIconedPopupMenuItem(
       content: Text(localizations.remove),
       icon: const Icon(Icons.delete_outline_rounded),
