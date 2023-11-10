@@ -192,6 +192,7 @@ class Identity extends PassyEntry<Identity> {
         'zipCode': zipCode,
         'city': city,
         'country': country,
+        'attachments': attachments,
       };
 
   @override
@@ -213,6 +214,7 @@ class Identity extends PassyEntry<Identity> {
         zipCode,
         city,
         country,
+        attachments,
       ];
 
   @override
