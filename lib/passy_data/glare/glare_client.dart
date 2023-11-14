@@ -78,8 +78,7 @@ class GlareClient {
     Completer<Map<String, dynamic>?>? commandEvent =
         _commandEvents[argumentsJoined];
     if (commandEvent == null) {
-      _log?.call('W:Unhandled command response:');
-      _log?.call(data);
+      _log?.call('W:Unhandled command response:\n$data');
       return;
     }
     if (!commandEvent.isCompleted) commandEvent.complete(data);

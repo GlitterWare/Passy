@@ -73,14 +73,19 @@ class GlareServer {
       log?.call('I:Client $address connected.');
       socket.done.catchError((Object error) {});
       socket.writeln(serviceInfo);
-      _sockets[address] = GlareServerSocket(socket,
+      GlareServerSocket? serverSocket;
+      serverSocket = GlareServerSocket(socket,
           keypair: keypair, maxIdleMs: maxIdleMs, onDone: () async {
         _sockets.remove(address);
         log?.call('I:Client $address disconnected.');
         if (totalConnections == maxTotalConnections) await _result!.stop();
-      }, onError: (Object error) async {
-        if (totalConnections == maxTotalConnections) await _result!.stop();
+      }, onError: (Object error) {
+        serverSocket!.sendError(error);
+        Future.delayed(const Duration(seconds: 1), () {
+          if (totalConnections == maxTotalConnections) _result!.stop();
+        });
       }, modules: modules);
+      _sockets[address] = serverSocket;
     }, onError: (Object error) => {});
     log?.call(
         'I:Glare server started at ${serverSocket.address.address}:${serverSocket.port}.');
@@ -102,6 +107,11 @@ class GlareServer {
     _isStopped = true;
     await _serverSocket.close();
     _log?.call('I:Glare server stopped.');
+    for (var socket in _sockets.values) {
+      try {
+        socket.destroy();
+      } catch (_) {}
+    }
     _sockets.clear();
   }
 }

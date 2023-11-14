@@ -13,6 +13,7 @@ class GlareServerSocket {
   final int _maxIdleMs;
   DateTime _lastEvent;
   final Map<String, GlareModule> _modules;
+  Map<String, dynamic>? _error;
 
   GlareServerSocket(
     Socket socket, {
@@ -32,6 +33,21 @@ class GlareServerSocket {
       onDone: onDone,
       cancelOnError: cancelOnError,
     );
+  }
+
+  void sendError(Object e) {
+    if (e is! Map<String, dynamic>) e = e.toString();
+    _error = {
+      'type': 'commandResponse',
+      'arguments': ['err'],
+      'data': {
+        'error': e,
+      },
+    };
+  }
+
+  void destroy() {
+    _socket.destroy();
   }
 
   Map<String, dynamic> _executeListModules() {
@@ -145,6 +161,12 @@ class GlareServerSocket {
     if ((now.millisecondsSinceEpoch - _lastEvent.millisecondsSinceEpoch) >
         _maxIdleMs) {
       _socket.destroy();
+      return;
+    }
+    Map<String, dynamic>? err = _error;
+    if (err != null) {
+      _socket.writeJson(err);
+      _error = null;
       return;
     }
     dynamic dataDecoded = data['data'];

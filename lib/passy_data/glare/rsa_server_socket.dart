@@ -62,12 +62,9 @@ class RSAServerSocket {
       : _socket = socket,
         _keyPair = keypair ?? RSAKeypair.fromRandom(keySize: 4096) {
     LineByteStreamSubscription subscription;
-    subscription = LineByteStreamSubscription(_socket.listen(null,
-        onError: (Object error, StackTrace? stackTrace) =>
-            _streamController.addError(error, stackTrace),
-        onDone: () {
-          _streamController.close();
-        }));
+    subscription = LineByteStreamSubscription(_socket.listen(null, onDone: () {
+      _streamController.close();
+    }));
     subscription.onData((data) {
       if (_handshake(data)) {
         String _password = generatePassword();
@@ -76,6 +73,9 @@ class RSAServerSocket {
             _clientPublicKey!.encrypt(jsonEncode({'password': _password})));
         subscription.onData(_onData);
       }
+    });
+    subscription.onError((Object error, StackTrace? stackTrace) {
+      _streamController.addError(error, stackTrace);
     });
     _socket.writeln(jsonEncode({
       'socketVersion': version,

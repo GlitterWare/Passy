@@ -795,7 +795,7 @@ class Synchronization {
               'Malformed server response. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
         };
       }
-      if (response.containsKey('error')) return response['error'];
+      if (response.containsKey('error')) return {'error': response['error']};
       dynamic data = response['data'];
       if (data is! Map<String, dynamic>) {
         return {
@@ -831,6 +831,11 @@ class Synchronization {
         port: port,
         keypair: _rsaKeypair,
         timeout: const Duration(seconds: 10),
+        log: (object) {
+          if (object is! String) return;
+          if (!object.startsWith('W:')) return;
+          _syncLog += '\n\n$object\n\n';
+        },
       );
       _sync2d0d0Client = _safeSync2d0d0Client;
     } catch (e, s) {
