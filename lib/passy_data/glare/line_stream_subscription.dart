@@ -9,11 +9,31 @@ class LineByteStreamSubscription implements StreamSubscription<List<int>> {
   List<int> _data = [];
   void Function(List<int>)? _handleData;
   Function? _handleError;
+  int? _binaryLength;
 
   LineByteStreamSubscription(this._subscription) {
     bool isExceeded = false;
     _subscription.onData((data) {
-      for (int n in data) {
+      int i = 0;
+      int? binLen = _binaryLength;
+      bool binBreak = false;
+      if (binLen != null) {
+        for (i; i != data.length; i++) {
+          int n = data[i];
+          _data.add(n);
+          if (_data.length == binLen) {
+            _binaryLength = null;
+            _handleData?.call(_data);
+            _data = [];
+            binBreak = true;
+            i++;
+            break;
+          }
+        }
+        if (!binBreak) return;
+      }
+      for (i; i != data.length; i++) {
+        int n = data[i];
         if (n == 10) {
           if (isExceeded) {
             try {
@@ -67,4 +87,10 @@ class LineByteStreamSubscription implements StreamSubscription<List<int>> {
 
   @override
   void resume() => _subscription.resume();
+
+  bool receiveBinary(int length) {
+    if (_binaryLength != null) return false;
+    _binaryLength = length;
+    return true;
+  }
 }
