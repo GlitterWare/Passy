@@ -1502,7 +1502,8 @@ Future<void> executeCommand(List<String> command,
                   ...loadedModules,
                   'authenticate': GlareModule(
                     name: 'authenticate',
-                    target: (args, {required addModule}) async {
+                    target: (args,
+                        {required addModule, required readBytes}) async {
                       if (args.length < 5) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1549,7 +1550,8 @@ Future<void> executeCommand(List<String> command,
                   ),
                   'login': GlareModule(
                     name: 'login',
-                    target: (args, {required addModule}) async {
+                    target: (args,
+                        {required addModule, required readBytes}) async {
                       if (args.length < 5) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1656,7 +1658,8 @@ Future<void> executeCommand(List<String> command,
                   ),
                   'getDeviceId': GlareModule(
                     name: 'getDeviceId',
-                    target: (args, {required addModule}) async {
+                    target: (args,
+                        {required addModule, required readBytes}) async {
                       PassyInfoFile infoFile = PassyInfo.fromFile(File(
                           _passyDataPath +
                               Platform.pathSeparator +
@@ -1674,7 +1677,8 @@ Future<void> executeCommand(List<String> command,
                   ),
                   'getTrustedConnection': GlareModule(
                     name: 'getTrustedConnection',
-                    target: (args, {required addModule}) async {
+                    target: (args,
+                        {required addModule, required readBytes}) async {
                       if (args.length < 5) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1726,7 +1730,8 @@ Future<void> executeCommand(List<String> command,
                   ),
                   'setTrustedConnection': GlareModule(
                     name: 'setTrustedConnection',
-                    target: (args, {required addModule}) async {
+                    target: (args,
+                        {required addModule, required readBytes}) async {
                       if (args.length < 7) {
                         throw {
                           'error': {'type': 'Missing arguments'},

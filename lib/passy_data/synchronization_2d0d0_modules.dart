@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/account_settings.dart';
@@ -55,7 +56,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   return {
     apiVersion: GlareModule(
       name: 'Passy 2.0.0+ Synchronization Modules',
-      target: (args, {required addModule}) async {
+      target: (args, {required addModule, required readBytes}) async {
         if (args.length == 3) {
           return {
             'commands': [
@@ -102,6 +103,22 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         }
 
         switch (args[3]) {
+          case 'readBytes':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            Map<String, dynamic> response = await readBytes(2);
+            if (response.containsKey('error')) return response;
+            dynamic bytes = response['bytes'];
+            if (bytes is! Uint8List) {
+              throw {
+                'error': {
+                  'type': 'Internal error',
+                  'exception':
+                      'Bytes of invalid type, expected `Uint8List`, received `${bytes.runtimeType}`',
+                },
+              };
+            }
+            return {'status': bytes};
           case 'checkAccount':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;

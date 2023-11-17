@@ -131,6 +131,10 @@ class RSAClientSocket {
     );
   }
 
+  void add(List<int> bytes) {
+    _socket.add(bytes);
+  }
+
   void writeJson(Map<String, dynamic> data) {
     if (_encrypter == null) return;
     String encoded = jsonEncode(data);

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypton/crypton.dart';
 
@@ -14,6 +16,7 @@ class GlareServerSocket {
   DateTime _lastEvent;
   final Map<String, GlareModule> _modules;
   Map<String, dynamic>? _error;
+  Completer<Uint8List>? _binaryCompleter;
 
   GlareServerSocket(
     Socket socket, {
@@ -101,8 +104,22 @@ class GlareServerSocket {
     }
     _lastEvent = DateTime.now().toUtc();
     try {
-      Map<String, dynamic>? result = await module.run(args,
-          addModule: (key, module) => _modules[key] = module);
+      Map<String, dynamic>? result = await module.run(
+        args,
+        addModule: (key, module) => _modules[key] = module,
+        readBytes: (int len) async {
+          Map<String, dynamic> openResult =
+              await _openBinaryChannel(len, module, args);
+          if (openResult.containsKey('error')) return openResult;
+          Completer<Uint8List>? binaryCompleter = _binaryCompleter;
+          if (binaryCompleter == null) {
+            return {'error': 'Binary completer is null.'};
+          }
+          Uint8List result = await binaryCompleter.future;
+          _binaryCompleter = null;
+          return {'bytes': result};
+        },
+      );
       return {
         'type': 'commandResponse',
         'arguments': args,
@@ -156,6 +173,37 @@ class GlareServerSocket {
     }
   }
 
+  Future<Map<String, dynamic>> _openBinaryChannel(
+      int length, GlareModule callback, List arguments) async {
+    if (!_socket.readBytes(length)) {
+      return {
+        'error': {
+          'type': 'Binary channel busy',
+          'description':
+              'Can not open more than binary channel at the same time',
+        }
+      };
+    }
+    _binaryCompleter = Completer<Uint8List>();
+    _socket.writeJson({
+      'type': 'commandResponse',
+      'arguments': arguments,
+      'action': {
+        'name': 'readBytes',
+        'status': 'ok',
+        'length': length.toString(),
+      },
+      'data': {
+        'result': {
+          'status': 'ok',
+        }
+      },
+    });
+    return {
+      'status': 'ok',
+    };
+  }
+
   Future<void> onData(Map<String, dynamic> data) async {
     DateTime now = DateTime.now().toUtc();
     if ((now.millisecondsSinceEpoch - _lastEvent.millisecondsSinceEpoch) >
@@ -167,6 +215,15 @@ class GlareServerSocket {
     if (err != null) {
       _socket.writeJson(err);
       _error = null;
+      return;
+    }
+    if (_binaryCompleter != null) {
+      if (data.containsKey('bytes')) {
+        dynamic bytes = data['bytes'];
+        if (bytes is! Uint8List) return;
+        _lastEvent = now;
+        _binaryCompleter?.complete(bytes);
+      }
       return;
     }
     dynamic dataDecoded = data['data'];

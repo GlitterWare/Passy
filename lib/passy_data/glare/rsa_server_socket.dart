@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
@@ -10,6 +11,7 @@ import 'line_stream_subscription.dart';
 
 class RSAServerSocket {
   static const version = rsaSocketVersion;
+  late final LineByteStreamSubscription _subscription;
   final Socket _socket;
   final RSAKeypair _keyPair;
   RSAPublicKey? _clientPublicKey;
@@ -17,6 +19,8 @@ class RSAServerSocket {
   final StreamController<Map<String, dynamic>> _streamController =
       StreamController<Map<String, dynamic>>();
   final Completer<void> _handshakeCompleter = Completer();
+  int _binaryIndex = 0;
+  Uint8List? _binaryData;
 
   Future<void> get handshakeComplete => _handshakeCompleter.future;
 
@@ -42,6 +46,19 @@ class RSAServerSocket {
 
   void _onData(List<int> data) {
     if (_encrypter == null) return;
+    Uint8List? binaryData = _binaryData;
+    if (binaryData != null) {
+      for (int d in data) {
+        binaryData[_binaryIndex] = d;
+        _binaryIndex++;
+        if (_binaryIndex == binaryData.length) {
+          _streamController.add({'bytes': _binaryData});
+          _binaryIndex = 0;
+          _binaryData = null;
+        }
+      }
+      return;
+    }
     Map<String, dynamic> decoded = {};
     try {
       String decrypted = '';
@@ -56,6 +73,13 @@ class RSAServerSocket {
       return;
     }
     _streamController.add(decoded);
+  }
+
+  bool readBytes(int length) {
+    if (_binaryData != null) return false;
+    _subscription.receiveBinary(length);
+    _binaryData = Uint8List(length);
+    return true;
   }
 
   RSAServerSocket(Socket socket, {RSAKeypair? keypair})
@@ -77,6 +101,7 @@ class RSAServerSocket {
     subscription.onError((Object error, StackTrace? stackTrace) {
       _streamController.addError(error, stackTrace);
     });
+    _subscription = subscription;
     _socket.writeln(jsonEncode({
       'socketVersion': version,
       'rsa': {'publicKey': _keyPair.publicKey.toString()},

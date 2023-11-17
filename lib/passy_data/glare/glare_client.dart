@@ -16,6 +16,7 @@ class GlareClient {
   late StreamSubscription<Map<String, dynamic>> _socketSubscription;
   final Function(dynamic)? _log;
   final Map<String, Completer<Map<String, dynamic>?>> _commandEvents = {};
+  final Map<String, List<int> Function(int length)> _readBytesEvents = {};
   final Event _onDisconnect = Event();
 
   GlareClient._({
@@ -80,6 +81,26 @@ class GlareClient {
     if (commandEvent == null) {
       _log?.call('W:Unhandled command response:\n$data');
       return;
+    }
+    dynamic action = data['action'];
+    if (action is Map<String, dynamic>) {
+      if (action['name'] == 'readBytes') {
+        if (action.containsKey('error')) {
+          return;
+        }
+        dynamic lengthStr = action['length'];
+        if (lengthStr is! String) return;
+        int length;
+        try {
+          length = int.parse(lengthStr);
+        } catch (_) {
+          return;
+        }
+        List<int>? bytes = _readBytesEvents[argumentsJoined]?.call(length);
+        if (bytes == null) return;
+        _socket.add(bytes);
+        return;
+      }
     }
     if (!commandEvent.isCompleted) commandEvent.complete(data);
     _commandEvents.remove(argumentsJoined);
@@ -237,7 +258,8 @@ class GlareClient {
     };
   }
 
-  Future<Map<String, dynamic>> runModule(List<String> args) async {
+  Future<Map<String, dynamic>> runModule(List<String> args,
+      {List<int> Function(int length)? getBytes}) async {
     if (args.isEmpty) {
       return {
         'type': 'localError',
@@ -252,6 +274,7 @@ class GlareClient {
     await onModulesRun?.future;
     onModulesRun = Completer<Map<String, dynamic>?>();
     _commandEvents[id] = onModulesRun;
+    if (getBytes != null) _readBytesEvents[id] = getBytes;
     writeJson({
       'type': 'command',
       'data': {
