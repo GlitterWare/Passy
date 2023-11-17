@@ -259,7 +259,7 @@ class GlareClient {
   }
 
   Future<Map<String, dynamic>> runModule(List<String> args,
-      {List<int> Function(int length)? getBytes}) async {
+      {List<int> Function(int length)? onReadBytes}) async {
     if (args.isEmpty) {
       return {
         'type': 'localError',
@@ -274,7 +274,7 @@ class GlareClient {
     await onModulesRun?.future;
     onModulesRun = Completer<Map<String, dynamic>?>();
     _commandEvents[id] = onModulesRun;
-    if (getBytes != null) _readBytesEvents[id] = getBytes;
+    if (onReadBytes != null) _readBytesEvents[id] = onReadBytes;
     writeJson({
       'type': 'command',
       'data': {
