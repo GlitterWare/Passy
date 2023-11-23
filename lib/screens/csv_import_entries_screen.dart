@@ -196,7 +196,6 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                 onChanged: (value) {
                   if (value == null) return;
                   setState(() {
-                    print(value);
                     csvToJson[index] = value;
                   });
                 },
