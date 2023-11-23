@@ -23,7 +23,7 @@ Future<Directory> getDocumentsDirectory() async {
       if (xdgDir != null) {
         try {
           if (!await xdgDir.exists()) {
-            await xdgDir.create();
+            await xdgDir.create(recursive: true);
           }
           return xdgDir;
         } catch (_) {}
