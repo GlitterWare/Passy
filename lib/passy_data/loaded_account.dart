@@ -1113,7 +1113,7 @@ class LoadedAccount {
           status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     }
     Future<void> _saveFuture = _passwords
-        .setEntries(Map.fromIterable(passwords.map((e) => MapEntry(e.key, e))));
+        .setEntries(Map.fromEntries(passwords.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -1172,7 +1172,7 @@ class LoadedAccount {
           status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     }
     Future<void> _saveFuture = _notes
-        .setEntries(Map.fromIterable(notes.map((e) => MapEntry(e.key, e))));
+        .setEntries(Map.fromEntries(notes.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -1232,7 +1232,7 @@ class LoadedAccount {
           status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     }
     Future<void> _saveFuture = _paymentCards.setEntries(
-        Map.fromIterable(paymentCards.map((e) => MapEntry(e.key, e))));
+        Map.fromEntries(paymentCards.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -1290,7 +1290,7 @@ class LoadedAccount {
           status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     }
     Future<void> _saveFuture = _idCards
-        .setEntries(Map.fromIterable(idCards.map((e) => MapEntry(e.key, e))));
+        .setEntries(Map.fromEntries(idCards.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -1349,8 +1349,8 @@ class LoadedAccount {
       _history.value.identities[identity.key] = EntryEvent(identity.key,
           status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     }
-    Future<void> _saveFuture = _identities.setEntries(
-        Map.fromIterable(identities.map((e) => MapEntry(e.key, e))));
+    Future<void> _saveFuture = _identities
+        .setEntries(Map.fromEntries(identities.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
