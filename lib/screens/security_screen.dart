@@ -10,6 +10,7 @@ import 'package:passy/screens/key_derivation_screen.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 
 import 'biometric_auth_screen.dart';
+import 'common.dart';
 
 class SecurityScreen extends StatefulWidget {
   static const routeName = '/security';
@@ -95,9 +96,11 @@ class _SecurityScreen extends State<SecurityScreen> {
             onPressed: () => setAutoScreenLock(!loadedAccount.autoScreenLock),
           )),
           PassyPadding(ThreeWidgetButton(
-            color: loadedAccount.keyDerivationType == KeyDerivationType.none
-                ? const Color.fromRGBO(255, 82, 82, 1)
-                : null,
+            color:
+                (loadedAccount.keyDerivationType == KeyDerivationType.none) &&
+                        recommendKeyDerivation
+                    ? const Color.fromRGBO(255, 82, 82, 1)
+                    : null,
             center: Text(localizations.keyDerivation),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),

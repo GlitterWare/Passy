@@ -115,7 +115,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                 arguments: data.loadedAccount!.username),
           )),
           PassyPadding(ThreeWidgetButton(
-              color: _account.keyDerivationType == KeyDerivationType.none
+              color: (_account.keyDerivationType == KeyDerivationType.none) &&
+                      recommendKeyDerivation
                   ? const Color.fromRGBO(255, 82, 82, 1)
                   : null,
               center: Text(localizations.security),

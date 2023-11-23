@@ -170,9 +170,10 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                     });
                   },
                 )),
-                color: _type == KeyDerivationType.none
-                    ? const Color.fromRGBO(255, 82, 82, 1)
-                    : null,
+                color:
+                    (_type == KeyDerivationType.none) && recommendKeyDerivation
+                        ? const Color.fromRGBO(255, 82, 82, 1)
+                        : null,
               ),
               if (_type == KeyDerivationType.argon2)
                 ExpansionPanelList(

@@ -572,7 +572,8 @@ class _MainScreen extends State<MainScreen>
         onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
             .then((value) => setState(() {})),
       )),
-      if (_account.keyDerivationType == KeyDerivationType.none)
+      if ((_account.keyDerivationType == KeyDerivationType.none) &&
+          recommendKeyDerivation)
         PassyPadding(ThreeWidgetButton(
           color: const Color.fromRGBO(255, 82, 82, 1),
           center: Text(localizations.keyDerivation),

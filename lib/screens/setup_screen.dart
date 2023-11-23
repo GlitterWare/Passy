@@ -8,6 +8,8 @@ import 'package:passy/screens/import_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/security_screen.dart';
 
+import 'common.dart';
+
 class SetupScreen extends StatefulWidget {
   static const String routeName = '/setupScreen';
 
@@ -51,7 +53,8 @@ class _SetupScreen extends State<SetupScreen> {
                 child: Icon(Icons.lock_rounded),
               ),
               right: const Icon(Icons.arrow_forward_ios_rounded),
-              color: _account.keyDerivationType == KeyDerivationType.none
+              color: (_account.keyDerivationType == KeyDerivationType.none) &&
+                      recommendKeyDerivation
                   ? const Color.fromRGBO(255, 82, 82, 1)
                   : null,
               onPressed: () =>

@@ -38,6 +38,10 @@ import 'payment_card_screen.dart';
 import 'splash_screen.dart';
 
 bool isAutofill = false;
+final bool recommendKeyDerivation = DateTime.now()
+    .toUtc()
+    .subtract(const Duration(days: 21))
+    .isAfter(DateTime.parse('2023-11-23 17:09:30.339789Z'));
 
 const screenToRouteName = {
   Screen.main: MainScreen.routeName,
