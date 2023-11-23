@@ -44,7 +44,7 @@ class _SynchronizationLogsScreen extends State<SynchronizationLogsScreen> {
     }
     result = [];
     for (MapEntry<DateTime, String> log in logs.entries.toList().reversed) {
-      DateTime date = log.key.toUtc();
+      DateTime date = log.key.toLocal();
       Widget widget = PassyPadding(ThreeWidgetButton(
           center: Text(
               '${date.hour < 10 ? '0' : ''}${date.hour}:${date.minute < 10 ? '0' : ''}${date.minute}:${date.second < 10 ? '0' : ''}${date.second} | ${date.day < 10 ? '0' : ''}${date.day}/${date.month < 10 ? '0' : ''}${date.month}/${date.year}'),
