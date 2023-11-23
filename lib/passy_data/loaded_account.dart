@@ -17,6 +17,7 @@ import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
 import 'package:passy/passy_data/tfa.dart';
+import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -244,6 +245,7 @@ class LoadedAccount {
       derivationInfo: _credentials.value.keyDerivationInfo,
     );
     _encrypter = Encrypter(AES(key));
+    Encrypter oldSyncEncrypter = _syncEncrypter;
     _syncEncrypter = await getSyncEncrypter(
       password,
       derivationType: _credentials.value.keyDerivationType,
@@ -272,6 +274,17 @@ class LoadedAccount {
     await _idCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
     await _identities.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
     await _fileIndex.setKey(key, oldEncrypter: oldEncrypter);
+    Directory trustedConnectionsDir = Directory(_versionFile.parent.path +
+        Platform.pathSeparator +
+        'trusted_connections');
+    if (await trustedConnectionsDir.exists()) {
+      await for (FileSystemEntity entity in trustedConnectionsDir.list()) {
+        File file = File(entity.path);
+        await file.writeAsString(TrustedConnectionData.fromEncrypted(
+                data: await file.readAsString(), encrypter: oldSyncEncrypter)
+            .toEncrypted(_syncEncrypter));
+      }
+    }
   }
 
   KeyDerivationType get keyDerivationType =>
