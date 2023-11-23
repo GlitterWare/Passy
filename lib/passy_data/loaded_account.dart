@@ -749,6 +749,28 @@ class LoadedAccount {
     }
   }
 
+  Future<void> Function(List<PassyEntry> value) setEntries(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return (List<PassyEntry> value) =>
+            setPasswords(value.map((e) => e as Password).toList());
+      case EntryType.paymentCard:
+        return (List<PassyEntry> value) =>
+            setPaymentCards(value.map((e) => e as PaymentCard).toList());
+      case EntryType.note:
+        return (List<PassyEntry> value) =>
+            setNotes(value.map((e) => e as Note).toList());
+      case EntryType.idCard:
+        return (List<PassyEntry> value) =>
+            setIDCards(value.map((e) => e as IDCard).toList());
+      case EntryType.identity:
+        return (List<PassyEntry> value) =>
+            setIdentities(value.map((e) => e as Identity).toList());
+      default:
+        throw Exception('Unsupported entry type \'${type.name}\'');
+    }
+  }
+
   PassyEntry? Function(String key) getEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
@@ -1084,6 +1106,18 @@ class LoadedAccount {
     await _saveFuture;
   }
 
+  Future<void> setPasswords(List<Password> passwords) async {
+    await _history.reload();
+    for (Password password in passwords) {
+      _history.value.passwords[password.key] = EntryEvent(password.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _passwords
+        .setEntries(Map.fromIterable(passwords.map((e) => MapEntry(e.key, e))));
+    await _history.save();
+    await _saveFuture;
+  }
+
   Future<void> removePassword(String key) async {
     await _history.reload();
     EntryEvent? _event = _history.value.passwords[key];
@@ -1127,6 +1161,18 @@ class LoadedAccount {
       lastModified: DateTime.now().toUtc(),
     );
     Future<void> _saveFuture = _notes.setEntry(note.key, entry: note);
+    await _history.save();
+    await _saveFuture;
+  }
+
+  Future<void> setNotes(List<Note> notes) async {
+    await _history.reload();
+    for (Note note in notes) {
+      _history.value.notes[note.key] = EntryEvent(note.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _notes
+        .setEntries(Map.fromIterable(notes.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -1179,6 +1225,18 @@ class LoadedAccount {
     await _saveFuture;
   }
 
+  Future<void> setPaymentCards(List<PaymentCard> paymentCards) async {
+    await _history.reload();
+    for (PaymentCard paymentCard in paymentCards) {
+      _history.value.paymentCards[paymentCard.key] = EntryEvent(paymentCard.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _paymentCards.setEntries(
+        Map.fromIterable(paymentCards.map((e) => MapEntry(e.key, e))));
+    await _history.save();
+    await _saveFuture;
+  }
+
   Future<void> removePaymentCard(String key) async {
     await _history.reload();
     EntryEvent? _event = _history.value.paymentCards[key];
@@ -1225,6 +1283,18 @@ class LoadedAccount {
     await _history.save();
   }
 
+  Future<void> setIDCards(List<IDCard> idCards) async {
+    await _history.reload();
+    for (IDCard idCard in idCards) {
+      _history.value.idCards[idCard.key] = EntryEvent(idCard.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _idCards
+        .setEntries(Map.fromIterable(idCards.map((e) => MapEntry(e.key, e))));
+    await _history.save();
+    await _saveFuture;
+  }
+
   Future<void> removeIDCard(String key) async {
     await _history.reload();
     EntryEvent? _event = _history.value.idCards[key];
@@ -1269,6 +1339,18 @@ class LoadedAccount {
     );
     Future<void> _saveFuture =
         _identities.setEntry(identity.key, entry: identity);
+    await _history.save();
+    await _saveFuture;
+  }
+
+  Future<void> setIdentities(List<Identity> identities) async {
+    await _history.reload();
+    for (Identity identity in identities) {
+      _history.value.identities[identity.key] = EntryEvent(identity.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _identities.setEntries(
+        Map.fromIterable(identities.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
