@@ -119,11 +119,13 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         onSave: _onSave,
       ),
       body: ListView(children: [
+        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
+        */
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(labelText: localizations.nickname),

@@ -69,11 +69,13 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
+        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
+        */
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.enableMarkdown),
           left: Padding(

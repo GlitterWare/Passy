@@ -562,6 +562,7 @@ class _MainScreen extends State<MainScreen>
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
+      /*
       PassyPadding(ThreeWidgetButton(
         center: Text(localizations.files),
         left: const Padding(
@@ -572,6 +573,7 @@ class _MainScreen extends State<MainScreen>
         onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
             .then((value) => setState(() {})),
       )),
+      */
       if ((_account.keyDerivationType == KeyDerivationType.none) &&
           recommendKeyDerivation)
         PassyPadding(ThreeWidgetButton(
@@ -661,7 +663,6 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[0],
                           _screenButtons[1],
                           _screenButtons[2],
-                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                       Expanded(
@@ -677,7 +678,7 @@ class _MainScreen extends State<MainScreen>
                         children: [
                           _screenButtons[6],
                           _screenButtons[7],
-                          _screenButtons[8],
+                          if (_screenButtons.length == 9) _screenButtons[8],
                         ],
                       ))
                     ]);
@@ -690,17 +691,16 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[1],
                           _screenButtons[2],
                           _screenButtons[3],
-                          _screenButtons[4],
+                          if (_screenButtons.length == 9) _screenButtons[8],
                         ]),
                       ),
                       Expanded(
                           child: ListView(
                         children: [
+                          _screenButtons[4],
                           _screenButtons[5],
                           _screenButtons[6],
                           _screenButtons[7],
-                          _screenButtons[8],
-                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                     ]);

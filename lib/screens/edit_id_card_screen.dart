@@ -102,11 +102,13 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
         isNew: _isNew,
       ),
       body: ListView(children: [
+        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
+        */
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(labelText: localizations.nickname),
