@@ -561,7 +561,7 @@ Future<File> copyPassyCLIServer({
       File(copy.parent.path + Platform.pathSeparator + 'autorun.pcli');
   try {
     await autorunFile.writeAsString(_passyServerAutorun
-        .replaceFirst('\$INSTALL_PATH', from.path)
+        .replaceFirst('\$INSTALL_PATH', from.path.replaceAll('\\', '\\\\'))
         .replaceFirst('\$SERVER_ADDRESS', address)
         .replaceFirst('\$SERVER_PORT', port.toString()));
   } catch (_) {
