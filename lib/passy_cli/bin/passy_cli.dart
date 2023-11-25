@@ -37,6 +37,7 @@ import 'package:passy/passy_data/synchronization_2d0d0_modules.dart';
 import 'package:passy/passy_data/autostart.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
 import 'package:passy/passy_data/trusted_connection_data.dart';
+import 'package:win32/win32.dart';
 
 const String helpMsg = '''
 
@@ -62,6 +63,7 @@ Commands:
         - Remove file suffix from path.
     echo [[arguments]]
         - Print out supplied arguments.
+    hide           Hide console window (Windows only)
 
   Version
     version shell  Show shell version.
@@ -817,6 +819,16 @@ Future<void> executeCommand(List<String> command,
     case 'echo':
       if (command.length == 1) break;
       log(command.sublist(1).join(' '), id: id);
+      return;
+    case 'hide':
+      if (_isNativeMessaging) break;
+      try {
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
+      } catch (e, s) {
+        log('passy:hide:Failed to hide window:\n$e\n$s');
+        return;
+      }
+      log('true');
       return;
     case 'version':
       if (command.length == 1) break;
