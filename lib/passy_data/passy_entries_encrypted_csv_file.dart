@@ -104,13 +104,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     });
     await _raf.close();
     await _tempRaf.close();
-    await _file.writeAsString('');
-    _raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in _tempFile.openRead()) {
-      await _raf.writeFrom(bytes);
-    }
-    await _raf.close();
-    await _tempFile.delete();
+    await _file.delete();
+    await _tempFile.rename(_file.absolute.path);
     _encrypter = encrypter;
   }
 
@@ -251,13 +246,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     _onEOF();
     await _raf.close();
     await _tempRaf.close();
-    await _file.writeAsString('');
-    _raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in _tempFile.openRead()) {
-      await _raf.writeFrom(bytes);
-    }
-    await _raf.close();
-    await _tempFile.delete();
+    await _file.delete();
+    await _tempFile.rename(_file.absolute.path);
   }
 
   Future<void> setEntries(Map<String, T?> entries) async {
@@ -303,13 +293,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     _onEOF();
     await _raf.close();
     await _tempRaf.close();
-    await _file.writeAsString('');
-    _raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in _tempFile.openRead()) {
-      await _raf.writeFrom(bytes);
-    }
-    await _raf.close();
-    await _tempFile.delete();
+    await _file.delete();
+    await _tempFile.rename(_file.absolute.path);
   }
 
   Future<void> export(File file,

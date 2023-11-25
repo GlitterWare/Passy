@@ -182,13 +182,8 @@ class FileIndex {
     onEOF();
     await raf.close();
     await tempRaf.close();
-    await _file.writeAsString('');
-    raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in tempFile.openRead()) {
-      await raf.writeFrom(bytes);
-    }
-    await raf.close();
-    await tempFile.delete();
+    await _file.delete();
+    await tempFile.rename(_file.absolute.path);
   }
 
   Future<Map<String, PassyFsMeta>> getMetadata() async {
@@ -279,13 +274,8 @@ class FileIndex {
     });
     await raf.close();
     await tempRaf.close();
-    await _file.writeAsString('');
-    raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in tempFile.openRead()) {
-      await raf.writeFrom(bytes);
-    }
-    await raf.close();
-    await tempFile.delete();
+    await _file.delete();
+    await tempFile.rename(_file.absolute.path);
   }
 
   Future<void> renameFile(String key, {required String name}) async {
@@ -319,13 +309,8 @@ class FileIndex {
     });
     await raf.close();
     await tempRaf.close();
-    await _file.writeAsString('');
-    raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in tempFile.openRead()) {
-      await raf.writeFrom(bytes);
-    }
-    await raf.close();
-    await tempFile.delete();
+    await _file.delete();
+    await tempFile.rename(_file.absolute.path);
   }
 
   Future<void> setKey(Key key, {Encrypter? oldEncrypter}) async {
@@ -359,13 +344,8 @@ class FileIndex {
     });
     await raf.close();
     await tempRaf.close();
-    await _file.writeAsString('');
-    raf = await _file.open(mode: FileMode.write);
-    await for (List<int> bytes in tempFile.openRead()) {
-      await raf.writeFrom(bytes);
-    }
-    await raf.close();
-    await tempFile.delete();
+    await _file.delete();
+    await tempFile.rename(_file.absolute.path);
     Key _oldKey = _key;
     _key = key;
     _encrypter = encrypter;
