@@ -534,6 +534,7 @@ Future<File> copyPassyCLI(Directory from, Directory to) async {
 }
 
 const String _passyServerAutorun = '''
+hide
 upgrade full "\$INSTALL_PATH"
 sync host 2d0d0 \$SERVER_ADDRESS \$SERVER_PORT true
 ipc server start true
