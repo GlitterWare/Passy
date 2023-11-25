@@ -279,7 +279,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      Text.rich(
+                      PassyPadding(Text.rich(
                         TextSpan(
                           text: localizations.doubleClickMessage,
                           children: [
@@ -293,8 +293,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           ],
                         ),
                         textAlign: TextAlign.center,
-                      ),
-                      Text(localizations.doubleClickMessage1),
+                      )),
+                      PassyPadding(Text(localizations.doubleClickMessage1)),
                       PassyPadding(
                         Text.rich(
                           TextSpan(
@@ -356,7 +356,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      Text.rich(
+                      PassyPadding(Text.rich(
                         TextSpan(
                           text: localizations.doubleClickMessage,
                           children: [
@@ -370,8 +370,8 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           ],
                         ),
                         textAlign: TextAlign.center,
-                      ),
-                      Text(localizations.doubleClickMessage1),
+                      )),
+                      PassyPadding(Text(localizations.doubleClickMessage1)),
                       PassyPadding(
                         Text.rich(
                           TextSpan(
