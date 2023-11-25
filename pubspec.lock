@@ -730,8 +730,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "09fc148e80bbaa9f66e3ab7f7f32adacab6b69b1"
-      resolved-ref: "09fc148e80bbaa9f66e3ab7f7f32adacab6b69b1"
+      ref: "7e24cacc9e469b2391cefb6e2619e5ffa9db84f8"
+      resolved-ref: "7e24cacc9e469b2391cefb6e2619e5ffa9db84f8"
       url: "https://github.com/GlitterWare/kdbx.dart.git"
     source: git
     version: "2.4.0"

@@ -76,7 +76,7 @@ dependencies:
   kdbx:
     git:
       url: https://github.com/GlitterWare/kdbx.dart.git
-      ref: 09fc148e80bbaa9f66e3ab7f7f32adacab6b69b1
+      ref: 7e24cacc9e469b2391cefb6e2619e5ffa9db84f8
   dropdown_button2: ^2.3.9
 
 dev_dependencies:

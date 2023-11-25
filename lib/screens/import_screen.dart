@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -51,8 +53,8 @@ class _ImportScreen extends State<ImportScreen> {
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.kdbxImport,
-      type: FileType.custom,
-      allowedExtensions: ['kdbx'],
+      type: Platform.isAndroid ? FileType.any : FileType.custom,
+      allowedExtensions: Platform.isAndroid ? null : ['kdbx'],
       lockParentWindow: true,
     )
         .then(
