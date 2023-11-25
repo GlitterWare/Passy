@@ -98,6 +98,7 @@ Future<String?> backupAccount(
   required String username,
   bool autoFilename = true,
 }) async {
+  if (Platform.isAndroid) autoFilename = true;
   try {
     MainScreen.shouldLockScreen = false;
     String? _fileName;
@@ -143,7 +144,7 @@ Future<String?> backupAccount(
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
         action: SnackBarAction(
-          label: 'Details',
+          label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
               arguments: e.toString() + '\n' + s.toString()),
         ),
@@ -514,11 +515,22 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         icon: const Icon(Icons.ios_share_rounded),
         onTap: () async {
           await Future.delayed(const Duration(milliseconds: 200));
-          String? expFile = await FilePicker.platform.saveFile(
-            fileName: fileEntry.name,
-            dialogTitle: localizations.export,
-            lockParentWindow: true,
-          );
+          String? expFile;
+          if (Platform.isAndroid) {
+            String? expDir = await FilePicker.platform.getDirectoryPath(
+              dialogTitle: localizations.exportPassy,
+              lockParentWindow: true,
+            );
+            if (expDir != null) {
+              expFile = expDir + Platform.pathSeparator + fileEntry.name;
+            }
+          } else {
+            expFile = await FilePicker.platform.saveFile(
+              dialogTitle: localizations.exportPassy,
+              lockParentWindow: true,
+              fileName: fileEntry.name,
+            );
+          }
           if (expFile == null) return;
           Navigator.pushNamed(context, SplashScreen.routeName);
           await Future.delayed(const Duration(milliseconds: 200));

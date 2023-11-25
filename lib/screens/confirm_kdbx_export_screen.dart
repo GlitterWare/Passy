@@ -49,12 +49,24 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
     }
     try {
       MainScreen.shouldLockScreen = false;
-      String? _expFile = await FilePicker.platform.saveFile(
-        dialogTitle: localizations.exportPassy,
-        lockParentWindow: true,
-        fileName:
-            'passy-kdbx-export-${_account.username}-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip',
-      );
+      String fileName =
+          'passy-kdbx-export-${_account.username}-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+      String? _expFile;
+      if (Platform.isAndroid) {
+        String? expDir = await FilePicker.platform.getDirectoryPath(
+          dialogTitle: localizations.exportPassy,
+          lockParentWindow: true,
+        );
+        if (expDir != null) {
+          _expFile = expDir + Platform.pathSeparator + fileName;
+        }
+      } else {
+        _expFile = await FilePicker.platform.saveFile(
+          dialogTitle: localizations.exportPassy,
+          lockParentWindow: true,
+          fileName: fileName,
+        );
+      }
       if (_expFile == null) return;
       File _file = File(_expFile);
       Navigator.pushNamed(context, SplashScreen.routeName);

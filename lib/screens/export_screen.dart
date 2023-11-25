@@ -85,11 +85,22 @@ class _ExportScreen extends State<ExportScreen> {
               'passy-csv-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
           break;
       }
-      String? _expFile = await FilePicker.platform.saveFile(
-        dialogTitle: localizations.exportPassy,
-        lockParentWindow: true,
-        fileName: filename,
-      );
+      String? _expFile;
+      if (Platform.isAndroid) {
+        String? expDir = await FilePicker.platform.getDirectoryPath(
+          dialogTitle: localizations.exportPassy,
+          lockParentWindow: true,
+        );
+        if (expDir != null) {
+          _expFile = expDir + Platform.pathSeparator + filename;
+        }
+      } else {
+        _expFile = await FilePicker.platform.saveFile(
+          dialogTitle: localizations.exportPassy,
+          lockParentWindow: true,
+          fileName: filename,
+        );
+      }
       if (_expFile == null) return;
       switch (type) {
         case _ExportType.passy:

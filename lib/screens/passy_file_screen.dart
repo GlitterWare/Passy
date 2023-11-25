@@ -37,11 +37,22 @@ class _PassyFileScreen extends State<StatefulWidget> {
 
   Future<void> _onExportPressed(PassyFileScreenArgs args) async {
     MainScreen.shouldLockScreen = false;
-    String? expFile = await FilePicker.platform.saveFile(
-      fileName: args.title,
-      dialogTitle: localizations.export,
-      lockParentWindow: true,
-    );
+    String? expFile;
+    if (Platform.isAndroid) {
+      String? expDir = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: localizations.exportPassy,
+        lockParentWindow: true,
+      );
+      if (expDir != null) {
+        expFile = expDir + Platform.pathSeparator + args.title;
+      }
+    } else {
+      expFile = await FilePicker.platform.saveFile(
+        dialogTitle: localizations.exportPassy,
+        lockParentWindow: true,
+        fileName: args.title,
+      );
+    }
     Future.delayed(const Duration(seconds: 2))
         .then((value) => MainScreen.shouldLockScreen = true);
     if (expFile == null) return;
