@@ -18,7 +18,7 @@ import 'glare/glare_client.dart';
 import 'key_derivation_type.dart';
 
 const String passyVersion = '1.7.0';
-const String syncVersion = '2.0.1';
+const String syncVersion = '2.0.2';
 const String accountVersion = '2.3.0';
 
 bool isSnap() {
