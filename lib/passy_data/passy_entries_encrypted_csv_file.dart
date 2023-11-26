@@ -105,7 +105,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.close();
     await _file.delete();
-    await _tempFile.rename(_file.absolute.path);
+    await _tempFile.copy(_file.absolute.path);
+    await _tempFile.delete();
     _encrypter = encrypter;
   }
 
@@ -247,7 +248,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.close();
     await _file.delete();
-    await _tempFile.rename(_file.absolute.path);
+    await _tempFile.copy(_file.absolute.path);
+    await _tempFile.delete();
   }
 
   Future<void> setEntries(Map<String, T?> entries) async {
@@ -294,7 +296,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.close();
     await _file.delete();
-    await _tempFile.rename(_file.absolute.path);
+    await _tempFile.copy(_file.absolute.path);
+    await _tempFile.delete();
   }
 
   Future<void> export(File file,

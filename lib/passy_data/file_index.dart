@@ -183,7 +183,8 @@ class FileIndex {
     await raf.close();
     await tempRaf.close();
     await _file.delete();
-    await tempFile.rename(_file.absolute.path);
+    await tempFile.copy(_file.absolute.path);
+    await tempFile.delete();
   }
 
   Future<Map<String, PassyFsMeta>> getMetadata() async {
@@ -275,7 +276,8 @@ class FileIndex {
     await raf.close();
     await tempRaf.close();
     await _file.delete();
-    await tempFile.rename(_file.absolute.path);
+    await tempFile.copy(_file.absolute.path);
+    await tempFile.delete();
   }
 
   Future<void> renameFile(String key, {required String name}) async {
@@ -310,7 +312,8 @@ class FileIndex {
     await raf.close();
     await tempRaf.close();
     await _file.delete();
-    await tempFile.rename(_file.absolute.path);
+    await tempFile.copy(_file.absolute.path);
+    await tempFile.delete();
   }
 
   Future<void> setKey(Key key, {Encrypter? oldEncrypter}) async {
@@ -345,7 +348,8 @@ class FileIndex {
     await raf.close();
     await tempRaf.close();
     await _file.delete();
-    await tempFile.rename(_file.absolute.path);
+    await tempFile.copy(_file.absolute.path);
+    await tempFile.delete();
     Key _oldKey = _key;
     _key = key;
     _encrypter = encrypter;
