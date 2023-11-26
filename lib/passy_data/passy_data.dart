@@ -445,7 +445,7 @@ class PassyData {
       await info.reload();
       LoadedAccount _account = JSONLoadedAccount.fromDirectory(
               path: _tempAccountPath, deviceId: info.value.deviceId)
-          .toEncryptedCSVLoadedAccount(encrypter, syncEncrypter, key);
+          .toEncryptedCSVLoadedAccount(encrypter, key);
       await _tempAccountDir.delete(recursive: true);
       await _tempAccountDir.create();
       _account.bioAuthEnabled = false;
