@@ -45,7 +45,6 @@ import 'synchronization.dart';
 
 class LoadedAccount {
   Encrypter _encrypter;
-  Encrypter _syncEncrypter;
   final String _deviceId;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
@@ -66,7 +65,6 @@ class LoadedAccount {
 
   LoadedAccount({
     required Encrypter encrypter,
-    required Encrypter syncEncrypter,
     required String deviceId,
     required File versionFile,
     required AccountCredentialsFile credentials,
@@ -82,7 +80,6 @@ class LoadedAccount {
     required FileIndex fileIndex,
   })  : _deviceId = deviceId,
         _encrypter = encrypter,
-        _syncEncrypter = syncEncrypter,
         _versionFile = versionFile,
         _credentials = credentials,
         _localSettings = localSettings,
@@ -155,7 +152,6 @@ class LoadedAccount {
   factory LoadedAccount.fromDirectory({
     required String path,
     required Encrypter encrypter,
-    required Encrypter syncEncrypter,
     required Key key,
     required String deviceId,
     File? versionFile,
@@ -205,7 +201,6 @@ class LoadedAccount {
         key: key);
     return LoadedAccount(
         encrypter: encrypter,
-        syncEncrypter: syncEncrypter,
         deviceId: deviceId,
         versionFile: versionFile,
         credentials: credentials,
@@ -245,12 +240,6 @@ class LoadedAccount {
       derivationInfo: _credentials.value.keyDerivationInfo,
     );
     _encrypter = Encrypter(AES(key));
-    Encrypter oldSyncEncrypter = _syncEncrypter;
-    _syncEncrypter = await getSyncEncrypter(
-      password,
-      derivationType: _credentials.value.keyDerivationType,
-      derivationInfo: _credentials.value.keyDerivationInfo,
-    );
     await _settings.reload();
     _settings.encrypter = _encrypter;
     await _settings.save();
@@ -281,8 +270,8 @@ class LoadedAccount {
       await for (FileSystemEntity entity in trustedConnectionsDir.list()) {
         File file = File(entity.path);
         await file.writeAsString(TrustedConnectionData.fromEncrypted(
-                data: await file.readAsString(), encrypter: oldSyncEncrypter)
-            .toEncrypted(_syncEncrypter));
+                data: await file.readAsString(), encrypter: oldEncrypter)
+            .toEncrypted(_encrypter));
       }
     }
   }
@@ -343,7 +332,7 @@ class LoadedAccount {
       history: _history,
       favorites: _favorites,
       settings: _settings,
-      encrypter: _syncEncrypter,
+      encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
       authWithIV:
           _credentials.value.keyDerivationType != KeyDerivationType.none,
@@ -1607,11 +1596,9 @@ class JSONLoadedAccount {
     );
   }
 
-  LoadedAccount toEncryptedCSVLoadedAccount(
-      Encrypter encrypter, Encrypter syncEncrypter, Key key) {
+  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter, Key key) {
     return LoadedAccount(
       encrypter: encrypter,
-      syncEncrypter: syncEncrypter,
       versionFile: _versionFile,
       deviceId: _deviceId,
       credentials: _credentials,

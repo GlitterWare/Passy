@@ -51,10 +51,7 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
           crypt.Key key =
               (await data.derivePassword(_account.username, password: value))!;
           await data.importAccount(args.path,
-              encrypter: getPassyEncrypterFromBytes(key.bytes),
-              syncEncrypter: (await data.getSyncEncrypter(
-                  username: _account.username, password: value)),
-              key: key);
+              encrypter: getPassyEncrypterFromBytes(key.bytes), key: key);
           Navigator.popUntil(
               context, (route) => route.settings.name == MainScreen.routeName);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);

@@ -138,14 +138,6 @@ class PassyData {
     }
   }
 
-  Future<Encrypter> getSyncEncrypter(
-      {required String username, required String password}) {
-    KeyDerivationType? type =
-        getKeyDerivationType(username) ?? KeyDerivationType.none;
-    return common.getSyncEncrypter(password,
-        derivationType: type, derivationInfo: getKeyDerivationInfo(username));
-  }
-
   bool hasAccount(String username) => _accounts.containsKey(username);
 
   PassyData(String path)
@@ -268,8 +260,6 @@ class PassyData {
       credentials: _file,
       encrypter: common
           .getPassyEncrypterFromBytes(Uint8List.fromList(result.rawBytes)),
-      syncEncrypter:
-          await getSyncEncrypter(username: username, password: password),
       key: Key(Uint8List.fromList(result.rawBytes)),
       deviceId: info.value.deviceId,
     );
@@ -305,13 +295,12 @@ class PassyData {
         .deleteSync(recursive: true);
   }
 
-  Future<LoadedAccount> loadAccount(String username, Encrypter encrypter,
-      Encrypter syncEncrypter, Key key) async {
+  Future<LoadedAccount> loadAccount(
+      String username, Encrypter encrypter, Key key) async {
     await info.reload();
     _loadedAccount = loadLegacyAccount(
       path: accountsPath + Platform.pathSeparator + username,
       encrypter: encrypter,
-      syncEncrypter: syncEncrypter,
       key: key,
       deviceId: info.value.deviceId,
       credentials: _accounts[username],
@@ -386,15 +375,11 @@ class PassyData {
           derivationType: creds.value.keyDerivationType,
           derivationInfo: creds.value.keyDerivationInfo);
       Encrypter encrypter = common.getPassyEncrypterFromBytes(key.bytes);
-      Encrypter syncEncrypter = await common.getSyncEncrypter(password,
-          derivationInfo: creds.value.keyDerivationInfo,
-          derivationType: creds.value.keyDerivationType);
       await info.reload();
       LoadedAccount _account = loadLegacyAccount(
           path: _tempAccountPath,
           encrypter: encrypter,
           deviceId: info.value.deviceId,
-          syncEncrypter: syncEncrypter,
           key: key)!;
       _account.bioAuthEnabled = false;
       _account.clearRemovedHistory();
@@ -424,7 +409,6 @@ class PassyData {
   Future<String> importAccount(
     String path, {
     required Encrypter encrypter,
-    required Encrypter syncEncrypter,
     required Key key,
   }) async {
     String _tempPath = (await getTemporaryDirectory()).path +

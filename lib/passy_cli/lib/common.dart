@@ -210,17 +210,3 @@ Future<Encrypter> getPasswordEncrypter(
       );
   }
 }
-
-Future<Encrypter> getSyncEncrypter(
-  String password, {
-  required KeyDerivationType derivationType,
-  required KeyDerivationInfo? derivationInfo,
-}) async {
-  if (derivationType == KeyDerivationType.argon2) {
-    int memory = (derivationInfo as Argon2Info).memory;
-    return await getPassyEncrypterV2(password,
-        salt: Salt(base64Decode('F/1S5+CUbhRCV4OaWrbKiw==')),
-        memory: memory > 65536 ? 65536 : memory);
-  }
-  return pcommon.getPassyEncrypter(password);
-}

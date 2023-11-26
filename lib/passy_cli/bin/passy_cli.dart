@@ -242,7 +242,6 @@ late String _passyDataPath;
 late String _accountsPath;
 Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
-Map<String, Encrypter> _syncEncrypters = {};
 Map<String, Key> _keys = {};
 Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
@@ -552,18 +551,12 @@ Future<String> _login(String username, String password) async {
     );
     _keys[username] = key;
     _encrypters[username] = pcommon.getPassyEncrypterFromBytes(key.bytes);
-    _syncEncrypters[username] = await cn.getSyncEncrypter(
-      password,
-      derivationType: _credentials.keyDerivationType,
-      derivationInfo: _credentials.keyDerivationInfo,
-    );
     try {
       PassyInfoFile infoFile = PassyInfo.fromFile(
           File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
       LoadedAccount acc = loadLegacyAccount(
           path: _accountsPath + Platform.pathSeparator + username,
           encrypter: _encrypters[username]!,
-          syncEncrypter: _syncEncrypters[username]!,
           key: key,
           deviceId: infoFile.value.deviceId,
           credentials: _credentialsFile!)!;
@@ -902,7 +895,6 @@ Future<void> executeCommand(List<String> command,
           if (command.length == 2) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
-          _syncEncrypters.remove(accountName);
           log('true', id: id);
           return;
         case 'logout_all':
@@ -922,13 +914,11 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               String path = command[4];
-              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
-                syncEncrypter: syncEncrypter,
                 key: _keys[accountName]!,
                 deviceId: infoFile.value.deviceId,
               );
@@ -953,14 +943,12 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               String path = command[4];
-              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
               Key key = _keys[accountName]!;
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
-                syncEncrypter: syncEncrypter,
                 key: key,
                 deviceId: infoFile.value.deviceId,
               );
@@ -986,13 +974,11 @@ Future<void> executeCommand(List<String> command,
               }
               String path = command[4];
               String password = command[5];
-              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
-                syncEncrypter: syncEncrypter,
                 key: _keys[accountName]!,
                 deviceId: infoFile.value.deviceId,
               );
@@ -1278,8 +1264,7 @@ Future<void> executeCommand(List<String> command,
               if (command.length < 6) break;
               String accountName = command[5];
               Encrypter? encrypter = _encrypters[accountName];
-              Encrypter? syncEncrypter = _syncEncrypters[accountName];
-              if (encrypter == null || syncEncrypter == null) {
+              if (encrypter == null) {
                 log('passy:sync:host:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
                 return;
@@ -1329,7 +1314,7 @@ Future<void> executeCommand(List<String> command,
               HostAddress? addr;
               Synchronization? serverNullable;
               serverNullable = Synchronization(
-                encrypter: syncEncrypter,
+                encrypter: encrypter,
                 username: accountName,
                 passyEntries: FullPassyEntriesFileCollection(
                   idCards: IDCards.fromFile(File('${accPath}idCards.enc'),
@@ -1470,7 +1455,6 @@ Future<void> executeCommand(List<String> command,
                     username +
                     Platform.pathSeparator;
                 Encrypter encrypter = encrypterEntry.value;
-                Encrypter syncEncrypter = _syncEncrypters[encrypterEntry.key]!;
                 Map<String, GlareModule> syncModules =
                     buildSynchronization2d0d0Modules(
                   username: username,
@@ -1489,7 +1473,7 @@ Future<void> executeCommand(List<String> command,
                         File('${accPath}paymentCards.enc'),
                         encrypter: encrypter),
                   ),
-                  encrypter: syncEncrypter,
+                  encrypter: encrypter,
                   history: History.fromFile(File('${accPath}history.enc'),
                       encrypter: encrypter),
                   favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
@@ -1533,7 +1517,7 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Auth is not of type String'},
                         };
                       }
-                      Encrypter? encrypter = _syncEncrypters[username];
+                      Encrypter? encrypter = _encrypters[username];
                       if (encrypter == null) {
                         return {
                           'error': {'type': 'Failed to authenticate'},
@@ -1621,7 +1605,6 @@ Future<void> executeCommand(List<String> command,
                         };
                       }
                       Encrypter encrypter = _encrypters[username]!;
-                      Encrypter syncEncrypter = _syncEncrypters[username]!;
                       String accPath = _accountsPath +
                           Platform.pathSeparator +
                           username +
@@ -1645,7 +1628,7 @@ Future<void> executeCommand(List<String> command,
                               File('${accPath}paymentCards.enc'),
                               encrypter: encrypter),
                         ),
-                        encrypter: syncEncrypter,
+                        encrypter: encrypter,
                         history: History.fromFile(File('${accPath}history.enc'),
                             encrypter: encrypter),
                         favorites: Favorites.fromFile(
@@ -1780,7 +1763,7 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Invalid device id'},
                         };
                       }
-                      Encrypter? encrypter = _syncEncrypters[username];
+                      Encrypter? encrypter = _encrypters[username];
                       Encrypter usernameEncrypter =
                           pcommon.getPassyEncrypter(username);
                       if (encrypter == null) {
@@ -1847,7 +1830,7 @@ Future<void> executeCommand(List<String> command,
               if (command.length == 5) break;
               String accountName = command[5];
               Encrypter? encrypter = _encrypters[accountName];
-              Encrypter? syncEncrypter = _syncEncrypters[accountName];
+              Encrypter? syncEncrypter = _encrypters[accountName];
               if (encrypter == null || syncEncrypter == null) {
                 log('passy:sync:connect:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
@@ -2013,7 +1996,7 @@ Future<void> executeCommand(List<String> command,
                 }
                 encrypter = _encrypters[accountName]!;
               }
-              Encrypter syncEncrypter = _syncEncrypters[accountName]!;
+              Encrypter syncEncrypter = _encrypters[accountName]!;
               String accPath = _accountsPath +
                   Platform.pathSeparator +
                   accountName +

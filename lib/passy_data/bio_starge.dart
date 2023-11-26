@@ -44,8 +44,6 @@ extension BioStorage on BiometricStorageData {
     await data.loadAccount(
       username,
       getPassyEncrypterFromBytes(key.bytes),
-      await data.getSyncEncrypter(
-          username: username, password: _bioData.password),
       key,
     );
     return true;

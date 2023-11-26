@@ -97,10 +97,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     crypt.Key key =
         (await data.derivePassword(_username, password: _password))!;
     LoadedAccount account = await data.loadAccount(
-        _username,
-        getPassyEncrypterFromBytes(key.bytes),
-        (await data.getSyncEncrypter(username: _username, password: _password)),
-        key);
+        _username, getPassyEncrypterFromBytes(key.bytes), key);
     account.startAutoSync(_password);
     data.info.save().then((value) {
       if (!mounted) return;
