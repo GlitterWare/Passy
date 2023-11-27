@@ -1605,7 +1605,7 @@ Future<void> executeCommand(List<String> command,
                             creds.value.passwordHash) {
                           if (creds.value.passwordHash ==
                               sha512
-                                  .convert(decodeHexString(password))
+                                  .convert(base64Decode(password))
                                   .toString()) {
                             return {
                               'status': {'type': 'Success'},
@@ -1620,7 +1620,7 @@ Future<void> executeCommand(List<String> command,
                       }
                       loadedModules.remove('2d0d1_$username');
                       try {
-                        password = decodeHexString(password);
+                        password = base64Decode(password);
                       } catch (e) {
                         return {
                           'error': {
