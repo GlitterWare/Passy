@@ -274,6 +274,10 @@ class LoadedAccount {
             .toEncrypted(_encrypter));
       }
     }
+    if (_autoSyncCompleter != null) {
+      stopAutoSync();
+      startAutoSync(key.base64);
+    }
   }
 
   KeyDerivationType get keyDerivationType =>

@@ -98,7 +98,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
         (await data.derivePassword(_username, password: _password))!;
     LoadedAccount account = await data.loadAccount(
         _username, getPassyEncrypterFromBytes(key.bytes), key);
-    account.startAutoSync(_password);
+    account.startAutoSync(key.base64);
     data.info.save().then((value) {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, SetupScreen.routeName);

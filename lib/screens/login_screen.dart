@@ -79,7 +79,7 @@ class _LoginScreen extends State<LoginScreen> {
             );
             return;
           }
-          account.startAutoSync(storageData.password);
+          account.startAutoSync(key.base64);
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
@@ -200,7 +200,10 @@ class _LoginScreen extends State<LoginScreen> {
           );
           return;
         }
-        _account.startAutoSync(_password);
+        _account.startAutoSync((_derivedPassword == null
+                ? enc.Key.fromUtf8(_password)
+                : enc.Key(Uint8List.fromList(_derivedPassword)))
+            .base64);
         if (Platform.isAndroid) {
           FlutterSecureScreen.singleton
               .setAndroidScreenSecure(_account.protectScreen);
