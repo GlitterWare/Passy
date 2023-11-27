@@ -189,6 +189,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
           )),
           ListView.builder(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return PassyPadding(DropdownButtonFormField<String>(
                 value: csvToJson[index],
