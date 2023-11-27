@@ -279,6 +279,9 @@ class LoadedAccount {
             .toEncrypted(_encrypter));
       }
     }
+    _encryptedPassword = encrypt(
+        decrypt(_encryptedPassword, encrypter: oldEncrypter),
+        encrypter: _encrypter);
     if (_autoSyncCompleter != null) {
       stopAutoSync();
       startAutoSync();
