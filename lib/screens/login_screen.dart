@@ -182,7 +182,7 @@ class _LoginScreen extends State<LoginScreen> {
     data.info.save().whenComplete(() async {
       try {
         enc.Key key = _derivedPassword == null
-            ? enc.Key.fromUtf8(_password)
+            ? enc.Key.fromUtf8(_password + (' ' * (32 - _password.length)))
             : enc.Key(Uint8List.fromList(_derivedPassword));
         LoadedAccount _account = await data.loadAccount(
             data.info.value.lastUsername,
