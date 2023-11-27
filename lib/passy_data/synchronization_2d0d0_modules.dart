@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
 
 import 'passy_entries_file_collection.dart';
@@ -20,6 +21,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required HistoryFile history,
   required FavoritesFile favorites,
   required AccountSettingsFile settings,
+  required AccountCredentialsFile credentials,
   required authWithIV,
   Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
@@ -107,6 +109,14 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             if (check.containsKey('error')) return check;
             return {
               'status': {'type': 'Success'}
+            };
+          case 'getAccountCredentials':
+            await credentials.reload();
+            Map<String, dynamic> credsJson = credentials.value.toJson();
+            credsJson.remove('passwordHash');
+            credsJson.remove('bioAuthEnabled');
+            return {
+              'credentials': credsJson,
             };
           case 'authenticate':
             Map<String, dynamic> check = checkArgs(args);

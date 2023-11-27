@@ -10,8 +10,9 @@ void synchronizationTest({
   void Function(String error)? onError,
 }) async {
   crypt.Key key = (await data.derivePassword('syn', password: 'syn'))!;
-  LoadedAccount syn =
-      await data.loadAccount('syn', getPassyEncrypterFromBytes(key.bytes), key);
+  crypt.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
+  LoadedAccount syn = await data.loadAccount('syn', encrypter, key,
+      encryptedPassword: encrypt('sync', encrypter: encrypter));
   syn.getSynchronization()!.host().then((value) => syn
       .getSynchronization(
           onConnected: onConnected, onComplete: onComplete, onError: onError)!

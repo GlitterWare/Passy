@@ -16,6 +16,7 @@ import 'package:system_info2/system_info2.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
+import 'common.dart';
 import 'key_derivation_info.dart';
 import 'passy_info.dart';
 
@@ -255,11 +256,13 @@ class PassyData {
       ..writeAsStringSync(common.accountVersion);
     _accounts[username] = _file;
     await info.reload();
+    Encrypter encrypter =
+        common.getPassyEncrypterFromBytes(Uint8List.fromList(result.rawBytes));
     LoadedAccount.fromDirectory(
+      encryptedPassword: encrypt(password, encrypter: encrypter),
       path: _accountPath,
       credentials: _file,
-      encrypter: common
-          .getPassyEncrypterFromBytes(Uint8List.fromList(result.rawBytes)),
+      encrypter: encrypter,
       key: Key(Uint8List.fromList(result.rawBytes)),
       deviceId: info.value.deviceId,
     );
@@ -296,10 +299,12 @@ class PassyData {
   }
 
   Future<LoadedAccount> loadAccount(
-      String username, Encrypter encrypter, Key key) async {
+      String username, Encrypter encrypter, Key key,
+      {required String encryptedPassword}) async {
     await info.reload();
     _loadedAccount = loadLegacyAccount(
       path: accountsPath + Platform.pathSeparator + username,
+      encryptedPassword: encryptedPassword,
       encrypter: encrypter,
       key: key,
       deviceId: info.value.deviceId,
@@ -377,6 +382,7 @@ class PassyData {
       Encrypter encrypter = common.getPassyEncrypterFromBytes(key.bytes);
       await info.reload();
       LoadedAccount _account = loadLegacyAccount(
+          encryptedPassword: encrypt(password, encrypter: encrypter),
           path: _tempAccountPath,
           encrypter: encrypter,
           deviceId: info.value.deviceId,
@@ -410,6 +416,7 @@ class PassyData {
     String path, {
     required Encrypter encrypter,
     required Key key,
+    required String encryptedPassword,
   }) async {
     String _tempPath = (await getTemporaryDirectory()).path +
         Platform.pathSeparator +
@@ -445,7 +452,8 @@ class PassyData {
       await info.reload();
       LoadedAccount _account = JSONLoadedAccount.fromDirectory(
               path: _tempAccountPath, deviceId: info.value.deviceId)
-          .toEncryptedCSVLoadedAccount(encrypter, key);
+          .toEncryptedCSVLoadedAccount(encrypter, key,
+              encryptedPassword: encryptedPassword);
       await _tempAccountDir.delete(recursive: true);
       await _tempAccountDir.create();
       _account.bioAuthEnabled = false;

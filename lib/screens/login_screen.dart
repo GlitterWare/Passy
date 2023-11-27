@@ -66,8 +66,10 @@ class _LoginScreen extends State<LoginScreen> {
           enc.Key key = await derivePassword(storageData.password,
               derivationType: derivationType, derivationInfo: derivationInfo);
           enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
-          LoadedAccount account =
-              await data.loadAccount(_username, encrypter, key);
+          LoadedAccount account = await data.loadAccount(
+              _username, encrypter, key,
+              encryptedPassword:
+                  encrypt(storageData.password, encrypter: encrypter));
           if (isAutofill) {
             Navigator.pushNamed(
               context,
@@ -79,7 +81,7 @@ class _LoginScreen extends State<LoginScreen> {
             );
             return;
           }
-          account.startAutoSync(key.base64);
+          account.startAutoSync();
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
@@ -179,15 +181,18 @@ class _LoginScreen extends State<LoginScreen> {
     Navigator.pushNamed(context, SplashScreen.routeName);
     data.info.save().whenComplete(() async {
       try {
+        enc.Key key = _derivedPassword == null
+            ? enc.Key.fromUtf8(_password)
+            : enc.Key(Uint8List.fromList(_derivedPassword));
         LoadedAccount _account = await data.loadAccount(
             data.info.value.lastUsername,
             _derivedPassword == null
                 ? getPassyEncrypter(_password)
                 : getPassyEncrypterFromBytes(
                     Uint8List.fromList(_derivedPassword)),
-            _derivedPassword == null
-                ? enc.Key.fromUtf8(_password)
-                : enc.Key(Uint8List.fromList(_derivedPassword)));
+            key,
+            encryptedPassword:
+                encrypt(_password, encrypter: enc.Encrypter(enc.AES(key))));
         Navigator.pop(context);
         if (isAutofill) {
           Navigator.pushNamed(
@@ -200,10 +205,7 @@ class _LoginScreen extends State<LoginScreen> {
           );
           return;
         }
-        _account.startAutoSync((_derivedPassword == null
-                ? enc.Key.fromUtf8(_password)
-                : enc.Key(Uint8List.fromList(_derivedPassword)))
-            .base64);
+        _account.startAutoSync();
         if (Platform.isAndroid) {
           FlutterSecureScreen.singleton
               .setAndroidScreenSecure(_account.protectScreen);

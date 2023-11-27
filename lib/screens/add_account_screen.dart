@@ -1,3 +1,4 @@
+import 'package:encrypt/encrypt.dart' as enc;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -96,9 +97,10 @@ class _AddAccountScreen extends State<StatefulWidget> {
     data.info.value.lastUsername = _username;
     crypt.Key key =
         (await data.derivePassword(_username, password: _password))!;
-    LoadedAccount account = await data.loadAccount(
-        _username, getPassyEncrypterFromBytes(key.bytes), key);
-    account.startAutoSync(key.base64);
+    enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
+    LoadedAccount account = await data.loadAccount(_username, encrypter, key,
+        encryptedPassword: encrypt(_password, encrypter: encrypter));
+    account.startAutoSync();
     data.info.save().then((value) {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, SetupScreen.routeName);

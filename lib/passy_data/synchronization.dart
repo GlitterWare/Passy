@@ -5,7 +5,10 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
+import 'package:passy/passy_data/key_derivation_info.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/trusted_connection_data.dart';
 
@@ -208,6 +211,7 @@ class Synchronization {
   final HistoryFile _history;
   final FavoritesFile _favorites;
   final AccountSettingsFile _settings;
+  final AccountCredentialsFile _credentials;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
       SynchronizationResults(log: '');
@@ -225,16 +229,19 @@ class Synchronization {
   final SynchronizationType _synchronizationType;
   GlareClient? _sync2d0d0Client;
   GlareServer? _sync2d0d0Host;
+  final String _encryptedPassword;
 
   get entriesAdded => _entriesAdded;
   get entriesRemoved => _entriesRemoved;
 
   Synchronization({
     required String username,
+    required String encryptedPassword,
     required FullPassyEntriesFileCollection passyEntries,
     required HistoryFile history,
     required FavoritesFile favorites,
     required AccountSettingsFile settings,
+    required AccountCredentialsFile credentials,
     required Encrypter encrypter,
     required RSAKeypair rsaKeypair,
     required bool authWithIV,
@@ -242,10 +249,12 @@ class Synchronization {
     void Function(SynchronizationResults)? onComplete,
     void Function(String log)? onError,
   })  : _username = username,
+        _encryptedPassword = encryptedPassword,
         _passyEntries = passyEntries,
         _history = history,
         _favorites = favorites,
         _settings = settings,
+        _credentials = credentials,
         _encrypter = encrypter,
         _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
@@ -439,6 +448,7 @@ class Synchronization {
           favorites: _favorites,
           settings: _settings,
           sharedEntryKeys: sharedEntryKeys,
+          credentials: _credentials,
           authWithIV: _authWithIV,
           onSetEntry: () => _entriesAdded++,
           onRemoveEntry: () => _entriesRemoved++,
@@ -705,6 +715,7 @@ class Synchronization {
                   history: _history,
                   favorites: _favorites,
                   settings: _settings,
+                  credentials: _credentials,
                   sharedEntryKeys: sharedEntryKeys,
                   authWithIV: _authWithIV,
                   onSetEntry: () => _entriesAdded++,
@@ -773,8 +784,8 @@ class Synchronization {
   Future<void> _synchronization2d0d0(
     String address, {
     Socket? socket,
-    String? password,
     String? deviceId,
+    bool isDedicatedServer = false,
     bool verifyTrustedConnectionData = false,
     Directory? trustedConnectionsDir,
     void Function()? onTrustSaveComplete,
@@ -868,10 +879,77 @@ class Synchronization {
       Encrypter usernameEncrypter = getPassyEncrypter(_username);
       String apiVersion = '2d0d1';
 
+      Key? derivedPassword;
+      Encrypter remoteEncrypter;
+      _syncLog += 'done.\nReceiving remote credentials metadata... ';
+      response = _checkResponse(await _safeSync2d0d0Client.runModule([
+        apiVersion,
+        'getAccountCredentials',
+      ]));
+      if (response.containsKey('error')) {
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'getAccountCredentials',
+          _username,
+        ]));
+      }
+      if (response.containsKey('error')) {
+        remoteEncrypter = _encrypter;
+      } else {
+        dynamic creds = response['credentials'];
+        if (creds is! Map<String, dynamic>) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              'Malformed account credentials:Expected type `Map<String, dynamic>`, received type `${creds.runtimeType}`');
+          return;
+        }
+        dynamic derivationTypeJson = creds['keyDerivationType'];
+        if (derivationTypeJson is! String) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              'Malformed key derivation type:Expected type `String`, received type `${derivationTypeJson.runtimeType}`');
+          return;
+        }
+        KeyDerivationType? derivationType =
+            keyDerivationTypeFromName(derivationTypeJson);
+        if (derivationType == null) {
+          onTrustSaveFailed?.call();
+          _handleException('Invalid key derivation type:`$derivationTypeJson`');
+          return;
+        }
+        dynamic derivationInfoJson = creds['keyDerivationInfo'];
+        if (derivationInfoJson is! Map<String, dynamic>) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              'Malformed key derivation info:Expected type `Map<String, dynamic>`, received type `${derivationInfoJson.runtimeType}`');
+          return;
+        }
+        KeyDerivationInfo derivationInfo;
+        try {
+          derivationInfo =
+              KeyDerivationInfo.fromJson(derivationType)!(derivationInfoJson);
+        } catch (e, s) {
+          onTrustSaveFailed?.call();
+          _handleException('Failed to decode key derivation info:\n$e\n$s');
+          return;
+        }
+
+        try {
+          derivedPassword = await derivePassword(
+              decrypt(_encryptedPassword, encrypter: _encrypter),
+              derivationType: derivationType,
+              derivationInfo: derivationInfo);
+          remoteEncrypter = Encrypter(AES(derivedPassword));
+        } catch (e, s) {
+          onTrustSaveFailed?.call();
+          _handleException('Failed to derive password:\n$e\n$s');
+          return;
+        }
+      }
+
       Map<String, dynamic> auth() {
         return {
           'auth': util.generateAuth(
-              encrypter: _encrypter,
+              encrypter: remoteEncrypter,
               usernameEncrypter: usernameEncrypter,
               withIV: _authWithIV),
         };
@@ -897,9 +975,9 @@ class Synchronization {
                 '${response['hostDeviceId']}--$deviceId');
             TrustedConnectionData local = TrustedConnectionData.fromEncrypted(
                 data: await connectionFile.readAsString(),
-                encrypter: _encrypter);
+                encrypter: remoteEncrypter);
             TrustedConnectionData remote = TrustedConnectionData.fromEncrypted(
-                data: response['connectionData'], encrypter: _encrypter);
+                data: response['connectionData'], encrypter: remoteEncrypter);
             if (local.deviceId != remote.deviceId) {
               onTrustSaveFailed?.call();
               _handleException('Trusted connection data does not match');
@@ -917,21 +995,21 @@ class Synchronization {
           }
         }
       }
-      if (password != null) {
+      if (isDedicatedServer && derivedPassword != null) {
         _syncLog += 'done.\nLogging in... ';
         bool loggedIn = false;
         response = _checkResponse(await _safeSync2d0d0Client.runModule([
           'authenticate',
           _username,
           util.generateAuth(
-              encrypter: _encrypter,
+              encrypter: Encrypter(AES(derivedPassword)),
               usernameEncrypter: usernameEncrypter,
               withIV: true),
         ]));
         if (!response.containsKey('error')) {
           try {
             util.verifyAuth(response['auth'],
-                encrypter: _encrypter,
+                encrypter: remoteEncrypter,
                 usernameEncrypter: usernameEncrypter,
                 withIV: true);
           } catch (e) {
@@ -941,13 +1019,12 @@ class Synchronization {
           }
           apiVersion += '_$_username';
           loggedIn = true;
-          password = '';
         }
         if (!loggedIn) {
           response = _checkResponse(await _safeSync2d0d0Client.runModule([
             'login',
             _username,
-            password,
+            derivedPassword.base64,
           ]));
           if (response.containsKey('error')) {
             onTrustSaveFailed?.call();
@@ -956,7 +1033,6 @@ class Synchronization {
             return;
           }
           apiVersion += '_$_username';
-          password = '';
         }
       }
       if (deviceId != null && trustedConnectionsDir != null) {
@@ -985,10 +1061,10 @@ class Synchronization {
           _username,
           deviceId,
           util.generateAuth(
-              encrypter: _encrypter,
+              encrypter: remoteEncrypter,
               usernameEncrypter: usernameEncrypter,
               withIV: true),
-          trustedConnectionData.toEncrypted(_encrypter),
+          trustedConnectionData.toEncrypted(remoteEncrypter),
         ]));
         if (response.containsKey('error')) {
           onTrustSaveFailed?.call();
@@ -1003,7 +1079,7 @@ class Synchronization {
           await connectionFile.create(recursive: true);
         }
         await connectionFile
-            .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
+            .writeAsString(trustedConnectionData.toEncrypted(remoteEncrypter));
         onTrustSaveComplete?.call();
       }
       _syncLog += 'done.\nAuthenticating... ';
@@ -1067,7 +1143,7 @@ class Synchronization {
       }
       try {
         util.verifyAuth(authResponse['auth'],
-            encrypter: _encrypter,
+            encrypter: remoteEncrypter,
             usernameEncrypter: usernameEncrypter,
             withIV: _authWithIV);
       } catch (e) {
@@ -1372,8 +1448,8 @@ class Synchronization {
 
   Future<void> connect2d0d0(
     HostAddress address, {
-    String? password,
     String? deviceId,
+    bool isDedicatedServer = false,
     bool verifyTrustedConnectionData = false,
     Directory? trustedConnectionsDir,
     void Function()? onTrustSaveComplete,
@@ -1381,8 +1457,8 @@ class Synchronization {
   }) {
     return _synchronization2d0d0(
       "${address.ip.address}:${address.port}",
-      password: password,
       deviceId: deviceId,
+      isDedicatedServer: isDedicatedServer,
       verifyTrustedConnectionData: verifyTrustedConnectionData,
       trustedConnectionsDir: trustedConnectionsDir,
       onTrustSaveComplete: onTrustSaveComplete,
@@ -1390,7 +1466,9 @@ class Synchronization {
     );
   }
 
-  Future<void> connect(HostAddress address) async {
+  Future<void> connect(
+    HostAddress address,
+  ) async {
     if (_synchronizationType == SynchronizationType.v2d0d0) {
       _syncLog += 'Connecting to a 2.0.0+ synchronization server... ';
       return await connect2d0d0(address);

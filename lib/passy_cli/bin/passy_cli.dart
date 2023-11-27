@@ -244,6 +244,7 @@ late String _accountsPath;
 Map<String, AccountCredentialsFile> _accounts = {};
 Map<String, Encrypter> _encrypters = {};
 Map<String, Key> _keys = {};
+Map<String, String> _encryptedPasswords = {};
 Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
 String _curRunFile = '';
@@ -561,22 +562,32 @@ Future<String> _login(String username, dynamic password) async {
       );
     }
     if (password is Uint8List) {
-      return Key.fromBase64(base64Encode(password));
+      if (password.length == 32) return Key(password);
+      return Key(Uint8List.fromList([
+        ...password,
+        ...utf8.encode(' ' * (32 - password.length)),
+      ]));
     }
-    return Key.fromLength(16);
+    return Key.fromLength(32);
   }
 
   bool match = _credentials.passwordHash == await getHash();
   if (match) {
     Key key = await derive();
     _keys[username] = key;
-    _encrypters[username] = pcommon.getPassyEncrypterFromBytes(key.bytes);
+    Encrypter encrypter = pcommon.getPassyEncrypterFromBytes(key.bytes);
+    _encrypters[username] = encrypter;
+    if (password is String) {
+      _encryptedPasswords[username] =
+          pcommon.encrypt(password, encrypter: encrypter);
+    }
     try {
       PassyInfoFile infoFile = PassyInfo.fromFile(
           File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
       LoadedAccount acc = loadLegacyAccount(
           path: _accountsPath + Platform.pathSeparator + username,
           encrypter: _encrypters[username]!,
+          encryptedPassword: '',
           key: key,
           deviceId: infoFile.value.deviceId,
           credentials: _credentialsFile!)!;
@@ -933,10 +944,17 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
+              String? encryptedPassword = _encryptedPasswords[accountName];
+              if (encryptedPassword == null) {
+                log('accounts:export:json:No encrypted password found, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
               String path = command[4];
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
+                encryptedPassword: encryptedPassword,
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
                 key: _keys[accountName]!,
@@ -962,11 +980,18 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
+              String? encryptedPassword = _encryptedPasswords[accountName];
+              if (encryptedPassword == null) {
+                log('accounts:export:csv:No encrypted password found, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
               String path = command[4];
               Key key = _keys[accountName]!;
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
+                encryptedPassword: encryptedPassword,
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
                 key: key,
@@ -992,11 +1017,18 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
+              String? encryptedPassword = _encryptedPasswords[accountName];
+              if (encryptedPassword == null) {
+                log('accounts:export:kdbx:No encrypted password found, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
               String path = command[4];
               String password = command[5];
               PassyInfoFile infoFile = PassyInfo.fromFile(
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               LoadedAccount account = LoadedAccount.fromDirectory(
+                encryptedPassword: encryptedPassword,
                 path: _accountsPath + Platform.pathSeparator + accountName,
                 encrypter: encrypter,
                 key: _keys[accountName]!,
@@ -1335,6 +1367,7 @@ Future<void> executeCommand(List<String> command,
               Synchronization? serverNullable;
               serverNullable = Synchronization(
                 encrypter: encrypter,
+                encryptedPassword: '',
                 username: accountName,
                 passyEntries: FullPassyEntriesFileCollection(
                   idCards: IDCards.fromFile(File('${accPath}id_cards.enc'),
@@ -1355,6 +1388,8 @@ Future<void> executeCommand(List<String> command,
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                credentials: AccountCredentials.fromFile(
+                    File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
                 authWithIV: _accounts[accountName]!.value.keyDerivationType !=
                     KeyDerivationType.none,
@@ -1501,6 +1536,8 @@ Future<void> executeCommand(List<String> command,
                   settings: AccountSettings.fromFile(
                       File('${accPath}settings.enc'),
                       encrypter: encrypter),
+                  credentials: AccountCredentials.fromFile(
+                      File('${accPath}credentials.json')),
                   authWithIV: _accounts[username]!.value.keyDerivationType !=
                       KeyDerivationType.none,
                 );
@@ -1564,6 +1601,38 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  'getAccountCredentials': GlareModule(
+                    name: 'getAccountCredentials',
+                    target: (args,
+                        {required addModule, required readBytes}) async {
+                      if (args.length < 4) {
+                        throw {
+                          'error': {'type': 'Missing arguments'},
+                        };
+                      }
+                      dynamic username = args[3];
+                      if (username is! String) {
+                        throw {
+                          'error': {'type': 'Username is not of type String'},
+                        };
+                      }
+                      refreshAccounts();
+                      AccountCredentialsFile? creds = _accounts[username];
+                      if (creds == null) {
+                        return {
+                          'error': {
+                            'type': 'Account not found',
+                          },
+                        };
+                      }
+                      Map<String, dynamic> credsJson = creds.value.toJson();
+                      credsJson.remove('passwordHash');
+                      credsJson.remove('bioAuthEnabled');
+                      return {
+                        'credentials': credsJson,
+                      };
+                    },
+                  ),
                   'login': GlareModule(
                     name: 'login',
                     target: (args,
@@ -1597,23 +1666,29 @@ Future<void> executeCommand(List<String> command,
                           loadedModules.remove('2d0d1_$username');
                           return {
                             'error': {
-                              'type': 'Failed to login',
+                              'type': 'Faileda to login',
                             },
                           };
                         }
                         if (oldCreds.value.passwordHash ==
                             creds.value.passwordHash) {
                           if (creds.value.passwordHash ==
-                              sha512
-                                  .convert(base64Decode(password))
-                                  .toString()) {
+                              sha512.convert([
+                                ...base64Decode(password),
+                                if (password.length != 32)
+                                  ...utf8.encode(' ' * (32 - password.length)),
+                              ]).toString()) {
                             return {
                               'status': {'type': 'Success'},
                             };
                           }
                           return {
                             'error': {
-                              'type': 'Failed to login',
+                              'type': 'Failedb to login',
+                              'local': creds.value.passwordHash,
+                              'remote': sha512
+                                  .convert(base64Decode(password))
+                                  .toString(),
                             },
                           };
                         }
@@ -1624,14 +1699,15 @@ Future<void> executeCommand(List<String> command,
                       } catch (e) {
                         return {
                           'error': {
-                            'type': 'Failed to login',
+                            'type': 'Failedc to login',
                           },
                         };
                       }
                       String result = await _login(username, password);
                       if (result != 'true') {
                         return {
-                          'error': {'type': 'Failed to login'},
+                          'error': {'type': 'Failedd to login'},
+                          'hash': sha512.convert(password).toString(),
                         };
                       }
                       Encrypter encrypter = _encrypters[username]!;
@@ -1663,6 +1739,8 @@ Future<void> executeCommand(List<String> command,
                         settings: AccountSettings.fromFile(
                             File('${accPath}settings.enc'),
                             encrypter: encrypter),
+                        credentials: AccountCredentials.fromFile(
+                            File('${accPath}credentials.json')),
                         authWithIV:
                             _accounts[username]!.value.keyDerivationType !=
                                 KeyDerivationType.none,
@@ -1861,6 +1939,12 @@ Future<void> executeCommand(List<String> command,
                     id: id);
                 return;
               }
+              String? encryptedPassword = _encryptedPasswords[accountName];
+              if (encryptedPassword == null) {
+                log('passy:sync:connect:classic:No encrypted password found, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
               String portString = command[4];
               int port;
               try {
@@ -1909,6 +1993,7 @@ Future<void> executeCommand(List<String> command,
               Synchronization? serverNullable;
               serverNullable = Synchronization(
                 encrypter: encrypter,
+                encryptedPassword: encryptedPassword,
                 username: accountName,
                 passyEntries: FullPassyEntriesFileCollection(
                   idCards: IDCards.fromFile(File('${accPath}id_cards.enc'),
@@ -1929,6 +2014,8 @@ Future<void> executeCommand(List<String> command,
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                credentials: AccountCredentials.fromFile(
+                    File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
                 authWithIV: _accounts[accountName]!.value.keyDerivationType !=
                     KeyDerivationType.none,
@@ -2021,7 +2108,12 @@ Future<void> executeCommand(List<String> command,
                 }
                 encrypter = _encrypters[accountName]!;
               }
-              Key key = _keys[accountName]!;
+              String? encryptedPassword = _encryptedPasswords[accountName];
+              if (encryptedPassword == null) {
+                log('passy:sync:connect:2d0d0:No encrypted password found, please use `accounts login` first.',
+                    id: id);
+                return;
+              }
               String accPath = _accountsPath +
                   Platform.pathSeparator +
                   accountName +
@@ -2031,6 +2123,7 @@ Future<void> executeCommand(List<String> command,
                   encrypter: encrypter);
               serverNullable = Synchronization(
                 encrypter: encrypter,
+                encryptedPassword: encryptedPassword,
                 username: accountName,
                 passyEntries: FullPassyEntriesFileCollection(
                   idCards: IDCards.fromFile(File('${accPath}id_cards.enc'),
@@ -2051,6 +2144,8 @@ Future<void> executeCommand(List<String> command,
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                credentials: AccountCredentials.fromFile(
+                    File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
                 authWithIV: _accounts[accountName]!.value.keyDerivationType !=
                     KeyDerivationType.none,
@@ -2085,16 +2180,16 @@ Future<void> executeCommand(List<String> command,
                   File(_passyDataPath + Platform.pathSeparator + 'passy.json'));
               if (detached) {
                 client.connect2d0d0(host,
-                    password: key.base64,
                     deviceId: infoFile.value.deviceId,
+                    isDedicatedServer: true,
                     verifyTrustedConnectionData: true,
                     trustedConnectionsDir:
                         Directory('${accPath}trusted_connections'));
                 log(fullAddr, id: id);
               } else {
                 await client.connect2d0d0(host,
-                    password: key.base64,
                     deviceId: infoFile.value.deviceId,
+                    isDedicatedServer: true,
                     verifyTrustedConnectionData: true,
                     trustedConnectionsDir:
                         Directory('${accPath}trusted_connections'));

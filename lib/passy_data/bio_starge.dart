@@ -41,10 +41,12 @@ extension BioStorage on BiometricStorageData {
     await data.info.save();
     Key key =
         (await data.derivePassword(username, password: _bioData.password))!;
+    Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
     await data.loadAccount(
       username,
-      getPassyEncrypterFromBytes(key.bytes),
+      encrypter,
       key,
+      encryptedPassword: encrypt(_bioData.password, encrypter: encrypter),
     );
     return true;
   }

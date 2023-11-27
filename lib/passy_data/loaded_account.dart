@@ -45,6 +45,7 @@ import 'synchronization.dart';
 
 class LoadedAccount {
   Encrypter _encrypter;
+  String _encryptedPassword;
   final String _deviceId;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
@@ -65,6 +66,7 @@ class LoadedAccount {
 
   LoadedAccount({
     required Encrypter encrypter,
+    required String encryptedPassword,
     required String deviceId,
     required File versionFile,
     required AccountCredentialsFile credentials,
@@ -78,7 +80,8 @@ class LoadedAccount {
     required IDCardsFile idCards,
     required IdentitiesFile identities,
     required FileIndex fileIndex,
-  })  : _deviceId = deviceId,
+  })  : _encryptedPassword = encryptedPassword,
+        _deviceId = deviceId,
         _encrypter = encrypter,
         _versionFile = versionFile,
         _credentials = credentials,
@@ -152,6 +155,7 @@ class LoadedAccount {
   factory LoadedAccount.fromDirectory({
     required String path,
     required Encrypter encrypter,
+    required String encryptedPassword,
     required Key key,
     required String deviceId,
     File? versionFile,
@@ -200,6 +204,7 @@ class LoadedAccount {
         saveDir: Directory(path + Platform.pathSeparator + 'files'),
         key: key);
     return LoadedAccount(
+        encryptedPassword: encryptedPassword,
         encrypter: encrypter,
         deviceId: deviceId,
         versionFile: versionFile,
@@ -276,7 +281,7 @@ class LoadedAccount {
     }
     if (_autoSyncCompleter != null) {
       stopAutoSync();
-      startAutoSync(key.base64);
+      startAutoSync();
     }
   }
 
@@ -325,6 +330,7 @@ class LoadedAccount {
     RSAKeypair? rsaKeypair = _settings.value.rsaKeypair;
     if (rsaKeypair == null) return null;
     return Synchronization(
+      encryptedPassword: _encryptedPassword,
       username: username,
       passyEntries: FullPassyEntriesFileCollection(
         passwords: _passwords,
@@ -336,6 +342,7 @@ class LoadedAccount {
       history: _history,
       favorites: _favorites,
       settings: _settings,
+      credentials: _credentials,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
       authWithIV:
@@ -397,20 +404,10 @@ class LoadedAccount {
     await completer.future;
   }
 
-  Future<void> _autoSyncCycle(
-      String password, Completer<void> completer) async {
+  Future<void> _autoSyncCycle(Completer<void> completer) async {
     Map<String, Sync2d0d0ServerInfo> serverInfo = sync2d0d0ServerInfo;
     serverInfo.addAll(_serversToTrust);
     if (serverInfo.isNotEmpty) {
-      String passwordDecrypted;
-      try {
-        passwordDecrypted = decrypt(password, encrypter: _encrypter);
-      } catch (_) {
-        await Future.delayed(
-            Duration(milliseconds: _settings.value.serverSyncInterval));
-        if (!completer.isCompleted) _autoSyncCycle(password, completer);
-        return;
-      }
       for (Sync2d0d0ServerInfo info in serverInfo.values) {
         Synchronization? syncClient = getSynchronization();
         if (syncClient == null) continue;
@@ -427,8 +424,8 @@ class LoadedAccount {
           }
           await syncClient.connect2d0d0(
               HostAddress(InternetAddress(info.address), info.port),
-              password: passwordDecrypted,
               deviceId: _deviceId,
+              isDedicatedServer: true,
               verifyTrustedConnectionData: verifyTrustedConnectionData,
               trustedConnectionsDir: Directory(_versionFile.parent.path +
                   Platform.pathSeparator +
@@ -441,15 +438,14 @@ class LoadedAccount {
     }
     await Future.delayed(
         Duration(milliseconds: _settings.value.serverSyncInterval));
-    if (!completer.isCompleted) _autoSyncCycle(password, completer);
+    if (!completer.isCompleted) _autoSyncCycle(completer);
   }
 
-  void startAutoSync(String password) {
-    String passwordEncrypted = encrypt(password, encrypter: _encrypter);
+  void startAutoSync() {
     if (_autoSyncCompleter != null) return;
     Completer completer = Completer<void>();
     _autoSyncCompleter = completer;
-    _autoSyncCycle(passwordEncrypted, completer);
+    _autoSyncCycle(completer);
   }
 
   void stopAutoSync() {
@@ -1600,8 +1596,10 @@ class JSONLoadedAccount {
     );
   }
 
-  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter, Key key) {
+  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter, Key key,
+      {required String encryptedPassword}) {
     return LoadedAccount(
+      encryptedPassword: encryptedPassword,
       encrypter: encrypter,
       versionFile: _versionFile,
       deviceId: _deviceId,

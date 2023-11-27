@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/main.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/sync_2d0d0_server_info.dart';
@@ -100,8 +101,9 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
       await _account.trustServer(Sync2d0d0ServerInfo(
           nickname: _nickname, address: address, port: _port));
     } catch (e, s) {
+      if (navigatorKey.currentContext == null) return;
       showSnackBar(
-        context,
+        navigatorKey.currentContext!,
         message: localizations.couldNotConnectToServer,
         icon:
             const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
@@ -117,8 +119,9 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
       Sync2d0d0ServerInfo(nickname: _nickname, address: address, port: _port)
     ]);
     await _account.saveSettings();
+    if (navigatorKey.currentContext == null) return;
     showSnackBar(
-      context,
+      navigatorKey.currentContext!,
       message: localizations.connectionEstablished,
       icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
     );
