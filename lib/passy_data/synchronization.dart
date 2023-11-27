@@ -975,7 +975,7 @@ class Synchronization {
                 '${response['hostDeviceId']}--$deviceId');
             TrustedConnectionData local = TrustedConnectionData.fromEncrypted(
                 data: await connectionFile.readAsString(),
-                encrypter: remoteEncrypter);
+                encrypter: _encrypter);
             TrustedConnectionData remote = TrustedConnectionData.fromEncrypted(
                 data: response['connectionData'], encrypter: remoteEncrypter);
             if (local.deviceId != remote.deviceId) {
@@ -1079,7 +1079,7 @@ class Synchronization {
           await connectionFile.create(recursive: true);
         }
         await connectionFile
-            .writeAsString(trustedConnectionData.toEncrypted(remoteEncrypter));
+            .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
         onTrustSaveComplete?.call();
       }
       _syncLog += 'done.\nAuthenticating... ';
