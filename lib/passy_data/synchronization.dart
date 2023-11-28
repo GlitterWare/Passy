@@ -918,15 +918,17 @@ class Synchronization {
         }
         dynamic derivationInfoJson = creds['keyDerivationInfo'];
         if (derivationInfoJson is! Map<String, dynamic>) {
-          onTrustSaveFailed?.call();
-          _handleException(
-              'Malformed key derivation info:Expected type `Map<String, dynamic>`, received type `${derivationInfoJson.runtimeType}`');
-          return;
+          if (derivationInfoJson != null) {
+            onTrustSaveFailed?.call();
+            _handleException(
+                'Malformed key derivation info:Expected type `Map<String, dynamic>`, received type `${derivationInfoJson.runtimeType}`');
+            return;
+          }
         }
-        KeyDerivationInfo derivationInfo;
+        KeyDerivationInfo? derivationInfo;
         try {
-          derivationInfo =
-              KeyDerivationInfo.fromJson(derivationType)!(derivationInfoJson);
+          derivationInfo = KeyDerivationInfo.fromJson(derivationType)
+              ?.call(derivationInfoJson);
         } catch (e, s) {
           onTrustSaveFailed?.call();
           _handleException('Failed to decode key derivation info:\n$e\n$s');
