@@ -28,8 +28,8 @@ class _IDCardsScreen extends State<IDCardsScreen> {
       Navigator.pushNamed(context, EditIDCardScreen.routeName);
 
   void _onSearchPressed() {
-    Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: SearchScreenArgs(builder: (String terms) {
+    Navigator.pushNamed(context, SearchScreen.routeName, arguments:
+        SearchScreenArgs(builder: (String terms, void Function() rebuild) {
       final List<IDCardMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (IDCardMeta _idCard in _account.idCardsMetadata.values) {
@@ -59,6 +59,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
         return CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(flex: 7),
@@ -99,6 +100,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

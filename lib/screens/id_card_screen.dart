@@ -111,6 +111,8 @@ class _IDCardScreen extends State<IDCardScreen> {
       ),
       body: ListView(
         children: [
+          if (_idCard.attachments.isNotEmpty)
+            AttachmentsListView(files: _idCard.attachments),
           if (_idCard.nickname != '')
             PassyPadding(RecordButton(
               title: localizations.nickname,

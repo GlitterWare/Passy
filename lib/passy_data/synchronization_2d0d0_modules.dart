@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/account_credentials.dart';
+import 'package:passy/passy_data/account_settings.dart';
 
+import 'passy_entries_file_collection.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'history.dart';
-import 'loaded_account.dart';
 import 'glare/glare_module.dart';
 import 'passy_entry.dart';
 import 'synchronization_2d0d0_utils.dart' as util;
@@ -13,34 +15,41 @@ import 'common.dart';
 import 'favorites.dart';
 
 Map<String, GlareModule> buildSynchronization2d0d0Modules({
-  required LoadedAccount account,
+  required String username,
+  required FullPassyEntriesFileCollection passyEntries,
   required Encrypter encrypter,
   required HistoryFile history,
   required FavoritesFile favorites,
+  required AccountSettingsFile settings,
+  required AccountCredentialsFile credentials,
+  required authWithIV,
   Map<EntryType, List<String>>? sharedEntryKeys,
   void Function()? onSetEntry,
   void Function()? onRemoveEntry,
 }) {
   history.reloadSync();
-  Encrypter usernameEncrypter = getPassyEncrypter(account.username);
+  Encrypter usernameEncrypter = getPassyEncrypter(username);
   String apiVersion = '2d0d1';
   String generateAuth() {
     return util.generateAuth(
-        encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+        encrypter: encrypter,
+        usernameEncrypter: usernameEncrypter,
+        withIV: authWithIV);
   }
 
   sharedEntryKeys ??= {};
   Map<String, dynamic> sharedEntries =
       sharedEntryKeys.map((entryType, entryKeys) {
     Map<String, EntryEvent> historyEntries = history.value.getEvents(entryType);
-    PassyEntry? Function(String) getEntry = account.getEntry(entryType);
+    Map<String, PassyEntry> entries =
+        passyEntries.getEntries(entryType).getEntries(entryKeys);
     return MapEntry(
       entryType.name,
       entryKeys.map<Map<String, dynamic>>((e) {
         return {
           'key': e,
           'historyEntry': historyEntries[e],
-          'entry': getEntry(e),
+          'entry': entries[e],
         };
       }).toList(),
     );
@@ -48,7 +57,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   return {
     apiVersion: GlareModule(
       name: 'Passy 2.0.0+ Synchronization Modules',
-      target: (args) async {
+      target: (args, {required addModule, required readBytes}) async {
         if (args.length == 3) {
           return {
             'commands': [
@@ -84,7 +93,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
           }
           try {
             util.verifyAuth(decoded['auth'],
-                encrypter: encrypter, usernameEncrypter: usernameEncrypter);
+                encrypter: encrypter,
+                usernameEncrypter: usernameEncrypter,
+                withIV: authWithIV);
           } catch (e) {
             if (e is Map<String, dynamic>) return e;
             rethrow;
@@ -98,6 +109,14 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             if (check.containsKey('error')) return check;
             return {
               'status': {'type': 'Success'}
+            };
+          case 'getAccountCredentials':
+            await credentials.reload();
+            Map<String, dynamic> credsJson = credentials.value.toJson();
+            credsJson.remove('passwordHash');
+            credsJson.remove('bioAuthEnabled');
+            return {
+              'credentials': credsJson,
             };
           case 'authenticate':
             Map<String, dynamic> check = checkArgs(args);
@@ -170,15 +189,15 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               'entries': entryKeys.map((entryType, entryKeys) {
                 Map<String, EntryEvent> historyEntries =
                     history.value.getEvents(entryType);
-                PassyEntry? Function(String) getEntry =
-                    account.getEntry(entryType);
+                Map<String, PassyEntry> entries =
+                    passyEntries.getEntries(entryType).getEntries(entryKeys);
                 return MapEntry(
                   entryType.name,
                   entryKeys.map<Map<String, dynamic>>((e) {
                     return {
                       'key': e,
                       'historyEntry': historyEntries[e],
-                      'entry': getEntry(e),
+                      'entry': entries[e],
                     };
                   }).toList(),
                 );
@@ -193,14 +212,16 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             if (check.containsKey('error')) return check;
             Map<EntryType, List<util.ExchangeEntry>> exchangeEntries;
             exchangeEntries = util.getEntries(check['entries']);
-            await history.reload();
             await util.processTypedExchangeEntries(
               entries: exchangeEntries,
-              account: account,
-              history: history.value,
+              passyEntries: passyEntries,
+              history: history,
               onRemoveEntry: onRemoveEntry,
               onSetEntry: onSetEntry,
             );
+            await settings.reload();
+            settings.value.lastSyncDate = DateTime.now().toUtc();
+            await settings.save();
             return {
               'status': {'type': 'Success'}
             };
@@ -241,7 +262,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
                 localFavoritesEntries[entryEvent.key] = entryEvent;
               }
             }
-            await account.saveFavorites();
+            await favorites.save();
             return {
               'status': {'type': 'Success'}
             };

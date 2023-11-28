@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,8 +10,7 @@ import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:passy/common/common.dart';
 import 'package:passy/common/synchronization_wrapper.dart';
-import 'package:passy/passy_data/biometric_storage_data.dart';
-import 'package:passy/passy_data/common.dart';
+import 'package:passy/main.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -35,8 +35,13 @@ import 'note_screen.dart';
 import 'password_screen.dart';
 import 'passwords_screen.dart';
 import 'payment_card_screen.dart';
+import 'splash_screen.dart';
 
 bool isAutofill = false;
+final bool recommendKeyDerivation = DateTime.now()
+    .toUtc()
+    .subtract(const Duration(days: 21))
+    .isAfter(DateTime.parse('2023-11-23 17:09:30.339789Z'));
 
 const screenToRouteName = {
   Screen.main: MainScreen.routeName,
@@ -79,21 +84,6 @@ String entryTypeToEntryRouteName(EntryType entryType) {
 
 final bool _isMobile = Platform.isAndroid || Platform.isIOS;
 
-Future<bool> bioAuth(String username) async {
-  BiometricStorageData _bioData;
-  try {
-    _bioData = await BiometricStorageData.fromLocker(username);
-  } catch (e) {
-    return false;
-  }
-  if (getPassyHash(_bioData.password).toString() !=
-      data.getPasswordHash(username)) return false;
-  data.info.value.lastUsername = username;
-  await data.info.save();
-  await data.loadAccount(username, getPassyEncrypter(_bioData.password));
-  return true;
-}
-
 void openUrl(String url) {
   if (_isMobile) {
     FlutterWebBrowser.openWebPage(url: url);
@@ -102,21 +92,39 @@ void openUrl(String url) {
   launchUrlString(url);
 }
 
+//TODO: localize backup
 Future<String?> backupAccount(
   BuildContext context, {
   required String username,
+  bool autoFilename = true,
 }) async {
+  if (Platform.isAndroid) autoFilename = true;
   try {
     MainScreen.shouldLockScreen = false;
-    String? _buDir = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Backup Passy',
-      lockParentWindow: true,
-    );
-    MainScreen.shouldLockScreen = true;
+    String? _fileName;
+    String? _buDir;
+    if (autoFilename) {
+      _buDir = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: 'Backup Passy',
+        lockParentWindow: true,
+      );
+    } else {
+      _fileName =
+          'passy-backup-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+      _buDir = await FilePicker.platform.saveFile(
+        dialogTitle: 'Backup Passy',
+        lockParentWindow: true,
+        fileName: _fileName,
+      );
+    }
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => MainScreen.shouldLockScreen = true);
     if (_buDir == null) return null;
+    if (!autoFilename) _buDir = File(_buDir).parent.path;
     await data.backupAccount(
       username: username,
       outputDirectoryPath: _buDir,
+      fileName: _fileName,
     );
     showSnackBar(context,
         message: 'Backup saved',
@@ -136,7 +144,7 @@ Future<String?> backupAccount(
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
         action: SnackBarAction(
-          label: 'Details',
+          label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
               arguments: e.toString() + '\n' + s.toString()),
         ),
@@ -255,6 +263,7 @@ PopupMenuItem getIconedPopupMenuItem({
   );
 }
 
+//TODO: localize menu builders
 List<PopupMenuEntry> idCardPopupMenuBuilder(
     BuildContext context, IDCardMeta idCardMeta) {
   return [
@@ -475,6 +484,126 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
   ];
 }
 
+List<PopupMenuEntry> filePopupMenuBuilder(
+    BuildContext context, FileEntry fileEntry,
+    {Future<void> Function()? onChanged}) {
+  return [
+    if (fileEntry.type != FileEntryType.folder)
+      getIconedPopupMenuItem(
+        content: Text(localizations.rename),
+        icon: const Icon(Icons.edit_outlined),
+        onTap: () async {
+          String? result = await showDialog(
+              context: context,
+              builder: (context) => RenameFileDialog(name: fileEntry.name));
+          if (result == null) return;
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await Future.delayed(const Duration(milliseconds: 200));
+          await data.loadedAccount!.renameFile(fileEntry.key, name: result);
+          await (onChanged?.call());
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          showSnackBar(context,
+              message: 'File renamed',
+              icon: const Icon(Icons.edit_outlined,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+    if (fileEntry.type != FileEntryType.folder)
+      getIconedPopupMenuItem(
+        content: Text(localizations.export),
+        icon: const Icon(Icons.ios_share_rounded),
+        onTap: () async {
+          await Future.delayed(const Duration(milliseconds: 200));
+          String? expFile;
+          if (Platform.isAndroid) {
+            String? expDir = await FilePicker.platform.getDirectoryPath(
+              dialogTitle: localizations.exportPassy,
+              lockParentWindow: true,
+            );
+            if (expDir != null) {
+              expFile = expDir + Platform.pathSeparator + fileEntry.name;
+            }
+          } else {
+            expFile = await FilePicker.platform.saveFile(
+              dialogTitle: localizations.exportPassy,
+              lockParentWindow: true,
+              fileName: fileEntry.name,
+            );
+          }
+          if (expFile == null) return;
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await Future.delayed(const Duration(milliseconds: 200));
+          await data.loadedAccount!
+              .exportFile(fileEntry.key, file: File(expFile));
+          Navigator.pop(context);
+          await (onChanged?.call());
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          showSnackBar(context,
+              message: localizations.exportSaved,
+              icon: const Icon(Icons.ios_share_rounded,
+                  color: PassyTheme.darkContentColor));
+        },
+      ),
+    getIconedPopupMenuItem(
+      content: Text(localizations.remove),
+      icon: const Icon(Icons.delete_outline_rounded),
+      onTap: () async {
+        bool? result = await showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                shape: PassyTheme.dialogShape,
+                title: Text(localizations.removeFile),
+                content:
+                    Text('${localizations.filesCanOnlyBeRestoredFromABackup}.'),
+                actions: [
+                  TextButton(
+                    child: Text(
+                      localizations.cancel,
+                      style: const TextStyle(
+                          color: PassyTheme.lightContentSecondaryColor),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  TextButton(
+                    child: Text(
+                      localizations.remove,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                  )
+                ],
+              );
+            });
+        if (result != true) return;
+        Navigator.pushNamed(context, SplashScreen.routeName);
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (fileEntry.type == FileEntryType.folder) {
+          await data.loadedAccount!.removeFolder(fileEntry.path);
+          await (onChanged?.call());
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          showSnackBar(context,
+              message: 'Folder removed',
+              icon: const Icon(Icons.delete_outline_rounded,
+                  color: PassyTheme.darkContentColor));
+          return;
+        }
+        await data.loadedAccount!.removeFile(fileEntry.key);
+        await (onChanged?.call());
+        if (!context.mounted) return;
+        Navigator.pop(context);
+        showSnackBar(context,
+            message: 'File removed',
+            icon: const Icon(Icons.delete_outline_rounded,
+                color: PassyTheme.darkContentColor));
+      },
+    ),
+  ];
+}
+
 List<PopupMenuEntry> passyEntryPopupMenuItemBuilder(
     BuildContext context, SearchEntryData entry) {
   switch (entry.type) {
@@ -629,4 +758,41 @@ String genderToReadableName(Gender gender) {
     case Gender.other:
       return localizations.other;
   }
+}
+
+setOnError(BuildContext context) {
+  FlutterError.onError = (e) {
+    FlutterError.presentError(e);
+    try {
+      showSnackBar(
+        navigatorKey.currentContext!,
+        message: localizations.somethingWentWrong,
+        icon: const Icon(Icons.error_outline_rounded,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(
+              navigatorKey.currentContext!, LogScreen.routeName,
+              arguments: e.exception.toString() + '\n' + e.stack.toString()),
+        ),
+      );
+    } catch (_) {}
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    try {
+      showSnackBar(
+        navigatorKey.currentContext!,
+        message: localizations.somethingWentWrong,
+        icon: const Icon(Icons.error_outline_rounded,
+            color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(
+              navigatorKey.currentContext!, LogScreen.routeName,
+              arguments: error.toString() + '\n' + stack.toString()),
+        ),
+      );
+    } catch (_) {}
+    return false;
+  };
 }

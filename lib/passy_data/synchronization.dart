@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:intranet_ip/intranet_ip.dart';
+import 'package:passy/passy_data/account_credentials.dart';
+import 'package:passy/passy_data/account_settings.dart';
+import 'package:passy/passy_data/key_derivation_info.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:passy/passy_data/trusted_connection_data.dart';
 
 import 'favorites.dart';
+import 'passy_entries_encrypted_csv_file.dart';
 import 'synchronization_2d0d0_modules.dart';
 import 'common.dart';
 import 'entry_event.dart';
@@ -16,7 +21,6 @@ import 'entry_type.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'json_convertable.dart';
-import 'loaded_account.dart';
 import 'passy_entry.dart';
 import 'passy_stream_subscription.dart';
 import 'glare/glare_client.dart';
@@ -28,8 +32,12 @@ const String _sameHistoryHash = 'same';
 
 class SynchronizationResults {
   Map<EntryType, List<util.ExchangeEntry>>? sharedEntries;
+  String log;
 
-  SynchronizationResults({this.sharedEntries});
+  SynchronizationResults({
+    this.sharedEntries,
+    required this.log,
+  });
 }
 
 class SynchronizationSignalData with JsonConvertable {
@@ -171,13 +179,42 @@ class _EntryInfo with JsonConvertable {
       };
 }
 
+class SynchronizationReport with JsonConvertable {
+  final bool isCompleted;
+  final int entriesSet;
+  final int entriesRemoved;
+
+  SynchronizationReport({
+    required this.isCompleted,
+    required this.entriesSet,
+    required this.entriesRemoved,
+  });
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'isCompleted': isCompleted,
+      'entriesSet': entriesSet,
+      'entriesRemoved': entriesRemoved,
+    };
+  }
+}
+
+enum SynchronizationType {
+  classic,
+  v2d0d0,
+}
+
 class Synchronization {
-  final LoadedAccount _loadedAccount;
+  final String _username;
+  final FullPassyEntriesFileCollection _passyEntries;
   final HistoryFile _history;
   final FavoritesFile _favorites;
+  final AccountSettingsFile _settings;
+  final AccountCredentialsFile _credentials;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
-      SynchronizationResults();
+      SynchronizationResults(log: '');
   final void Function(SynchronizationResults)? _onComplete;
   bool _isOnCompleteCalled = false;
   final void Function(String log)? _onError;
@@ -188,29 +225,55 @@ class Synchronization {
   int _entriesAdded = 0;
   int _entriesRemoved = 0;
   final RSAKeypair _rsaKeypair;
+  final bool _authWithIV;
+  final SynchronizationType _synchronizationType;
   GlareClient? _sync2d0d0Client;
   GlareServer? _sync2d0d0Host;
+  final String _encryptedPassword;
 
   get entriesAdded => _entriesAdded;
   get entriesRemoved => _entriesRemoved;
 
-  Synchronization(this._loadedAccount,
-      {required HistoryFile history,
-      required FavoritesFile favorites,
-      required Encrypter encrypter,
-      required RSAKeypair rsaKeypair,
-      void Function(SynchronizationResults)? onComplete,
-      void Function(String log)? onError})
-      : _history = history,
+  Synchronization({
+    required String username,
+    required String encryptedPassword,
+    required FullPassyEntriesFileCollection passyEntries,
+    required HistoryFile history,
+    required FavoritesFile favorites,
+    required AccountSettingsFile settings,
+    required AccountCredentialsFile credentials,
+    required Encrypter encrypter,
+    required RSAKeypair rsaKeypair,
+    required bool authWithIV,
+    required SynchronizationType synchronizationType,
+    void Function(SynchronizationResults)? onComplete,
+    void Function(String log)? onError,
+  })  : _username = username,
+        _encryptedPassword = encryptedPassword,
+        _passyEntries = passyEntries,
+        _history = history,
         _favorites = favorites,
+        _settings = settings,
+        _credentials = credentials,
         _encrypter = encrypter,
         _rsaKeypair = rsaKeypair,
         _onComplete = onComplete,
-        _onError = onError;
+        _onError = onError,
+        _authWithIV = authWithIV,
+        _synchronizationType = synchronizationType;
+
+  SynchronizationReport getReport() {
+    return SynchronizationReport(
+      isCompleted: _isOnCompleteCalled,
+      entriesSet: _entriesAdded,
+      entriesRemoved: _entriesRemoved,
+    );
+  }
 
   void _callOnComplete() {
     if (_isOnCompleteCalled) return;
     _isOnCompleteCalled = true;
+    _synchronizationResults.log = _syncLog;
     _onComplete?.call(_synchronizationResults);
   }
 
@@ -239,13 +302,16 @@ class Synchronization {
       EntryType.idCard,
       EntryType.identity,
     ]) {
-      for (String key in request.getKeys(entryType)) {
+      List<String> keys = request.getKeys(entryType);
+      Map<String, PassyEntry> entries =
+          _passyEntries.getEntries(entryType).getEntries(keys);
+      for (String key in keys) {
         _data.add(utf8.encode(encrypt(
                 jsonEncode(_EntryData(
                     key: key,
                     type: entryType,
                     event: _history.value.getEvents(entryType)[key]!,
-                    value: _loadedAccount.getEntry(entryType)(key)?.toCSV())),
+                    value: entries[key]?.toCSV())),
                 encrypter: _encrypter) +
             '\u0000'));
       }
@@ -274,6 +340,8 @@ class Synchronization {
             'Could not decode an entry.\n${e.toString()}\n${s.toString()}');
         return;
       }
+      PassyEntriesEncryptedCSVFile file =
+          _passyEntries.getEntries(_entryData.type);
 
       try {
         Map<String, EntryEvent> _events =
@@ -282,7 +350,7 @@ class Synchronization {
         if (_entryData.event.status == EntryStatus.removed) {
           if (_events.containsKey(_entryData.key)) {
             if (_events[_entryData.key]!.status == EntryStatus.alive) {
-              await _loadedAccount.removeEntry(_entryData.type)(_entryData.key);
+              await file.setEntry(_entryData.key);
             }
           }
           _events[_entryData.key] = _entryData.event;
@@ -297,8 +365,8 @@ class Synchronization {
           _events[_entryData.key] = _entryData.event;
           continue;
         }
-        await _loadedAccount.setEntry(_entryData.type)(
-            PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
+        await file.setEntry(_entryData.key,
+            entry: PassyEntry.fromCSV(_entryData.type)(_entryData.value!));
         _events[_entryData.key] = _entryData.event;
         _entriesAdded += 1;
       } catch (e, s) {
@@ -307,13 +375,13 @@ class Synchronization {
         return;
       }
     }
-    return _loadedAccount.save();
+    return _history.save();
   }
 
   Future<List<List<int>>> _handleEntries(
     PassyStreamSubscription subscription, {
     required int entryCount,
-    VoidCallback? onFirstReceive,
+    void Function()? onFirstReceive,
   }) {
     List<List<int>> _entries = [];
     Completer<List<List<int>>> _completer = Completer<List<List<int>>>();
@@ -353,32 +421,54 @@ class Synchronization {
   Future<HostAddress?> host({
     void Function()? onConnected,
     Map<EntryType, List<String>>? sharedEntryKeys,
+    String? address,
+    int port = 0,
   }) async {
     await _history.reload();
     _syncLog = 'Hosting... ';
     HostAddress? _address;
     String _ip = '';
-    try {
-      List<NetworkInterface> _interfaces =
-          await NetworkInterface.list(type: InternetAddressType.IPv4);
-      for (NetworkInterface _interface in _interfaces) {
-        for (InternetAddress _address in _interface.addresses) {
-          String _strAddress = _address.address;
-          if (_strAddress.startsWith('192.168.1.')) {
-            _ip = _strAddress;
-            break;
-          }
-        }
-      }
-      if (_ip == '') _ip = (await intranetIpv4()).address;
-    } catch (_) {
-      _ip = '127.0.0.1';
+    if (address == null) {
+      _ip = await getInternetAddress();
+    } else {
+      _ip = address;
+    }
+    if (_synchronizationType == SynchronizationType.v2d0d0) {
+      GlareServer host = await GlareServer.bind(
+        address: _ip,
+        port: 0,
+        keypair: _rsaKeypair,
+        maxTotalConnections: 1,
+        onConnected: (totalConnections) => onConnected?.call(),
+        modules: buildSynchronization2d0d0Modules(
+          username: _username,
+          passyEntries: _passyEntries,
+          encrypter: _encrypter,
+          history: _history,
+          favorites: _favorites,
+          settings: _settings,
+          sharedEntryKeys: sharedEntryKeys,
+          credentials: _credentials,
+          authWithIV: _authWithIV,
+          onSetEntry: () => _entriesAdded++,
+          onRemoveEntry: () => _entriesRemoved++,
+        ),
+        serviceInfo:
+            'Passy cross-platform password manager entry synchronization server v$syncVersion',
+        onStop: () async {
+          _isConnected = false;
+          await close();
+        },
+      );
+      _sync2d0d0Host = host;
+      _address = HostAddress(host.address, host.port);
+      return _address;
     }
     try {
       if (_server != null) await _server?.close();
       _syncLog += 'done. \nListening... ';
 
-      await ServerSocket.bind(_ip, 0).then((server) {
+      await ServerSocket.bind(_ip, port).then((server) {
         _server = server;
         _address = HostAddress(InternetAddress(_ip), server.port);
         server.listen(
@@ -422,6 +512,10 @@ class Synchronization {
                   _socket = null;
                   socket.destroy();
                   server.close();
+                  _settings.reload().then((value) async {
+                    _settings.value.lastSyncDate = DateTime.now().toUtc();
+                    await _settings.save();
+                  });
                   _callOnComplete();
                   return;
                 }
@@ -531,6 +625,9 @@ class Synchronization {
                   // Cleanup
                   _syncLog += 'done.';
                   _isConnected = false;
+                  await _settings.reload();
+                  _settings.value.lastSyncDate = DateTime.now().toUtc();
+                  await _settings.save();
                   _callOnComplete();
                 });
                 _sendInfo(_info);
@@ -610,12 +707,17 @@ class Synchronization {
                 address: _ip,
                 port: 0,
                 keypair: _rsaKeypair,
+                maxTotalConnections: 1,
                 modules: buildSynchronization2d0d0Modules(
-                  account: _loadedAccount,
+                  username: _username,
+                  passyEntries: _passyEntries,
                   encrypter: _encrypter,
                   history: _history,
                   favorites: _favorites,
+                  settings: _settings,
+                  credentials: _credentials,
                   sharedEntryKeys: sharedEntryKeys,
+                  authWithIV: _authWithIV,
                   onSetEntry: () => _entriesAdded++,
                   onRemoveEntry: () => _entriesRemoved++,
                 ),
@@ -646,7 +748,7 @@ class Synchronization {
               }
               try {
                 _data = decrypt(decrypt(_data, encrypter: _encrypter),
-                    encrypter: getPassyEncrypter(_loadedAccount.username));
+                    encrypter: getPassyEncrypter(_username));
               } catch (e, s) {
                 _handleException(
                     'Could not decrypt hello. Make sure that local and remote username and password are the same.\n${e.toString()}\n${s.toString()}');
@@ -679,7 +781,700 @@ class Synchronization {
     return null;
   }
 
-  Future<void> connect(HostAddress address) async {
+  Future<void> _synchronization2d0d0(
+    String address, {
+    Socket? socket,
+    String? deviceId,
+    bool isDedicatedServer = false,
+    bool verifyTrustedConnectionData = false,
+    Directory? trustedConnectionsDir,
+    void Function()? onTrustSaveComplete,
+    void Function()? onTrustSaveFailed,
+  }) async {
+    void _handleApiException(String message, Object exception) {
+      if (exception is Map<String, dynamic>) {
+        _handleException('$message: ${jsonEncode(exception)}');
+        return;
+      }
+      _handleException('$message: $exception.');
+    }
+
+    Map<String, dynamic> _checkResponse(Map<String, dynamic>? response) {
+      if (response is! Map<String, dynamic>) {
+        return {
+          'error':
+              'Malformed server response. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
+        };
+      }
+      if (response.containsKey('error')) return {'error': response['error']};
+      dynamic data = response['data'];
+      if (data is! Map<String, dynamic>) {
+        return {
+          'error':
+              'Malformed server response data. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
+        };
+      }
+      dynamic error = data['error'];
+      if (error != null) return {'error': error};
+      dynamic result = data['result'];
+      if (result == null) {
+        return {'error': 'Server module responded with null'};
+      }
+      return response['data']['result'];
+    }
+
+    List<String> _addressSplit = address.split(':');
+    if (_addressSplit.length < 2) {
+      _handleException(
+          'Could not connect. Malformed server address: $address.');
+      return;
+    }
+    int? port = int.tryParse(_addressSplit[1]);
+    if (port == null) {
+      _handleException(
+          'Could not connect. Malformed server address: $address.');
+      return;
+    }
+    GlareClient _safeSync2d0d0Client;
+    try {
+      _safeSync2d0d0Client = await GlareClient.connect(
+        host: _addressSplit[0],
+        port: port,
+        keypair: _rsaKeypair,
+        timeout: const Duration(seconds: 10),
+        log: (object) {
+          if (object is! String) return;
+          if (!object.startsWith('W:')) return;
+          _syncLog += '\n\n$object\n\n';
+        },
+      );
+      _sync2d0d0Client = _safeSync2d0d0Client;
+    } catch (e, s) {
+      _handleException('Could not connect.\n${e.toString()}\n${s.toString()}');
+      return;
+    }
+    _syncLog += 'done.\nReceiving users list... ';
+    Map<String, dynamic> response;
+    dynamic users = [
+      {'username': _username}
+    ];
+    for (dynamic user in users) {
+      _syncLog += 'done.\nProcessing next user... ';
+      if (user is! Map<String, dynamic>) {
+        _handleException(
+            'Malformed user information. Expected type `Map<String, dynamic>`, received type `${users.runtimeType.toString()}`.');
+        return;
+      }
+      dynamic userName = user['username'];
+      if (userName is! String) {
+        _handleException(
+            'Malformed username. Expected type `String`, received type `${userName.runtimeType.toString()}`.');
+        return;
+      }
+      if (userName != _username) {
+        _handleException(
+            'No shared accounts found. Please make sure that your main and/or shared accounts are added on both ends and have the same usernames and passwords.');
+        return;
+      }
+      Encrypter usernameEncrypter = getPassyEncrypter(_username);
+      String apiVersion = '2d0d1';
+
+      Key? derivedPassword;
+      Encrypter remoteEncrypter;
+      _syncLog += 'done.\nReceiving remote credentials metadata... ';
+      response = _checkResponse(await _safeSync2d0d0Client.runModule([
+        apiVersion,
+        'getAccountCredentials',
+      ]));
+      if (response.containsKey('error')) {
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'getAccountCredentials',
+          _username,
+        ]));
+      }
+      if (response.containsKey('error')) {
+        remoteEncrypter = _encrypter;
+      } else {
+        dynamic creds = response['credentials'];
+        if (creds is! Map<String, dynamic>) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              'Malformed account credentials:Expected type `Map<String, dynamic>`, received type `${creds.runtimeType}`');
+          return;
+        }
+        dynamic derivationTypeJson = creds['keyDerivationType'];
+        if (derivationTypeJson is! String) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              'Malformed key derivation type:Expected type `String`, received type `${derivationTypeJson.runtimeType}`');
+          return;
+        }
+        KeyDerivationType? derivationType =
+            keyDerivationTypeFromName(derivationTypeJson);
+        if (derivationType == null) {
+          onTrustSaveFailed?.call();
+          _handleException('Invalid key derivation type:`$derivationTypeJson`');
+          return;
+        }
+        dynamic derivationInfoJson = creds['keyDerivationInfo'];
+        if (derivationInfoJson is! Map<String, dynamic>) {
+          if (derivationInfoJson != null) {
+            onTrustSaveFailed?.call();
+            _handleException(
+                'Malformed key derivation info:Expected type `Map<String, dynamic>`, received type `${derivationInfoJson.runtimeType}`');
+            return;
+          }
+        }
+        KeyDerivationInfo? derivationInfo;
+        try {
+          derivationInfo = KeyDerivationInfo.fromJson(derivationType)
+              ?.call(derivationInfoJson);
+        } catch (e, s) {
+          onTrustSaveFailed?.call();
+          _handleException('Failed to decode key derivation info:\n$e\n$s');
+          return;
+        }
+
+        try {
+          derivedPassword = await derivePassword(
+              decrypt(_encryptedPassword, encrypter: _encrypter),
+              derivationType: derivationType,
+              derivationInfo: derivationInfo);
+          remoteEncrypter = Encrypter(AES(derivedPassword));
+        } catch (e, s) {
+          onTrustSaveFailed?.call();
+          _handleException('Failed to derive password:\n$e\n$s');
+          return;
+        }
+      }
+
+      Map<String, dynamic> auth() {
+        return {
+          'auth': util.generateAuth(
+              encrypter: remoteEncrypter,
+              usernameEncrypter: usernameEncrypter,
+              withIV: _authWithIV),
+        };
+      }
+
+      if (verifyTrustedConnectionData) {
+        if (deviceId != null && trustedConnectionsDir != null) {
+          _syncLog += 'done.\nVerifying trusted connection data... ';
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            'getTrustedConnection',
+            _username,
+            deviceId,
+          ]));
+          if (response.containsKey('error')) {
+            onTrustSaveFailed?.call();
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          try {
+            File connectionFile = File(trustedConnectionsDir.path +
+                Platform.pathSeparator +
+                '${response['hostDeviceId']}--$deviceId');
+            TrustedConnectionData local = TrustedConnectionData.fromEncrypted(
+                data: await connectionFile.readAsString(),
+                encrypter: _encrypter);
+            TrustedConnectionData remote = TrustedConnectionData.fromEncrypted(
+                data: response['connectionData'], encrypter: remoteEncrypter);
+            if (local.deviceId != remote.deviceId) {
+              onTrustSaveFailed?.call();
+              _handleException('Trusted connection data does not match');
+              return;
+            }
+            if (!local.version.isBefore(remote.version)) {
+              onTrustSaveFailed?.call();
+              _handleException('Trusted connection data does not match');
+              return;
+            }
+          } catch (e) {
+            onTrustSaveFailed?.call();
+            _handleApiException('Failed to verify trusted connection data', e);
+            return;
+          }
+        }
+      }
+      if (isDedicatedServer && derivedPassword != null) {
+        _syncLog += 'done.\nLogging in... ';
+        bool loggedIn = false;
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'authenticate',
+          _username,
+          util.generateAuth(
+              encrypter: Encrypter(AES(derivedPassword)),
+              usernameEncrypter: usernameEncrypter,
+              withIV: true),
+        ]));
+        if (!response.containsKey('error')) {
+          try {
+            util.verifyAuth(response['auth'],
+                encrypter: remoteEncrypter,
+                usernameEncrypter: usernameEncrypter,
+                withIV: true);
+          } catch (e) {
+            onTrustSaveFailed?.call();
+            _handleApiException('Failed to verify host auth', e);
+            return;
+          }
+          apiVersion += '_$_username';
+          loggedIn = true;
+        }
+        if (!loggedIn) {
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            'login',
+            _username,
+            derivedPassword.base64,
+          ]));
+          if (response.containsKey('error')) {
+            onTrustSaveFailed?.call();
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          apiVersion += '_$_username';
+        }
+      }
+      if (deviceId != null && trustedConnectionsDir != null) {
+        _syncLog += 'done.\nUpdating trusted connection data... ';
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'getDeviceId',
+          _username,
+          deviceId,
+        ]));
+        dynamic hostDeviceId = response['hostDeviceId'];
+        if (hostDeviceId is! String) {
+          onTrustSaveFailed?.call();
+          _handleException('Host did not provide their device id.');
+          return;
+        }
+        if (response.containsKey('error')) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        TrustedConnectionData trustedConnectionData = TrustedConnectionData(
+            deviceId: deviceId, version: DateTime.now().toUtc());
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          'setTrustedConnection',
+          _username,
+          deviceId,
+          util.generateAuth(
+              encrypter: remoteEncrypter,
+              usernameEncrypter: usernameEncrypter,
+              withIV: true),
+          trustedConnectionData.toEncrypted(remoteEncrypter),
+        ]));
+        if (response.containsKey('error')) {
+          onTrustSaveFailed?.call();
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        File connectionFile = File(trustedConnectionsDir.path +
+            Platform.pathSeparator +
+            '$hostDeviceId--$deviceId');
+        if (!await connectionFile.exists()) {
+          await connectionFile.create(recursive: true);
+        }
+        await connectionFile
+            .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
+        onTrustSaveComplete?.call();
+      }
+      _syncLog += 'done.\nAuthenticating... ';
+      Map<String, dynamic> authResponse =
+          _checkResponse(await _safeSync2d0d0Client.runModule([
+        apiVersion,
+        'authenticate',
+        jsonEncode(auth()),
+      ]));
+      if (authResponse.containsKey('error')) {
+        _syncLog +=
+            'done.\nFailed to authenticate. Receiving shared entries... ';
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          apiVersion,
+          'getSharedEntries',
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        Map<EntryType, List<util.ExchangeEntry>> sharedEntries;
+        try {
+          sharedEntries = util.getEntries(response['entries']);
+        } catch (e) {
+          _handleApiException('Malformed entries received', e);
+          return;
+        }
+        if (sharedEntries.isEmpty) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(authResponse)}');
+          return;
+        }
+
+        _syncLog += 'done.\nProcessing shared entries... ';
+        String nowString = DateTime.now().toUtc().toIso8601String();
+        int i = 0;
+        for (List<util.ExchangeEntry> sharedEntriesEntry
+            in sharedEntries.values) {
+          for (util.ExchangeEntry exchangeEntry in sharedEntriesEntry) {
+            exchangeEntry.key = '$nowString-shared-$i';
+            i++;
+            if (i == 15) break;
+          }
+          if (i == 15) break;
+        }
+        try {
+          await util.processTypedExchangeEntries(
+            entries: sharedEntries,
+            passyEntries: _passyEntries,
+            history: _history,
+            onSetEntry: () => _entriesAdded++,
+            onRemoveEntry: () => _entriesAdded++,
+          );
+        } catch (e) {
+          _handleApiException('Failed to process shared entries', e);
+          return;
+        }
+        _synchronizationResults.sharedEntries = sharedEntries;
+        continue;
+      }
+      try {
+        util.verifyAuth(authResponse['auth'],
+            encrypter: remoteEncrypter,
+            usernameEncrypter: usernameEncrypter,
+            withIV: _authWithIV);
+      } catch (e) {
+        _handleApiException('Failed to verify host auth', e);
+        return;
+      }
+      // 1. Receive hashes
+      _syncLog += 'done.\nReceiving hashes... ';
+      response = _checkResponse(await _safeSync2d0d0Client.runModule([
+        apiVersion,
+        'getHashes',
+        jsonEncode(auth()),
+      ]));
+      if (response.containsKey('error')) {
+        _handleException(
+            '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+        return;
+      }
+      dynamic remoteHistoryHash = response['historyHash'];
+      dynamic remoteFavoritesHash = response['favoritesHash'];
+      if (remoteHistoryHash is! String) {
+        _handleException(
+            'Received malformed history hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
+        return;
+      }
+      if (remoteFavoritesHash is! String) {
+        _handleException(
+            'Received malformed favorites hash. Expected type `String`, received type `${remoteFavoritesHash.runtimeType.toString()}`.');
+        return;
+      }
+      Map<EntryType, String> historyHashes;
+      try {
+        historyHashes = util.getEntriesHashes(response['historyHashes']);
+      } catch (e) {
+        _handleApiException('Received malformed history hashes', e);
+        return;
+      }
+      Map<EntryType, String> favoritesHashes;
+      try {
+        favoritesHashes = util.getEntriesHashes(response['favoritesHashes']);
+      } catch (e) {
+        _handleApiException('Received malformed favorites hashes', e);
+        return;
+      }
+      await _history.reload();
+      Map<String, dynamic> historyJson = _history.value.toJson();
+      _syncLog += 'done.\nComparing history hashes... ';
+      if (remoteHistoryHash !=
+          getPassyHash(jsonEncode(historyJson)).toString()) {
+        // 2. Compare history hashes and find entry types that require synchronization
+        Map<EntryType, String> localHistoryHashes;
+        try {
+          localHistoryHashes = util.findEntriesHashes(json: historyJson);
+        } catch (e) {
+          _handleApiException('Failed to find local history hashes', e);
+          return;
+        }
+        List<EntryType> entryTypes;
+        try {
+          entryTypes = util.findEntryTypesToSynchronize(
+              localHashes: localHistoryHashes, remoteHashes: historyHashes);
+        } catch (e) {
+          _handleApiException('Failed to compare history hashes', e);
+          return;
+        }
+        // 3. Receive history for entry types that require synchronization
+        _syncLog += 'done.\nReceiving history entries... ';
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          apiVersion,
+          'getHistoryEntries',
+          jsonEncode({
+            ...auth(),
+            'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
+          }),
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        Map<EntryType, Map<String, EntryEvent>> historyEntries;
+        try {
+          historyEntries = util.getTypedEntryEvents(response['historyEntries']);
+        } catch (e) {
+          _handleApiException('Received malformed history entries', e);
+          return;
+        }
+        Map<EntryType, Map<String, EntryEvent>> localHistoryEntries = {};
+        for (EntryType type in entryTypes) {
+          localHistoryEntries[type] = _history.value.getEvents(type);
+        }
+        _syncLog += 'done.\nComparing history entries... ';
+        util.EntriesToSynchronize entriesToSynchronize;
+        try {
+          entriesToSynchronize = util.findEntriesToSynchronize(
+              localEntries: localHistoryEntries, remoteEntries: historyEntries);
+        } catch (e) {
+          _handleApiException('Failed to compare history entries', e);
+          return;
+        }
+        if (entriesToSynchronize.entriesToSend.isNotEmpty) {
+          _syncLog += 'done.\nSending entries... ';
+          Map<String, List<Map<String, dynamic>>> entries =
+              entriesToSynchronize.entriesToSend.map((entryType, entryKeys) {
+            Map<String, EntryEvent> historyEntries =
+                _history.value.getEvents(entryType);
+            Map<String, PassyEntry> entries =
+                _passyEntries.getEntries(entryType).getEntries(entryKeys);
+            return MapEntry(
+              entryType.name,
+              entryKeys.map<Map<String, dynamic>>((e) {
+                return {
+                  'key': e,
+                  'historyEntry': historyEntries[e],
+                  'entry': entries[e],
+                };
+              }).toList(),
+            );
+          });
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            apiVersion,
+            'setEntries',
+            jsonEncode({
+              ...auth(),
+              'entries': entries,
+            }),
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+        }
+        if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
+          _syncLog += 'done.\nReceiving entries... ';
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            apiVersion,
+            'getEntries',
+            jsonEncode({
+              ...auth(),
+              'entryKeys': entriesToSynchronize.entriesToRetrieve
+                  .map((key, value) => MapEntry(key.name, value)),
+            }),
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          Map<EntryType, List<util.ExchangeEntry>> entries;
+          try {
+            entries = util.getEntries(response['entries']);
+          } catch (e) {
+            _handleApiException('Malformed entries received', e);
+            return;
+          }
+          _syncLog += 'done.\nProcessing entries... ';
+          try {
+            await util.processTypedExchangeEntries(
+              entries: entries,
+              passyEntries: _passyEntries,
+              history: _history,
+              onRemoveEntry: () => _entriesRemoved++,
+              onSetEntry: () => _entriesAdded++,
+            );
+          } catch (e) {
+            _handleApiException('Failed to process entries', e);
+            return;
+          }
+        }
+      }
+      await _favorites.reload();
+      Map<String, dynamic> favoritesJson = _favorites.value.toJson();
+      _syncLog += 'done.\nComparing favorites hashes... ';
+      if (remoteFavoritesHash !=
+          getPassyHash(jsonEncode(favoritesJson)).toString()) {
+        // Compare favorites hashes and find entry types that require synchronization
+        Map<EntryType, String> localFavoritesHashes;
+        try {
+          localFavoritesHashes = util.findEntriesHashes(json: favoritesJson);
+        } catch (e) {
+          _handleApiException('Failed to find local favorites hashes', e);
+          return;
+        }
+        List<EntryType> entryTypes;
+        try {
+          entryTypes = util.findEntryTypesToSynchronize(
+              localHashes: localFavoritesHashes, remoteHashes: favoritesHashes);
+        } catch (e) {
+          _handleApiException('Failed to compare favorites hashes', e);
+          return;
+        }
+        // Receive favorites for entry types that require synchronization
+        _syncLog += 'done.\nReceiving favorites entries... ';
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          apiVersion,
+          'getFavoritesEntries',
+          jsonEncode({
+            ...auth(),
+            'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
+          }),
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        Map<EntryType, Map<String, EntryEvent>> favoritesEntries;
+        try {
+          favoritesEntries =
+              util.getTypedEntryEvents(response['favoritesEntries']);
+        } catch (e) {
+          _handleApiException('Received malformed favorites entries', e);
+          return;
+        }
+        Map<EntryType, Map<String, EntryEvent>> localFavoritesEntries = {};
+        await _favorites.reload();
+        for (EntryType type in entryTypes) {
+          localFavoritesEntries[type] = _favorites.value.getEvents(type);
+        }
+        _syncLog += 'done.\nComparing favorites entries... ';
+        util.EntriesToSynchronize entriesToSynchronize;
+        try {
+          entriesToSynchronize = util.findEntriesToSynchronize(
+              localEntries: localFavoritesEntries,
+              remoteEntries: favoritesEntries);
+        } catch (e) {
+          _handleApiException('Failed to compare favorites entries', e);
+          return;
+        }
+        if (entriesToSynchronize.entriesToSend.isNotEmpty) {
+          _syncLog += 'done.\nSending favorites entries... ';
+          response = _checkResponse(await _safeSync2d0d0Client.runModule([
+            apiVersion,
+            'setFavoritesEntries',
+            jsonEncode({
+              ...auth(),
+              'favoritesEntries': entriesToSynchronize.entriesToSend
+                  .map<String, dynamic>((entryType, keyList) {
+                Map<String, EntryEvent> localFavorites =
+                    _favorites.value.getEvents(entryType);
+                List<dynamic> val = [];
+                for (String key in keyList) {
+                  EntryEvent? entryEvent = localFavorites[key];
+                  if (entryEvent == null) continue;
+                  val.add(entryEvent);
+                }
+                return MapEntry(
+                  entryType.name,
+                  val,
+                );
+              }),
+            }),
+          ]));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+        }
+        if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
+          await _favorites.reload();
+          _syncLog += 'done.\nSaving favorites entries... ';
+          for (MapEntry<EntryType, List<String>> entriesToRetrieveEntry
+              in entriesToSynchronize.entriesToRetrieve.entries) {
+            EntryType entryType = entriesToRetrieveEntry.key;
+            Map<String, EntryEvent>? typeFavoritesEntries =
+                favoritesEntries[entryType];
+            if (typeFavoritesEntries == null) continue;
+            Map<String, EntryEvent> localFavoritesEntries =
+                _favorites.value.getEvents(entryType);
+            for (String entryKey in entriesToRetrieveEntry.value) {
+              EntryEvent? favoritesEntry = typeFavoritesEntries[entryKey];
+              if (favoritesEntry == null) continue;
+              localFavoritesEntries[entryKey] = favoritesEntry;
+            }
+          }
+          await _favorites.save();
+        }
+      }
+    }
+    _syncLog += '\nAll done.\nDisconnecting... ';
+    _safeSync2d0d0Client.disconnect();
+    _socket = null;
+    if (socket != null) {
+      socket.add(utf8.encode(jsonEncode(SynchronizationSignal(
+                  data: SynchronizationSignalData(name: 'exit'))
+              .toJson()) +
+          '\u0000'));
+      socket.flush();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        socket.destroy();
+        _syncLog += 'done.';
+      });
+    }
+    await _settings.reload();
+    _settings.value.lastSyncDate = DateTime.now().toUtc();
+    await _settings.save();
+    _syncLog += 'done.';
+    _callOnComplete();
+  }
+
+  Future<void> connect2d0d0(
+    HostAddress address, {
+    String? deviceId,
+    bool isDedicatedServer = false,
+    bool verifyTrustedConnectionData = false,
+    Directory? trustedConnectionsDir,
+    void Function()? onTrustSaveComplete,
+    void Function()? onTrustSaveFailed,
+  }) {
+    return _synchronization2d0d0(
+      "${address.ip.address}:${address.port}",
+      deviceId: deviceId,
+      isDedicatedServer: isDedicatedServer,
+      verifyTrustedConnectionData: verifyTrustedConnectionData,
+      trustedConnectionsDir: trustedConnectionsDir,
+      onTrustSaveComplete: onTrustSaveComplete,
+      onTrustSaveFailed: onTrustSaveFailed,
+    );
+  }
+
+  Future<void> connect(
+    HostAddress address,
+  ) async {
+    if (_synchronizationType == SynchronizationType.v2d0d0) {
+      _syncLog += 'Connecting to a 2.0.0+ synchronization server... ';
+      return await connect2d0d0(address);
+    }
     await _history.reload();
     void _onConnected(Socket socket) {
       _isConnected = true;
@@ -753,6 +1548,9 @@ class Synchronization {
             _socket = null;
             await _decryptEntriesCompleter.future;
             _syncLog += 'done.';
+            await _settings.reload();
+            _settings.value.lastSyncDate = DateTime.now().toUtc();
+            await _settings.save();
             _callOnComplete();
           });
         }
@@ -787,458 +1585,6 @@ class Synchronization {
         _sendHistory(_historyJson);
       }
 
-      void _synchronization2d0d0(String address) async {
-        void _handleApiException(String message, Object exception) {
-          if (exception is Map<String, dynamic>) {
-            _handleException('$message: ${jsonEncode(exception)}');
-            return;
-          }
-          _handleException('$message: $exception.');
-        }
-
-        Map<String, dynamic> _checkResponse(Map<String, dynamic>? response) {
-          if (response is! Map<String, dynamic>) {
-            return {
-              'error':
-                  'Malformed server response. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
-            };
-          }
-          if (response.containsKey('error')) return response['error'];
-          dynamic data = response['data'];
-          if (data is! Map<String, dynamic>) {
-            return {
-              'error':
-                  'Malformed server response data. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
-            };
-          }
-          dynamic error = data['error'];
-          if (error != null) return {'error': error};
-          dynamic result = data['result'];
-          if (result == null) {
-            return {'error': 'Server module responded with null'};
-          }
-          return response['data']['result'];
-        }
-
-        List<String> _addressSplit = address.split(':');
-        if (_addressSplit.length < 2) {
-          _handleException(
-              'Could not connect. Malformed server address: $address.');
-          return;
-        }
-        int? port = int.tryParse(_addressSplit[1]);
-        if (port == null) {
-          _handleException(
-              'Could not connect. Malformed server address: $address.');
-          return;
-        }
-        GlareClient _safeSync2d0d0Client;
-        try {
-          _safeSync2d0d0Client = await GlareClient.connect(
-            host: _addressSplit[0],
-            port: port,
-            keypair: _rsaKeypair,
-          );
-          _sync2d0d0Client = _safeSync2d0d0Client;
-        } catch (e, s) {
-          _handleException(
-              'Could not connect.\n${e.toString()}\n${s.toString()}');
-          return;
-        }
-        _syncLog += 'done.\nReceiving users list... ';
-        Map<String, dynamic> response;
-        dynamic users = [
-          {'username': _loadedAccount.username}
-        ];
-        for (dynamic user in users) {
-          _syncLog += 'done.\nProcessing next user... ';
-          if (user is! Map<String, dynamic>) {
-            _handleException(
-                'Malformed user information. Expected type `Map<String, dynamic>`, received type `${users.runtimeType.toString()}`.');
-            return;
-          }
-          dynamic username = user['username'];
-          if (username is! String) {
-            _handleException(
-                'Malformed username. Expected type `String`, received type `${username.runtimeType.toString()}`.');
-            return;
-          }
-          if (username != _loadedAccount.username) {
-            _handleException(
-                'No shared accounts found. Please make sure that your main and/or shared accounts are added on both ends and have the same usernames and passwords.');
-            return;
-          }
-          Encrypter usernameEncrypter =
-              getPassyEncrypter(_loadedAccount.username);
-          String apiVersion = '2d0d1';
-
-          Map<String, dynamic> auth() {
-            return {
-              'auth': util.generateAuth(
-                  encrypter: _encrypter, usernameEncrypter: usernameEncrypter),
-            };
-          }
-
-          _syncLog += 'done.\nAuthenticating... ';
-          Map<String, dynamic> authResponse =
-              _checkResponse(await _safeSync2d0d0Client.runModule([
-            apiVersion,
-            'authenticate',
-            jsonEncode(auth()),
-          ]));
-          if (authResponse.containsKey('error')) {
-            _syncLog +=
-                'done.\nFailed to authenticate. Receiving shared entries... ';
-            response = _checkResponse(await _safeSync2d0d0Client.runModule([
-              apiVersion,
-              'getSharedEntries',
-            ]));
-            if (response.containsKey('error')) {
-              _handleException(
-                  '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-              return;
-            }
-            Map<EntryType, List<util.ExchangeEntry>> sharedEntries;
-            try {
-              sharedEntries = util.getEntries(response['entries']);
-            } catch (e) {
-              _handleApiException('Malformed entries received', e);
-              return;
-            }
-            if (sharedEntries.isEmpty) {
-              _handleException(
-                  '2.0.0+ synchronization host error:\n${jsonEncode(authResponse)}');
-              return;
-            }
-
-            _syncLog += 'done.\nProcessing shared entries... ';
-            String nowString = DateTime.now().toUtc().toIso8601String();
-            int i = 0;
-            for (List<util.ExchangeEntry> sharedEntriesEntry
-                in sharedEntries.values) {
-              for (util.ExchangeEntry exchangeEntry in sharedEntriesEntry) {
-                exchangeEntry.key = '$nowString-shared-$i';
-                i++;
-                if (i == 15) break;
-              }
-              if (i == 15) break;
-            }
-            try {
-              await util.processTypedExchangeEntries(
-                entries: sharedEntries,
-                account: _loadedAccount,
-                history: _history.value,
-                onSetEntry: () => _entriesAdded++,
-                onRemoveEntry: () => _entriesAdded++,
-              );
-            } catch (e) {
-              _handleApiException('Failed to process shared entries', e);
-              return;
-            }
-            _synchronizationResults.sharedEntries = sharedEntries;
-            continue;
-          }
-          try {
-            util.verifyAuth(authResponse['auth'],
-                encrypter: _encrypter, usernameEncrypter: usernameEncrypter);
-          } catch (e) {
-            _handleApiException('Failed to verify host auth', e);
-            return;
-          }
-          // 1. Receive hashes
-          _syncLog += 'done.\nReceiving hashes... ';
-          response = _checkResponse(await _safeSync2d0d0Client.runModule([
-            apiVersion,
-            'getHashes',
-            jsonEncode(auth()),
-          ]));
-          if (response.containsKey('error')) {
-            _handleException(
-                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-            return;
-          }
-          dynamic remoteHistoryHash = response['historyHash'];
-          dynamic remoteFavoritesHash = response['favoritesHash'];
-          if (remoteHistoryHash is! String) {
-            _handleException(
-                'Received malformed history hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
-            return;
-          }
-          if (remoteFavoritesHash is! String) {
-            _handleException(
-                'Received malformed favorites hash. Expected type `String`, received type `${remoteFavoritesHash.runtimeType.toString()}`.');
-            return;
-          }
-          Map<EntryType, String> historyHashes;
-          try {
-            historyHashes = util.getEntriesHashes(response['historyHashes']);
-          } catch (e) {
-            _handleApiException('Received malformed history hashes', e);
-            return;
-          }
-          Map<EntryType, String> favoritesHashes;
-          try {
-            favoritesHashes =
-                util.getEntriesHashes(response['favoritesHashes']);
-          } catch (e) {
-            _handleApiException('Received malformed favorites hashes', e);
-            return;
-          }
-          Map<String, dynamic> historyJson = _history.value.toJson();
-          _syncLog += 'done.\nComparing history hashes... ';
-          if (remoteHistoryHash !=
-              getPassyHash(jsonEncode(historyJson)).toString()) {
-            // 2. Compare history hashes and find entry types that require synchronization
-            Map<EntryType, String> localHistoryHashes;
-            try {
-              localHistoryHashes = util.findEntriesHashes(json: historyJson);
-            } catch (e) {
-              _handleApiException('Failed to find local history hashes', e);
-              return;
-            }
-            List<EntryType> entryTypes;
-            try {
-              entryTypes = util.findEntryTypesToSynchronize(
-                  localHashes: localHistoryHashes, remoteHashes: historyHashes);
-            } catch (e) {
-              _handleApiException('Failed to compare history hashes', e);
-              return;
-            }
-            // 3. Receive history for entry types that require synchronization
-            _syncLog += 'done.\nReceiving history entries... ';
-            response = _checkResponse(await _safeSync2d0d0Client.runModule([
-              apiVersion,
-              'getHistoryEntries',
-              jsonEncode({
-                ...auth(),
-                'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
-              }),
-            ]));
-            if (response.containsKey('error')) {
-              _handleException(
-                  '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-              return;
-            }
-            Map<EntryType, Map<String, EntryEvent>> historyEntries;
-            try {
-              historyEntries =
-                  util.getTypedEntryEvents(response['historyEntries']);
-            } catch (e) {
-              _handleApiException('Received malformed history entries', e);
-              return;
-            }
-            Map<EntryType, Map<String, EntryEvent>> localHistoryEntries = {};
-            for (EntryType type in entryTypes) {
-              localHistoryEntries[type] = _history.value.getEvents(type);
-            }
-            _syncLog += 'done.\nComparing history entries... ';
-            util.EntriesToSynchronize entriesToSynchronize;
-            try {
-              entriesToSynchronize = util.findEntriesToSynchronize(
-                  localEntries: localHistoryEntries,
-                  remoteEntries: historyEntries);
-            } catch (e) {
-              _handleApiException('Failed to compare history entries', e);
-              return;
-            }
-            if (entriesToSynchronize.entriesToSend.isNotEmpty) {
-              _syncLog += 'done.\nSending entries... ';
-              response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                apiVersion,
-                'setEntries',
-                jsonEncode({
-                  ...auth(),
-                  'entries': entriesToSynchronize.entriesToSend
-                      .map((entryType, entryKeys) {
-                    Map<String, EntryEvent> historyEntries =
-                        _history.value.getEvents(entryType);
-                    PassyEntry? Function(String) getEntry =
-                        _loadedAccount.getEntry(entryType);
-                    return MapEntry(
-                      entryType.name,
-                      entryKeys.map<Map<String, dynamic>>((e) {
-                        return {
-                          'key': e,
-                          'historyEntry': historyEntries[e],
-                          'entry': getEntry(e),
-                        };
-                      }).toList(),
-                    );
-                  }),
-                }),
-              ]));
-              if (response.containsKey('error')) {
-                _handleException(
-                    '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                return;
-              }
-            }
-            if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
-              _syncLog += 'done.\nReceiving entries... ';
-              response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                apiVersion,
-                'getEntries',
-                jsonEncode({
-                  ...auth(),
-                  'entryKeys': entriesToSynchronize.entriesToRetrieve
-                      .map((key, value) => MapEntry(key.name, value)),
-                }),
-              ]));
-              if (response.containsKey('error')) {
-                _handleException(
-                    '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                return;
-              }
-              Map<EntryType, List<util.ExchangeEntry>> entries;
-              try {
-                entries = util.getEntries(response['entries']);
-              } catch (e) {
-                _handleApiException('Malformed entries received', e);
-                return;
-              }
-              _syncLog += 'done.\nProcessing entries... ';
-              try {
-                await _history.reload();
-                await util.processTypedExchangeEntries(
-                  entries: entries,
-                  account: _loadedAccount,
-                  history: _history.value,
-                  onRemoveEntry: () => _entriesRemoved++,
-                  onSetEntry: () => _entriesAdded++,
-                );
-              } catch (e) {
-                _handleApiException('Failed to process entries', e);
-                return;
-              }
-            }
-          }
-          await _favorites.reload();
-          Map<String, dynamic> favoritesJson = _favorites.value.toJson();
-          _syncLog += 'done.\nComparing favorites hashes... ';
-          if (remoteFavoritesHash !=
-              getPassyHash(jsonEncode(favoritesJson)).toString()) {
-            // Compare favorites hashes and find entry types that require synchronization
-            Map<EntryType, String> localFavoritesHashes;
-            try {
-              localFavoritesHashes =
-                  util.findEntriesHashes(json: favoritesJson);
-            } catch (e) {
-              _handleApiException('Failed to find local favorites hashes', e);
-              return;
-            }
-            List<EntryType> entryTypes;
-            try {
-              entryTypes = util.findEntryTypesToSynchronize(
-                  localHashes: localFavoritesHashes,
-                  remoteHashes: favoritesHashes);
-            } catch (e) {
-              _handleApiException('Failed to compare favorites hashes', e);
-              return;
-            }
-            // Receive favorites for entry types that require synchronization
-            _syncLog += 'done.\nReceiving favorites entries... ';
-            response = _checkResponse(await _safeSync2d0d0Client.runModule([
-              apiVersion,
-              'getFavoritesEntries',
-              jsonEncode({
-                ...auth(),
-                'entryTypes': entryTypes.map<String>((e) => e.name).toList(),
-              }),
-            ]));
-            if (response.containsKey('error')) {
-              _handleException(
-                  '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-              return;
-            }
-            Map<EntryType, Map<String, EntryEvent>> favoritesEntries;
-            try {
-              favoritesEntries =
-                  util.getTypedEntryEvents(response['favoritesEntries']);
-            } catch (e) {
-              _handleApiException('Received malformed favorites entries', e);
-              return;
-            }
-            Map<EntryType, Map<String, EntryEvent>> localFavoritesEntries = {};
-            await _favorites.reload();
-            for (EntryType type in entryTypes) {
-              localFavoritesEntries[type] = _favorites.value.getEvents(type);
-            }
-            _syncLog += 'done.\nComparing favorites entries... ';
-            util.EntriesToSynchronize entriesToSynchronize;
-            try {
-              entriesToSynchronize = util.findEntriesToSynchronize(
-                  localEntries: localFavoritesEntries,
-                  remoteEntries: favoritesEntries);
-            } catch (e) {
-              _handleApiException('Failed to compare favorites entries', e);
-              return;
-            }
-            if (entriesToSynchronize.entriesToSend.isNotEmpty) {
-              _syncLog += 'done.\nSending favorites entries... ';
-              response = _checkResponse(await _safeSync2d0d0Client.runModule([
-                apiVersion,
-                'setFavoritesEntries',
-                jsonEncode({
-                  ...auth(),
-                  'favoritesEntries': entriesToSynchronize.entriesToSend
-                      .map<String, dynamic>((entryType, keyList) {
-                    Map<String, EntryEvent> localFavorites =
-                        _favorites.value.getEvents(entryType);
-                    List<dynamic> val = [];
-                    for (String key in keyList) {
-                      EntryEvent? entryEvent = localFavorites[key];
-                      if (entryEvent == null) continue;
-                      val.add(entryEvent);
-                    }
-                    return MapEntry(
-                      entryType.name,
-                      val,
-                    );
-                  }),
-                }),
-              ]));
-              if (response.containsKey('error')) {
-                _handleException(
-                    '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
-                return;
-              }
-            }
-            if (entriesToSynchronize.entriesToRetrieve.isNotEmpty) {
-              await _favorites.reload();
-              _syncLog += 'done.\nSaving favorites entries... ';
-              for (MapEntry<EntryType, List<String>> entriesToRetrieveEntry
-                  in entriesToSynchronize.entriesToRetrieve.entries) {
-                EntryType entryType = entriesToRetrieveEntry.key;
-                Map<String, EntryEvent>? typeFavoritesEntries =
-                    favoritesEntries[entryType];
-                if (typeFavoritesEntries == null) continue;
-                Map<String, EntryEvent> localFavoritesEntries =
-                    _favorites.value.getEvents(entryType);
-                for (String entryKey in entriesToRetrieveEntry.value) {
-                  EntryEvent? favoritesEntry = typeFavoritesEntries[entryKey];
-                  if (favoritesEntry == null) continue;
-                  localFavoritesEntries[entryKey] = favoritesEntry;
-                }
-              }
-              await _loadedAccount.saveFavorites();
-            }
-          }
-        }
-        _syncLog += '\nAll done.\nDisconnecting... ';
-        _safeSync2d0d0Client.disconnect();
-        _socket = null;
-        socket.add(utf8.encode(jsonEncode(SynchronizationSignal(
-                    data: SynchronizationSignalData(name: 'exit'))
-                .toJson()) +
-            '\u0000'));
-        socket.flush();
-        _callOnComplete();
-        Future.delayed(const Duration(milliseconds: 500), () {
-          socket.destroy();
-          _syncLog += 'done.';
-        });
-      }
-
       _handle2p0p0ServerAddress(List<int> data) {
         String _address2d0d0;
         try {
@@ -1249,7 +1595,7 @@ class Synchronization {
           return;
         }
         _syncLog += 'done.\nConnecting... ';
-        _synchronization2d0d0(_address2d0d0);
+        _synchronization2d0d0(_address2d0d0, socket: socket);
       }
 
       Future<void> _sendHello(String hello) {
@@ -1297,8 +1643,7 @@ class Synchronization {
         _syncLog += 'done.\nReceiving history hash... ';
         _sub.onData(_handleHistoryHash);
         _sendHello(encrypt(
-            encrypt(_hello,
-                encrypter: getPassyEncrypter(_loadedAccount.username)),
+            encrypt(_hello, encrypter: getPassyEncrypter(_username)),
             encrypter: _encrypter));
       }
 
@@ -1313,12 +1658,12 @@ class Synchronization {
                 'Failed to connect.\n${e.toString()}\n${s.toString()}'));
   }
 
-  void close() {
+  Future<void> close() async {
     if (!_isConnected) {
-      _server?.close();
+      await _server?.close();
       _socket?.destroy();
-      _sync2d0d0Host?.stop();
-      _sync2d0d0Client?.disconnect();
+      await _sync2d0d0Host?.stop();
+      await _sync2d0d0Client?.disconnect();
       _callOnComplete();
     } else {
       _handleException('Synchronization requested to close while connected.');

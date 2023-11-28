@@ -1,5 +1,7 @@
 import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/entry_meta.dart';
+import 'package:passy/passy_data/passy_kdbx_entry.dart';
 
 import 'passy_entries.dart';
 import 'passy_entries_encrypted_csv_file.dart';
@@ -25,13 +27,16 @@ class Note extends PassyEntry<Note> {
   String title;
   String note;
   bool isMarkdown;
+  List<String> attachments;
 
   Note({
     String? key,
     this.title = '',
     this.note = '',
     this.isMarkdown = false,
-  }) : super(key ?? DateTime.now().toUtc().toIso8601String());
+    List<String>? attachments,
+  })  : attachments = attachments ?? [],
+        super(key ?? DateTime.now().toUtc().toIso8601String());
 
   @override
   EntryMeta get metadata => NoteMeta(key: key, title: title);
@@ -40,16 +45,24 @@ class Note extends PassyEntry<Note> {
       : title = json['title'] ?? '',
         note = json['note'] ?? '',
         isMarkdown = json['isMarkdown'] ?? false,
+        attachments = json['attachments'] == null
+            ? []
+            : (json['attachments'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList(),
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   Note._fromCSV(List csv)
       : title = csv[1] ?? '',
         note = csv[2] ?? '',
         isMarkdown = boolFromString(csv[3] ?? 'false') ?? false,
+        attachments =
+            (csv[4] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Note.fromCSV(List csv) {
     if (csv.length == 3) csv.add('false');
+    if (csv.length == 4) csv.add([]);
     return Note._fromCSV(csv);
   }
 
@@ -62,6 +75,7 @@ class Note extends PassyEntry<Note> {
         'title': title,
         'note': note,
         'isMarkdown': isMarkdown,
+        'attachments': attachments,
       };
 
   @override
@@ -70,5 +84,16 @@ class Note extends PassyEntry<Note> {
         title,
         note,
         isMarkdown.toString(),
+        attachments,
       ];
+
+  @override
+  PassyKdbxEntry toKdbx() {
+    return PassyKdbxEntry(
+      title: title,
+      customFields: [
+        if (note.isNotEmpty) CustomField(title: 'Note', value: note),
+      ],
+    );
+  }
 }

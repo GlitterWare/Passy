@@ -32,35 +32,142 @@ class CSVImportEntriesScreen extends StatefulWidget {
 }
 
 class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
+  List<String> csvToJson = [];
+  List<DropdownMenuItem<String>> entryJsonKeys = [
+    DropdownMenuItem(
+      child: Text(localizations.none),
+      value: '',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     CSVImportEntriesScreenArguments args = ModalRoute.of(context)!
         .settings
         .arguments as CSVImportEntriesScreenArguments;
-    Map<String, int> jsonToCSV = {};
-    for (MapEntry<String, dynamic> entryJsonEntry in args.entryJson.entries) {
-      dynamic entryJsonValue = entryJsonEntry.value;
-      if (entryJsonValue is! String) continue;
-      String entryJsonKey = entryJsonEntry.key;
-      if (entryJsonKey == 'iconName') continue;
-      if (entryJsonKey == 'key') continue;
-      jsonToCSV[entryJsonKey] = -1;
+    //List<String> entryJsonKeys = jsonToCSV.keys.toList();
+    String defaultEntry;
+    switch (args.entryType) {
+      case EntryType.password:
+        defaultEntry = 'additionalInfo';
+        break;
+      case EntryType.paymentCard:
+        defaultEntry = 'additionalInfo';
+        break;
+      case EntryType.note:
+        defaultEntry = 'note';
+        break;
+      case EntryType.idCard:
+        defaultEntry = 'additionalInfo';
+        break;
+      case EntryType.identity:
+        defaultEntry = 'additionalInfo';
+        break;
     }
-    List<String> entryJsonKeys = jsonToCSV.keys.toList();
-    List<DropdownMenuItem<int>> items = [
-      const DropdownMenuItem(
-        child: Text('Empty'),
-        value: -1,
-      ),
-    ];
-    if (args.entries.isNotEmpty) {
-      List<String> entry = args.entries.first;
-      for (int i = 0; i != entry.length; i++) {
-        dynamic entryValue = entry[i];
-        if (entryValue is! String) continue;
-        items.add(DropdownMenuItem(
-          child: Text(entryValue),
-          value: i,
+    if (csvToJson.isEmpty) {
+      if (args.entries.isNotEmpty) {
+        List<String> entry = args.entries.first;
+        for (int i = 0; i != entry.length; i++) {
+          dynamic entryValue = entry[i];
+          if (entryValue is! String) continue;
+          csvToJson.add(defaultEntry);
+        }
+      }
+    }
+    if (entryJsonKeys.length == 1) {
+      for (MapEntry<String, dynamic> entryJsonEntry in args.entryJson.entries) {
+        dynamic entryJsonValue = entryJsonEntry.value;
+        if (entryJsonValue is! String) continue;
+        String entryJsonKey = entryJsonEntry.key;
+        if (entryJsonKey == 'iconName') continue;
+        if (entryJsonKey == 'key') continue;
+        String name = entryJsonKey;
+        switch (entryJsonKey) {
+          case 'additionalInfo':
+            name = localizations.additionalInfo;
+            break;
+          case 'nickname':
+            name = localizations.nickname;
+            break;
+          case 'username':
+            name = localizations.username;
+            break;
+          case 'email':
+            name = localizations.email;
+            break;
+          case 'password':
+            name = localizations.password;
+            break;
+          case 'website':
+            name = localizations.website;
+            break;
+          case 'cardNumber':
+            name = localizations.cardNumber;
+            break;
+          case 'cardholderName':
+            name = localizations.cardHolderName;
+            break;
+          case 'cvv':
+            name = 'CVV';
+            break;
+          case 'exp':
+            name = localizations.expirationDate;
+            break;
+          case 'title':
+            name = localizations.title;
+            break;
+          case 'note':
+            name = localizations.note;
+            break;
+          case 'type':
+            name = localizations.type;
+            break;
+          case 'idNumber':
+            name = localizations.idNumber;
+            break;
+          case 'name':
+            name = localizations.name;
+            break;
+          case 'issDate':
+            name = localizations.dateOfIssue;
+            break;
+          case 'expDate':
+            name = localizations.expirationDate;
+            break;
+          case 'firstName':
+            name = localizations.firstName;
+            break;
+          case 'middleName':
+            name = localizations.middleName;
+            break;
+          case 'lastName':
+            name = localizations.lastName;
+            break;
+          case 'gender':
+            name = localizations.gender;
+            break;
+          case 'number':
+            name = localizations.phoneNumber;
+            break;
+          case 'firstAddressLine':
+            name = localizations.firstAddresssLine;
+            break;
+          case 'secondAddressLine':
+            name = localizations.secondAddressLine;
+            break;
+          case 'zipCode':
+            name = localizations.zipCode;
+            break;
+          case 'city':
+            name = localizations.city;
+            break;
+          case 'country':
+            name = localizations.country;
+            break;
+        }
+        entryJsonKeys.add(DropdownMenuItem(
+          child: Text(name),
+          value: entryJsonKey,
         ));
       }
     }
@@ -82,103 +189,22 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
           )),
           ListView.builder(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              String entryJsonKey = entryJsonKeys[index];
-              String name = entryJsonKey;
-              switch (entryJsonKey) {
-                case 'additionalInfo':
-                  name = localizations.additionalInfo;
-                  break;
-                case 'nickname':
-                  name = localizations.nickname;
-                  break;
-                case 'username':
-                  name = localizations.username;
-                  break;
-                case 'email':
-                  name = localizations.email;
-                  break;
-                case 'password':
-                  name = localizations.password;
-                  break;
-                case 'website':
-                  name = localizations.website;
-                  break;
-                case 'cardNumber':
-                  name = localizations.cardNumber;
-                  break;
-                case 'cardholderName':
-                  name = localizations.cardHolderName;
-                  break;
-                case 'cvv':
-                  name = 'CVV';
-                  break;
-                case 'exp':
-                  name = localizations.expirationDate;
-                  break;
-                case 'title':
-                  name = localizations.title;
-                  break;
-                case 'note':
-                  name = localizations.note;
-                  break;
-                case 'type':
-                  name = localizations.type;
-                  break;
-                case 'idNumber':
-                  name = localizations.idNumber;
-                  break;
-                case 'name':
-                  name = localizations.name;
-                  break;
-                case 'issDate':
-                  name = localizations.dateOfIssue;
-                  break;
-                case 'expDate':
-                  name = localizations.expirationDate;
-                  break;
-                case 'firstName':
-                  name = localizations.firstName;
-                  break;
-                case 'middleName':
-                  name = localizations.middleName;
-                  break;
-                case 'lastName':
-                  name = localizations.lastName;
-                  break;
-                case 'gender':
-                  name = localizations.gender;
-                  break;
-                case 'number':
-                  name = localizations.phoneNumber;
-                  break;
-                case 'firstAddressLine':
-                  name = localizations.firstAddresssLine;
-                  break;
-                case 'secondAddressLine':
-                  name = localizations.secondAddressLine;
-                  break;
-                case 'zipCode':
-                  name = localizations.zipCode;
-                  break;
-                case 'city':
-                  name = localizations.city;
-                  break;
-                case 'country':
-                  name = localizations.country;
-                  break;
-              }
-              return PassyPadding(DropdownButtonFormField<int>(
-                value: -1,
-                items: items,
+              return PassyPadding(DropdownButtonFormField<String>(
+                value: csvToJson[index],
+                items: entryJsonKeys,
                 onChanged: (value) {
                   if (value == null) return;
-                  jsonToCSV[entryJsonKey] = value;
+                  setState(() {
+                    csvToJson[index] = value;
+                  });
                 },
-                decoration: InputDecoration(labelText: name),
+                decoration:
+                    InputDecoration(labelText: args.entries.first[index]),
               ));
             },
-            itemCount: entryJsonKeys.length,
+            itemCount: csvToJson.length,
           ),
           PassyPadding(ThreeWidgetButton(
               left: const Padding(
@@ -188,31 +214,24 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               center: Text(localizations.import),
               onPressed: () async {
+                if (args.entries.length == 1) return;
                 Navigator.pushNamed(context, SplashScreen.routeName);
                 List<PassyEntry> result = [];
                 DateTime _now = DateTime.now().toUtc();
-                int i = 0;
-                for (List<dynamic> entry in args.entries) {
-                  Map<String, dynamic> jsonResult = {
-                    'key': '${_now.toIso8601String()}-import-$i',
-                  };
-                  for (MapEntry<String, int> jsonToCSVEntry
-                      in jsonToCSV.entries) {
-                    int index = jsonToCSVEntry.value;
-                    if (index == -1) {
-                      jsonResult[jsonToCSVEntry.key] = '';
-                      continue;
+                for (int i = 1; i != args.entries.length; i++) {
+                  Map<String, dynamic> jsonResult =
+                      args.entryJson.map((key, value) => MapEntry(key, value));
+                  jsonResult['key'] = '${_now.toIso8601String()}-import-$i';
+                  for (int j = 0; j != csvToJson.length; j++) {
+                    String value = csvToJson[j];
+                    dynamic jsonValue = jsonResult[value];
+                    if (jsonValue is String) {
+                      if (jsonValue.isEmpty) {
+                        jsonResult[value] = args.entries[i][j];
+                      } else {
+                        jsonResult[value] += '   ' + args.entries[i][j];
+                      }
                     }
-                    if (index >= entry.length) {
-                      jsonResult[jsonToCSVEntry.key] = '';
-                      continue;
-                    }
-                    dynamic entryValue = entry[index];
-                    if (entryValue is! String) {
-                      jsonResult[jsonToCSVEntry.key] = '';
-                      continue;
-                    }
-                    jsonResult[jsonToCSVEntry.key] = entryValue;
                   }
                   PassyEntry entryDecoded;
                   try {
@@ -235,13 +254,10 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                     return;
                   }
                   result.add(entryDecoded);
-                  i++;
                 }
-                Future<void> Function(PassyEntry<dynamic>) setEntry =
-                    data.loadedAccount!.setEntry(args.entryType);
-                for (PassyEntry entry in result) {
-                  await setEntry(entry);
-                }
+                Future<void> Function(List<PassyEntry<dynamic>>) setEntries =
+                    data.loadedAccount!.setEntries(args.entryType);
+                setEntries(result);
                 Navigator.pop(context);
                 Navigator.pop(context);
               })),

@@ -21,9 +21,9 @@ class BackupAndRestoreScreen extends StatefulWidget {
 class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
   Future<void> _onBackupPressed(String username) async {
     try {
-      await backupAccount(context, username: username);
+      await backupAccount(context, username: username, autoFilename: false);
     } catch (e) {
-      //
+      return;
     }
   }
 
@@ -38,7 +38,8 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
     )
         .then(
       (_pick) {
-        MainScreen.shouldLockScreen = true;
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => MainScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,

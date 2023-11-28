@@ -8,12 +8,14 @@ import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/search_entry_data.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -27,6 +29,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
+import 'key_derivation_screen.dart';
 import 'payment_cards_screen.dart';
 import 'passwords_screen.dart';
 import 'settings_screen.dart';
@@ -49,8 +52,9 @@ class _MainScreen extends State<MainScreen>
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
   bool _unlockScreenOn = false;
+  String _lastSyncDate = 'NaN';
 
-  Widget _searchBuilder(String terms) {
+  Widget _searchBuilder(String terms, void Function() rebuild) {
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     final List<SearchEntryData> _searchEntries = [];
@@ -68,6 +72,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -145,6 +150,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -190,24 +196,23 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Widget _favoritesSearchBuilder(String terms) {
+  Widget _favoritesSearchBuilder(String terms, void Function() setState) {
     if (!_account.hasFavorites) {
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
-                RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                        text: '${localizations.noFavorites}.',
-                        children: [
-                          TextSpan(text: '\n\n${localizations.noFavorites1}'),
-                          const WidgetSpan(
-                              child: Icon(Icons.star_outline_rounded)),
-                          TextSpan(text: ' ${localizations.noFavorites2}.'),
-                        ])),
+                Text.rich(
+                  TextSpan(text: '${localizations.noFavorites}.', children: [
+                    TextSpan(text: '\n\n${localizations.noFavorites1}'),
+                    const WidgetSpan(child: Icon(Icons.star_outline_rounded)),
+                    TextSpan(text: ' ${localizations.noFavorites2}.'),
+                  ]),
+                  textAlign: TextAlign.center,
+                ),
                 const Spacer(flex: 7),
               ],
             ),
@@ -303,6 +308,7 @@ class _MainScreen extends State<MainScreen>
       return CustomScrollView(
         slivers: [
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Column(
               children: [
                 const Spacer(flex: 7),
@@ -324,23 +330,28 @@ class _MainScreen extends State<MainScreen>
         switch (entry.type) {
           case EntryType.idCard:
             Navigator.pushNamed(context, IDCardScreen.routeName,
-                arguments: _account.getIDCard(entry.meta.key));
+                    arguments: _account.getIDCard(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.identity:
             Navigator.pushNamed(context, IdentityScreen.routeName,
-                arguments: _account.getIdentity(entry.meta.key));
+                    arguments: _account.getIdentity(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.note:
             Navigator.pushNamed(context, NoteScreen.routeName,
-                arguments: _account.getNote(entry.meta.key));
+                    arguments: _account.getNote(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.password:
             Navigator.pushNamed(context, PasswordScreen.routeName,
-                arguments: _account.getPassword(entry.meta.key));
+                    arguments: _account.getPassword(entry.meta.key))
+                .then((value) => setState());
             return;
           case EntryType.paymentCard:
             Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                arguments: _account.getPaymentCard(entry.meta.key));
+                    arguments: _account.getPaymentCard(entry.meta.key))
+                .then((value) => setState());
             return;
         }
       },
@@ -397,11 +408,14 @@ class _MainScreen extends State<MainScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (!MainScreen.shouldLockScreen) return;
+    if (UnlockScreen.isAuthenticating) return;
+    if (data.loadedAccount == null) return;
     if (_unlockScreenOn) return;
     if (data.loadedAccount?.autoScreenLock == false) return;
     _unlockScreenOn = true;
-    Navigator.pushNamed(context, UnlockScreen.routeName)
-        .then((value) => _unlockScreenOn = false);
+    Navigator.pushNamed(context, UnlockScreen.routeName).then((value) =>
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => _unlockScreenOn = false));
   }
 
   @override
@@ -417,6 +431,19 @@ class _MainScreen extends State<MainScreen>
     routeObserver.unsubscribe(this);
   }
 
+  void _mainLoop() {
+    if (!mounted) return;
+    DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
+    if (lastSyncDate != null) {
+      String newLastSyncDate =
+          '${lastSyncDate.hour < 10 ? '0' : ''}${lastSyncDate.hour}:${lastSyncDate.minute < 10 ? '0' : ''}${lastSyncDate.minute} | ${lastSyncDate.day < 10 ? '0' : ''}${lastSyncDate.day}/${lastSyncDate.month < 10 ? '0' : ''}${lastSyncDate.month}/${lastSyncDate.year}';
+      if (_lastSyncDate != newLastSyncDate) {
+        setState(() => _lastSyncDate = newLastSyncDate);
+      }
+    }
+    Future.delayed(const Duration(seconds: 5)).then((value) => _mainLoop());
+  }
+
   @override
   void initState() {
     super.initState();
@@ -425,6 +452,12 @@ class _MainScreen extends State<MainScreen>
           .setAndroidScreenSecure(_account.protectScreen);
     }
     WidgetsBinding.instance.addObserver(this);
+    DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
+    if (lastSyncDate != null) {
+      _lastSyncDate =
+          '${lastSyncDate.hour}:${lastSyncDate.minute} | ${lastSyncDate.day}/${lastSyncDate.month}/${lastSyncDate.year}';
+    }
+    _mainLoop();
   }
 
   @override
@@ -529,6 +562,32 @@ class _MainScreen extends State<MainScreen>
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
+      /*
+      PassyPadding(ThreeWidgetButton(
+        center: Text(localizations.files),
+        left: const Padding(
+          padding: EdgeInsets.only(right: 30),
+          child: Icon(Icons.description_outlined),
+        ),
+        right: const Icon(Icons.arrow_forward_ios_rounded),
+        onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
+            .then((value) => setState(() {})),
+      )),
+      */
+      if ((_account.keyDerivationType == KeyDerivationType.none) &&
+          recommendKeyDerivation)
+        PassyPadding(ThreeWidgetButton(
+          color: const Color.fromRGBO(255, 82, 82, 1),
+          center: Text(localizations.keyDerivation),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.key_rounded),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () =>
+              Navigator.pushNamed(context, KeyDerivationScreen.routeName)
+                  .then((value) => setState(() {})),
+        )),
     ];
 
     return WillPopScope(
@@ -583,64 +642,80 @@ class _MainScreen extends State<MainScreen>
               padding: PassyTheme.appBarButtonPadding,
               tooltip: localizations.settings,
               onPressed: () =>
-                  Navigator.pushNamed(context, SettingsScreen.routeName),
+                  Navigator.pushNamed(context, SettingsScreen.routeName)
+                      .then((value) => setState(() {})),
               icon: const Icon(Icons.settings),
               splashRadius: PassyTheme.appBarButtonSplashRadius,
             ),
           ],
         ),
-        body: LayoutBuilder(
-          builder: (ctx, constr) {
-            if (constr.maxWidth >= 1100) {
-              return Row(children: [
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[0],
-                    _screenButtons[1],
-                    _screenButtons[2],
-                  ],
-                )),
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[3],
-                    _screenButtons[4],
-                    _screenButtons[5],
-                  ],
-                )),
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[6],
-                    _screenButtons[7],
-                  ],
-                ))
-              ]);
-            }
-            if (constr.maxWidth >= 700) {
-              return Row(children: [
-                Expanded(
-                  child: ListView(children: [
-                    _screenButtons[0],
-                    _screenButtons[1],
-                    _screenButtons[2],
-                    _screenButtons[3],
-                  ]),
-                ),
-                Expanded(
-                    child: ListView(
-                  children: [
-                    _screenButtons[4],
-                    _screenButtons[5],
-                    _screenButtons[6],
-                    _screenButtons[7],
-                  ],
-                )),
-              ]);
-            }
-            return ListView(children: _screenButtons);
-          },
+        body: Column(
+          children: [
+            Flexible(
+              fit: FlexFit.tight,
+              child: LayoutBuilder(
+                builder: (ctx, constr) {
+                  if (constr.maxWidth >= 1100) {
+                    return Row(children: [
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[0],
+                          _screenButtons[1],
+                          _screenButtons[2],
+                        ],
+                      )),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[3],
+                          _screenButtons[4],
+                          _screenButtons[5],
+                        ],
+                      )),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[6],
+                          _screenButtons[7],
+                          if (_screenButtons.length == 9) _screenButtons[8],
+                        ],
+                      ))
+                    ]);
+                  }
+                  if (constr.maxWidth >= 700) {
+                    return Row(children: [
+                      Expanded(
+                        child: ListView(children: [
+                          _screenButtons[0],
+                          _screenButtons[1],
+                          _screenButtons[2],
+                          _screenButtons[3],
+                          if (_screenButtons.length == 9) _screenButtons[8],
+                        ]),
+                      ),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[4],
+                          _screenButtons[5],
+                          _screenButtons[6],
+                          _screenButtons[7],
+                        ],
+                      )),
+                    ]);
+                  }
+                  return ListView(children: _screenButtons);
+                },
+              ),
+            ),
+            PassyPadding(Text(
+              '${localizations.lastSynchronization}: $_lastSyncDate',
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            )),
+          ],
         ),
       ),
     );

@@ -1,11 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:crypto/crypto.dart';
+import 'package:encrypt/encrypt.dart' as enc;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/biometric_storage_data.dart';
+import 'package:passy/passy_data/key_derivation_info.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 import 'package:passy/screens/search_screen.dart';
 import 'package:passy/common/common.dart';
@@ -14,6 +21,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/splash_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'add_account_screen.dart';
 import 'common.dart';
@@ -31,7 +39,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreen();
 }
 
-class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
+class _LoginScreen extends State<LoginScreen> {
   static bool didRun = false;
   Widget? _floatingActionButton;
   String _password = '';
@@ -41,23 +49,49 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
 
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
+      UnlockScreen.isAuthenticating = true;
       if (data.getBioAuthEnabled(_username) ?? false) {
-        if (await bioAuth(_username)) {
+        BiometricStorageData storageData =
+            await BioStorage.fromLocker(_username);
+        KeyDerivationType derivationType =
+            data.getKeyDerivationType(_username)!;
+        KeyDerivationInfo? derivationInfo =
+            data.getKeyDerivationInfo(_username);
+        if (data.getPasswordHash(_username) ==
+            (await getPasswordHash(storageData.password,
+                    derivationType: derivationType,
+                    derivationInfo: derivationInfo))
+                .toString()) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
+          enc.Key key = await derivePassword(storageData.password,
+              derivationType: derivationType, derivationInfo: derivationInfo);
+          enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
+          LoadedAccount account = await data.loadAccount(
+              _username, encrypter, key,
+              encryptedPassword:
+                  encrypt(storageData.password, encrypter: encrypter));
+          if (isAutofill) {
+            Navigator.pushNamed(
+              context,
+              SearchScreen.routeName,
+              arguments: SearchScreenArgs(
+                builder: _buildPasswords,
+                isAutofill: true,
+              ),
+            );
+            return;
+          }
+          account.startAutoSync();
           Navigator.pushReplacementNamed(context, MainScreen.routeName);
         }
       }
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => UnlockScreen.isAuthenticating = false);
     }
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) _bioAuth();
-  }
-
-  Widget _buildPasswords(String terms) {
+  Widget _buildPasswords(String terms, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
         passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
     List<PwDataset> _dataSets = [];
@@ -75,7 +109,13 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
         )),
       ],
       passwords: _found,
-      onPressed: (password) async {
+      onPressed: (passwordMeta) async {
+        PasswordMeta password = PasswordMeta(
+            key: passwordMeta.key,
+            tags: passwordMeta.tags,
+            nickname: '>>> ${passwordMeta.nickname} <<<<',
+            username: passwordMeta.username,
+            website: passwordMeta.website);
         _found.remove(password);
         _found.insert(0, password);
         int max = _found.length < 5 ? _found.length : 5;
@@ -96,8 +136,36 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     );
   }
 
-  void login() {
-    if (getPassyHash(_password).toString() != data.getPasswordHash(_username)) {
+  void login() async {
+    List<int>? _derivedPassword;
+    bool _isPasswordWrong = false;
+    switch (data.getKeyDerivationType(_username)) {
+      case KeyDerivationType.none:
+        if (getPassyHash(_password).toString() !=
+            data.getPasswordHash(_username)) {
+          _isPasswordWrong = true;
+        }
+        break;
+      case KeyDerivationType.argon2:
+        try {
+          _derivedPassword =
+              (await data.getArgon2Key(_username, password: _password))!
+                  .rawBytes;
+        } catch (_) {
+          // TODO: show an error log
+          _isPasswordWrong = true;
+          break;
+        }
+        if (sha512.convert(_derivedPassword).toString() !=
+            data.getPasswordHash(_username)) {
+          _isPasswordWrong = true;
+        }
+        break;
+      default:
+        _isPasswordWrong = true;
+        break;
+    }
+    if (_isPasswordWrong) {
       showSnackBar(
         context,
         message: localizations.incorrectPassword,
@@ -114,8 +182,19 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
     Navigator.pushNamed(context, SplashScreen.routeName);
     data.info.save().whenComplete(() async {
       try {
+        enc.Key key = _derivedPassword == null
+            ? enc.Key.fromUtf8(
+                _password + (' ' * (32 - utf8.encode(_password).length)))
+            : enc.Key(Uint8List.fromList(_derivedPassword));
         LoadedAccount _account = await data.loadAccount(
-            data.info.value.lastUsername, getPassyEncrypter(_password));
+            data.info.value.lastUsername,
+            _derivedPassword == null
+                ? getPassyEncrypter(_password)
+                : getPassyEncrypterFromBytes(
+                    Uint8List.fromList(_derivedPassword)),
+            key,
+            encryptedPassword:
+                encrypt(_password, encrypter: enc.Encrypter(enc.AES(key))));
         Navigator.pop(context);
         if (isAutofill) {
           Navigator.pushNamed(
@@ -128,6 +207,7 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           );
           return;
         }
+        _account.startAutoSync();
         if (Platform.isAndroid) {
           FlutterSecureScreen.singleton
               .setAndroidScreenSecure(_account.protectScreen);
@@ -151,7 +231,6 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
 
   void updateBioAuthButton() {
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (isAutofill) return;
     if (data.getBioAuthEnabled(_username) == true) {
       _bioAuthButton = FloatingActionButton(
         onPressed: () => _bioAuth(),
@@ -196,22 +275,17 @@ class _LoginScreen extends State<LoginScreen> with WidgetsBindingObserver {
           ),
       ]);
     }
-    WidgetsBinding.instance.addObserver(this);
     if (didRun) return;
     didRun = true;
     _bioAuth();
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-  }
-
-  @override
   Widget build(BuildContext context) {
     updateBioAuthButton();
-    final List<DropdownMenuItem<String>> usernames = data.usernames
+    List<String> usernamesSorted = data.usernames.toList();
+    usernamesSorted.sort((a, b) => alphabeticalCompare(a, b));
+    final List<DropdownMenuItem<String>> usernames = usernamesSorted
         .map<DropdownMenuItem<String>>((_username) => DropdownMenuItem(
               child: Row(children: [
                 Expanded(child: Text(_username)),

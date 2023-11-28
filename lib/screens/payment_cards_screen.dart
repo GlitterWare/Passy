@@ -25,7 +25,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
-      builder: (String terms) {
+      builder: (String terms, void Function() rebuild) {
         final List<PaymentCardMeta> _found = [];
         final List<String> _terms = terms.trim().toLowerCase().split(' ');
         for (PaymentCardMeta _paymentCard
@@ -61,6 +61,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           return CustomScrollView(
             slivers: [
               SliverFillRemaining(
+                hasScrollBody: false,
                 child: Column(
                   children: [
                     const Spacer(flex: 7),
@@ -105,6 +106,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

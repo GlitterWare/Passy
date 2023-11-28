@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,12 +33,42 @@ class _ImportScreen extends State<ImportScreen> {
     )
         .then(
       (_pick) {
-        MainScreen.shouldLockScreen = true;
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => MainScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,
           ConfirmImportScreen.routeName,
-          arguments: _pick.files[0].path,
+          arguments: ConfirmImportScreenArgs(
+            path: _pick.files[0].path!,
+            importType: ImportType.passy,
+          ),
+        );
+      },
+    );
+  }
+
+  void _onKdbxImportPressed() {
+    MainScreen.shouldLockScreen = false;
+    FilePicker.platform
+        .pickFiles(
+      dialogTitle: localizations.kdbxImport,
+      type: Platform.isAndroid ? FileType.any : FileType.custom,
+      allowedExtensions: Platform.isAndroid ? null : ['kdbx'],
+      lockParentWindow: true,
+    )
+        .then(
+      (_pick) {
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => MainScreen.shouldLockScreen = true);
+        if (_pick == null) return;
+        Navigator.pushNamed(
+          context,
+          ConfirmImportScreen.routeName,
+          arguments: ConfirmImportScreenArgs(
+            path: _pick.files[0].path!,
+            importType: ImportType.kdbx,
+          ),
         );
       },
     );
@@ -56,6 +88,26 @@ class _ImportScreen extends State<ImportScreen> {
         centerTitle: true,
       ),
       body: ListView(children: [
+        PassyPadding(
+          ThreeWidgetButton(
+              center: Text(localizations.csvImport),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.download_for_offline_outlined),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, CSVImportScreen.routeName)),
+        ),
+        PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.kdbxImport),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.file_copy),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: _onKdbxImportPressed,
+        )),
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.passyImport),
           left: Padding(
@@ -70,17 +122,6 @@ class _ImportScreen extends State<ImportScreen> {
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: _onPassyImportPressed,
         )),
-        PassyPadding(
-          ThreeWidgetButton(
-              center: Text(localizations.csvImport),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.download_for_offline_outlined),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, CSVImportScreen.routeName)),
-        ),
       ]),
     );
   }

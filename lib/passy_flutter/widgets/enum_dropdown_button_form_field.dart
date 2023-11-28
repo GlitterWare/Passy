@@ -4,19 +4,29 @@ import 'package:passy/passy_flutter/common/common.dart';
 class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
   final T value;
   final List<T> values;
-  final Function(T gender)? getName;
+  final Widget Function(T object)? itemBuilder;
   final InputDecoration? decoration;
   final TextCapitalization textCapitalization;
   final void Function(T? value)? onChanged;
+  final TextStyle? style;
+  final Widget? icon;
+  final double iconSize;
+  final bool isExpanded;
+  final AlignmentGeometry alignment;
 
   const EnumDropDownButtonFormField({
     Key? key,
     required this.value,
     required this.values,
-    this.getName,
+    this.itemBuilder,
     this.decoration,
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
+    this.style,
+    this.icon,
+    this.iconSize = 24.0,
+    this.isExpanded = false,
+    this.alignment = AlignmentDirectional.centerStart,
   }) : super(key: key);
 
   @override
@@ -42,7 +52,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
           break;
       }
       _menuItems.add(DropdownMenuItem(
-        child: Text(getName?.call(value) ?? _name),
+        child: itemBuilder?.call(value) ?? Text(_name),
         value: value,
       ));
     }
@@ -51,6 +61,11 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
       value: value,
       decoration: decoration,
       onChanged: onChanged,
+      style: style,
+      icon: icon,
+      iconSize: iconSize,
+      isExpanded: isExpanded,
+      alignment: alignment,
     );
   }
 }

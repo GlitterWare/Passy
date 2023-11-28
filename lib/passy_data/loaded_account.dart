@@ -1,13 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
-import 'package:passy/passy_data/biometric_storage_data.dart';
+import 'package:kdbx/kdbx.dart';
+import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_data/file_index.dart';
+import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:archive/archive_io.dart';
+import 'package:passy/passy_data/tfa.dart';
+import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -17,19 +27,26 @@ import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'favorites.dart';
+import 'glare/glare_client.dart';
 import 'history.dart';
 import 'host_address.dart';
 import 'id_card.dart';
 import 'identity.dart';
+import 'key_derivation_info.dart';
+import 'key_derivation_type.dart';
 import 'note.dart';
 import 'password.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
+import 'passy_fs_meta.dart';
 import 'payment_card.dart';
+import 'sync_2d0d0_server_info.dart';
 import 'synchronization.dart';
 
 class LoadedAccount {
   Encrypter _encrypter;
+  String _encryptedPassword;
+  final String _deviceId;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
   final LocalSettingsFile _localSettings;
@@ -41,9 +58,16 @@ class LoadedAccount {
   final PaymentCardsFile _paymentCards;
   final IDCardsFile _idCards;
   final IdentitiesFile _identities;
+  final FileIndex _fileIndex;
+  Completer<void>? _autoSyncCompleter;
+  final Map<String, Sync2d0d0ServerInfo> _serversToTrust = {};
+  final Map<String, Completer<void>> _serversToTrustCompleters = {};
+  final Map<DateTime, String> _synchronizationLogs = {};
 
   LoadedAccount({
     required Encrypter encrypter,
+    required String encryptedPassword,
+    required String deviceId,
     required File versionFile,
     required AccountCredentialsFile credentials,
     required LocalSettingsFile localSettings,
@@ -55,7 +79,10 @@ class LoadedAccount {
     required PaymentCardsFile paymentCards,
     required IDCardsFile idCards,
     required IdentitiesFile identities,
-  })  : _encrypter = encrypter,
+    required FileIndex fileIndex,
+  })  : _encryptedPassword = encryptedPassword,
+        _deviceId = deviceId,
+        _encrypter = encrypter,
         _versionFile = versionFile,
         _credentials = credentials,
         _localSettings = localSettings,
@@ -66,10 +93,15 @@ class LoadedAccount {
         _notes = notes,
         _paymentCards = paymentCards,
         _idCards = idCards,
-        _identities = identities {
+        _identities = identities,
+        _fileIndex = fileIndex {
     Future(() async {
-      await _settings.value.rsaKeypairCompleter.future;
-      await _settings.save();
+      if (_settings.value.rsaKeypair == null) {
+        RSAKeypair keypair = await compute(
+            (message) => RSAKeypair.fromRandom(keySize: 4096), null);
+        _settings.value.rsaKeypair = keypair;
+        await _settings.save();
+      }
     });
     bool shouldSaveHistory = false;
     {
@@ -123,6 +155,9 @@ class LoadedAccount {
   factory LoadedAccount.fromDirectory({
     required String path,
     required Encrypter encrypter,
+    required String encryptedPassword,
+    required Key key,
+    required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -134,6 +169,7 @@ class LoadedAccount {
     PaymentCardsFile? paymentCards,
     IDCardsFile? idCards,
     IdentitiesFile? identities,
+    FileIndex? fileIndex,
   }) {
     versionFile ??= File(path + Platform.pathSeparator + 'version.txt');
     credentials ??= AccountCredentials.fromFile(
@@ -163,8 +199,14 @@ class LoadedAccount {
     identities ??= Identities.fromFile(
         File(path + Platform.pathSeparator + 'identities.enc'),
         encrypter: encrypter);
+    fileIndex ??= FileIndex(
+        file: File(path + Platform.pathSeparator + 'file_index.enc'),
+        saveDir: Directory(path + Platform.pathSeparator + 'files'),
+        key: key);
     return LoadedAccount(
+        encryptedPassword: encryptedPassword,
         encrypter: encrypter,
+        deviceId: deviceId,
         versionFile: versionFile,
         credentials: credentials,
         localSettings: localSettings,
@@ -175,16 +217,34 @@ class LoadedAccount {
         notes: notes,
         paymentCards: paymentCards,
         idCards: idCards,
-        identities: identities);
+        identities: identities,
+        fileIndex: fileIndex);
   }
 
   Future<void> setAccountPassword(
     String password, {
     bool doNotReencryptEntries = false,
+    KeyDerivationType? derivationType,
+    KeyDerivationInfo? derivationInfo,
   }) async {
-    _credentials.value.password = password;
+    if (derivationType != null) {
+      _credentials.value.keyDerivationType = derivationType;
+      _credentials.value.keyDerivationInfo = derivationInfo;
+    }
+    _credentials.value.passwordHash = (await getPasswordHash(
+      password,
+      derivationType: _credentials.value.keyDerivationType,
+      derivationInfo: _credentials.value.keyDerivationInfo,
+    ))
+        .toString();
     await _credentials.save();
-    _encrypter = getPassyEncrypter(password);
+    Encrypter oldEncrypter = _encrypter;
+    Key key = await derivePassword(
+      password,
+      derivationType: _credentials.value.keyDerivationType,
+      derivationInfo: _credentials.value.keyDerivationInfo,
+    );
+    _encrypter = Encrypter(AES(key));
     await _settings.reload();
     _settings.encrypter = _encrypter;
     await _settings.save();
@@ -202,11 +262,49 @@ class LoadedAccount {
       _identities.encrypter = _encrypter;
       return;
     }
-    await _passwords.setEncrypter(_encrypter);
-    await _notes.setEncrypter(_encrypter);
-    await _paymentCards.setEncrypter(_encrypter);
-    await _idCards.setEncrypter(_encrypter);
-    await _identities.setEncrypter(_encrypter);
+    await _passwords.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _notes.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _paymentCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _idCards.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _identities.setEncrypter(_encrypter, oldEncrypter: oldEncrypter);
+    await _fileIndex.setKey(key, oldEncrypter: oldEncrypter);
+    Directory trustedConnectionsDir = Directory(_versionFile.parent.path +
+        Platform.pathSeparator +
+        'trusted_connections');
+    if (await trustedConnectionsDir.exists()) {
+      await for (FileSystemEntity entity in trustedConnectionsDir.list()) {
+        File file = File(entity.path);
+        await file.writeAsString(TrustedConnectionData.fromEncrypted(
+                data: await file.readAsString(), encrypter: oldEncrypter)
+            .toEncrypted(_encrypter));
+      }
+    }
+    _encryptedPassword = encrypt(
+        decrypt(_encryptedPassword, encrypter: oldEncrypter),
+        encrypter: _encrypter);
+    if (_autoSyncCompleter != null) {
+      stopAutoSync();
+      startAutoSync();
+    }
+  }
+
+  KeyDerivationType get keyDerivationType =>
+      _credentials.value.keyDerivationType;
+
+  KeyDerivationInfo? get keyDerivationInfo {
+    KeyDerivationType type = _credentials.value.keyDerivationType;
+    switch (type) {
+      case KeyDerivationType.none:
+        return null;
+      case KeyDerivationType.argon2:
+        Argon2Info info = _credentials.value.keyDerivationInfo as Argon2Info;
+        return Argon2Info(
+          salt: info.salt,
+          parallelism: info.parallelism,
+          memory: info.memory,
+          iterations: info.iterations,
+        );
+    }
   }
 
   Future<void> save() => Future.wait([
@@ -235,14 +333,48 @@ class LoadedAccount {
     RSAKeypair? rsaKeypair = _settings.value.rsaKeypair;
     if (rsaKeypair == null) return null;
     return Synchronization(
-      this,
+      encryptedPassword: _encryptedPassword,
+      username: username,
+      passyEntries: FullPassyEntriesFileCollection(
+        passwords: _passwords,
+        notes: _notes,
+        paymentCards: _paymentCards,
+        idCards: _idCards,
+        identities: _identities,
+      ),
       history: _history,
       favorites: _favorites,
+      settings: _settings,
+      credentials: _credentials,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
-      onComplete: onComplete,
+      authWithIV:
+          _credentials.value.keyDerivationType != KeyDerivationType.none,
+      synchronizationType:
+          _credentials.value.keyDerivationType == KeyDerivationType.none
+              ? SynchronizationType.classic
+              : SynchronizationType.v2d0d0,
+      onComplete: (results) {
+        _synchronizationLogs[DateTime.now().toUtc()] = results.log;
+        onComplete?.call(results);
+      },
       onError: onError,
     );
+  }
+
+  Map<DateTime, String> get synchronizationLogs =>
+      Map.from(_synchronizationLogs);
+
+  Future<void> testSynchronizationConnection2d0d0(
+      String address, int port) async {
+    GlareClient? client;
+    client = await connectTo2d0d0Server(address, port,
+        keypair: _settings.value.rsaKeypair);
+    try {
+      await client.disconnect();
+    } catch (_) {
+      return;
+    }
   }
 
   Future<HostAddress?> host({
@@ -268,6 +400,343 @@ class LoadedAccount {
         ?.connect(address);
   }
 
+  Future<void> trustServer(Sync2d0d0ServerInfo server) async {
+    _serversToTrust[server.nickname] = server;
+    Completer<void> completer = Completer<void>();
+    _serversToTrustCompleters[server.nickname] = completer;
+    await completer.future;
+  }
+
+  Future<void> _autoSyncCycle(Completer<void> completer) async {
+    Map<String, Sync2d0d0ServerInfo> serverInfo = sync2d0d0ServerInfo;
+    serverInfo.addAll(_serversToTrust);
+    if (serverInfo.isNotEmpty) {
+      for (Sync2d0d0ServerInfo info in serverInfo.values) {
+        Synchronization? syncClient = getSynchronization();
+        if (syncClient == null) continue;
+        try {
+          bool verifyTrustedConnectionData;
+          Completer? trustCompleter;
+          if (_serversToTrust.containsKey(info.nickname)) {
+            verifyTrustedConnectionData = false;
+            _serversToTrust.remove(info.address);
+            trustCompleter = _serversToTrustCompleters[info.nickname];
+            _serversToTrustCompleters.remove(info.nickname);
+          } else {
+            verifyTrustedConnectionData = true;
+          }
+          await syncClient.connect2d0d0(
+              HostAddress(InternetAddress(info.address), info.port),
+              deviceId: _deviceId,
+              isDedicatedServer: true,
+              verifyTrustedConnectionData: verifyTrustedConnectionData,
+              trustedConnectionsDir: Directory(_versionFile.parent.path +
+                  Platform.pathSeparator +
+                  'trusted_connections'),
+              onTrustSaveComplete: () => trustCompleter?.complete(),
+              onTrustSaveFailed: () => trustCompleter?.completeError(
+                  'Failed to complete server trust saving procedures.'));
+        } catch (_) {}
+      }
+    }
+    await Future.delayed(
+        Duration(milliseconds: _settings.value.serverSyncInterval));
+    if (!completer.isCompleted) _autoSyncCycle(completer);
+  }
+
+  void startAutoSync() {
+    if (_autoSyncCompleter != null) return;
+    Completer completer = Completer<void>();
+    _autoSyncCompleter = completer;
+    _autoSyncCycle(completer);
+  }
+
+  void stopAutoSync() {
+    Completer<void>? completer = _autoSyncCompleter;
+    if (completer == null) return;
+    if (completer.isCompleted) return;
+    completer.complete();
+    _autoSyncCompleter = null;
+  }
+
+  Future<void> _exportFiles(Directory dir) async {
+    if (await dir.exists()) {
+      List<FileSystemEntity> files = await dir.list().toList();
+      if (files.isNotEmpty) throw 'Directory is not empty';
+    } else {
+      await dir.create(recursive: true);
+    }
+    List<String> dirs = [''];
+    List<PassyFsMeta> metaValues =
+        (await _fileIndex.getMetadata()).values.toList();
+    for (PassyFsMeta meta in metaValues) {
+      List<String> pathSplit = meta.virtualPath.split('/');
+      String subDir = pathSplit
+          .sublist(0, pathSplit.length - 1)
+          .join(Platform.pathSeparator);
+      if (!dirs.contains(subDir)) {
+        String subDirPart = '';
+        for (int i = 1; i != pathSplit.length - 1; i++) {
+          subDirPart += Platform.pathSeparator + pathSplit[i];
+          await Directory(dir.path + subDirPart).create(recursive: true);
+          dirs.add(subDirPart);
+        }
+      }
+      await _fileIndex.saveDecrypted(meta.key,
+          file: File(dir.path + subDir + Platform.pathSeparator + meta.name));
+    }
+  }
+
+  Future<String> exportPassy({
+    required Directory outputDirectory,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectory.path +
+          Platform.pathSeparator +
+          'passy-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectory.path + Platform.pathSeparator + fileName;
+    }
+    Directory _tempDir = Directory(Directory.systemTemp.path +
+        Platform.pathSeparator +
+        'passy-export-' +
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';'));
+    Directory _tempAccDir =
+        Directory(_tempDir.path + Platform.pathSeparator + username);
+    if (await _tempDir.exists()) {
+      await _tempDir.delete(recursive: true);
+    }
+    await _tempAccDir.create(recursive: true);
+    Directory _accDir = Directory(_versionFile.parent.path);
+    await copyDirectory(_accDir, _tempAccDir);
+    {
+      JSONLoadedAccount _jsonAcc = JSONLoadedAccount.fromEncryptedCSVDirectory(
+          path: _tempAccDir.path, encrypter: _encrypter, deviceId: _deviceId);
+      await _tempAccDir.delete(recursive: true);
+      await _tempAccDir.create();
+      _jsonAcc.saveSync();
+      await _exportFiles(
+          Directory(_tempAccDir.path + Platform.pathSeparator + 'files'));
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempDir.delete(recursive: true);
+    return fileName;
+  }
+
+  Future<String> exportCSV({
+    required Directory outputDirectory,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectory.path +
+          Platform.pathSeparator +
+          'passy-csv-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectory.path + Platform.pathSeparator + fileName;
+    }
+    Directory _tempDir = Directory(Directory.systemTemp.path +
+        Platform.pathSeparator +
+        'passy-csv-export-' +
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';'));
+    Directory _tempAccDir =
+        Directory(_tempDir.path + Platform.pathSeparator + username);
+    if (await _tempDir.exists()) {
+      await _tempDir.delete(recursive: true);
+    }
+    await _tempAccDir.create(recursive: true);
+    String tempPath = '${_tempAccDir.path}${Platform.pathSeparator}';
+    {
+      await _passwords.export(
+        File('${tempPath}passwords.csv'),
+        annotation:
+            '"customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website"',
+        skipKey: true,
+      );
+      await _paymentCards.export(
+        File('${tempPath}payment_cards.csv'),
+        annotation:
+            '"customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp"',
+        skipKey: true,
+      );
+      await _notes.export(
+        File('${tempPath}notes.csv'),
+        annotation: '"title","note","isMarkdown"',
+        skipKey: true,
+      );
+      await _idCards.export(
+        File('${tempPath}id_cards.csv'),
+        annotation:
+            '"customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country"',
+        skipKey: true,
+      );
+      await _identities.export(
+        File('${tempPath}identities.csv'),
+        annotation:
+            '"customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
+        skipKey: true,
+      );
+      await _versionFile.copy('${tempPath}version.txt');
+      JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+      await File('${tempPath}history.json')
+          .writeAsString(encoder.convert(_history.value.toJson()));
+      await File('${tempPath}favorites.json')
+          .writeAsString(encoder.convert(_favorites.value.toJson()));
+      await _exportFiles(Directory('${tempPath}files'));
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempDir.delete(recursive: true);
+    return fileName;
+  }
+
+  Future<String> exportKdbx({
+    required String password,
+    required Directory outputDirectory,
+    String? fileName,
+  }) async {
+    if (fileName == null) {
+      fileName = outputDirectory.path +
+          Platform.pathSeparator +
+          'passy-kdbx-export-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
+    } else {
+      fileName = outputDirectory.path + Platform.pathSeparator + fileName;
+    }
+    Directory _tempDir = Directory(Directory.systemTemp.path +
+        Platform.pathSeparator +
+        'passy-csv-export-' +
+        DateTime.now().toUtc().toIso8601String().replaceAll(':', ';'));
+    Directory _tempAccDir =
+        Directory(_tempDir.path + Platform.pathSeparator + username);
+    if (await _tempDir.exists()) {
+      await _tempDir.delete(recursive: true);
+    }
+    await _tempAccDir.create(recursive: true);
+    String tempPath = '${_tempAccDir.path}${Platform.pathSeparator}';
+    {
+      final kdbx = KdbxFormat()
+          .create(Credentials(ProtectedValue.fromString(password)), username);
+      // Passwords
+      KdbxGroup passwordsGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Passwords');
+      await _passwords.exportKdbx(kdbx, group: passwordsGroup);
+      kdbx.body.rootGroup.addGroup(passwordsGroup);
+      // Payment cards
+      KdbxGroup paymentCardsGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Payment cards');
+      await _paymentCards.exportKdbx(kdbx, group: paymentCardsGroup);
+      kdbx.body.rootGroup.addGroup(paymentCardsGroup);
+      // Notes
+      KdbxGroup notesGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Notes');
+      await _notes.exportKdbx(kdbx, group: notesGroup);
+      kdbx.body.rootGroup.addGroup(notesGroup);
+      // ID Cards
+      KdbxGroup idCardsGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'ID cards');
+      await _idCards.exportKdbx(kdbx, group: idCardsGroup);
+      kdbx.body.rootGroup.addGroup(idCardsGroup);
+      // Identities
+      KdbxGroup identitiesGroup = KdbxGroup.create(
+          ctx: kdbx.ctx, parent: kdbx.body.rootGroup, name: 'Identities');
+      await _identities.exportKdbx(kdbx, group: identitiesGroup);
+      kdbx.body.rootGroup.addGroup(identitiesGroup);
+      await File('$tempPath$username.kdbx').writeAsBytes(await kdbx.save());
+      await _versionFile.copy('${tempPath}version.txt');
+      JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+      await File('${tempPath}history.json')
+          .writeAsString(encoder.convert(_history.value.toJson()));
+      await File('${tempPath}favorites.json')
+          .writeAsString(encoder.convert(_favorites.value.toJson()));
+      await _exportFiles(Directory('${tempPath}files'));
+    }
+    ZipFileEncoder _encoder = ZipFileEncoder();
+    _encoder.create(fileName, level: 9);
+    await _encoder.addDirectory(_tempAccDir);
+    _encoder.close();
+    await _tempDir.delete(recursive: true);
+    return fileName;
+  }
+
+  Future<void> importKDBXPasswords(List<KdbxEntry> entries) async {
+    String keyPrefix = '${DateTime.now().toUtc().toIso8601String()}-import';
+    Map<String, Password> passwords = {};
+    for (int i = 0; i != entries.length; i++) {
+      KdbxEntry entry = entries[i];
+      List<CustomField> customFields = [];
+      String? additionalInfo;
+      String? nickname;
+      String? username;
+      String? email;
+      String? password;
+      TFA? tfa;
+      String? website;
+      for (var e in entry.stringEntries) {
+        String? val = e.value?.getText();
+        if (val == null) continue;
+        switch (e.key.key) {
+          case 'Additional info':
+            additionalInfo = val;
+            continue;
+          case KdbxKeyCommon.KEY_TITLE:
+            nickname = val;
+            continue;
+          case KdbxKeyCommon.KEY_USER_NAME:
+            username = val;
+            continue;
+          case 'Email':
+            email = val;
+            continue;
+          case KdbxKeyCommon.KEY_PASSWORD:
+            password = val;
+            continue;
+          case KdbxKeyCommon.KEY_OTP:
+            tfa = TFA(secret: val);
+            continue;
+          case KdbxKeyCommon.KEY_URL:
+            website = val;
+            continue;
+        }
+        customFields.add(CustomField(
+          title: e.key.key,
+          value: val,
+        ));
+      }
+      String key = '$keyPrefix-$i';
+      passwords[key] = Password(
+        key: key,
+        customFields: customFields,
+        additionalInfo: additionalInfo ?? '',
+        nickname: nickname ?? '',
+        username: username ?? '',
+        email: email ?? '',
+        password: password ?? '',
+        tfa: tfa,
+        website: website ?? '',
+      );
+    }
+    await _history.reload();
+    for (Password password in passwords.values) {
+      _history.value.passwords[password.key] = EntryEvent(
+        password.key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+    }
+    try {
+      _passwords.setEntries(passwords);
+    } catch (_) {
+      await _history.reload();
+      rethrow;
+    }
+    await _history.save();
+  }
+
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
     switch (type) {
       case EntryType.password:
@@ -280,6 +749,28 @@ class LoadedAccount {
         return (PassyEntry value) => setIDCard(value as IDCard);
       case EntryType.identity:
         return (PassyEntry value) => setIdentity(value as Identity);
+      default:
+        throw Exception('Unsupported entry type \'${type.name}\'');
+    }
+  }
+
+  Future<void> Function(List<PassyEntry> value) setEntries(EntryType type) {
+    switch (type) {
+      case EntryType.password:
+        return (List<PassyEntry> value) =>
+            setPasswords(value.map((e) => e as Password).toList());
+      case EntryType.paymentCard:
+        return (List<PassyEntry> value) =>
+            setPaymentCards(value.map((e) => e as PaymentCard).toList());
+      case EntryType.note:
+        return (List<PassyEntry> value) =>
+            setNotes(value.map((e) => e as Note).toList());
+      case EntryType.idCard:
+        return (List<PassyEntry> value) =>
+            setIDCards(value.map((e) => e as IDCard).toList());
+      case EntryType.identity:
+        return (List<PassyEntry> value) =>
+            setIdentities(value.map((e) => e as Identity).toList());
       default:
         throw Exception('Unsupported entry type \'${type.name}\'');
     }
@@ -341,15 +832,37 @@ class LoadedAccount {
   bool get autoScreenLock => _settings.value.autoScreenLock;
   set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
   bool get isRSAKeypairLoaded {
-    _settings.reloadSync();
     return _settings.value.rsaKeypair != null;
   }
 
+  int get serverSyncInterval => _settings.value.serverSyncInterval;
+  set serverSyncInterval(int value) =>
+      _settings.value.serverSyncInterval = value;
+  Map<String, Sync2d0d0ServerInfo> get sync2d0d0ServerInfo =>
+      _settings.value.serverInfo.map((key, value) => MapEntry(
+          key,
+          Sync2d0d0ServerInfo(
+            nickname: value.nickname,
+            address: value.address,
+            port: value.port,
+          )));
+  void addSync2d0d0ServerInfo(Iterable<Sync2d0d0ServerInfo> info) =>
+      _settings.value.serverInfo.addEntries(info.map((e) => MapEntry(
+          e.nickname,
+          Sync2d0d0ServerInfo(
+            nickname: e.nickname,
+            address: e.address,
+            port: e.port,
+          ))));
+  void removeSync2d0d0ServerInfo(String nickname) {
+    _settings.value.serverInfo.remove(nickname);
+  }
+
+  set lastSyncDate(DateTime? value) => _settings.value.lastSyncDate = value;
+  DateTime? get lastSyncDate => _settings.value.lastSyncDate;
+
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
-
-  Future<BiometricStorageData> get biometricStorageData =>
-      BiometricStorageData.fromLocker(_credentials.value.username);
 
   // History wrappers
   void clearRemovedHistory() => _history.value.clearRemoved();
@@ -533,24 +1046,37 @@ class LoadedAccount {
   }
 
   void removeDeletedFavorites() async {
-    // TODO: optimize IO + await on each statement
-    // multiple entries should be requested via one get command per entry type
     await _favorites.reload();
-    _favorites.value.passwords.forEach((key, value) {
-      if (getPassword(key) == null) removeFavoritePassword(key);
-    });
-    _favorites.value.paymentCards.forEach((key, value) {
-      if (getPaymentCard(key) == null) removeFavoritePaymentCard(key);
-    });
-    _favorites.value.notes.forEach((key, value) {
-      if (getNote(key) == null) removeFavoriteNote(key);
-    });
-    _favorites.value.idCards.forEach((key, value) {
-      if (getIDCard(key) == null) removeFavoriteIDCard(key);
-    });
-    _favorites.value.identities.forEach((key, value) {
-      if (getIdentity(key) == null) removeFavoriteIdentity(key);
-    });
+    {
+      List<String> keys = _passwords.keys;
+      _favorites.value.passwords.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoritePassword(key);
+      });
+    }
+    {
+      List<String> keys = _paymentCards.keys;
+      _favorites.value.paymentCards.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoritePaymentCard(key);
+      });
+    }
+    {
+      List<String> keys = _notes.keys;
+      _favorites.value.notes.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoriteNote(key);
+      });
+    }
+    {
+      List<String> keys = _idCards.keys;
+      _favorites.value.idCards.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoriteIDCard(key);
+      });
+    }
+    {
+      List<String> keys = _identities.keys;
+      _favorites.value.identities.forEach((key, value) {
+        if (!keys.contains(key)) removeFavoriteIdentity(key);
+      });
+    }
   }
 
   // Passwords wrappers
@@ -581,6 +1107,18 @@ class LoadedAccount {
         status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
     Future<void> _saveFuture =
         _passwords.setEntry(password.key, entry: password);
+    await _history.save();
+    await _saveFuture;
+  }
+
+  Future<void> setPasswords(List<Password> passwords) async {
+    await _history.reload();
+    for (Password password in passwords) {
+      _history.value.passwords[password.key] = EntryEvent(password.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _passwords
+        .setEntries(Map.fromEntries(passwords.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -628,6 +1166,18 @@ class LoadedAccount {
       lastModified: DateTime.now().toUtc(),
     );
     Future<void> _saveFuture = _notes.setEntry(note.key, entry: note);
+    await _history.save();
+    await _saveFuture;
+  }
+
+  Future<void> setNotes(List<Note> notes) async {
+    await _history.reload();
+    for (Note note in notes) {
+      _history.value.notes[note.key] = EntryEvent(note.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _notes
+        .setEntries(Map.fromEntries(notes.map((e) => MapEntry(e.key, e))));
     await _history.save();
     await _saveFuture;
   }
@@ -680,6 +1230,18 @@ class LoadedAccount {
     await _saveFuture;
   }
 
+  Future<void> setPaymentCards(List<PaymentCard> paymentCards) async {
+    await _history.reload();
+    for (PaymentCard paymentCard in paymentCards) {
+      _history.value.paymentCards[paymentCard.key] = EntryEvent(paymentCard.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _paymentCards.setEntries(
+        Map.fromEntries(paymentCards.map((e) => MapEntry(e.key, e))));
+    await _history.save();
+    await _saveFuture;
+  }
+
   Future<void> removePaymentCard(String key) async {
     await _history.reload();
     EntryEvent? _event = _history.value.paymentCards[key];
@@ -724,6 +1286,18 @@ class LoadedAccount {
     );
     await _idCards.setEntry(idCard.key, entry: idCard);
     await _history.save();
+  }
+
+  Future<void> setIDCards(List<IDCard> idCards) async {
+    await _history.reload();
+    for (IDCard idCard in idCards) {
+      _history.value.idCards[idCard.key] = EntryEvent(idCard.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _idCards
+        .setEntries(Map.fromEntries(idCards.map((e) => MapEntry(e.key, e))));
+    await _history.save();
+    await _saveFuture;
   }
 
   Future<void> removeIDCard(String key) async {
@@ -774,6 +1348,18 @@ class LoadedAccount {
     await _saveFuture;
   }
 
+  Future<void> setIdentities(List<Identity> identities) async {
+    await _history.reload();
+    for (Identity identity in identities) {
+      _history.value.identities[identity.key] = EntryEvent(identity.key,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    Future<void> _saveFuture = _identities
+        .setEntries(Map.fromEntries(identities.map((e) => MapEntry(e.key, e))));
+    await _history.save();
+    await _saveFuture;
+  }
+
   Future<void> removeIdentity(String key) async {
     await _history.reload();
     EntryEvent? _event = _history.value.identities[key];
@@ -786,9 +1372,43 @@ class LoadedAccount {
     await removeFavoriteIdentity(key);
     await _saveFuture;
   }
+
+  // File index wrappers
+  Future<Map<String, PassyFsMeta>> getFsMetadata() => _fileIndex.getMetadata();
+  Future<Map<String, PassyFsMeta>> getFsEntries(List<String> keys) =>
+      _fileIndex.getEntries(keys);
+  Future<String> addFile(
+    File file, {
+    bool useIsolate = false,
+    FileMeta? meta,
+    String? parent,
+  }) {
+    if (useIsolate) {
+      return compute<FileIndex, String>(
+          (index) => index.addFile(file, meta: meta, parent: parent),
+          _fileIndex);
+    }
+    return _fileIndex.addFile(file, meta: meta, parent: parent);
+  }
+
+  Future<Uint8List> readFileAsBytes(String key, {bool useIsolate = false}) {
+    if (useIsolate) {
+      return compute<FileIndex, Uint8List>(
+          (index) => index.readAsBytes(key), _fileIndex);
+    }
+    return _fileIndex.readAsBytes(key);
+  }
+
+  Future<void> removeFile(String key) => _fileIndex.removeFile(key);
+  Future<void> removeFolder(String path) => _fileIndex.removeFolder(path);
+  Future<void> renameFile(String key, {required String name}) =>
+      _fileIndex.renameFile(key, name: name);
+  Future<void> exportFile(String key, {required File file}) =>
+      _fileIndex.saveDecrypted(key, file: file);
 }
 
 class JSONLoadedAccount {
+  final String _deviceId;
   final File _versionFile;
   final AccountCredentialsFile _credentials;
   final LocalSettingsFile _localSettings;
@@ -802,6 +1422,7 @@ class JSONLoadedAccount {
   final PassyEntriesJSONFile<Identity> _identities;
 
   JSONLoadedAccount({
+    required String deviceId,
     required File versionFile,
     required AccountCredentialsFile credentials,
     required LocalSettingsFile localSettings,
@@ -813,7 +1434,8 @@ class JSONLoadedAccount {
     required PassyEntriesJSONFile<PaymentCard> paymentCards,
     required PassyEntriesJSONFile<IDCard> idCards,
     required PassyEntriesJSONFile<Identity> identities,
-  })  : _versionFile = versionFile,
+  })  : _deviceId = deviceId,
+        _versionFile = versionFile,
         _credentials = credentials,
         _localSettings = localSettings,
         _settings = settings,
@@ -827,6 +1449,7 @@ class JSONLoadedAccount {
 
   factory JSONLoadedAccount.fromDirectory({
     required String path,
+    required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -875,6 +1498,7 @@ class JSONLoadedAccount {
       File(path + Platform.pathSeparator + 'identities.enc'),
     );
     return JSONLoadedAccount(
+        deviceId: deviceId,
         versionFile: versionFile,
         credentials: credentials,
         localSettings: localSettings,
@@ -891,6 +1515,7 @@ class JSONLoadedAccount {
   factory JSONLoadedAccount.fromEncryptedCSVDirectory({
     required String path,
     required Encrypter encrypter,
+    required String deviceId,
     File? versionFile,
     AccountCredentialsFile? credentials,
     LocalSettingsFile? localSettings,
@@ -961,6 +1586,7 @@ class JSONLoadedAccount {
     return JSONLoadedAccount(
       versionFile: versionFile,
       credentials: credentials,
+      deviceId: deviceId,
       localSettings: localSettings,
       settings: settings,
       history: history,
@@ -973,10 +1599,13 @@ class JSONLoadedAccount {
     );
   }
 
-  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter) {
+  LoadedAccount toEncryptedCSVLoadedAccount(Encrypter encrypter, Key key,
+      {required String encryptedPassword}) {
     return LoadedAccount(
+      encryptedPassword: encryptedPassword,
       encrypter: encrypter,
       versionFile: _versionFile,
+      deviceId: _deviceId,
       credentials: _credentials,
       localSettings: _localSettings,
       settings: _settings.toEncryptedJSONFile(encrypter),
@@ -987,6 +1616,13 @@ class JSONLoadedAccount {
       paymentCards: _paymentCards.toPassyEntriesEncryptedCSVFile(encrypter),
       idCards: _idCards.toPassyEntriesEncryptedCSVFile(encrypter),
       identities: _identities.toPassyEntriesEncryptedCSVFile(encrypter),
+      fileIndex: FileIndex(
+          file: File(_versionFile.parent.path +
+              Platform.pathSeparator +
+              'file_index.enc'),
+          saveDir: Directory(
+              _versionFile.parent.path + Platform.pathSeparator + 'files'),
+          key: key),
     );
   }
 

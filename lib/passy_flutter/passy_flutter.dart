@@ -1,3 +1,5 @@
+export 'common/file_entry_type.dart';
+export 'common/file_entry.dart';
 export 'widgets/widgets.dart';
 export 'passy_gen.dart';
 export 'passy_sort.dart';

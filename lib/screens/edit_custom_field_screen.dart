@@ -57,35 +57,34 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
           decoration: InputDecoration(labelText: localizations.type),
           onChanged: (value) => _customField.fieldType = value as FieldType,
         )),
-        PassyPadding(DropdownButtonFormField(
-          items: [
-            DropdownMenuItem(
-              child: Text(localizations.false_),
-              value: false,
-            ),
-            DropdownMenuItem(
-              child: Text(localizations.true_),
-              value: true,
-            ),
-          ],
-          value: _customField.obscured,
-          decoration: InputDecoration(labelText: localizations.obscured),
-          onChanged: (value) => _customField.obscured = value as bool,
+        PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.obscured),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.hide_source),
+          ),
+          right: Switch(
+            activeColor: Colors.greenAccent,
+            value: _customField.obscured,
+            onChanged: (value) => setState(() => _customField.obscured = value),
+          ),
+          onPressed: () =>
+              setState(() => _customField.obscured = !_customField.obscured),
         )),
-        PassyPadding(DropdownButtonFormField(
-          items: [
-            DropdownMenuItem(
-              child: Text(localizations.false_),
-              value: false,
-            ),
-            DropdownMenuItem(
-              child: Text(localizations.true_),
-              value: true,
-            ),
-          ],
-          value: _customField.obscured,
-          decoration: InputDecoration(labelText: localizations.multiline),
-          onChanged: (value) => _customField.multiline = value as bool,
+        PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.multiline),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.list_outlined),
+          ),
+          right: Switch(
+            activeColor: Colors.greenAccent,
+            value: _customField.multiline,
+            onChanged: (value) =>
+                setState(() => _customField.multiline = value),
+          ),
+          onPressed: () =>
+              setState(() => _customField.multiline = !_customField.multiline),
         )),
       ]),
     );

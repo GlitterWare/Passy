@@ -1,9 +1,15 @@
 import 'dart:convert';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/note.dart';
+import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
+import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:passy/passy_data/payment_card.dart';
 
 import 'history.dart';
-import 'loaded_account.dart';
 import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -429,11 +435,10 @@ EntriesToSynchronize findEntriesToSynchronize({
   );
 }
 
-Future<void> processExchangeEntry({
+Future<PassyEntry?> processExchangeEntry({
   required EntryType entryType,
   required ExchangeEntry entry,
-  required LoadedAccount account,
-  required History history,
+  required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
@@ -442,74 +447,115 @@ Future<void> processExchangeEntry({
     throw {'error': 'History entry not provided'};
   }
   if (historyEntry.status == EntryStatus.removed) {
-    await account.removeEntry(entryType)(historyEntry.key);
     onRemoveEntry?.call();
-    history.getEvents(entryType)[historyEntry.key] = historyEntry;
-    await account.saveHistory();
-    return;
+    history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
+    return null;
   }
   PassyEntry? passyEntry = entry.entry;
   if (passyEntry == null) {
     throw {'error': 'Passy entry not provided'};
   }
-  await account.setEntry(entryType)(passyEntry);
+  history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
   onSetEntry?.call();
-  history.getEvents(entryType)[historyEntry.key] = historyEntry;
-  await account.saveHistory();
+  return passyEntry;
 }
 
 Future<void> processExchangeEntries({
   required EntryType entryType,
   required List<ExchangeEntry> entries,
-  required LoadedAccount account,
-  required History history,
+  required PassyEntriesEncryptedCSVFile entriesFile,
+  required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
+  Map<String, PassyEntry?> passyEntries = {};
   for (ExchangeEntry entry in entries) {
-    await processExchangeEntry(
+    PassyEntry? passyEntry = await processExchangeEntry(
       entryType: entryType,
       entry: entry,
-      account: account,
       history: history,
       onRemoveEntry: onRemoveEntry,
       onSetEntry: onSetEntry,
     );
+    passyEntries[entry.key] = passyEntry;
+  }
+  switch (entryType) {
+    case EntryType.password:
+      await entriesFile.setEntries(passyEntries.map<String, Password?>(
+          (key, value) => MapEntry(key, value as Password?)));
+      break;
+    case EntryType.paymentCard:
+      await entriesFile.setEntries(passyEntries.map<String, PaymentCard?>(
+          (key, value) => MapEntry(key, value as PaymentCard?)));
+      break;
+    case EntryType.note:
+      await entriesFile.setEntries(passyEntries
+          .map<String, Note?>((key, value) => MapEntry(key, value as Note?)));
+      break;
+    case EntryType.idCard:
+      await entriesFile.setEntries(passyEntries.map<String, IDCard?>(
+          (key, value) => MapEntry(key, value as IDCard?)));
+      break;
+    case EntryType.identity:
+      await entriesFile.setEntries(passyEntries.map<String, Identity?>(
+          (key, value) => MapEntry(key, value as Identity?)));
+      break;
   }
 }
 
 Future<void> processTypedExchangeEntries({
   required Map<EntryType, List<ExchangeEntry>> entries,
-  required LoadedAccount account,
-  required History history,
+  required FullPassyEntriesFileCollection passyEntries,
+  required HistoryFile history,
   void Function()? onRemoveEntry,
   void Function()? onSetEntry,
 }) async {
-  for (MapEntry<EntryType, List<ExchangeEntry>> exchangeEntriesEntry
-      in entries.entries) {
-    EntryType entryType = exchangeEntriesEntry.key;
-    List<ExchangeEntry> exchangeEntries = exchangeEntriesEntry.value;
-    await processExchangeEntries(
-      entryType: entryType,
-      entries: exchangeEntries,
-      account: account,
-      history: history,
-      onRemoveEntry: onRemoveEntry,
-      onSetEntry: onSetEntry,
-    );
+  await history.reload();
+  try {
+    for (MapEntry<EntryType, List<ExchangeEntry>> exchangeEntriesEntry
+        in entries.entries) {
+      EntryType entryType = exchangeEntriesEntry.key;
+      List<ExchangeEntry> exchangeEntries = exchangeEntriesEntry.value;
+      await processExchangeEntries(
+        entryType: entryType,
+        entries: exchangeEntries,
+        entriesFile: passyEntries.getEntries(entryType),
+        history: history,
+        onRemoveEntry: onRemoveEntry,
+        onSetEntry: onSetEntry,
+      );
+    }
+    await history.save();
+  } catch (e) {
+    await history.reload();
+    rethrow;
   }
 }
 
-String generateAuth(
-    {required Encrypter encrypter, required Encrypter usernameEncrypter}) {
-  return encrypt(
+String generateAuth({
+  required Encrypter encrypter,
+  required Encrypter usernameEncrypter,
+  bool withIV = false,
+}) {
+  IV? iv = withIV ? IV.fromSecureRandom(16) : null;
+  String auth = encrypt(
       encrypt(jsonEncode({'date': DateTime.now().toUtc().toIso8601String()}),
           encrypter: usernameEncrypter),
-      encrypter: encrypter);
+      encrypter: encrypter,
+      iv: iv);
+  if (iv == null) {
+    return auth;
+  } else {
+    return '${iv.base64},$auth';
+  }
 }
 
-void verifyAuth(dynamic auth,
-    {required Encrypter encrypter, required Encrypter usernameEncrypter}) {
+void verifyAuth(
+  dynamic auth, {
+  required Encrypter encrypter,
+  required Encrypter usernameEncrypter,
+  bool withIV = false,
+}) {
   if (auth is! String) {
     throw {
       'error': {
@@ -519,8 +565,23 @@ void verifyAuth(dynamic auth,
       },
     };
   }
+  IV? iv;
+  if (withIV) {
+    try {
+      List<String> authSplit = auth.split(',');
+      iv = IV.fromBase64(authSplit[0]);
+      auth = authSplit[1];
+    } catch (_) {
+      throw {
+        'error': {
+          'type': 'Malformed auth',
+          'description': 'Expected one IV, found none'
+        },
+      };
+    }
+  }
   try {
-    auth = decrypt(decrypt(auth, encrypter: encrypter),
+    auth = decrypt(decrypt(auth, encrypter: encrypter, iv: iv),
         encrypter: usernameEncrypter);
   } catch (e) {
     throw {

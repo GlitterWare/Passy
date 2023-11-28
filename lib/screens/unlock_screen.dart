@@ -3,7 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
+import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -13,6 +14,8 @@ import 'common.dart';
 
 class UnlockScreen extends StatefulWidget {
   static const String routeName = '/unlock';
+
+  static bool isAuthenticating = false;
 
   const UnlockScreen({Key? key}) : super(key: key);
 
@@ -45,15 +48,30 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _bioAuth() async {
+    if (UnlockScreen.isAuthenticating) return;
+    if (!mounted) return;
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!_account.bioAuthEnabled) return;
-    if (!await bioAuth(_account.username)) return;
+    UnlockScreen.isAuthenticating = true;
+    try {
+      BiometricStorageData data =
+          await BioStorage.fromLocker(_account.username);
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => UnlockScreen.isAuthenticating = false);
+      if (data.password.isEmpty) return;
+    } catch (e) {
+      Future.delayed(const Duration(seconds: 2))
+          .then((value) => UnlockScreen.isAuthenticating = false);
+      return;
+    }
     _shouldPop = true;
     Navigator.pop(context);
   }
 
-  void _unlock() {
-    String _passwordHash = getPassyHash(_password).toString();
+  void _unlock() async {
+    String _passwordHash =
+        (await data.createPasswordHash(_account.username, password: _password))
+            .toString();
     _password = '';
     if (_passwordHash == data.getPasswordHash(_account.username)) {
       _shouldPop = true;
@@ -80,7 +98,10 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     if (!Platform.isAndroid && !Platform.isIOS) return;
     if (data.getBioAuthEnabled(_account.username) == true) {
       _bioAuthButton = FloatingActionButton(
-        onPressed: () => _bioAuth(),
+        onPressed: () {
+          UnlockScreen.isAuthenticating = false;
+          _bioAuth();
+        },
         child: const Icon(
           Icons.fingerprint_rounded,
         ),
@@ -101,7 +122,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state != AppLifecycleState.resumed) return;
-    _bioAuth();
+    await _bioAuth();
   }
 
   @override
@@ -126,6 +147,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
         body: CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(

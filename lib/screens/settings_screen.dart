@@ -1,11 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_autofill_service/flutter_autofill_service.dart';
+import 'package:passy/passy_data/key_derivation_type.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/screens/security_screen.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/screens/servers_screen.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
 import 'automatic_backup_screen.dart';
@@ -25,6 +30,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreen extends State<SettingsScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +56,20 @@ class _SettingsScreen extends State<SettingsScreen> {
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => openUrl('https://github.com/sponsors/GlitterWare'),
           )),
+          if (Platform.isAndroid || Platform.isIOS)
+            PassyPadding(
+              ThreeWidgetButton(
+                center: Text(localizations.enableAutofill),
+                left: const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Icon(Icons.password_rounded),
+                ),
+                right: const Icon(Icons.arrow_forward_ios_rounded),
+                onPressed: () {
+                  AutofillService().requestSetAutofillService();
+                },
+              ),
+            ),
           if (!Platform.isAndroid && !Platform.isIOS)
             PassyPadding(ThreeWidgetButton(
               center: Text(localizations.passyBrowserExtension),
@@ -93,16 +114,20 @@ class _SettingsScreen extends State<SettingsScreen> {
                 context, ExportAndImportScreen.routeName,
                 arguments: data.loadedAccount!.username),
           )),
-          if (Platform.isAndroid || Platform.isIOS)
-            PassyPadding(ThreeWidgetButton(
-                center: Text(localizations.security),
-                left: const Padding(
-                  padding: EdgeInsets.only(right: 30),
-                  child: Icon(Icons.lock_rounded),
-                ),
-                right: const Icon(Icons.arrow_forward_ios_rounded),
-                onPressed: () =>
-                    Navigator.pushNamed(context, SecurityScreen.routeName))),
+          PassyPadding(ThreeWidgetButton(
+              color: (_account.keyDerivationType == KeyDerivationType.none) &&
+                      recommendKeyDerivation
+                  ? const Color.fromRGBO(255, 82, 82, 1)
+                  : null,
+              center: Text(localizations.security),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.lock_rounded),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  Navigator.pushNamed(context, SecurityScreen.routeName)
+                      .then((value) => setState(() {})))),
           PassyPadding(ThreeWidgetButton(
               center: Text(localizations.credentials),
               left: const Padding(
@@ -112,6 +137,25 @@ class _SettingsScreen extends State<SettingsScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () =>
                   Navigator.pushNamed(context, CredentialsScreen.routeName))),
+          PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.synchronizationServers),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.desktop_windows_rounded),
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () {
+                if (!data.loadedAccount!.isRSAKeypairLoaded) {
+                  showSnackBar(
+                    context,
+                    message: localizations.settingUpSynchronization,
+                    icon: const Icon(CupertinoIcons.clock_solid,
+                        color: PassyTheme.darkContentColor),
+                  );
+                  return;
+                }
+                Navigator.pushNamed(context, ServersScreen.routeName);
+              })),
           PassyPadding(ThreeWidgetButton(
             left: Padding(
               padding: const EdgeInsets.only(right: 30),

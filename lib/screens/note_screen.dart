@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:markdown/markdown.dart' as md;
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
@@ -49,8 +47,7 @@ class _NoteScreen extends State<NoteScreen> {
               TextButton(
                 child: Text(
                   localizations.remove,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, SplashScreen.routeName);
@@ -113,6 +110,8 @@ class _NoteScreen extends State<NoteScreen> {
         if (_note.title != '')
           PassyPadding(
               RecordButton(title: localizations.title, value: _note.title)),
+        if (_note.attachments.isNotEmpty)
+          AttachmentsListView(files: _note.attachments),
         if (_note.note != '')
           if (!_note.isMarkdown)
             PassyPadding(RecordButton(
@@ -130,17 +129,7 @@ class _NoteScreen extends State<NoteScreen> {
           Padding(
             padding: EdgeInsets.fromLTRB(20, PassyTheme.passyPadding.top,
                 PassyTheme.passyPadding.right, PassyTheme.passyPadding.bottom),
-            child: MarkdownBody(
-              data: _note.note,
-              selectable: true,
-              extensionSet: md.ExtensionSet(
-                md.ExtensionSet.gitHubFlavored.blockSyntaxes,
-                <md.InlineSyntax>[
-                  md.EmojiSyntax(),
-                  ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
-                ],
-              ),
-            ),
+            child: PassyMarkdownBody(data: _note.note),
           ),
       ]),
     );

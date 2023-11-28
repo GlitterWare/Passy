@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:favicon/favicon.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
 import '../../common/assets.dart';
@@ -45,10 +46,15 @@ class FavIconImage extends StatelessWidget {
           file.writeAsStringSync(jsonEncode({'favicons': _favicons}));
         } else {
           file = fileInfo!.file;
-          Map<String, dynamic> contents = jsonDecode(file.readAsStringSync());
+          Map<String, dynamic> contents;
+          try {
+            contents = jsonDecode(file.readAsStringSync());
+          } catch (_) {
+            contents = <String, dynamic>{};
+          }
           dynamic favicons = contents['favicons'];
           if (favicons is! Map<String, dynamic>) {
-            favicons = {};
+            favicons = <String, dynamic>{};
             contents['favicons'] = favicons;
             file.writeAsStringSync(jsonEncode(contents));
           }
@@ -77,10 +83,14 @@ class FavIconImage extends StatelessWidget {
       future: Future(() async {
         await _faviconManagerCompleter.future;
         dynamic imageURL = _favicons[url];
-        if (imageURL is String) return Favicon(imageURL);
+        if (imageURL is String) {
+          if (!await confirmUrlStatusCode(imageURL)) return null;
+          return Favicon(imageURL);
+        }
         Favicon? icon;
         try {
           Future<Favicon?>? faviconFuture = _faviconFutures[url];
+          if (!await confirmUrlStatusCode(url)) return null;
           faviconFuture ??= compute<String, Favicon?>(
               (url) async => await FaviconFinder.getBest(url,
                   suffixes: ['png', 'jpg', 'jpeg', 'ico']),

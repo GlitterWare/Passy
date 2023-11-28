@@ -67,4 +67,19 @@ class PassySort {
       return _nameComp;
     });
   }
+
+  static void sortFiles(List<FileEntry> entries) {
+    entries.sort((a, b) {
+      if (a.type == FileEntryType.folder) {
+        if (b.type != FileEntryType.folder) {
+          return -1;
+        }
+      } else {
+        if (b.type == FileEntryType.folder) {
+          return 1;
+        }
+      }
+      return alphabeticalCompare(a.path, b.path);
+    });
+  }
 }

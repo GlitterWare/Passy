@@ -28,8 +28,8 @@ class _NotesScreen extends State<NotesScreen> {
       Navigator.pushNamed(context, EditNoteScreen.routeName);
 
   void _onSearchPressed() {
-    Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: SearchScreenArgs(builder: (String terms) {
+    Navigator.pushNamed(context, SearchScreen.routeName, arguments:
+        SearchScreenArgs(builder: (String terms, void Function() rebuild) {
       final List<NoteMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (NoteMeta _note in _account.notesMetadata.values) {
@@ -55,6 +55,7 @@ class _NotesScreen extends State<NotesScreen> {
         return CustomScrollView(
           slivers: [
             SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
                 children: [
                   const Spacer(flex: 7),
@@ -92,6 +93,7 @@ class _NotesScreen extends State<NotesScreen> {
           ? CustomScrollView(
               slivers: [
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Column(
                     children: [
                       const Spacer(flex: 7),

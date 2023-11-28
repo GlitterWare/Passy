@@ -1,2 +1,8 @@
 {
+    "search.exclude": {
+        "submodules": true,
+    },
+    "dart.analysisExcludedFolders": [
+        "submodules"
+    ]
 }

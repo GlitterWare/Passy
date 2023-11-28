@@ -34,6 +34,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
   String _cardholderName = '';
   String _cvv = '';
   String _exp = '';
+  List<String> _attachments = [];
 
   @override
   void initState() {
@@ -72,6 +73,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
         _cardholderName = _paymentCardArgs.cardholderName;
         _cvv = _paymentCardArgs.cvv;
         _exp = _paymentCardArgs.exp;
+        _attachments = List.from(_paymentCardArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -92,6 +94,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             cardholderName: _cardholderName,
             cvv: _cvv,
             exp: _exp,
+            attachments: _attachments,
           );
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setPaymentCard(_paymentCardArgs);
@@ -118,6 +121,13 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             obscureCardCvv: false,
             isSwipeGestureEnabled: false,
           ),
+          /*
+          AttachmentsEditor(
+            files: _attachments,
+            onFileAdded: (key) => setState(() => _attachments.add(key)),
+            onFileRemoved: (key) => setState(() => _attachments.remove(key)),
+          ),
+          */
           PassyPadding(TextFormField(
             initialValue: _nickname,
             decoration: InputDecoration(labelText: localizations.nickname),
@@ -185,17 +195,17 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             decoration: InputDecoration(
               labelText: localizations.additionalInfo,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
+                borderRadius: BorderRadius.circular(30.0),
                 borderSide:
                     const BorderSide(color: PassyTheme.lightContentColor),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
+                borderRadius: BorderRadius.circular(30.0),
                 borderSide: const BorderSide(
                     color: PassyTheme.darkContentSecondaryColor),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28.0),
+                borderRadius: BorderRadius.circular(30.0),
                 borderSide:
                     const BorderSide(color: PassyTheme.lightContentColor),
               ),

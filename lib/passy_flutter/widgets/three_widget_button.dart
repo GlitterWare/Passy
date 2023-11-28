@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ThreeWidgetButton extends StatelessWidget {
+  final Color? color;
   final Widget? left;
   final Widget center;
   final Widget? right;
@@ -8,6 +9,7 @@ class ThreeWidgetButton extends StatelessWidget {
 
   const ThreeWidgetButton({
     Key? key,
+    this.color,
     this.left,
     required this.center,
     this.right,
@@ -20,6 +22,7 @@ class ThreeWidgetButton extends StatelessWidget {
       key: key,
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
+        backgroundColor: color,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(35.0),
         ),

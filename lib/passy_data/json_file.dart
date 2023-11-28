@@ -9,7 +9,7 @@ import 'json_convertable.dart';
 import 'saveable_file_base.dart';
 
 class JsonFile<T extends JsonConvertable> with SaveableFileBase {
-  final T value;
+  T value;
   final File _file;
   final T Function(Map<String, dynamic> json) _fromJson;
 
@@ -53,4 +53,7 @@ class JsonFile<T extends JsonConvertable> with SaveableFileBase {
         fromJson: _fromJson,
         value: value,
       );
+
+  Future<void> reload() async =>
+      value = _fromJson(jsonDecode(await _file.readAsString()));
 }

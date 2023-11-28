@@ -1,17 +1,27 @@
 import 'dart:io';
 
+import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
 import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
+import 'package:passy/screens/confirm_kdbx_export_screen.dart';
 import 'package:passy/screens/export_and_import_screen.dart';
 import 'package:passy/screens/export_screen.dart';
+import 'package:passy/screens/passy_file_screen.dart';
+import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/global_settings_screen.dart';
 import 'package:passy/screens/import_screen.dart';
+import 'package:passy/screens/key_derivation_screen.dart';
+import 'package:passy/screens/manage_servers_screen.dart';
 import 'package:passy/screens/no_accounts_screen.dart';
+import 'package:passy/screens/server_connect_screen.dart';
+import 'package:passy/screens/servers_screen.dart';
 
 import 'common/common.dart';
 import 'screens/change_password_screen.dart';
@@ -22,6 +32,7 @@ import 'screens/credentials_screen.dart';
 import 'screens/csv_import_screen.dart';
 import 'screens/csv_import_entries_screen.dart';
 import 'screens/remove_account_screen.dart';
+import 'screens/server_setup_screen.dart';
 import 'screens/setup_screen.dart';
 import 'screens/security_screen.dart';
 import 'screens/edit_note_screen.dart';
@@ -50,6 +61,7 @@ import 'screens/payment_card_screen.dart';
 import 'screens/payment_cards_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/synchronization_logs_screen.dart';
 import 'screens/unlock_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -63,7 +75,11 @@ final ThemeData theme = ThemeData(
   textSelectionTheme: PassyTheme.theme.textSelectionTheme,
 );
 
-void main() => runApp(const Passy());
+void main() {
+  KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
+  DArgon2Flutter.init();
+  runApp(const Passy());
+}
 
 @pragma('vm:entry-point')
 void autofillEntryPoint() {
@@ -118,6 +134,7 @@ class Passy extends StatelessWidget {
       ],
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
+        AddFileScreen.routeName: (context) => const AddFileScreen(),
         AutomaticBackupScreen.routeName: (context) =>
             const AutomaticBackupScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
@@ -128,6 +145,8 @@ class Passy extends StatelessWidget {
         ChangeUsernameScreen.routeName: (context) =>
             const ChangeUsernameScreen(),
         ConfirmImportScreen.routeName: (context) => const ConfirmImportScreen(),
+        ConfirmKdbxExportScreen.routeName: (context) =>
+            const ConfirmKdbxExportScreen(),
         ConfirmRestoreScreen.routeName: (context) =>
             const ConfirmRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
@@ -146,6 +165,8 @@ class Passy extends StatelessWidget {
         ExportAndImportScreen.routeName: (context) =>
             const ExportAndImportScreen(),
         ExportScreen.routeName: (context) => const ExportScreen(),
+        FilesScreen.routeName: (context) => const FilesScreen(),
+        PassyFileScreen.routeName: (context) => const PassyFileScreen(),
         GlobalSettingsScreen.routeName: (context) =>
             const GlobalSettingsScreen(),
         IDCardScreen.routeName: (context) => const IDCardScreen(),
@@ -153,9 +174,11 @@ class Passy extends StatelessWidget {
         IdentitiesScreen.routeName: (context) => const IdentitiesScreen(),
         IdentityScreen.routeName: (context) => const IdentityScreen(),
         ImportScreen.routeName: (context) => const ImportScreen(),
+        KeyDerivationScreen.routeName: (context) => const KeyDerivationScreen(),
         LogScreen.routeName: (context) => const LogScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         MainScreen.routeName: (context) => const MainScreen(),
+        ManageServersScreen.routeName: (context) => const ManageServersScreen(),
         NoteScreen.routeName: (context) => const NoteScreen(),
         NotesScreen.routeName: (context) => const NotesScreen(),
         PasswordScreen.routeName: (context) => const PasswordScreen(),
@@ -165,9 +188,14 @@ class Passy extends StatelessWidget {
         RemoveAccountScreen.routeName: (context) => const RemoveAccountScreen(),
         SearchScreen.routeName: (context) => const SearchScreen(),
         SecurityScreen.routeName: (context) => const SecurityScreen(),
+        ServerConnectScreen.routeName: (context) => const ServerConnectScreen(),
+        ServerSetupScreen.routeName: (context) => const ServerSetupScreen(),
+        ServersScreen.routeName: (context) => const ServersScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SetupScreen.routeName: (context) => const SetupScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
+        SynchronizationLogsScreen.routeName: (context) =>
+            const SynchronizationLogsScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
       localizationsDelegates: const [
@@ -187,4 +215,5 @@ const List<Locale> supportedLocales = [
   Locale('en'),
   Locale('it'),
   Locale('ru'),
+  Locale('zh'),
 ];

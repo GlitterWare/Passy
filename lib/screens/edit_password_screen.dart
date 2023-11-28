@@ -46,6 +46,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   bool _tfaIsGoogle = true;
   bool _tfaIsExpanded = false;
   String _website = '';
+  List<String> _attachments = [];
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +80,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           _tfaIsGoogle = _tfa.isGoogle;
         }
         _website = _passwordArgs.website;
+        _attachments = List.from(_passwordArgs.attachments);
       }
       _isLoaded = true;
     }
@@ -109,6 +111,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                     isGoogle: _tfaIsGoogle,
                   ),
             website: _website,
+            attachments: _attachments,
           );
           Navigator.pushNamed(context, SplashScreen.routeName);
           await _account.setPassword(_passwordArgs);
@@ -133,6 +136,13 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
+        /*
+        AttachmentsEditor(
+          files: _attachments,
+          onFileAdded: (key) => setState(() => _attachments.add(key)),
+          onFileRemoved: (key) => setState(() => _attachments.remove(key)),
+        ),
+        */
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(
@@ -170,7 +180,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         ExpansionPanelList(
             expandedHeaderPadding: EdgeInsets.zero,
             expansionCallback: (panelIndex, isExpanded) =>
-                setState(() => _tfaIsExpanded = !isExpanded),
+                setState(() => _tfaIsExpanded = isExpanded),
             elevation: 0,
             dividerColor: PassyTheme.lightContentSecondaryColor,
             children: [
@@ -186,16 +196,16 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(32.0)),
                                 color: PassyTheme.darkPassyPurple),
-                            child: const PassyPadding(Row(
+                            child: PassyPadding(Row(
                               children: [
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.only(left: 5),
                                   child: Icon(Icons.security),
                                 ),
                                 Padding(
-                                    padding: EdgeInsets.only(left: 15),
-                                    //TODO: Move 'Two-Factor Authentication' to localizations
-                                    child: Text('Two-Factor Authentication')),
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Text(
+                                        localizations.twoFactorAuthentication)),
                               ],
                             ))));
                   },
@@ -296,16 +306,16 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: InputDecoration(
             labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(28.0),
+              borderRadius: BorderRadius.circular(30.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(28.0),
+              borderRadius: BorderRadius.circular(30.0),
               borderSide:
                   const BorderSide(color: PassyTheme.darkContentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(28.0),
+              borderRadius: BorderRadius.circular(30.0),
               borderSide: const BorderSide(color: PassyTheme.lightContentColor),
             ),
           ),

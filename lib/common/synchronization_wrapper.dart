@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
 import 'package:passy/screens/common.dart';
@@ -66,9 +67,9 @@ class SynchronizationWrapper {
         context: _context,
         builder: (ctx) => AlertDialog(
               shape: PassyTheme.dialogShape,
-              title: const Text('Synchronization Complete'),
+              title: Text(localizations.synchronizationComplete),
               content: Text(
-                  'Entries added: ${_sync!.entriesAdded}\nEntries removed: ${_sync!.entriesRemoved}'),
+                  '${localizations.entriesAdded}: ${_sync!.entriesAdded}\n${localizations.entriesRemoved}: ${_sync!.entriesRemoved}'),
             ));
   }
 
@@ -76,10 +77,11 @@ class SynchronizationWrapper {
     void _showLog() => navigatorKey.currentState!
         .pushNamed(LogScreen.routeName, arguments: log);
     showSnackBar(_context,
-        message: 'Sync error',
+        message: localizations.syncError,
         icon: const Icon(Icons.sync_problem_rounded,
             color: PassyTheme.darkContentColor),
-        action: SnackBarAction(label: 'Details', onPressed: _showLog));
+        action:
+            SnackBarAction(label: localizations.details, onPressed: _showLog));
   }
 
   void connect(
@@ -93,13 +95,14 @@ class SynchronizationWrapper {
     } catch (e) {
       showSnackBar(
         _context,
-        message: 'Invalid address format',
+        message: localizations.invalidAddressFormat,
         icon: const Icon(Icons.sync_problem_rounded,
             color: PassyTheme.darkContentColor),
       );
       return;
     }
 
+    Navigator.pushNamed(_context, SplashScreen.routeName);
     _sync = account.getSynchronization(
       onConnected: () => _onConnected(),
       onComplete: (SynchronizationResults results) => _onSyncComplete(
@@ -112,11 +115,11 @@ class SynchronizationWrapper {
     _sync!.connect(_hostAddress).onError((error, stackTrace) {
       showSnackBar(
         _context,
-        message: 'Connection failed',
+        message: localizations.connectionFailed,
         icon: const Icon(Icons.sync_problem_rounded,
             color: PassyTheme.darkContentColor),
         action: SnackBarAction(
-          label: 'Details',
+          label: localizations.details,
           onPressed: () => Navigator.pushNamed(_context, LogScreen.routeName,
               arguments: error.toString() + '\n' + stackTrace.toString()),
         ),
@@ -155,9 +158,13 @@ class SynchronizationWrapper {
                 height: 350,
                 child: Column(
                   children: [
-                    QrImage(
+                    QrImageView(
                       data: value.toString(),
-                      foregroundColor: Colors.blue[50],
+                      eyeStyle: QrEyeStyle(
+                          eyeShape: QrEyeShape.square, color: Colors.blue[50]),
+                      dataModuleStyle: QrDataModuleStyle(
+                          dataModuleShape: QrDataModuleShape.square,
+                          color: Colors.blue[50]),
                     ),
                     Expanded(
                       child: Center(

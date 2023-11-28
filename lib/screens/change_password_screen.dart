@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
@@ -25,10 +24,21 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   String _newPasswordConfirm = '';
   bool _advancedSettingsIsExpanded = false;
   bool _doNotReencryptEntries = false;
+  bool _isBackupComplete = false;
 
-  void _onConfirmPressed() {
-    if (getPassyHash(_password).toString() !=
-        data.getPasswordHash(_account.username)) {
+  void _onConfirmPressed() async {
+    if (!_isBackupComplete) {
+      showSnackBar(context,
+          message: localizations.backupYourAccountBeforeProceeding,
+          icon: const Icon(
+            Icons.save_rounded,
+            color: PassyTheme.darkContentColor,
+          ));
+      return;
+    }
+    if ((await data.createPasswordHash(_account.username,
+            password: _password)) !=
+        _account.passwordHash) {
       showSnackBar(context,
           message: localizations.incorrectPassword,
           icon: const Icon(
@@ -60,9 +70,26 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     _account
         .setAccountPassword(_newPassword,
             doNotReencryptEntries: _doNotReencryptEntries)
-        .then((value) {
-      Navigator.popUntil(context,
-          (route) => route.settings.name == CredentialsScreen.routeName);
+        .then((value) async {
+      _account.bioAuthEnabled = false;
+      await _account.saveCredentials();
+      if (mounted) {
+        Navigator.popUntil(context,
+            (route) => route.settings.name == CredentialsScreen.routeName);
+      }
+    });
+  }
+
+  Future<void> _onBackupPressed() async {
+    try {
+      String? path = await backupAccount(context,
+          username: _account.username, autoFilename: false);
+      if (path == null) return;
+    } catch (e) {
+      return;
+    }
+    setState(() {
+      _isBackupComplete = true;
     });
   }
 
@@ -85,8 +112,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
             hasScrollBody: false,
             child: Column(children: [
               const Spacer(),
-              RichText(
-                text: TextSpan(
+              Text.rich(
+                TextSpan(
                     text: localizations.youAreChangingPasswordFor,
                     children: [
                       TextSpan(
@@ -97,6 +124,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                       ),
                       const TextSpan(text: '.')
                     ]),
+                textAlign: TextAlign.center,
               ),
               Expanded(
                 child: PassyPadding(
@@ -114,6 +142,28 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                         obscureText: true,
                         onChanged: (s) => setState(() => _newPassword = s),
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                              child: PassyPadding(ThreeWidgetButton(
+                                  center: Text(localizations.backup),
+                                  left: const Padding(
+                                    padding: EdgeInsets.only(right: 30),
+                                    child: Icon(Icons.save_rounded),
+                                  ),
+                                  right: const Icon(
+                                      Icons.arrow_forward_ios_rounded),
+                                  onPressed: () => _onBackupPressed()))),
+                          if (_isBackupComplete)
+                            const Flexible(
+                                child: PassyPadding(Icon(
+                              Icons.check,
+                              color: Colors.green,
+                              size: 35,
+                            ))),
+                        ],
+                      ),
                       ButtonedTextFormField(
                         labelText: localizations.confirmPassword,
                         obscureText: true,
@@ -130,7 +180,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
               ExpansionPanelList(
                   expandedHeaderPadding: EdgeInsets.zero,
                   expansionCallback: (panelIndex, isExpanded) =>
-                      setState(() => _advancedSettingsIsExpanded = !isExpanded),
+                      setState(() => _advancedSettingsIsExpanded = isExpanded),
                   elevation: 0,
                   dividerColor: PassyTheme.lightContentSecondaryColor,
                   children: [
@@ -146,17 +196,18 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(32.0)),
                                       color: PassyTheme.darkPassyPurple),
-                                  child: const PassyPadding(Row(
+                                  child: PassyPadding(Row(
                                     children: [
-                                      Padding(
+                                      const Padding(
                                         padding: EdgeInsets.only(left: 5),
                                         child:
                                             Icon(Icons.error_outline_rounded),
                                       ),
                                       Padding(
-                                          padding: EdgeInsets.only(left: 15),
-                                          //TODO: Move 'Advanced settings' to localizations
-                                          child: Text('Advanced settings')),
+                                          padding:
+                                              const EdgeInsets.only(left: 15),
+                                          child: Text(
+                                              localizations.advancedSettings)),
                                     ],
                                   ))));
                         },

@@ -122,8 +122,7 @@ class _PasswordScreen extends State<PasswordScreen> {
               TextButton(
                 child: Text(
                   localizations.remove,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, SplashScreen.routeName);
@@ -188,6 +187,8 @@ class _PasswordScreen extends State<PasswordScreen> {
       ),
       body: ListView(
         children: [
+          if (password!.attachments.isNotEmpty)
+            AttachmentsListView(files: password!.attachments),
           if (password!.nickname != '')
             PassyPadding(RecordButton(
               title: localizations.nickname,

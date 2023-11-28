@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:passy/main.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
@@ -13,11 +13,12 @@ import 'package:passy/common/common.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/screens/common.dart';
 
-import 'log_screen.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  final Widget? underLogo;
+
+  const SplashScreen({Key? key, this.underLogo}) : super(key: key);
 
   static const routeName = '/';
   static bool loaded = false;
@@ -25,44 +26,11 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     loadLocalizations(context);
-    //TODO: move the 'Something went wrong' message to localizations
-    FlutterError.onError = (e) {
-      try {
-        FlutterError.presentError(e);
-        showSnackBar(
-          navigatorKey.currentContext!,
-          message: 'Something went wrong',
-          icon: const Icon(Icons.error_outline_rounded,
-              color: PassyTheme.darkContentColor),
-          action: SnackBarAction(
-            label: localizations.details,
-            onPressed: () => Navigator.pushNamed(
-                navigatorKey.currentContext!, LogScreen.routeName,
-                arguments: e.exception.toString() + '\n' + e.stack.toString()),
-          ),
-        );
-      } catch (_) {}
-    };
-    PlatformDispatcher.instance.onError = (error, stack) {
-      try {
-        showSnackBar(
-          navigatorKey.currentContext!,
-          message: 'Something went wrong',
-          icon: const Icon(Icons.error_outline_rounded,
-              color: PassyTheme.darkContentColor),
-          action: SnackBarAction(
-            label: localizations.details,
-            onPressed: () => Navigator.pushNamed(
-                navigatorKey.currentContext!, LogScreen.routeName,
-                arguments: error.toString() + '\n' + stack.toString()),
-          ),
-        );
-      } catch (_) {}
-      return false;
-    };
+    setOnError(context);
     Future<void> showUpdateDialog() {
+      Future.delayed(const Duration(milliseconds: 500));
       return showDialog<void>(
-        context: context,
+        context: navigatorKey.currentContext ?? context,
         builder: (context) => AlertDialog(
           shape: PassyTheme.dialogShape,
           title: Text(localizations.newVersionAvailable),
@@ -149,15 +117,15 @@ class SplashScreen extends StatelessWidget {
         Directory tempCopyDir =
             Directory(copyDir.path + Platform.pathSeparator + date);
         await tempCopyDir.create();
-        String filename = 'passy_cli';
-        String copyPath =
-            tempCopyDir.path + Platform.pathSeparator + filename + suffix;
-        await original.copy(copyPath);
-        String scriptCopyPath = tempCopyDir.path +
+        try {
+          await copyPassyCLI(installDir, tempCopyDir);
+        } catch (_) {
+          return null;
+        }
+        scriptCopy = File(tempCopyDir.path +
             Platform.pathSeparator +
             'passy_cli_native_messaging' +
-            scriptSuffix;
-        scriptCopy = await originalScript.copy(scriptCopyPath);
+            scriptSuffix);
       } catch (_) {
         return null;
       }
@@ -337,7 +305,12 @@ class SplashScreen extends StatelessWidget {
       Navigator.pushReplacementNamed(context, LoginScreen.routeName);
       if (const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false') {
         try {
-          String _version = await getLatestVersion();
+          String _version;
+          if (kDebugMode) {
+            _version = passyVersion;
+          } else {
+            _version = await getLatestVersion();
+          }
           if (_version == passyVersion) return;
           List<String> _newVersionSplit = _version.split('.');
           List<String> _currentVersionSplit = passyVersion.split('.');
@@ -362,8 +335,31 @@ class SplashScreen extends StatelessWidget {
       _load();
     }
     return Scaffold(
-      body: Center(
-        child: logo60Purple,
+      body: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                const Spacer(flex: 5),
+                Center(
+                  child: logo60Purple,
+                ),
+                underLogo ??
+                    const PassyPadding(Row(
+                      children: [
+                        Spacer(),
+                        Expanded(
+                            child: PassyPadding(
+                                LinearProgressIndicator(color: Colors.purple))),
+                        Spacer(),
+                      ],
+                    )),
+                const Spacer(flex: 5),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
