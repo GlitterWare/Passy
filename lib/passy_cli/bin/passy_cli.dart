@@ -1562,18 +1562,8 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Missing arguments'},
                         };
                       }
-                      dynamic username = args[3];
-                      dynamic auth = args[4];
-                      if (username is! String) {
-                        throw {
-                          'error': {'type': 'Username is not of type String'},
-                        };
-                      }
-                      if (auth is! String) {
-                        throw {
-                          'error': {'type': 'Auth is not of type String'},
-                        };
-                      }
+                      String username = args[3];
+                      String auth = args[4];
                       Encrypter? encrypter = _encrypters[username];
                       if (encrypter == null) {
                         return {
@@ -1610,12 +1600,7 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Missing arguments'},
                         };
                       }
-                      dynamic username = args[3];
-                      if (username is! String) {
-                        throw {
-                          'error': {'type': 'Username is not of type String'},
-                        };
-                      }
+                      String username = args[3];
                       refreshAccounts();
                       AccountCredentialsFile? creds = _accounts[username];
                       if (creds == null) {
@@ -1642,18 +1627,8 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Missing arguments'},
                         };
                       }
-                      dynamic username = args[3];
-                      dynamic password = args[4];
-                      if (username is! String) {
-                        throw {
-                          'error': {'type': 'Username is not of type String'},
-                        };
-                      }
-                      if (password is! String) {
-                        throw {
-                          'error': {'type': 'Password is not of type String'},
-                        };
-                      }
+                      String username = args[3];
+                      String password = args[4];
                       String accPath = _accountsPath +
                           Platform.pathSeparator +
                           username +
@@ -1694,8 +1669,9 @@ Future<void> executeCommand(List<String> command,
                         }
                       }
                       loadedModules.remove('2d0d1_$username');
+                      Uint8List passwordBytes;
                       try {
-                        password = base64Decode(password);
+                        passwordBytes = base64Decode(password);
                       } catch (e) {
                         return {
                           'error': {
@@ -1703,11 +1679,11 @@ Future<void> executeCommand(List<String> command,
                           },
                         };
                       }
-                      String result = await _login(username, password);
+                      String result = await _login(username, passwordBytes);
                       if (result != 'true') {
                         return {
                           'error': {'type': 'Failedd to login'},
-                          'hash': sha512.convert(password).toString(),
+                          'hash': sha512.convert(passwordBytes).toString(),
                         };
                       }
                       Encrypter encrypter = _encrypters[username]!;
@@ -1783,18 +1759,8 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Missing arguments'},
                         };
                       }
-                      dynamic username = args[3];
-                      dynamic deviceId = args[4];
-                      if (username is! String) {
-                        throw {
-                          'error': {'type': 'Username is not of type String'},
-                        };
-                      }
-                      if (deviceId is! String) {
-                        throw {
-                          'error': {'type': 'Device id is not of type String'},
-                        };
-                      }
+                      String username = args[3];
+                      String deviceId = args[4];
                       if (deviceId.length < 16) {
                         throw {
                           'error': {'type': 'Invalid device id'},
@@ -1836,32 +1802,10 @@ Future<void> executeCommand(List<String> command,
                           'error': {'type': 'Missing arguments'},
                         };
                       }
-                      dynamic username = args[3];
-                      dynamic deviceId = args[4];
-                      dynamic auth = args[5];
-                      dynamic connectionData = args[6];
-                      if (username is! String) {
-                        throw {
-                          'error': {'type': 'Username is not of type String'},
-                        };
-                      }
-                      if (deviceId is! String) {
-                        throw {
-                          'error': {'type': 'Device id is not of type String'},
-                        };
-                      }
-                      if (auth is! String) {
-                        throw {
-                          'error': {'type': 'Auth is not of type String'},
-                        };
-                      }
-                      if (connectionData is! String) {
-                        throw {
-                          'error': {
-                            'type': 'Connection data is not of type String'
-                          },
-                        };
-                      }
+                      String username = args[3];
+                      String deviceId = args[4];
+                      String auth = args[5];
+                      String connectionData = args[6];
                       if (deviceId.length < 16) {
                         throw {
                           'error': {'type': 'Invalid device id'},
