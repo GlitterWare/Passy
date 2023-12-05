@@ -35,7 +35,7 @@ class TFA with JsonConvertable, CSVConvertable {
         length = json['length'],
         interval = json['interval'],
         algorithm = algorithmFromName(json['algorithm']) ?? Algorithm.SHA1,
-        isGoogle = true;
+        isGoogle = json['isGoogle'] ?? true;
 
   TFA.fromCSV(List csv)
       : secret = csv[0],
