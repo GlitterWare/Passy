@@ -117,7 +117,7 @@ class TFA with JsonConvertable, CSVConvertable {
     );
   }
 
-  Future<String> _generateSteam() async {
+  String _generateSteam() {
     var time = ByteData(8)
       ..setUint32(0, 0, Endian.big)
       ..setUint32(
@@ -141,7 +141,7 @@ class TFA with JsonConvertable, CSVConvertable {
     return result;
   }
 
-  Future<String> generate() async {
+  String generate() {
     switch (type) {
       case TFAType.TOTP:
         return _generateTOTP();
