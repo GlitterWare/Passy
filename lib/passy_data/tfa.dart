@@ -3,6 +3,27 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 
+enum TFAType {
+// ignore: constant_identifier_names
+  TOTP,
+// ignore: constant_identifier_names
+  HOTP,
+// ignore: constant_identifier_names
+  Steam,
+}
+
+TFAType? tfaTypeFromName(String name) {
+  switch (name) {
+    case 'TOTP':
+      return TFAType.TOTP;
+    case 'HOTP':
+      return TFAType.HOTP;
+    case 'Steam':
+      return TFAType.Steam;
+  }
+  return null;
+}
+
 Algorithm? algorithmFromName(String name) {
   switch (name) {
     case 'SHA1':
@@ -21,6 +42,7 @@ class TFA with JsonConvertable, CSVConvertable {
   int interval;
   Algorithm algorithm;
   bool isGoogle;
+  TFAType type;
 
   TFA({
     this.secret = '',
@@ -28,6 +50,7 @@ class TFA with JsonConvertable, CSVConvertable {
     this.interval = 30,
     this.algorithm = Algorithm.SHA1,
     this.isGoogle = true,
+    this.type = TFAType.TOTP,
   });
 
   TFA.fromJson(Map<String, dynamic> json)
@@ -35,14 +58,19 @@ class TFA with JsonConvertable, CSVConvertable {
         length = json['length'],
         interval = json['interval'],
         algorithm = algorithmFromName(json['algorithm']) ?? Algorithm.SHA1,
-        isGoogle = json['isGoogle'] ?? true;
+        isGoogle = json['isGoogle'] ?? true,
+        type = tfaTypeFromName(json['type']) ?? TFAType.TOTP;
 
-  TFA.fromCSV(List csv)
-      : secret = csv[0],
-        length = int.tryParse(csv[1]) ?? 6,
-        interval = int.tryParse(csv[2]) ?? 30,
-        algorithm = algorithmFromName(csv[3]) ?? Algorithm.SHA1,
-        isGoogle = boolFromString(csv[4]) ?? true;
+  factory TFA.fromCSV(List csv) {
+    if (csv.length == 5) csv.add(TFAType.TOTP.name);
+    return TFA(
+        secret: csv[0],
+        length: int.tryParse(csv[1]) ?? 6,
+        interval: int.tryParse(csv[2]) ?? 30,
+        algorithm: algorithmFromName(csv[3]) ?? Algorithm.SHA1,
+        isGoogle: boolFromString(csv[4]) ?? true,
+        type: tfaTypeFromName(csv[5]) ?? TFAType.TOTP);
+  }
 
   @override
   Map<String, dynamic> toJson() => {
@@ -51,6 +79,7 @@ class TFA with JsonConvertable, CSVConvertable {
         'interval': interval,
         'algorithm': algorithm.name,
         'isGoogle': isGoogle,
+        'type': type.name,
       };
 
   @override
@@ -60,5 +89,6 @@ class TFA with JsonConvertable, CSVConvertable {
         interval.toString(),
         algorithm.name,
         isGoogle.toString(),
+        type.name,
       ];
 }
