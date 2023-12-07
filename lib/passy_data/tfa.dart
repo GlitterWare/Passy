@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
+import 'package:crypto/crypto.dart';
 import 'package:otp/otp.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/json_convertable.dart';
+import 'package:base32/base32.dart';
 
 enum TFAType {
 // ignore: constant_identifier_names
@@ -91,4 +95,60 @@ class TFA with JsonConvertable, CSVConvertable {
         isGoogle.toString(),
         type.name,
       ];
+
+  String _generateTOTP() {
+    return OTP.generateTOTPCodeString(
+      secret,
+      DateTime.now().millisecondsSinceEpoch,
+      length: length,
+      interval: interval,
+      algorithm: algorithm,
+      isGoogle: isGoogle,
+    );
+  }
+
+  String _generateHOTP() {
+    return OTP.generateHOTPCodeString(
+      secret,
+      interval,
+      length: length,
+      algorithm: algorithm,
+      isGoogle: isGoogle,
+    );
+  }
+
+  Future<String> _generateSteam() async {
+    var time = ByteData(8)
+      ..setUint32(0, 0, Endian.big)
+      ..setUint32(
+          4,
+          ((DateTime.now().millisecondsSinceEpoch / 1000).floor() / 30).floor(),
+          Endian.big);
+    Hmac hmac = Hmac(sha1, base32.decode(secret));
+    Digest digest = hmac.convert(time.buffer.asUint8List());
+    var bytes = digest.bytes;
+    var start = bytes[19] & 0x0F;
+    var code = bytes.sublist(start, start + 4);
+    var totp =
+        Uint8List.fromList(code).buffer.asByteData().getUint32(0, Endian.big) &
+            0x7FFFFFFF;
+    const chars = '23456789BCDFGHJKMNPQRTVWXY';
+    String result = '';
+    for (int i = 0; i != 5; i++) {
+      result += chars[(totp % chars.length).toInt()];
+      totp ~/= chars.length;
+    }
+    return result;
+  }
+
+  Future<String> generate() async {
+    switch (type) {
+      case TFAType.TOTP:
+        return _generateTOTP();
+      case TFAType.HOTP:
+        return _generateHOTP();
+      case TFAType.Steam:
+        return _generateSteam();
+    }
+  }
 }
