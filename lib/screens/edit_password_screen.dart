@@ -45,6 +45,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   Algorithm _tfaAlgorithm = Algorithm.SHA1;
   bool _tfaIsGoogle = true;
   bool _tfaIsExpanded = false;
+  TFAType _tfaType = TFAType.TOTP;
+  UniqueKey _tfaKey = UniqueKey();
   String _website = '';
   List<String> _attachments = [];
 
@@ -78,6 +80,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           _tfaInterval = _tfa.interval;
           _tfaAlgorithm = _tfa.algorithm;
           _tfaIsGoogle = _tfa.isGoogle;
+          _tfaType = _tfa.type;
         }
         _website = _passwordArgs.website;
         _attachments = List.from(_passwordArgs.attachments);
@@ -109,6 +112,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                     interval: _tfaInterval,
                     algorithm: _tfaAlgorithm,
                     isGoogle: _tfaIsGoogle,
+                    type: _tfaType,
                   ),
             website: _website,
             attachments: _attachments,
@@ -211,6 +215,37 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                   },
                   body: Column(
                     children: [
+                      PassyPadding(EnumDropDownButtonFormField<TFAType>(
+                        value: _tfaType,
+                        values: TFAType.values,
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.type.toLowerCase()}'),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          if (value == _tfaType) return;
+                          setState(() {
+                            _tfaType = value;
+                            switch (value) {
+                              case TFAType.TOTP:
+                                _tfaLength = 6;
+                                _tfaInterval = 30;
+                                break;
+                              case TFAType.HOTP:
+                                _tfaLength = 6;
+                                _tfaInterval = 0;
+                                break;
+                              case TFAType.Steam:
+                                _tfaLength = 5;
+                                _tfaInterval = 30;
+                                break;
+                            }
+                            _tfaAlgorithm = Algorithm.SHA1;
+                            _tfaIsGoogle = true;
+                            _tfaKey = UniqueKey();
+                          });
+                        },
+                      )),
                       PassyPadding(TextFormField(
                         initialValue: _tfaSecret.replaceFirst('=', ''),
                         decoration: InputDecoration(
@@ -230,6 +265,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                         },
                       )),
                       PassyPadding(TextFormField(
+                        key: _tfaKey,
+                        enabled: _tfaType != TFAType.Steam,
                         initialValue: _tfaLength.toString(),
                         decoration: InputDecoration(
                             labelText:
@@ -241,10 +278,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                             setState(() => _tfaLength = int.parse(value)),
                       )),
                       PassyPadding(TextFormField(
+                        key: _tfaKey,
+                        enabled: _tfaType != TFAType.Steam,
                         initialValue: _tfaInterval.toString(),
                         decoration: InputDecoration(
                             labelText:
-                                '2FA ${localizations.interval.toLowerCase()}'),
+                                '2FA ${_tfaType == TFAType.HOTP ? localizations.counter .toLowerCase(): localizations.interval.toLowerCase()}'),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
@@ -252,36 +291,40 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                             setState(() => _tfaInterval = int.parse(value)),
                       )),
                       PassyPadding(EnumDropDownButtonFormField<Algorithm>(
+                        key: _tfaKey,
                         value: _tfaAlgorithm,
                         values: Algorithm.values,
                         decoration: InputDecoration(
                             labelText:
                                 '2FA ${localizations.algorithm.toLowerCase()}'),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _tfaAlgorithm = value);
-                          }
-                        },
+                        onChanged: _tfaType == TFAType.Steam
+                            ? null
+                            : (value) {
+                                if (value != null) {
+                                  setState(() => _tfaAlgorithm = value);
+                                }
+                              },
                       )),
-                      PassyPadding(DropdownButtonFormField(
-                        items: [
-                          DropdownMenuItem(
-                            child: Text(
-                                '${localizations.true_} (${localizations.recommended.toLowerCase()})'),
-                            value: true,
-                          ),
-                          DropdownMenuItem(
-                            child: Text(localizations.false_),
-                            value: false,
-                          ),
-                        ],
-                        value: _tfaIsGoogle,
-                        decoration: InputDecoration(
-                            labelText:
-                                '2FA ${localizations.isGoogle.replaceRange(0, 1, localizations.isGoogle[0].toLowerCase())}'),
-                        onChanged: (value) =>
-                            setState(() => _tfaIsGoogle = value as bool),
-                      )),
+                      if (_tfaType != TFAType.Steam)
+                        PassyPadding(DropdownButtonFormField(
+                          items: [
+                            DropdownMenuItem(
+                              child: Text(
+                                  '${localizations.true_} (${localizations.recommended.toLowerCase()})'),
+                              value: true,
+                            ),
+                            DropdownMenuItem(
+                              child: Text(localizations.false_),
+                              value: false,
+                            ),
+                          ],
+                          value: _tfaIsGoogle,
+                          decoration: InputDecoration(
+                              labelText:
+                                  '2FA ${localizations.isGoogle.replaceRange(0, 1, localizations.isGoogle[0].toLowerCase())}'),
+                          onChanged: (value) =>
+                              setState(() => _tfaIsGoogle = value as bool),
+                        )),
                     ],
                   ))
             ]),

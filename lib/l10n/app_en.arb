@@ -337,5 +337,8 @@
     "scrollOrPinchToZoom": "Scroll or pinch to zoom",
     "missingFile": "Missing file",
     "rename": "Rename",
-    "fileName": "File name"
+    "fileName": "File name",
+    "refresh": "Refresh",
+    "counter": "Counter",
+    "@counter": { "description": "HOTP 2FA counter stores a number that is incremented on every logon" }
 }
