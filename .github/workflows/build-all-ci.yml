@@ -124,11 +124,6 @@ jobs:
           directory: ../build
           filename: Passy-Linux-AppImage.zip
           path: Passy-Latest-x86_64.AppImage
-      - name: Upload Android no updates popup build
-        uses: actions/upload-artifact@v3
-        with:
-          name: android-no-updates-popup
-          path: /home/runner/work/Passy/build/Passy-Android.apk
       - name: Upload Linux bundle no updates popup build
         uses: actions/upload-artifact@v3
         with:
