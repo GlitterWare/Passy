@@ -129,7 +129,7 @@ jobs:
         shell: bash
         run: flutter config --no-analytics
       - name: Build Passy for Windows
-        shell: pwsh
+        shell: bash
         run: ./build_windows_with_updates_popup.bat
       - name: Prepare releases
         shell: bash
