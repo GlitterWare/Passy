@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - dev
+      
 jobs:
   build_linux_armv7:
     name: Build Passy CLI for Linux ARMv7
