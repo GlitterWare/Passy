@@ -63,7 +63,7 @@ class TFA with JsonConvertable, CSVConvertable {
         interval = json['interval'],
         algorithm = algorithmFromName(json['algorithm']) ?? Algorithm.SHA1,
         isGoogle = json['isGoogle'] ?? true,
-        type = tfaTypeFromName(json['type']) ?? TFAType.TOTP;
+        type = tfaTypeFromName(json['type'] ?? TFAType.TOTP.name) ?? TFAType.TOTP;
 
   factory TFA.fromCSV(List csv) {
     if (csv.length == 5) csv.add(TFAType.TOTP.name);
