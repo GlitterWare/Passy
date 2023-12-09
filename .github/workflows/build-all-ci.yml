@@ -7,8 +7,8 @@ on:
       - main
       - dev
 jobs:
-  build_linux:
-    name: Build Passy for Android and Linux
+  build_android:
+    name: Build Passy for Android
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,22 +19,56 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync
       - name: Install flutter
-        uses: subosito/flutter-action@v2
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
+      - name: Configure flutter
+        shell: bash
+        run: flutter config --no-analytics
+      - name: Build Android
+        shell: bash
+        run: bash build_android.sh
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          mkdir build
+          cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
+      - name: Upload Android build
+        uses: actions/upload-artifact@v3
         with:
-          flutter-version: '3.10.1'
-          channel: 'stable'
+          name: android
+          path: /home/runner/work/Passy/build/Passy-Android.apk
+  build_linux:
+    name: Build Passy for Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync
+      - name: Install flutter
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
       - name: Configure flutter
         shell: bash
         run: flutter config --no-analytics
       - name: Build with updates popup
         shell: bash
-        run: bash build_all_with_updates_popup.sh
+        run: echo "echo 3;echo y;echo;" | bash | bash build_all.sh
       - name: Prepare releases
         shell: bash
         run: |
           cd ..
           mkdir -p build/linux-bundle/Passy
-          cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
           cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
           cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
           chmod +x build/linux-bundle/Passy/passy
@@ -53,11 +87,6 @@ jobs:
           directory: ../build
           filename: Passy-Linux-AppImage.zip
           path: Passy-Latest-x86_64.AppImage
-      - name: Upload Android build
-        uses: actions/upload-artifact@v3
-        with:
-          name: android
-          path: /home/runner/work/Passy/build/Passy-Android.apk
       - name: Upload Linux bundle build
         uses: actions/upload-artifact@v3
         with:
@@ -70,14 +99,13 @@ jobs:
           path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
       - name: Build without updates popup
         shell: bash
-        run: bash build_all_without_updates_popup.sh
+        run: echo "echo 3;echo n;echo;" | bash | bash build_all.sh
       - name: Prepare releases
         shell: bash
         run: |
           cd ..
           rm -rf build/*
           mkdir -p build/linux-bundle/Passy
-          cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
           cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
           cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
           chmod +x build/linux-bundle/Passy/passy
@@ -96,11 +124,6 @@ jobs:
           directory: ../build
           filename: Passy-Linux-AppImage.zip
           path: Passy-Latest-x86_64.AppImage
-      - name: Upload Android no updates popup build
-        uses: actions/upload-artifact@v3
-        with:
-          name: android-no-updates-popup
-          path: /home/runner/work/Passy/build/Passy-Android.apk
       - name: Upload Linux bundle no updates popup build
         uses: actions/upload-artifact@v3
         with:
@@ -118,16 +141,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Install flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.10.1'
-          channel: 'stable'
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
+          echo "$PWD/submodules/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
       - name: Configure flutter
         shell: bash
         run: flutter config --no-analytics
       - name: Build Passy for Windows
         shell: bash
-        run: ./build_windows_with_updates_popup.bat
+        run: flutter --no-version-check --suppress-analytics build windows
       - name: Prepare releases
         shell: bash
         run: |
