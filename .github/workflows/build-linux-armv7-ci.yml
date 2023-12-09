@@ -1,4 +1,4 @@
-name: Build Passy for all platforms
+name: Build Passy for Linux ARMv7
 on:
   workflow_dispatch:
   pull_request:
