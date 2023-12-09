@@ -125,11 +125,6 @@ jobs:
           git submodule update
           echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
           echo "$PWD/submodules/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
-      - name: Add flutter to Path
-        uses: myci-actions/export-env-var-powershell@1
-        with:
-          name: PATH
-          value: $env:PATH;d:D:\a\Passy\Passy\submodules\flutter\bin
       - name: Configure flutter
         shell: bash
         run: flutter config --no-analytics
