@@ -45,5 +45,5 @@ jobs:
       - name: Upload Passy CLI build
         uses: actions/upload-artifact@v3
         with:
-          name: linux-bundle
+          name: passy-cli-linux-armv7
           path: /home/runner/work/Passy/build/Passy-CLI-Linux-ARMv7.zip
