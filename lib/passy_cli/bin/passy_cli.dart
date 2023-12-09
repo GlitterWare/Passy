@@ -1641,7 +1641,7 @@ Future<void> executeCommand(List<String> command,
                           loadedModules.remove('2d0d1_$username');
                           return {
                             'error': {
-                              'type': 'Faileda to login',
+                              'type': 'Failed to login',
                             },
                           };
                         }
@@ -1659,7 +1659,7 @@ Future<void> executeCommand(List<String> command,
                           }
                           return {
                             'error': {
-                              'type': 'Failedb to login',
+                              'type': 'Failed to login',
                               'local': creds.value.passwordHash,
                               'remote': sha512
                                   .convert(base64Decode(password))
@@ -1675,14 +1675,14 @@ Future<void> executeCommand(List<String> command,
                       } catch (e) {
                         return {
                           'error': {
-                            'type': 'Failedc to login',
+                            'type': 'Failed to login',
                           },
                         };
                       }
                       String result = await _login(username, passwordBytes);
                       if (result != 'true') {
                         return {
-                          'error': {'type': 'Failedd to login'},
+                          'error': {'type': 'Failed to login'},
                           'hash': sha512.convert(passwordBytes).toString(),
                         };
                       }
