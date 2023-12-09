@@ -130,7 +130,7 @@ jobs:
         run: flutter config --no-analytics
       - name: Build Passy for Windows
         shell: bash
-        run: ./build_windows_with_updates_popup.bat
+        run: flutter --no-version-check --suppress-analytics build windows
       - name: Prepare releases
         shell: bash
         run: |
