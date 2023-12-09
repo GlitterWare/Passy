@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux-bundle
-          path: /home/runner/work/Passy/build/cli/Passy-CLI-Linux-ARMv7.zip
+          path: /home/runner/work/Passy/build/Passy-CLI-Linux-ARMv7.zip
