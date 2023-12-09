@@ -34,6 +34,7 @@ jobs:
         shell: bash
         run: |
           cd ..
+          mkdir build
           cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
       - name: Upload Android build
         uses: actions/upload-artifact@v3
