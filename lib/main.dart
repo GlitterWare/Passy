@@ -216,4 +216,5 @@ const List<Locale> supportedLocales = [
   Locale('it'),
   Locale('ru'),
   Locale('zh'),
+  Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
 ];
