@@ -58,6 +58,7 @@ class PaymentCardButton extends StatelessWidget {
                   paymentCard.cardNumber.replaceAll('*', '0')),
               isSwipeGestureEnabled: isSwipeGestureEnabled,
               onCreditCardWidgetChange: (brand) {},
+              bankName: ' ',
             ),
           ),
           Padding(
