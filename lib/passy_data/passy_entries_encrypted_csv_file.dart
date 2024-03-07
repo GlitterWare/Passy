@@ -11,6 +11,7 @@ import 'passy_kdbx_value.dart';
 class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
   final File _file;
   Encrypter _encrypter;
+  EntryType? _entryType;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
 
   List<String> get keys {
@@ -23,6 +24,34 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     });
     _raf.closeSync();
     return _keys;
+  }
+
+  List<String> get tags {
+    List<String> _tags = [];
+    RandomAccessFile _raf = _file.openSync();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      _raf.closeSync();
+      return _tags;
+    }
+    int _tagIndex = T.toString() == 'Note' ? 5 : 3;
+    processLines(_raf, onLine: (entry, eofReached) {
+      List<String> _decoded = entry.split(',');
+      String _decrypted = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      List<dynamic> _csv = csvDecode(_decrypted, recursive: true);
+      if (_csv.length < _tagIndex + 1) {
+        return true;
+      }
+      for (dynamic tag in (_csv[_tagIndex] as List<dynamic>)) {
+        tag = tag.toString();
+        if (_tags.contains(tag)) continue;
+        _tags.add(tag);
+      }
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    _raf.closeSync();
+    return _tags;
   }
 
   Map<String, EntryMeta> get metadata {
