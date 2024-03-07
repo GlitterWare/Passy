@@ -29,7 +29,7 @@ class _NotesScreen extends State<NotesScreen> {
 
   void _onSearchPressed() {
     Navigator.pushNamed(context, SearchScreen.routeName, arguments:
-        SearchScreenArgs(builder: (String terms, void Function() rebuild) {
+        SearchScreenArgs(builder: (String terms, List<String> tags, void Function() rebuild) {
       final List<NoteMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (NoteMeta _note in _account.notesMetadata.values) {

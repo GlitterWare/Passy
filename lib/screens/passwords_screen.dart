@@ -24,13 +24,18 @@ class PasswordsScreen extends StatefulWidget {
 
 class _PasswordsScreen extends State<PasswordsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  final List<String> _tags = data.loadedAccount!.passwordTags;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
 
-  Widget _buildPasswords(String terms, void Function() rebuild) {
+  Widget _buildPasswords(
+    String terms,
+    List<String> tags,
+    void Function() rebuild,
+  ) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
-        passwords: _account.passwordsMetadata.values, terms: terms);
+        passwords: _account.passwordsMetadata.values, terms: terms, tags: tags);
     if (_found.isEmpty) {
       return CustomScrollView(
         slivers: [
@@ -60,9 +65,12 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     );
   }
 
-  void _onSearchPressed() {
+  void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: SearchScreenArgs(builder: _buildPasswords));
+        arguments: SearchScreenArgs(
+            builder: _buildPasswords,
+            notSelectedTags: _account.passwordTags..remove(tag),
+            selectedTags: tag == null ? [] : [tag]));
   }
 
   @override
@@ -109,6 +117,19 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                     right: const Icon(Icons.arrow_forward_ios_rounded),
                     onPressed: () => Navigator.pushNamed(
                         context, EditPasswordScreen.routeName),
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: PassyTheme.passyPadding.top / 2,
+                        bottom: PassyTheme.passyPadding.bottom / 2),
+                    child: EntryTagList(
+                      notSelected: _tags,
+                      onAdded: (tag) => setState(() {
+                        _onSearchPressed(tag: tag);
+                      }),
+                    ),
                   ),
                 ),
               ],

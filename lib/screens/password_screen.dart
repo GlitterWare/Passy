@@ -30,6 +30,8 @@ class PasswordScreen extends StatefulWidget {
 class _PasswordScreen extends State<PasswordScreen> {
   final Completer<void> _onClosed = Completer<void>();
   final LoadedAccount _account = data.loadedAccount!;
+  List<String> _tags = [];
+  List<String> _selected = [];
   Password? password;
   Future<void>? generateTFA;
   String _tfaCode = '';
@@ -84,6 +86,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   @override
   void initState() {
     super.initState();
+    _tags = _account.passwordTags;
   }
 
   @override
@@ -148,6 +151,12 @@ class _PasswordScreen extends State<PasswordScreen> {
           });
         } else {
           generateTFA = _generateTFA(password!.tfa!);
+        }
+      }
+      _selected = password!.tags.toList();
+      for (String tag in _selected) {
+        if (_tags.contains(tag)) {
+          _tags.remove(tag);
         }
       }
     }
@@ -242,6 +251,52 @@ class _PasswordScreen extends State<PasswordScreen> {
       ),
       body: ListView(
         children: [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: PassyTheme.passyPadding.top / 2,
+                  bottom: PassyTheme.passyPadding.bottom / 2),
+              child: EntryTagList(
+                showAddButton: true,
+                selected: _selected,
+                notSelected: _tags,
+                onAdded: (tag) async {
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  password!.tags = _selected.toList();
+                  password!.tags.add(tag);
+                  await _account.setPassword(password!);
+                  Navigator.popUntil(
+                      context,
+                      (route) =>
+                          route.settings.name == PasswordScreen.routeName);
+                  if (!mounted) return;
+                  setState(() {
+                    _tags.remove(tag);
+                    _selected.add(tag);
+                    _selected.sort();
+                    password!.tags = _selected;
+                  });
+                },
+                onRemoved: (tag) async {
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  password!.tags = _selected.toList();
+                  password!.tags.remove(tag);
+                  await _account.setPassword(password!);
+                  Navigator.popUntil(
+                      context,
+                      (route) =>
+                          route.settings.name == PasswordScreen.routeName);
+                  if (!mounted) return;
+                  setState(() {
+                    _tags.add(tag);
+                    _tags.sort();
+                    _selected.remove(tag);
+                    password!.tags = _selected;
+                  });
+                },
+              ),
+            ),
+          ),
           if (password!.attachments.isNotEmpty)
             AttachmentsListView(files: password!.attachments),
           if (password!.nickname != '')

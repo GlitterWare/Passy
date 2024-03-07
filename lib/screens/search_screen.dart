@@ -6,13 +6,21 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class SearchScreenArgs {
   String? title;
-  Widget Function(String terms, void Function() rebuild) builder;
+  Widget Function(
+    String terms,
+    List<String> tags,
+    void Function() rebuild,
+  ) builder;
   bool isAutofill;
+  List<String> notSelectedTags;
+  List<String> selectedTags;
 
   SearchScreenArgs({
     this.title,
     required this.builder,
     this.isAutofill = false,
+    this.notSelectedTags = const [],
+    this.selectedTags = const [],
   });
 }
 
@@ -30,8 +38,11 @@ class _SearchScreen extends State<SearchScreen> {
   Widget _widget = const Text('');
   TextEditingController queryController = TextEditingController();
   FocusNode queryFocus = FocusNode()..requestFocus();
+  List<String> selected = [];
+  List<String> notSelected = [];
   Future<void>? entryBuilder;
-  late Widget Function(String terms, void Function() rebuild) _builder;
+  late Widget Function(String terms, List<String> tags, void Function() rebuild)
+      _builder;
 
   @override
   void initState() {
@@ -47,7 +58,7 @@ class _SearchScreen extends State<SearchScreen> {
           Future<void>.delayed(const Duration(milliseconds: 100), () {
         entryBuilder = null;
         setState(() {
-          _widget = _builder(queryController.text, rebuild);
+          _widget = _builder(queryController.text, selected, rebuild);
         });
       });
     });
@@ -59,7 +70,9 @@ class _SearchScreen extends State<SearchScreen> {
         ModalRoute.of(context)!.settings.arguments as SearchScreenArgs;
     _builder = args.builder;
     if (!_initialized) {
-      _widget = _builder(queryController.text, rebuild);
+      selected = args.selectedTags;
+      notSelected = args.notSelectedTags;
+      _widget = _builder(queryController.text, selected, rebuild);
       _initialized = true;
     }
     return Scaffold(
@@ -102,11 +115,33 @@ class _SearchScreen extends State<SearchScreen> {
                       const Duration(milliseconds: 100), () {
                     entryBuilder = null;
                     setState(() {
-                      _widget = _builder(queryController.text, rebuild);
+                      _widget =
+                          _builder(queryController.text, selected, rebuild);
                     });
                   });
                 });
               })),
+          if (selected.isNotEmpty || notSelected.isNotEmpty)
+            Padding(
+                padding: EdgeInsets.only(
+                    top: PassyTheme.passyPadding.top / 2,
+                    bottom: PassyTheme.passyPadding.bottom / 2),
+                child: EntryTagList(
+                  notSelected: notSelected,
+                  selected: selected,
+                  onAdded: (tag) => setState(() {
+                    selected.add(tag);
+                    selected.sort();
+                    notSelected.remove(tag);
+                    _widget = _builder(queryController.text, selected, rebuild);
+                  }),
+                  onRemoved: (tag) => setState(() {
+                    selected.remove(tag);
+                    notSelected.add(tag);
+                    notSelected.sort();
+                    _widget = _builder(queryController.text, selected, rebuild);
+                  }),
+                )),
           Expanded(
             child: _widget,
           ),

@@ -91,7 +91,7 @@ class _LoginScreen extends State<LoginScreen> {
     }
   }
 
-  Widget _buildPasswords(String terms, void Function() rebuild) {
+  Widget _buildPasswords(String terms, List<String> tags, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
         passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
     List<PwDataset> _dataSets = [];

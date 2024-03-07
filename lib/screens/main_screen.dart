@@ -54,7 +54,8 @@ class _MainScreen extends State<MainScreen>
   bool _unlockScreenOn = false;
   String _lastSyncDate = 'NaN';
 
-  Widget _searchBuilder(String terms, void Function() rebuild) {
+  Widget _searchBuilder(
+      String terms, List<String> tags, void Function() rebuild) {
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     final List<SearchEntryData> _searchEntries = [];
@@ -196,7 +197,7 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Widget _favoritesSearchBuilder(String terms, void Function() setState) {
+  Widget _favoritesSearchBuilder(String terms, List<String> tags, void Function() setState) {
     if (!_account.hasFavorites) {
       return CustomScrollView(
         slivers: [
