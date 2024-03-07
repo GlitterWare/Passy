@@ -1079,8 +1079,17 @@ class LoadedAccount {
     }
   }
 
+  List<String> get tags => [
+        ..._passwords.tags,
+        ..._notes.tags,
+        ..._paymentCards.tags,
+        ..._idCards.tags,
+        ..._identities.tags,
+      ];
+
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
+  List<String> get passwordTags => _passwords.tags;
   Map<String, PasswordMeta> get passwordsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1138,6 +1147,7 @@ class LoadedAccount {
 
   // Notes wrappers
   List<String> get notesKeys => _notes.keys;
+  List<String> get notesTags => _notes.tags;
   Map<String, NoteMeta> get notesMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1197,6 +1207,7 @@ class LoadedAccount {
 
   // Payment Cards wrappers
   List<String> get paymentCardKeys => _paymentCards.keys;
+  List<String> get paymentCardTags => _paymentCards.tags;
   Map<String, PaymentCardMeta> get paymentCardsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1257,6 +1268,7 @@ class LoadedAccount {
 
   // ID Cards wrappers
   List<String> get idCardsKeys => _idCards.keys;
+  List<String> get idCardsTags => _idCards.tags;
   Map<String, IDCardMeta> get idCardsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1315,6 +1327,7 @@ class LoadedAccount {
 
   // Identities wrappers
   List<String> get identitiesKeys => _identities.keys;
+  List<String> get identitiesTags => _identities.tags;
   Map<String, IdentityMeta> get identitiesMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
