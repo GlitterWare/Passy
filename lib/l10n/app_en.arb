@@ -340,5 +340,8 @@
     "fileName": "File name",
     "refresh": "Refresh",
     "counter": "Counter",
-    "@counter": { "description": "HOTP 2FA counter stores a number that is incremented on every logon" }
+    "@counter": { "description": "HOTP 2FA counter stores a number that is incremented on every logon" },
+    "createTag": "Create tag",
+    "create": "Create",
+    "tag": "Tag"
 }
