@@ -34,7 +34,7 @@ class _EntryTagList extends State<EntryTagList> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _key = GlobalKey();
 
-  bool showScrollbar = true;
+  bool showScrollbar = false;
 
   @override
   void initState() {
