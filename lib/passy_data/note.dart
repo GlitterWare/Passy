@@ -62,9 +62,9 @@ class Note extends PassyEntry<Note> {
       : title = csv[1] ?? '',
         note = csv[2] ?? '',
         isMarkdown = boolFromString(csv[3] ?? 'false') ?? false,
+        tags = (csv[4] as List<dynamic>).map((e) => e.toString()).toList(),
         attachments =
-            (csv[4] as List<dynamic>).map((e) => e.toString()).toList(),
-        tags = (csv[5] as List<dynamic>).map((e) => e.toString()).toList(),
+            (csv[5] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
 
   factory Note.fromCSV(List csv) {
@@ -93,6 +93,7 @@ class Note extends PassyEntry<Note> {
         title,
         note,
         isMarkdown.toString(),
+        tags,
         attachments,
       ];
 
