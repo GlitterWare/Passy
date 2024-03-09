@@ -553,30 +553,30 @@ class LoadedAccount {
       await _passwords.export(
         File('${tempPath}passwords.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website"',
+            '"customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website","attachments"',
         skipKey: true,
       );
       await _paymentCards.export(
         File('${tempPath}payment_cards.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp"',
+            '"customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp","attachments"',
         skipKey: true,
       );
       await _notes.export(
         File('${tempPath}notes.csv'),
-        annotation: '"title","note","isMarkdown"',
+        annotation: '"title","note","isMarkdown","tags","attachments"',
         skipKey: true,
       );
       await _idCards.export(
         File('${tempPath}id_cards.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country"',
+            '"customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country","attachments"',
         skipKey: true,
       );
       await _identities.export(
         File('${tempPath}identities.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
+            '"customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country","attachments',
         skipKey: true,
       );
       await _versionFile.copy('${tempPath}version.txt');
