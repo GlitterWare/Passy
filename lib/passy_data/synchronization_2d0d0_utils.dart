@@ -552,6 +552,7 @@ String generateAuth({
 
 void verifyAuth(
   dynamic auth, {
+  String lastAuth = '',
   required Encrypter encrypter,
   required Encrypter usernameEncrypter,
   bool withIV = false,
@@ -562,6 +563,14 @@ void verifyAuth(
         'type': 'Malformed auth',
         'description':
             'Expected type `String`, received type `${auth.runtimeType.toString()}`',
+      },
+    };
+  }
+  if (auth == lastAuth) {
+    throw {
+      'error': {
+        'type': 'Illegal auth',
+        'description': 'Received auth is identical to sent auth',
       },
     };
   }
