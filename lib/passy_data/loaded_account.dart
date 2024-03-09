@@ -14,6 +14,7 @@ import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
+import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
 import 'package:passy/passy_data/tfa.dart';
@@ -1089,7 +1090,9 @@ class LoadedAccount {
 
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
-  List<String> get passwordTags => _passwords.tags;
+  Future<List<String>> get passwordTags => compute(
+      (PassyEntriesEncryptedCSVFile<Password> _passwords) => _passwords.tags,
+      _passwords);
   Map<String, PasswordMeta> get passwordsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1147,7 +1150,8 @@ class LoadedAccount {
 
   // Notes wrappers
   List<String> get notesKeys => _notes.keys;
-  List<String> get notesTags => _notes.tags;
+  Future<List<String>> get notesTags => compute(
+      (PassyEntriesEncryptedCSVFile<Note> _notes) => _notes.tags, _notes);
   Map<String, NoteMeta> get notesMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1207,7 +1211,10 @@ class LoadedAccount {
 
   // Payment Cards wrappers
   List<String> get paymentCardKeys => _paymentCards.keys;
-  List<String> get paymentCardTags => _paymentCards.tags;
+  Future<List<String>> get paymentCardTags => compute(
+      (PassyEntriesEncryptedCSVFile<PaymentCard> _paymentCards) =>
+          _paymentCards.tags,
+      _paymentCards);
   Map<String, PaymentCardMeta> get paymentCardsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1268,7 +1275,8 @@ class LoadedAccount {
 
   // ID Cards wrappers
   List<String> get idCardsKeys => _idCards.keys;
-  List<String> get idCardsTags => _idCards.tags;
+  Future<List<String>> get idCardsTags => compute(
+      (PassyEntriesEncryptedCSVFile _idCards) => _idCards.tags, _idCards);
   Map<String, IDCardMeta> get idCardsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1327,7 +1335,9 @@ class LoadedAccount {
 
   // Identities wrappers
   List<String> get identitiesKeys => _identities.keys;
-  List<String> get identitiesTags => _identities.tags;
+  Future<List<String>> get identitiesTags => compute(
+      (PassyEntriesEncryptedCSVFile _identities) => _identities.tags,
+      _identities);
   Map<String, IdentityMeta> get identitiesMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();

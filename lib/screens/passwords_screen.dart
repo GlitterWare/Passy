@@ -24,7 +24,8 @@ class PasswordsScreen extends StatefulWidget {
 
 class _PasswordsScreen extends State<PasswordsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
-  final List<String> _tags = data.loadedAccount!.passwordTags;
+  List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
@@ -73,8 +74,21 @@ class _PasswordsScreen extends State<PasswordsScreen> {
             selectedTags: tag == null ? [] : [tag]));
   }
 
+  Future<void> _load() async {
+    List<String> newTags = await _account.passwordTags;
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_isLoading) {
+      _isLoading = true;
+      _load();
+    }
     List<PasswordMeta> _passwords = _account.passwordsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
@@ -119,19 +133,20 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                         context, EditPasswordScreen.routeName),
                   ),
                 ),
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: PassyTheme.passyPadding.top / 2,
-                        bottom: PassyTheme.passyPadding.bottom / 2),
-                    child: EntryTagList(
-                      notSelected: _tags,
-                      onAdded: (tag) => setState(() {
-                        _onSearchPressed(tag: tag);
-                      }),
+                if (_tags.isNotEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: PassyTheme.passyPadding.top / 2,
+                          bottom: PassyTheme.passyPadding.bottom / 2),
+                      child: EntryTagList(
+                        notSelected: _tags,
+                        onAdded: (tag) => setState(() {
+                          _onSearchPressed(tag: tag);
+                        }),
+                      ),
                     ),
                   ),
-                ),
               ],
               passwords: _passwords.toList(),
               onPressed: (password) => Navigator.pushNamed(

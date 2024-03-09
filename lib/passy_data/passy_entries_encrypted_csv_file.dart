@@ -11,7 +11,6 @@ import 'passy_kdbx_value.dart';
 class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
   final File _file;
   Encrypter _encrypter;
-  EntryType? _entryType;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
 
   List<String> get keys {

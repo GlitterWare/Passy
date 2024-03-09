@@ -81,14 +81,6 @@ class _PasswordScreen extends State<PasswordScreen> {
     }
   }
 
-  //TODO: implement tags
-
-  @override
-  void initState() {
-    super.initState();
-    _tags = _account.passwordTags;
-  }
-
   @override
   void deactivate() {
     super.deactivate();
@@ -140,6 +132,21 @@ class _PasswordScreen extends State<PasswordScreen> {
     );
   }
 
+  Future<void> _load() async {
+    List<String> newTags = await _account.passwordTags;
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+        _selected = password!.tags.toList();
+        for (String tag in _selected) {
+          if (_tags.contains(tag)) {
+            _tags.remove(tag);
+          }
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (password == null) {
@@ -153,12 +160,7 @@ class _PasswordScreen extends State<PasswordScreen> {
           generateTFA = _generateTFA(password!.tfa!);
         }
       }
-      _selected = password!.tags.toList();
-      for (String tag in _selected) {
-        if (_tags.contains(tag)) {
-          _tags.remove(tag);
-        }
-      }
+      _load();
     }
     Widget? tfaWidget;
     if (password!.tfa != null) {
