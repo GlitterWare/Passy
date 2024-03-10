@@ -13,8 +13,8 @@ class EntryTagList extends StatefulWidget {
 
   const EntryTagList({
     super.key,
-     this.selected = const [],
-     this.notSelected = const [],
+    this.selected = const [],
+    this.notSelected = const [],
     void Function(String tag)? onAdded,
     void Function(String tag)? onRemoved,
     void Function()? onAddPressed,
@@ -98,6 +98,14 @@ class _EntryTagList extends State<EntryTagList> {
           children: [
             Row(
               children: [
+                if (selectedButtons.isEmpty && notSelectedButtons.isEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: PassyTheme.passyPadding.left / 2,
+                        right: PassyTheme.passyPadding.right / 2,
+                        bottom: showScrollbar ? 14 : 0),
+                    child: Text(localizations.noTags),
+                  ),
                 if (widget.showAddButton)
                   Padding(
                     padding: EdgeInsets.only(bottom: showScrollbar ? 14 : 0),
