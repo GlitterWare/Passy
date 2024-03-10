@@ -26,6 +26,9 @@ class PaymentCardScreen extends StatefulWidget {
 class _PaymentCardScreen extends State<PaymentCardScreen> {
   final _account = data.loadedAccount!;
   bool isFavorite = false;
+  PaymentCard? _paymentCard;
+  List<String> _tags = [];
+  List<String> _selected = [];
 
   void _onRemovePressed(PaymentCard paymentCard) {
     showDialog(
@@ -73,25 +76,42 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
     );
   }
 
+  Future<void> _load() async {
+    List<String> newTags = await _account.paymentCardTags;
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+        _selected = _paymentCard!.tags.toList();
+        for (String tag in _selected) {
+          if (_tags.contains(tag)) {
+            _tags.remove(tag);
+          }
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final PaymentCard _paymentCard =
-        ModalRoute.of(context)!.settings.arguments as PaymentCard;
+    if (_paymentCard == null) {
+      _paymentCard = ModalRoute.of(context)!.settings.arguments as PaymentCard;
+      _load();
+    }
     _account.reloadFavoritesSync();
-    isFavorite = _account.favoritePaymentCards[_paymentCard.key]?.status ==
+    isFavorite = _account.favoritePaymentCards[_paymentCard!.key]?.status ==
         EntryStatus.alive;
 
     return Scaffold(
       appBar: EntryScreenAppBar(
         entryType: EntryType.paymentCard,
-        entryKey: _paymentCard.key,
+        entryKey: _paymentCard!.key,
         title: Center(child: Text(localizations.paymentCard)),
-        onRemovePressed: () => _onRemovePressed(_paymentCard),
-        onEditPressed: () => _onEditPressed(_paymentCard),
+        onRemovePressed: () => _onRemovePressed(_paymentCard!),
+        onEditPressed: () => _onEditPressed(_paymentCard!),
         isFavorite: isFavorite,
         onFavoritePressed: () async {
           if (isFavorite) {
-            await _account.removeFavoritePaymentCard(_paymentCard.key);
+            await _account.removeFavoritePaymentCard(_paymentCard!.key);
             showSnackBar(context,
                 message: localizations.removedFromFavorites,
                 icon: const Icon(
@@ -99,7 +119,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                   color: PassyTheme.darkContentColor,
                 ));
           } else {
-            await _account.addFavoritePaymentCard(_paymentCard.key);
+            await _account.addFavoritePaymentCard(_paymentCard!.key);
             showSnackBar(context,
                 message: localizations.addedToFavorites,
                 icon: const Icon(
@@ -112,45 +132,92 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
       ),
       body: ListView(children: [
         PaymentCardButton(
-          paymentCard: _paymentCard.uncensoredMetadata,
+          paymentCard: _paymentCard!.uncensoredMetadata,
           obscureCardNumber: false,
           obscureCardCvv: false,
           isSwipeGestureEnabled: false,
         ),
-        if (_paymentCard.attachments.isNotEmpty)
-          AttachmentsListView(files: _paymentCard.attachments),
-        if (_paymentCard.nickname != '')
+
+        Center(
+          child: Padding(
+            padding: EdgeInsets.only(
+                top: PassyTheme.passyPadding.top / 2,
+                bottom: PassyTheme.passyPadding.bottom / 2),
+            child: EntryTagList(
+              showAddButton: true,
+              selected: _selected,
+              notSelected: _tags,
+              onAdded: (tag) async {
+                Navigator.pushNamed(context, SplashScreen.routeName);
+                _paymentCard!.tags = _selected.toList();
+                _paymentCard!.tags.add(tag);
+                await _account.setPaymentCard(_paymentCard!);
+                Navigator.popUntil(
+                    context,
+                    (route) =>
+                        route.settings.name == PaymentCardScreen.routeName);
+                if (!mounted) return;
+                setState(() {
+                  _tags.remove(tag);
+                  _selected.add(tag);
+                  _selected.sort();
+                  _paymentCard!.tags = _selected;
+                });
+              },
+              onRemoved: (tag) async {
+                Navigator.pushNamed(context, SplashScreen.routeName);
+                _paymentCard!.tags = _selected.toList();
+                _paymentCard!.tags.remove(tag);
+                await _account.setPaymentCard(_paymentCard!);
+                Navigator.popUntil(
+                    context,
+                    (route) =>
+                        route.settings.name == PaymentCardScreen.routeName);
+                if (!mounted) return;
+                setState(() {
+                  _tags.add(tag);
+                  _tags.sort();
+                  _selected.remove(tag);
+                  _paymentCard!.tags = _selected;
+                });
+              },
+            ),
+          ),
+        ),
+        if (_paymentCard!.attachments.isNotEmpty)
+          AttachmentsListView(files: _paymentCard!.attachments),
+        if (_paymentCard!.nickname != '')
           PassyPadding(RecordButton(
             title: localizations.nickname,
-            value: _paymentCard.nickname,
+            value: _paymentCard!.nickname,
           )),
-        if (_paymentCard.cardNumber != '')
+        if (_paymentCard!.cardNumber != '')
           PassyPadding(RecordButton(
             title: localizations.cardNumber,
-            value: _paymentCard.cardNumber,
+            value: _paymentCard!.cardNumber,
           )),
-        if (_paymentCard.cardholderName != '')
+        if (_paymentCard!.cardholderName != '')
           PassyPadding(RecordButton(
             title: localizations.cardHolderName,
-            value: _paymentCard.cardholderName,
+            value: _paymentCard!.cardholderName,
           )),
-        if (_paymentCard.exp != '')
+        if (_paymentCard!.exp != '')
           PassyPadding(RecordButton(
             title: localizations.expirationDate,
-            value: _paymentCard.exp,
+            value: _paymentCard!.exp,
           )),
-        if (_paymentCard.cvv != '')
+        if (_paymentCard!.cvv != '')
           PassyPadding(RecordButton(
             title: 'CVV',
-            value: _paymentCard.cvv,
+            value: _paymentCard!.cvv,
             obscureValue: true,
           )),
-        for (CustomField _customField in _paymentCard.customFields)
+        for (CustomField _customField in _paymentCard!.customFields)
           PassyPadding(CustomFieldButton(customField: _customField)),
-        if (_paymentCard.additionalInfo != '')
+        if (_paymentCard!.additionalInfo != '')
           PassyPadding(RecordButton(
             title: localizations.additionalInfo,
-            value: _paymentCard.additionalInfo,
+            value: _paymentCard!.additionalInfo,
           )),
       ]),
     );
