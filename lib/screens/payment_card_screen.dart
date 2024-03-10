@@ -29,6 +29,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
   PaymentCard? _paymentCard;
   List<String> _tags = [];
   List<String> _selected = [];
+  bool _tagsLoaded = false;
 
   void _onRemovePressed(PaymentCard paymentCard) {
     showDialog(
@@ -87,6 +88,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
             _tags.remove(tag);
           }
         }
+        _tagsLoaded = true;
       });
     }
   }
@@ -137,7 +139,6 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           obscureCardCvv: false,
           isSwipeGestureEnabled: false,
         ),
-
         Center(
           child: Padding(
             padding: EdgeInsets.only(
@@ -148,21 +149,16 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
               selected: _selected,
               notSelected: _tags,
               onAdded: (tag) async {
+                if (_paymentCard!.tags.contains(tag)) return;
                 Navigator.pushNamed(context, SplashScreen.routeName);
                 _paymentCard!.tags = _selected.toList();
                 _paymentCard!.tags.add(tag);
                 await _account.setPaymentCard(_paymentCard!);
                 Navigator.popUntil(
-                    context,
-                    (route) =>
-                        route.settings.name == PaymentCardScreen.routeName);
-                if (!mounted) return;
-                setState(() {
-                  _tags.remove(tag);
-                  _selected.add(tag);
-                  _selected.sort();
-                  _paymentCard!.tags = _selected;
-                });
+                    context, (r) => r.settings.name == MainScreen.routeName);
+                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+                Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                    arguments: _paymentCard!);
               },
               onRemoved: (tag) async {
                 Navigator.pushNamed(context, SplashScreen.routeName);
@@ -170,16 +166,10 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                 _paymentCard!.tags.remove(tag);
                 await _account.setPaymentCard(_paymentCard!);
                 Navigator.popUntil(
-                    context,
-                    (route) =>
-                        route.settings.name == PaymentCardScreen.routeName);
-                if (!mounted) return;
-                setState(() {
-                  _tags.add(tag);
-                  _tags.sort();
-                  _selected.remove(tag);
-                  _paymentCard!.tags = _selected;
-                });
+                    context, (r) => r.settings.name == MainScreen.routeName);
+                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+                Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                    arguments: _paymentCard!);
               },
             ),
           ),

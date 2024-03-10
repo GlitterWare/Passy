@@ -32,6 +32,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   final LoadedAccount _account = data.loadedAccount!;
   List<String> _tags = [];
   List<String> _selected = [];
+  bool _tagsLoaded = false;
   Password? password;
   Future<void>? generateTFA;
   String _tfaCode = '';
@@ -143,6 +144,7 @@ class _PasswordScreen extends State<PasswordScreen> {
             _tags.remove(tag);
           }
         }
+        _tagsLoaded = true;
       });
     }
   }
@@ -263,21 +265,16 @@ class _PasswordScreen extends State<PasswordScreen> {
                 selected: _selected,
                 notSelected: _tags,
                 onAdded: (tag) async {
+                    if (password!.tags.contains(tag)) return;
                   Navigator.pushNamed(context, SplashScreen.routeName);
                   password!.tags = _selected.toList();
                   password!.tags.add(tag);
                   await _account.setPassword(password!);
                   Navigator.popUntil(
-                      context,
-                      (route) =>
-                          route.settings.name == PasswordScreen.routeName);
-                  if (!mounted) return;
-                  setState(() {
-                    _tags.remove(tag);
-                    _selected.add(tag);
-                    _selected.sort();
-                    password!.tags = _selected;
-                  });
+                      context, (r) => r.settings.name == MainScreen.routeName);
+                  Navigator.pushNamed(context, PasswordsScreen.routeName);
+                  Navigator.pushNamed(context, PasswordScreen.routeName,
+                      arguments: password!);
                 },
                 onRemoved: (tag) async {
                   Navigator.pushNamed(context, SplashScreen.routeName);
@@ -285,16 +282,10 @@ class _PasswordScreen extends State<PasswordScreen> {
                   password!.tags.remove(tag);
                   await _account.setPassword(password!);
                   Navigator.popUntil(
-                      context,
-                      (route) =>
-                          route.settings.name == PasswordScreen.routeName);
-                  if (!mounted) return;
-                  setState(() {
-                    _tags.add(tag);
-                    _tags.sort();
-                    _selected.remove(tag);
-                    password!.tags = _selected;
-                  });
+                      context, (r) => r.settings.name == MainScreen.routeName);
+                  Navigator.pushNamed(context, PasswordsScreen.routeName);
+                  Navigator.pushNamed(context, PasswordScreen.routeName,
+                      arguments: password!);
                 },
               ),
             ),

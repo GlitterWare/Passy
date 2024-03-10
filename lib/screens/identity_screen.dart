@@ -30,6 +30,7 @@ class _IdentityScreen extends State<IdentityScreen> {
   Identity? _identity;
   List<String> _tags = [];
   List<String> _selected = [];
+  bool _tagsLoaded = false;
 
   Future<void> _load() async {
     List<String> newTags = await _account.identitiesTags;
@@ -42,6 +43,7 @@ class _IdentityScreen extends State<IdentityScreen> {
             _tags.remove(tag);
           }
         }
+        _tagsLoaded = true;
       });
     }
   }
@@ -133,52 +135,42 @@ class _IdentityScreen extends State<IdentityScreen> {
       ),
       body: ListView(
         children: [
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(
-                  top: PassyTheme.passyPadding.top / 2,
-                  bottom: PassyTheme.passyPadding.bottom / 2),
-              child: EntryTagList(
-                showAddButton: true,
-                selected: _selected,
-                notSelected: _tags,
-                onAdded: (tag) async {
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  _identity!.tags = _selected.toList();
-                  _identity!.tags.add(tag);
-                  await _account.setIdentity(_identity!);
-                  Navigator.popUntil(
-                      context,
-                      (route) =>
-                          route.settings.name == IdentityScreen.routeName);
-                  if (!mounted) return;
-                  setState(() {
-                    _tags.remove(tag);
-                    _selected.add(tag);
-                    _selected.sort();
-                    _identity!.tags = _selected;
-                  });
-                },
-                onRemoved: (tag) async {
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  _identity!.tags = _selected.toList();
-                  _identity!.tags.remove(tag);
-                  await _account.setIdentity(_identity!);
-                  Navigator.popUntil(
-                      context,
-                      (route) =>
-                          route.settings.name == IdentityScreen.routeName);
-                  if (!mounted) return;
-                  setState(() {
-                    _tags.add(tag);
-                    _tags.sort();
-                    _selected.remove(tag);
-                    _identity!.tags = _selected;
-                  });
-                },
+          if (_tagsLoaded)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: PassyTheme.passyPadding.top / 2,
+                    bottom: PassyTheme.passyPadding.bottom / 2),
+                child: EntryTagList(
+                  showAddButton: true,
+                  selected: _selected,
+                  notSelected: _tags,
+                  onAdded: (tag) async {
+                    if (_identity!.tags.contains(tag)) return;
+                    Navigator.pushNamed(context, SplashScreen.routeName);
+                    _identity!.tags = _selected.toList();
+                    _identity!.tags.add(tag);
+                    await _account.setIdentity(_identity!);
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, IdentitiesScreen.routeName);
+                    Navigator.pushNamed(context, IdentityScreen.routeName,
+                        arguments: _identity!);
+                  },
+                  onRemoved: (tag) async {
+                    Navigator.pushNamed(context, SplashScreen.routeName);
+                    _identity!.tags = _selected.toList();
+                    _identity!.tags.remove(tag);
+                    await _account.setIdentity(_identity!);
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, IdentitiesScreen.routeName);
+                    Navigator.pushNamed(context, IdentityScreen.routeName,
+                        arguments: _identity!);
+                  },
+                ),
               ),
             ),
-          ),
           if (_identity!.attachments.isNotEmpty)
             AttachmentsListView(files: _identity!.attachments),
           if (_identity!.nickname != '')

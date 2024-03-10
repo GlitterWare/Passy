@@ -30,6 +30,7 @@ class _IDCardScreen extends State<IDCardScreen> {
   IDCard? _idCard;
   List<String> _tags = [];
   List<String> _selected = [];
+  bool _tagsLoaded = false;
 
   Future<void> _load() async {
     List<String> newTags = await _account.idCardsTags;
@@ -42,6 +43,7 @@ class _IDCardScreen extends State<IDCardScreen> {
             _tags.remove(tag);
           }
         }
+        _tagsLoaded = true;
       });
     }
   }
@@ -132,48 +134,42 @@ class _IDCardScreen extends State<IDCardScreen> {
       ),
       body: ListView(
         children: [
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(
-                  top: PassyTheme.passyPadding.top / 2,
-                  bottom: PassyTheme.passyPadding.bottom / 2),
-              child: EntryTagList(
-                showAddButton: true,
-                selected: _selected,
-                notSelected: _tags,
-                onAdded: (tag) async {
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  _idCard!.tags = _selected.toList();
-                  _idCard!.tags.add(tag);
-                  await _account.setIDCard(_idCard!);
-                  Navigator.popUntil(context,
-                      (route) => route.settings.name == IDCardScreen.routeName);
-                  if (!mounted) return;
-                  setState(() {
-                    _tags.remove(tag);
-                    _selected.add(tag);
-                    _selected.sort();
-                    _idCard!.tags = _selected;
-                  });
-                },
-                onRemoved: (tag) async {
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  _idCard!.tags = _selected.toList();
-                  _idCard!.tags.remove(tag);
-                  await _account.setIDCard(_idCard!);
-                  Navigator.popUntil(context,
-                      (route) => route.settings.name == IDCardScreen.routeName);
-                  if (!mounted) return;
-                  setState(() {
-                    _tags.add(tag);
-                    _tags.sort();
-                    _selected.remove(tag);
-                    _idCard!.tags = _selected;
-                  });
-                },
+          if (_tagsLoaded)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: PassyTheme.passyPadding.top / 2,
+                    bottom: PassyTheme.passyPadding.bottom / 2),
+                child: EntryTagList(
+                  showAddButton: true,
+                  selected: _selected,
+                  notSelected: _tags,
+                  onAdded: (tag) async {
+                    if (_idCard!.tags.contains(tag)) return;
+                    Navigator.pushNamed(context, SplashScreen.routeName);
+                    _idCard!.tags = _selected.toList();
+                    _idCard!.tags.add(tag);
+                    await _account.setIDCard(_idCard!);
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, IDCardsScreen.routeName);
+                    Navigator.pushNamed(context, IDCardScreen.routeName,
+                        arguments: _idCard!);
+                  },
+                  onRemoved: (tag) async {
+                    Navigator.pushNamed(context, SplashScreen.routeName);
+                    _idCard!.tags = _selected.toList();
+                    _idCard!.tags.remove(tag);
+                    await _account.setIDCard(_idCard!);
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, IDCardsScreen.routeName);
+                    Navigator.pushNamed(context, IDCardScreen.routeName,
+                        arguments: _idCard!);
+                  },
+                ),
               ),
             ),
-          ),
           if (_idCard!.attachments.isNotEmpty)
             AttachmentsListView(files: _idCard!.attachments),
           if (_idCard!.nickname != '')

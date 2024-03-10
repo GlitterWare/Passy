@@ -28,6 +28,7 @@ class _NoteScreen extends State<NoteScreen> {
   Note? _note;
   List<String> _tags = [];
   List<String> _selected = [];
+  bool _tagsLoaded = false;
 
   void _onRemovePressed(Note note) {
     showDialog(
@@ -85,6 +86,7 @@ class _NoteScreen extends State<NoteScreen> {
             _tags.remove(tag);
           }
         }
+        _tagsLoaded = true;
       });
     }
   }
@@ -129,48 +131,42 @@ class _NoteScreen extends State<NoteScreen> {
         },
       ),
       body: ListView(children: [
-        Center(
-          child: Padding(
-            padding: EdgeInsets.only(
-                top: PassyTheme.passyPadding.top / 2,
-                bottom: PassyTheme.passyPadding.bottom / 2),
-            child: EntryTagList(
-              showAddButton: true,
-              selected: _selected,
-              notSelected: _tags,
-              onAdded: (tag) async {
-                Navigator.pushNamed(context, SplashScreen.routeName);
-                _note!.tags = _selected.toList();
-                _note!.tags.add(tag);
-                await _account.setNote(_note!);
-                Navigator.popUntil(context,
-                    (route) => route.settings.name == NoteScreen.routeName);
-                if (!mounted) return;
-                setState(() {
-                  _tags.remove(tag);
-                  _selected.add(tag);
-                  _selected.sort();
-                  _note!.tags = _selected;
-                });
-              },
-              onRemoved: (tag) async {
-                Navigator.pushNamed(context, SplashScreen.routeName);
-                _note!.tags = _selected.toList();
-                _note!.tags.remove(tag);
-                await _account.setNote(_note!);
-                Navigator.popUntil(context,
-                    (route) => route.settings.name == NoteScreen.routeName);
-                if (!mounted) return;
-                setState(() {
-                  _tags.add(tag);
-                  _tags.sort();
-                  _selected.remove(tag);
-                  _note!.tags = _selected;
-                });
-              },
+        if (_tagsLoaded)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: PassyTheme.passyPadding.top / 2,
+                  bottom: PassyTheme.passyPadding.bottom / 2),
+              child: EntryTagList(
+                showAddButton: true,
+                selected: _selected,
+                notSelected: _tags,
+                onAdded: (tag) async {
+                  if (_note!.tags.contains(tag)) return;
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  _note!.tags = _selected.toList();
+                  _note!.tags.add(tag);
+                  await _account.setNote(_note!);
+                  Navigator.popUntil(
+                      context, (r) => r.settings.name == MainScreen.routeName);
+                  Navigator.pushNamed(context, NotesScreen.routeName);
+                  Navigator.pushNamed(context, NoteScreen.routeName,
+                      arguments: _note!);
+                },
+                onRemoved: (tag) async {
+                  Navigator.pushNamed(context, SplashScreen.routeName);
+                  _note!.tags = _selected.toList();
+                  _note!.tags.remove(tag);
+                  await _account.setNote(_note!);
+                  Navigator.popUntil(
+                      context, (r) => r.settings.name == MainScreen.routeName);
+                  Navigator.pushNamed(context, NotesScreen.routeName);
+                  Navigator.pushNamed(context, NoteScreen.routeName,
+                      arguments: _note!);
+                },
+              ),
             ),
           ),
-        ),
         if (_note!.title != '')
           PassyPadding(
               RecordButton(title: localizations.title, value: _note!.title)),
