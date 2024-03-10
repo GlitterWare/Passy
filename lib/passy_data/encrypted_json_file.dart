@@ -50,8 +50,11 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
 
   Future<void> reload() async => value = _fromJson(
       jsonDecode(decrypt(await _file.readAsString(), encrypter: _encrypter)));
-  void reloadSync() => value = _fromJson(
-      jsonDecode(decrypt(_file.readAsStringSync(), encrypter: _encrypter)));
+  void reloadSync() {
+    String read = decrypt(_file.readAsStringSync(), encrypter: _encrypter);
+    if (read.isEmpty) return;
+    value = _fromJson(jsonDecode(read));
+  }
 
   @override
   Future<void> save() =>
