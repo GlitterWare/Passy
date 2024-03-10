@@ -343,5 +343,6 @@
     "@counter": { "description": "HOTP 2FA counter stores a number that is incremented on every logon" },
     "createTag": "Create tag",
     "create": "Create",
-    "tag": "Tag"
+    "tag": "Tag",
+    "noTags": "No tags"
 }
