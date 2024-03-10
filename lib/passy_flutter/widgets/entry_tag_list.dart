@@ -126,6 +126,10 @@ class _EntryTagList extends State<EntryTagList> {
                                 decoration: InputDecoration(
                                     labelText: localizations.tag),
                                 onChanged: (value) => {tag = value},
+                                onFieldSubmitted: (tag) {
+                                  widget.onAdded(tag);
+                                  Navigator.pop(context);
+                                },
                               ),
                               actions: [
                                 TextButton(
