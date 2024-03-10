@@ -32,7 +32,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       _raf.closeSync();
       return _tags;
     }
-    int _tagIndex = T.toString() == 'Note' ? 5 : 3;
+    int _tagIndex = T.toString() == 'Note' ? 4 : 3;
     processLines(_raf, onLine: (entry, eofReached) {
       List<String> _decoded = entry.split(',');
       String _decrypted = decrypt(_decoded[1],
