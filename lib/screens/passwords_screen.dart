@@ -74,7 +74,10 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   }
 
   Future<void> _load() async {
-    List<String> newTags = await _account.passwordTags;
+    List<String> newTags;
+    try {
+      newTags = await _account.passwordTags;
+    } catch (_) {return;}
     if (mounted) {
       setState(() {
         _tags = newTags;
@@ -84,8 +87,11 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
   @override
   Widget build(BuildContext context) {
-      _load();
-    List<PasswordMeta> _passwords = _account.passwordsMetadata.values.toList();
+    _load();
+    List<PasswordMeta> _passwords = [];
+    try {
+      _passwords = _account.passwordsMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.password,

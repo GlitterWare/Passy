@@ -96,7 +96,12 @@ class _NotesScreen extends State<NotesScreen> {
   }
 
   Future<void> _load() async {
-    List<String> newTags = await _account.notesTags;
+    List<String> newTags ;
+    try {
+      newTags = await _account.notesTags;
+    } catch (_) {
+      return;
+    }
     if (mounted) {
       setState(() {
         _tags = newTags;
@@ -107,7 +112,10 @@ class _NotesScreen extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     _load();
-    List<NoteMeta> _notes = _account.notesMetadata.values.toList();
+    List<NoteMeta> _notes = [];
+    try {
+      _notes = _account.notesMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.note,

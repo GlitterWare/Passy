@@ -28,73 +28,86 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
 
   void _onSearchPressed({String? tag}) {
-    Navigator.pushNamed(context, SearchScreen.routeName, arguments:
-        SearchScreenArgs(
-
+    Navigator.pushNamed(context, SearchScreen.routeName,
+        arguments: SearchScreenArgs(
             notSelectedTags: _tags.toList()..remove(tag),
             selectedTags: tag == null ? [] : [tag],
+            builder:
+                (String terms, List<String> tags, void Function() rebuild) {
+              final List<IdentityMeta> _found = [];
+              final List<String> _terms = terms.trim().toLowerCase().split(' ');
+              for (IdentityMeta _identity
+                  in _account.identitiesMetadata.values) {
+                {
+                  bool testIdentity(IdentityMeta value) =>
+                      _identity.key == value.key;
 
-          builder:
-            (String terms, List<String> tags, void Function() rebuild) {
-      final List<IdentityMeta> _found = [];
-      final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IdentityMeta _identity in _account.identitiesMetadata.values) {
-        {
-          bool testIdentity(IdentityMeta value) => _identity.key == value.key;
-
-          if (_found.any(testIdentity)) continue;
-        }
-        {
-          int _positiveCount = 0;
-          for (String _term in _terms) {
-            if (_identity.firstAddressLine.toLowerCase().contains(_term)) {
-              _positiveCount++;
-              continue;
-            }
-            if (_identity.nickname.toLowerCase().contains(_term)) {
-              _positiveCount++;
-              continue;
-            }
-          }
-          if (_positiveCount == _terms.length) {
-            _found.add(_identity);
-          }
-        }
-      }
-      if (_found.isEmpty) {
-        return CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Column(
-                children: [
-                  const Spacer(flex: 7),
-                  Text(
-                    localizations.noSearchResults,
-                    textAlign: TextAlign.center,
-                  ),
-                  const Spacer(flex: 7),
-                ],
-              ),
-            ),
-          ],
-        );
-      }
-      return IdentityButtonListView(
-        identities: _found,
-        shouldSort: true,
-        onPressed: (identity) => Navigator.pushNamed(
-          context,
-          IdentityScreen.routeName,
-          arguments: _account.getIdentity(identity.key),
-        ),
-        popupMenuItemBuilder: identityPopupMenuBuilder,
-      );
-    }));
+                  if (_found.any(testIdentity)) continue;
+                }
+                {
+                  bool _tagMismatch = false;
+                  for (String tag in tags) {
+                    if (_identity.tags.contains(tag)) continue;
+                    _tagMismatch = true;
+                  }
+                  if (_tagMismatch) continue;
+                  int _positiveCount = 0;
+                  for (String _term in _terms) {
+                    if (_identity.firstAddressLine
+                        .toLowerCase()
+                        .contains(_term)) {
+                      _positiveCount++;
+                      continue;
+                    }
+                    if (_identity.nickname.toLowerCase().contains(_term)) {
+                      _positiveCount++;
+                      continue;
+                    }
+                  }
+                  if (_positiveCount == _terms.length) {
+                    _found.add(_identity);
+                  }
+                }
+              }
+              if (_found.isEmpty) {
+                return CustomScrollView(
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        children: [
+                          const Spacer(flex: 7),
+                          Text(
+                            localizations.noSearchResults,
+                            textAlign: TextAlign.center,
+                          ),
+                          const Spacer(flex: 7),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return IdentityButtonListView(
+                identities: _found,
+                shouldSort: true,
+                onPressed: (identity) => Navigator.pushNamed(
+                  context,
+                  IdentityScreen.routeName,
+                  arguments: _account.getIdentity(identity.key),
+                ),
+                popupMenuItemBuilder: identityPopupMenuBuilder,
+              );
+            }));
   }
 
   Future<void> _load() async {
-    List<String> newTags = await _account.identitiesTags;
+    List<String> newTags;
+    try {
+      newTags = await _account.identitiesTags;
+    } catch (_) {
+      return;
+    }
     if (mounted) {
       setState(() {
         _tags = newTags;
@@ -105,8 +118,10 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
   @override
   Widget build(BuildContext context) {
     _load();
-    List<IdentityMeta> _identities =
-        _account.identitiesMetadata.values.toList();
+    List<IdentityMeta> _identities = [];
+    try {
+      _identities = _account.identitiesMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.identity,

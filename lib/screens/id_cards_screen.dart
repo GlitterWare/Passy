@@ -99,7 +99,12 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   }
 
   Future<void> _load() async {
-    List<String> newTags = await _account.idCardsTags;
+    List<String> newTags;
+    try {
+      newTags = await _account.idCardsTags;
+    } catch (_) {
+      return;
+    }
     if (mounted) {
       setState(() {
         _tags = newTags;
@@ -110,7 +115,8 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   @override
   Widget build(BuildContext context) {
     _load();
-    List<IDCardMeta> _idCards = _account.idCardsMetadata.values.toList();
+    List<IDCardMeta> _idCards = [];
+    try{_idCards = _account.idCardsMetadata.values.toList();}catch(_){}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.idCard,

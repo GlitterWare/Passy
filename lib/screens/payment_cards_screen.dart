@@ -103,7 +103,9 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
       Navigator.pushNamed(context, EditPaymentCardScreen.routeName);
 
   Future<void> _load() async {
-    List<String> newTags = await _account.paymentCardTags;
+    List<String> newTags;
+    try{
+    newTags = await _account.paymentCardTags;}catch(_){return;}
     if (mounted) {
       setState(() {
         _tags = newTags;
@@ -114,8 +116,10 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   @override
   Widget build(BuildContext context) {
     _load();
-    List<PaymentCardMeta> _paymentCards =
-        _account.paymentCardsMetadata.values.toList();
+    List<PaymentCardMeta> _paymentCards = [];
+    try {
+      _paymentCards = _account.paymentCardsMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
         entryType: EntryType.paymentCard,
