@@ -25,7 +25,6 @@ class PasswordsScreen extends StatefulWidget {
 class _PasswordsScreen extends State<PasswordsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
   List<String> _tags = [];
-  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
@@ -85,10 +84,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_isLoading) {
-      _isLoading = true;
       _load();
-    }
     List<PasswordMeta> _passwords = _account.passwordsMetadata.values.toList();
     return Scaffold(
       appBar: EntriesScreenAppBar(
