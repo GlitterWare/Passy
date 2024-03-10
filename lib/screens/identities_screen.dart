@@ -22,13 +22,20 @@ class IdentitiesScreen extends StatefulWidget {
 
 class _IdentitiesScreen extends State<IdentitiesScreen> {
   final _account = data.loadedAccount!;
+  List<String> _tags = [];
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
 
-  void _onSearchPressed() {
+  void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName, arguments:
-        SearchScreenArgs(builder: (String terms, List<String> tags, void Function() rebuild) {
+        SearchScreenArgs(
+
+            notSelectedTags: _tags.toList()..remove(tag),
+            selectedTags: tag == null ? [] : [tag],
+
+          builder:
+            (String terms, List<String> tags, void Function() rebuild) {
       final List<IdentityMeta> _found = [];
       final List<String> _terms = terms.trim().toLowerCase().split(' ');
       for (IdentityMeta _identity in _account.identitiesMetadata.values) {
@@ -86,8 +93,18 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
     }));
   }
 
+  Future<void> _load() async {
+    List<String> newTags = await _account.identitiesTags;
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _load();
     List<IdentityMeta> _identities =
         _account.identitiesMetadata.values.toList();
     return Scaffold(
@@ -133,6 +150,20 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
                         context, EditIdentityScreen.routeName),
                   ),
                 ),
+                if (_tags.isNotEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: PassyTheme.passyPadding.top / 2,
+                          bottom: PassyTheme.passyPadding.bottom / 2),
+                      child: EntryTagList(
+                        notSelected: _tags,
+                        onAdded: (tag) => setState(() {
+                          _onSearchPressed(tag: tag);
+                        }),
+                      ),
+                    ),
+                  ),
               ],
               identities: _identities,
               shouldSort: true,
