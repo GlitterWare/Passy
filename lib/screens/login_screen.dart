@@ -91,7 +91,8 @@ class _LoginScreen extends State<LoginScreen> {
     }
   }
 
-  Widget _buildPasswords(String terms, List<String> tags, void Function() rebuild) {
+  Widget _buildPasswords(
+      String terms, List<String> tags, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
         passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
     List<PwDataset> _dataSets = [];
@@ -234,9 +235,7 @@ class _LoginScreen extends State<LoginScreen> {
     if (data.getBioAuthEnabled(_username) == true) {
       _bioAuthButton = FloatingActionButton(
         onPressed: () => _bioAuth(),
-        child: const Icon(
-          Icons.fingerprint_rounded,
-        ),
+        child: const Icon(Icons.fingerprint_rounded),
         tooltip: localizations.authenticate,
         heroTag: null,
       );
@@ -256,6 +255,8 @@ class _LoginScreen extends State<LoginScreen> {
       _floatingActionButton =
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         FloatingActionButton(
+          foregroundColor: PassyTheme.lightContentColor,
+          backgroundColor: Colors.purple,
           child: const Icon(Icons.settings_rounded),
           tooltip: localizations.settings,
           heroTag: null,
@@ -266,6 +267,8 @@ class _LoginScreen extends State<LoginScreen> {
           Padding(
             padding: EdgeInsets.only(left: PassyTheme.passyPadding.left),
             child: FloatingActionButton(
+              foregroundColor: PassyTheme.lightContentColor,
+              backgroundColor: Colors.purple,
               child: const Icon(Icons.extension_rounded),
               tooltip: localizations.passyBrowserExtension,
               heroTag: null,
@@ -331,6 +334,9 @@ class _LoginScreen extends State<LoginScreen> {
                               children: [
                                 if (!isAutofill)
                                   FloatingActionButton(
+                                    foregroundColor:
+                                        PassyTheme.lightContentColor,
+                                    backgroundColor: Colors.purple,
                                     onPressed: () =>
                                         Navigator.pushReplacementNamed(context,
                                             AddAccountScreen.routeName),
@@ -340,6 +346,7 @@ class _LoginScreen extends State<LoginScreen> {
                                   ),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
+                                    isDense: false,
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(30)),
                                     value: _username,

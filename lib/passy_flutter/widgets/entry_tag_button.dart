@@ -19,17 +19,15 @@ class EntryTagButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
       onPressed: onPressed ?? () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(35.0),
-        ),
+      style: ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(color),
       ),
-      icon: Icon(isSelected ? Icons.close_rounded: Icons.add_rounded),
+      icon: Icon(isSelected ? Icons.close_rounded : Icons.add_rounded,
+          color: PassyTheme.theme.colorScheme.onPrimary),
       label: Padding(
         padding: EdgeInsets.only(
-            top: PassyTheme.passyPadding.top,
-            bottom: PassyTheme.passyPadding.bottom,
+            top: PassyTheme.passyPadding.top / 1.5,
+            bottom: PassyTheme.passyPadding.bottom / 1.5,
             right: PassyTheme.passyPadding.right),
         child: Text(
           tag,

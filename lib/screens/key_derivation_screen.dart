@@ -139,6 +139,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
               const SizedBox(height: 24),
               Container(
                 child: PassyPadding(DropdownButtonFormField<KeyDerivationType>(
+                  borderRadius: const BorderRadius.all(Radius.circular(30)),
                   items: [
                     DropdownMenuItem(
                       child: Text(

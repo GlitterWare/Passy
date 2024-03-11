@@ -44,6 +44,7 @@ class LogScreen extends StatelessWidget {
               padding: PassyTheme.appBarButtonPadding,
               splashRadius: PassyTheme.appBarButtonSplashRadius,
               icon: SvgPicture.asset(
+                width: PassyTheme.appBarButtonSplashRadius ,
                 'assets/images/github_icon.svg',
                 colorFilter: const ColorFilter.mode(
                     PassyTheme.lightContentColor, BlendMode.srcIn),

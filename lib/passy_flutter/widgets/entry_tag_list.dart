@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/passy_flutter/widgets/entry_tag_button.dart';
 
 class EntryTagList extends StatefulWidget {
   final List<String> selected;
@@ -116,43 +115,11 @@ class _EntryTagList extends State<EntryTagList> {
                         widget.onAddPressed();
                         showDialog(
                           context: context,
-                          builder: (context) {
-                            String tag = '';
-                            return AlertDialog(
-                              shape: PassyTheme.dialogShape,
-                              title: Text(localizations.createTag),
-                              content: TextFormField(
-                                autofocus: true,
-                                decoration: InputDecoration(
-                                    labelText: localizations.tag),
-                                onChanged: (value) => {tag = value},
-                                onFieldSubmitted: (tag) {
-                                  widget.onAdded(tag);
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(localizations.cancel,
-                                      style: const TextStyle(
-                                          color: PassyTheme
-                                              .lightContentSecondaryColor)),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    widget.onAdded(tag);
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text(localizations.create,
-                                      style: const TextStyle(
-                                          color: PassyTheme
-                                              .lightContentSecondaryColor)),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                          builder: (context) => const EntryTagCreationDialog(),
+                        ).then((value) {
+                          if (value is! String) return;
+                          widget.onAdded(value);
+                        });
                       },
                     ),
                   ),

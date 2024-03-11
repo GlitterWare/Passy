@@ -25,7 +25,8 @@ class RecordButton extends StatelessWidget {
     this.valueAlign = TextAlign.center,
     this.left,
   })  : titleStyle = titleStyle ??
-            const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            const TextStyle(
+                color: PassyTheme.lightContentSecondaryColor, height: 0.94),
         super(key: key);
 
   @override
