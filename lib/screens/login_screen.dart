@@ -46,6 +46,7 @@ class _LoginScreen extends State<LoginScreen> {
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
+  bool isCapsLockEnabled = false;
 
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -365,12 +366,26 @@ class _LoginScreen extends State<LoginScreen> {
                             ),
                             Row(
                               children: [
+                                if (isCapsLockEnabled)
+                                  const PassyPadding(Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Color.fromRGBO(255, 82, 82, 1),
+                                  )),
                                 Expanded(
                                   child: TextField(
                                     controller: _passwordController,
                                     obscureText: true,
-                                    onChanged: (a) =>
-                                        setState(() => _password = a),
+                                    onChanged: (a) => setState(() {
+                                      if (HardwareKeyboard
+                                          .instance.lockModesEnabled
+                                          .contains(
+                                              KeyboardLockMode.capsLock)) {
+                                        isCapsLockEnabled = true;
+                                      } else {
+                                        isCapsLockEnabled = false;
+                                      }
+                                      _password = a;
+                                    }),
                                     onSubmitted: (s) => login(),
                                     decoration: InputDecoration(
                                       hintText: localizations.password,

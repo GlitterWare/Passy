@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/setup_screen.dart';
 import 'package:encrypt/encrypt.dart' as crypt;
@@ -27,6 +27,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
+  bool isCapsLockEnabled = false;
 
   void _addAccount() async {
     if (_username.isEmpty) {
@@ -184,11 +185,25 @@ class _AddAccountScreen extends State<StatefulWidget> {
                             ),
                             Row(
                               children: [
+                                if (isCapsLockEnabled)
+                                  const PassyPadding(Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Color.fromRGBO(255, 82, 82, 1),
+                                  )),
                                 Expanded(
                                   child: TextField(
                                     obscureText: true,
-                                    onChanged: (a) =>
-                                        setState(() => _password = a),
+                                    onChanged: (a) => setState(() {
+                                      if (HardwareKeyboard
+                                          .instance.lockModesEnabled
+                                          .contains(
+                                              KeyboardLockMode.capsLock)) {
+                                        isCapsLockEnabled = true;
+                                      } else {
+                                        isCapsLockEnabled = false;
+                                      }
+                                      _password = a;
+                                    }),
                                     decoration: InputDecoration(
                                       hintText: localizations.password,
                                     ),
@@ -201,14 +216,28 @@ class _AddAccountScreen extends State<StatefulWidget> {
                             ),
                             Row(
                               children: [
+                                if (isCapsLockEnabled)
+                                  const PassyPadding(Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Color.fromRGBO(255, 82, 82, 1),
+                                  )),
                                 Expanded(
                                   child: TextField(
                                     obscureText: true,
                                     decoration: InputDecoration(
                                       hintText: localizations.confirmPassword,
                                     ),
-                                    onChanged: (a) =>
-                                        setState(() => _confirmPassword = a),
+                                    onChanged: (a) => setState(() {
+                                      if (HardwareKeyboard
+                                          .instance.lockModesEnabled
+                                          .contains(
+                                              KeyboardLockMode.capsLock)) {
+                                        isCapsLockEnabled = true;
+                                      } else {
+                                        isCapsLockEnabled = false;
+                                      }
+                                      _confirmPassword = a;
+                                    }),
                                     onSubmitted: (value) => _addAccount(),
                                     inputFormatters: [
                                       LengthLimitingTextInputFormatter(32),
