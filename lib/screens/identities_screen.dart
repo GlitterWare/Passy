@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -106,6 +107,9 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
     try {
       newTags = await _account.identitiesTags;
     } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
       return;
     }
     if (mounted) {

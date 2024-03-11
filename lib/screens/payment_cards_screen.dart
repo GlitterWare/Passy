@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -104,8 +105,14 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
 
   Future<void> _load() async {
     List<String> newTags;
-    try{
-    newTags = await _account.paymentCardTags;}catch(_){return;}
+    try {
+      newTags = await _account.paymentCardTags;
+    } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
     if (mounted) {
       setState(() {
         _tags = newTags;

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -105,6 +106,9 @@ class _IDCardsScreen extends State<IDCardsScreen> {
     } catch (_) {
       return;
     }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
     if (mounted) {
       setState(() {
         _tags = newTags;
@@ -116,7 +120,9 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   Widget build(BuildContext context) {
     _load();
     List<IDCardMeta> _idCards = [];
-    try{_idCards = _account.idCardsMetadata.values.toList();}catch(_){}
+    try {
+      _idCards = _account.idCardsMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.idCard,

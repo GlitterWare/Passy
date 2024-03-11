@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -77,7 +78,12 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     List<String> newTags;
     try {
       newTags = await _account.passwordTags;
-    } catch (_) {return;}
+    } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
     if (mounted) {
       setState(() {
         _tags = newTags;

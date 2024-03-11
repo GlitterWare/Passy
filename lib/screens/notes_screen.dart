@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -96,10 +97,13 @@ class _NotesScreen extends State<NotesScreen> {
   }
 
   Future<void> _load() async {
-    List<String> newTags ;
+    List<String> newTags;
     try {
       newTags = await _account.notesTags;
     } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
       return;
     }
     if (mounted) {
