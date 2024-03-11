@@ -25,6 +25,7 @@ class NotesScreen extends StatefulWidget {
 class _NotesScreen extends State<NotesScreen> {
   final LoadedAccount _account = data.loadedAccount!;
   List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditNoteScreen.routeName);
@@ -97,6 +98,7 @@ class _NotesScreen extends State<NotesScreen> {
   }
 
   Future<void> _load() async {
+    _isLoading = true;
     List<String> newTags;
     try {
       newTags = await _account.notesTags;
@@ -115,7 +117,7 @@ class _NotesScreen extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _load();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
     List<NoteMeta> _notes = [];
     try {
       _notes = _account.notesMetadata.values.toList();

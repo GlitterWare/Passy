@@ -24,6 +24,7 @@ class IdentitiesScreen extends StatefulWidget {
 class _IdentitiesScreen extends State<IdentitiesScreen> {
   final _account = data.loadedAccount!;
   List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
@@ -103,6 +104,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
   }
 
   Future<void> _load() async {
+    _isLoading = true;
     List<String> newTags;
     try {
       newTags = await _account.identitiesTags;
@@ -121,7 +123,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _load();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
     List<IdentityMeta> _identities = [];
     try {
       _identities = _account.identitiesMetadata.values.toList();

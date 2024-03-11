@@ -23,6 +23,7 @@ class PaymentCardsScreen extends StatefulWidget {
 class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
   List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
@@ -104,6 +105,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
       Navigator.pushNamed(context, EditPaymentCardScreen.routeName);
 
   Future<void> _load() async {
+    _isLoading = true;
     List<String> newTags;
     try {
       newTags = await _account.paymentCardTags;
@@ -122,7 +124,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _load();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
     List<PaymentCardMeta> _paymentCards = [];
     try {
       _paymentCards = _account.paymentCardsMetadata.values.toList();
