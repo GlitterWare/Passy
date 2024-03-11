@@ -107,6 +107,17 @@ class _SearchScreen extends State<SearchScreen> {
               },
               onChanged: (s) {
                 setState(() {
+                  String lowerS = s.toLowerCase();
+                  notSelected.sort(
+                    (a, b) {
+                      a = a.toLowerCase();
+                      b = b.toLowerCase();
+                      int aMatches = lowerS.allMatches(a).length;
+                      int bMatches = lowerS.allMatches(b).length;
+                      if (aMatches == bMatches) return a.compareTo(b);
+                      return bMatches - aMatches;
+                    },
+                  );
                   int baseOffset = queryController.selection.baseOffset;
                   queryController.text = s;
                   queryController.selection = TextSelection(
@@ -130,12 +141,17 @@ class _SearchScreen extends State<SearchScreen> {
                   notSelected: notSelected,
                   selected: selected,
                   onAdded: (tag) => setState(() {
+                    queryFocus.requestFocus();
+                    if (queryController.text.isNotEmpty) {
+                      queryController.text = '';
+                    }
                     selected.add(tag);
                     selected.sort();
                     notSelected.remove(tag);
                     _widget = _builder(queryController.text, selected, rebuild);
                   }),
                   onRemoved: (tag) => setState(() {
+                    queryFocus.requestFocus();
                     selected.remove(tag);
                     notSelected.add(tag);
                     notSelected.sort();
