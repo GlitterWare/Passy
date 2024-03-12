@@ -50,16 +50,19 @@ class RecordButton extends StatelessWidget {
         builder: (_) => RecordDialog(
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
-      right: IconButton(
-        icon: const Icon(Icons.copy_rounded),
-        tooltip: localizations.copy,
-        onPressed: () {
-          Clipboard.setData(ClipboardData(text: value));
-          showSnackBar(context,
-              message: '$title ${localizations.copied.toLowerCase()}',
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
-        },
+      right: CircleAvatar(child:
+        IconButton(
+          padding: EdgeInsets.zero,
+          icon: const Icon(Icons.copy_rounded),
+          tooltip: localizations.copy,
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: value));
+            showSnackBar(context,
+                message: '$title ${localizations.copied.toLowerCase()}',
+                icon: const Icon(Icons.copy_rounded,
+                    color: PassyTheme.darkContentColor));
+          },
+        ),
       ),
     );
   }
