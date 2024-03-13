@@ -135,42 +135,45 @@ class _IdentityScreen extends State<IdentityScreen> {
       ),
       body: ListView(
         children: [
-          if (_tagsLoaded)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    top: PassyTheme.passyPadding.top / 2,
-                    bottom: PassyTheme.passyPadding.bottom / 2),
-                child: EntryTagList(
-                  showAddButton: true,
-                  selected: _selected,
-                  notSelected: _tags,
-                  onAdded: (tag) async {
-                    if (_identity!.tags.contains(tag)) return;
-                    Navigator.pushNamed(context, SplashScreen.routeName);
-                    _identity!.tags = _selected.toList();
-                    _identity!.tags.add(tag);
-                    await _account.setIdentity(_identity!);
-                    Navigator.popUntil(context,
-                        (r) => r.settings.name == MainScreen.routeName);
-                    Navigator.pushNamed(context, IdentitiesScreen.routeName);
-                    Navigator.pushNamed(context, IdentityScreen.routeName,
-                        arguments: _identity!);
-                  },
-                  onRemoved: (tag) async {
-                    Navigator.pushNamed(context, SplashScreen.routeName);
-                    _identity!.tags = _selected.toList();
-                    _identity!.tags.remove(tag);
-                    await _account.setIdentity(_identity!);
-                    Navigator.popUntil(context,
-                        (r) => r.settings.name == MainScreen.routeName);
-                    Navigator.pushNamed(context, IdentitiesScreen.routeName);
-                    Navigator.pushNamed(context, IdentityScreen.routeName,
-                        arguments: _identity!);
-                  },
-                ),
-              ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: PassyTheme.passyPadding.top / 2,
+                  bottom: PassyTheme.passyPadding.bottom / 2),
+              child: !_tagsLoaded
+                  ? const CircularProgressIndicator()
+                  : EntryTagList(
+                      showAddButton: true,
+                      selected: _selected,
+                      notSelected: _tags,
+                      onAdded: (tag) async {
+                        if (_identity!.tags.contains(tag)) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        _identity!.tags = _selected.toList();
+                        _identity!.tags.add(tag);
+                        await _account.setIdentity(_identity!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(
+                            context, IdentitiesScreen.routeName);
+                        Navigator.pushNamed(context, IdentityScreen.routeName,
+                            arguments: _identity!);
+                      },
+                      onRemoved: (tag) async {
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        _identity!.tags = _selected.toList();
+                        _identity!.tags.remove(tag);
+                        await _account.setIdentity(_identity!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(
+                            context, IdentitiesScreen.routeName);
+                        Navigator.pushNamed(context, IdentityScreen.routeName,
+                            arguments: _identity!);
+                      },
+                    ),
             ),
+          ),
           if (_identity!.attachments.isNotEmpty)
             AttachmentsListView(files: _identity!.attachments),
           if (_identity!.nickname != '')

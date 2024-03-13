@@ -144,34 +144,38 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
             padding: EdgeInsets.only(
                 top: PassyTheme.passyPadding.top / 2,
                 bottom: PassyTheme.passyPadding.bottom / 2),
-            child: EntryTagList(
-              showAddButton: true,
-              selected: _selected,
-              notSelected: _tags,
-              onAdded: (tag) async {
-                if (_paymentCard!.tags.contains(tag)) return;
-                Navigator.pushNamed(context, SplashScreen.routeName);
-                _paymentCard!.tags = _selected.toList();
-                _paymentCard!.tags.add(tag);
-                await _account.setPaymentCard(_paymentCard!);
-                Navigator.popUntil(
-                    context, (r) => r.settings.name == MainScreen.routeName);
-                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-                Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                    arguments: _paymentCard!);
-              },
-              onRemoved: (tag) async {
-                Navigator.pushNamed(context, SplashScreen.routeName);
-                _paymentCard!.tags = _selected.toList();
-                _paymentCard!.tags.remove(tag);
-                await _account.setPaymentCard(_paymentCard!);
-                Navigator.popUntil(
-                    context, (r) => r.settings.name == MainScreen.routeName);
-                Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-                Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                    arguments: _paymentCard!);
-              },
-            ),
+            child: !_tagsLoaded
+                ? const CircularProgressIndicator()
+                : EntryTagList(
+                    showAddButton: true,
+                    selected: _selected,
+                    notSelected: _tags,
+                    onAdded: (tag) async {
+                      if (_paymentCard!.tags.contains(tag)) return;
+                      Navigator.pushNamed(context, SplashScreen.routeName);
+                      _paymentCard!.tags = _selected.toList();
+                      _paymentCard!.tags.add(tag);
+                      await _account.setPaymentCard(_paymentCard!);
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(
+                          context, PaymentCardsScreen.routeName);
+                      Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                          arguments: _paymentCard!);
+                    },
+                    onRemoved: (tag) async {
+                      Navigator.pushNamed(context, SplashScreen.routeName);
+                      _paymentCard!.tags = _selected.toList();
+                      _paymentCard!.tags.remove(tag);
+                      await _account.setPaymentCard(_paymentCard!);
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(
+                          context, PaymentCardsScreen.routeName);
+                      Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                          arguments: _paymentCard!);
+                    },
+                  ),
           ),
         ),
         if (_paymentCard!.attachments.isNotEmpty)

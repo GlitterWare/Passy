@@ -134,42 +134,43 @@ class _IDCardScreen extends State<IDCardScreen> {
       ),
       body: ListView(
         children: [
-          if (_tagsLoaded)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    top: PassyTheme.passyPadding.top / 2,
-                    bottom: PassyTheme.passyPadding.bottom / 2),
-                child: EntryTagList(
-                  showAddButton: true,
-                  selected: _selected,
-                  notSelected: _tags,
-                  onAdded: (tag) async {
-                    if (_idCard!.tags.contains(tag)) return;
-                    Navigator.pushNamed(context, SplashScreen.routeName);
-                    _idCard!.tags = _selected.toList();
-                    _idCard!.tags.add(tag);
-                    await _account.setIDCard(_idCard!);
-                    Navigator.popUntil(context,
-                        (r) => r.settings.name == MainScreen.routeName);
-                    Navigator.pushNamed(context, IDCardsScreen.routeName);
-                    Navigator.pushNamed(context, IDCardScreen.routeName,
-                        arguments: _idCard!);
-                  },
-                  onRemoved: (tag) async {
-                    Navigator.pushNamed(context, SplashScreen.routeName);
-                    _idCard!.tags = _selected.toList();
-                    _idCard!.tags.remove(tag);
-                    await _account.setIDCard(_idCard!);
-                    Navigator.popUntil(context,
-                        (r) => r.settings.name == MainScreen.routeName);
-                    Navigator.pushNamed(context, IDCardsScreen.routeName);
-                    Navigator.pushNamed(context, IDCardScreen.routeName,
-                        arguments: _idCard!);
-                  },
-                ),
-              ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: PassyTheme.passyPadding.top / 2,
+                  bottom: PassyTheme.passyPadding.bottom / 2),
+              child: !_tagsLoaded
+                  ? const CircularProgressIndicator()
+                  : EntryTagList(
+                      showAddButton: true,
+                      selected: _selected,
+                      notSelected: _tags,
+                      onAdded: (tag) async {
+                        if (_idCard!.tags.contains(tag)) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        _idCard!.tags = _selected.toList();
+                        _idCard!.tags.add(tag);
+                        await _account.setIDCard(_idCard!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, IDCardsScreen.routeName);
+                        Navigator.pushNamed(context, IDCardScreen.routeName,
+                            arguments: _idCard!);
+                      },
+                      onRemoved: (tag) async {
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        _idCard!.tags = _selected.toList();
+                        _idCard!.tags.remove(tag);
+                        await _account.setIDCard(_idCard!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, IDCardsScreen.routeName);
+                        Navigator.pushNamed(context, IDCardScreen.routeName,
+                            arguments: _idCard!);
+                      },
+                    ),
             ),
+          ),
           if (_idCard!.attachments.isNotEmpty)
             AttachmentsListView(files: _idCard!.attachments),
           if (_idCard!.nickname != '')

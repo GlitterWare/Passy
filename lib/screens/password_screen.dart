@@ -260,34 +260,36 @@ class _PasswordScreen extends State<PasswordScreen> {
               padding: EdgeInsets.only(
                   top: PassyTheme.passyPadding.top / 2,
                   bottom: PassyTheme.passyPadding.bottom / 2),
-              child: EntryTagList(
-                showAddButton: true,
-                selected: _selected,
-                notSelected: _tags,
-                onAdded: (tag) async {
-                  if (password!.tags.contains(tag)) return;
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  password!.tags = _selected.toList();
-                  password!.tags.add(tag);
-                  await _account.setPassword(password!);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  Navigator.pushNamed(context, PasswordsScreen.routeName);
-                  Navigator.pushNamed(context, PasswordScreen.routeName,
-                      arguments: password!);
-                },
-                onRemoved: (tag) async {
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  password!.tags = _selected.toList();
-                  password!.tags.remove(tag);
-                  await _account.setPassword(password!);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  Navigator.pushNamed(context, PasswordsScreen.routeName);
-                  Navigator.pushNamed(context, PasswordScreen.routeName,
-                      arguments: password!);
-                },
-              ),
+              child: !_tagsLoaded
+                  ? const CircularProgressIndicator()
+                  : EntryTagList(
+                      showAddButton: true,
+                      selected: _selected,
+                      notSelected: _tags,
+                      onAdded: (tag) async {
+                        if (password!.tags.contains(tag)) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        password!.tags = _selected.toList();
+                        password!.tags.add(tag);
+                        await _account.setPassword(password!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, PasswordsScreen.routeName);
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: password!);
+                      },
+                      onRemoved: (tag) async {
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        password!.tags = _selected.toList();
+                        password!.tags.remove(tag);
+                        await _account.setPassword(password!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, PasswordsScreen.routeName);
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: password!);
+                      },
+                    ),
             ),
           ),
           if (password!.attachments.isNotEmpty)

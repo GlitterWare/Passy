@@ -131,42 +131,43 @@ class _NoteScreen extends State<NoteScreen> {
         },
       ),
       body: ListView(children: [
-        if (_tagsLoaded)
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(
-                  top: PassyTheme.passyPadding.top / 2,
-                  bottom: PassyTheme.passyPadding.bottom / 2),
-              child: EntryTagList(
-                showAddButton: true,
-                selected: _selected,
-                notSelected: _tags,
-                onAdded: (tag) async {
-                  if (_note!.tags.contains(tag)) return;
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  _note!.tags = _selected.toList();
-                  _note!.tags.add(tag);
-                  await _account.setNote(_note!);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  Navigator.pushNamed(context, NotesScreen.routeName);
-                  Navigator.pushNamed(context, NoteScreen.routeName,
-                      arguments: _note!);
-                },
-                onRemoved: (tag) async {
-                  Navigator.pushNamed(context, SplashScreen.routeName);
-                  _note!.tags = _selected.toList();
-                  _note!.tags.remove(tag);
-                  await _account.setNote(_note!);
-                  Navigator.popUntil(
-                      context, (r) => r.settings.name == MainScreen.routeName);
-                  Navigator.pushNamed(context, NotesScreen.routeName);
-                  Navigator.pushNamed(context, NoteScreen.routeName,
-                      arguments: _note!);
-                },
-              ),
-            ),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.only(
+                top: PassyTheme.passyPadding.top / 2,
+                bottom: PassyTheme.passyPadding.bottom / 2),
+            child: !_tagsLoaded
+                ? const CircularProgressIndicator()
+                : EntryTagList(
+                    showAddButton: true,
+                    selected: _selected,
+                    notSelected: _tags,
+                    onAdded: (tag) async {
+                      if (_note!.tags.contains(tag)) return;
+                      Navigator.pushNamed(context, SplashScreen.routeName);
+                      _note!.tags = _selected.toList();
+                      _note!.tags.add(tag);
+                      await _account.setNote(_note!);
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(context, NotesScreen.routeName);
+                      Navigator.pushNamed(context, NoteScreen.routeName,
+                          arguments: _note!);
+                    },
+                    onRemoved: (tag) async {
+                      Navigator.pushNamed(context, SplashScreen.routeName);
+                      _note!.tags = _selected.toList();
+                      _note!.tags.remove(tag);
+                      await _account.setNote(_note!);
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(context, NotesScreen.routeName);
+                      Navigator.pushNamed(context, NoteScreen.routeName,
+                          arguments: _note!);
+                    },
+                  ),
           ),
+        ),
         if (_note!.title != '')
           PassyPadding(
               RecordButton(title: localizations.title, value: _note!.title)),
