@@ -1095,8 +1095,7 @@ class LoadedAccount {
       idCardsTags,
       identitiesTags,
     ]);
-    List<String> result = [...tags.removeLast()]
-    ;
+    List<String> result = [...tags.removeLast()];
     for (List<String> list in tags) {
       for (String tag in list) {
         if (result.contains(tag)) continue;
