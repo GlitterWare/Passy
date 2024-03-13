@@ -1087,13 +1087,24 @@ class LoadedAccount {
     }
   }
 
-  List<String> get tags => [
-        ..._passwords.tags,
-        ..._notes.tags,
-        ..._paymentCards.tags,
-        ..._idCards.tags,
-        ..._identities.tags,
-      ];
+  Future<List<String>> get tags async {
+    List<List<String>> tags = await Future.wait([
+      passwordTags,
+      notesTags,
+      paymentCardTags,
+      idCardsTags,
+      identitiesTags,
+    ]);
+    List<String> result = [...tags.removeLast()]
+    ;
+    for (List<String> list in tags) {
+      for (String tag in list) {
+        if (result.contains(tag)) continue;
+        result.add(tag);
+      }
+    }
+    return result;
+  }
 
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
