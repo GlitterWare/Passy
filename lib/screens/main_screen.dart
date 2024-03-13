@@ -585,18 +585,16 @@ class _MainScreen extends State<MainScreen>
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
-      /*
       PassyPadding(ThreeWidgetButton(
-        center: Text(localizations.files),
+        center: Text(localizations.files + ' (Coming soon)'),
         left: const Padding(
           padding: EdgeInsets.only(right: 30),
           child: Icon(Icons.description_outlined),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
-            .then((value) => setState(() {})),
+        //onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
+        //    .then((value) => setState(() {})),
       )),
-      */
       if ((_account.keyDerivationType == KeyDerivationType.none) &&
           recommendKeyDerivation)
         PassyPadding(ThreeWidgetButton(
