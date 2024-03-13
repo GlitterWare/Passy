@@ -345,5 +345,8 @@
     "create": "Create",
     "tag": "Tag",
     "noTags": "No tags",
-    "aegisImport": "Aegis import"
+    "aegisImport": "Aegis import",
+    "backupPassy": "Backup Passy",
+    "backupSaved": "Backup saved",
+    "couldNotBackup": "Could not backup"
 }

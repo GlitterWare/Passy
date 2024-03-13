@@ -92,7 +92,6 @@ void openUrl(String url) {
   launchUrlString(url);
 }
 
-//TODO: localize backup
 Future<String?> backupAccount(
   BuildContext context, {
   required String username,
@@ -105,14 +104,14 @@ Future<String?> backupAccount(
     String? _buDir;
     if (autoFilename) {
       _buDir = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Backup Passy',
+        dialogTitle: localizations.backupPassy,
         lockParentWindow: true,
       );
     } else {
       _fileName =
           'passy-backup-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
       _buDir = await FilePicker.platform.saveFile(
-        dialogTitle: 'Backup Passy',
+        dialogTitle: localizations.backupPassy,
         lockParentWindow: true,
         fileName: _fileName,
       );
@@ -127,19 +126,19 @@ Future<String?> backupAccount(
       fileName: _fileName,
     );
     showSnackBar(
-        message: 'Backup saved',
+        message: localizations.backupSaved,
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor));
     return _buDir;
   } catch (e, s) {
     if (e is FileSystemException) {
       showSnackBar(
-          message: 'Access denied, try another folder',
+          message: localizations.accessDeniedTryAnotherFolder,
           icon: const Icon(Icons.save_rounded,
               color: PassyTheme.darkContentColor));
     } else {
       showSnackBar(
-        message: 'Could not backup',
+        message: localizations.couldNotBackup,
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
         action: SnackBarAction(
