@@ -92,35 +92,40 @@ class _MainScreen extends State<MainScreen>
           name: idCard.nickname,
           description: idCard.name,
           type: EntryType.idCard,
-          meta: idCard));
+          meta: idCard,
+          tags: idCard.tags));
     }
     for (IdentityMeta _identity in identitiesMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _identity.nickname,
           description: _identity.firstAddressLine,
           type: EntryType.identity,
-          meta: _identity));
+          meta: _identity,
+          tags: _identity.tags));
     }
     for (NoteMeta _note in notesMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _note.title,
           description: '',
           type: EntryType.note,
-          meta: _note));
+          meta: _note,
+          tags: _note.tags));
     }
     for (PasswordMeta _password in passwordsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
-          meta: _password));
+          meta: _password,
+          tags: _password.tags));
     }
     for (PaymentCardMeta _paymentCard in paymentCardsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
           type: EntryType.paymentCard,
-          meta: _paymentCard));
+          meta: _paymentCard,
+          tags: _paymentCard.tags));
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
@@ -239,7 +244,8 @@ class _MainScreen extends State<MainScreen>
           name: idCard.nickname,
           description: idCard.name,
           type: EntryType.idCard,
-          meta: idCard));
+          meta: idCard,
+          tags: idCard.tags));
     }
     for (EntryEvent event in _account.favoriteIdentities.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -249,7 +255,8 @@ class _MainScreen extends State<MainScreen>
           name: _identity.nickname,
           description: _identity.firstAddressLine,
           type: EntryType.identity,
-          meta: _identity));
+          meta: _identity,
+          tags: _identity.tags));
     }
     for (EntryEvent event in _account.favoriteNotes.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -259,7 +266,8 @@ class _MainScreen extends State<MainScreen>
           name: _note.title,
           description: '',
           type: EntryType.note,
-          meta: _note));
+          meta: _note,
+          tags: _note.tags));
     }
     for (EntryEvent event in _account.favoritePasswords.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -269,7 +277,7 @@ class _MainScreen extends State<MainScreen>
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
-          meta: _password));
+          meta: _password, tags: _password.tags));
     }
     for (EntryEvent event in _account.favoritePaymentCards.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -279,7 +287,7 @@ class _MainScreen extends State<MainScreen>
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
           type: EntryType.paymentCard,
-          meta: _paymentCard));
+          meta: _paymentCard, tags: _paymentCard.tags));
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
