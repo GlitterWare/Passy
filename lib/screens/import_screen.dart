@@ -114,7 +114,7 @@ class _ImportScreen extends State<ImportScreen> {
             padding: const EdgeInsets.only(right: 30),
             child: SvgPicture.asset(
               logoCircleSvg,
-              width: 30,
+              width: 24,
               colorFilter: const ColorFilter.mode(
                   PassyTheme.lightContentColor, BlendMode.srcIn),
             ),
