@@ -265,7 +265,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                 selected: _selected,
                 notSelected: _tags,
                 onAdded: (tag) async {
-                    if (password!.tags.contains(tag)) return;
+                  if (password!.tags.contains(tag)) return;
                   Navigator.pushNamed(context, SplashScreen.routeName);
                   password!.tags = _selected.toList();
                   password!.tags.add(tag);

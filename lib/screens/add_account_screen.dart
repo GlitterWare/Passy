@@ -102,16 +102,19 @@ class _AddAccountScreen extends State<StatefulWidget> {
     });
   }
 
-  Future<bool> _onWillPop() {
-    if (data.noAccounts) return Future.value(true);
+  void _onWillPop(bool isPopped) {
+    if (data.noAccounts) {
+      Navigator.pop(context);
+      return;
+    }
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-    return Future.value(false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,

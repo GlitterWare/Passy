@@ -416,9 +416,8 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Future<bool> _onWillPop() {
+  void _onWillPop(bool isPopped) {
     _logOut();
-    return Future.value(false);
   }
 
   @override
@@ -614,8 +613,9 @@ class _MainScreen extends State<MainScreen>
         )),
     ];
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,

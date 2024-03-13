@@ -50,8 +50,8 @@ class RecordButton extends StatelessWidget {
         builder: (_) => RecordDialog(
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
-      right: CircleAvatar(child:
-        IconButton(
+      right: CircleAvatar(
+        child: IconButton(
           padding: EdgeInsets.zero,
           icon: const Icon(Icons.copy_rounded),
           tooltip: localizations.copy,

@@ -37,14 +37,16 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     data.unloadAccount();
   }
 
-  Future<bool> _onWillPop() {
-    if (_shouldPop) return Future.value(true);
+  void _onWillPop(bool isPopped) {
+    if (_shouldPop) {
+      Navigator.pop(context);
+      return;
+    }
     Navigator.popUntil(context, (route) {
       if (route.settings.name != MainScreen.routeName) return false;
       _logOut();
       return true;
     });
-    return Future.value(false);
   }
 
   Future<void> _bioAuth() async {
@@ -127,8 +129,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: Text(localizations.unlock),

@@ -32,7 +32,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
-          entryType: EntryType.identity,
+            entryType: EntryType.identity,
             selectedTags: tag == null ? [] : [tag],
             builder:
                 (String terms, List<String> tags, void Function() rebuild) {

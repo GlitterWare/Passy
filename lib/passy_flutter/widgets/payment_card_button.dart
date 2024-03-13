@@ -28,7 +28,7 @@ class PaymentCardButton extends StatelessWidget {
       child: Stack(
         children: [
           InkWell(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
             onTap: onPressed,
             child: ClipRect(
               child: Align(
