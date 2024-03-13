@@ -30,7 +30,7 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
 
   void _onConfirmPressed() async {
     if (_newPassword.isEmpty) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.passwordIsEmpty,
           icon: const Icon(
             Icons.lock_rounded,
@@ -39,7 +39,7 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
       return;
     }
     if (_newPassword != _newPasswordConfirm) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.passwordsDoNotMatch,
           icon: const Icon(
             Icons.lock_rounded,
@@ -76,19 +76,18 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
           fileName: path.basename(_file.path));
       Navigator.pop(context);
       Navigator.pop(context);
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.exportSaved,
           icon: const Icon(Icons.ios_share_rounded,
               color: PassyTheme.darkContentColor));
     } catch (e, s) {
       if (e is FileSystemException) {
-        showSnackBar(context,
+        showSnackBar(
             message: localizations.accessDeniedTryAnotherFolder,
             icon: const Icon(Icons.ios_share_rounded,
                 color: PassyTheme.darkContentColor));
       } else {
         showSnackBar(
-          context,
           message: localizations.couldNotExport,
           icon: const Icon(Icons.ios_share_rounded,
               color: PassyTheme.darkContentColor),

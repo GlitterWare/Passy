@@ -46,7 +46,7 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
       onBackPressed: (context) => Navigator.pop(context),
       onConfirmPressed: (context, value) {
         if (value != _username) {
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.usernamesDoNotMatch,
               icon: const Icon(Icons.error_outline_rounded,
                   color: PassyTheme.darkContentColor));

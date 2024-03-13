@@ -235,7 +235,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         onFavoritePressed: () async {
           if (isFavorite) {
             await _account.removeFavoritePassword(password!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.removedFromFavorites,
                 icon: const Icon(
                   Icons.star_outline_rounded,
@@ -243,7 +243,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                 ));
           } else {
             await _account.addFavoritePassword(password!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.addedToFavorites,
                 icon: const Icon(
                   Icons.star_rounded,

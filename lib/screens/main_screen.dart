@@ -15,7 +15,6 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/search_entry_data.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -197,7 +196,8 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Widget _favoritesSearchBuilder(String terms, List<String> tags, void Function() setState) {
+  Widget _favoritesSearchBuilder(
+      String terms, List<String> tags, void Function() setState) {
     if (!_account.hasFavorites) {
       return CustomScrollView(
         slivers: [
@@ -505,7 +505,6 @@ class _MainScreen extends State<MainScreen>
         onPressed: () {
           if (!_account.isRSAKeypairLoaded) {
             showSnackBar(
-              context,
               message: localizations.settingUpSynchronization,
               icon: const Icon(CupertinoIcons.clock_solid,
                   color: PassyTheme.darkContentColor),
@@ -628,7 +627,6 @@ class _MainScreen extends State<MainScreen>
               onPressed: () {
                 if (!_account.isRSAKeypairLoaded) {
                   showSnackBar(
-                    context,
                     message: localizations.settingUpSynchronization,
                     icon: const Icon(CupertinoIcons.clock_solid,
                         color: PassyTheme.darkContentColor),

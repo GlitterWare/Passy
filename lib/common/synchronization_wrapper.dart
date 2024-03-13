@@ -76,7 +76,7 @@ class SynchronizationWrapper {
   void _onSyncError(String log) {
     void _showLog() => navigatorKey.currentState!
         .pushNamed(LogScreen.routeName, arguments: log);
-    showSnackBar(_context,
+    showSnackBar(
         message: localizations.syncError,
         icon: const Icon(Icons.sync_problem_rounded,
             color: PassyTheme.darkContentColor),
@@ -94,7 +94,6 @@ class SynchronizationWrapper {
       _hostAddress = HostAddress.parse(address);
     } catch (e) {
       showSnackBar(
-        _context,
         message: localizations.invalidAddressFormat,
         icon: const Icon(Icons.sync_problem_rounded,
             color: PassyTheme.darkContentColor),
@@ -114,7 +113,6 @@ class SynchronizationWrapper {
     );
     _sync!.connect(_hostAddress).onError((error, stackTrace) {
       showSnackBar(
-        _context,
         message: localizations.connectionFailed,
         icon: const Icon(Icons.sync_problem_rounded,
             color: PassyTheme.darkContentColor),

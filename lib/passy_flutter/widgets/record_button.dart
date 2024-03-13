@@ -57,7 +57,7 @@ class RecordButton extends StatelessWidget {
           tooltip: localizations.copy,
           onPressed: () {
             Clipboard.setData(ClipboardData(text: value));
-            showSnackBar(context,
+            showSnackBar(
                 message: '$title ${localizations.copied.toLowerCase()}',
                 icon: const Icon(Icons.copy_rounded,
                     color: PassyTheme.darkContentColor));

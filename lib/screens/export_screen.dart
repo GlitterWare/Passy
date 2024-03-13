@@ -114,19 +114,18 @@ class _ExportScreen extends State<ExportScreen> {
               fileName: path.basename(_expFile));
           break;
       }
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.exportSaved,
           icon: const Icon(Icons.ios_share_rounded,
               color: PassyTheme.darkContentColor));
     } catch (e, s) {
       if (e is FileSystemException) {
-        showSnackBar(context,
+        showSnackBar(
             message: localizations.accessDeniedTryAnotherFolder,
             icon: const Icon(Icons.ios_share_rounded,
                 color: PassyTheme.darkContentColor));
       } else {
         showSnackBar(
-          context,
           message: localizations.couldNotExport,
           icon: const Icon(Icons.ios_share_rounded,
               color: PassyTheme.darkContentColor),

@@ -34,7 +34,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
 
   Future<void> _onConfirmPressed() async {
     if (!_isBackupComplete) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.backupYourAccountBeforeProceeding,
           icon: const Icon(
             Icons.save_rounded,
@@ -45,7 +45,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
         _account.passwordHash) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.incorrectPassword,
           icon: const Icon(
             Icons.lock_rounded,

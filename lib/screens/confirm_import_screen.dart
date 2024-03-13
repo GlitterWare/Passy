@@ -60,7 +60,6 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
               context, (route) => route.settings.name == MainScreen.routeName);
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
           showSnackBar(
-            context,
             message: localizations.imported,
             icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
           );
@@ -74,16 +73,16 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
           Navigator.popUntil(context,
               (route) => route.settings.name == ImportScreen.routeName);
           showSnackBar(
-            context,
             message: localizations.imported,
             icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
           );
           break;
       }
     } catch (e, s) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (!mounted) return;
       Navigator.pop(context);
       showSnackBar(
-        context,
         message: localizations.couldNotImportAccount,
         icon: const Icon(Icons.download_for_offline_outlined,
             color: PassyTheme.darkContentColor),

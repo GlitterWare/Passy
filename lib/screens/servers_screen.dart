@@ -67,7 +67,7 @@ class _ServersScreen extends State<ServersScreen> {
       _syncInterval = int.parse(_syncIntervalString);
     }
     if (_syncInterval < 1) {
-      showSnackBar(context,
+      showSnackBar(
           message:
               '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
           icon:
@@ -76,7 +76,7 @@ class _ServersScreen extends State<ServersScreen> {
     }
     if (_syncIntervalUnits == IntervalUnit.seconds) {
       if (_syncInterval < 5) {
-        showSnackBar(context,
+        showSnackBar(
             message:
                 '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
             icon: const Icon(Icons.timelapse,

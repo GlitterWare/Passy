@@ -114,7 +114,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         onFavoritePressed: () async {
           if (isFavorite) {
             await _account.removeFavoritePaymentCard(_paymentCard!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.removedFromFavorites,
                 icon: const Icon(
                   Icons.star_outline_rounded,
@@ -122,7 +122,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                 ));
           } else {
             await _account.addFavoritePaymentCard(_paymentCard!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.addedToFavorites,
                 icon: const Icon(
                   Icons.star_rounded,

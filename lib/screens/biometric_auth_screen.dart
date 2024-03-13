@@ -32,7 +32,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
         if ((await data.createPasswordHash(_username, password: _password))
                 .toString() !=
             data.loadedAccount!.passwordHash) {
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.incorrectPassword,
               icon: const Icon(Icons.lock_rounded,
                   color: PassyTheme.darkContentColor));
@@ -47,7 +47,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
         } catch (e) {
           Future.delayed(const Duration(seconds: 2))
               .then((value) => MainScreen.shouldLockScreen = true);
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.couldNotAuthenticate,
               icon: const Icon(Icons.fingerprint_rounded,
                   color: PassyTheme.darkContentColor));

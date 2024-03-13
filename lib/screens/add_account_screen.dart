@@ -32,7 +32,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
   void _addAccount() async {
     if (_username.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.usernameIsEmpty,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
@@ -41,7 +40,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (_username.length < 2) {
       showSnackBar(
-        context,
         message: localizations.usernameShorterThan2Letters,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
@@ -50,7 +48,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (data.hasAccount(_username)) {
       showSnackBar(
-        context,
         message: localizations.usernameAlreadyInUse,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
@@ -59,7 +56,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (_password.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.passwordIsEmpty,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
@@ -68,7 +64,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (_password != _confirmPassword) {
       showSnackBar(
-        context,
         message: localizations.passwordsDoNotMatch,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
@@ -83,7 +78,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     } catch (e, s) {
       if (!mounted) return;
       showSnackBar(
-        context,
         message: localizations.couldNotAddAccount,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),

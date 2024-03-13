@@ -80,7 +80,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
       case FileEntryType.photo:
         if (widget.name.endsWith('.svg')) {
           return InkWell(
-            onTap: () => showSnackBar(context,
+            onTap: () => showSnackBar(
                 message: localizations.scrollOrPinchToZoom,
                 icon: const Icon(
                   Icons.zoom_in,
@@ -102,7 +102,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
           );
         }
         return InkWell(
-          onTap: () => showSnackBar(context,
+          onTap: () => showSnackBar(
               message: localizations.scrollOrPinchToZoom,
               icon: const Icon(
                 Icons.zoom_in,

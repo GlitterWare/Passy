@@ -112,7 +112,7 @@ class _NoteScreen extends State<NoteScreen> {
         onFavoritePressed: () async {
           if (isFavorite) {
             await _account.removeFavoriteNote(_note!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.removedFromFavorites,
                 icon: const Icon(
                   Icons.star_outline_rounded,
@@ -120,7 +120,7 @@ class _NoteScreen extends State<NoteScreen> {
                 ));
           } else {
             await _account.addFavoriteNote(_note!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.addedToFavorites,
                 icon: const Icon(
                   Icons.star_rounded,

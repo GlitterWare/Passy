@@ -147,7 +147,6 @@ class _SettingsScreen extends State<SettingsScreen> {
               onPressed: () {
                 if (!data.loadedAccount!.isRSAKeypairLoaded) {
                   showSnackBar(
-                    context,
                     message: localizations.settingUpSynchronization,
                     icon: const Icon(CupertinoIcons.clock_solid,
                         color: PassyTheme.darkContentColor),

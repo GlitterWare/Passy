@@ -169,7 +169,6 @@ class _LoginScreen extends State<LoginScreen> {
     }
     if (_isPasswordWrong) {
       showSnackBar(
-        context,
         message: localizations.incorrectPassword,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
@@ -217,7 +216,6 @@ class _LoginScreen extends State<LoginScreen> {
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
       } catch (e, s) {
         showSnackBar(
-          context,
           message: localizations.couldNotLogin,
           icon: const Icon(Icons.lock_rounded,
               color: PassyTheme.darkContentColor),

@@ -39,7 +39,6 @@ class _CSVImportScreen extends State<CSVImportScreen> {
       );
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.couldNotImportAccount,
         icon: const Icon(Icons.download_for_offline_outlined,
             color: PassyTheme.darkContentColor),
@@ -62,7 +61,6 @@ class _CSVImportScreen extends State<CSVImportScreen> {
       fileData = (await file.readAsString()).replaceAll('\r', '');
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.couldNotImportAccount,
         icon: const Icon(Icons.download_for_offline_outlined,
             color: PassyTheme.darkContentColor),
@@ -80,7 +78,6 @@ class _CSVImportScreen extends State<CSVImportScreen> {
           .convert<String>(fileData, shouldParseNumbers: false, eol: '\n');
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.couldNotImportAccount,
         icon: const Icon(Icons.download_for_offline_outlined,
             color: PassyTheme.darkContentColor),
@@ -94,7 +91,6 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     }
     if (fileDataDecoded.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.noCSVDataFound,
         icon: const Icon(Icons.download_for_offline_outlined,
             color: PassyTheme.darkContentColor),

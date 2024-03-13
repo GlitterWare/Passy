@@ -33,7 +33,7 @@ class LogScreen extends StatelessWidget {
               tooltip: localizations.copy,
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: '```\n$_log\n```'));
-                showSnackBar(context,
+                showSnackBar(
                     message:
                         '${localizations.log} ${localizations.copied.toLowerCase()}',
                     icon: const Icon(Icons.copy_rounded,

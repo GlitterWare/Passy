@@ -78,7 +78,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       Navigator.pop(context);
       return;
     }
-    showSnackBar(context,
+    showSnackBar(
         message: localizations.incorrectPassword,
         icon: const Icon(
           Icons.lock_rounded,

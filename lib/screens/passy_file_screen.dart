@@ -60,7 +60,7 @@ class _PassyFileScreen extends State<StatefulWidget> {
     await Future.delayed(const Duration(milliseconds: 200));
     await _account.exportFile(args.key, file: File(expFile));
     Navigator.pop(context);
-    showSnackBar(context,
+    showSnackBar(
         message: localizations.exportSaved,
         icon: const Icon(Icons.ios_share_rounded,
             color: PassyTheme.darkContentColor));

@@ -114,7 +114,7 @@ class _IDCardScreen extends State<IDCardScreen> {
         onFavoritePressed: () async {
           if (isFavorite) {
             await _account.removeFavoriteIDCard(_idCard!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.removedFromFavorites,
                 icon: const Icon(
                   Icons.star_outline_rounded,
@@ -122,7 +122,7 @@ class _IDCardScreen extends State<IDCardScreen> {
                 ));
           } else {
             await _account.addFavoriteIDCard(_idCard!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.addedToFavorites,
                 icon: const Icon(
                   Icons.star_rounded,

@@ -126,20 +126,19 @@ Future<String?> backupAccount(
       outputDirectoryPath: _buDir,
       fileName: _fileName,
     );
-    showSnackBar(context,
+    showSnackBar(
         message: 'Backup saved',
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor));
     return _buDir;
   } catch (e, s) {
     if (e is FileSystemException) {
-      showSnackBar(context,
+      showSnackBar(
           message: 'Access denied, try another folder',
           icon: const Icon(Icons.save_rounded,
               color: PassyTheme.darkContentColor));
     } else {
       showSnackBar(
-        context,
         message: 'Could not backup',
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
@@ -224,8 +223,7 @@ Result? qrResultFromImage(imglib.Image image) {
   }
 }
 
-ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
-  BuildContext context, {
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showSnackBar({
   required String message,
   TextStyle? textStyle,
   required Widget icon,
@@ -233,6 +231,8 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
   Duration duration = const Duration(milliseconds: 4000),
   Color? backgroundColor,
 }) {
+  BuildContext? context = navigatorKey.currentContext;
+  if (context == null) return null;
   ScaffoldMessenger.of(context).clearSnackBars();
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Row(children: [
@@ -273,7 +273,7 @@ List<PopupMenuEntry> idCardPopupMenuBuilder(
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIDCard(idCardMeta.key)!.idNumber));
-        showSnackBar(context,
+        showSnackBar(
             message: 'ID number copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -285,7 +285,7 @@ List<PopupMenuEntry> idCardPopupMenuBuilder(
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(ClipboardData(text: idCardMeta.name));
-          showSnackBar(context,
+          showSnackBar(
               message: 'Name copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
@@ -315,7 +315,7 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
           _name += ' ${_identity.lastName}';
         }
         Clipboard.setData(ClipboardData(text: _name));
-        showSnackBar(context,
+        showSnackBar(
             message: 'Name copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -327,7 +327,7 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIdentity(identityMeta.key)!.email));
-        showSnackBar(context,
+        showSnackBar(
             message: 'Email copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -339,7 +339,7 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
         icon: const Icon(Icons.house_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(text: identityMeta.firstAddressLine));
-          showSnackBar(context,
+          showSnackBar(
               message: 'Address line copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
@@ -357,7 +357,7 @@ List<PopupMenuEntry> notePopupMenuBuilder(
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getNote(identityMeta.key)!.note));
-        showSnackBar(context,
+        showSnackBar(
             message: 'Note copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -377,7 +377,7 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
           Clipboard.setData(ClipboardData(
               text:
                   data.loadedAccount!.getPassword(passwordMeta.key)!.username));
-          showSnackBar(context,
+          showSnackBar(
               message: 'Username copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
@@ -389,7 +389,7 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.email));
-        showSnackBar(context,
+        showSnackBar(
             message: 'Email copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -401,7 +401,7 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.password));
-        showSnackBar(context,
+        showSnackBar(
             message: 'Password copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -437,7 +437,7 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
               text: data.loadedAccount!
                   .getPaymentCard(paymentCardMeta.key)!
                   .cardNumber));
-          showSnackBar(context,
+          showSnackBar(
               message: 'Card number copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
@@ -450,7 +450,7 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
         onTap: () {
           Clipboard.setData(
               ClipboardData(text: paymentCardMeta.cardholderName));
-          showSnackBar(context,
+          showSnackBar(
               message: 'Card holder name copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
@@ -462,7 +462,7 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
         icon: const Icon(Icons.date_range_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(text: paymentCardMeta.exp));
-          showSnackBar(context,
+          showSnackBar(
               message: 'Expiration date copied',
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
@@ -475,7 +475,7 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text:
                 data.loadedAccount!.getPaymentCard(paymentCardMeta.key)!.cvv));
-        showSnackBar(context,
+        showSnackBar(
             message: 'CVV copied',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
@@ -503,7 +503,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
-          showSnackBar(context,
+          showSnackBar(
               message: 'File renamed',
               icon: const Icon(Icons.edit_outlined,
                   color: PassyTheme.darkContentColor));
@@ -540,7 +540,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.exportSaved,
               icon: const Icon(Icons.ios_share_rounded,
                   color: PassyTheme.darkContentColor));
@@ -585,7 +585,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
-          showSnackBar(context,
+          showSnackBar(
               message: 'Folder removed',
               icon: const Icon(Icons.delete_outline_rounded,
                   color: PassyTheme.darkContentColor));
@@ -595,7 +595,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         await (onChanged?.call());
         if (!context.mounted) return;
         Navigator.pop(context);
-        showSnackBar(context,
+        showSnackBar(
             message: 'File removed',
             icon: const Icon(Icons.delete_outline_rounded,
                 color: PassyTheme.darkContentColor));
@@ -765,7 +765,6 @@ setOnError(BuildContext context) {
     FlutterError.presentError(e);
     try {
       showSnackBar(
-        navigatorKey.currentContext!,
         message: localizations.somethingWentWrong,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),
@@ -781,7 +780,6 @@ setOnError(BuildContext context) {
   PlatformDispatcher.instance.onError = (error, stack) {
     try {
       showSnackBar(
-        navigatorKey.currentContext!,
         message: localizations.somethingWentWrong,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),

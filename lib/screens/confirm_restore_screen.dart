@@ -53,7 +53,6 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
             },
             onError: (e, s) {
               showSnackBar(
-                context,
                 message: localizations.couldNotRestoreAccount,
                 icon: const Icon(Icons.settings_backup_restore_rounded,
                     color: PassyTheme.darkContentColor),

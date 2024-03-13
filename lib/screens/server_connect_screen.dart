@@ -29,14 +29,14 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
   Future<void> _onConnectPressed({bool testRun = false}) async {
     if (!testRun) {
       if (_nickname.isEmpty) {
-        showSnackBar(context,
+        showSnackBar(
             message: localizations.nicknameCanNotBeEmpty,
             icon: const Icon(Icons.desktop_windows_rounded,
                 color: PassyTheme.darkContentColor));
         return;
       }
       if (_account.sync2d0d0ServerInfo.keys.contains(_nickname)) {
-        showSnackBar(context,
+        showSnackBar(
             message: localizations.nicknameAlreadyInUse,
             icon: const Icon(Icons.desktop_windows_rounded,
                 color: PassyTheme.darkContentColor));
@@ -46,7 +46,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     String? address = _address;
     if (address == null) {
       showSnackBar(
-        context,
         message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
@@ -55,7 +54,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     }
     if (address.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
@@ -64,7 +62,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     }
     if (_port == 0) {
       showSnackBar(
-        context,
         message: localizations.invalidPortSpecified,
         icon: const Icon(Icons.numbers_rounded,
             color: PassyTheme.darkContentColor),
@@ -75,7 +72,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
       await _account.testSynchronizationConnection2d0d0(address, _port);
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.couldNotConnectToServer,
         icon: const Icon(
           Icons.cast_rounded,
@@ -93,7 +89,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     setState(() => _connectionChecked = true);
     if (testRun) return;
     showSnackBar(
-      context,
       message: localizations.connecting,
       icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
     );
@@ -103,7 +98,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     } catch (e, s) {
       if (navigatorKey.currentContext == null) return;
       showSnackBar(
-        navigatorKey.currentContext!,
         message: localizations.couldNotConnectToServer,
         icon:
             const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
@@ -121,7 +115,6 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     await _account.saveSettings();
     if (navigatorKey.currentContext == null) return;
     showSnackBar(
-      navigatorKey.currentContext!,
       message: localizations.connectionEstablished,
       icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
     );
