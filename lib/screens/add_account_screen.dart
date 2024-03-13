@@ -207,9 +207,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     decoration: InputDecoration(
                                       hintText: localizations.password,
                                     ),
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(32),
-                                    ],
                                   ),
                                 )
                               ],
@@ -239,9 +236,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                       _confirmPassword = a;
                                     }),
                                     onSubmitted: (value) => _addAccount(),
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(32),
-                                    ],
                                   ),
                                 ),
                                 FloatingActionButton(
