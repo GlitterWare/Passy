@@ -105,6 +105,10 @@ class _EntryTagList extends State<EntryTagList> {
                         bottom: showScrollbar ? 14 : 0),
                     child: Text(localizations.noTags),
                   ),
+                if (selectedButtons.isEmpty && notSelectedButtons.isEmpty)
+                  const SizedBox(
+                    width: 10
+                  ),
                 if (widget.showAddButton)
                   Padding(
                     padding: EdgeInsets.only(bottom: showScrollbar ? 14 : 0),
