@@ -417,6 +417,7 @@ class _MainScreen extends State<MainScreen>
   }
 
   void _onWillPop(bool isPopped) {
+    if (isPopped) return;
     _logOut();
   }
 

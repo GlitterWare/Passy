@@ -38,15 +38,12 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   void _onWillPop(bool isPopped) {
+    if (isPopped) return;
     if (_shouldPop) {
       Navigator.pop(context);
       return;
     }
-    Navigator.popUntil(context, (route) {
-      if (route.settings.name != MainScreen.routeName) return false;
-      _logOut();
-      return true;
-    });
+    _logOut();
   }
 
   Future<void> _bioAuth() async {

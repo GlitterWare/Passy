@@ -103,6 +103,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   }
 
   void _onWillPop(bool isPopped) {
+    if (isPopped) return;
     if (data.noAccounts) {
       Navigator.pop(context);
       return;
