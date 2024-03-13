@@ -77,6 +77,7 @@ class _LoginScreen extends State<LoginScreen> {
               context,
               SearchScreen.routeName,
               arguments: SearchScreenArgs(
+                entryType: null,
                 builder: _buildPasswords,
                 isAutofill: true,
               ),
@@ -202,6 +203,7 @@ class _LoginScreen extends State<LoginScreen> {
             context,
             SearchScreen.routeName,
             arguments: SearchScreenArgs(
+              entryType: null,
               builder: _buildPasswords,
               isAutofill: true,
             ),

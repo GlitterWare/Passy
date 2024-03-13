@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_type.dart';
+import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
@@ -12,14 +14,14 @@ class SearchScreenArgs {
     void Function() rebuild,
   ) builder;
   bool isAutofill;
-  List<String> notSelectedTags;
+  EntryType? entryType;
   List<String> selectedTags;
 
   SearchScreenArgs({
     this.title,
     required this.builder,
     this.isAutofill = false,
-    this.notSelectedTags = const [],
+    required this.entryType,
     this.selectedTags = const [],
   });
 }
@@ -34,7 +36,9 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreen extends State<SearchScreen> {
+  final LoadedAccount _account = data.loadedAccount!;
   bool _initialized = false;
+  bool _loaded = false;
   Widget _widget = const Text('');
   TextEditingController queryController = TextEditingController();
   FocusNode queryFocus = FocusNode()..requestFocus();
@@ -64,15 +68,56 @@ class _SearchScreen extends State<SearchScreen> {
     });
   }
 
+  Future<void> _load(SearchScreenArgs args) async {
+    List<String> newTags;
+    try {
+      switch (args.entryType) {
+        case EntryType.password:
+          newTags = await _account.passwordTags;
+          break;
+        case EntryType.paymentCard:
+          newTags = await _account.paymentCardTags;
+          break;
+        case EntryType.note:
+          newTags = await _account.notesTags;
+          break;
+        case EntryType.idCard:
+          newTags = await _account.idCardsTags;
+          break;
+        case EntryType.identity:
+          newTags = await _account.identitiesTags;
+          break;
+        case null:
+          newTags = await _account.tags;
+          break;
+      }
+    } catch (_) {
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _loaded = true;
+        if (newTags.isEmpty) {
+          selected = [];
+          return;
+        }
+        for (String tag in newTags) {
+          if (selected.contains(tag)) continue;
+          notSelected.add(tag);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SearchScreenArgs args =
         ModalRoute.of(context)!.settings.arguments as SearchScreenArgs;
     _builder = args.builder;
     if (!_initialized) {
-      selected = args.selectedTags;
-      notSelected = args.notSelectedTags;
+      selected = args.selectedTags.toList();
       _widget = _builder(queryController.text, selected, rebuild);
+      _load(args);
       _initialized = true;
     }
     return Scaffold(
@@ -132,7 +177,7 @@ class _SearchScreen extends State<SearchScreen> {
                   });
                 });
               })),
-          if (selected.isNotEmpty || notSelected.isNotEmpty)
+          if (_loaded && (selected.isNotEmpty || notSelected.isNotEmpty))
             Padding(
                 padding: EdgeInsets.only(
                     top: PassyTheme.passyPadding.top / 2,

@@ -33,7 +33,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
-            notSelectedTags: _tags.toList()..remove(tag),
+          entryType: EntryType.idCard,
             selectedTags: tag == null ? [] : [tag],
             builder:
                 (String terms, List<String> tags, void Function() rebuild) {

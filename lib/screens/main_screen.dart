@@ -277,7 +277,8 @@ class _MainScreen extends State<MainScreen>
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
-          meta: _password, tags: _password.tags));
+          meta: _password,
+          tags: _password.tags));
     }
     for (EntryEvent event in _account.favoritePaymentCards.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -287,7 +288,8 @@ class _MainScreen extends State<MainScreen>
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
           type: EntryType.paymentCard,
-          meta: _paymentCard, tags: _paymentCard.tags));
+          meta: _paymentCard,
+          tags: _paymentCard.tags));
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
@@ -484,6 +486,7 @@ class _MainScreen extends State<MainScreen>
           if (mounted) {
             Navigator.pushNamed(context, SearchScreen.routeName,
                 arguments: SearchScreenArgs(
+                  entryType: null,
                   title: localizations.favorites,
                   builder: _favoritesSearchBuilder,
                 ));
@@ -499,6 +502,7 @@ class _MainScreen extends State<MainScreen>
         center: Text(localizations.searchAllEntries),
         onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
             arguments: SearchScreenArgs(
+              entryType: null,
               title: localizations.allEntries,
               builder: _searchBuilder,
             )),
@@ -622,6 +626,7 @@ class _MainScreen extends State<MainScreen>
               onPressed: () =>
                   Navigator.pushNamed(context, SearchScreen.routeName,
                       arguments: SearchScreenArgs(
+                        entryType: null,
                         title: localizations.allEntries,
                         builder: _searchBuilder,
                       )),

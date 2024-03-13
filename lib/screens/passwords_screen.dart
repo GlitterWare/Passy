@@ -71,7 +71,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
             builder: _buildPasswords,
-            notSelectedTags: _tags.toList()..remove(tag),
+            entryType: EntryType.password,
             selectedTags: tag == null ? [] : [tag]));
   }
 

@@ -35,7 +35,7 @@ class _NotesScreen extends State<NotesScreen> {
       context,
       SearchScreen.routeName,
       arguments: SearchScreenArgs(
-        notSelectedTags: _tags.toList()..remove(tag),
+        entryType: EntryType.note,
         selectedTags: tag == null ? [] : [tag],
         builder: (String terms, List<String> tags, void Function() rebuild) {
           final List<NoteMeta> _found = [];
