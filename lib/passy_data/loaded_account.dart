@@ -8,6 +8,7 @@ import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/convert_aegis.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/file_index.dart';
 import 'package:passy/passy_data/file_meta.dart';
@@ -736,6 +737,12 @@ class LoadedAccount {
       rethrow;
     }
     await _history.save();
+  }
+
+  Future<void> importAegis({required File aegisFile, String? password}) async {
+    List<Password> newPasswords =
+        convertAegis(aegisFile: aegisFile, password: password);
+    await setPasswords(newPasswords);
   }
 
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
