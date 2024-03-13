@@ -135,6 +135,12 @@ class _MainScreen extends State<MainScreen>
         if (_found.any(testSearchEntry)) continue;
       }
       {
+        bool _tagMismatch = false;
+        for (String tag in tags) {
+          if (_searchEntry.tags.contains(tag)) continue;
+          _tagMismatch = true;
+        }
+        if (_tagMismatch) continue;
         int _positiveCount = 0;
         for (String _term in _terms) {
           if (_searchEntry.name.toLowerCase().contains(_term)) {
@@ -299,6 +305,12 @@ class _MainScreen extends State<MainScreen>
         if (_found.any(testSearchEntry)) continue;
       }
       {
+        bool _tagMismatch = false;
+        for (String tag in tags) {
+          if (_searchEntry.tags.contains(tag)) continue;
+          _tagMismatch = true;
+        }
+        if (_tagMismatch) continue;
         int _positiveCount = 0;
         for (String _term in _terms) {
           if (_searchEntry.name.toLowerCase().contains(_term)) {
