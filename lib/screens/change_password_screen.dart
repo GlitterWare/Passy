@@ -38,7 +38,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
-        _account.passwordHash) {
+        data.getPasswordHash(_account.username)) {
       showSnackBar(context,
           message: localizations.incorrectPassword,
           icon: const Icon(
