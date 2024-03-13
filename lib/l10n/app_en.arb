@@ -344,5 +344,6 @@
     "createTag": "Create tag",
     "create": "Create",
     "tag": "Tag",
-    "noTags": "No tags"
+    "noTags": "No tags",
+    "aegisImport": "Aegis import"
 }

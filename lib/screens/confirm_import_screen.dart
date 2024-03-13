@@ -18,6 +18,7 @@ import 'log_screen.dart';
 enum ImportType {
   passy,
   kdbx,
+  aegis,
 }
 
 class ConfirmImportScreenArgs {
@@ -77,11 +78,35 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
             icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
           );
           break;
+        case ImportType.aegis:
+          File file = File(args.path);
+          await _account.importAegis(
+              aegisFile: file, password: value.isEmpty ? null : value);
+          Navigator.popUntil(context,
+              (route) => route.settings.name == ImportScreen.routeName);
+          showSnackBar(
+            message: localizations.imported,
+            icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
+          );
+          break;
       }
     } catch (e, s) {
       await Future.delayed(const Duration(milliseconds: 200));
       if (!mounted) return;
       Navigator.pop(context);
+      if (e.runtimeType.toString() == 'InvalidCipherTextException') {
+        showSnackBar(
+          message: localizations.incorrectPassword,
+          icon: const Icon(Icons.download_for_offline_outlined,
+              color: PassyTheme.darkContentColor),
+          action: SnackBarAction(
+            label: localizations.details,
+            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                arguments: e.toString() + '\n' + s.toString()),
+          ),
+        );
+        return;
+      }
       showSnackBar(
         message: localizations.couldNotImportAccount,
         icon: const Icon(Icons.download_for_offline_outlined,
@@ -99,10 +124,20 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
   Widget build(BuildContext context) {
     ConfirmImportScreenArgs args =
         ModalRoute.of(context)!.settings.arguments as ConfirmImportScreenArgs;
+    String title;
+    switch (args.importType) {
+      case ImportType.passy:
+        title = localizations.passyImport;
+        break;
+      case ImportType.kdbx:
+        title = localizations.kdbxImport;
+        break;
+      case ImportType.aegis:
+        title = localizations.aegisImport;
+        break;
+    }
     return ConfirmStringScaffold(
-        title: Text(args.importType == ImportType.passy
-            ? localizations.passyImport
-            : localizations.kdbxImport),
+        title: Text(title),
         message: PassyPadding(Text.rich(
           TextSpan(
             text: localizations.confirmImport1,

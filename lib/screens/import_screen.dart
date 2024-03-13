@@ -74,6 +74,32 @@ class _ImportScreen extends State<ImportScreen> {
     );
   }
 
+  void _onAegisImportPressed() {
+    MainScreen.shouldLockScreen = false;
+    FilePicker.platform
+        .pickFiles(
+      dialogTitle: localizations.aegisImport,
+      type: Platform.isAndroid ? FileType.any : FileType.custom,
+      allowedExtensions: Platform.isAndroid ? null : ['json'],
+      lockParentWindow: true,
+    )
+        .then(
+      (_pick) {
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => MainScreen.shouldLockScreen = true);
+        if (_pick == null) return;
+        Navigator.pushNamed(
+          context,
+          ConfirmImportScreen.routeName,
+          arguments: ConfirmImportScreenArgs(
+            path: _pick.files[0].path!,
+            importType: ImportType.aegis,
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,6 +133,15 @@ class _ImportScreen extends State<ImportScreen> {
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: _onKdbxImportPressed,
+        )),
+        PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.aegisImport),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.security),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: _onAegisImportPressed,
         )),
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.passyImport),
