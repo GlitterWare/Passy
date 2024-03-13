@@ -262,30 +262,29 @@ PopupMenuItem getIconedPopupMenuItem({
   );
 }
 
-//TODO: localize menu builders
 List<PopupMenuEntry> idCardPopupMenuBuilder(
     BuildContext context, IDCardMeta idCardMeta) {
   return [
     getIconedPopupMenuItem(
-      content: const Text('ID number'),
+      content: Text(localizations.idNumber),
       icon: const Icon(Icons.numbers_outlined),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIDCard(idCardMeta.key)!.idNumber));
         showSnackBar(
-            message: 'ID number copied',
+            message: localizations.idNumber,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     if (idCardMeta.name != '')
       getIconedPopupMenuItem(
-        content: const Text('Name'),
+        content: Text(localizations.name),
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(ClipboardData(text: idCardMeta.name));
           showSnackBar(
-              message: 'Name copied',
+              message: localizations.name,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
@@ -297,7 +296,7 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
     BuildContext context, IdentityMeta identityMeta) {
   return [
     getIconedPopupMenuItem(
-      content: const Text('Name'),
+      content: Text(localizations.name),
       icon: const Icon(Icons.person_outline_rounded),
       onTap: () {
         Identity? _identity = data.loadedAccount!.getIdentity(identityMeta.key);
@@ -315,31 +314,31 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
         }
         Clipboard.setData(ClipboardData(text: _name));
         showSnackBar(
-            message: 'Name copied',
+            message: localizations.name,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     getIconedPopupMenuItem(
-      content: const Text('Email'),
+      content: Text(localizations.email),
       icon: const Icon(Icons.mail_outline_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIdentity(identityMeta.key)!.email));
         showSnackBar(
-            message: 'Email copied',
+            message: localizations.email,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     if (identityMeta.firstAddressLine != '')
       getIconedPopupMenuItem(
-        content: const Text('Address line'),
+        content: Text(localizations.firstAddresssLine),
         icon: const Icon(Icons.house_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(text: identityMeta.firstAddressLine));
           showSnackBar(
-              message: 'Address line copied',
+              message: localizations.firstAddresssLine,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
@@ -351,13 +350,13 @@ List<PopupMenuEntry> notePopupMenuBuilder(
     BuildContext context, NoteMeta identityMeta) {
   return [
     getIconedPopupMenuItem(
-      content: const Text('Copy'),
+      content: Text(localizations.copy),
       icon: const Icon(Icons.copy_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getNote(identityMeta.key)!.note));
         showSnackBar(
-            message: 'Note copied',
+            message: localizations.copied,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
@@ -370,45 +369,45 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
   return [
     if (passwordMeta.username != '')
       getIconedPopupMenuItem(
-        content: const Text('Username'),
+        content: Text(localizations.username),
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(ClipboardData(
               text:
                   data.loadedAccount!.getPassword(passwordMeta.key)!.username));
           showSnackBar(
-              message: 'Username copied',
+              message: localizations.username,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
       ),
     getIconedPopupMenuItem(
-      content: const Text('Email'),
+      content: Text(localizations.email),
       icon: const Icon(Icons.mail_outline_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.email));
         showSnackBar(
-            message: 'Email copied',
+            message: localizations.email,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     getIconedPopupMenuItem(
-      content: const Text('Password'),
+      content: Text(localizations.password),
       icon: const Icon(Icons.lock_outline_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.password));
         showSnackBar(
-            message: 'Password copied',
+            message: localizations.password,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     if (passwordMeta.website != '')
       getIconedPopupMenuItem(
-        content: const Text('Visit'),
+        content: Text(localizations.visit),
         icon: const Icon(Icons.open_in_browser_outlined),
         onTap: () {
           String _url =
@@ -429,7 +428,7 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
   return [
     if (paymentCardMeta.cardNumber != '')
       getIconedPopupMenuItem(
-        content: const Text('Card number'),
+        content: Text(localizations.cardNumber),
         icon: const Icon(Icons.numbers_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(
@@ -437,32 +436,32 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
                   .getPaymentCard(paymentCardMeta.key)!
                   .cardNumber));
           showSnackBar(
-              message: 'Card number copied',
+              message: localizations.cardNumber,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
       ),
     if (paymentCardMeta.cardholderName != '')
       getIconedPopupMenuItem(
-        content: const Text('Card holder name'),
+        content: Text(localizations.cardHolderName),
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(
               ClipboardData(text: paymentCardMeta.cardholderName));
           showSnackBar(
-              message: 'Card holder name copied',
+              message: localizations.cardHolderName,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
       ),
     if (paymentCardMeta.exp != '')
       getIconedPopupMenuItem(
-        content: const Text('Expiration date'),
+        content: Text(localizations.expirationDate),
         icon: const Icon(Icons.date_range_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(text: paymentCardMeta.exp));
           showSnackBar(
-              message: 'Expiration date copied',
+              message: localizations.expirationDate,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
@@ -475,7 +474,7 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
             text:
                 data.loadedAccount!.getPaymentCard(paymentCardMeta.key)!.cvv));
         showSnackBar(
-            message: 'CVV copied',
+            message: 'CVV',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
