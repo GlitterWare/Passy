@@ -137,8 +137,10 @@ class _MainScreen extends State<MainScreen>
       {
         bool _tagMismatch = false;
         for (String tag in tags) {
-          if (_searchEntry.tags.contains(tag)) continue;
-          _tagMismatch = true;
+          if (!_searchEntry.tags.contains(tag)) {
+            _tagMismatch = true;
+            break;
+          }
         }
         if (_tagMismatch) continue;
         int _positiveCount = 0;

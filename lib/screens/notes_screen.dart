@@ -49,8 +49,10 @@ class _NotesScreen extends State<NotesScreen> {
             {
               bool _tagMismatch = false;
               for (String tag in tags) {
-                if (_note.tags.contains(tag)) continue;
-                _tagMismatch = true;
+                if (!_note.tags.contains(tag)) {
+                  _tagMismatch = true;
+                  break;
+                }
               }
               if (_tagMismatch) continue;
               int _positiveCount = 0;

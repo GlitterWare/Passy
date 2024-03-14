@@ -45,8 +45,10 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
                 int _positiveCount = 0;
                 bool _tagMismatch = false;
                 for (String tag in tags) {
-                  if (_paymentCard.tags.contains(tag)) continue;
-                  _tagMismatch = true;
+                  if (!_paymentCard.tags.contains(tag)) {
+                    _tagMismatch = true;
+                    break;
+                  }
                 }
                 if (_tagMismatch) continue;
                 for (String _term in _terms) {

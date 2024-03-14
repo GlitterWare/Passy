@@ -48,8 +48,10 @@ class _IDCardsScreen extends State<IDCardsScreen> {
                 {
                   bool _tagMismatch = false;
                   for (String tag in tags) {
-                    if (_idCard.tags.contains(tag)) continue;
-                    _tagMismatch = true;
+                    if (!_idCard.tags.contains(tag)) {
+                      _tagMismatch = true;
+                      break;
+                    }
                   }
                   if (_tagMismatch) continue;
                   int _positiveCount = 0;

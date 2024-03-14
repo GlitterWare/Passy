@@ -19,8 +19,10 @@ class PassySearch {
         int _positiveCount = 0;
         bool _tagMismatch = false;
         for (String tag in tags) {
-          if (_password.tags.contains(tag)) continue;
-          _tagMismatch = true;
+          if (!_password.tags.contains(tag)) {
+            _tagMismatch = true;
+            break;
+          }
         }
         if (_tagMismatch) continue;
         for (String _term in _terms) {
