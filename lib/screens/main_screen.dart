@@ -684,24 +684,25 @@ class _MainScreen extends State<MainScreen>
                           child: ListView(
                         children: [
                           _screenButtons[0],
-                          _screenButtons[1],
-                          _screenButtons[2],
-                        ],
-                      )),
-                      Expanded(
-                          child: ListView(
-                        children: [
                           _screenButtons[3],
-                          _screenButtons[4],
-                          _screenButtons[5],
+                          _screenButtons[6],
+                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                       Expanded(
                           child: ListView(
                         children: [
-                          _screenButtons[6],
+                          _screenButtons[1],
+                          _screenButtons[4],
                           _screenButtons[7],
-                          if (_screenButtons.length == 9) _screenButtons[8],
+                        ],
+                      )),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[2],
+                          _screenButtons[5],
+                          _screenButtons[8],
                         ],
                       ))
                     ]);
@@ -711,19 +712,20 @@ class _MainScreen extends State<MainScreen>
                       Expanded(
                         child: ListView(children: [
                           _screenButtons[0],
-                          _screenButtons[1],
                           _screenButtons[2],
-                          _screenButtons[3],
-                          if (_screenButtons.length == 9) _screenButtons[8],
+                          _screenButtons[4],
+                          _screenButtons[6],
+                          _screenButtons[8],
                         ]),
                       ),
                       Expanded(
                           child: ListView(
                         children: [
-                          _screenButtons[4],
+                          _screenButtons[1],
+                          _screenButtons[3],
                           _screenButtons[5],
-                          _screenButtons[6],
                           _screenButtons[7],
+                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                     ]);
