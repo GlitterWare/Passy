@@ -64,6 +64,7 @@ class _ConfirmStringScaffold extends State<ConfirmStringScaffold> {
               widget.message,
               PassyPadding(
                 ButtonedTextFormField(
+                  autofocus: true,
                   labelText: widget.labelText,
                   obscureText: widget.obscureText,
                   onChanged: (s) => setState(() => _input = s),
