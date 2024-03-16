@@ -133,12 +133,12 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         },
       ),
       body: ListView(children: [
-        PaymentCardButton(
+        PassyPadding(PaymentCardButton(
           paymentCard: _paymentCard!.uncensoredMetadata,
           obscureCardNumber: false,
           obscureCardCvv: false,
           isSwipeGestureEnabled: false,
-        ),
+        )),
         Center(
           child: Padding(
             padding: EdgeInsets.only(
