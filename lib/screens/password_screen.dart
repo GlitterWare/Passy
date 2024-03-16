@@ -185,14 +185,11 @@ class _PasswordScreen extends State<PasswordScreen> {
                     Navigator.pushNamed(context, SplashScreen.routeName);
                     password!.tfa!.interval++;
                     await _account.setPassword(password!);
-                    Navigator.popUntil(
-                        context,
-                        (route) =>
-                            route.settings.name == PasswordScreen.routeName);
-                    if (!mounted) return;
-                    setState(() {
-                      _tfaCode = password!.tfa!.generate();
-                    });
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, PasswordsScreen.routeName);
+                    Navigator.pushNamed(context, PasswordScreen.routeName,
+                        arguments: password!);
                   }),
             ],
           ),
