@@ -138,22 +138,24 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
     }
     return ConfirmStringScaffold(
         title: Text(title),
-        message: PassyPadding(Text.rich(
-          TextSpan(
-            text: localizations.confirmImport1,
-            children: [
-              TextSpan(
-                text: localizations.confirmImport2Highlighted,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
-              ),
-              TextSpan(
-                  text:
-                      '${localizations.confirmImport3}.\n\n${localizations.enterAccountPasswordToImport}.'),
-            ],
-          ),
-          textAlign: TextAlign.center,
-        )),
+        message: args.importType == ImportType.passy
+            ? PassyPadding(Text.rich(
+                TextSpan(
+                  text: localizations.confirmImport1,
+                  children: [
+                    TextSpan(
+                      text: localizations.confirmImport2Highlighted,
+                      style: const TextStyle(
+                          color: PassyTheme.lightContentSecondaryColor),
+                    ),
+                    TextSpan(
+                        text:
+                            '${localizations.confirmImport3}.\n\n${localizations.enterAccountPasswordToImport}.'),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ))
+            : PassyPadding(Text(localizations.enterAccountPasswordToImport)),
         labelText: localizations.enterPassword,
         obscureText: true,
         confirmIcon: const Icon(Icons.download_for_offline_outlined),
