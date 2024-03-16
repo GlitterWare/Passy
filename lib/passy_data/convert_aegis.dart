@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:otp/otp.dart' as otp;
+import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:pointycastle/key_derivators/scrypt.dart';
@@ -47,12 +48,19 @@ List<Password> _convertAegis(Map<String, dynamic> db) {
     TFAType? tfaType = _aegisTypeToTFAType(type);
     if (tfaType == null) continue;
     var info = entry['info'];
+    if (info is! Map<String, dynamic>) continue;
     var algo = info['algo'];
     otp.Algorithm? tfaAlgo = _aegisAlgoToTFAType(algo);
     if (tfaAlgo == null) continue;
-    var secret = info['secret'];
-    var digits = info['digits'];
-    var period = info['period'];
+    var secret = info.containsKey('secret') ? info['secret'] : '';
+    var digits = info.containsKey('digits') ? info['digits'] : 6;
+    var period = info.containsKey('period')
+        ? info['period']
+        : (info.containsKey('counter')
+            ? info['counter']
+            : (tfaType == TFAType.HOTP)
+                ? 0
+                : 30);
     TFA tfa = TFA(
       type: tfaType,
       algorithm: tfaAlgo,
@@ -61,23 +69,22 @@ List<Password> _convertAegis(Map<String, dynamic> db) {
       interval: period,
       isGoogle: tfaType != TFAType.Steam,
     );
-    var issuer = info['issuer'];
-    var note = info['note'];
+    var issuer = entry['issuer'];
+    var note = entry['note'];
     String additionalInfo = '';
-    if (issuer != null) additionalInfo = issuer;
-    if (note != null) {
-      if (additionalInfo.isEmpty) {
-        additionalInfo = note;
-      } else {
-        additionalInfo += '\n\n$note';
-      }
+    List<CustomField> customFields = [];
+    if (issuer != null) {
+      customFields.add(CustomField(title: 'Issuer', value: issuer));
     }
+    if (note != null) additionalInfo = note;
+
     String key = '$keyPrefix-$i';
     result.add(Password(
       key: key,
       nickname: name,
       tfa: tfa,
       additionalInfo: additionalInfo,
+      customFields: customFields,
     ));
     i++;
   }
