@@ -134,7 +134,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
     return Scaffold(
       appBar: EntriesScreenAppBar(
         entryType: EntryType.paymentCard,
-        title: Text(localizations.paymentCards),
+        title: Center(child: Text(localizations.paymentCards)),
         onAddPressed: _onAddPressed,
         onSearchPressed: _onSearchPressed,
       ),
