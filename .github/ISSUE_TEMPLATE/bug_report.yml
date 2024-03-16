@@ -37,6 +37,7 @@ body:
       label: App version
       description: Select the app version. You can find it in the app settings under the `About` section.
       options:
+        - v1.8.0 - Entry Tags
         - v1.7.0 - Better Synchronization
         - v1.6.0 - Markdown Notes
         - v1.5.2 - Windows Hotfix
