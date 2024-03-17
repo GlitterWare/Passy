@@ -43,7 +43,7 @@ class _EntryTagList extends State<EntryTagList> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _key.currentContext?.size?.width;
+      if (!mounted) return;
       setState(() {
         showScrollbar = (_key.currentContext?.size?.width ?? 0) ==
             MediaQuery.of(context).size.width;
