@@ -8,6 +8,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 import 'common.dart';
+import 'log_screen.dart';
 import 'main_screen.dart';
 import 'edit_note_screen.dart';
 import 'notes_screen.dart';
@@ -142,6 +143,42 @@ class _NoteScreen extends State<NoteScreen> {
                     showAddButton: true,
                     selected: _selected,
                     notSelected: _tags,
+                    onSecondary: (tag) async {
+                      String? newTag = await showDialog(
+                        context: context,
+                        builder: (ctx) => RenameTagDialog(tag: tag),
+                      );
+                      if (newTag == null) return;
+                      if (newTag == tag) return;
+                      Navigator.pushNamed(context, SplashScreen.routeName);
+                      try {
+                        await _account.renameTag(tag: tag, newTag: newTag);
+                      } catch (e, s) {
+                        Navigator.pop(context);
+                        showSnackBar(
+                          message: localizations.somethingWentWrong,
+                          icon: const Icon(Icons.error_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                          action: SnackBarAction(
+                            label: localizations.details,
+                            onPressed: () => Navigator.pushNamed(
+                                context, LogScreen.routeName,
+                                arguments: e.toString() + '\n' + s.toString()),
+                          ),
+                        );
+                        return;
+                      }
+                      _note!.tags = _selected.toList();
+                      if (_note!.tags.contains(tag)) {
+                        _note!.tags.remove(tag);
+                        _note!.tags.add(newTag);
+                      }
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(context, NotesScreen.routeName);
+                      Navigator.pushNamed(context, NoteScreen.routeName,
+                          arguments: _note!);
+                    },
                     onAdded: (tag) async {
                       if (_note!.tags.contains(tag)) return;
                       Navigator.pushNamed(context, SplashScreen.routeName);

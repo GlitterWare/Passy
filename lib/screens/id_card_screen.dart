@@ -13,6 +13,7 @@ import 'package:passy/screens/splash_screen.dart';
 import 'common.dart';
 import 'edit_id_card_screen.dart';
 import 'id_cards_screen.dart';
+import 'log_screen.dart';
 import 'main_screen.dart';
 
 class IDCardScreen extends StatefulWidget {
@@ -145,6 +146,43 @@ class _IDCardScreen extends State<IDCardScreen> {
                       showAddButton: true,
                       selected: _selected,
                       notSelected: _tags,
+                      onSecondary: (tag) async {
+                        String? newTag = await showDialog(
+                          context: context,
+                          builder: (ctx) => RenameTagDialog(tag: tag),
+                        );
+                        if (newTag == null) return;
+                        if (newTag == tag) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        try {
+                          await _account.renameTag(tag: tag, newTag: newTag);
+                        } catch (e, s) {
+                          Navigator.pop(context);
+                          showSnackBar(
+                            message: localizations.somethingWentWrong,
+                            icon: const Icon(Icons.error_outline_rounded,
+                                color: PassyTheme.darkContentColor),
+                            action: SnackBarAction(
+                              label: localizations.details,
+                              onPressed: () => Navigator.pushNamed(
+                                  context, LogScreen.routeName,
+                                  arguments:
+                                      e.toString() + '\n' + s.toString()),
+                            ),
+                          );
+                          return;
+                        }
+                        _idCard!.tags = _selected.toList();
+                        if (_idCard!.tags.contains(tag)) {
+                          _idCard!.tags.remove(tag);
+                          _idCard!.tags.add(newTag);
+                        }
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, IDCardsScreen.routeName);
+                        Navigator.pushNamed(context, IDCardScreen.routeName,
+                            arguments: _idCard!);
+                      },
                       onAdded: (tag) async {
                         if (_idCard!.tags.contains(tag)) return;
                         Navigator.pushNamed(context, SplashScreen.routeName);

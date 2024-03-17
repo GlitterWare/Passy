@@ -14,6 +14,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
 
 import 'edit_password_screen.dart';
+import 'log_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 import 'splash_screen.dart';
@@ -263,6 +264,43 @@ class _PasswordScreen extends State<PasswordScreen> {
                       showAddButton: true,
                       selected: _selected,
                       notSelected: _tags,
+                      onSecondary: (tag) async {
+                        String? newTag = await showDialog(
+                          context: context,
+                          builder: (ctx) => RenameTagDialog(tag: tag),
+                        );
+                        if (newTag == null) return;
+                        if (newTag == tag) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        try {
+                          await _account.renameTag(tag: tag, newTag: newTag);
+                        } catch (e, s) {
+                          Navigator.pop(context);
+                          showSnackBar(
+                            message: localizations.somethingWentWrong,
+                            icon: const Icon(Icons.error_outline_rounded,
+                                color: PassyTheme.darkContentColor),
+                            action: SnackBarAction(
+                              label: localizations.details,
+                              onPressed: () => Navigator.pushNamed(
+                                  context, LogScreen.routeName,
+                                  arguments:
+                                      e.toString() + '\n' + s.toString()),
+                            ),
+                          );
+                          return;
+                        }
+                        password!.tags = _selected.toList();
+                        if (password!.tags.contains(tag)) {
+                          password!.tags.remove(tag);
+                          password!.tags.add(newTag);
+                        }
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, PasswordsScreen.routeName);
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: password!);
+                      },
                       onAdded: (tag) async {
                         if (password!.tags.contains(tag)) return;
                         Navigator.pushNamed(context, SplashScreen.routeName);

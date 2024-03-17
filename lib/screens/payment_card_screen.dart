@@ -9,6 +9,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
 
+import 'log_screen.dart';
 import 'main_screen.dart';
 import 'edit_payment_card_screen.dart';
 import 'payment_cards_screen.dart';
@@ -150,6 +151,43 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                     showAddButton: true,
                     selected: _selected,
                     notSelected: _tags,
+                    onSecondary: (tag) async {
+                      String? newTag = await showDialog(
+                        context: context,
+                        builder: (ctx) => RenameTagDialog(tag: tag),
+                      );
+                      if (newTag == null) return;
+                      if (newTag == tag) return;
+                      Navigator.pushNamed(context, SplashScreen.routeName);
+                      try {
+                        await _account.renameTag(tag: tag, newTag: newTag);
+                      } catch (e, s) {
+                        Navigator.pop(context);
+                        showSnackBar(
+                          message: localizations.somethingWentWrong,
+                          icon: const Icon(Icons.error_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                          action: SnackBarAction(
+                            label: localizations.details,
+                            onPressed: () => Navigator.pushNamed(
+                                context, LogScreen.routeName,
+                                arguments: e.toString() + '\n' + s.toString()),
+                          ),
+                        );
+                        return;
+                      }
+                      _paymentCard!.tags = _selected.toList();
+                      if (_paymentCard!.tags.contains(tag)) {
+                        _paymentCard!.tags.remove(tag);
+                        _paymentCard!.tags.add(newTag);
+                      }
+                      Navigator.popUntil(context,
+                          (r) => r.settings.name == MainScreen.routeName);
+                      Navigator.pushNamed(
+                          context, PaymentCardsScreen.routeName);
+                      Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                          arguments: _paymentCard!);
+                    },
                     onAdded: (tag) async {
                       if (_paymentCard!.tags.contains(tag)) return;
                       Navigator.pushNamed(context, SplashScreen.routeName);
