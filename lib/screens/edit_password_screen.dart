@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:otp/otp.dart';
+import 'package:base32/base32.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -49,6 +52,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   UniqueKey _tfaKey = UniqueKey();
   String _website = '';
   List<String> _attachments = [];
+  String _steamSharedSecret = '';
+  UniqueKey _tfaSecretFieldKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +251,30 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                           });
                         },
                       )),
+                      if (_tfaType == TFAType.Steam)
+                        PassyPadding(TextFormField(
+                          initialValue: _steamSharedSecret,
+                          decoration: const InputDecoration(
+                              labelText: 'Steam shared_secret'),
+                          onChanged: (value) {
+                            String? newTfaSecret;
+                            try {
+                              newTfaSecret = base32.encode(base64Decode(value));
+                              if (newTfaSecret.length.isOdd) {
+                                newTfaSecret += '=';
+                              }
+                            } catch (_) {}
+                            setState(() {
+                              _steamSharedSecret = value;
+                              if (newTfaSecret != null) {
+                                _tfaSecret = newTfaSecret;
+                                _tfaSecretFieldKey = UniqueKey();
+                              }
+                            });
+                          },
+                        )),
                       PassyPadding(TextFormField(
+                        key: _tfaSecretFieldKey,
                         initialValue: _tfaSecret.replaceFirst('=', ''),
                         decoration: InputDecoration(
                             labelText:
@@ -283,7 +311,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                         initialValue: _tfaInterval.toString(),
                         decoration: InputDecoration(
                             labelText:
-                                '2FA ${_tfaType == TFAType.HOTP ? localizations.counter .toLowerCase(): localizations.interval.toLowerCase()}'),
+                                '2FA ${_tfaType == TFAType.HOTP ? localizations.counter.toLowerCase() : localizations.interval.toLowerCase()}'),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
