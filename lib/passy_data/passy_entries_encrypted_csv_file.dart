@@ -378,4 +378,51 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     });
     await _raf.close();
   }
+
+  Future<void> renameTag({
+    required String tag,
+    required String newTag,
+  }) async {
+    RandomAccessFile _raf = await _file.open();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      await _raf.close();
+      return;
+    }
+    File _tempFile;
+    {
+      String _tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-entries-${entryTypeFromType(T)}-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      _tempFile = await File(_tempPath).create();
+    }
+    int _tagIndex = T.toString() == 'Note' ? 4 : 3;
+    RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await processLinesAsync(_raf, onLine: (entry, eofReached) async {
+      if (eofReached) return true;
+      List<String> _decoded = entry.split(',');
+      entry = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      List<dynamic> _csv = csvDecode(entry, recursive: true);
+      if (_csv.length < _tagIndex + 1) {
+        return true;
+      }
+      var tagList = _csv[_tagIndex];
+      for (dynamic oldTag in (tagList as List<dynamic>).toList()) {
+        oldTag = oldTag.toString();
+        if (oldTag != tag) continue;
+        tagList.remove(tag);
+        tagList.add(newTag);
+      }
+      entry = _encodeEntryForSaving(_csv);
+      await _tempRaf.writeString(entry);
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    await _raf.close();
+    await _tempRaf.close();
+    await _file.delete();
+    await _tempFile.copy(_file.absolute.path);
+    await _tempFile.delete();
+  }
 }
