@@ -44,6 +44,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   void _onWillPop(bool isPopped) {
     if (isPopped) return;
     if (_shouldPop) {
+      _shouldPop = false;
       setState(() => _unlockScreenOn = false);
       return;
     }
