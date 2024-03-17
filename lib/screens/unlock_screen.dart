@@ -50,6 +50,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       setState(() {
         _shouldPop = false;
         _unlockScreenOn = false;
+      });
       return;
     }
     _logOut();
