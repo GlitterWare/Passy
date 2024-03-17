@@ -121,6 +121,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
     if (_unlockScreenOn) return;
+    if (!MainScreen.shouldLockScreen) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
     if (!account.autoScreenLock) return;
