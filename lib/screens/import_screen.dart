@@ -8,7 +8,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/csv_import_screen.dart';
-import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'export_and_import_screen.dart';
 
@@ -23,7 +23,7 @@ class ImportScreen extends StatefulWidget {
 
 class _ImportScreen extends State<ImportScreen> {
   void _onPassyImportPressed() {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.importFromPassy,
@@ -34,7 +34,7 @@ class _ImportScreen extends State<ImportScreen> {
         .then(
       (_pick) {
         Future.delayed(const Duration(seconds: 2))
-            .then((value) => MainScreen.shouldLockScreen = true);
+            .then((value) => UnlockScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,
@@ -49,7 +49,7 @@ class _ImportScreen extends State<ImportScreen> {
   }
 
   void _onKdbxImportPressed() {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.kdbxImport,
@@ -60,7 +60,7 @@ class _ImportScreen extends State<ImportScreen> {
         .then(
       (_pick) {
         Future.delayed(const Duration(seconds: 2))
-            .then((value) => MainScreen.shouldLockScreen = true);
+            .then((value) => UnlockScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,
@@ -75,7 +75,7 @@ class _ImportScreen extends State<ImportScreen> {
   }
 
   void _onAegisImportPressed() {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.aegisImport,
@@ -86,7 +86,7 @@ class _ImportScreen extends State<ImportScreen> {
         .then(
       (_pick) {
         Future.delayed(const Duration(seconds: 2))
-            .then((value) => MainScreen.shouldLockScreen = true);
+            .then((value) => UnlockScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,

@@ -23,6 +23,7 @@ import 'package:passy/screens/id_cards_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/screens/payment_cards_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zxing2/qrcode.dart';
 
@@ -99,7 +100,7 @@ Future<String?> backupAccount(
 }) async {
   if (Platform.isAndroid) autoFilename = true;
   try {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     String? _fileName;
     String? _buDir;
     if (autoFilename) {
@@ -117,7 +118,7 @@ Future<String?> backupAccount(
       );
     }
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => MainScreen.shouldLockScreen = true);
+        .then((value) => UnlockScreen.shouldLockScreen = true);
     if (_buDir == null) return null;
     if (!autoFilename) _buDir = File(_buDir).parent.path;
     await data.backupAccount(

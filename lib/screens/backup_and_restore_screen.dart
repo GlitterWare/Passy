@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'common.dart';
 import 'confirm_restore_screen.dart';
-import 'main_screen.dart';
 import 'settings_screen.dart';
 
 class BackupAndRestoreScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
   }
 
   void _onRestorePressed() {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.restorePassyBackup,
@@ -39,7 +39,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
         .then(
       (_pick) {
         Future.delayed(const Duration(seconds: 2))
-            .then((value) => MainScreen.shouldLockScreen = true);
+            .then((value) => UnlockScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,

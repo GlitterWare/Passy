@@ -7,11 +7,11 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/screens/unlock_screen.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/confirm_kdbx_export_screen.dart';
-import 'package:passy/screens/main_screen.dart';
 
 import 'export_and_import_screen.dart';
 import 'log_screen.dart';
@@ -70,7 +70,7 @@ class _ExportScreen extends State<ExportScreen> {
   }
 
   Future<void> _onPassyExport(String username, _ExportType type) async {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     try {
       bool? _isConfirmed = await _showExportWarningDialog();
       if (_isConfirmed != true) return;
@@ -138,7 +138,7 @@ class _ExportScreen extends State<ExportScreen> {
       }
     }
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => MainScreen.shouldLockScreen = true);
+        .then((value) => UnlockScreen.shouldLockScreen = true);
   }
 
   @override

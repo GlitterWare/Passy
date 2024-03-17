@@ -15,6 +15,7 @@ import 'common.dart';
 
 class UnlockScreen extends StatefulWidget {
   static const String routeName = '/unlock';
+  static bool shouldLockScreen = true;
 
   static bool isAuthenticating = false;
 
@@ -127,7 +128,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
     if (_unlockScreenOn) return;
-    if (!MainScreen.shouldLockScreen) return;
+    if (!UnlockScreen.shouldLockScreen) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
     if (!account.autoScreenLock) return;

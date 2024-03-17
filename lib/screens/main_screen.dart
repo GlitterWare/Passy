@@ -37,7 +37,6 @@ import 'notes_screen.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main';
-  static bool shouldLockScreen = true;
 
   const MainScreen({Key? key}) : super(key: key);
 

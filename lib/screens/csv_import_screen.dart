@@ -12,10 +12,10 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/csv_import_entries_screen.dart';
 import 'package:csv/csv.dart';
+import 'package:passy/screens/unlock_screen.dart';
 import 'common.dart';
 import 'import_screen.dart';
 import 'log_screen.dart';
-import 'main_screen.dart';
 
 class CSVImportScreen extends StatefulWidget {
   const CSVImportScreen({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ class CSVImportScreen extends StatefulWidget {
 class _CSVImportScreen extends State<CSVImportScreen> {
   void _onImportPressed(
       String title, EntryType entryType, Map<String, dynamic> entryJson) async {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePickerResult? fileResult;
     try {
       fileResult = await FilePicker.platform.pickFiles(
@@ -50,7 +50,7 @@ class _CSVImportScreen extends State<CSVImportScreen> {
       );
       return;
     }
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     if (fileResult == null) return;
     if (fileResult.files.isEmpty) return;
     String? filePath = fileResult.files[0].path;

@@ -7,11 +7,11 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/splash_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 import 'package:path/path.dart' as path;
 
 import 'export_screen.dart';
 import 'log_screen.dart';
-import 'main_screen.dart';
 
 class ConfirmKdbxExportScreen extends StatefulWidget {
   static const String routeName = '${ExportScreen.routeName}/kdbx';
@@ -48,7 +48,7 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
       return;
     }
     try {
-      MainScreen.shouldLockScreen = false;
+      UnlockScreen.shouldLockScreen = false;
       String fileName =
           'passy-kdbx-export-${_account.username}-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
       String? _expFile;
@@ -100,7 +100,7 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
       }
     }
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => MainScreen.shouldLockScreen = true);
+        .then((value) => UnlockScreen.shouldLockScreen = true);
   }
 
   @override

@@ -7,7 +7,7 @@ import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
-import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'settings_screen.dart';
 
@@ -39,14 +39,14 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
           return;
         }
         _bioData = BiometricStorageData(key: _username, password: _password);
-        MainScreen.shouldLockScreen = false;
+        UnlockScreen.shouldLockScreen = false;
         try {
           await _bioData.save();
           Future.delayed(const Duration(seconds: 2))
-              .then((value) => MainScreen.shouldLockScreen = true);
+              .then((value) => UnlockScreen.shouldLockScreen = true);
         } catch (e) {
           Future.delayed(const Duration(seconds: 2))
-              .then((value) => MainScreen.shouldLockScreen = true);
+              .then((value) => UnlockScreen.shouldLockScreen = true);
           showSnackBar(
               message: localizations.couldNotAuthenticate,
               icon: const Icon(Icons.fingerprint_rounded,

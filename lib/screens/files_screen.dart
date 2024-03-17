@@ -11,6 +11,7 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/passy_file_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'main_screen.dart';
 
@@ -176,13 +177,13 @@ class _FilesScreen extends State<FilesScreen> {
 
   Future<void> _onAddFilePressed(FilesScreenArgs args,
       {FileEntryType type = FileEntryType.file}) async {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: localizations.addFile,
       lockParentWindow: true,
     );
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => MainScreen.shouldLockScreen = true);
+        .then((value) => UnlockScreen.shouldLockScreen = true);
     if (result == null) return;
     if (result.files.isEmpty) return;
     File file = File(result.files[0].path!);
