@@ -1105,6 +1105,19 @@ class LoadedAccount {
     return result;
   }
 
+  Future<void> renameTag({
+    required String tag,
+    required String newTag,
+  }) async {
+    await Future.wait([
+      _passwords.renameTag(tag: tag, newTag: newTag),
+      _notes.renameTag(tag: tag, newTag: newTag),
+      _paymentCards.renameTag(tag: tag, newTag: newTag),
+      _identities.renameTag(tag: tag, newTag: newTag),
+      _idCards.renameTag(tag: tag, newTag: newTag),
+    ]);
+  }
+
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
   Future<List<String>> get passwordTags => compute(
