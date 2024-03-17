@@ -6,6 +6,7 @@ class EntryTagButton extends StatelessWidget {
   final Color color;
   final bool isSelected;
   final void Function()? onPressed;
+  final void Function()? onSecondary;
 
   const EntryTagButton(
     this.tag, {
@@ -13,27 +14,31 @@ class EntryTagButton extends StatelessWidget {
     this.color = PassyTheme.lightContentColor,
     this.isSelected = false,
     this.onPressed,
+    this.onSecondary,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextButton.icon(
-      onPressed: onPressed ?? () {},
-      style: ButtonStyle(
-        backgroundColor: MaterialStatePropertyAll(color),
-      ),
-      icon: Icon(isSelected ? Icons.close_rounded : Icons.add_rounded,
-          color: PassyTheme.theme.colorScheme.onPrimary),
-      label: Padding(
-        padding: EdgeInsets.only(
-            top: PassyTheme.passyPadding.top / 1.5,
-            bottom: PassyTheme.passyPadding.bottom / 1.5,
-            right: PassyTheme.passyPadding.right),
-        child: Text(
-          tag,
-          style: const TextStyle(color: PassyTheme.darkContentColor),
-        ),
-      ),
-    );
+    return GestureDetector(
+        onSecondaryTap: onSecondary,
+        child: TextButton.icon(
+          onLongPress: onSecondary,
+          onPressed: onPressed ?? () {},
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(color),
+          ),
+          icon: Icon(isSelected ? Icons.close_rounded : Icons.add_rounded,
+              color: PassyTheme.theme.colorScheme.onPrimary),
+          label: Padding(
+            padding: EdgeInsets.only(
+                top: PassyTheme.passyPadding.top / 1.5,
+                bottom: PassyTheme.passyPadding.bottom / 1.5,
+                right: PassyTheme.passyPadding.right),
+            child: Text(
+              tag,
+              style: const TextStyle(color: PassyTheme.darkContentColor),
+            ),
+          ),
+        ));
   }
 }
