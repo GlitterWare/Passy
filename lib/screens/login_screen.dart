@@ -154,8 +154,17 @@ class _LoginScreen extends State<LoginScreen> {
           _derivedPassword =
               (await data.getArgon2Key(_username, password: _password))!
                   .rawBytes;
-        } catch (_) {
-          // TODO: show an error log
+        } catch (e, s) {
+          showSnackBar(
+            message: localizations.couldNotLogin,
+            icon: const Icon(Icons.lock_rounded,
+                color: PassyTheme.darkContentColor),
+            action: SnackBarAction(
+              label: localizations.details,
+              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                  arguments: e.toString() + '\n' + s.toString()),
+            ),
+          );
           _isPasswordWrong = true;
           break;
         }
