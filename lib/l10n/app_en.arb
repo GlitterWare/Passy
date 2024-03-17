@@ -348,5 +348,6 @@
     "aegisImport": "Aegis import",
     "backupPassy": "Backup Passy",
     "backupSaved": "Backup saved",
-    "couldNotBackup": "Could not backup"
+    "couldNotBackup": "Could not backup",
+    "renameTag": "Rename tag"
 }
