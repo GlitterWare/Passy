@@ -7,6 +7,7 @@ class EntryTagList extends StatefulWidget {
   final List<String> notSelected;
   final void Function(String tag) onAdded;
   final void Function(String tag) onRemoved;
+  final void Function(String tag) onSecondary;
   final void Function() onAddPressed;
   final bool showAddButton;
 
@@ -16,14 +17,17 @@ class EntryTagList extends StatefulWidget {
     this.notSelected = const [],
     void Function(String tag)? onAdded,
     void Function(String tag)? onRemoved,
+    void Function(String tag)? onSecondary,
     void Function()? onAddPressed,
     this.showAddButton = false,
   })  : onAdded = onAdded ?? _onChanged,
         onRemoved = onRemoved ?? _onChanged,
+        onSecondary = onSecondary ?? _voidString,
         onAddPressed = onAddPressed ?? _void;
 
   static void _onChanged(tag) {}
   static void _void() {}
+  static void _voidString(String foobar) {}
 
   @override
   State<StatefulWidget> createState() => _EntryTagList();
@@ -66,6 +70,9 @@ class _EntryTagList extends State<EntryTagList> {
             onPressed: () {
               widget.onRemoved(tag);
             },
+            onSecondary: () {
+              widget.onSecondary(tag);
+            },
           ),
         ),
       );
@@ -82,6 +89,9 @@ class _EntryTagList extends State<EntryTagList> {
             tag,
             onPressed: () {
               widget.onAdded(tag);
+            },
+            onSecondary: () {
+              widget.onSecondary(tag);
             },
           ),
         ),
