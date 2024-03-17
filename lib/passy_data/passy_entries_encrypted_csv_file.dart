@@ -334,7 +334,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile rafExport = await file.open(mode: FileMode.write);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      _raf.closeSync();
+      await _raf.close();
       return;
     }
     if (annotation != null) {
@@ -359,7 +359,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     final KdbxGroup groupFinal = group ?? file.body.rootGroup;
     RandomAccessFile _raf = await _file.open();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      _raf.closeSync();
+      await _raf.close();
       return;
     }
     processLines(_raf, onLine: (entry, eofReached) {
