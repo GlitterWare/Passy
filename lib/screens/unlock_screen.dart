@@ -38,14 +38,18 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     Navigator.pushReplacementNamed(
         navigatorKey.currentContext!, LoginScreen.routeName);
     data.unloadAccount();
-    setState(() {});
+    UnlockScreen.shouldLockScreen = true;
+    setState(() {
+      _unlockScreenOn = false;
+    });
   }
 
   void _onWillPop(bool isPopped) {
     if (isPopped) return;
     if (_shouldPop) {
-      _shouldPop = false;
-      setState(() => _unlockScreenOn = false);
+      setState(() {
+        _shouldPop = false;
+        _unlockScreenOn = false;
       return;
     }
     _logOut();
