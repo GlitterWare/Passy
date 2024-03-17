@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/main.dart';
 import 'package:passy/passy_data/bio_starge.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -24,37 +25,41 @@ class UnlockScreen extends StatefulWidget {
 }
 
 class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
-  final LoadedAccount _account = data.loadedAccount!;
   bool _shouldPop = false;
   String _password = '';
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
+  bool _unlockScreenOn = false;
+  final FocusNode _passwordFocus = FocusNode();
 
   void _logOut() {
-    Navigator.popUntil(
-        context, (route) => route.settings.name == MainScreen.routeName);
-    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+    Navigator.popUntil(navigatorKey.currentContext!,
+        (route) => route.settings.name == MainScreen.routeName);
+    Navigator.pushReplacementNamed(
+        navigatorKey.currentContext!, LoginScreen.routeName);
     data.unloadAccount();
+    setState(() {});
   }
 
   void _onWillPop(bool isPopped) {
     if (isPopped) return;
     if (_shouldPop) {
-      Navigator.pop(context);
+      setState(() => _unlockScreenOn = false);
       return;
     }
     _logOut();
   }
 
   Future<void> _bioAuth() async {
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
     if (UnlockScreen.isAuthenticating) return;
     if (!mounted) return;
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (!_account.bioAuthEnabled) return;
+    if (!account.bioAuthEnabled) return;
     UnlockScreen.isAuthenticating = true;
     try {
-      BiometricStorageData data =
-          await BioStorage.fromLocker(_account.username);
+      BiometricStorageData data = await BioStorage.fromLocker(account.username);
       Future.delayed(const Duration(seconds: 2))
           .then((value) => UnlockScreen.isAuthenticating = false);
       if (data.password.isEmpty) return;
@@ -64,17 +69,22 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       return;
     }
     _shouldPop = true;
-    Navigator.pop(context);
+    setState(() => _unlockScreenOn = false);
   }
 
   void _unlock() async {
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
     String _passwordHash =
-        (await data.createPasswordHash(_account.username, password: _password))
+        (await data.createPasswordHash(account.username, password: _password))
             .toString();
-    _password = '';
-    if (_passwordHash == data.getPasswordHash(_account.username)) {
+    if (_passwordHash == data.getPasswordHash(account.username)) {
       _shouldPop = true;
-      Navigator.pop(context);
+      setState(() {
+        _password = '';
+        _passwordController.text = '';
+        _unlockScreenOn = false;
+      });
       return;
     }
     showSnackBar(
@@ -93,39 +103,60 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _passwordFocus.addListener(() {
+      if (!_unlockScreenOn) return;
+      if (!_passwordFocus.hasFocus) _passwordFocus.requestFocus();
+    });
     WidgetsBinding.instance.addObserver(this);
-    if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (data.getBioAuthEnabled(_account.username) == true) {
-      _bioAuthButton = FloatingActionButton(
-        onPressed: () {
-          UnlockScreen.isAuthenticating = false;
-          _bioAuth();
-        },
-        child: const Icon(
-          Icons.fingerprint_rounded,
-        ),
-        tooltip: localizations.authenticate,
-        heroTag: null,
-      );
-      return;
-    }
-    _bioAuthButton = null;
   }
 
   @override
   void dispose() {
     super.dispose();
+    _passwordFocus.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state != AppLifecycleState.resumed) return;
+    super.didChangeAppLifecycleState(state);
+    if (_unlockScreenOn) return;
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
+    if (!account.autoScreenLock) return;
+    if (UnlockScreen.isAuthenticating) return;
+    if ((state != AppLifecycleState.resumed) &&
+        (state != AppLifecycleState.inactive)) return;
+    setState(() => _unlockScreenOn = true);
+    _passwordFocus.requestFocus();
     await _bioAuth();
   }
 
   @override
   Widget build(BuildContext context) {
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) {
+      _unlockScreenOn = false;
+      return const SizedBox.shrink();
+    }
+    if (!_unlockScreenOn) return const SizedBox.shrink();
+    if (Platform.isAndroid && !Platform.isIOS) {
+      if (data.getBioAuthEnabled(account.username) == true) {
+        _bioAuthButton = FloatingActionButton(
+          onPressed: () {
+            UnlockScreen.isAuthenticating = false;
+            _bioAuth();
+          },
+          child: const Icon(
+            Icons.fingerprint_rounded,
+          ),
+          tooltip: localizations.authenticate,
+          heroTag: null,
+        );
+      } else {
+        _bioAuthButton = null;
+      }
+    }
     return PopScope(
       canPop: false,
       onPopInvoked: _onWillPop,
@@ -154,7 +185,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                     flex: 5,
                   ),
                   Text(
-                    _account.username,
+                    account.username,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -165,6 +196,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
                   ),
                   PassyPadding(
                     ButtonedTextFormField(
+                      focusNode: _passwordFocus,
                       controller: _passwordController,
                       labelText: localizations.password,
                       obscureText: true,

@@ -198,6 +198,31 @@ class Passy extends StatelessWidget {
             const SynchronizationLogsScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
+      builder: (context, child) {
+        return Stack(
+          children: [
+            child!,
+            Overlay(
+              initialEntries: [
+                OverlayEntry(
+                  builder: (context) => FutureBuilder(
+                    future: Future<String>(() async {
+                      while (SplashScreen.loaded != true) {
+                        await Future.delayed(const Duration(seconds: 1));
+                      }
+                      return '';
+                    }),
+                    builder: (ctx, snapshot) {
+                      if (!snapshot.hasData) return const SizedBox.shrink();
+                      return const UnlockScreen();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
       localizationsDelegates: const [
         AppLocalizations.delegate, // Add this line
         GlobalMaterialLocalizations.delegate,

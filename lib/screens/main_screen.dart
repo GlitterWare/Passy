@@ -22,7 +22,6 @@ import 'package:passy/screens/note_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/payment_card_screen.dart';
 import 'package:passy/screens/search_screen.dart';
-import 'package:passy/screens/unlock_screen.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
@@ -47,10 +46,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreen extends State<MainScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
+    with SingleTickerProviderStateMixin, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
-  bool _unlockScreenOn = false;
   String _lastSyncDate = 'NaN';
 
   Widget _searchBuilder(
@@ -430,29 +428,8 @@ class _MainScreen extends State<MainScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (!MainScreen.shouldLockScreen) return;
-    if (UnlockScreen.isAuthenticating) return;
-    if (data.loadedAccount == null) return;
-    if (_unlockScreenOn) return;
-    if (data.loadedAccount?.autoScreenLock == false) return;
-    _unlockScreenOn = true;
-    Navigator.pushNamed(context, UnlockScreen.routeName).then((value) =>
-        Future.delayed(const Duration(seconds: 2))
-            .then((value) => _unlockScreenOn = false));
-  }
-
-  @override
-  Future<bool> didPushRoute(String route) {
-    if (route == UnlockScreen.routeName) _unlockScreenOn = true;
-    return Future.value(true);
-  }
-
-  @override
   void dispose() {
     super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
   }
 
@@ -476,7 +453,6 @@ class _MainScreen extends State<MainScreen>
       FlutterSecureScreen.singleton
           .setAndroidScreenSecure(_account.protectScreen);
     }
-    WidgetsBinding.instance.addObserver(this);
     DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
     if (lastSyncDate != null) {
       _lastSyncDate =
