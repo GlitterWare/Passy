@@ -157,18 +157,18 @@ packages:
     dependency: "direct main"
     description:
       name: camera
-      sha256: f63f2687fb1795c36f7c57b18a03071880eabb0fd8b5291b0fcd3fb979cb0fb1
+      sha256: "9499cbc2e51d8eb0beadc158b288380037618ce4e30c9acbc4fae1ac3ecb5797"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.5+4"
+    version: "0.10.5+9"
   camera_android:
     dependency: transitive
     description:
       name: camera_android
-      sha256: ed4f645848074166fc3b8e20350f83ca07e09a2becc1e185040ee561f955d4df
+      sha256: "351429510121d179b9aac5a2e8cb525c3cd6c39f4d709c5f72dfb21726e52371"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.8+8"
+    version: "0.10.8+16"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -490,11 +490,12 @@ packages:
   flutter_autofill_service:
     dependency: "direct main"
     description:
-      name: flutter_autofill_service
-      sha256: d4385563c46310a0a47191ab5c4b7414a48517a40ee2c74512c3ab119f28466b
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.14.0"
+      path: "."
+      ref: "8d742765ddda32c113d630c35577c02feb3df102"
+      resolved-ref: "8d742765ddda32c113d630c35577c02feb3df102"
+      url: "https://github.com/kee-org/flutter_autofill_service.git"
+    source: git
+    version: "0.18.1"
   flutter_cache_manager:
     dependency: transitive
     description:
