@@ -492,9 +492,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: f6a3df54dd5b9547bedf6c46645f5e9f94014ce2
-      resolved-ref: f6a3df54dd5b9547bedf6c46645f5e9f94014ce2
-      url: "https://github.com/GlitterWare/flutter_autofill_service.git"
+      ref: "8d742765ddda32c113d630c35577c02feb3df102"
+      resolved-ref: "8d742765ddda32c113d630c35577c02feb3df102"
+      url: "https://github.com/kee-org/flutter_autofill_service.git"
     source: git
     version: "0.18.1"
   flutter_cache_manager:
