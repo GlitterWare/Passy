@@ -52,8 +52,8 @@ dependencies:
   camera: ^0.10.5+9
   flutter_autofill_service:
     git:
-      url: https://github.com/kee-org/flutter_autofill_service.git
-      ref: 8d742765ddda32c113d630c35577c02feb3df102
+      url: https://github.com/GlitterWare/flutter_autofill_service.git
+      ref: f6a3df54dd5b9547bedf6c46645f5e9f94014ce2
   url_launcher: ^6.0.20
   intranet_ip: ^1.0.2
   zxing2: ^0.1.1
