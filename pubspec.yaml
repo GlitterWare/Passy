@@ -81,7 +81,10 @@ dependencies:
       url: https://github.com/GlitterWare/kdbx.dart.git
       ref: 7e24cacc9e469b2391cefb6e2619e5ffa9db84f8
   dropdown_button2: ^2.3.9
-  emoji_picker_flutter: ^2.1.0
+  emoji_picker_flutter:
+    git:
+      url: https://github.com/GlitterWare/emoji_picker_flutter
+      ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
   text_divider: ^1.0.0
 
 dev_dependencies:

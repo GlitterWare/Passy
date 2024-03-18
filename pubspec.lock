@@ -413,10 +413,11 @@ packages:
   emoji_picker_flutter:
     dependency: "direct main"
     description:
-      name: emoji_picker_flutter
-      sha256: "871339250c00dc469b7fdaaec84f4e10ffa435e730a4f3f3fd06ebd5289ea5ad"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
+      resolved-ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
+      url: "https://github.com/GlitterWare/emoji_picker_flutter"
+    source: git
     version: "2.1.0"
   encrypt:
     dependency: "direct main"
