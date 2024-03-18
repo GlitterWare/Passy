@@ -58,11 +58,11 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _bioAuth() async {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
     if (UnlockScreen.isAuthenticating) return;
     if (!mounted) return;
-    if (!Platform.isAndroid && !Platform.isIOS) return;
     if (!account.bioAuthEnabled) return;
     UnlockScreen.isAuthenticating = true;
     try {
@@ -136,8 +136,10 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     if ((state != AppLifecycleState.resumed) &&
         (state != AppLifecycleState.inactive)) return;
     setState(() => _unlockScreenOn = true);
-    _passwordFocus.requestFocus();
-    await _bioAuth();
+    if (state == AppLifecycleState.resumed) {
+      _passwordFocus.requestFocus();
+      await _bioAuth();
+    }
   }
 
   @override
