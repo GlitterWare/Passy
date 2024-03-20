@@ -20,12 +20,11 @@ class EntryTagList extends StatefulWidget {
     void Function(String tag)? onSecondary,
     void Function()? onAddPressed,
     this.showAddButton = false,
-  })  : onAdded = onAdded ?? _onChanged,
-        onRemoved = onRemoved ?? _onChanged,
+  })  : onAdded = onAdded ?? _voidString,
+        onRemoved = onRemoved ?? _voidString,
         onSecondary = onSecondary ?? _voidString,
         onAddPressed = onAddPressed ?? _void;
 
-  static void _onChanged(tag) {}
   static void _void() {}
   static void _voidString(String foobar) {}
 
