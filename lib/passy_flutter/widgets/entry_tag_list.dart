@@ -45,7 +45,7 @@ class _EntryTagList extends State<EntryTagList> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.scheduleFrameCallback((_) {
       if (!mounted) return;
       setState(() {
         showScrollbar = (_key.currentContext?.size?.width ?? 0) ==
