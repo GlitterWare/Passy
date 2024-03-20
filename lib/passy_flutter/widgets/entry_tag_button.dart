@@ -36,7 +36,8 @@ class EntryTagButton extends StatelessWidget {
                 right: PassyTheme.passyPadding.right),
             child: Text(
               tag,
-              style: const TextStyle(color: PassyTheme.darkContentColor),
+              style: const TextStyle(
+                  color: PassyTheme.darkContentColor, height: 0.01),
             ),
           ),
         ));
