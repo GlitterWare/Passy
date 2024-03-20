@@ -127,7 +127,13 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
-    if (_unlockScreenOn) return;
+    if (_unlockScreenOn) {
+      if (state == AppLifecycleState.resumed) {
+        _passwordFocus.requestFocus();
+        await _bioAuth();
+      }
+      return;
+    }
     if (!UnlockScreen.shouldLockScreen) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
@@ -136,10 +142,6 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     if ((state != AppLifecycleState.resumed) &&
         (state != AppLifecycleState.inactive)) return;
     setState(() => _unlockScreenOn = true);
-    if (state == AppLifecycleState.resumed) {
-      _passwordFocus.requestFocus();
-      await _bioAuth();
-    }
   }
 
   @override
