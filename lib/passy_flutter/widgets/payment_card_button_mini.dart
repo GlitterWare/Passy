@@ -41,6 +41,7 @@ class PaymentCardButtonMini extends StatelessWidget {
                 child: Text(
                   paymentCard.cardholderName,
                   style: const TextStyle(color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 alignment: Alignment.centerLeft,
               ),

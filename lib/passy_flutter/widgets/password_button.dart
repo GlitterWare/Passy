@@ -41,6 +41,7 @@ class PasswordButton extends StatelessWidget {
                 child: Text(
                   password.username,
                   style: const TextStyle(color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 alignment: Alignment.centerLeft,
               ),

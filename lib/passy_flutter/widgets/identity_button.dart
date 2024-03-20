@@ -40,6 +40,7 @@ class IdentityButton extends StatelessWidget {
                   child: Text(
                     identity.firstAddressLine,
                     style: const TextStyle(color: Colors.grey),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   alignment: Alignment.centerLeft,
                 ),

@@ -41,6 +41,7 @@ class IDCardButton extends StatelessWidget {
                   child: Text(
                     idCard.name,
                     style: const TextStyle(color: Colors.grey),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   alignment: Alignment.centerLeft,
                 ),
