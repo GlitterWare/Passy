@@ -65,6 +65,11 @@ class _LoginScreen extends State<LoginScreen> {
                 .toString()) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          if (data.info.value.lastUsername != _username) {
+            data.info.value.lastUsername = _username;
+            await data.info.save();
+          }
           enc.Key key = await derivePassword(storageData.password,
               derivationType: derivationType, derivationInfo: derivationInfo);
           enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
@@ -72,9 +77,6 @@ class _LoginScreen extends State<LoginScreen> {
               _username, encrypter, key,
               encryptedPassword:
                   encrypt(storageData.password, encrypter: encrypter));
-          data.info.value.lastUsername = _username;
-          Navigator.pushNamed(context, SplashScreen.routeName);
-          await data.info.save();
           Navigator.pop(context);
           if (isAutofill) {
             Navigator.pushNamed(
@@ -193,9 +195,11 @@ class _LoginScreen extends State<LoginScreen> {
       });
       return;
     }
-    data.info.value.lastUsername = _username;
     Navigator.pushNamed(context, SplashScreen.routeName);
-    await data.info.save();
+    if (data.info.value.lastUsername != _username) {
+      data.info.value.lastUsername = _username;
+      await data.info.save();
+    }
     try {
       enc.Key key = _derivedPassword == null
           ? enc.Key.fromUtf8(
