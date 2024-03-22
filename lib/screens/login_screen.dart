@@ -195,53 +195,52 @@ class _LoginScreen extends State<LoginScreen> {
     }
     data.info.value.lastUsername = _username;
     Navigator.pushNamed(context, SplashScreen.routeName);
-    data.info.save().whenComplete(() async {
-      try {
-        enc.Key key = _derivedPassword == null
-            ? enc.Key.fromUtf8(
-                _password + (' ' * (32 - utf8.encode(_password).length)))
-            : enc.Key(Uint8List.fromList(_derivedPassword));
-        LoadedAccount _account = await data.loadAccount(
-            data.info.value.lastUsername,
-            _derivedPassword == null
-                ? getPassyEncrypter(_password)
-                : getPassyEncrypterFromBytes(
-                    Uint8List.fromList(_derivedPassword)),
-            key,
-            encryptedPassword:
-                encrypt(_password, encrypter: enc.Encrypter(enc.AES(key))));
-        Navigator.pop(context);
-        if (isAutofill) {
-          Navigator.pushNamed(
-            context,
-            SearchScreen.routeName,
-            arguments: SearchScreenArgs(
-              entryType: null,
-              builder: _buildPasswords,
-              isAutofill: true,
-            ),
-          );
-          return;
-        }
-        _account.startAutoSync();
-        if (Platform.isAndroid) {
-          FlutterSecureScreen.singleton
-              .setAndroidScreenSecure(_account.protectScreen);
-        }
-        Navigator.pushReplacementNamed(context, MainScreen.routeName);
-      } catch (e, s) {
-        showSnackBar(
-          message: localizations.couldNotLogin,
-          icon: const Icon(Icons.lock_rounded,
-              color: PassyTheme.darkContentColor),
-          action: SnackBarAction(
-            label: localizations.details,
-            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                arguments: e.toString() + '\n' + s.toString()),
+    await data.info.save();
+    try {
+      enc.Key key = _derivedPassword == null
+          ? enc.Key.fromUtf8(
+              _password + (' ' * (32 - utf8.encode(_password).length)))
+          : enc.Key(Uint8List.fromList(_derivedPassword));
+      LoadedAccount _account = await data.loadAccount(
+          data.info.value.lastUsername,
+          _derivedPassword == null
+              ? getPassyEncrypter(_password)
+              : getPassyEncrypterFromBytes(
+                  Uint8List.fromList(_derivedPassword)),
+          key,
+          encryptedPassword:
+              encrypt(_password, encrypter: enc.Encrypter(enc.AES(key))));
+      Navigator.pop(context);
+      if (isAutofill) {
+        Navigator.pushNamed(
+          context,
+          SearchScreen.routeName,
+          arguments: SearchScreenArgs(
+            entryType: null,
+            builder: _buildPasswords,
+            isAutofill: true,
           ),
         );
+        return;
       }
-    });
+      _account.startAutoSync();
+      if (Platform.isAndroid) {
+        FlutterSecureScreen.singleton
+            .setAndroidScreenSecure(_account.protectScreen);
+      }
+      Navigator.pushReplacementNamed(context, MainScreen.routeName);
+    } catch (e, s) {
+      showSnackBar(
+        message: localizations.couldNotLogin,
+        icon:
+            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
+    }
   }
 
   void updateBioAuthButton() {
