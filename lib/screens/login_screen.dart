@@ -72,6 +72,10 @@ class _LoginScreen extends State<LoginScreen> {
               _username, encrypter, key,
               encryptedPassword:
                   encrypt(storageData.password, encrypter: encrypter));
+          data.info.value.lastUsername = _username;
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await data.info.save();
+          Navigator.pop(context);
           if (isAutofill) {
             Navigator.pushNamed(
               context,
