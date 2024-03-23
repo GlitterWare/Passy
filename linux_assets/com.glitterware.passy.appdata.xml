@@ -4,7 +4,9 @@
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0</project_license>
 	<name>Passy</name>
-	<developer>GlitterWare</developer>
+	<developer id="com.glitterware">
+	  <name>GlitterWare</name>
+	</developer>
 	<developer_name>GlitterWare</developer_name>
 	<summary>Offline password manager with cross-platform synchronization</summary>
 	<description>
