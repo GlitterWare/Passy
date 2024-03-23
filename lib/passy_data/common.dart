@@ -18,8 +18,8 @@ import 'glare/glare_client.dart';
 import 'key_derivation_type.dart';
 
 const String passyVersion = '1.8.0';
-const String syncVersion = '2.1.0';
 const String accountVersion = '2.4.0';
+const String syncVersion = '2.1.1';
 
 bool isSnap() {
   return Platform.environment['SNAP_NAME'] == 'passy';
