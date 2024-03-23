@@ -17,24 +17,39 @@
 	<url type="homepage">https://glitterware.github.io/Passy</url>
 	<screenshots>
 		<screenshot type="default">
+			<caption>Passy login screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/1.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Passy main screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/2.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Host connection QR code.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/3.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Add password screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/4.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Password generator.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/5.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Custom field screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/6.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Date selection.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/7.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Password entry screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/8.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Password view dialog.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/9.png</image>
 		</screenshot>
 	</screenshots>
