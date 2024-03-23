@@ -379,10 +379,11 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
   }
 
-  Future<void> renameTag({
+  Future<List<String>> renameTag({
     required String tag,
     required String newTag,
   }) async {
+    List<String> keys = [];
     RandomAccessFile _raf = await _file.open();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
       await _raf.close();
@@ -408,12 +409,15 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
         return true;
       }
       var tagList = _csv[_tagIndex];
+      bool _changed = false;
       for (dynamic oldTag in (tagList as List<dynamic>).toList()) {
         oldTag = oldTag.toString();
         if (oldTag != tag) continue;
+        _changed = true;
         tagList.remove(tag);
         tagList.add(newTag);
       }
+      if (_changed) keys.add(_decoded[0]);
       entry = _encodeEntryForSaving(_csv);
       await _tempRaf.writeString(entry);
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
@@ -424,5 +428,6 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _file.delete();
     await _tempFile.copy(_file.absolute.path);
     await _tempFile.delete();
+    return keys;
   }
 }

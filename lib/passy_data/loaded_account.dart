@@ -1109,13 +1109,34 @@ class LoadedAccount {
     required String tag,
     required String newTag,
   }) async {
-    await Future.wait([
+    List<List<String>> keyLists = await Future.wait([
       _passwords.renameTag(tag: tag, newTag: newTag),
       _notes.renameTag(tag: tag, newTag: newTag),
       _paymentCards.renameTag(tag: tag, newTag: newTag),
       _identities.renameTag(tag: tag, newTag: newTag),
       _idCards.renameTag(tag: tag, newTag: newTag),
     ]);
+    for (String passwordKey in keyLists[0]) {
+      _history.value.passwords[passwordKey] = EntryEvent(passwordKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String notesKey in keyLists[1]) {
+      _history.value.notes[notesKey] = EntryEvent(notesKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String paymentCardKey in keyLists[2]) {
+      _history.value.paymentCards[paymentCardKey] = EntryEvent(paymentCardKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String identityKey in keyLists[3]) {
+      _history.value.identities[identityKey] = EntryEvent(identityKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String idCardKey in keyLists[4]) {
+      _history.value.idCards[idCardKey] = EntryEvent(idCardKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    await _history.save();
   }
 
   // Passwords wrappers
