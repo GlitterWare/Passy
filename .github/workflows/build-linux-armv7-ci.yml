@@ -22,7 +22,7 @@ jobs:
           mkdir build
           mkdir bin
           cd bin
-          wget https://raw.githubusercontent.com/GlitterWare/Passy/4a813c8b87960ff5bf6f7fe9a5fbebab7c5ad353/.github/workflows/armv7.sh
+          wget https://raw.githubusercontent.com/GlitterWare/Passy/$GITHUB_SHA/.github/workflows/armv7.sh
           chmod +x armv7.sh
       - name: Install dependencies
         shell: bash
