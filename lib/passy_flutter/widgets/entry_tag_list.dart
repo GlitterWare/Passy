@@ -125,6 +125,8 @@ class _EntryTagList extends State<EntryTagList> {
                 if (widget.showAddButton)
                   Padding(
                     padding: EdgeInsets.only(
+                        left: PassyTheme.passyPadding.left / 2,
+                        right: PassyTheme.passyPadding.right / 2,
                         bottom: showScrollbar ? _bottomPadding : 0),
                     child: FloatingActionButton(
                       heroTag: null,
