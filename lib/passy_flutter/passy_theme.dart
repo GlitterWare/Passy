@@ -58,14 +58,6 @@ class PassyTheme {
       selectionColor: lightContentSecondaryColor,
       selectionHandleColor: lightContentColor,
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      sizeConstraints: BoxConstraints(
-        minWidth: 55,
-        minHeight: 55,
-        maxWidth: 55,
-        maxHeight: 55,
-      ),
-    ),
   );
 
   static const ColorScheme datePickerColorScheme = ColorScheme.dark(
