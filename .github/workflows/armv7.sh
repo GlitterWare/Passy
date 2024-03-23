@@ -52,10 +52,20 @@ echo "===================================================="
 bash build_cli.sh
 
 echo "===================================================="
+echo "Build Passy"
+echo "===================================================="
+
+flutter build linux
+rm /Passy/build/linux/arm64/release/bundle/lib/libargon2.so
+cp /Passy/build/cli/latest/lib/libargon2.so /Passy/build/linux/arm64/release/bundle/lib/
+
+echo "===================================================="
 echo "Prepare releases"
 echo "===================================================="
 
 cd /passy-build
 mkdir cli
 cp -r /Passy/build/cli/latest/. cli
+mkdir Passy
+cp -r /Passy/build/linux/arm64/release/bundle/. Passy
 
