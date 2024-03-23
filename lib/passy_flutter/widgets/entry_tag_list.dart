@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -35,6 +37,8 @@ class EntryTagList extends StatefulWidget {
 class _EntryTagList extends State<EntryTagList> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _key = GlobalKey();
+  static final double _bottomPadding =
+      (Platform.isAndroid || Platform.isIOS) ? 6 : 14;
 
   bool showScrollbar = false;
 
@@ -47,10 +51,12 @@ class _EntryTagList extends State<EntryTagList> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.scheduleFrameCallback((_) {
       if (!mounted) return;
-      setState(() {
-        showScrollbar = (_key.currentContext?.size?.width ?? 0) ==
-            MediaQuery.of(context).size.width;
-      });
+      try {
+        setState(() {
+          showScrollbar = (_key.currentContext?.size?.width ?? 0) ==
+              MediaQuery.of(context).size.width;
+        });
+      } catch (_) {}
     });
 
     List<Widget> notSelectedButtons = [];
@@ -62,7 +68,7 @@ class _EntryTagList extends State<EntryTagList> {
           padding: EdgeInsets.only(
               left: PassyTheme.passyPadding.left / 2,
               right: PassyTheme.passyPadding.right / 2,
-              bottom: showScrollbar ? 14 : 0),
+              bottom: showScrollbar ? _bottomPadding : 0),
           child: EntryTagButton(
             tag,
             isSelected: true,
@@ -83,7 +89,7 @@ class _EntryTagList extends State<EntryTagList> {
           padding: EdgeInsets.only(
               left: PassyTheme.passyPadding.left / 2,
               right: PassyTheme.passyPadding.right / 2,
-              bottom: showScrollbar ? 14 : 0),
+              bottom: showScrollbar ? _bottomPadding : 0),
           child: EntryTagButton(
             tag,
             onPressed: () {
@@ -111,14 +117,15 @@ class _EntryTagList extends State<EntryTagList> {
                     padding: EdgeInsets.only(
                         left: PassyTheme.passyPadding.left / 2,
                         right: PassyTheme.passyPadding.right / 2,
-                        bottom: showScrollbar ? 14 : 0),
+                        bottom: showScrollbar ? _bottomPadding : 0),
                     child: Text(localizations.noTags),
                   ),
                 if (selectedButtons.isEmpty && notSelectedButtons.isEmpty)
                   const SizedBox(width: 10),
                 if (widget.showAddButton)
                   Padding(
-                    padding: EdgeInsets.only(bottom: showScrollbar ? 14 : 0),
+                    padding: EdgeInsets.only(
+                        bottom: showScrollbar ? _bottomPadding : 0),
                     child: FloatingActionButton(
                       heroTag: null,
                       child: const Icon(Icons.add),
@@ -140,7 +147,7 @@ class _EntryTagList extends State<EntryTagList> {
                     padding: EdgeInsets.only(
                         left: PassyTheme.passyPadding.left / 2,
                         right: PassyTheme.passyPadding.right / 2,
-                        bottom: showScrollbar ? 14 : 0),
+                        bottom: showScrollbar ? _bottomPadding : 0),
                     child: const SizedBox(
                       height: 36,
                       width: 2,
@@ -160,7 +167,7 @@ class _EntryTagList extends State<EntryTagList> {
 
     return SizedBox(
       key: _key,
-      height: showScrollbar ? 50 : 36,
+      height: showScrollbar ? 50 : (50 - _bottomPadding),
       child: PrimaryScrollController(
         controller: _scrollController,
         child: showScrollbar
