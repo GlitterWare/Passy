@@ -387,7 +387,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     RandomAccessFile _raf = await _file.open();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
       await _raf.close();
-      return;
+      return const [];
     }
     File _tempFile;
     {
