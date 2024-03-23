@@ -23,6 +23,7 @@ echo 'Cloning Argon2...'
 if [ -d ./phc-winner-argon2 ]; then rm -rf ./phc-winner-argon2; fi
 git clone https://github.com/P-H-C/phc-winner-argon2
 cd phc-winner-argon2
+git reset --hard f57e61e19229e23c4445b85494dbf7c07de721cb
 make
 cp libargon2.so.1 ../latest/lib/libargon2.so
 cd ..
