@@ -26,7 +26,7 @@ jobs:
         run: |
           cd ..
           mkdir -p build/windows-portable/Passy
-          cp -r Passy/build/windows/runner/Release/. build/windows-portable/Passy
+          cp -r Passy/build/windows/x64/runner/Release/. build/windows-portable/Passy
       - name: Upload Windows portable build
         uses: actions/upload-artifact@v3
         with:
