@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -22,74 +23,113 @@ class IdentitiesScreen extends StatefulWidget {
 
 class _IdentitiesScreen extends State<IdentitiesScreen> {
   final _account = data.loadedAccount!;
+  List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
 
-  void _onSearchPressed() {
-    Navigator.pushNamed(context, SearchScreen.routeName, arguments:
-        SearchScreenArgs(builder: (String terms, void Function() rebuild) {
-      final List<IdentityMeta> _found = [];
-      final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (IdentityMeta _identity in _account.identitiesMetadata.values) {
-        {
-          bool testIdentity(IdentityMeta value) => _identity.key == value.key;
+  void _onSearchPressed({String? tag}) {
+    Navigator.pushNamed(context, SearchScreen.routeName,
+        arguments: SearchScreenArgs(
+            entryType: EntryType.identity,
+            selectedTags: tag == null ? [] : [tag],
+            builder:
+                (String terms, List<String> tags, void Function() rebuild) {
+              final List<IdentityMeta> _found = [];
+              final List<String> _terms = terms.trim().toLowerCase().split(' ');
+              for (IdentityMeta _identity
+                  in _account.identitiesMetadata.values) {
+                {
+                  bool testIdentity(IdentityMeta value) =>
+                      _identity.key == value.key;
 
-          if (_found.any(testIdentity)) continue;
-        }
-        {
-          int _positiveCount = 0;
-          for (String _term in _terms) {
-            if (_identity.firstAddressLine.toLowerCase().contains(_term)) {
-              _positiveCount++;
-              continue;
-            }
-            if (_identity.nickname.toLowerCase().contains(_term)) {
-              _positiveCount++;
-              continue;
-            }
-          }
-          if (_positiveCount == _terms.length) {
-            _found.add(_identity);
-          }
-        }
-      }
-      if (_found.isEmpty) {
-        return CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Column(
-                children: [
-                  const Spacer(flex: 7),
-                  Text(
-                    localizations.noSearchResults,
-                    textAlign: TextAlign.center,
-                  ),
-                  const Spacer(flex: 7),
-                ],
-              ),
-            ),
-          ],
-        );
-      }
-      return IdentityButtonListView(
-        identities: _found,
-        shouldSort: true,
-        onPressed: (identity) => Navigator.pushNamed(
-          context,
-          IdentityScreen.routeName,
-          arguments: _account.getIdentity(identity.key),
-        ),
-        popupMenuItemBuilder: identityPopupMenuBuilder,
-      );
-    }));
+                  if (_found.any(testIdentity)) continue;
+                }
+                {
+                  bool _tagMismatch = false;
+                  for (String tag in tags) {
+                    if (!_identity.tags.contains(tag)) {
+                      _tagMismatch = true;
+                      break;
+                    }
+                  }
+                  if (_tagMismatch) continue;
+                  int _positiveCount = 0;
+                  for (String _term in _terms) {
+                    if (_identity.firstAddressLine
+                        .toLowerCase()
+                        .contains(_term)) {
+                      _positiveCount++;
+                      continue;
+                    }
+                    if (_identity.nickname.toLowerCase().contains(_term)) {
+                      _positiveCount++;
+                      continue;
+                    }
+                  }
+                  if (_positiveCount == _terms.length) {
+                    _found.add(_identity);
+                  }
+                }
+              }
+              if (_found.isEmpty) {
+                return CustomScrollView(
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        children: [
+                          const Spacer(flex: 7),
+                          Text(
+                            localizations.noSearchResults,
+                            textAlign: TextAlign.center,
+                          ),
+                          const Spacer(flex: 7),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return IdentityButtonListView(
+                identities: _found,
+                shouldSort: true,
+                onPressed: (identity) => Navigator.pushNamed(
+                  context,
+                  IdentityScreen.routeName,
+                  arguments: _account.getIdentity(identity.key),
+                ),
+                popupMenuItemBuilder: identityPopupMenuBuilder,
+              );
+            }));
+  }
+
+  Future<void> _load() async {
+    _isLoading = true;
+    List<String> newTags;
+    try {
+      newTags = await _account.identitiesTags;
+    } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<IdentityMeta> _identities =
-        _account.identitiesMetadata.values.toList();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
+    List<IdentityMeta> _identities = [];
+    try {
+      _identities = _account.identitiesMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.identity,
@@ -133,6 +173,20 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
                         context, EditIdentityScreen.routeName),
                   ),
                 ),
+                if (_tags.isNotEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: PassyTheme.passyPadding.top / 2,
+                          bottom: PassyTheme.passyPadding.bottom / 2),
+                      child: EntryTagList(
+                        notSelected: _tags,
+                        onAdded: (tag) => setState(() {
+                          _onSearchPressed(tag: tag);
+                        }),
+                      ),
+                    ),
+                  ),
               ],
               identities: _identities,
               shouldSort: true,

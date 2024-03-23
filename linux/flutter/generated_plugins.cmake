@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dargon2_flutter_desktop
+  emoji_picker_flutter
   url_launcher_linux
 )
 

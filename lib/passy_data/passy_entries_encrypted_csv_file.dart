@@ -25,6 +25,34 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     return _keys;
   }
 
+  List<String> get tags {
+    List<String> _tags = [];
+    RandomAccessFile _raf = _file.openSync();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      _raf.closeSync();
+      return _tags;
+    }
+    int _tagIndex = T.toString() == 'Note' ? 4 : 3;
+    processLines(_raf, onLine: (entry, eofReached) {
+      List<String> _decoded = entry.split(',');
+      String _decrypted = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      List<dynamic> _csv = csvDecode(_decrypted, recursive: true);
+      if (_csv.length < _tagIndex + 1) {
+        return true;
+      }
+      for (dynamic tag in (_csv[_tagIndex] as List<dynamic>)) {
+        tag = tag.toString();
+        if (_tags.contains(tag)) continue;
+        _tags.add(tag);
+      }
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    _raf.closeSync();
+    return _tags;
+  }
+
   Map<String, EntryMeta> get metadata {
     Map<String, EntryMeta> _meta = {};
     RandomAccessFile _raf = _file.openSync();
@@ -306,7 +334,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile rafExport = await file.open(mode: FileMode.write);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      _raf.closeSync();
+      await _raf.close();
       return;
     }
     if (annotation != null) {
@@ -331,7 +359,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     final KdbxGroup groupFinal = group ?? file.body.rootGroup;
     RandomAccessFile _raf = await _file.open();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      _raf.closeSync();
+      await _raf.close();
       return;
     }
     processLines(_raf, onLine: (entry, eofReached) {
@@ -349,5 +377,57 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       return null;
     });
     await _raf.close();
+  }
+
+  Future<List<String>> renameTag({
+    required String tag,
+    required String newTag,
+  }) async {
+    List<String> keys = [];
+    RandomAccessFile _raf = await _file.open();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      await _raf.close();
+      return const [];
+    }
+    File _tempFile;
+    {
+      String _tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-entries-${entryTypeFromType(T)}-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      _tempFile = await File(_tempPath).create();
+    }
+    int _tagIndex = T.toString() == 'Note' ? 4 : 3;
+    RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await processLinesAsync(_raf, onLine: (entry, eofReached) async {
+      if (eofReached) return true;
+      List<String> _decoded = entry.split(',');
+      entry = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      List<dynamic> _csv = csvDecode(entry, recursive: true);
+      if (_csv.length < _tagIndex + 1) {
+        return true;
+      }
+      var tagList = _csv[_tagIndex];
+      bool _changed = false;
+      for (dynamic oldTag in (tagList as List<dynamic>).toList()) {
+        oldTag = oldTag.toString();
+        if (oldTag != tag) continue;
+        _changed = true;
+        tagList.remove(tag);
+        tagList.add(newTag);
+      }
+      if (_changed) keys.add(_decoded[0]);
+      entry = _encodeEntryForSaving(_csv);
+      await _tempRaf.writeString(entry);
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    await _raf.close();
+    await _tempRaf.close();
+    await _file.delete();
+    await _tempFile.copy(_file.absolute.path);
+    await _tempFile.delete();
+    return keys;
   }
 }

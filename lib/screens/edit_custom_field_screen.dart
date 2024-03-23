@@ -55,7 +55,20 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
           ],
           value: _customField.fieldType,
           decoration: InputDecoration(labelText: localizations.type),
-          onChanged: (value) => _customField.fieldType = value as FieldType,
+          onChanged: (value) {
+            if (value == null) return;
+            dynamic type = value as FieldType;
+            bool obscured;
+            if (type == FieldType.password) {
+              obscured = true;
+            } else {
+              obscured = false;
+            }
+            setState(() {
+              _customField.fieldType = type;
+              _customField.obscured = obscured;
+            });
+          },
         )),
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.obscured),

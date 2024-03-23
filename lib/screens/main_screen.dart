@@ -15,7 +15,6 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/search_entry_data.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
-import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -23,7 +22,6 @@ import 'package:passy/screens/note_screen.dart';
 import 'package:passy/screens/password_screen.dart';
 import 'package:passy/screens/payment_card_screen.dart';
 import 'package:passy/screens/search_screen.dart';
-import 'package:passy/screens/unlock_screen.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
@@ -39,7 +37,6 @@ import 'notes_screen.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main';
-  static bool shouldLockScreen = true;
 
   const MainScreen({Key? key}) : super(key: key);
 
@@ -48,13 +45,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreen extends State<MainScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
+    with SingleTickerProviderStateMixin, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
-  bool _unlockScreenOn = false;
   String _lastSyncDate = 'NaN';
 
-  Widget _searchBuilder(String terms, void Function() rebuild) {
+  Widget _searchBuilder(
+      String terms, List<String> tags, void Function() rebuild) {
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     final List<SearchEntryData> _searchEntries = [];
@@ -92,35 +89,40 @@ class _MainScreen extends State<MainScreen>
           name: idCard.nickname,
           description: idCard.name,
           type: EntryType.idCard,
-          meta: idCard));
+          meta: idCard,
+          tags: idCard.tags));
     }
     for (IdentityMeta _identity in identitiesMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _identity.nickname,
           description: _identity.firstAddressLine,
           type: EntryType.identity,
-          meta: _identity));
+          meta: _identity,
+          tags: _identity.tags));
     }
     for (NoteMeta _note in notesMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _note.title,
           description: '',
           type: EntryType.note,
-          meta: _note));
+          meta: _note,
+          tags: _note.tags));
     }
     for (PasswordMeta _password in passwordsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
-          meta: _password));
+          meta: _password,
+          tags: _password.tags));
     }
     for (PaymentCardMeta _paymentCard in paymentCardsMetadata.values) {
       _searchEntries.add(SearchEntryData(
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
           type: EntryType.paymentCard,
-          meta: _paymentCard));
+          meta: _paymentCard,
+          tags: _paymentCard.tags));
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
@@ -130,6 +132,14 @@ class _MainScreen extends State<MainScreen>
         if (_found.any(testSearchEntry)) continue;
       }
       {
+        bool _tagMismatch = false;
+        for (String tag in tags) {
+          if (!_searchEntry.tags.contains(tag)) {
+            _tagMismatch = true;
+            break;
+          }
+        }
+        if (_tagMismatch) continue;
         int _positiveCount = 0;
         for (String _term in _terms) {
           if (_searchEntry.name.toLowerCase().contains(_term)) {
@@ -196,7 +206,8 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Widget _favoritesSearchBuilder(String terms, void Function() setState) {
+  Widget _favoritesSearchBuilder(
+      String terms, List<String> tags, void Function() setState) {
     if (!_account.hasFavorites) {
       return CustomScrollView(
         slivers: [
@@ -238,7 +249,8 @@ class _MainScreen extends State<MainScreen>
           name: idCard.nickname,
           description: idCard.name,
           type: EntryType.idCard,
-          meta: idCard));
+          meta: idCard,
+          tags: idCard.tags));
     }
     for (EntryEvent event in _account.favoriteIdentities.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -248,7 +260,8 @@ class _MainScreen extends State<MainScreen>
           name: _identity.nickname,
           description: _identity.firstAddressLine,
           type: EntryType.identity,
-          meta: _identity));
+          meta: _identity,
+          tags: _identity.tags));
     }
     for (EntryEvent event in _account.favoriteNotes.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -258,7 +271,8 @@ class _MainScreen extends State<MainScreen>
           name: _note.title,
           description: '',
           type: EntryType.note,
-          meta: _note));
+          meta: _note,
+          tags: _note.tags));
     }
     for (EntryEvent event in _account.favoritePasswords.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -268,7 +282,8 @@ class _MainScreen extends State<MainScreen>
           name: _password.nickname,
           description: _password.username,
           type: EntryType.password,
-          meta: _password));
+          meta: _password,
+          tags: _password.tags));
     }
     for (EntryEvent event in _account.favoritePaymentCards.values) {
       if (event.status == EntryStatus.removed) continue;
@@ -278,7 +293,8 @@ class _MainScreen extends State<MainScreen>
           name: _paymentCard.nickname,
           description: _paymentCard.cardholderName,
           type: EntryType.paymentCard,
-          meta: _paymentCard));
+          meta: _paymentCard,
+          tags: _paymentCard.tags));
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
@@ -288,6 +304,12 @@ class _MainScreen extends State<MainScreen>
         if (_found.any(testSearchEntry)) continue;
       }
       {
+        bool _tagMismatch = false;
+        for (String tag in tags) {
+          if (_searchEntry.tags.contains(tag)) continue;
+          _tagMismatch = true;
+        }
+        if (_tagMismatch) continue;
         int _positiveCount = 0;
         for (String _term in _terms) {
           if (_searchEntry.name.toLowerCase().contains(_term)) {
@@ -393,9 +415,9 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  Future<bool> _onWillPop() {
+  void _onWillPop(bool isPopped) {
+    if (isPopped) return;
     _logOut();
-    return Future.value(false);
   }
 
   @override
@@ -405,29 +427,8 @@ class _MainScreen extends State<MainScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (!MainScreen.shouldLockScreen) return;
-    if (UnlockScreen.isAuthenticating) return;
-    if (data.loadedAccount == null) return;
-    if (_unlockScreenOn) return;
-    if (data.loadedAccount?.autoScreenLock == false) return;
-    _unlockScreenOn = true;
-    Navigator.pushNamed(context, UnlockScreen.routeName).then((value) =>
-        Future.delayed(const Duration(seconds: 2))
-            .then((value) => _unlockScreenOn = false));
-  }
-
-  @override
-  Future<bool> didPushRoute(String route) {
-    if (route == UnlockScreen.routeName) _unlockScreenOn = true;
-    return Future.value(true);
-  }
-
-  @override
   void dispose() {
     super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
   }
 
@@ -451,7 +452,6 @@ class _MainScreen extends State<MainScreen>
       FlutterSecureScreen.singleton
           .setAndroidScreenSecure(_account.protectScreen);
     }
-    WidgetsBinding.instance.addObserver(this);
     DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
     if (lastSyncDate != null) {
       _lastSyncDate =
@@ -475,6 +475,7 @@ class _MainScreen extends State<MainScreen>
           if (mounted) {
             Navigator.pushNamed(context, SearchScreen.routeName,
                 arguments: SearchScreenArgs(
+                  entryType: null,
                   title: localizations.favorites,
                   builder: _favoritesSearchBuilder,
                 ));
@@ -490,6 +491,7 @@ class _MainScreen extends State<MainScreen>
         center: Text(localizations.searchAllEntries),
         onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
             arguments: SearchScreenArgs(
+              entryType: null,
               title: localizations.allEntries,
               builder: _searchBuilder,
             )),
@@ -504,7 +506,6 @@ class _MainScreen extends State<MainScreen>
         onPressed: () {
           if (!_account.isRSAKeypairLoaded) {
             showSnackBar(
-              context,
               message: localizations.settingUpSynchronization,
               icon: const Icon(CupertinoIcons.clock_solid,
                   color: PassyTheme.darkContentColor),
@@ -562,18 +563,16 @@ class _MainScreen extends State<MainScreen>
         onPressed: () =>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
-      /*
       PassyPadding(ThreeWidgetButton(
-        center: Text(localizations.files),
+        center: Text(localizations.files + ' (Coming soon)'),
         left: const Padding(
           padding: EdgeInsets.only(right: 30),
           child: Icon(Icons.description_outlined),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
-        onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
-            .then((value) => setState(() {})),
+        //onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
+        //    .then((value) => setState(() {})),
       )),
-      */
       if ((_account.keyDerivationType == KeyDerivationType.none) &&
           recommendKeyDerivation)
         PassyPadding(ThreeWidgetButton(
@@ -590,8 +589,9 @@ class _MainScreen extends State<MainScreen>
         )),
     ];
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -614,6 +614,7 @@ class _MainScreen extends State<MainScreen>
               onPressed: () =>
                   Navigator.pushNamed(context, SearchScreen.routeName,
                       arguments: SearchScreenArgs(
+                        entryType: null,
                         title: localizations.allEntries,
                         builder: _searchBuilder,
                       )),
@@ -627,7 +628,6 @@ class _MainScreen extends State<MainScreen>
               onPressed: () {
                 if (!_account.isRSAKeypairLoaded) {
                   showSnackBar(
-                    context,
                     message: localizations.settingUpSynchronization,
                     icon: const Icon(CupertinoIcons.clock_solid,
                         color: PassyTheme.darkContentColor),
@@ -661,24 +661,25 @@ class _MainScreen extends State<MainScreen>
                           child: ListView(
                         children: [
                           _screenButtons[0],
-                          _screenButtons[1],
-                          _screenButtons[2],
-                        ],
-                      )),
-                      Expanded(
-                          child: ListView(
-                        children: [
                           _screenButtons[3],
-                          _screenButtons[4],
-                          _screenButtons[5],
+                          _screenButtons[6],
+                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                       Expanded(
                           child: ListView(
                         children: [
-                          _screenButtons[6],
+                          _screenButtons[1],
+                          _screenButtons[4],
                           _screenButtons[7],
-                          if (_screenButtons.length == 9) _screenButtons[8],
+                        ],
+                      )),
+                      Expanded(
+                          child: ListView(
+                        children: [
+                          _screenButtons[2],
+                          _screenButtons[5],
+                          _screenButtons[8],
                         ],
                       ))
                     ]);
@@ -688,19 +689,20 @@ class _MainScreen extends State<MainScreen>
                       Expanded(
                         child: ListView(children: [
                           _screenButtons[0],
-                          _screenButtons[1],
                           _screenButtons[2],
-                          _screenButtons[3],
-                          if (_screenButtons.length == 9) _screenButtons[8],
+                          _screenButtons[4],
+                          _screenButtons[6],
+                          _screenButtons[8],
                         ]),
                       ),
                       Expanded(
                           child: ListView(
                         children: [
-                          _screenButtons[4],
+                          _screenButtons[1],
+                          _screenButtons[3],
                           _screenButtons[5],
-                          _screenButtons[6],
                           _screenButtons[7],
+                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                     ]);

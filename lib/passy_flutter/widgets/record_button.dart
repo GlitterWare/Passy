@@ -25,7 +25,8 @@ class RecordButton extends StatelessWidget {
     this.valueAlign = TextAlign.center,
     this.left,
   })  : titleStyle = titleStyle ??
-            const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            const TextStyle(
+                color: PassyTheme.lightContentSecondaryColor, height: 0.94),
         super(key: key);
 
   @override
@@ -49,16 +50,19 @@ class RecordButton extends StatelessWidget {
         builder: (_) => RecordDialog(
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
-      right: IconButton(
-        icon: const Icon(Icons.copy_rounded),
-        tooltip: localizations.copy,
-        onPressed: () {
-          Clipboard.setData(ClipboardData(text: value));
-          showSnackBar(context,
-              message: '$title ${localizations.copied.toLowerCase()}',
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
-        },
+      right: CircleAvatar(
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          icon: const Icon(Icons.copy_rounded),
+          tooltip: localizations.copy,
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: value));
+            showSnackBar(
+                message: '$title ${localizations.copied.toLowerCase()}',
+                icon: const Icon(Icons.copy_rounded,
+                    color: PassyTheme.darkContentColor));
+          },
+        ),
       ),
     );
   }

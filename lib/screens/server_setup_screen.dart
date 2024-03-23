@@ -30,7 +30,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     String? address = _address;
     if (address == null) {
       showSnackBar(
-        context,
         message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
@@ -39,7 +38,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     }
     if (address.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
@@ -48,7 +46,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     }
     if (_port == 0) {
       showSnackBar(
-        context,
         message: localizations.invalidPortSpecified,
         icon: const Icon(Icons.numbers_rounded,
             color: PassyTheme.darkContentColor),
@@ -69,14 +66,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
         port: _port,
       );
       showSnackBar(
-        context,
         message: localizations.serverInstalled,
         icon: const Icon(Icons.install_desktop_rounded,
             color: PassyTheme.darkContentColor),
       );
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.couldNotInstallServer,
         icon: const Icon(Icons.install_desktop_rounded,
             color: PassyTheme.darkContentColor),
@@ -94,7 +89,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     String? address = _address;
     if (address == null) {
       showSnackBar(
-        context,
         message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
@@ -103,7 +97,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     }
     if (address.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.hostAddressIsEmpty,
         icon: const Icon(Icons.desktop_windows_rounded,
             color: PassyTheme.darkContentColor),
@@ -112,7 +105,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     }
     if (_port == 0) {
       showSnackBar(
-        context,
         message: localizations.invalidPortSpecified,
         icon: const Icon(Icons.numbers_rounded,
             color: PassyTheme.darkContentColor),
@@ -123,7 +115,6 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       await _account.testSynchronizationConnection2d0d0(address, _port);
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.couldNotConnectToServer,
         icon: const Icon(
           Icons.cast_rounded,

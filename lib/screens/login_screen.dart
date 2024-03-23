@@ -46,6 +46,7 @@ class _LoginScreen extends State<LoginScreen> {
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
+  bool isCapsLockEnabled = false;
 
   Future<void> _bioAuth() async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -64,6 +65,11 @@ class _LoginScreen extends State<LoginScreen> {
                 .toString()) {
           Navigator.popUntil(
               context, (route) => route.settings.name == LoginScreen.routeName);
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          if (data.info.value.lastUsername != _username) {
+            data.info.value.lastUsername = _username;
+            await data.info.save();
+          }
           enc.Key key = await derivePassword(storageData.password,
               derivationType: derivationType, derivationInfo: derivationInfo);
           enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
@@ -71,11 +77,13 @@ class _LoginScreen extends State<LoginScreen> {
               _username, encrypter, key,
               encryptedPassword:
                   encrypt(storageData.password, encrypter: encrypter));
+          Navigator.pop(context);
           if (isAutofill) {
             Navigator.pushNamed(
               context,
               SearchScreen.routeName,
               arguments: SearchScreenArgs(
+                entryType: null,
                 builder: _buildPasswords,
                 isAutofill: true,
               ),
@@ -91,7 +99,8 @@ class _LoginScreen extends State<LoginScreen> {
     }
   }
 
-  Widget _buildPasswords(String terms, void Function() rebuild) {
+  Widget _buildPasswords(
+      String terms, List<String> tags, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
         passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
     List<PwDataset> _dataSets = [];
@@ -151,8 +160,17 @@ class _LoginScreen extends State<LoginScreen> {
           _derivedPassword =
               (await data.getArgon2Key(_username, password: _password))!
                   .rawBytes;
-        } catch (_) {
-          // TODO: show an error log
+        } catch (e, s) {
+          showSnackBar(
+            message: localizations.couldNotLogin,
+            icon: const Icon(Icons.lock_rounded,
+                color: PassyTheme.darkContentColor),
+            action: SnackBarAction(
+              label: localizations.details,
+              onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+                  arguments: e.toString() + '\n' + s.toString()),
+            ),
+          );
           _isPasswordWrong = true;
           break;
         }
@@ -167,7 +185,6 @@ class _LoginScreen extends State<LoginScreen> {
     }
     if (_isPasswordWrong) {
       showSnackBar(
-        context,
         message: localizations.incorrectPassword,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
@@ -178,55 +195,56 @@ class _LoginScreen extends State<LoginScreen> {
       });
       return;
     }
-    data.info.value.lastUsername = _username;
     Navigator.pushNamed(context, SplashScreen.routeName);
-    data.info.save().whenComplete(() async {
-      try {
-        enc.Key key = _derivedPassword == null
-            ? enc.Key.fromUtf8(
-                _password + (' ' * (32 - utf8.encode(_password).length)))
-            : enc.Key(Uint8List.fromList(_derivedPassword));
-        LoadedAccount _account = await data.loadAccount(
-            data.info.value.lastUsername,
-            _derivedPassword == null
-                ? getPassyEncrypter(_password)
-                : getPassyEncrypterFromBytes(
-                    Uint8List.fromList(_derivedPassword)),
-            key,
-            encryptedPassword:
-                encrypt(_password, encrypter: enc.Encrypter(enc.AES(key))));
-        Navigator.pop(context);
-        if (isAutofill) {
-          Navigator.pushNamed(
-            context,
-            SearchScreen.routeName,
-            arguments: SearchScreenArgs(
-              builder: _buildPasswords,
-              isAutofill: true,
-            ),
-          );
-          return;
-        }
-        _account.startAutoSync();
-        if (Platform.isAndroid) {
-          FlutterSecureScreen.singleton
-              .setAndroidScreenSecure(_account.protectScreen);
-        }
-        Navigator.pushReplacementNamed(context, MainScreen.routeName);
-      } catch (e, s) {
-        showSnackBar(
+    if (data.info.value.lastUsername != _username) {
+      data.info.value.lastUsername = _username;
+      await data.info.save();
+    }
+    try {
+      enc.Key key = _derivedPassword == null
+          ? enc.Key.fromUtf8(
+              _password + (' ' * (32 - utf8.encode(_password).length)))
+          : enc.Key(Uint8List.fromList(_derivedPassword));
+      LoadedAccount _account = await data.loadAccount(
+          data.info.value.lastUsername,
+          _derivedPassword == null
+              ? getPassyEncrypter(_password)
+              : getPassyEncrypterFromBytes(
+                  Uint8List.fromList(_derivedPassword)),
+          key,
+          encryptedPassword:
+              encrypt(_password, encrypter: enc.Encrypter(enc.AES(key))));
+      Navigator.pop(context);
+      if (isAutofill) {
+        Navigator.pushNamed(
           context,
-          message: localizations.couldNotLogin,
-          icon: const Icon(Icons.lock_rounded,
-              color: PassyTheme.darkContentColor),
-          action: SnackBarAction(
-            label: localizations.details,
-            onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
-                arguments: e.toString() + '\n' + s.toString()),
+          SearchScreen.routeName,
+          arguments: SearchScreenArgs(
+            entryType: null,
+            builder: _buildPasswords,
+            isAutofill: true,
           ),
         );
+        return;
       }
-    });
+      _account.startAutoSync();
+      if (Platform.isAndroid) {
+        FlutterSecureScreen.singleton
+            .setAndroidScreenSecure(_account.protectScreen);
+      }
+      Navigator.pushReplacementNamed(context, MainScreen.routeName);
+    } catch (e, s) {
+      showSnackBar(
+        message: localizations.couldNotLogin,
+        icon:
+            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
+    }
   }
 
   void updateBioAuthButton() {
@@ -234,9 +252,7 @@ class _LoginScreen extends State<LoginScreen> {
     if (data.getBioAuthEnabled(_username) == true) {
       _bioAuthButton = FloatingActionButton(
         onPressed: () => _bioAuth(),
-        child: const Icon(
-          Icons.fingerprint_rounded,
-        ),
+        child: const Icon(Icons.fingerprint_rounded),
         tooltip: localizations.authenticate,
         heroTag: null,
       );
@@ -256,6 +272,8 @@ class _LoginScreen extends State<LoginScreen> {
       _floatingActionButton =
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         FloatingActionButton(
+          foregroundColor: PassyTheme.lightContentColor,
+          backgroundColor: Colors.purple,
           child: const Icon(Icons.settings_rounded),
           tooltip: localizations.settings,
           heroTag: null,
@@ -266,6 +284,8 @@ class _LoginScreen extends State<LoginScreen> {
           Padding(
             padding: EdgeInsets.only(left: PassyTheme.passyPadding.left),
             child: FloatingActionButton(
+              foregroundColor: PassyTheme.lightContentColor,
+              backgroundColor: Colors.purple,
               child: const Icon(Icons.extension_rounded),
               tooltip: localizations.passyBrowserExtension,
               heroTag: null,
@@ -331,6 +351,9 @@ class _LoginScreen extends State<LoginScreen> {
                               children: [
                                 if (!isAutofill)
                                   FloatingActionButton(
+                                    foregroundColor:
+                                        PassyTheme.lightContentColor,
+                                    backgroundColor: Colors.purple,
                                     onPressed: () =>
                                         Navigator.pushReplacementNamed(context,
                                             AddAccountScreen.routeName),
@@ -340,6 +363,7 @@ class _LoginScreen extends State<LoginScreen> {
                                   ),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
+                                    isDense: false,
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(30)),
                                     value: _username,
@@ -358,19 +382,30 @@ class _LoginScreen extends State<LoginScreen> {
                             ),
                             Row(
                               children: [
+                                if (isCapsLockEnabled)
+                                  const PassyPadding(Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Color.fromRGBO(255, 82, 82, 1),
+                                  )),
                                 Expanded(
                                   child: TextField(
                                     controller: _passwordController,
                                     obscureText: true,
-                                    onChanged: (a) =>
-                                        setState(() => _password = a),
+                                    onChanged: (a) => setState(() {
+                                      if (HardwareKeyboard
+                                          .instance.lockModesEnabled
+                                          .contains(
+                                              KeyboardLockMode.capsLock)) {
+                                        isCapsLockEnabled = true;
+                                      } else {
+                                        isCapsLockEnabled = false;
+                                      }
+                                      _password = a;
+                                    }),
                                     onSubmitted: (s) => login(),
                                     decoration: InputDecoration(
                                       hintText: localizations.password,
                                     ),
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(32),
-                                    ],
                                     autofocus: true,
                                   ),
                                 ),

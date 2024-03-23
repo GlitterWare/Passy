@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/setup_screen.dart';
 import 'package:encrypt/encrypt.dart' as crypt;
@@ -27,11 +27,11 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _username = '';
   String _password = '';
   String _confirmPassword = '';
+  bool isCapsLockEnabled = false;
 
   void _addAccount() async {
     if (_username.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.usernameIsEmpty,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
@@ -40,7 +40,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (_username.length < 2) {
       showSnackBar(
-        context,
         message: localizations.usernameShorterThan2Letters,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
@@ -49,7 +48,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (data.hasAccount(_username)) {
       showSnackBar(
-        context,
         message: localizations.usernameAlreadyInUse,
         icon: const Icon(Icons.person_rounded,
             color: PassyTheme.darkContentColor),
@@ -58,7 +56,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (_password.isEmpty) {
       showSnackBar(
-        context,
         message: localizations.passwordIsEmpty,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
@@ -67,7 +64,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     }
     if (_password != _confirmPassword) {
       showSnackBar(
-        context,
         message: localizations.passwordsDoNotMatch,
         icon:
             const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
@@ -82,7 +78,6 @@ class _AddAccountScreen extends State<StatefulWidget> {
     } catch (e, s) {
       if (!mounted) return;
       showSnackBar(
-        context,
         message: localizations.couldNotAddAccount,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),
@@ -107,16 +102,20 @@ class _AddAccountScreen extends State<StatefulWidget> {
     });
   }
 
-  Future<bool> _onWillPop() {
-    if (data.noAccounts) return Future.value(true);
+  void _onWillPop(bool isPopped) {
+    if (isPopped) return;
+    if (data.noAccounts) {
+      Navigator.pop(context);
+      return;
+    }
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-    return Future.value(false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -184,35 +183,57 @@ class _AddAccountScreen extends State<StatefulWidget> {
                             ),
                             Row(
                               children: [
+                                if (isCapsLockEnabled)
+                                  const PassyPadding(Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Color.fromRGBO(255, 82, 82, 1),
+                                  )),
                                 Expanded(
                                   child: TextField(
                                     obscureText: true,
-                                    onChanged: (a) =>
-                                        setState(() => _password = a),
+                                    onChanged: (a) => setState(() {
+                                      if (HardwareKeyboard
+                                          .instance.lockModesEnabled
+                                          .contains(
+                                              KeyboardLockMode.capsLock)) {
+                                        isCapsLockEnabled = true;
+                                      } else {
+                                        isCapsLockEnabled = false;
+                                      }
+                                      _password = a;
+                                    }),
                                     decoration: InputDecoration(
                                       hintText: localizations.password,
                                     ),
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(32),
-                                    ],
                                   ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
+                                if (isCapsLockEnabled)
+                                  const PassyPadding(Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: Color.fromRGBO(255, 82, 82, 1),
+                                  )),
                                 Expanded(
                                   child: TextField(
                                     obscureText: true,
                                     decoration: InputDecoration(
                                       hintText: localizations.confirmPassword,
                                     ),
-                                    onChanged: (a) =>
-                                        setState(() => _confirmPassword = a),
+                                    onChanged: (a) => setState(() {
+                                      if (HardwareKeyboard
+                                          .instance.lockModesEnabled
+                                          .contains(
+                                              KeyboardLockMode.capsLock)) {
+                                        isCapsLockEnabled = true;
+                                      } else {
+                                        isCapsLockEnabled = false;
+                                      }
+                                      _confirmPassword = a;
+                                    }),
                                     onSubmitted: (value) => _addAccount(),
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(32),
-                                    ],
                                   ),
                                 ),
                                 FloatingActionButton(

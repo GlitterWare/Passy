@@ -9,6 +9,7 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/manage_servers_screen.dart';
 import 'package:passy/screens/settings_screen.dart';
+import 'package:text_divider/text_divider.dart';
 
 import 'server_connect_screen.dart';
 import 'synchronization_logs_screen.dart';
@@ -66,7 +67,7 @@ class _ServersScreen extends State<ServersScreen> {
       _syncInterval = int.parse(_syncIntervalString);
     }
     if (_syncInterval < 1) {
-      showSnackBar(context,
+      showSnackBar(
           message:
               '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
           icon:
@@ -75,7 +76,7 @@ class _ServersScreen extends State<ServersScreen> {
     }
     if (_syncIntervalUnits == IntervalUnit.seconds) {
       if (_syncInterval < 5) {
-        showSnackBar(context,
+        showSnackBar(
             message:
                 '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
             icon: const Icon(Icons.timelapse,
@@ -157,6 +158,14 @@ class _ServersScreen extends State<ServersScreen> {
                       onPressed: () => Navigator.pushNamed(
                               context, ManageServersScreen.routeName)
                           .then((value) => setState(() {})))),
+                TextDivider.horizontal(
+                  color: PassyTheme.lightContentSecondaryColor,
+                  text: Text(
+                    localizations.synchronizationInterval,
+                    style: const TextStyle(
+                        color: PassyTheme.lightContentSecondaryColor),
+                  ),
+                ),
                 PassyPadding(Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
@@ -164,8 +173,6 @@ class _ServersScreen extends State<ServersScreen> {
                       child: TextFormField(
                         key: _syncIntervalKey,
                         initialValue: _syncIntervalString,
-                        decoration: InputDecoration(
-                            labelText: localizations.synchronizationInterval),
                         onChanged: (value) =>
                             setState(() => _syncIntervalString = value),
                         inputFormatters: [

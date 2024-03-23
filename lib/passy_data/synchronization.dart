@@ -948,12 +948,15 @@ class Synchronization {
         }
       }
 
+      String lastAuth = '';
+
       Map<String, dynamic> auth() {
+        lastAuth = util.generateAuth(
+            encrypter: remoteEncrypter,
+            usernameEncrypter: usernameEncrypter,
+            withIV: _authWithIV);
         return {
-          'auth': util.generateAuth(
-              encrypter: remoteEncrypter,
-              usernameEncrypter: usernameEncrypter,
-              withIV: _authWithIV),
+          'auth': lastAuth,
         };
       }
 
@@ -1011,6 +1014,7 @@ class Synchronization {
         if (!response.containsKey('error')) {
           try {
             util.verifyAuth(response['auth'],
+              lastAuth: lastAuth,
                 encrypter: remoteEncrypter,
                 usernameEncrypter: usernameEncrypter,
                 withIV: true);
@@ -1145,6 +1149,7 @@ class Synchronization {
       }
       try {
         util.verifyAuth(authResponse['auth'],
+          lastAuth: lastAuth,
             encrypter: remoteEncrypter,
             usernameEncrypter: usernameEncrypter,
             withIV: _authWithIV);

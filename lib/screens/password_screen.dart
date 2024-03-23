@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:otp/otp.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
@@ -15,6 +14,7 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/common.dart';
 
 import 'edit_password_screen.dart';
+import 'log_screen.dart';
 import 'main_screen.dart';
 import 'passwords_screen.dart';
 import 'splash_screen.dart';
@@ -31,6 +31,9 @@ class PasswordScreen extends StatefulWidget {
 class _PasswordScreen extends State<PasswordScreen> {
   final Completer<void> _onClosed = Completer<void>();
   final LoadedAccount _account = data.loadedAccount!;
+  List<String> _tags = [];
+  List<String> _selected = [];
+  bool _tagsLoaded = false;
   Password? password;
   Future<void>? generateTFA;
   String _tfaCode = '';
@@ -72,27 +75,12 @@ class _PasswordScreen extends State<PasswordScreen> {
           break;
       }
       if (_tfaProgress < _tfaProgressLast) {
-        setState(() {
-          _tfaCode = OTP.generateTOTPCodeString(
-            tfa.secret,
-            DateTime.now().millisecondsSinceEpoch,
-            length: tfa.length,
-            interval: tfa.interval,
-            algorithm: tfa.algorithm,
-            isGoogle: tfa.isGoogle,
-          );
-        });
+        if (!mounted) return;
+        setState(() => _tfaCode = tfa.generate());
       }
       _tfaProgressLast = _tfaProgress;
       await Future.delayed(const Duration(milliseconds: 50));
     }
-  }
-
-  //TODO: implement tags
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -146,12 +134,90 @@ class _PasswordScreen extends State<PasswordScreen> {
     );
   }
 
+  Future<void> _load() async {
+    List<String> newTags = await _account.passwordTags;
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+        _selected = password!.tags.toList();
+        for (String tag in _selected) {
+          if (_tags.contains(tag)) {
+            _tags.remove(tag);
+          }
+        }
+        _tagsLoaded = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (password == null) {
       password = ModalRoute.of(context)!.settings.arguments as Password;
-      if (password!.tfa != null) generateTFA = _generateTFA(password!.tfa!);
+      if (password!.tfa != null) {
+        if (password!.tfa!.type == TFAType.HOTP) {
+          setState(() {
+            _tfaCode = password!.tfa!.generate();
+          });
+        } else {
+          generateTFA = _generateTFA(password!.tfa!);
+        }
+      }
+      _load();
     }
+    Widget? tfaWidget;
+    if (password!.tfa != null) {
+      if (password!.tfa!.type == TFAType.HOTP) {
+        tfaWidget = Container(
+          padding: EdgeInsets.only(right: PassyTheme.passyPadding.right),
+          child: Row(
+            children: [
+              Flexible(
+                child: PassyPadding(RecordButton(
+                  title: localizations.tfaCode,
+                  value: _tfaCode,
+                )),
+              ),
+              FloatingActionButton(
+                  heroTag: null,
+                  child: const Icon(Icons.refresh_rounded),
+                  tooltip: localizations.refresh,
+                  onPressed: () async {
+                    Navigator.pushNamed(context, SplashScreen.routeName);
+                    password!.tfa!.interval++;
+                    await _account.setPassword(password!);
+                    Navigator.popUntil(context,
+                        (r) => r.settings.name == MainScreen.routeName);
+                    Navigator.pushNamed(context, PasswordsScreen.routeName);
+                    Navigator.pushNamed(context, PasswordScreen.routeName,
+                        arguments: password!);
+                  }),
+            ],
+          ),
+        );
+      } else {
+        tfaWidget = Row(
+          children: [
+            SizedBox(
+              width: PassyTheme.passyPadding.left * 2,
+            ),
+            SizedBox(
+              child: CircularProgressIndicator(
+                value: _tfaProgress,
+                color: _tfaColor,
+              ),
+            ),
+            Flexible(
+              child: PassyPadding(RecordButton(
+                title: localizations.tfaCode,
+                value: _tfaCode,
+              )),
+            ),
+          ],
+        );
+      }
+    }
+
     _account.reloadFavoritesSync();
     isFavorite =
         _account.favoritePasswords[password!.key]?.status == EntryStatus.alive;
@@ -167,7 +233,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         onFavoritePressed: () async {
           if (isFavorite) {
             await _account.removeFavoritePassword(password!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.removedFromFavorites,
                 icon: const Icon(
                   Icons.star_outline_rounded,
@@ -175,7 +241,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                 ));
           } else {
             await _account.addFavoritePassword(password!.key);
-            showSnackBar(context,
+            showSnackBar(
                 message: localizations.addedToFavorites,
                 icon: const Icon(
                   Icons.star_rounded,
@@ -187,6 +253,80 @@ class _PasswordScreen extends State<PasswordScreen> {
       ),
       body: ListView(
         children: [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: PassyTheme.passyPadding.top / 2,
+                  bottom: PassyTheme.passyPadding.bottom / 2),
+              child: !_tagsLoaded
+                  ? const CircularProgressIndicator()
+                  : EntryTagList(
+                      showAddButton: true,
+                      selected: _selected,
+                      notSelected: _tags,
+                      onSecondary: (tag) async {
+                        String? newTag = await showDialog(
+                          context: context,
+                          builder: (ctx) => RenameTagDialog(tag: tag),
+                        );
+                        if (newTag == null) return;
+                        if (newTag == tag) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        try {
+                          await _account.renameTag(tag: tag, newTag: newTag);
+                        } catch (e, s) {
+                          Navigator.pop(context);
+                          showSnackBar(
+                            message: localizations.somethingWentWrong,
+                            icon: const Icon(Icons.error_outline_rounded,
+                                color: PassyTheme.darkContentColor),
+                            action: SnackBarAction(
+                              label: localizations.details,
+                              onPressed: () => Navigator.pushNamed(
+                                  context, LogScreen.routeName,
+                                  arguments:
+                                      e.toString() + '\n' + s.toString()),
+                            ),
+                          );
+                          return;
+                        }
+                        password!.tags = _selected.toList();
+                        if (password!.tags.contains(tag)) {
+                          password!.tags.remove(tag);
+                          password!.tags.add(newTag);
+                        }
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, PasswordsScreen.routeName);
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: password!);
+                      },
+                      onAdded: (tag) async {
+                        if (password!.tags.contains(tag)) return;
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        password!.tags = _selected.toList();
+                        password!.tags.add(tag);
+                        await _account.setPassword(password!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, PasswordsScreen.routeName);
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: password!);
+                      },
+                      onRemoved: (tag) async {
+                        Navigator.pushNamed(context, SplashScreen.routeName);
+                        password!.tags = _selected.toList();
+                        password!.tags.remove(tag);
+                        await _account.setPassword(password!);
+                        Navigator.popUntil(context,
+                            (r) => r.settings.name == MainScreen.routeName);
+                        Navigator.pushNamed(context, PasswordsScreen.routeName);
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: password!);
+                      },
+                    ),
+            ),
+          ),
           if (password!.attachments.isNotEmpty)
             AttachmentsListView(files: password!.attachments),
           if (password!.nickname != '')
@@ -209,26 +349,7 @@ class _PasswordScreen extends State<PasswordScreen> {
               obscureValue: true,
               isPassword: true,
             )),
-          if (password!.tfa != null)
-            Row(
-              children: [
-                SizedBox(
-                  width: PassyTheme.passyPadding.left * 2,
-                ),
-                SizedBox(
-                  child: CircularProgressIndicator(
-                    value: _tfaProgress,
-                    color: _tfaColor,
-                  ),
-                ),
-                Flexible(
-                  child: PassyPadding(RecordButton(
-                    title: localizations.tfaCode,
-                    value: _tfaCode,
-                  )),
-                ),
-              ],
-            ),
+          if (tfaWidget != null) tfaWidget,
           if (password!.website != '')
             Row(
               children: [

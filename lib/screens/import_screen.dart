@@ -8,7 +8,7 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/csv_import_screen.dart';
-import 'package:passy/screens/main_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'export_and_import_screen.dart';
 
@@ -23,7 +23,7 @@ class ImportScreen extends StatefulWidget {
 
 class _ImportScreen extends State<ImportScreen> {
   void _onPassyImportPressed() {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.importFromPassy,
@@ -34,7 +34,7 @@ class _ImportScreen extends State<ImportScreen> {
         .then(
       (_pick) {
         Future.delayed(const Duration(seconds: 2))
-            .then((value) => MainScreen.shouldLockScreen = true);
+            .then((value) => UnlockScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,
@@ -49,7 +49,7 @@ class _ImportScreen extends State<ImportScreen> {
   }
 
   void _onKdbxImportPressed() {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
         .pickFiles(
       dialogTitle: localizations.kdbxImport,
@@ -60,7 +60,7 @@ class _ImportScreen extends State<ImportScreen> {
         .then(
       (_pick) {
         Future.delayed(const Duration(seconds: 2))
-            .then((value) => MainScreen.shouldLockScreen = true);
+            .then((value) => UnlockScreen.shouldLockScreen = true);
         if (_pick == null) return;
         Navigator.pushNamed(
           context,
@@ -68,6 +68,32 @@ class _ImportScreen extends State<ImportScreen> {
           arguments: ConfirmImportScreenArgs(
             path: _pick.files[0].path!,
             importType: ImportType.kdbx,
+          ),
+        );
+      },
+    );
+  }
+
+  void _onAegisImportPressed() {
+    UnlockScreen.shouldLockScreen = false;
+    FilePicker.platform
+        .pickFiles(
+      dialogTitle: localizations.aegisImport,
+      type: Platform.isAndroid ? FileType.any : FileType.custom,
+      allowedExtensions: Platform.isAndroid ? null : ['json'],
+      lockParentWindow: true,
+    )
+        .then(
+      (_pick) {
+        Future.delayed(const Duration(seconds: 2))
+            .then((value) => UnlockScreen.shouldLockScreen = true);
+        if (_pick == null) return;
+        Navigator.pushNamed(
+          context,
+          ConfirmImportScreen.routeName,
+          arguments: ConfirmImportScreenArgs(
+            path: _pick.files[0].path!,
+            importType: ImportType.aegis,
           ),
         );
       },
@@ -109,12 +135,21 @@ class _ImportScreen extends State<ImportScreen> {
           onPressed: _onKdbxImportPressed,
         )),
         PassyPadding(ThreeWidgetButton(
+          center: Text(localizations.aegisImport),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.security),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: _onAegisImportPressed,
+        )),
+        PassyPadding(ThreeWidgetButton(
           center: Text(localizations.passyImport),
           left: Padding(
             padding: const EdgeInsets.only(right: 30),
             child: SvgPicture.asset(
               logoCircleSvg,
-              width: 30,
+              width: 24,
               colorFilter: const ColorFilter.mode(
                   PassyTheme.lightContentColor, BlendMode.srcIn),
             ),

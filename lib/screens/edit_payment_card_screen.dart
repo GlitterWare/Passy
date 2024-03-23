@@ -108,7 +108,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
       ),
       body: ListView(
         children: [
-          PaymentCardButton(
+          PassyPadding(PaymentCardButton(
             paymentCard: PaymentCardMeta(
               key: '',
               tags: [],
@@ -120,7 +120,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             obscureCardNumber: false,
             obscureCardCvv: false,
             isSwipeGestureEnabled: false,
-          ),
+          )),
           /*
           AttachmentsEditor(
             files: _attachments,

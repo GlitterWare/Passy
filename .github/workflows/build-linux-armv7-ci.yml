@@ -1,0 +1,48 @@
+name: Build Passy for Linux ARMv7
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ opened, synchronize, reopened, review_requested ]
+    branches:
+      - main
+      - dev
+jobs:
+  build_linux_armv7:
+    name: Build Passy CLI for Linux ARMv7
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2.1.0
+      - name: Create build directory
+        shell: bash
+        run: |
+          cd ..
+          mkdir build
+          mkdir bin
+          cd bin
+          wget https://raw.githubusercontent.com/GlitterWare/Passy/$GITHUB_SHA/.github/workflows/armv7.sh
+          chmod +x armv7.sh
+      - name: Install dependencies
+        shell: bash
+        run: sudo apt install -y qemu binfmt-support qemu-user-static qemu-system-arm
+      - name: Build for ARMv7
+        uses: tj-actions/docker-run@v2
+        with:
+          image: ubuntu:latest
+          name: ubuntu
+          options: --rm --platform linux/arm/v7 -v $PWD:/Passy -v /home/runner/work/Passy/build:/passy-build -v /home/runner/work/Passy/bin:/passy-bin
+          args: /passy-bin/armv7.sh
+      - name: Archive Passy CLI build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-CLI-Linux-ARMv7.zip
+          path: cli
+      - name: Upload Passy CLI build
+        uses: actions/upload-artifact@v4
+        with:
+          name: passy-cli-linux-armv7
+          path: /home/runner/work/Passy/build/Passy-CLI-Linux-ARMv7.zip

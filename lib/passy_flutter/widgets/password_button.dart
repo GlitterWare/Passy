@@ -41,6 +41,7 @@ class PasswordButton extends StatelessWidget {
                 child: Text(
                   password.username,
                   style: const TextStyle(color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 alignment: Alignment.centerLeft,
               ),
@@ -53,7 +54,7 @@ class PasswordButton extends StatelessWidget {
           child: PopupMenuButton(
             shape: PassyTheme.dialogShape,
             icon: const Icon(Icons.more_vert_rounded),
-            padding: const EdgeInsets.fromLTRB(12, 23, 12, 23),
+            padding: const EdgeInsets.fromLTRB(12, 22, 12, 22),
             splashRadius: 24,
             itemBuilder: popupMenuItemBuilder!,
           ),

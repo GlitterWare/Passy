@@ -30,6 +30,7 @@ class _SetupScreen extends State<SetupScreen> {
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: localizations.done,
         child: const Icon(Icons.check_rounded),
         onPressed: () =>
             Navigator.pushReplacementNamed(context, MainScreen.routeName),
@@ -70,6 +71,26 @@ class _SetupScreen extends State<SetupScreen> {
             onPressed: () => Navigator.pushNamed(
                 context, AutomaticBackupScreen.routeName,
                 arguments: data.loadedAccount!.username),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            color: PassyTheme.lightContentColor,
+            center: Text(
+              localizations.done,
+              style: const TextStyle(color: PassyTheme.darkContentColor),
+            ),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(
+                Icons.check_rounded,
+                color: PassyTheme.darkContentColor,
+              ),
+            ),
+            right: const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: PassyTheme.darkContentColor,
+            ),
+            onPressed: () =>
+                Navigator.pushReplacementNamed(context, MainScreen.routeName),
           )),
         ],
       ),

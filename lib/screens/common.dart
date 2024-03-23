@@ -23,6 +23,7 @@ import 'package:passy/screens/id_cards_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/screens/payment_cards_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zxing2/qrcode.dart';
 
@@ -92,7 +93,6 @@ void openUrl(String url) {
   launchUrlString(url);
 }
 
-//TODO: localize backup
 Future<String?> backupAccount(
   BuildContext context, {
   required String username,
@@ -100,25 +100,25 @@ Future<String?> backupAccount(
 }) async {
   if (Platform.isAndroid) autoFilename = true;
   try {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     String? _fileName;
     String? _buDir;
     if (autoFilename) {
       _buDir = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Backup Passy',
+        dialogTitle: localizations.backupPassy,
         lockParentWindow: true,
       );
     } else {
       _fileName =
           'passy-backup-$username-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
       _buDir = await FilePicker.platform.saveFile(
-        dialogTitle: 'Backup Passy',
+        dialogTitle: localizations.backupPassy,
         lockParentWindow: true,
         fileName: _fileName,
       );
     }
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => MainScreen.shouldLockScreen = true);
+        .then((value) => UnlockScreen.shouldLockScreen = true);
     if (_buDir == null) return null;
     if (!autoFilename) _buDir = File(_buDir).parent.path;
     await data.backupAccount(
@@ -126,21 +126,20 @@ Future<String?> backupAccount(
       outputDirectoryPath: _buDir,
       fileName: _fileName,
     );
-    showSnackBar(context,
-        message: 'Backup saved',
+    showSnackBar(
+        message: localizations.backupSaved,
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor));
     return _buDir;
   } catch (e, s) {
     if (e is FileSystemException) {
-      showSnackBar(context,
-          message: 'Access denied, try another folder',
+      showSnackBar(
+          message: localizations.accessDeniedTryAnotherFolder,
           icon: const Icon(Icons.save_rounded,
               color: PassyTheme.darkContentColor));
     } else {
       showSnackBar(
-        context,
-        message: 'Could not backup',
+        message: localizations.couldNotBackup,
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
         action: SnackBarAction(
@@ -224,8 +223,7 @@ Result? qrResultFromImage(imglib.Image image) {
   }
 }
 
-ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
-  BuildContext context, {
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showSnackBar({
   required String message,
   TextStyle? textStyle,
   required Widget icon,
@@ -233,6 +231,8 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
   Duration duration = const Duration(milliseconds: 4000),
   Color? backgroundColor,
 }) {
+  BuildContext? context = navigatorKey.currentContext;
+  if (context == null) return null;
   ScaffoldMessenger.of(context).clearSnackBars();
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Row(children: [
@@ -263,30 +263,29 @@ PopupMenuItem getIconedPopupMenuItem({
   );
 }
 
-//TODO: localize menu builders
 List<PopupMenuEntry> idCardPopupMenuBuilder(
     BuildContext context, IDCardMeta idCardMeta) {
   return [
     getIconedPopupMenuItem(
-      content: const Text('ID number'),
+      content: Text(localizations.idNumber),
       icon: const Icon(Icons.numbers_outlined),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIDCard(idCardMeta.key)!.idNumber));
-        showSnackBar(context,
-            message: 'ID number copied',
+        showSnackBar(
+            message: localizations.idNumber,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     if (idCardMeta.name != '')
       getIconedPopupMenuItem(
-        content: const Text('Name'),
+        content: Text(localizations.name),
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(ClipboardData(text: idCardMeta.name));
-          showSnackBar(context,
-              message: 'Name copied',
+          showSnackBar(
+              message: localizations.name,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
@@ -298,7 +297,7 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
     BuildContext context, IdentityMeta identityMeta) {
   return [
     getIconedPopupMenuItem(
-      content: const Text('Name'),
+      content: Text(localizations.name),
       icon: const Icon(Icons.person_outline_rounded),
       onTap: () {
         Identity? _identity = data.loadedAccount!.getIdentity(identityMeta.key);
@@ -315,32 +314,32 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
           _name += ' ${_identity.lastName}';
         }
         Clipboard.setData(ClipboardData(text: _name));
-        showSnackBar(context,
-            message: 'Name copied',
+        showSnackBar(
+            message: localizations.name,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     getIconedPopupMenuItem(
-      content: const Text('Email'),
+      content: Text(localizations.email),
       icon: const Icon(Icons.mail_outline_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIdentity(identityMeta.key)!.email));
-        showSnackBar(context,
-            message: 'Email copied',
+        showSnackBar(
+            message: localizations.email,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     if (identityMeta.firstAddressLine != '')
       getIconedPopupMenuItem(
-        content: const Text('Address line'),
+        content: Text(localizations.firstAddresssLine),
         icon: const Icon(Icons.house_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(text: identityMeta.firstAddressLine));
-          showSnackBar(context,
-              message: 'Address line copied',
+          showSnackBar(
+              message: localizations.firstAddresssLine,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
@@ -352,13 +351,13 @@ List<PopupMenuEntry> notePopupMenuBuilder(
     BuildContext context, NoteMeta identityMeta) {
   return [
     getIconedPopupMenuItem(
-      content: const Text('Copy'),
+      content: Text(localizations.copy),
       icon: const Icon(Icons.copy_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getNote(identityMeta.key)!.note));
-        showSnackBar(context,
-            message: 'Note copied',
+        showSnackBar(
+            message: localizations.copied,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
@@ -371,45 +370,45 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
   return [
     if (passwordMeta.username != '')
       getIconedPopupMenuItem(
-        content: const Text('Username'),
+        content: Text(localizations.username),
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(ClipboardData(
               text:
                   data.loadedAccount!.getPassword(passwordMeta.key)!.username));
-          showSnackBar(context,
-              message: 'Username copied',
+          showSnackBar(
+              message: localizations.username,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
       ),
     getIconedPopupMenuItem(
-      content: const Text('Email'),
+      content: Text(localizations.email),
       icon: const Icon(Icons.mail_outline_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.email));
-        showSnackBar(context,
-            message: 'Email copied',
+        showSnackBar(
+            message: localizations.email,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     getIconedPopupMenuItem(
-      content: const Text('Password'),
+      content: Text(localizations.password),
       icon: const Icon(Icons.lock_outline_rounded),
       onTap: () {
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.password));
-        showSnackBar(context,
-            message: 'Password copied',
+        showSnackBar(
+            message: localizations.password,
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
     ),
     if (passwordMeta.website != '')
       getIconedPopupMenuItem(
-        content: const Text('Visit'),
+        content: Text(localizations.visit),
         icon: const Icon(Icons.open_in_browser_outlined),
         onTap: () {
           String _url =
@@ -430,40 +429,40 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
   return [
     if (paymentCardMeta.cardNumber != '')
       getIconedPopupMenuItem(
-        content: const Text('Card number'),
+        content: Text(localizations.cardNumber),
         icon: const Icon(Icons.numbers_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(
               text: data.loadedAccount!
                   .getPaymentCard(paymentCardMeta.key)!
                   .cardNumber));
-          showSnackBar(context,
-              message: 'Card number copied',
+          showSnackBar(
+              message: localizations.cardNumber,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
       ),
     if (paymentCardMeta.cardholderName != '')
       getIconedPopupMenuItem(
-        content: const Text('Card holder name'),
+        content: Text(localizations.cardHolderName),
         icon: const Icon(Icons.person_outline_rounded),
         onTap: () {
           Clipboard.setData(
               ClipboardData(text: paymentCardMeta.cardholderName));
-          showSnackBar(context,
-              message: 'Card holder name copied',
+          showSnackBar(
+              message: localizations.cardHolderName,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
       ),
     if (paymentCardMeta.exp != '')
       getIconedPopupMenuItem(
-        content: const Text('Expiration date'),
+        content: Text(localizations.expirationDate),
         icon: const Icon(Icons.date_range_outlined),
         onTap: () {
           Clipboard.setData(ClipboardData(text: paymentCardMeta.exp));
-          showSnackBar(context,
-              message: 'Expiration date copied',
+          showSnackBar(
+              message: localizations.expirationDate,
               icon: const Icon(Icons.copy_rounded,
                   color: PassyTheme.darkContentColor));
         },
@@ -475,8 +474,8 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text:
                 data.loadedAccount!.getPaymentCard(paymentCardMeta.key)!.cvv));
-        showSnackBar(context,
-            message: 'CVV copied',
+        showSnackBar(
+            message: 'CVV',
             icon: const Icon(Icons.copy_rounded,
                 color: PassyTheme.darkContentColor));
       },
@@ -503,7 +502,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
-          showSnackBar(context,
+          showSnackBar(
               message: 'File renamed',
               icon: const Icon(Icons.edit_outlined,
                   color: PassyTheme.darkContentColor));
@@ -540,7 +539,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.exportSaved,
               icon: const Icon(Icons.ios_share_rounded,
                   color: PassyTheme.darkContentColor));
@@ -585,7 +584,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
-          showSnackBar(context,
+          showSnackBar(
               message: 'Folder removed',
               icon: const Icon(Icons.delete_outline_rounded,
                   color: PassyTheme.darkContentColor));
@@ -595,7 +594,7 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         await (onChanged?.call());
         if (!context.mounted) return;
         Navigator.pop(context);
-        showSnackBar(context,
+        showSnackBar(
             message: 'File removed',
             icon: const Icon(Icons.delete_outline_rounded,
                 color: PassyTheme.darkContentColor));
@@ -765,7 +764,6 @@ setOnError(BuildContext context) {
     FlutterError.presentError(e);
     try {
       showSnackBar(
-        navigatorKey.currentContext!,
         message: localizations.somethingWentWrong,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),
@@ -781,7 +779,6 @@ setOnError(BuildContext context) {
   PlatformDispatcher.instance.onError = (error, stack) {
     try {
       showSnackBar(
-        navigatorKey.currentContext!,
         message: localizations.somethingWentWrong,
         icon: const Icon(Icons.error_outline_rounded,
             color: PassyTheme.darkContentColor),

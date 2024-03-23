@@ -96,7 +96,6 @@ class _AddFileScreen extends State<AddFileScreen> {
           await _account.addFile(args.file, useIsolate: true, meta: _fileMeta);
     } catch (e, s) {
       showSnackBar(
-        context,
         message: localizations.failedToAddFile,
         icon:
             const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),

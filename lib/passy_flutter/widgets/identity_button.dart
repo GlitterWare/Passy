@@ -40,6 +40,7 @@ class IdentityButton extends StatelessWidget {
                   child: Text(
                     identity.firstAddressLine,
                     style: const TextStyle(color: Colors.grey),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   alignment: Alignment.centerLeft,
                 ),
@@ -52,7 +53,7 @@ class IdentityButton extends StatelessWidget {
             child: PopupMenuButton(
               shape: PassyTheme.dialogShape,
               icon: const Icon(Icons.more_vert_rounded),
-              padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+              padding: const EdgeInsets.fromLTRB(12, 22, 12, 22),
               splashRadius: 24,
               itemBuilder: popupMenuItemBuilder!,
             ),

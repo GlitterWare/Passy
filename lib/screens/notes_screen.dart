@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -23,66 +24,106 @@ class NotesScreen extends StatefulWidget {
 
 class _NotesScreen extends State<NotesScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditNoteScreen.routeName);
 
-  void _onSearchPressed() {
-    Navigator.pushNamed(context, SearchScreen.routeName, arguments:
-        SearchScreenArgs(builder: (String terms, void Function() rebuild) {
-      final List<NoteMeta> _found = [];
-      final List<String> _terms = terms.trim().toLowerCase().split(' ');
-      for (NoteMeta _note in _account.notesMetadata.values) {
-        {
-          bool testNote(NoteMeta value) => _note.key == value.key;
+  void _onSearchPressed({String? tag}) {
+    Navigator.pushNamed(
+      context,
+      SearchScreen.routeName,
+      arguments: SearchScreenArgs(
+        entryType: EntryType.note,
+        selectedTags: tag == null ? [] : [tag],
+        builder: (String terms, List<String> tags, void Function() rebuild) {
+          final List<NoteMeta> _found = [];
+          final List<String> _terms = terms.trim().toLowerCase().split(' ');
+          for (NoteMeta _note in _account.notesMetadata.values) {
+            {
+              bool testNote(NoteMeta value) => _note.key == value.key;
 
-          if (_found.any(testNote)) continue;
-        }
-        {
-          int _positiveCount = 0;
-          for (String _term in _terms) {
-            if (_note.title.toLowerCase().contains(_term)) {
-              _positiveCount++;
-              continue;
+              if (_found.any(testNote)) continue;
+            }
+            {
+              bool _tagMismatch = false;
+              for (String tag in tags) {
+                if (!_note.tags.contains(tag)) {
+                  _tagMismatch = true;
+                  break;
+                }
+              }
+              if (_tagMismatch) continue;
+              int _positiveCount = 0;
+              for (String _term in _terms) {
+                if (_note.title.toLowerCase().contains(_term)) {
+                  _positiveCount++;
+                  continue;
+                }
+              }
+              if (_positiveCount == _terms.length) {
+                _found.add(_note);
+              }
             }
           }
-          if (_positiveCount == _terms.length) {
-            _found.add(_note);
-          }
-        }
-      }
-      if (_found.isEmpty) {
-        return CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Column(
-                children: [
-                  const Spacer(flex: 7),
-                  Text(
-                    localizations.noSearchResults,
-                    textAlign: TextAlign.center,
+          if (_found.isEmpty) {
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 7),
+                      Text(
+                        localizations.noSearchResults,
+                        textAlign: TextAlign.center,
+                      ),
+                      const Spacer(flex: 7),
+                    ],
                   ),
-                  const Spacer(flex: 7),
-                ],
-              ),
-            ),
-          ],
-        );
-      }
-      return NoteButtonListView(
-        notes: _found,
-        shouldSort: true,
-        onPressed: (note) => Navigator.pushNamed(context, NoteScreen.routeName,
-            arguments: _account.getNote(note.key)),
-        popupMenuItemBuilder: notePopupMenuBuilder,
-      );
-    }));
+                ),
+              ],
+            );
+          }
+          return NoteButtonListView(
+            notes: _found,
+            shouldSort: true,
+            onPressed: (note) => Navigator.pushNamed(
+                context, NoteScreen.routeName,
+                arguments: _account.getNote(note.key)),
+            popupMenuItemBuilder: notePopupMenuBuilder,
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _load() async {
+    _isLoading = true;
+    List<String> newTags;
+    try {
+      newTags = await _account.notesTags;
+    } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<NoteMeta> _notes = _account.notesMetadata.values.toList();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
+    List<NoteMeta> _notes = [];
+    try {
+      _notes = _account.notesMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.note,
@@ -126,6 +167,20 @@ class _NotesScreen extends State<NotesScreen> {
                         Navigator.pushNamed(context, EditNoteScreen.routeName),
                   ),
                 ),
+                if (_tags.isNotEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: PassyTheme.passyPadding.top / 2,
+                          bottom: PassyTheme.passyPadding.bottom / 2),
+                      child: EntryTagList(
+                        notSelected: _tags,
+                        onAdded: (tag) => setState(() {
+                          _onSearchPressed(tag: tag);
+                        }),
+                      ),
+                    ),
+                  ),
               ],
               notes: _notes,
               shouldSort: true,

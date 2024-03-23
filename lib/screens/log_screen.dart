@@ -33,7 +33,7 @@ class LogScreen extends StatelessWidget {
               tooltip: localizations.copy,
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: '```\n$_log\n```'));
-                showSnackBar(context,
+                showSnackBar(
                     message:
                         '${localizations.log} ${localizations.copied.toLowerCase()}',
                     icon: const Icon(Icons.copy_rounded,
@@ -44,6 +44,7 @@ class LogScreen extends StatelessWidget {
               padding: PassyTheme.appBarButtonPadding,
               splashRadius: PassyTheme.appBarButtonSplashRadius,
               icon: SvgPicture.asset(
+                width: PassyTheme.appBarButtonSplashRadius,
                 'assets/images/github_icon.svg',
                 colorFilter: const ColorFilter.mode(
                     PassyTheme.lightContentColor, BlendMode.srcIn),

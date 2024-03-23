@@ -8,12 +8,14 @@ import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/convert_aegis.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/file_index.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
+import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
 import 'package:passy/passy_data/tfa.dart';
@@ -553,30 +555,30 @@ class LoadedAccount {
       await _passwords.export(
         File('${tempPath}passwords.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website"',
+            '"customFields","additionalInfo","tags","nickname","iconName","username","email","password","tfa","website","attachments"',
         skipKey: true,
       );
       await _paymentCards.export(
         File('${tempPath}payment_cards.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp"',
+            '"customFields","additionalInfo","tags","nickname","cardNumber","cardholderName","cvv","exp","attachments"',
         skipKey: true,
       );
       await _notes.export(
         File('${tempPath}notes.csv'),
-        annotation: '"title","note","isMarkdown"',
+        annotation: '"title","note","isMarkdown","tags","attachments"',
         skipKey: true,
       );
       await _idCards.export(
         File('${tempPath}id_cards.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country"',
+            '"customFields","additionalInfo","tags","nickname","pictures","type","idNumber","name","issDate","expDate","country","attachments"',
         skipKey: true,
       );
       await _identities.export(
         File('${tempPath}identities.csv'),
         annotation:
-            '"customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country"',
+            '"customFields","additionalInfo","tags","nickname","title","firstName","middleName","lastName","gender","email","number","firstAddressLine","secondAddressLine","zipCode","city","country","attachments',
         skipKey: true,
       );
       await _versionFile.copy('${tempPath}version.txt');
@@ -735,6 +737,12 @@ class LoadedAccount {
       rethrow;
     }
     await _history.save();
+  }
+
+  Future<void> importAegis({required File aegisFile, String? password}) async {
+    List<Password> newPasswords =
+        convertAegis(aegisFile: aegisFile, password: password);
+    await setPasswords(newPasswords);
   }
 
   Future<void> Function(PassyEntry value) setEntry(EntryType type) {
@@ -1079,8 +1087,63 @@ class LoadedAccount {
     }
   }
 
+  Future<List<String>> get tags async {
+    List<List<String>> tags = await Future.wait([
+      passwordTags,
+      notesTags,
+      paymentCardTags,
+      idCardsTags,
+      identitiesTags,
+    ]);
+    List<String> result = [...tags.removeLast()];
+    for (List<String> list in tags) {
+      for (String tag in list) {
+        if (result.contains(tag)) continue;
+        result.add(tag);
+      }
+    }
+    return result;
+  }
+
+  Future<void> renameTag({
+    required String tag,
+    required String newTag,
+  }) async {
+    List<List<String>> keyLists = await Future.wait([
+      _passwords.renameTag(tag: tag, newTag: newTag),
+      _notes.renameTag(tag: tag, newTag: newTag),
+      _paymentCards.renameTag(tag: tag, newTag: newTag),
+      _identities.renameTag(tag: tag, newTag: newTag),
+      _idCards.renameTag(tag: tag, newTag: newTag),
+    ]);
+    for (String passwordKey in keyLists[0]) {
+      _history.value.passwords[passwordKey] = EntryEvent(passwordKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String notesKey in keyLists[1]) {
+      _history.value.notes[notesKey] = EntryEvent(notesKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String paymentCardKey in keyLists[2]) {
+      _history.value.paymentCards[paymentCardKey] = EntryEvent(paymentCardKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String identityKey in keyLists[3]) {
+      _history.value.identities[identityKey] = EntryEvent(identityKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    for (String idCardKey in keyLists[4]) {
+      _history.value.idCards[idCardKey] = EntryEvent(idCardKey,
+          status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    }
+    await _history.save();
+  }
+
   // Passwords wrappers
   List<String> get passwordKeys => _passwords.keys;
+  Future<List<String>> get passwordTags => compute(
+      (PassyEntriesEncryptedCSVFile<Password> _passwords) => _passwords.tags,
+      _passwords);
   Map<String, PasswordMeta> get passwordsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1138,6 +1201,8 @@ class LoadedAccount {
 
   // Notes wrappers
   List<String> get notesKeys => _notes.keys;
+  Future<List<String>> get notesTags => compute(
+      (PassyEntriesEncryptedCSVFile<Note> _notes) => _notes.tags, _notes);
   Map<String, NoteMeta> get notesMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1197,6 +1262,10 @@ class LoadedAccount {
 
   // Payment Cards wrappers
   List<String> get paymentCardKeys => _paymentCards.keys;
+  Future<List<String>> get paymentCardTags => compute(
+      (PassyEntriesEncryptedCSVFile<PaymentCard> _paymentCards) =>
+          _paymentCards.tags,
+      _paymentCards);
   Map<String, PaymentCardMeta> get paymentCardsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1257,6 +1326,8 @@ class LoadedAccount {
 
   // ID Cards wrappers
   List<String> get idCardsKeys => _idCards.keys;
+  Future<List<String>> get idCardsTags => compute(
+      (PassyEntriesEncryptedCSVFile _idCards) => _idCards.tags, _idCards);
   Map<String, IDCardMeta> get idCardsMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();
@@ -1315,6 +1386,9 @@ class LoadedAccount {
 
   // Identities wrappers
   List<String> get identitiesKeys => _identities.keys;
+  Future<List<String>> get identitiesTags => compute(
+      (PassyEntriesEncryptedCSVFile _identities) => _identities.tags,
+      _identities);
   Map<String, IdentityMeta> get identitiesMetadata {
     bool _isHistoryChanged = false;
     _history.reloadSync();

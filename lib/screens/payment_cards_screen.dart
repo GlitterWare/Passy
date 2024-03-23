@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 import '../passy_data/entry_type.dart';
 import 'edit_payment_card_screen.dart';
@@ -21,84 +22,119 @@ class PaymentCardsScreen extends StatefulWidget {
 
 class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  List<String> _tags = [];
+  bool _isLoading = false;
 
-  void _onSearchPressed() {
+  void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
-      builder: (String terms, void Function() rebuild) {
-        final List<PaymentCardMeta> _found = [];
-        final List<String> _terms = terms.trim().toLowerCase().split(' ');
-        for (PaymentCardMeta _paymentCard
-            in data.loadedAccount!.paymentCardsMetadata.values) {
-          {
-            bool testPaymentCard(PaymentCardMeta value) =>
-                _paymentCard.key == value.key;
+          entryType: EntryType.paymentCard,
+          selectedTags: tag == null ? [] : [tag],
+          builder: (String terms, List<String> tags, void Function() rebuild) {
+            final List<PaymentCardMeta> _found = [];
+            final List<String> _terms = terms.trim().toLowerCase().split(' ');
+            for (PaymentCardMeta _paymentCard
+                in data.loadedAccount!.paymentCardsMetadata.values) {
+              {
+                bool testPaymentCard(PaymentCardMeta value) =>
+                    _paymentCard.key == value.key;
 
-            if (_found.any(testPaymentCard)) continue;
-          }
-          {
-            int _positiveCount = 0;
-            for (String _term in _terms) {
-              if (_paymentCard.cardholderName.toLowerCase().contains(_term)) {
-                _positiveCount++;
-                continue;
+                if (_found.any(testPaymentCard)) continue;
               }
-              if (_paymentCard.nickname.toLowerCase().contains(_term)) {
-                _positiveCount++;
-                continue;
-              }
-              if (_paymentCard.exp.toLowerCase().contains(_term)) {
-                _positiveCount++;
-                continue;
+              {
+                int _positiveCount = 0;
+                bool _tagMismatch = false;
+                for (String tag in tags) {
+                  if (!_paymentCard.tags.contains(tag)) {
+                    _tagMismatch = true;
+                    break;
+                  }
+                }
+                if (_tagMismatch) continue;
+                for (String _term in _terms) {
+                  if (_paymentCard.cardholderName
+                      .toLowerCase()
+                      .contains(_term)) {
+                    _positiveCount++;
+                    continue;
+                  }
+                  if (_paymentCard.nickname.toLowerCase().contains(_term)) {
+                    _positiveCount++;
+                    continue;
+                  }
+                  if (_paymentCard.exp.toLowerCase().contains(_term)) {
+                    _positiveCount++;
+                    continue;
+                  }
+                }
+                if (_positiveCount == _terms.length) {
+                  _found.add(_paymentCard);
+                }
               }
             }
-            if (_positiveCount == _terms.length) {
-              _found.add(_paymentCard);
-            }
-          }
-        }
-        if (_found.isEmpty) {
-          return CustomScrollView(
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  children: [
-                    const Spacer(flex: 7),
-                    Text(
-                      localizations.noSearchResults,
-                      textAlign: TextAlign.center,
+            if (_found.isEmpty) {
+              return CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Column(
+                      children: [
+                        const Spacer(flex: 7),
+                        Text(
+                          localizations.noSearchResults,
+                          textAlign: TextAlign.center,
+                        ),
+                        const Spacer(flex: 7),
+                      ],
                     ),
-                    const Spacer(flex: 7),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-        return PaymentCardButtonListView(
-          paymentCards: _found,
-          shouldSort: true,
-          onPressed: (paymentCard) => {
-            Navigator.pushNamed(context, PaymentCardScreen.routeName,
-                arguments: _account.getPaymentCard(paymentCard.key)),
+                  ),
+                ],
+              );
+            }
+            return PaymentCardButtonListView(
+              paymentCards: _found,
+              shouldSort: true,
+              onPressed: (paymentCard) => {
+                Navigator.pushNamed(context, PaymentCardScreen.routeName,
+                    arguments: _account.getPaymentCard(paymentCard.key)),
+              },
+            );
           },
-        );
-      },
-    ));
+        ));
   }
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPaymentCardScreen.routeName);
 
+  Future<void> _load() async {
+    _isLoading = true;
+    List<String> newTags;
+    try {
+      newTags = await _account.paymentCardTags;
+    } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<PaymentCardMeta> _paymentCards =
-        _account.paymentCardsMetadata.values.toList();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
+    List<PaymentCardMeta> _paymentCards = [];
+    try {
+      _paymentCards = _account.paymentCardsMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
         entryType: EntryType.paymentCard,
-        title: Text(localizations.paymentCards),
+        title: Center(child: Text(localizations.paymentCards)),
         onAddPressed: _onAddPressed,
         onSearchPressed: _onSearchPressed,
       ),
@@ -139,6 +175,20 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
                         context, EditPaymentCardScreen.routeName),
                   ),
                 ),
+                if (_tags.isNotEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: PassyTheme.passyPadding.top / 2,
+                          bottom: PassyTheme.passyPadding.bottom / 2),
+                      child: EntryTagList(
+                        notSelected: _tags,
+                        onAdded: (tag) => setState(() {
+                          _onSearchPressed(tag: tag);
+                        }),
+                      ),
+                    ),
+                  ),
               ],
               paymentCards: _paymentCards,
               shouldSort: true,

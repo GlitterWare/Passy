@@ -6,8 +6,8 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/files_screen.dart';
-import 'package:passy/screens/main_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
+import 'package:passy/screens/unlock_screen.dart';
 
 import 'common.dart';
 
@@ -36,7 +36,7 @@ class _PassyFileScreen extends State<StatefulWidget> {
   final LoadedAccount _account = data.loadedAccount!;
 
   Future<void> _onExportPressed(PassyFileScreenArgs args) async {
-    MainScreen.shouldLockScreen = false;
+    UnlockScreen.shouldLockScreen = false;
     String? expFile;
     if (Platform.isAndroid) {
       String? expDir = await FilePicker.platform.getDirectoryPath(
@@ -54,13 +54,13 @@ class _PassyFileScreen extends State<StatefulWidget> {
       );
     }
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => MainScreen.shouldLockScreen = true);
+        .then((value) => UnlockScreen.shouldLockScreen = true);
     if (expFile == null) return;
     Navigator.pushNamed(context, SplashScreen.routeName);
     await Future.delayed(const Duration(milliseconds: 200));
     await _account.exportFile(args.key, file: File(expFile));
     Navigator.pop(context);
-    showSnackBar(context,
+    showSnackBar(
         message: localizations.exportSaved,
         icon: const Icon(Icons.ios_share_rounded,
             color: PassyTheme.darkContentColor));

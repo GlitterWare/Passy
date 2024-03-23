@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -24,13 +25,19 @@ class PasswordsScreen extends StatefulWidget {
 
 class _PasswordsScreen extends State<PasswordsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  List<String> _tags = [];
+  bool _isLoading = false;
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
 
-  Widget _buildPasswords(String terms, void Function() rebuild) {
+  Widget _buildPasswords(
+    String terms,
+    List<String> tags,
+    void Function() rebuild,
+  ) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
-        passwords: _account.passwordsMetadata.values, terms: terms);
+        passwords: _account.passwordsMetadata.values, terms: terms, tags: tags);
     if (_found.isEmpty) {
       return CustomScrollView(
         slivers: [
@@ -60,14 +67,39 @@ class _PasswordsScreen extends State<PasswordsScreen> {
     );
   }
 
-  void _onSearchPressed() {
+  void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
-        arguments: SearchScreenArgs(builder: _buildPasswords));
+        arguments: SearchScreenArgs(
+            builder: _buildPasswords,
+            entryType: EntryType.password,
+            selectedTags: tag == null ? [] : [tag]));
+  }
+
+  Future<void> _load() async {
+    _isLoading = true;
+    List<String> newTags;
+    try {
+      newTags = await _account.passwordTags;
+    } catch (_) {
+      return;
+    }
+    if (listEquals(newTags, _tags)) {
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        _tags = newTags;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<PasswordMeta> _passwords = _account.passwordsMetadata.values.toList();
+    if (!_isLoading) _load().whenComplete(() => _isLoading = false);
+    List<PasswordMeta> _passwords = [];
+    try {
+      _passwords = _account.passwordsMetadata.values.toList();
+    } catch (_) {}
     return Scaffold(
       appBar: EntriesScreenAppBar(
           entryType: EntryType.password,
@@ -111,6 +143,20 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                         context, EditPasswordScreen.routeName),
                   ),
                 ),
+                if (_tags.isNotEmpty)
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: PassyTheme.passyPadding.top / 2,
+                          bottom: PassyTheme.passyPadding.bottom / 2),
+                      child: EntryTagList(
+                        notSelected: _tags,
+                        onAdded: (tag) => setState(() {
+                          _onSearchPressed(tag: tag);
+                        }),
+                      ),
+                    ),
+                  ),
               ],
               passwords: _passwords.toList(),
               onPressed: (password) => Navigator.pushNamed(

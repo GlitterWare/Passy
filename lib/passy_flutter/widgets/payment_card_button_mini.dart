@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_credit_card/credit_card_widget.dart';
+import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -41,6 +41,7 @@ class PaymentCardButtonMini extends StatelessWidget {
                 child: Text(
                   paymentCard.cardholderName,
                   style: const TextStyle(color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 alignment: Alignment.centerLeft,
               ),
@@ -53,7 +54,7 @@ class PaymentCardButtonMini extends StatelessWidget {
           child: PopupMenuButton(
             shape: PassyTheme.dialogShape,
             icon: const Icon(Icons.more_vert_rounded),
-            padding: const EdgeInsets.fromLTRB(12, 23, 12, 23),
+            padding: const EdgeInsets.fromLTRB(12, 22, 12, 22),
             splashRadius: 24,
             itemBuilder: popupMenuItemBuilder!,
           ),

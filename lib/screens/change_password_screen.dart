@@ -28,7 +28,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
 
   void _onConfirmPressed() async {
     if (!_isBackupComplete) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.backupYourAccountBeforeProceeding,
           icon: const Icon(
             Icons.save_rounded,
@@ -38,8 +38,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
-        _account.passwordHash) {
-      showSnackBar(context,
+        data.getPasswordHash(_account.username)) {
+      showSnackBar(
           message: localizations.incorrectPassword,
           icon: const Icon(
             Icons.lock_rounded,
@@ -48,7 +48,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
       return;
     }
     if (_newPassword.isEmpty) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.passwordIsEmpty,
           icon: const Icon(
             Icons.lock_rounded,
@@ -57,7 +57,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
       return;
     }
     if (_newPassword != _newPasswordConfirm) {
-      showSnackBar(context,
+      showSnackBar(
           message: localizations.passwordsDoNotMatch,
           icon: const Icon(
             Icons.lock_rounded,

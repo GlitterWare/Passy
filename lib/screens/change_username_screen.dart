@@ -30,14 +30,14 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
       labelText: localizations.newUsername,
       onConfirmPressed: (context, value) {
         if (value.length < 2) {
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.usernameShorterThan2Letters,
               icon: const Icon(Icons.person_rounded,
                   color: PassyTheme.darkContentColor));
           return;
         }
         if (data.hasAccount(value)) {
-          showSnackBar(context,
+          showSnackBar(
               message: localizations.usernameAlreadyInUse,
               icon: const Icon(Icons.person_rounded,
                   color: PassyTheme.darkContentColor));

@@ -57,6 +57,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
       ));
     }
     return DropdownButtonFormField(
+      borderRadius: const BorderRadius.all(Radius.circular(30)),
       items: _menuItems,
       value: value,
       decoration: decoration,

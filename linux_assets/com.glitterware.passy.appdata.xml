@@ -4,6 +4,10 @@
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0</project_license>
 	<name>Passy</name>
+	<developer id="com.glitterware">
+	  <name>GlitterWare</name>
+	</developer>
+	<developer_name>GlitterWare</developer_name>
 	<summary>Offline password manager with cross-platform synchronization</summary>
 	<description>
 		<p>Store passwords, payment cards notes, ID cards and identities offline and safe, synchronized between all of your devices.</p>
@@ -15,24 +19,39 @@
 	<url type="homepage">https://glitterware.github.io/Passy</url>
 	<screenshots>
 		<screenshot type="default">
+			<caption>Passy login screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/1.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Passy main screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/2.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Host connection QR code.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/3.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Add password screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/4.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Password generator.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/5.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Custom field screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/6.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Date selection.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/7.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Password entry screen.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/8.png</image>
 		</screenshot>
 		<screenshot>
+			<caption>Password view dialog.</caption>
 			<image type="source" width="1920" height="1080">https://github.com/GlitterWare/Passy/raw/273e012d77e0667486388d94c9f5d129a2911350/screenshots/1920x1080/9.png</image>
 		</screenshot>
 	</screenshots>
@@ -41,7 +60,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
-		<release version="v1.7.0" date="2023-11-25">
+		<release version="v1.8.0" date="2024-03-16">
 		</release>
 	</releases>
 </component>

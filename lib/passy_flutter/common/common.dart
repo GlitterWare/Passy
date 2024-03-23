@@ -7,6 +7,31 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:http/http.dart' as http;
 
+class CardAssetPaths {
+  const CardAssetPaths._();
+
+  static const String visa = 'icons/visa.png';
+  static const String rupay = 'icons/rupay.png';
+  static const String mastercard = 'icons/mastercard.png';
+  static const String americanExpress = 'icons/amex.png';
+  static const String unionpay = 'icons/unionpay.png';
+  static const String discover = 'icons/discover.png';
+  static const String elo = 'icons/elo.png';
+  static const String hipercard = 'icons/hipercard.png';
+  static const String chip = 'icons/chip.png';
+}
+
+const Map<CardType, String> cardTypeIconAsset = <CardType, String>{
+  CardType.visa: CardAssetPaths.visa,
+  CardType.rupay: CardAssetPaths.rupay,
+  CardType.americanExpress: CardAssetPaths.americanExpress,
+  CardType.mastercard: CardAssetPaths.mastercard,
+  CardType.unionpay: CardAssetPaths.unionpay,
+  CardType.discover: CardAssetPaths.discover,
+  CardType.elo: CardAssetPaths.elo,
+  CardType.hipercard: CardAssetPaths.hipercard,
+};
+
 String capitalize(String string) {
   if (string.isEmpty) return '';
   String _firstLetter = string[0].toUpperCase();
@@ -91,7 +116,7 @@ Widget getCardTypeImage(CardType? cardType) {
   }
 
   return Image.asset(
-    CardTypeIconAsset[cardType]!,
+    cardTypeIconAsset[cardType]!,
     height: 48,
     width: 48,
     package: 'flutter_credit_card',

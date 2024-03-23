@@ -269,7 +269,6 @@ class SplashScreen extends StatelessWidget {
           if (hasAccess != true) {
             if (context.mounted) {
               showSnackBar(
-                context,
                 message: localizations.unableToConnectBrowserExtension,
                 icon: const Icon(Icons.extension_rounded,
                     color: PassyTheme.lightContentColor),
