@@ -26,7 +26,10 @@ jobs:
           chmod +x armv7.sh
       - name: Install dependencies
         shell: bash
-        run: sudo apt install -y qemu binfmt-support qemu-user-static qemu-system-arm
+        run: |
+          sudo dpkg --add-architecture arm64
+          sudo apt update
+          sudo apt install -y qemu binfmt-support qemu-user-static qemu-system-arm libc6:arm64
       - name: Build for ARMv7
         uses: tj-actions/docker-run@v2
         with:
