@@ -27,11 +27,6 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          sudo dpkg --add-architecture arm64
-          sudo mkdir -p /etc/resolvconf/resolv.conf.d/
-          sudo echo 'nameserver 8.8.8.8' >> /etc/resolvconf/resolv.conf.d/base
-          sudo echo 'nameserver 8.8.4.4' >> /etc/resolvconf/resolv.conf.d/base
-          sudo resolvconf -u
           sudo apt-get update
           sudo apt-get install -y qemu binfmt-support qemu-user-static qemu-system-arm libc6:arm64
       - name: Build for ARMv7
