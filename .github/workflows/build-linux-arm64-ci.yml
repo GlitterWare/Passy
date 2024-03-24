@@ -30,7 +30,7 @@ jobs:
       - name: Build for ARM64
         uses: tj-actions/docker-run@v2
         with:
-          image: ubuntu:latest
+          image: ubuntu:20.04
           name: ubuntu
           options: --rm --platform linux/arm64 -v $PWD:/Passy -v /home/runner/work/Passy/build:/passy-build -v /home/runner/work/Passy/bin:/passy-bin
           args: /passy-bin/arm64.sh
