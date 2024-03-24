@@ -41,8 +41,20 @@ jobs:
           directory: ../build
           filename: Passy-CLI-Linux-ARM64.zip
           path: cli
+      - name: Archive Passy build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-Linux-ARM64.zip
+          path: Passy
       - name: Upload Passy CLI build
         uses: actions/upload-artifact@v4
         with:
           name: passy-cli-linux-arm64
           path: /home/runner/work/Passy/build/Passy-CLI-Linux-ARM64.zip
+      - name: Upload Passy build
+        uses: actions/upload-artifact@v4
+        with:
+          name: passy-linux-arm64
+          path: /home/runner/work/Passy/build/Passy-Linux-ARM64.zip
