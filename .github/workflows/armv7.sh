@@ -5,6 +5,7 @@ echo "===================================================="
 echo "Install dependencies"
 echo "===================================================="
 
+cp /lib/ld-linux-aarch64.so.1 /lib-runner
 apt-get update
 apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync git file unzip zip wget curl libc6
 
