@@ -28,8 +28,15 @@ jobs:
         shell: bash
         run: |
           sudo dpkg --add-architecture arm64
-          sudo apt update
-          sudo apt install -y qemu binfmt-support qemu-user-static qemu-system-arm libc6:arm64
+          mkdir test
+          cp /etc/apt/sources.lst test
+          cd test
+          sed -i -- 's/us.archive/old-releases/g' *
+          sed -i -- 's/security/old-releases/g' *
+          sudo cp sources.lst /etc/apt
+          cd ..
+          sudo apt-get update
+          sudo apt-get install -y qemu binfmt-support qemu-user-static qemu-system-arm libc6:arm64
       - name: Build for ARMv7
         uses: tj-actions/docker-run@v2
         with:
