@@ -27,8 +27,9 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          sudo apt-get update
           sudo dpkg --add-architecture arm64
+          sudo echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
+          sudo echo 'nameserver 8.8.4.4' >> /etc/resolv.conf
           sudo apt-get update
           sudo apt-get install -y qemu binfmt-support qemu-user-static qemu-system-arm libc6:arm64
       - name: Build for ARMv7
