@@ -12,6 +12,9 @@ echo "===================================================="
 echo "Configure"
 echo "===================================================="
 
+mkdir /passy-build/cli
+mkdir /passy-build/Passy
+mkdir /passy-build/Passy-No-Updates-Popup
 export PATH="$PATH:$PWD/submodules/flutter/bin"
 git config --global --add safe.directory /Passy
 git config --global --add safe.directory /Passy/submodules/flutter
@@ -35,6 +38,7 @@ echo "Build Passy CLI"
 echo "===================================================="
 
 bash build_cli.sh
+cp -r /Passy/build/cli/latest/. /passy-build/cli
 
 echo "===================================================="
 echo "Build Passy"
@@ -43,14 +47,15 @@ echo "===================================================="
 flutter build linux
 rm /Passy/build/linux/arm64/release/bundle/lib/libargon2.so
 cp /Passy/build/cli/latest/lib/libargon2.so /Passy/build/linux/arm64/release/bundle/lib/
+cp -r /Passy/build/linux/arm64/release/bundle/. /passy-build/Passy
 
 echo "===================================================="
-echo "Prepare releases"
+echo "Build Passy No Updates Popup"
 echo "===================================================="
 
-cd /passy-build
-mkdir cli
-cp -r /Passy/build/cli/latest/. cli
-mkdir Passy
-cp -r /Passy/build/linux/arm64/release/bundle/. Passy
+flutter build linux --dart-define=UPDATES_POPUP_ENABLED=false
+rm /Passy/build/linux/arm64/release/bundle/lib/libargon2.so
+cp /Passy/build/cli/latest/lib/libargon2.so /Passy/build/linux/arm64/release/bundle/lib/
+cp -r /Passy/build/linux/arm64/release/bundle/. /passy-build/Passy-No-Updates-Popup
 
+echo "All Done!"
