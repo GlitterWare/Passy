@@ -47,6 +47,7 @@ Submissions will be finished until June 1 2023.
 
 - 🔒 Security – All your information is encrypted in AES and stored offline on your devices, providing highest-tier security.
 - 🔄 Synchronization – Share data between separate devices within seconds.
+- 📱 2FA codes - Keep your 2FA codes safe and sound in offline storage.
 - 🤝 Entry sharing – Send entries to your friends and family.
 - 🖐️ Biometrics – Quickly unlock the app using your fingerprint.
 - 📚 Multipurpose – Store passwords, payment cards, notes, id cards and identities, all in one place.
