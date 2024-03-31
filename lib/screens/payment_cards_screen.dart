@@ -114,6 +114,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
     } catch (_) {
       return;
     }
+    newTags.sort();
     if (listEquals(newTags, _tags)) {
       return;
     }
