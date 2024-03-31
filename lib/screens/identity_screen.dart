@@ -35,10 +35,12 @@ class _IdentityScreen extends State<IdentityScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.identitiesTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _identity!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);

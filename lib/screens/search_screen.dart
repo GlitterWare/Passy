@@ -91,6 +91,7 @@ class _SearchScreen extends State<SearchScreen> {
           newTags = await _account.tags;
           break;
       }
+      newTags.sort();
     } catch (_) {
       return;
     }

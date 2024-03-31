@@ -80,10 +80,12 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.paymentCardTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _paymentCard!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);

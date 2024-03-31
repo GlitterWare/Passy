@@ -78,10 +78,12 @@ class _NoteScreen extends State<NoteScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.notesTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _note!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);

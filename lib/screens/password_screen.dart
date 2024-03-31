@@ -136,10 +136,12 @@ class _PasswordScreen extends State<PasswordScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.passwordTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = password!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);

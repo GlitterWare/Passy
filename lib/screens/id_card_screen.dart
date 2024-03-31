@@ -35,10 +35,12 @@ class _IDCardScreen extends State<IDCardScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.idCardsTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _idCard!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);
