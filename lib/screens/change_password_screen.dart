@@ -214,6 +214,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                         body: Column(
                           children: [
                             PassyPadding(DropdownButtonFormField(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(30)),
                               items: [
                                 DropdownMenuItem(
                                   child: Text(localizations.true_),
