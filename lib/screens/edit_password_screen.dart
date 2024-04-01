@@ -335,6 +335,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                       )),
                       if (_tfaType != TFAType.Steam)
                         PassyPadding(DropdownButtonFormField(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(30)),
                           items: [
                             DropdownMenuItem(
                               child: Text(
