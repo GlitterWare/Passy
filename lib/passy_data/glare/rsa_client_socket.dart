@@ -41,7 +41,6 @@ class RSAClientSocket {
     } catch (_) {
       return false;
     }
-    _socket.writeln('{"rsa":{"publicKey":"${_keyPair.publicKey.toString()}"}}');
     return true;
   }
 
@@ -96,6 +95,8 @@ class RSAClientSocket {
           subscription.onData(_onData);
           _onConnected.complete();
         });
+        _socket.writeln(
+            '{"rsa":{"publicKey":"${_keyPair.publicKey.toString()}"}}');
       }
     });
   }

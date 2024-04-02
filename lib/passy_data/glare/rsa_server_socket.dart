@@ -93,9 +93,9 @@ class RSAServerSocket {
       if (_handshake(data)) {
         String _password = generatePassword();
         _encrypter = Encrypter(AES(Key.fromUtf8(_password)));
+        subscription.onData(_onData);
         _socket.writeln(
             _clientPublicKey!.encrypt(jsonEncode({'password': _password})));
-        subscription.onData(_onData);
       }
     });
     subscription.onError((Object error, StackTrace? stackTrace) {
