@@ -340,7 +340,7 @@
     "fileName": "Название файла",
     "refresh": "Обновить",
     "counter": "Счетчик",
-    "@counter": { "description": "HOTP 2FA counter stores a number that is incremented on every logon" }
+    "@counter": { "description": "HOTP 2FA counter stores a number that is incremented on every logon" },
     "createTag": "Создать тег",
     "create": "Создать",
     "tag": "Тег",
