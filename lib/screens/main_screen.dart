@@ -48,7 +48,7 @@ class _MainScreen extends State<MainScreen>
     with SingleTickerProviderStateMixin, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
-  String _lastSyncDate = 'NaN';
+  String? _lastSyncDate;
 
   Widget _searchBuilder(
       String terms, List<String> tags, void Function() rebuild) {
@@ -711,12 +711,13 @@ class _MainScreen extends State<MainScreen>
                 },
               ),
             ),
-            PassyPadding(Text(
-              '${localizations.lastSynchronization}: $_lastSyncDate',
-              textAlign: TextAlign.center,
-              style:
-                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-            )),
+            if (_lastSyncDate != null)
+              PassyPadding(Text(
+                '${localizations.lastSynchronization}: $_lastSyncDate',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: PassyTheme.lightContentSecondaryColor),
+              )),
           ],
         ),
       ),
