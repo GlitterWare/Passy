@@ -10,6 +10,7 @@ import 'entry_type.dart';
 import 'history.dart';
 import 'glare/glare_module.dart';
 import 'passy_entry.dart';
+import 'sync_entry_state.dart';
 import 'synchronization_2d0d0_utils.dart' as util;
 import 'common.dart';
 import 'favorites.dart';
@@ -24,8 +25,8 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required AccountCredentialsFile credentials,
   required authWithIV,
   Map<EntryType, List<String>>? sharedEntryKeys,
-  void Function()? onSetEntry,
-  void Function()? onRemoveEntry,
+  void Function(EntryType type, String key, SyncEntryState state)?
+      onEntryChanged,
 }) {
   history.reloadSync();
   Encrypter usernameEncrypter = getPassyEncrypter(username);
@@ -216,8 +217,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               entries: exchangeEntries,
               passyEntries: passyEntries,
               history: history,
-              onRemoveEntry: onRemoveEntry,
-              onSetEntry: onSetEntry,
+              onEntryChanged: onEntryChanged,
             );
             await settings.reload();
             settings.value.lastSyncDate = DateTime.now().toUtc();

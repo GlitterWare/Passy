@@ -302,6 +302,7 @@
     "synchronizationComplete": "Synchronization complete",
     "entriesAdded": "Entries added",
     "entriesRemoved": "Entries removed",
+    "entriesChanged": "Entries changed",
     "csvExport": "CSV export",
     "kdbxImport": "KDBX import",
     "kdbxExport": "KDBX export",
@@ -349,5 +350,7 @@
     "backupPassy": "Backup Passy",
     "backupSaved": "Backup saved",
     "couldNotBackup": "Could not backup",
-    "renameTag": "Rename tag"
+    "renameTag": "Rename tag",
+    "noChanges": "No changes",
+    "close": "Close"
 }

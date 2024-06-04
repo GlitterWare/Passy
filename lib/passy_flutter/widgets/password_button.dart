@@ -4,6 +4,7 @@ import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class PasswordButton extends StatelessWidget {
+  final Widget? leftWidget;
   final PasswordMeta password;
   final void Function()? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
@@ -11,6 +12,7 @@ class PasswordButton extends StatelessWidget {
 
   const PasswordButton({
     Key? key,
+    this.leftWidget,
     required this.password,
     this.onPressed,
     this.popupMenuItemBuilder,
@@ -19,6 +21,7 @@ class PasswordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
+      if (leftWidget != null) leftWidget!,
       Flexible(
         child: ThreeWidgetButton(
           left: Padding(

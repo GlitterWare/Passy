@@ -1407,10 +1407,11 @@ Future<void> executeCommand(List<String> command,
                   _syncCloseMethods.remove('${addr!.ip.address}:${addr.port}');
                   syncCompleter.complete();
                   if (detached) return;
+                  SynchronizationReport report = serverNullable!.getReport();
                   log('Synchronization server stopped.', id: id);
-                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
-                  log('Entries removed: ${serverNullable.entriesRemoved}',
-                      id: id);
+                  log('Entries added: ${report.entriesAdded}', id: id);
+                  log('Entries removed: ${report.entriesRemoved}', id: id);
+                  log('Entries changed: ${report.entriesChanged}', id: id);
                 },
               );
               Synchronization server = serverNullable;
@@ -1976,10 +1977,11 @@ Future<void> executeCommand(List<String> command,
                 onComplete: (p0) {
                   syncCompleter.complete();
                   if (detached) return;
+                  SynchronizationReport report = serverNullable!.getReport();
                   log('Synchronization client stopped.', id: id);
-                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
-                  log('Entries removed: ${serverNullable.entriesRemoved}',
-                      id: id);
+                  log('Entries added: ${report.entriesAdded}', id: id);
+                  log('Entries removed: ${report.entriesRemoved}', id: id);
+                  log('Entries changed: ${report.entriesChanged}', id: id);
                 },
               );
               Synchronization server = serverNullable;
@@ -2105,10 +2107,11 @@ Future<void> executeCommand(List<String> command,
                 },
                 onComplete: (p0) {
                   if (detached) return;
+                  SynchronizationReport report = serverNullable!.getReport();
                   log('Synchronization client stopped.', id: id);
-                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
-                  log('Entries removed: ${serverNullable.entriesRemoved}',
-                      id: id);
+                  log('Entries added: ${report.entriesAdded}', id: id);
+                  log('Entries removed: ${report.entriesRemoved}', id: id);
+                  log('Entries changed: ${report.entriesChanged}', id: id);
                 },
               );
               Synchronization client = serverNullable;

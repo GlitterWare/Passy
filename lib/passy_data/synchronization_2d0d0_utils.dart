@@ -14,6 +14,7 @@ import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'passy_entry.dart';
+import 'sync_entry_state.dart';
 
 class EntriesToSynchronize {
   Map<EntryType, List<String>> entriesToSend;
@@ -439,15 +440,14 @@ Future<PassyEntry?> processExchangeEntry({
   required EntryType entryType,
   required ExchangeEntry entry,
   required HistoryFile history,
-  void Function()? onRemoveEntry,
-  void Function()? onSetEntry,
+  void Function(String key, SyncEntryState state)? onEntryChanged,
 }) async {
   EntryEvent? historyEntry = entry.historyEntry;
   if (historyEntry == null) {
     throw {'error': 'History entry not provided'};
   }
   if (historyEntry.status == EntryStatus.removed) {
-    onRemoveEntry?.call();
+    onEntryChanged?.call(historyEntry.key, SyncEntryState.removed);
     history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
     return null;
   }
@@ -455,8 +455,13 @@ Future<PassyEntry?> processExchangeEntry({
   if (passyEntry == null) {
     throw {'error': 'Passy entry not provided'};
   }
-  history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
-  onSetEntry?.call();
+  Map<String, EntryEvent> events = history.value.getEvents(entryType);
+  if (events.keys.contains(historyEntry.key)) {
+    onEntryChanged?.call(historyEntry.key, SyncEntryState.modified);
+  } else {
+    onEntryChanged?.call(historyEntry.key, SyncEntryState.added);
+  }
+  events[historyEntry.key] = historyEntry;
   return passyEntry;
 }
 
@@ -465,8 +470,7 @@ Future<void> processExchangeEntries({
   required List<ExchangeEntry> entries,
   required PassyEntriesEncryptedCSVFile entriesFile,
   required HistoryFile history,
-  void Function()? onRemoveEntry,
-  void Function()? onSetEntry,
+  void Function(String key, SyncEntryState state)? onEntryChanged,
 }) async {
   Map<String, PassyEntry?> passyEntries = {};
   for (ExchangeEntry entry in entries) {
@@ -474,8 +478,7 @@ Future<void> processExchangeEntries({
       entryType: entryType,
       entry: entry,
       history: history,
-      onRemoveEntry: onRemoveEntry,
-      onSetEntry: onSetEntry,
+      onEntryChanged: onEntryChanged,
     );
     passyEntries[entry.key] = passyEntry;
   }
@@ -507,8 +510,8 @@ Future<void> processTypedExchangeEntries({
   required Map<EntryType, List<ExchangeEntry>> entries,
   required FullPassyEntriesFileCollection passyEntries,
   required HistoryFile history,
-  void Function()? onRemoveEntry,
-  void Function()? onSetEntry,
+  void Function(EntryType type, String key, SyncEntryState state)?
+      onEntryChanged,
 }) async {
   await history.reload();
   try {
@@ -521,8 +524,9 @@ Future<void> processTypedExchangeEntries({
         entries: exchangeEntries,
         entriesFile: passyEntries.getEntries(entryType),
         history: history,
-        onRemoveEntry: onRemoveEntry,
-        onSetEntry: onSetEntry,
+        onEntryChanged: onEntryChanged == null
+            ? null
+            : (key, state) => onEntryChanged(entryType, key, state),
       );
     }
     await history.save();

@@ -4,6 +4,7 @@ import 'package:passy/passy_data/identity.dart';
 import '../passy_flutter.dart';
 
 class IdentityButton extends StatelessWidget {
+  final Widget? leftWidget;
   final IdentityMeta identity;
   final void Function()? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
@@ -11,6 +12,7 @@ class IdentityButton extends StatelessWidget {
 
   const IdentityButton({
     Key? key,
+    this.leftWidget,
     required this.identity,
     this.onPressed,
     this.popupMenuItemBuilder,
@@ -20,6 +22,7 @@ class IdentityButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        if (leftWidget != null) leftWidget!,
         Flexible(
           child: ThreeWidgetButton(
             left: const Padding(

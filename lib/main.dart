@@ -61,6 +61,7 @@ import 'screens/payment_card_screen.dart';
 import 'screens/payment_cards_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/sync_details_screen.dart';
 import 'screens/synchronization_logs_screen.dart';
 import 'screens/unlock_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -194,6 +195,7 @@ class Passy extends StatelessWidget {
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SetupScreen.routeName: (context) => const SetupScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
+        SyncDetailsScreen.routeName:(context) => const SyncDetailsScreen(),
         SynchronizationLogsScreen.routeName: (context) =>
             const SynchronizationLogsScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),

@@ -14,6 +14,7 @@ import 'package:passy/passy_data/trusted_connection_data.dart';
 
 import 'favorites.dart';
 import 'passy_entries_encrypted_csv_file.dart';
+import 'sync_entry_state.dart';
 import 'synchronization_2d0d0_modules.dart';
 import 'common.dart';
 import 'entry_event.dart';
@@ -181,21 +182,46 @@ class _EntryInfo with JsonConvertable {
 
 class SynchronizationReport with JsonConvertable {
   final bool isCompleted;
-  final int entriesSet;
+  final int entriesAdded;
   final int entriesRemoved;
+  final int entriesChanged;
+  final String log;
+  final Map<String, SyncEntryState> changedPasswords;
+  final Map<String, SyncEntryState> changedNotes;
+  final Map<String, SyncEntryState> changedPaymentCards;
+  final Map<String, SyncEntryState> changedIDCards;
+  final Map<String, SyncEntryState> changedIdentities;
 
   SynchronizationReport({
     required this.isCompleted,
-    required this.entriesSet,
+    required this.entriesAdded,
     required this.entriesRemoved,
+    required this.entriesChanged,
+    required this.log,
+    required this.changedPasswords,
+    required this.changedNotes,
+    required this.changedPaymentCards,
+    required this.changedIDCards,
+    required this.changedIdentities,
   });
 
   @override
   Map<String, dynamic> toJson() {
     return {
       'isCompleted': isCompleted,
-      'entriesSet': entriesSet,
+      'entriesAdded': entriesAdded,
       'entriesRemoved': entriesRemoved,
+      'entriesChanged': entriesChanged,
+      'changedPasswords':
+          changedPasswords.map((key, value) => MapEntry(key, value.name)),
+      'changedNotes':
+          changedNotes.map((key, value) => MapEntry(key, value.name)),
+      'changedPaymentCards':
+          changedPaymentCards.map((key, value) => MapEntry(key, value.name)),
+      'changedIDCards':
+          changedIDCards.map((key, value) => MapEntry(key, value.name)),
+      'changedIdentities':
+          changedIdentities.map((key, value) => MapEntry(key, value.name)),
     };
   }
 }
@@ -223,16 +249,19 @@ class Synchronization {
   String _syncLog = '';
   bool _isConnected = false;
   int _entriesAdded = 0;
+  int _entriesChanged = 0;
   int _entriesRemoved = 0;
+  final Map<String, SyncEntryState> _changedPasswords = {};
+  final Map<String, SyncEntryState> _changedNotes = {};
+  final Map<String, SyncEntryState> _changedPaymentCards = {};
+  final Map<String, SyncEntryState> _changedIDCards = {};
+  final Map<String, SyncEntryState> _changedIdentities = {};
   final RSAKeypair _rsaKeypair;
   final bool _authWithIV;
   final SynchronizationType _synchronizationType;
   GlareClient? _sync2d0d0Client;
   GlareServer? _sync2d0d0Host;
   final String _encryptedPassword;
-
-  get entriesAdded => _entriesAdded;
-  get entriesRemoved => _entriesRemoved;
 
   Synchronization({
     required String username,
@@ -265,8 +294,15 @@ class Synchronization {
   SynchronizationReport getReport() {
     return SynchronizationReport(
       isCompleted: _isOnCompleteCalled,
-      entriesSet: _entriesAdded,
+      entriesAdded: _entriesAdded,
       entriesRemoved: _entriesRemoved,
+      entriesChanged: _entriesChanged,
+      log: _syncLog,
+      changedPasswords: _changedPasswords,
+      changedNotes: _changedNotes,
+      changedPaymentCards: _changedPaymentCards,
+      changedIDCards: _changedIDCards,
+      changedIdentities: _changedIdentities,
     );
   }
 
@@ -418,12 +454,50 @@ class Synchronization {
     return _completer.future;
   }
 
+  void _onEntryChanged(type, key, state) {
+    Map<String, SyncEntryState>? entryMap;
+    switch (type) {
+      case EntryType.password:
+        entryMap = _changedPasswords;
+        break;
+      case EntryType.paymentCard:
+        entryMap = _changedPaymentCards;
+        break;
+      case EntryType.note:
+        entryMap = _changedNotes;
+        break;
+      case EntryType.idCard:
+        entryMap = _changedIDCards;
+        break;
+      case EntryType.identity:
+        entryMap = _changedIdentities;
+        break;
+    }
+    switch (state) {
+      case SyncEntryState.added:
+        _entriesAdded++;
+        break;
+      case SyncEntryState.removed:
+        _entriesRemoved++;
+        break;
+      case SyncEntryState.modified:
+        _entriesChanged++;
+        break;
+    }
+    entryMap![key] = state;
+  }
+
   Future<HostAddress?> host({
     void Function()? onConnected,
     Map<EntryType, List<String>>? sharedEntryKeys,
     String? address,
     int port = 0,
   }) async {
+    _changedPasswords.clear();
+    _changedNotes.clear();
+    _changedPaymentCards.clear();
+    _changedIDCards.clear();
+    _changedIdentities.clear();
     await _history.reload();
     _syncLog = 'Hosting... ';
     HostAddress? _address;
@@ -450,8 +524,7 @@ class Synchronization {
           sharedEntryKeys: sharedEntryKeys,
           credentials: _credentials,
           authWithIV: _authWithIV,
-          onSetEntry: () => _entriesAdded++,
-          onRemoveEntry: () => _entriesRemoved++,
+          onEntryChanged: _onEntryChanged,
         ),
         serviceInfo:
             'Passy cross-platform password manager entry synchronization server v$syncVersion',
@@ -718,8 +791,7 @@ class Synchronization {
                   credentials: _credentials,
                   sharedEntryKeys: sharedEntryKeys,
                   authWithIV: _authWithIV,
-                  onSetEntry: () => _entriesAdded++,
-                  onRemoveEntry: () => _entriesRemoved++,
+                  onEntryChanged: _onEntryChanged,
                 ),
                 serviceInfo:
                     'Passy cross-platform password manager entry synchronization server v$syncVersion',
@@ -1014,7 +1086,7 @@ class Synchronization {
         if (!response.containsKey('error')) {
           try {
             util.verifyAuth(response['auth'],
-              lastAuth: lastAuth,
+                lastAuth: lastAuth,
                 encrypter: remoteEncrypter,
                 usernameEncrypter: usernameEncrypter,
                 withIV: true);
@@ -1137,8 +1209,7 @@ class Synchronization {
             entries: sharedEntries,
             passyEntries: _passyEntries,
             history: _history,
-            onSetEntry: () => _entriesAdded++,
-            onRemoveEntry: () => _entriesAdded++,
+            onEntryChanged: _onEntryChanged,
           );
         } catch (e) {
           _handleApiException('Failed to process shared entries', e);
@@ -1149,7 +1220,7 @@ class Synchronization {
       }
       try {
         util.verifyAuth(authResponse['auth'],
-          lastAuth: lastAuth,
+            lastAuth: lastAuth,
             encrypter: remoteEncrypter,
             usernameEncrypter: usernameEncrypter,
             withIV: _authWithIV);
@@ -1313,8 +1384,7 @@ class Synchronization {
               entries: entries,
               passyEntries: _passyEntries,
               history: _history,
-              onRemoveEntry: () => _entriesRemoved++,
-              onSetEntry: () => _entriesAdded++,
+              onEntryChanged: _onEntryChanged,
             );
           } catch (e) {
             _handleApiException('Failed to process entries', e);
@@ -1476,6 +1546,11 @@ class Synchronization {
   Future<void> connect(
     HostAddress address,
   ) async {
+    _changedPasswords.clear();
+    _changedNotes.clear();
+    _changedPaymentCards.clear();
+    _changedIDCards.clear();
+    _changedIdentities.clear();
     if (_synchronizationType == SynchronizationType.v2d0d0) {
       _syncLog += 'Connecting to a 2.0.0+ synchronization server... ';
       return await connect2d0d0(address);

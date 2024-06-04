@@ -3,6 +3,7 @@ import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class NoteButton extends StatelessWidget {
+  final Widget? leftWidget;
   final NoteMeta note;
   final void Function()? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
@@ -10,6 +11,7 @@ class NoteButton extends StatelessWidget {
 
   const NoteButton({
     Key? key,
+    this.leftWidget,
     required this.note,
     this.onPressed,
     this.popupMenuItemBuilder,
@@ -19,6 +21,7 @@ class NoteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+      if (leftWidget != null) leftWidget!,
         Flexible(
           child: ThreeWidgetButton(
             left: const Padding(
