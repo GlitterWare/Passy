@@ -16,7 +16,6 @@ import 'package:websafe_svg/websafe_svg.dart';
 import 'automatic_backup_screen.dart';
 import 'backup_and_restore_screen.dart';
 import 'common.dart';
-import 'credentials_screen.dart';
 import 'export_and_import_screen.dart';
 import 'main_screen.dart';
 
@@ -128,15 +127,6 @@ class _SettingsScreen extends State<SettingsScreen> {
               onPressed: () =>
                   Navigator.pushNamed(context, SecurityScreen.routeName)
                       .then((value) => setState(() {})))),
-          PassyPadding(ThreeWidgetButton(
-              center: Text(localizations.credentials),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.person_outline_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, CredentialsScreen.routeName))),
           PassyPadding(ThreeWidgetButton(
               center: Text(localizations.synchronizationServers),
               left: const Padding(

@@ -4,14 +4,14 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 
-import 'credentials_screen.dart';
+import 'security_screen.dart';
 import 'login_screen.dart';
 import 'main_screen.dart';
 import 'splash_screen.dart';
 
 class ChangeUsernameScreen extends StatefulWidget {
   static const String routeName =
-      '${CredentialsScreen.routeName}/changeUsername';
+      '${SecurityScreen.routeName}/changeUsername';
 
   const ChangeUsernameScreen({Key? key}) : super(key: key);
 

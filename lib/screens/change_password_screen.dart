@@ -3,12 +3,11 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
-import 'package:passy/screens/credentials_screen.dart';
+import 'package:passy/screens/security_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  static const String routeName =
-      '${CredentialsScreen.routeName}/changePassword';
+  static const String routeName = '${SecurityScreen.routeName}/changePassword';
 
   const ChangePasswordScreen({Key? key}) : super(key: key);
 
@@ -75,7 +74,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
       await _account.saveCredentials();
       if (mounted) {
         Navigator.popUntil(context,
-            (route) => route.settings.name == CredentialsScreen.routeName);
+            (route) => route.settings.name == SecurityScreen.routeName);
       }
     });
   }

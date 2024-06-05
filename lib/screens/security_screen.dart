@@ -10,6 +10,8 @@ import 'package:passy/screens/key_derivation_screen.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
 
 import 'biometric_auth_screen.dart';
+import 'change_password_screen.dart';
+import 'change_username_screen.dart';
 import 'common.dart';
 
 class SecurityScreen extends StatefulWidget {
@@ -94,6 +96,26 @@ class _SecurityScreen extends State<SecurityScreen> {
               onChanged: (value) => setAutoScreenLock(value),
             ),
             onPressed: () => setAutoScreenLock(!loadedAccount.autoScreenLock),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.changeUsername),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.person_outline_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, ChangeUsernameScreen.routeName),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.changePassword),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.lock_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, ChangePasswordScreen.routeName),
           )),
           PassyPadding(ThreeWidgetButton(
             color:

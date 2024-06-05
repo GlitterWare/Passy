@@ -28,7 +28,6 @@ import 'screens/change_password_screen.dart';
 import 'screens/change_username_screen.dart';
 import 'screens/common.dart';
 import 'screens/confirm_restore_screen.dart';
-import 'screens/credentials_screen.dart';
 import 'screens/csv_import_screen.dart';
 import 'screens/csv_import_entries_screen.dart';
 import 'screens/remove_account_screen.dart';
@@ -151,7 +150,6 @@ class Passy extends StatelessWidget {
         ConfirmRestoreScreen.routeName: (context) =>
             const ConfirmRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
-        CredentialsScreen.routeName: (context) => const CredentialsScreen(),
         CSVImportScreen.routeName: (context) => const CSVImportScreen(),
         CSVImportEntriesScreen.routeName: (context) =>
             const CSVImportEntriesScreen(),
