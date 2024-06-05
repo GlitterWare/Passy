@@ -85,10 +85,12 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   Future<void> _generateLoop() async {
     while (true) {
       await Future.delayed(const Duration(milliseconds: 200));
-      if (_value.length != _length) {
-        _generatePassword();
+      if (!_shouldGenerate) {
+        if (_value.length != _length) {
+          _generatePassword();
+        }
+        continue;
       }
-      if (!_shouldGenerate) continue;
       _shouldGenerate = false;
       _generatePassword();
       if (!mounted) return;
