@@ -13,7 +13,6 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/servers_screen.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
-import 'automatic_backup_screen.dart';
 import 'backup_and_restore_screen.dart';
 import 'common.dart';
 import 'export_and_import_screen.dart';
@@ -80,17 +79,6 @@ class _SettingsScreen extends State<SettingsScreen> {
               onPressed: () => openUrl(
                   'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
             )),
-          PassyPadding(ThreeWidgetButton(
-            center: Text(localizations.automaticBackup),
-            left: const Padding(
-              padding: EdgeInsets.only(right: 30),
-              child: Icon(Icons.save_outlined),
-            ),
-            right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => Navigator.pushNamed(
-                context, AutomaticBackupScreen.routeName,
-                arguments: data.loadedAccount!.username),
-          )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.backupAndRestore),
             left: const Padding(

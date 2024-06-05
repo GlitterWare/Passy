@@ -8,7 +8,6 @@ import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
-import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/confirm_kdbx_export_screen.dart';
 import 'package:passy/screens/export_and_import_screen.dart';
@@ -135,8 +134,6 @@ class Passy extends StatelessWidget {
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         AddFileScreen.routeName: (context) => const AddFileScreen(),
-        AutomaticBackupScreen.routeName: (context) =>
-            const AutomaticBackupScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
             const BackupAndRestoreScreen(),
         BiometricAuthScreen.routeName: (context) => const BiometricAuthScreen(),
