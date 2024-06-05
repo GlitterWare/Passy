@@ -101,10 +101,10 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
             hasScrollBody: false,
             child: Column(children: [
               const Spacer(),
-              Text(
+              PassyPadding(Text(
                 localizations.keyDerivationDescription,
                 textAlign: TextAlign.center,
-              ),
+              )),
               const SizedBox(height: 24),
               PassyPadding(Text(
                 localizations.keyDerivationWarning1,
