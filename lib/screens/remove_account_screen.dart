@@ -23,22 +23,17 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
     return ConfirmStringScaffold(
       title: Text(localizations.removeAccount),
       message: PassyPadding(Text.rich(
-        TextSpan(text: localizations.confirmRemoveAccount1, children: [
-          TextSpan(
-            text: '\'$_username\' ',
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-          ),
-          TextSpan(
-              text:
-                  '${localizations.confirmRemoveAccount2}.\n\n${localizations.confirmRemoveAccount3}'),
-          TextSpan(
-            text: localizations.confirmRemoveAccount4Highlighted,
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-          ),
-          const TextSpan(text: '.'),
-        ]),
+        formattedTextParser.parse(
+          text:
+              '${localizations.confirmRemoveAccountMsg}\n\n${localizations.thisActionIsIrreversible}',
+          placeholders: {
+            'u': TextSpan(
+              text: '\'$_username\'',
+              style:
+                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            ),
+          },
+        ),
         textAlign: TextAlign.center,
       )),
       labelText: localizations.confirmUsername,

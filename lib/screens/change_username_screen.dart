@@ -10,8 +10,7 @@ import 'main_screen.dart';
 import 'splash_screen.dart';
 
 class ChangeUsernameScreen extends StatefulWidget {
-  static const String routeName =
-      '${SecurityScreen.routeName}/changeUsername';
+  static const String routeName = '${SecurityScreen.routeName}/changeUsername';
 
   const ChangeUsernameScreen({Key? key}) : super(key: key);
 
@@ -65,17 +64,16 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
         );
       },
       message: Text.rich(
-        TextSpan(
+        formattedTextParser.parse(
           text: localizations.currentUsernameIs,
-          children: [
-            TextSpan(
+          placeholders: {
+            'u': TextSpan(
               text: _account.username,
               style: const TextStyle(
                 color: PassyTheme.lightContentSecondaryColor,
               ),
             ),
-            TextSpan(text: '.\n\n${localizations.typeInTheNewUsername}.'),
-          ],
+          },
         ),
         textAlign: TextAlign.center,
       ),

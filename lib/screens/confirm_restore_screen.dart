@@ -25,19 +25,9 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
     return ConfirmStringScaffold(
         title: Text(localizations.passyRestore),
         message: PassyPadding(Text.rich(
-          TextSpan(
-            text: localizations.confirmRestore1,
-            children: [
-              TextSpan(
-                text: localizations.confirmRestore2Highlighted,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
-              ),
-              TextSpan(
-                  text:
-                      '${localizations.confirmRestore3}.\n\n${localizations.enterAccountPasswordToRestore}.'),
-            ],
-          ),
+          formattedTextParser.parse(
+              text:
+                  '${localizations.confirmRestoreMsg}\n\n${localizations.enterAccountPasswordToRestore}'),
           textAlign: TextAlign.center,
         )),
         labelText: localizations.enterPassword,

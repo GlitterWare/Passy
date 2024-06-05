@@ -114,26 +114,32 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
               )),
               const SizedBox(height: 24),
               PassyPadding(Text.rich(
-                TextSpan(children: [
-                  const WidgetSpan(
+                formattedTextParser.parse(
+                  text: '%i  ${localizations.keyDerivationWarning2}',
+                  placeholders: {
+                    'i': const WidgetSpan(
                       child: Icon(
-                    Icons.sync_rounded,
-                    size: 15,
-                  )),
-                  TextSpan(text: '  ${localizations.keyDerivationWarning2}'),
-                ]),
+                        Icons.sync_rounded,
+                        size: 15,
+                      ),
+                    ),
+                  },
+                ),
                 textAlign: TextAlign.center,
               )),
               const SizedBox(height: 24),
               PassyPadding(Text.rich(
-                TextSpan(children: [
-                  const WidgetSpan(
+                formattedTextParser.parse(
+                  text: '%i  ${localizations.keyDerivationWarning3}',
+                  placeholders: {
+                    'i': const WidgetSpan(
                       child: Icon(
-                    Icons.update,
-                    size: 15,
-                  )),
-                  TextSpan(text: '  ${localizations.keyDerivationWarning3}'),
-                ]),
+                        Icons.update,
+                        size: 15,
+                      ),
+                    ),
+                  },
+                ),
                 textAlign: TextAlign.center,
               )),
               const SizedBox(height: 24),
@@ -301,20 +307,22 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                   ],
                 ),
               if (_isChanged)
-                PassyPadding(Text.rich(
-                  TextSpan(
+                PassyPadding(
+                  Text.rich(
+                    formattedTextParser.parse(
                       text: localizations.youAreChangingKeyDerivationFor,
-                      children: [
-                        TextSpan(
+                      placeholders: {
+                        'u': TextSpan(
                           text: _account.username,
                           style: const TextStyle(
                             color: PassyTheme.lightContentSecondaryColor,
                           ),
                         ),
-                        const TextSpan(text: '.')
-                      ]),
-                  textAlign: TextAlign.center,
-                )),
+                      },
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               if (_isChanged)
                 Expanded(
                   child: PassyPadding(

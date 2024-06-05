@@ -112,17 +112,17 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
             child: Column(children: [
               const Spacer(),
               Text.rich(
-                TextSpan(
-                    text: localizations.youAreChangingPasswordFor,
-                    children: [
-                      TextSpan(
-                        text: _account.username,
-                        style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor,
-                        ),
+                formattedTextParser.parse(
+                  text: localizations.youAreChangingPasswordFor,
+                  placeholders: {
+                    'u': TextSpan(
+                      text: _account.username,
+                      style: const TextStyle(
+                        color: PassyTheme.lightContentSecondaryColor,
                       ),
-                      const TextSpan(text: '.')
-                    ]),
+                    ),
+                  },
+                ),
                 textAlign: TextAlign.center,
               ),
               Expanded(

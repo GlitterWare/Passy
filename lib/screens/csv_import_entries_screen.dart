@@ -184,7 +184,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
         ),
         body: ListView(children: [
           PassyPadding(Text(
-            '${localizations.csvImportMessage1}.\n\n${localizations.csvImportMessage2}.',
+            '${localizations.csvImportMsg1}\n\n${localizations.csvImportMsg2}',
             textAlign: TextAlign.center,
           )),
           ListView.builder(

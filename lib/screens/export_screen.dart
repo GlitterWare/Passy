@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/unlock_screen.dart';
 import 'package:path/path.dart' as path;
 
@@ -37,17 +36,9 @@ class _ExportScreen extends State<ExportScreen> {
         shape: PassyTheme.dialogShape,
         title: Text(localizations.confirmExport),
         content: Text.rich(
-          TextSpan(
-            text: localizations.confirmExport1,
-            children: [
-              TextSpan(
-                  text: localizations.confirmExport2Highlighted,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor)),
-              TextSpan(text: '.\n\n${localizations.confirmExport3}.'),
-            ],
-          ),
-          textAlign: TextAlign.center,
+          formattedTextParser.parse(
+              text:
+                  '${localizations.confirmExportMsg1}\n\n${localizations.confirmExportMsg2}'),
         ),
         actions: [
           TextButton(

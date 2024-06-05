@@ -140,16 +140,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
                 logo60Purple,
                 const Spacer(),
                 Text.rich(
-                  TextSpan(
-                    text: localizations.yourAccountWillBeStoredLocally1,
-                    children: [
-                      TextSpan(
-                          text: localizations
-                              .yourAccountWillBeStoredLocally2Highlighted,
-                          style: const TextStyle(
-                              color: PassyTheme.lightContentSecondaryColor)),
-                    ],
-                  ),
+                  formattedTextParser.parse(
+                      text: localizations
+                          .yourAccountWillBeStoredLocallyOnThisDevice),
                   textAlign: TextAlign.center,
                 ),
                 const Spacer(),

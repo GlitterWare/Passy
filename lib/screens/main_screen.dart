@@ -12,9 +12,8 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/passy_flutter/search_entry_data.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -24,7 +23,6 @@ import 'package:passy/screens/payment_card_screen.dart';
 import 'package:passy/screens/search_screen.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
 import 'key_derivation_screen.dart';
@@ -217,11 +215,14 @@ class _MainScreen extends State<MainScreen>
               children: [
                 const Spacer(flex: 7),
                 Text.rich(
-                  TextSpan(text: '${localizations.noFavorites}.', children: [
-                    TextSpan(text: '\n\n${localizations.noFavorites1}'),
-                    const WidgetSpan(child: Icon(Icons.star_outline_rounded)),
-                    TextSpan(text: ' ${localizations.noFavorites2}.'),
-                  ]),
+                  formattedTextParser.parse(
+                    text:
+                        '${localizations.noFavorites}\n\n${localizations.noFavoritesMsg}',
+                    placeholders: {
+                      'f': const WidgetSpan(
+                          child: Icon(Icons.star_outline_rounded))
+                    },
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const Spacer(flex: 7),

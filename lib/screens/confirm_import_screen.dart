@@ -140,19 +140,9 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
         title: Text(title),
         message: args.importType == ImportType.passy
             ? PassyPadding(Text.rich(
-                TextSpan(
-                  text: localizations.confirmImport1,
-                  children: [
-                    TextSpan(
-                      text: localizations.confirmImport2Highlighted,
-                      style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor),
-                    ),
-                    TextSpan(
-                        text:
-                            '${localizations.confirmImport3}.\n\n${localizations.enterAccountPasswordToImport}.'),
-                  ],
-                ),
+                formattedTextParser.parse(
+                    text:
+                        '${localizations.confirmImportMsg}\n\n${localizations.enterAccountPasswordToImport}'),
                 textAlign: TextAlign.center,
               ))
             : PassyPadding(Text(localizations.enterAccountPasswordToImport)),

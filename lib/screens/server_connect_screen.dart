@@ -24,7 +24,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
   String? _address;
   int _port = 5592;
   bool _connectionChecked = false;
-  String _nickname = '';
+  String _nickname = 'Home server';
 
   Future<void> _onConnectPressed({bool testRun = false}) async {
     if (!testRun) {
@@ -163,8 +163,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             text: '1. ',
                             children: [
                               TextSpan(
-                                text:
-                                    '${localizations.chooseHostAddressAndPort}:',
+                                text: localizations.chooseHostAddressAndPort,
                                 style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
@@ -220,7 +219,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             text: '2. ',
                             children: [
                               TextSpan(
-                                text: '${localizations.testConnection}:',
+                                text: localizations.testConnection,
                                 style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
@@ -266,7 +265,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             text: '3. ',
                             children: [
                               TextSpan(
-                                text: '${localizations.connectToServer}:',
+                                text: localizations.connectToServer,
                                 style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
