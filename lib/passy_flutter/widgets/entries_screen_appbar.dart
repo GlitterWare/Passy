@@ -41,6 +41,24 @@ class EntriesScreenAppBar extends StatelessWidget
         IconButton(
           padding: buttonPadding,
           splashRadius: buttonSplashRadius,
+          onPressed: () {
+            if (!data.loadedAccount!.isRSAKeypairLoaded) {
+              showSnackBar(
+                message: localizations.settingUpSynchronization,
+                icon: const Icon(CupertinoIcons.clock_solid,
+                    color: PassyTheme.darkContentColor),
+              );
+              return;
+            }
+            onConnectPressed(context,
+                popUntilRouteName: entryTypeToEntriesRouteName(entryType))();
+          },
+          tooltip: localizations.scanQRCode,
+          icon: const Icon(Icons.qr_code_scanner),
+        ),
+        IconButton(
+          padding: buttonPadding,
+          splashRadius: buttonSplashRadius,
           onPressed: onSearchPressed,
           tooltip: localizations.search,
           icon: const Icon(Icons.search_rounded),
