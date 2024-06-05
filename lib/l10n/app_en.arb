@@ -352,5 +352,6 @@
     "couldNotBackup": "Could not backup",
     "renameTag": "Rename tag",
     "noChanges": "No changes",
-    "close": "Close"
+    "close": "Close",
+    "entryDoesNotExist": "Entry does not exist"
 }

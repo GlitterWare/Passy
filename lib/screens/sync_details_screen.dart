@@ -9,6 +9,7 @@ import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
+import 'common.dart';
 import 'id_card_screen.dart';
 import 'identity_screen.dart';
 import 'note_screen.dart';
@@ -106,9 +107,18 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                   )
                 : PasswordButtonListView(
                     passwords: args.passwordsMetadata.values.toList(),
-                    onPressed: (password) => Navigator.pushNamed(
-                        context, PasswordScreen.routeName,
-                        arguments: _account.getPassword(password.key)!),
+                    onPressed: (password) {
+                      try {
+                        Navigator.pushNamed(context, PasswordScreen.routeName,
+                            arguments: _account.getPassword(password.key)!);
+                      } catch (e) {
+                        showSnackBar(
+                          message: localizations.entryDoesNotExist,
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                        );
+                      }
+                    },
                     shouldSort: true,
                     syncStates: args.report.changedPasswords,
                   ),
@@ -132,9 +142,20 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                   )
                 : PaymentCardButtonMiniListView(
                     paymentCards: args.paymentCardsMetadata.values.toList(),
-                    onPressed: (paymentCard) => Navigator.pushNamed(
-                        context, PaymentCardScreen.routeName,
-                        arguments: _account.getPaymentCard(paymentCard.key)!),
+                    onPressed: (paymentCard) {
+                      try {
+                        Navigator.pushNamed(
+                            context, PaymentCardScreen.routeName,
+                            arguments:
+                                _account.getPaymentCard(paymentCard.key)!);
+                      } catch (e) {
+                        showSnackBar(
+                          message: localizations.entryDoesNotExist,
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                        );
+                      }
+                    },
                     shouldSort: true,
                     syncStates: args.report.changedPaymentCards,
                   ),
@@ -158,9 +179,18 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                   )
                 : NoteButtonListView(
                     notes: args.notesMetadata.values.toList(),
-                    onPressed: (note) => Navigator.pushNamed(
-                        context, NoteScreen.routeName,
-                        arguments: _account.getNote(note.key)!),
+                    onPressed: (note) {
+                      try {
+                        Navigator.pushNamed(context, NoteScreen.routeName,
+                            arguments: _account.getNote(note.key)!);
+                      } catch (e) {
+                        showSnackBar(
+                          message: localizations.entryDoesNotExist,
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                        );
+                      }
+                    },
                     shouldSort: true,
                     syncStates: args.report.changedNotes,
                   ),
@@ -184,9 +214,18 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                   )
                 : IDCardButtonListView(
                     idCards: args.idCardsMetadata.values.toList(),
-                    onPressed: (idCard) => Navigator.pushNamed(
-                        context, IDCardScreen.routeName,
-                        arguments: _account.getIDCard(idCard.key)!),
+                    onPressed: (idCard) {
+                      try {
+                        Navigator.pushNamed(context, IDCardScreen.routeName,
+                            arguments: _account.getIDCard(idCard.key)!);
+                      } catch (e) {
+                        showSnackBar(
+                          message: localizations.entryDoesNotExist,
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                        );
+                      }
+                    },
                     shouldSort: true,
                     syncStates: args.report.changedIDCards,
                   ),
@@ -210,9 +249,18 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                   )
                 : IdentityButtonListView(
                     identities: args.identitiesMetadata.values.toList(),
-                    onPressed: (identity) => Navigator.pushNamed(
-                        context, IdentityScreen.routeName,
-                        arguments: _account.getIdentity(identity.key)!),
+                    onPressed: (identity) {
+                      try {
+                        Navigator.pushNamed(context, IdentityScreen.routeName,
+                            arguments: _account.getIdentity(identity.key)!);
+                      } catch (e) {
+                        showSnackBar(
+                          message: localizations.entryDoesNotExist,
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              color: PassyTheme.darkContentColor),
+                        );
+                      }
+                    },
                     shouldSort: true,
                     syncStates: args.report.changedIdentities,
                   ),
