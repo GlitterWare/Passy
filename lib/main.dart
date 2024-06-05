@@ -193,7 +193,7 @@ class Passy extends StatelessWidget {
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SetupScreen.routeName: (context) => const SetupScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
-        SyncDetailsScreen.routeName:(context) => const SyncDetailsScreen(),
+        SyncDetailsScreen.routeName: (context) => const SyncDetailsScreen(),
         SynchronizationLogsScreen.routeName: (context) =>
             const SynchronizationLogsScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),
