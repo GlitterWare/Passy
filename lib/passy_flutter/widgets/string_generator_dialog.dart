@@ -22,20 +22,23 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   bool _numbersEnabled = true;
   bool _symbolsEnabled = true;
   String _characterSet = _letters + _numbers + _symbols;
+  bool _shouldGenerate = true;
+  Future<void>? _generateLoopFuture;
 
   _StringGeneratorDialog() {
     _generatePassword();
   }
 
   void _generatePassword() {
+    String newVal = '';
     int minSpecial;
     if (_numbersEnabled && _symbolsEnabled) {
       minSpecial = (_halfMinSpecial * _length).round();
       while (true) {
-        _value = PassyGen.generateString(_characterSet, _length);
+        newVal = PassyGen.generateString(_characterSet, _length);
         int numCount = 0;
         int symCount = 0;
-        for (String c in _value.characters) {
+        for (String c in newVal.characters) {
           if (_numbers.contains(c)) {
             numCount++;
             continue;
@@ -60,9 +63,9 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
         special = _symbols;
       }
       while (true) {
-        _value = PassyGen.generateString(_characterSet, _length);
+        newVal = PassyGen.generateString(_characterSet, _length);
         int specialCount = 0;
-        for (String c in _value.characters) {
+        for (String c in newVal.characters) {
           if (special.contains(c)) {
             specialCount++;
             continue;
@@ -71,8 +74,24 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
         if (specialCount >= minSpecial) break;
       }
     } else {
-      _value = PassyGen.generateString(_characterSet, _length);
-      return;
+      newVal = PassyGen.generateString(_characterSet, _length);
+    }
+    if (!mounted) return;
+    setState(() {
+      _value = newVal;
+    });
+  }
+
+  Future<void> _generateLoop() async {
+    while (true) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (_value.length != _length) {
+        _generatePassword();
+      }
+      if (!_shouldGenerate) continue;
+      _shouldGenerate = false;
+      _generatePassword();
+      if (!mounted) return;
     }
   }
 
@@ -86,7 +105,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
     setState(() {
       _numbersEnabled = value;
       _buildCharacterSet();
-      _generatePassword();
+      _shouldGenerate = true;
     });
   }
 
@@ -94,12 +113,13 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
     setState(() {
       _symbolsEnabled = value;
       _buildCharacterSet();
-      _generatePassword();
+      _shouldGenerate = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    _generateLoopFuture ??= _generateLoop();
     return Dialog(
       shape: PassyTheme.dialogShape,
       child: ListView(
@@ -154,7 +174,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               value: _length.toDouble(),
               onChanged: (value) => setState(() {
                 _length = value.toInt();
-                _generatePassword();
+                _shouldGenerate = true;
               }),
               min: 4.0,
               max: 200.0,
@@ -184,7 +204,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
                 FloatingActionButton(
                   heroTag: null,
                   tooltip: localizations.generate,
-                  onPressed: () => setState(() => _generatePassword()),
+                  onPressed: () => setState(() => _shouldGenerate = true),
                   child: const Icon(Icons.refresh_rounded),
                 ),
               ),
