@@ -192,6 +192,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return PassyPadding(DropdownButtonFormField<String>(
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
                 value: csvToJson[index],
                 items: entryJsonKeys,
                 onChanged: (value) {
