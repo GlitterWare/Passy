@@ -138,11 +138,8 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     _encrypter = encrypter;
   }
 
-  String _encodeEntryForSaving(List<dynamic> _entry) {
-    String _key = _entry[0];
-    IV _iv = IV.fromSecureRandom(16);
-    return '$_key,${_iv.base64},${encrypt(csvEncode(_entry), encrypter: _encrypter, iv: _iv)}\n';
-  }
+  String _encodeEntryForSaving(List<dynamic> entry) =>
+      encodeCSVEntryForSaving(entry: entry, encrypter: _encrypter);
 
   String? getEntryString(String key) {
     RandomAccessFile _raf = _file.openSync();

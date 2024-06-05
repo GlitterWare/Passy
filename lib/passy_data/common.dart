@@ -619,3 +619,12 @@ Future<Digest> getFileChecksum(File file) async {
   input.close();
   return output.events.single;
 }
+
+String encodeCSVEntryForSaving({
+  required List<dynamic> entry,
+  required Encrypter encrypter,
+}) {
+  String key = entry[0];
+  IV iv = IV.fromSecureRandom(16);
+  return '$key,${iv.base64},${encrypt(csvEncode(entry), encrypter: encrypter, iv: iv)}\n';
+}
