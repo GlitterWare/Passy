@@ -485,39 +485,6 @@ class _MainScreen extends State<MainScreen>
       PassyPadding(ThreeWidgetButton(
         left: const Padding(
           padding: EdgeInsets.only(right: 30),
-          child: Icon(CupertinoIcons.globe),
-        ),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: Text(localizations.searchAllEntries),
-        onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
-            arguments: SearchScreenArgs(
-              entryType: null,
-              title: localizations.allEntries,
-              builder: _searchBuilder,
-            )),
-      )),
-      PassyPadding(ThreeWidgetButton(
-        left: const Padding(
-          padding: EdgeInsets.only(right: 30),
-          child: Icon(Icons.qr_code_scanner),
-        ),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: Text(localizations.synchronize),
-        onPressed: () {
-          if (!_account.isRSAKeypairLoaded) {
-            showSnackBar(
-              message: localizations.settingUpSynchronization,
-              icon: const Icon(CupertinoIcons.clock_solid,
-                  color: PassyTheme.darkContentColor),
-            );
-            return;
-          }
-          showSynchronizationDialog(context);
-        },
-      )),
-      PassyPadding(ThreeWidgetButton(
-        left: const Padding(
-          padding: EdgeInsets.only(right: 30),
           child: Icon(Icons.password_rounded),
         ),
         right: const Icon(Icons.arrow_forward_ios_rounded),
@@ -663,7 +630,6 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[0],
                           _screenButtons[3],
                           _screenButtons[6],
-                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                       Expanded(
@@ -671,7 +637,7 @@ class _MainScreen extends State<MainScreen>
                         children: [
                           _screenButtons[1],
                           _screenButtons[4],
-                          _screenButtons[7],
+                          if (_screenButtons.length == 8) _screenButtons[7],
                         ],
                       )),
                       Expanded(
@@ -679,7 +645,6 @@ class _MainScreen extends State<MainScreen>
                         children: [
                           _screenButtons[2],
                           _screenButtons[5],
-                          _screenButtons[8],
                         ],
                       ))
                     ]);
@@ -692,7 +657,6 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[2],
                           _screenButtons[4],
                           _screenButtons[6],
-                          _screenButtons[8],
                         ]),
                       ),
                       Expanded(
@@ -701,8 +665,7 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[1],
                           _screenButtons[3],
                           _screenButtons[5],
-                          _screenButtons[7],
-                          if (_screenButtons.length == 10) _screenButtons[9],
+                          if (_screenButtons.length == 8) _screenButtons[7],
                         ],
                       )),
                     ]);
