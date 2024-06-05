@@ -576,19 +576,6 @@ class _MainScreen extends State<MainScreen>
           ),
           actions: [
             IconButton(
-              padding: PassyTheme.appBarButtonPadding,
-              tooltip: localizations.search,
-              onPressed: () =>
-                  Navigator.pushNamed(context, SearchScreen.routeName,
-                      arguments: SearchScreenArgs(
-                        entryType: null,
-                        title: localizations.allEntries,
-                        builder: _searchBuilder,
-                      )),
-              icon: const Icon(Icons.search_rounded),
-              splashRadius: PassyTheme.appBarButtonSplashRadius,
-            ),
-            IconButton(
               splashRadius: PassyTheme.appBarButtonSplashRadius,
               padding: PassyTheme.appBarButtonPadding,
               tooltip: localizations.synchronize,
@@ -604,6 +591,19 @@ class _MainScreen extends State<MainScreen>
                 showSynchronizationDialog(context);
               },
               icon: const Icon(Icons.sync_rounded),
+            ),
+            IconButton(
+              padding: PassyTheme.appBarButtonPadding,
+              tooltip: localizations.search,
+              onPressed: () =>
+                  Navigator.pushNamed(context, SearchScreen.routeName,
+                      arguments: SearchScreenArgs(
+                        entryType: null,
+                        title: localizations.allEntries,
+                        builder: _searchBuilder,
+                      )),
+              icon: const Icon(Icons.search_rounded),
+              splashRadius: PassyTheme.appBarButtonSplashRadius,
             ),
             IconButton(
               padding: PassyTheme.appBarButtonPadding,
