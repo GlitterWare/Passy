@@ -22,12 +22,8 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   bool _numbersEnabled = true;
   bool _symbolsEnabled = true;
   String _characterSet = _letters + _numbers + _symbols;
-  bool _shouldGenerate = true;
+  bool _shouldGenerate = false;
   Future<void>? _generateLoopFuture;
-
-  _StringGeneratorDialog() {
-    _generatePassword();
-  }
 
   void _generatePassword() {
     String newVal = '';
@@ -117,6 +113,12 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
       _buildCharacterSet();
       _shouldGenerate = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _generatePassword();
   }
 
   @override
