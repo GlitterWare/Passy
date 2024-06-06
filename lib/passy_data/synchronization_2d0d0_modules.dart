@@ -58,7 +58,11 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   return {
     apiVersion: GlareModule(
       name: 'Passy 2.0.0+ Synchronization Modules',
-      target: (args, {required addModule, required readBytes}) async {
+      target: (
+        args, {
+        required addModule,
+        Map<String, List<int>>? binaryObjects,
+      }) async {
         if (args.length == 3) {
           return {
             'commands': [
@@ -125,6 +129,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'status': {'type': 'Success'},
               'auth': generateAuth(),
+              'binaryObjects': {
+                'hello': 'world!'.codeUnits,
+              }
             };
           case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);

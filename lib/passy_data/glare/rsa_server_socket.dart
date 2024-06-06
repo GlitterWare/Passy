@@ -19,7 +19,6 @@ class RSAServerSocket {
   final StreamController<Map<String, dynamic>> _streamController =
       StreamController<Map<String, dynamic>>();
   final Completer<void> _handshakeCompleter = Completer();
-  int _binaryIndex = 0;
   Uint8List? _binaryData;
 
   Future<void> get handshakeComplete => _handshakeCompleter.future;
@@ -46,29 +45,30 @@ class RSAServerSocket {
 
   void _onData(List<int> data) {
     if (_encrypter == null) return;
-    Uint8List? binaryData = _binaryData;
-    if (binaryData != null) {
-      for (int d in data) {
-        binaryData[_binaryIndex] = d;
-        _binaryIndex++;
-        if (_binaryIndex == binaryData.length) {
-          _streamController.add({'bytes': _binaryData});
-          _binaryIndex = 0;
-          _binaryData = null;
-        }
-      }
-      return;
-    }
+    Map<String, List<int>> binaryObjects = {};
     Map<String, dynamic> decoded = {};
     try {
       String decrypted = '';
       for (String part in utf8.decode(data).split(' ')) {
         List<String> partSplit = part.split(',');
         if (partSplit.length < 2) return;
-        decrypted += _encrypter!
-            .decrypt64(partSplit[1], iv: IV.fromBase64(partSplit[0]));
+        String? type;
+        String? name;
+        IV iv = IV.fromBase64(partSplit[0]);
+        if (partSplit.length > 3) {
+          type = partSplit[2];
+          name = _encrypter!.decrypt64(partSplit[3], iv: iv);
+        }
+        String data = _encrypter!.decrypt64(partSplit[1], iv: iv);
+        if (type == 'bin') {
+          binaryObjects[name!] = data.codeUnits;
+        } else {
+          decrypted += data;
+        }
       }
       decoded = jsonDecode(decrypted);
+      decoded.remove('binaryObjects');
+      if (binaryObjects.isNotEmpty) decoded['binaryObjects'] = binaryObjects;
     } catch (_) {
       return;
     }
@@ -124,11 +124,27 @@ class RSAServerSocket {
     );
   }
 
-  void writeJson(Map<String, dynamic> data) {
+  void writeJson(
+    Map<String, dynamic> data, {
+    Map<String, List<int>>? binaryObjects,
+  }) {
     if (_encrypter == null) return;
     String encoded = jsonEncode(data);
     IV _iv = IV.fromSecureRandom(16);
     encoded = _iv.base64 + ',' + _encrypter!.encrypt(encoded, iv: _iv).base64;
+    if (binaryObjects != null) {
+      for (String key in binaryObjects.keys) {
+        List<int> val = binaryObjects[key]!;
+        IV _iv = IV.fromSecureRandom(16);
+        encoded += ' ' +
+            _iv.base64 +
+            ',' +
+            _encrypter!.encryptBytes(val, iv: _iv).base64 +
+            ',bin,' +
+            _encrypter!.encrypt(key, iv: _iv).base64;
+      }
+      print(encoded);
+    }
     _socket.writeln(encoded);
   }
 }

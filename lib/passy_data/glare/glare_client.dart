@@ -16,7 +16,6 @@ class GlareClient {
   late StreamSubscription<Map<String, dynamic>> _socketSubscription;
   final Function(dynamic)? _log;
   final Map<String, Completer<Map<String, dynamic>?>> _commandEvents = {};
-  final Map<String, List<int> Function(int length)> _readBytesEvents = {};
   final Event _onDisconnect = Event();
 
   GlareClient._({
@@ -82,26 +81,6 @@ class GlareClient {
       _log?.call('W:Unhandled command response:\n$data');
       return;
     }
-    dynamic action = data['action'];
-    if (action is Map<String, dynamic>) {
-      if (action['name'] == 'readBytes') {
-        if (action.containsKey('error')) {
-          return;
-        }
-        dynamic lengthStr = action['length'];
-        if (lengthStr is! String) return;
-        int length;
-        try {
-          length = int.parse(lengthStr);
-        } catch (_) {
-          return;
-        }
-        List<int>? bytes = _readBytesEvents[argumentsJoined]?.call(length);
-        if (bytes == null) return;
-        _socket.add(bytes);
-        return;
-      }
-    }
     if (!commandEvent.isCompleted) commandEvent.complete(data);
     _commandEvents.remove(argumentsJoined);
   }
@@ -118,8 +97,14 @@ class GlareClient {
     }
   }
 
-  void writeJson(Map<String, dynamic> data) {
-    _socket.writeJson(data);
+  void writeJson(
+    Map<String, dynamic> data, {
+    Map<String, List<int>>? binaryObjects,
+  }) {
+    _socket.writeJson(
+      data,
+      binaryObjects: binaryObjects,
+    );
   }
 
   Future<Map<String, dynamic>> ping() async {
@@ -258,8 +243,11 @@ class GlareClient {
     };
   }
 
-  Future<Map<String, dynamic>> runModule(List<String> args,
-      {List<int> Function(int length)? onReadBytes}) async {
+  Future<Map<String, dynamic>> runModule(
+    List<String> args, {
+    List<int> Function(int length)? onReadBytes,
+    Map<String, List<int>>? binaryObjects,
+  }) async {
     if (args.isEmpty) {
       return {
         'type': 'localError',
@@ -274,13 +262,15 @@ class GlareClient {
     await onModulesRun?.future;
     onModulesRun = Completer<Map<String, dynamic>?>();
     _commandEvents[id] = onModulesRun;
-    if (onReadBytes != null) _readBytesEvents[id] = onReadBytes;
-    writeJson({
-      'type': 'command',
-      'data': {
-        'arguments': ['modules', 'run', ...args],
-      }
-    });
+    writeJson(
+      {
+        'type': 'command',
+        'data': {
+          'arguments': ['modules', 'run', ...args],
+        },
+      },
+      binaryObjects: binaryObjects,
+    );
     Map<String, dynamic>? response = await onModulesRun.future;
     if (response == null) {
       return {

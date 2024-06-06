@@ -892,7 +892,11 @@ class Synchronization {
       if (result == null) {
         return {'error': 'Server module responded with null'};
       }
-      return response['data']['result'];
+      Map<String, dynamic> jsonResult = response['data']['result'];
+      if (response.containsKey('binaryObjects')) {
+        jsonResult['binaryObjects'] = response['binaryObjects'];
+      }
+      return jsonResult;
     }
 
     List<String> _addressSplit = address.split(':');
@@ -1161,12 +1165,16 @@ class Synchronization {
         onTrustSaveComplete?.call();
       }
       _syncLog += 'done.\nAuthenticating... ';
-      Map<String, dynamic> authResponse =
-          _checkResponse(await _safeSync2d0d0Client.runModule([
-        apiVersion,
-        'authenticate',
-        jsonEncode(auth()),
-      ]));
+      Map<String, dynamic> authResponse = _checkResponse(
+        await _safeSync2d0d0Client.runModule(
+          [
+            apiVersion,
+            'authenticate',
+            jsonEncode(auth()),
+          ],
+          binaryObjects: {'hello': 'world!'.codeUnits},
+        ),
+      );
       if (authResponse.containsKey('error')) {
         _syncLog +=
             'done.\nFailed to authenticate. Receiving shared entries... ';
