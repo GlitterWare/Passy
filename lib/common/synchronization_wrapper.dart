@@ -232,7 +232,7 @@ class SynchronizationWrapper {
                     ),
                     Expanded(
                       child: Center(
-                        child: Text(value.toString()),
+                        child: SelectableText(value.toString()),
                       ),
                     ),
                   ],
