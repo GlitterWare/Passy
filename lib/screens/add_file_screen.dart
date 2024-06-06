@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/main.dart';
+import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
@@ -53,6 +54,7 @@ class _AddFileScreen extends State<AddFileScreen> {
   FileMeta? _fileMeta;
   GlobalKey _previewKey = GlobalKey();
   Widget? _preview;
+  CompressionType _compressionType = CompressionType.none;
 
   Future<void> _load(BuildContext context, AddFileScreenArgs args) async {
     FileMeta newFileMeta =
@@ -92,8 +94,8 @@ class _AddFileScreen extends State<AddFileScreen> {
     Navigator.pushNamed(context, SplashScreen.routeName);
     String key;
     try {
-      key =
-          await _account.addFile(args.file, useIsolate: true, meta: _fileMeta);
+      key = await _account.addFile(args.file,
+          useIsolate: true, meta: _fileMeta, compressionType: _compressionType);
     } catch (e, s) {
       showSnackBar(
         message: localizations.failedToAddFile,
@@ -135,6 +137,15 @@ class _AddFileScreen extends State<AddFileScreen> {
         ),
         title: Text(basename(args.file.path)),
         centerTitle: true,
+        actions: [
+          IconButton(
+            padding: PassyTheme.appBarButtonPadding,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
+            onPressed: () => _onAddPressed(context, args),
+            tooltip: localizations.addFile,
+            icon: const Icon(Icons.add_rounded),
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -217,7 +228,33 @@ class _AddFileScreen extends State<AddFileScreen> {
                         },
                         onChanged: (value) {
                           if (value == null) return;
-                          args.type = value;
+                          setState(() => args.type = value);
+                          _load(context, args);
+                        },
+                      )),
+                      PassyPadding(EnumDropDownButtonFormField<CompressionType>(
+                        value: _compressionType,
+                        decoration: InputDecoration(
+                            labelText: localizations.compressionType),
+                        values: CompressionType.values,
+                        itemBuilder: (object) {
+                          switch (object) {
+                            case CompressionType.none:
+                              return Text(localizations.none);
+                            case CompressionType.tar:
+                              return const Text('Tar');
+                            case CompressionType.zlib:
+                              return const Text('ZLib');
+                            case CompressionType.gzip:
+                              return Text(
+                                  'GZip (${localizations.recommended})');
+                            case CompressionType.bzip2:
+                              return const Text('BZip2');
+                          }
+                        },
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _compressionType = value);
                           _load(context, args);
                         },
                       )),

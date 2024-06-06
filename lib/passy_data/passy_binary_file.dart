@@ -3,7 +3,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/compression_type.dart';
 import 'package:pointycastle/api.dart';
+import 'package:archive/archive.dart';
 
 class PassyBinaryFile {
   final Key _key;
@@ -18,10 +20,30 @@ class PassyBinaryFile {
     required Uint8List input,
     IV? iv,
     String algorithm = 'AES/SIC/PKCS7',
+    CompressionType compressionType = CompressionType.none,
   }) async {
     iv ??= IV.fromSecureRandom(16);
     if (!await file.exists()) await file.create(recursive: true);
     RandomAccessFile rafOut = await file.open(mode: FileMode.write);
+    switch (compressionType) {
+      case CompressionType.none:
+        break;
+      case CompressionType.tar:
+        Archive archive = Archive();
+        archive.addFile(
+            ArchiveFile.stream('data', input.length, InputStream(input)));
+        input = Uint8List.fromList(TarEncoder().encode(archive));
+        break;
+      case CompressionType.zlib:
+        input = Uint8List.fromList(const ZLibEncoder().encode(input));
+        break;
+      case CompressionType.gzip:
+        input = Uint8List.fromList(GZipEncoder().encode(input)!);
+        break;
+      case CompressionType.bzip2:
+        input = Uint8List.fromList(BZip2Encoder().encode(input));
+        break;
+    }
     int inLen = input.length;
     Uint8List contents = input;
     Uint8List copyList =
@@ -44,7 +66,8 @@ class PassyBinaryFile {
         PaddedBlockCipherParameters(
             ParametersWithIV<KeyParameter>(KeyParameter(_key.bytes), iv.bytes),
             null));
-    await rafOut.writeString('${iv.base64},$inLen,$algorithm\n');
+    await rafOut.writeString(
+        '${iv.base64},$inLen,$algorithm,${compressionType.name},\n');
     while (fileIndex <= inLen) {
       Uint8List blockIn = Uint8List(16);
       Uint8List blockOut = Uint8List(16);
@@ -93,6 +116,7 @@ class PassyBinaryFile {
     IV? iv;
     int length = 0;
     String algo = '';
+    CompressionType compressionType = CompressionType.none;
     if (meta.isNotEmpty) {
       String metaString = utf8.decode(meta);
       if (metaString[0] == '{') {
@@ -100,17 +124,23 @@ class PassyBinaryFile {
         iv = IV.fromBase64(metaJson['iv']);
         length = int.parse(metaJson['length']);
         algo = metaJson['algo'];
+        compressionType =
+            compressionTypeFromName(metaJson['compressionType']) ??
+                CompressionType.none;
       } else {
         List<String> metaSplit = metaString.split(',');
         if (metaSplit.isNotEmpty) {
           iv = IV.fromBase64(metaSplit[0]);
           length = int.parse(metaSplit[1]);
           algo = metaSplit[2];
+          compressionType =
+              compressionTypeFromName(metaSplit[3]) ?? CompressionType.none;
         }
       }
     }
     if (length == 0) return Uint8List(0);
-    Uint8List contents = await file.readAsBytes();
+    Uint8List contents;
+    contents = await file.readAsBytes();
     Uint8List result = Uint8List(length);
     int resultIndex = 0;
     PaddedBlockCipher _cipher = PaddedBlockCipher(algo);
@@ -140,6 +170,28 @@ class PassyBinaryFile {
       //print('Offset changed: $offset');
     }
     //print(utf8.decode(result));
+    switch (compressionType) {
+      case CompressionType.none:
+        break;
+      case CompressionType.tar:
+        ArchiveFile file =
+            TarDecoder().decodeBuffer(InputStream(result)).findFile('data')!;
+        file.decompress();
+        result = Uint8List.fromList(file.rawContent!.toUint8List());
+        break;
+      case CompressionType.zlib:
+        result = Uint8List.fromList(
+            const ZLibDecoder().decodeBuffer(InputStream(result)));
+        break;
+      case CompressionType.gzip:
+        result =
+            Uint8List.fromList(GZipDecoder().decodeBuffer(InputStream(result)));
+        break;
+      case CompressionType.bzip2:
+        result = Uint8List.fromList(
+            BZip2Decoder().decodeBuffer(InputStream(result)));
+        break;
+    }
     return result;
   }
 

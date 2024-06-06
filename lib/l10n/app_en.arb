@@ -316,5 +316,8 @@
     "renameTag": "Rename tag",
     "noChanges": "No changes",
     "close": "Close",
-    "entryDoesNotExist": "Entry does not exist"
+    "entryDoesNotExist": "Entry does not exist",
+    "compressionType": "Compression type",
+    "bestCompression": "Best compression",
+    "bestDecompression": "Best decompression"
 }

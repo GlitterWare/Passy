@@ -8,6 +8,7 @@ import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/convert_aegis.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/file_index.dart';
@@ -1455,11 +1456,13 @@ class LoadedAccount {
     File file, {
     bool useIsolate = false,
     FileMeta? meta,
+    CompressionType compressionType = CompressionType.none,
     String? parent,
   }) {
     if (useIsolate) {
       return compute<FileIndex, String>(
-          (index) => index.addFile(file, meta: meta, parent: parent),
+          (index) => index.addFile(file,
+              meta: meta, compressionType: compressionType, parent: parent),
           _fileIndex);
     }
     return _fileIndex.addFile(file, meta: meta, parent: parent);

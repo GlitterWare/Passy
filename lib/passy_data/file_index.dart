@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 
@@ -101,7 +102,7 @@ class FileIndex {
     Map<String, List<dynamic>> result = {};
     Map<String, String> entryStrings = await getEntryStrings(keys);
     for (MapEntry<String, String> entryString in entryStrings.entries) {
-      result[entryString.key] = csvDecode(entryString.value);
+      result[entryString.key] = csvDecode(entryString.value, recursive: true);
     }
     return result;
   }
@@ -211,13 +212,15 @@ class FileIndex {
   Future<String> addFile(
     File file, {
     FileMeta? meta,
+    CompressionType compressionType = CompressionType.none,
     String? parent,
   }) async {
     meta ??= await FileMeta.fromFile(file, virtualParent: parent);
     PassyBinaryFile binaryFile = PassyBinaryFile(
         file: File(_saveDir.path + Platform.pathSeparator + meta.key),
         key: _key);
-    await binaryFile.encrypt(input: await file.readAsBytes());
+    await binaryFile.encrypt(
+        input: await file.readAsBytes(), compressionType: compressionType);
     await _setEntry(meta.key, meta);
     return meta.key;
   }
@@ -264,8 +267,9 @@ class FileIndex {
       if (entry == null) return true;
       List<String> entrySplit = entry.split(',');
       IV iv = IV.fromBase64(entrySplit[0]);
-      PassyFsMeta meta = PassyFsMeta.fromCSV(
-          csvDecode(decrypt(entrySplit[2], encrypter: _encrypter, iv: iv)))!;
+      PassyFsMeta meta = PassyFsMeta.fromCSV(csvDecode(
+          decrypt(entrySplit[2], encrypter: _encrypter, iv: iv),
+          recursive: true))!;
       if (meta.virtualPath.startsWith(path)) {
         skipLine(raf, lineDelimiter: '\n');
         return null;
@@ -299,8 +303,10 @@ class FileIndex {
       if (entry == null) return true;
       List<String> entrySplit = entry.split(',');
       if (_key == key) {
-        PassyFsMeta? meta = PassyFsMeta.fromCSV(csvDecode(decrypt(entrySplit[2],
-            encrypter: _encrypter, iv: IV.fromBase64(entrySplit[0]))));
+        PassyFsMeta? meta = PassyFsMeta.fromCSV(csvDecode(
+            decrypt(entrySplit[2],
+                encrypter: _encrypter, iv: IV.fromBase64(entrySplit[0])),
+            recursive: true));
         if (meta == null) return true;
         meta.name = name;
         await tempRaf.writeString(_encodeEntryForSaving(meta));

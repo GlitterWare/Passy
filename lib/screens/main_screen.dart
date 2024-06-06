@@ -25,6 +25,7 @@ import 'package:passy/screens/search_screen.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
+import 'files_screen.dart';
 import 'key_derivation_screen.dart';
 import 'payment_cards_screen.dart';
 import 'passwords_screen.dart';
@@ -532,15 +533,14 @@ class _MainScreen extends State<MainScreen>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
       PassyPadding(ThreeWidgetButton(
-        center: Text(localizations.files + ' (Coming soon)'),
-        left: const Padding(
-          padding: EdgeInsets.only(right: 30),
-          child: Icon(Icons.description_outlined),
-        ),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        //onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
-        //    .then((value) => setState(() {})),
-      )),
+          center: Text(localizations.files + ' (Coming soon)'),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.description_outlined),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () =>
+              Navigator.pushNamed(context, FilesScreen.routeName))),
       if ((_account.keyDerivationType == KeyDerivationType.none) &&
           recommendKeyDerivation)
         PassyPadding(ThreeWidgetButton(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -164,11 +165,15 @@ class _FilesScreen extends State<FilesScreen> {
             Navigator.pop(context, FilesScreenResult(key: value.key));
             return;
           }
-          Navigator.pushNamed(context, PassyFileScreen.routeName,
-              arguments: PassyFileScreenArgs(
-                  title: value.title,
-                  key: value.key,
-                  type: fileEntryTypeFromPassyFileType(value.type)));
+          _push(
+            args,
+            context,
+            PassyFileScreen.routeName,
+            PassyFileScreenArgs(
+                title: value.title,
+                key: value.key,
+                type: fileEntryTypeFromPassyFileType(value.type)),
+          );
           return;
       }
       return;
@@ -235,17 +240,14 @@ class _FilesScreen extends State<FilesScreen> {
     }
 
     Widget addDropdown = EnumDropdownButton2<FileEntryType>(
+      dropdownStyleData: DropdownStyleData(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
       isExpanded: true,
       alignment: Alignment.centerRight,
       items: [
-        EnumDropdownButton2Item(
-          value: FileEntryType.unknown,
-          text: Text(
-            '${localizations.add}...',
-            textAlign: TextAlign.center,
-          ),
-          icon: const Icon(Icons.add_rounded),
-        ),
         EnumDropdownButton2Item(
           value: FileEntryType.file,
           text: Text(
@@ -263,7 +265,14 @@ class _FilesScreen extends State<FilesScreen> {
           icon: const Icon(Icons.folder),
         ),
       ],
-      value: FileEntryType.unknown,
+      hint: EnumDropdownButton2Item(
+        value: FileEntryType.unknown,
+        text: Text(
+          localizations.addEntry,
+          textAlign: TextAlign.center,
+        ),
+        icon: const Icon(Icons.add_rounded),
+      ),
       onChanged: (value) {
         if (value == null) return;
         switch (value) {

@@ -18,6 +18,8 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
 
   FileMeta({
     super.key,
+    super.synchronized,
+    super.tags,
     required super.name,
     required super.virtualPath,
     required this.path,
@@ -46,27 +48,37 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
         super(
           key: json['key'] ??
               DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c'),
+          synchronized: json['synchronized'],
+          tags: json.containsKey('tags')
+              ? (json['tags'] as List<dynamic>)
+                  .map((e) => e.toString())
+                  .toList()
+              : [],
           name: json['name'] ?? '',
           virtualPath: json['virtualPath'] ?? '',
         );
 
   FileMeta.fromCSV(List<dynamic> csv)
-      : path = csv[4],
-        changed = DateTime.tryParse(csv[5]) ?? DateTime.now().toUtc(),
-        modified = DateTime.tryParse(csv[6]) ?? DateTime.now().toUtc(),
-        accessed = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
-        size = int.tryParse(csv[8]) ?? 0,
-        type = passyFileTypeFromName(csv[9]) ?? PassyFileType.unknown,
+      : path = csv[6],
+        changed = DateTime.tryParse(csv[7]) ?? DateTime.now().toUtc(),
+        modified = DateTime.tryParse(csv[8]) ?? DateTime.now().toUtc(),
+        accessed = DateTime.tryParse(csv[9]) ?? DateTime.now().toUtc(),
+        size = int.tryParse(csv[10]) ?? 0,
+        type = passyFileTypeFromName(csv[11]) ?? PassyFileType.unknown,
         super(
           key: csv[0],
-          name: csv[1],
-          virtualPath: csv[2],
+          synchronized: boolFromString(csv[1]),
+          tags: (csv[2] as List<dynamic>).map((e) => e.toString()).toList(),
+          name: csv[3],
+          virtualPath: csv[4],
         );
 
   @override
   Map<String, dynamic> toJson() {
     return {
       'key': key,
+      'synchronized': synchronized,
+      'tags': tags,
       'name': name,
       'virtualPath': virtualPath,
       'path': path,
@@ -82,6 +94,8 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
   List toCSV() {
     return [
       key,
+      synchronized,
+      tags,
       name,
       virtualPath,
       'f',
@@ -132,6 +146,12 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
             type = PassyFileType.photo;
             break;
           case 'svg':
+            type = PassyFileType.photo;
+            break;
+          case 'gif':
+            type = PassyFileType.photo;
+            break;
+          case 'webp':
             type = PassyFileType.photo;
             break;
           default:
