@@ -58,6 +58,9 @@ class PassyTheme {
       selectionColor: lightContentSecondaryColor,
       selectionHandleColor: lightContentColor,
     ),
+    popupMenuTheme: PopupMenuThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+    ),
   );
 
   static const ColorScheme datePickerColorScheme = ColorScheme.dark(

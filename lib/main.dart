@@ -72,6 +72,7 @@ final ThemeData theme = ThemeData(
   inputDecorationTheme: PassyTheme.theme.inputDecorationTheme,
   elevatedButtonTheme: PassyTheme.theme.elevatedButtonTheme,
   textSelectionTheme: PassyTheme.theme.textSelectionTheme,
+  popupMenuTheme: PassyTheme.theme.popupMenuTheme,
 );
 
 void main() {
