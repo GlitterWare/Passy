@@ -135,7 +135,7 @@ class History with JsonConvertable {
 
   void renew() {
     DateTime _time = DateTime.now().toUtc();
-    passwords.forEach((key, value) {});
+    passwords.forEach((key, value) => value.lastModified = _time);
     passwordIcons.forEach((key, value) => value.lastModified = _time);
     paymentCards.forEach((key, value) => value.lastModified = _time);
     notes.forEach((key, value) => value.lastModified = _time);
