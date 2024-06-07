@@ -129,9 +129,6 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'status': {'type': 'Success'},
               'auth': generateAuth(),
-              'binaryObjects': {
-                'hello': 'world!'.codeUnits,
-              }
             };
           case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);

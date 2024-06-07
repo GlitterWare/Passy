@@ -1172,7 +1172,6 @@ class Synchronization {
             'authenticate',
             jsonEncode(auth()),
           ],
-          binaryObjects: {'hello': 'world!'.codeUnits},
         ),
       );
       if (authResponse.containsKey('error')) {
