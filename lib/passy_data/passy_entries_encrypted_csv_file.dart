@@ -414,7 +414,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
         tagList.remove(tag);
         tagList.add(newTag);
       }
-      if (_changed) keys.add(_decoded[0]);
+      if (_changed) keys.add(_csv[0]);
       entry = _encodeEntryForSaving(_csv);
       await _tempRaf.writeString(entry);
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
