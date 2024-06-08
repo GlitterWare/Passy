@@ -319,5 +319,8 @@
     "entryDoesNotExist": "Entry does not exist",
     "compressionType": "Compression type",
     "bestCompression": "Best compression",
-    "bestDecompression": "Best decompression"
+    "bestDecompression": "Best decompression",
+    "text": "Text",
+    "date": "Date",
+    "number": "Number"
 }

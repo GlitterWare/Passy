@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 
 import 'package:passy/passy_data/custom_field.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
 class EditCustomFieldScreen extends StatefulWidget {
@@ -30,29 +31,25 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
           decoration: InputDecoration(labelText: localizations.title),
           onChanged: (value) => setState(() => _customField.title = value),
         )),
-        PassyPadding(DropdownButtonFormField(
-          items: [
-            DropdownMenuItem(
-              child: Text(FieldType.text.name[0].toUpperCase() +
-                  FieldType.text.name.substring(1)),
-              value: FieldType.text,
-            ),
-            DropdownMenuItem(
-              child: Text(FieldType.number.name[0].toUpperCase() +
-                  FieldType.number.name.substring(1)),
-              value: FieldType.number,
-            ),
-            DropdownMenuItem(
-              child: Text(FieldType.password.name[0].toUpperCase() +
-                  FieldType.password.name.substring(1)),
-              value: FieldType.password,
-            ),
-            DropdownMenuItem(
-              child: Text(FieldType.date.name[0].toUpperCase() +
-                  FieldType.date.name.substring(1)),
-              value: FieldType.date,
-            ),
+        PassyPadding(EnumDropDownButtonFormField(
+          values: const [
+            FieldType.text,
+            FieldType.number,
+            FieldType.password,
+            FieldType.date,
           ],
+          itemBuilder: (FieldType type) {
+            switch (type) {
+              case FieldType.text:
+                return Text(localizations.text);
+              case FieldType.password:
+                return Text(localizations.password);
+              case FieldType.date:
+                return Text(localizations.date);
+              case FieldType.number:
+                return Text(localizations.number);
+            }
+          },
           value: _customField.fieldType,
           decoration: InputDecoration(labelText: localizations.type),
           onChanged: (value) {
