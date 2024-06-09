@@ -194,4 +194,10 @@ class PassyBinaryFile {
     }
     return result;
   }
+
+  Future<void> export(File file) async {
+    Uint8List data = await readAsBytes();
+    if (!await file.parent.exists()) await file.parent.create(recursive: true);
+    await file.writeAsBytes(data);
+  }
 }

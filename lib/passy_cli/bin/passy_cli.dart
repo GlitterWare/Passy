@@ -16,6 +16,8 @@ import 'package:passy/passy_data/common.dart' as pcommon;
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
+import 'package:passy/passy_data/file_index.dart';
+import 'package:passy/passy_data/file_sync_history.dart';
 import 'package:passy/passy_data/glare/glare_module.dart';
 import 'package:passy/passy_data/glare/glare_server.dart';
 import 'package:passy/passy_data/glare/line_stream_subscription.dart';
@@ -1315,8 +1317,9 @@ Future<void> executeCommand(List<String> command,
             case 'classic':
               if (command.length < 6) break;
               String accountName = command[5];
+              Key? key = _keys[accountName];
               Encrypter? encrypter = _encrypters[accountName];
-              if (encrypter == null) {
+              if (key == null || encrypter == null) {
                 log('passy:sync:host:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
                 return;
@@ -1382,8 +1385,15 @@ Future<void> executeCommand(List<String> command,
                   paymentCards: PaymentCards.fromFile(
                       File('${accPath}payment_cards.enc'),
                       encrypter: encrypter),
+                  fileIndex: FileIndex(
+                      file: File('${accPath}file_index.enc'),
+                      saveDir: Directory('${accPath}files'),
+                      key: key),
                 ),
                 history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                fileSyncHistory: FileSyncHistory.fromFile(
+                    File('${accPath}file_sync_history.enc'),
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
@@ -1511,6 +1521,7 @@ Future<void> executeCommand(List<String> command,
                     username +
                     Platform.pathSeparator;
                 Encrypter encrypter = encrypterEntry.value;
+                Key key = _keys[encrypterEntry.key]!;
                 Map<String, GlareModule> syncModules =
                     buildSynchronization2d0d0Modules(
                   username: username,
@@ -1528,9 +1539,16 @@ Future<void> executeCommand(List<String> command,
                     paymentCards: PaymentCards.fromFile(
                         File('${accPath}payment_cards.enc'),
                         encrypter: encrypter),
+                    fileIndex: FileIndex(
+                        file: File('${accPath}file_index.enc'),
+                        saveDir: Directory('${accPath}files'),
+                        key: key),
                   ),
                   encrypter: encrypter,
                   history: History.fromFile(File('${accPath}history.enc'),
+                      encrypter: encrypter),
+                  fileSyncHistory: FileSyncHistory.fromFile(
+                      File('${accPath}file_sync_history.enc'),
                       encrypter: encrypter),
                   favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                       encrypter: encrypter),
@@ -1697,6 +1715,7 @@ Future<void> executeCommand(List<String> command,
                         };
                       }
                       Encrypter encrypter = _encrypters[username]!;
+                      Key key = _keys[username]!;
                       Map<String, GlareModule> syncModules =
                           buildSynchronization2d0d0Modules(
                         username: username,
@@ -1715,9 +1734,16 @@ Future<void> executeCommand(List<String> command,
                           paymentCards: PaymentCards.fromFile(
                               File('${accPath}payment_cards.enc'),
                               encrypter: encrypter),
+                          fileIndex: FileIndex(
+                              file: File('${accPath}file_index.enc'),
+                              saveDir: Directory('${accPath}files'),
+                              key: key),
                         ),
                         encrypter: encrypter,
                         history: History.fromFile(File('${accPath}history.enc'),
+                            encrypter: encrypter),
+                        fileSyncHistory: FileSyncHistory.fromFile(
+                            File('${accPath}file_sync_history.enc'),
                             encrypter: encrypter),
                         favorites: Favorites.fromFile(
                             File('${accPath}favorites.enc'),
@@ -1896,8 +1922,9 @@ Future<void> executeCommand(List<String> command,
             case 'classic':
               if (command.length == 5) break;
               String accountName = command[5];
+              Key? key = _keys[accountName];
               Encrypter? encrypter = _encrypters[accountName];
-              if (encrypter == null) {
+              if (key == null || encrypter == null) {
                 log('passy:sync:connect:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
                 return;
@@ -1971,8 +1998,15 @@ Future<void> executeCommand(List<String> command,
                   paymentCards: PaymentCards.fromFile(
                       File('${accPath}payment_cards.enc'),
                       encrypter: encrypter),
+                  fileIndex: FileIndex(
+                      file: File('${accPath}file_index.enc'),
+                      saveDir: Directory('${accPath}files'),
+                      key: key),
                 ),
                 history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                fileSyncHistory: FileSyncHistory.fromFile(
+                    File('${accPath}file_sync_history.enc'),
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
@@ -2062,14 +2096,16 @@ Future<void> executeCommand(List<String> command,
               }
               String accountName = command[5];
               String password = command[6];
+              Key? key = _keys[accountName];
               Encrypter? encrypter = _encrypters[accountName];
-              if (encrypter == null) {
+              if (key == null || encrypter == null) {
                 String loginResponse = await _login(accountName, password);
                 if (loginResponse != 'true') {
                   log('passy:sync:connect:2d0d0:Failed to login:$loginResponse',
                       id: id);
                   return;
                 }
+                key = _keys[accountName]!;
                 encrypter = _encrypters[accountName]!;
               }
               String? encryptedPassword = _encryptedPasswords[accountName];
@@ -2102,8 +2138,15 @@ Future<void> executeCommand(List<String> command,
                   paymentCards: PaymentCards.fromFile(
                       File('${accPath}payment_cards.enc'),
                       encrypter: encrypter),
+                  fileIndex: FileIndex(
+                      file: File('${accPath}file_index.enc'),
+                      saveDir: Directory('${accPath}files'),
+                      key: key),
                 ),
                 history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                fileSyncHistory: FileSyncHistory.fromFile(
+                    File('${accPath}file_sync_history.enc'),
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),

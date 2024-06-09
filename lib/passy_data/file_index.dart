@@ -7,6 +7,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
+import 'package:path/path.dart' as p;
 
 import 'file_meta.dart';
 import 'common.dart';
@@ -16,6 +17,34 @@ class FileIndex {
   final Directory _saveDir;
   Key _key;
   Encrypter _encrypter;
+
+  List<String> get tags {
+    List<String> _tags = [];
+    RandomAccessFile _raf = _file.openSync();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      _raf.closeSync();
+      return _tags;
+    }
+    const int _tagIndex = 2;
+    processLines(_raf, onLine: (entry, eofReached) {
+      List<String> _decoded = entry.split(',');
+      String _decrypted = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      List<dynamic> _csv = csvDecode(_decrypted, recursive: true);
+      if (_csv.length < _tagIndex + 1) {
+        return true;
+      }
+      for (dynamic tag in (_csv[_tagIndex] as List<dynamic>)) {
+        tag = tag.toString();
+        if (_tags.contains(tag)) continue;
+        _tags.add(tag);
+      }
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    _raf.closeSync();
+    return _tags;
+  }
 
   FileIndex({
     required File file,
@@ -123,9 +152,13 @@ class FileIndex {
     return result;
   }
 
-  String _encodeEntryForSaving(PassyFsMeta _entry) {
+  String _encodeCSVForSaving(List<dynamic> csv) {
     IV _iv = IV.fromSecureRandom(16);
-    return '${_entry.key},${_iv.base64},${sha256.convert(utf8.encode(_entry.virtualPath)).toString()},${encrypt(csvEncode(_entry.toCSV()), encrypter: _encrypter, iv: _iv)}\n';
+    return '${csv[0]},${_iv.base64},${sha256.convert(utf8.encode(csv[4])).toString()},${encrypt(csvEncode(csv), encrypter: _encrypter, iv: _iv)}\n';
+  }
+
+  String _encodeEntryForSaving(PassyFsMeta _entry) {
+    return _encodeCSVForSaving(_entry.toCSV());
   }
 
   Future<void> _setEntry(String key, PassyFsMeta? entry) async {
@@ -209,20 +242,50 @@ class FileIndex {
     return _meta;
   }
 
-  Future<String> addFile(
+  Future<Map<String, PassyFsMeta>> getPathMetadata(String path) async {
+    Map<String, PassyFsMeta> _meta = {};
+    RandomAccessFile _raf = await _file.open();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      await _raf.close();
+      return _meta;
+    }
+    await processLinesAsync(_raf, onLine: (entry, eofReached) async {
+      List<String> decoded = entry.split(',');
+      String decrypted = decrypt(decoded[2],
+          encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
+      PassyFsMeta meta =
+          PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
+      if (!(meta.virtualPath.startsWith(path))) return null;
+      _meta[meta.key] = meta;
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    await _raf.close();
+    return _meta;
+  }
+
+  Future<FileMeta> addBytes(
+    Uint8List bytes, {
+    required FileMeta meta,
+    CompressionType compressionType = CompressionType.none,
+  }) async {
+    PassyBinaryFile binaryFile = PassyBinaryFile(
+        file: File(_saveDir.path + Platform.pathSeparator + meta.key),
+        key: _key);
+    await binaryFile.encrypt(input: bytes, compressionType: compressionType);
+    await _setEntry(meta.key, meta);
+    return meta;
+  }
+
+  Future<FileMeta> addFile(
     File file, {
     FileMeta? meta,
     CompressionType compressionType = CompressionType.none,
     String? parent,
   }) async {
     meta ??= await FileMeta.fromFile(file, virtualParent: parent);
-    PassyBinaryFile binaryFile = PassyBinaryFile(
-        file: File(_saveDir.path + Platform.pathSeparator + meta.key),
-        key: _key);
-    await binaryFile.encrypt(
-        input: await file.readAsBytes(), compressionType: compressionType);
-    await _setEntry(meta.key, meta);
-    return meta.key;
+    return await addBytes(await file.readAsBytes(),
+        meta: meta, compressionType: compressionType);
   }
 
   Future<Uint8List> readAsBytes(String key) {
@@ -232,9 +295,7 @@ class FileIndex {
   }
 
   Future<void> saveDecrypted(String key, {required File file}) async {
-    await file.writeAsBytes(await PassyBinaryFile(
-            file: File(_saveDir.path + Platform.pathSeparator + key), key: _key)
-        .readAsBytes());
+    await file.writeAsBytes(await readAsBytes(key));
   }
 
   Future<void> removeFile(String key) async {
@@ -365,5 +426,73 @@ class FileIndex {
       PassyBinaryFile newFile = PassyBinaryFile(file: file, key: key);
       newFile.encrypt(input: await oldFile.readAsBytes());
     }
+  }
+
+  Future<List<String>> renameTag({
+    required String tag,
+    required String newTag,
+  }) async {
+    List<String> keys = [];
+    RandomAccessFile _raf = await _file.open();
+    if (skipLine(_raf, lineDelimiter: ',') == -1) {
+      await _raf.close();
+      return const [];
+    }
+    File _tempFile;
+    {
+      String _tempPath = (Directory.systemTemp).path +
+          Platform.pathSeparator +
+          'passy-set-entries-file-' +
+          DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
+      _tempFile = await File(_tempPath).create();
+    }
+    const int _tagIndex = 2;
+    RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await processLinesAsync(_raf, onLine: (entry, eofReached) async {
+      if (eofReached) return true;
+      List<String> _decoded = entry.split(',');
+      entry = decrypt(_decoded[1],
+          encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
+      List<dynamic> _csv = csvDecode(entry, recursive: true);
+      if (_csv.length < _tagIndex + 1) {
+        return true;
+      }
+      var tagList = _csv[_tagIndex];
+      bool _changed = false;
+      for (dynamic oldTag in (tagList as List<dynamic>).toList()) {
+        oldTag = oldTag.toString();
+        if (oldTag != tag) continue;
+        _changed = true;
+        tagList.remove(tag);
+        tagList.add(newTag);
+      }
+      if (_changed) keys.add(_csv[0]);
+      entry = _encodeCSVForSaving(_csv);
+      await _tempRaf.writeString(entry);
+      if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+      return null;
+    });
+    await _raf.close();
+    await _tempRaf.close();
+    await _file.delete();
+    await _tempFile.copy(_file.absolute.path);
+    await _tempFile.delete();
+    return keys;
+  }
+
+  Future<void> export(String path) async {
+    Map<String, PassyFsMeta> metadata = await getMetadata();
+    await Future.wait([
+      for (PassyFsMeta meta in metadata.values)
+        () async {
+          PassyBinaryFile binaryFile = PassyBinaryFile(
+              file: File(_saveDir.path + Platform.pathSeparator + meta.key),
+              key: _key);
+          List<String> vParent = meta.virtualPath.split('/');
+          vParent = vParent.sublist(0, vParent.length - 1);
+          String filePath = p.join(path, vParent.join(Platform.pathSeparator));
+          await binaryFile.export(File(filePath));
+        }(),
+    ]);
   }
 }

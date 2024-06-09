@@ -17,10 +17,20 @@ import 'passy_entry.dart';
 import 'sync_entry_state.dart';
 
 class EntriesToSynchronize {
+  List<String> entriesToSend;
+  List<String> entriesToRetrieve;
+
+  EntriesToSynchronize({
+    required this.entriesToSend,
+    required this.entriesToRetrieve,
+  });
+}
+
+class TypedEntriesToSynchronize {
   Map<EntryType, List<String>> entriesToSend;
   Map<EntryType, List<String>> entriesToRetrieve;
 
-  EntriesToSynchronize({
+  TypedEntriesToSynchronize({
     required this.entriesToSend,
     required this.entriesToRetrieve,
   });
@@ -372,6 +382,38 @@ Map<EntryType, Map<String, EntryEvent>> getTypedEntryEvents(
 }
 
 EntriesToSynchronize findEntriesToSynchronize({
+  required Map<String, EntryEvent> localEntries,
+  required Map<String, EntryEvent> remoteEntries,
+}) {
+  List<String> entriesToSend = [];
+  List<String> entriesToRetrieve = [];
+  for (String key in localEntries.keys) {
+    if (remoteEntries.keys.contains(key)) {
+      if (!remoteEntries[key]!
+          .lastModified
+          .isBefore(localEntries[key]!.lastModified)) {
+        continue;
+      }
+    }
+    entriesToSend.add(key);
+  }
+  for (String key in remoteEntries.keys) {
+    if (localEntries.keys.contains(key)) {
+      if (!localEntries[key]!
+          .lastModified
+          .isBefore(remoteEntries[key]!.lastModified)) {
+        continue;
+      }
+    }
+    entriesToRetrieve.add(key);
+  }
+  return EntriesToSynchronize(
+    entriesToSend: entriesToSend,
+    entriesToRetrieve: entriesToRetrieve,
+  );
+}
+
+TypedEntriesToSynchronize findTypedEntriesToSynchronize({
   required Map<EntryType, Map<String, EntryEvent>> localEntries,
   required Map<EntryType, Map<String, EntryEvent>> remoteEntries,
 }) {
@@ -430,7 +472,7 @@ EntriesToSynchronize findEntriesToSynchronize({
       entriesToSend[entryType] = entriesToSendList;
     }
   }
-  return EntriesToSynchronize(
+  return TypedEntriesToSynchronize(
     entriesToSend: entriesToSend,
     entriesToRetrieve: entriesToRetrieve,
   );

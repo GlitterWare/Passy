@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
+import 'package:passy/passy_data/file_meta.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 
+import 'file_sync_history.dart';
 import 'passy_entries_file_collection.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -20,6 +24,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required FullPassyEntriesFileCollection passyEntries,
   required Encrypter encrypter,
   required HistoryFile history,
+  required FileSyncHistoryFile fileSyncHistory,
   required FavoritesFile favorites,
   required AccountSettingsFile settings,
   required AccountCredentialsFile credentials,
@@ -75,6 +80,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               {'name': 'setEntries'},
               {'name': 'getFavoritesEntries'},
               {'name': 'setFavoritesEntries'},
+              {'name': 'getFileSyncHistoryEntries'},
+              {'name': 'getFile'},
+              {'name': 'setFile'},
             ]
           };
         }
@@ -139,10 +147,17 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             ]);
             Map<String, dynamic> historyJson = history.value.toJson();
             Map<String, dynamic> favoritesJson = favorites.value.toJson();
+            Map<String, dynamic> fileSyncHistoryJson =
+                fileSyncHistory.value.toJson();
             String historyHash =
                 getPassyHash(jsonEncode(historyJson)).toString();
             String favoritesHash =
                 getPassyHash(jsonEncode(favoritesJson)).toString();
+            String fileSyncHistoryHash =
+                getPassyHash(jsonEncode(fileSyncHistoryJson)).toString();
+            //String filesHash =
+            //    getPassyHash(jsonEncode(fileSyncHistoryJson['files']))
+            //        .toString();
             Map<String, dynamic> historyHashes = {};
             Map<String, dynamic> favoritesHashes = {};
             for (EntryType entryType in [
@@ -166,6 +181,10 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               'historyHashes': historyHashes,
               'favoritesHash': favoritesHash,
               'favoritesHashes': favoritesHashes,
+              'fileSyncHistoryHash': fileSyncHistoryHash,
+              //'fileSyncHistoryHashes': {
+              //  'files': filesHash,
+              //},
             };
           case 'getHistoryEntries':
             Map<String, dynamic> check = checkArgs(args);
@@ -267,6 +286,76 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               }
             }
             await favorites.save();
+            return {
+              'status': {'type': 'Success'}
+            };
+          case 'getFileSyncHistoryEntries':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            Map<String, dynamic> result = {};
+            await fileSyncHistory.reload();
+            result['files'] = fileSyncHistory.value.files.values
+                .map<Map<String, dynamic>>((value) => value.toJson())
+                .toList();
+            return {
+              'historyEntries': result,
+            };
+          case 'getFile':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            String entryKey = check['entryKey'];
+            await fileSyncHistory.reload();
+            EntryEvent? historyEntry = fileSyncHistory.value.files[entryKey];
+            PassyFsMeta? fsMeta =
+                (await passyEntries.fileIndex!.getEntry(entryKey));
+            Map<String, dynamic> result = {
+              'entryKey': entryKey,
+              'fsMeta': fsMeta?.toJson(),
+              'historyEntry': historyEntry,
+            };
+            if (fsMeta != null) {
+              result['binaryObjects'] = {
+                'file': (await passyEntries.fileIndex!.readAsBytes(entryKey))
+                    .toList(),
+              };
+            }
+            return result;
+          case 'setFile':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            String key = check['entryKey'];
+            FileMeta? remoteFsMeta;
+            Map<String, dynamic>? remoteFsMetaJson = check['fsMeta'];
+            if (remoteFsMetaJson != null) {
+              try {
+                dynamic fsType = remoteFsMetaJson['fsType'];
+                if (fsType != 'f') {
+                  throw Exception(
+                      'Unsupported Passy filesystem type: `$fsType`.');
+                }
+                remoteFsMeta = FileMeta.fromJson(remoteFsMetaJson);
+              } catch (e, s) {
+                throw ('Failed to decode Passy filesystem metadata:\n$e\n$s`.');
+              }
+            }
+            EntryEvent remoteHistoryEntry;
+            try {
+              remoteHistoryEntry = EntryEvent.fromJson(check['historyEntry']);
+            } catch (e, s) {
+              throw 'Failed to decode history entry:\n$e\n$s`.';
+            }
+            passyEntries.fileIndex!.removeFile(key);
+            if (binaryObjects != null && remoteFsMeta != null) {
+              if (binaryObjects.isNotEmpty) {
+                // Save file
+                passyEntries.fileIndex!.addBytes(
+                    Uint8List.fromList(binaryObjects.values.first),
+                    meta: remoteFsMeta);
+              }
+            }
+            await fileSyncHistory.reload();
+            fileSyncHistory.value.files[key] = remoteHistoryEntry;
+            await fileSyncHistory.save();
             return {
               'status': {'type': 'Success'}
             };

@@ -1,18 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
+import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/trusted_connection_data.dart';
 
 import 'favorites.dart';
+import 'glare/glare_message.dart';
 import 'passy_entries_encrypted_csv_file.dart';
 import 'sync_entry_state.dart';
 import 'synchronization_2d0d0_modules.dart';
@@ -20,6 +24,7 @@ import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'history.dart';
+import 'file_sync_history.dart';
 import 'host_address.dart';
 import 'json_convertable.dart';
 import 'passy_entry.dart';
@@ -235,6 +240,7 @@ class Synchronization {
   final String _username;
   final FullPassyEntriesFileCollection _passyEntries;
   final HistoryFile _history;
+  final FileSyncHistoryFile _fileSyncHistory;
   final FavoritesFile _favorites;
   final AccountSettingsFile _settings;
   final AccountCredentialsFile _credentials;
@@ -268,6 +274,7 @@ class Synchronization {
     required String encryptedPassword,
     required FullPassyEntriesFileCollection passyEntries,
     required HistoryFile history,
+    required FileSyncHistoryFile fileSyncHistory,
     required FavoritesFile favorites,
     required AccountSettingsFile settings,
     required AccountCredentialsFile credentials,
@@ -281,6 +288,7 @@ class Synchronization {
         _encryptedPassword = encryptedPassword,
         _passyEntries = passyEntries,
         _history = history,
+        _fileSyncHistory = fileSyncHistory,
         _favorites = favorites,
         _settings = settings,
         _credentials = credentials,
@@ -519,6 +527,7 @@ class Synchronization {
           passyEntries: _passyEntries,
           encrypter: _encrypter,
           history: _history,
+          fileSyncHistory: _fileSyncHistory,
           favorites: _favorites,
           settings: _settings,
           sharedEntryKeys: sharedEntryKeys,
@@ -786,6 +795,7 @@ class Synchronization {
                   passyEntries: _passyEntries,
                   encrypter: _encrypter,
                   history: _history,
+                  fileSyncHistory: _fileSyncHistory,
                   favorites: _favorites,
                   settings: _settings,
                   credentials: _credentials,
@@ -871,32 +881,39 @@ class Synchronization {
       _handleException('$message: $exception.');
     }
 
-    Map<String, dynamic> _checkResponse(Map<String, dynamic>? response) {
-      if (response is! Map<String, dynamic>) {
-        return {
+    GlareMessage _checkResponseMsg(GlareMessage? response) {
+      if (response is! GlareMessage) {
+        return GlareMessage({
           'error':
               'Malformed server response. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
-        };
+        });
       }
-      if (response.containsKey('error')) return {'error': response['error']};
-      dynamic data = response['data'];
+      if (response.data.containsKey('error')) {
+        return GlareMessage({'error': response.data['error']});
+      }
+      dynamic data = response.data['data'];
       if (data is! Map<String, dynamic>) {
-        return {
+        return GlareMessage({
           'error':
               'Malformed server response data. Expected type `Map<String, dynamic>`, received type `${response.runtimeType.toString()}`.'
-        };
+        });
       }
       dynamic error = data['error'];
-      if (error != null) return {'error': error};
+      if (error != null) return GlareMessage({'error': error});
       dynamic result = data['result'];
       if (result == null) {
-        return {'error': 'Server module responded with null'};
+        return GlareMessage({'error': 'Server module responded with null'});
       }
-      Map<String, dynamic> jsonResult = response['data']['result'];
-      if (response.containsKey('binaryObjects')) {
-        jsonResult['binaryObjects'] = response['binaryObjects'];
+      Map<String, dynamic> jsonResult = response.data['data']['result'];
+      return GlareMessage(jsonResult, binaryObjects: response.binaryObjects);
+    }
+
+    Map<String, dynamic> _checkResponse(GlareMessage? response) {
+      response = _checkResponseMsg(response);
+      if (response.binaryObjects != null) {
+        response.data['binaryObjects'] = response.binaryObjects;
       }
-      return jsonResult;
+      return response.data;
     }
 
     List<String> _addressSplit = address.split(':');
@@ -955,6 +972,28 @@ class Synchronization {
       Encrypter usernameEncrypter = getPassyEncrypter(_username);
       String apiVersion = '2d0d1';
 
+      /*
+      _syncLog += 'done.\nListing server commands... ';
+      Map<String, dynamic> serverCommands =
+          _checkResponse(await _safeSync2d0d0Client.runModule([
+        apiVersion,
+      ]));
+      if (serverCommands.containsKey('error')) {
+        onTrustSaveFailed?.call();
+        _handleException(
+            '2.0.0+ synchronization host error:\n${jsonEncode(serverCommands)}');
+        return;
+      }
+      dynamic serverCommandsListJson = serverCommands['commands'];
+      if (serverCommandsListJson is! List<dynamic>) {
+        _handleException(
+            'Invalid server commands:`${jsonEncode(serverCommands)}`');
+        return;
+      }
+      List<String?> serverCommandsList = (serverCommandsListJson)
+          .map((val) => val['name']?.toString())
+          .toList();
+      */
       Key? derivedPassword;
       Encrypter remoteEncrypter;
       _syncLog += 'done.\nReceiving remote credentials metadata... ';
@@ -1249,6 +1288,7 @@ class Synchronization {
       }
       dynamic remoteHistoryHash = response['historyHash'];
       dynamic remoteFavoritesHash = response['favoritesHash'];
+      dynamic remoteFileSyncHistoryHash = response['fileSyncHistoryHash'];
       if (remoteHistoryHash is! String) {
         _handleException(
             'Received malformed history hash. Expected type `String`, received type `${remoteHistoryHash.runtimeType.toString()}`.');
@@ -1273,6 +1313,7 @@ class Synchronization {
         _handleApiException('Received malformed favorites hashes', e);
         return;
       }
+      //dynamic fileSyncHistoryHashesJson = response['fileSyncHistoryHashesJson'];
       await _history.reload();
       Map<String, dynamic> historyJson = _history.value.toJson();
       _syncLog += 'done.\nComparing history hashes... ';
@@ -1321,9 +1362,9 @@ class Synchronization {
           localHistoryEntries[type] = _history.value.getEvents(type);
         }
         _syncLog += 'done.\nComparing history entries... ';
-        util.EntriesToSynchronize entriesToSynchronize;
+        util.TypedEntriesToSynchronize entriesToSynchronize;
         try {
-          entriesToSynchronize = util.findEntriesToSynchronize(
+          entriesToSynchronize = util.findTypedEntriesToSynchronize(
               localEntries: localHistoryEntries, remoteEntries: historyEntries);
         } catch (e) {
           _handleApiException('Failed to compare history entries', e);
@@ -1449,9 +1490,9 @@ class Synchronization {
           localFavoritesEntries[type] = _favorites.value.getEvents(type);
         }
         _syncLog += 'done.\nComparing favorites entries... ';
-        util.EntriesToSynchronize entriesToSynchronize;
+        util.TypedEntriesToSynchronize entriesToSynchronize;
         try {
-          entriesToSynchronize = util.findEntriesToSynchronize(
+          entriesToSynchronize = util.findTypedEntriesToSynchronize(
               localEntries: localFavoritesEntries,
               remoteEntries: favoritesEntries);
         } catch (e) {
@@ -1506,6 +1547,136 @@ class Synchronization {
             }
           }
           await _favorites.save();
+        }
+      }
+      await _fileSyncHistory.reload();
+      Map<String, dynamic> fileSyncHistoryJson =
+          _fileSyncHistory.value.toJson();
+      _syncLog += 'done.\nComparing file sync history hashes... ';
+      if (remoteFileSyncHistoryHash is String &&
+          remoteFileSyncHistoryHash !=
+              getPassyHash(jsonEncode(fileSyncHistoryJson)).toString()) {
+        _syncLog += 'done.\nReceiving file sync history entries... ';
+        response = _checkResponse(await _safeSync2d0d0Client.runModule([
+          apiVersion,
+          'getFileSyncHistoryEntries',
+          jsonEncode({
+            ...auth(),
+          }),
+        ]));
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        Map<String, EntryEvent> fileSyncHistoryEntries;
+        try {
+          fileSyncHistoryEntries =
+              util.getEntryEvents(response['historyEntries']['files']);
+        } catch (e) {
+          _handleApiException(
+              'Received malformed file sync history entries', e);
+          return;
+        }
+        await _fileSyncHistory.reload();
+        Map<String, EntryEvent> localFileSyncHistoryEntries =
+            _fileSyncHistory.value.files;
+        _syncLog += 'done.\nComparing file sync history entries... ';
+        // Receive files that require synchronization
+        util.EntriesToSynchronize entriesToSynchronize;
+        try {
+          entriesToSynchronize = util.findEntriesToSynchronize(
+              localEntries: localFileSyncHistoryEntries,
+              remoteEntries: fileSyncHistoryEntries);
+        } catch (e) {
+          _handleApiException('Failed to compare file sync history entries', e);
+          return;
+        }
+        _syncLog += 'done.\nReceiving file entries... ';
+        for (String key in entriesToSynchronize.entriesToRetrieve) {
+          GlareMessage message =
+              _checkResponseMsg(await _safeSync2d0d0Client.runModule([
+            apiVersion,
+            'getFile',
+            jsonEncode({
+              ...auth(),
+              'entryKey': key,
+            }),
+          ]));
+          response = message.data;
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
+          FileMeta? remoteFsMeta;
+          Map<String, dynamic>? remoteFsMetaJson = response['fsMeta'];
+          if (remoteFsMetaJson != null) {
+            try {
+              dynamic fsType = remoteFsMetaJson['fsType'];
+              if (fsType != 'f') {
+                _handleException(
+                    'Unsupported Passy filesystem type: `$fsType`.');
+                return;
+              }
+              remoteFsMeta = FileMeta.fromJson(remoteFsMetaJson);
+            } catch (e, s) {
+              _handleException(
+                  'Failed to decode Passy filesystem metadata:\n$e\n$s`.');
+              return;
+            }
+          }
+          EntryEvent remoteHistoryEntry;
+          try {
+            remoteHistoryEntry = EntryEvent.fromJson(response['historyEntry']);
+          } catch (e, s) {
+            _handleException('Failed to decode history entry:\n$e\n$s`.');
+            return;
+          }
+          _passyEntries.fileIndex!.removeFile(key);
+          if (message.binaryObjects != null && remoteFsMeta != null) {
+            if (message.binaryObjects!.isNotEmpty) {
+              // Save file
+              _passyEntries.fileIndex!.addBytes(
+                  Uint8List.fromList(message.binaryObjects!.values.first),
+                  meta: remoteFsMeta);
+            }
+          }
+          await _fileSyncHistory.reload();
+          _fileSyncHistory.value.files[key] = remoteHistoryEntry;
+          await _fileSyncHistory.save();
+        }
+        _syncLog += 'done.\nSending file entries... ';
+        for (String key in entriesToSynchronize.entriesToSend) {
+          await _fileSyncHistory.reload();
+          EntryEvent? historyEntry = _fileSyncHistory.value.files[key];
+          PassyFsMeta? fsMeta = (await _passyEntries.fileIndex!.getEntry(key));
+          Map<String, dynamic> result = {
+            'entryKey': key,
+            'fsMeta': fsMeta?.toJson(),
+            'historyEntry': historyEntry,
+          };
+          Map<String, List<int>>? binaryObjects;
+          if (fsMeta != null) {
+            binaryObjects = {
+              'file':
+                  (await _passyEntries.fileIndex!.readAsBytes(key)).toList(),
+            };
+          }
+          Map<String, dynamic> response =
+              _checkResponse(await _safeSync2d0d0Client.runModule([
+            apiVersion,
+            'setFile',
+            jsonEncode({
+              ...auth(),
+              ...result,
+            }),
+          ], binaryObjects: binaryObjects));
+          if (response.containsKey('error')) {
+            _handleException(
+                '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+            return;
+          }
         }
       }
     }

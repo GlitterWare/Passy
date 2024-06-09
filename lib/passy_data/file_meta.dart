@@ -81,6 +81,7 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
       'tags': tags,
       'name': name,
       'virtualPath': virtualPath,
+      'fsType': 'f',
       'path': path,
       'changed': changed.toIso8601String(),
       'modified': modified.toIso8601String(),

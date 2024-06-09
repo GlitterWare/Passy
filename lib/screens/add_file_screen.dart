@@ -94,8 +94,11 @@ class _AddFileScreen extends State<AddFileScreen> {
     Navigator.pushNamed(context, SplashScreen.routeName);
     String key;
     try {
-      key = await _account.addFile(args.file,
-          useIsolate: true, meta: _fileMeta, compressionType: _compressionType);
+      key = (await _account.addFile(args.file,
+              useIsolate: true,
+              meta: _fileMeta,
+              compressionType: _compressionType))
+          .key;
     } catch (e, s) {
       showSnackBar(
         message: localizations.failedToAddFile,
