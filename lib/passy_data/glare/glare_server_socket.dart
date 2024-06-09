@@ -118,8 +118,9 @@ class GlareServerSocket {
         },
       };
       if (result != null) {
-        if (result.containsKey('binaryObjects')) {
-          jsonResult['binaryObjects'] = result['binaryObjects'];
+        dynamic binaryObjects = result['binaryObjects'];
+        if (binaryObjects != null) {
+          jsonResult['binaryObjects'] = binaryObjects;
           result.remove('binaryObjects');
         }
       }
