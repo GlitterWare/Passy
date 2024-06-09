@@ -130,13 +130,7 @@ abstract class RSASocketHelpers {
       for (String part in utfMessages) {
         List<String> partSplit = part.split(',');
         if (partSplit.length < 2) return null;
-        String? type;
-        String? name;
         IV iv = IV.fromBase64(partSplit[0]);
-        if (partSplit.length > 3) {
-          type = partSplit[2];
-          name = encrypter.decrypt64(partSplit[3], iv: iv);
-        }
         String data = encrypter.decrypt64(partSplit[1], iv: iv);
         decrypted += data;
       }
