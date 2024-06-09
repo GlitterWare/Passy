@@ -7,6 +7,7 @@ import 'package:encrypt/encrypt.dart';
 
 import 'common.dart';
 import 'line_stream_subscription.dart';
+import 'rsa_socket_helpers.dart';
 
 class RSAClientSocket {
   static const version = rsaSocketVersion;
@@ -14,7 +15,7 @@ class RSAClientSocket {
   final InternetAddress address;
   final int port;
   final RSAKeypair _keyPair;
-  RSAPublicKey? _serverPublicKey;
+  //RSAPublicKey? _serverPublicKey;
   Encrypter? _encrypter;
   final StreamController<Map<String, dynamic>> _streamController =
       StreamController<Map<String, dynamic>>();
@@ -36,44 +37,24 @@ class RSAClientSocket {
     if (rsa is! Map) return false;
     dynamic publicKey = rsa['publicKey'];
     if (publicKey == null) return false;
+    /*
     try {
       _serverPublicKey = RSAPublicKey.fromString(publicKey);
     } catch (_) {
       return false;
     }
+    */
     return true;
   }
 
   void _onData(List<int> data) {
     if (_encrypter == null) return;
-    Map<String, List<int>> binaryObjects = {};
     Map<String, dynamic> decoded = {};
     try {
-      String decrypted = '';
-      for (String part in utf8.decode(data).split(' ')) {
-        List<String> partSplit = part.split(',');
-        if (partSplit.length < 2) return;
-        String? type;
-        String? name;
-        IV iv = IV.fromBase64(partSplit[0]);
-        if (partSplit.length > 3) {
-          type = partSplit[2];
-          name = _encrypter!.decrypt64(partSplit[3], iv: iv);
-        }
-        String data = _encrypter!.decrypt64(partSplit[1], iv: iv);
-        if (type == 'bin') {
-          binaryObjects[name!] = data.codeUnits;
-        } else {
-          decrypted += data;
-        }
-      }
-      decoded = jsonDecode(decrypted);
-      decoded.remove('binaryObjects');
-      if (binaryObjects.isNotEmpty) decoded['binaryObjects'] = binaryObjects;
+      decoded = RSASocketHelpers.decodeData(data, encrypter: _encrypter)!;
     } catch (_) {
       return;
     }
-    if (_serverPublicKey == null) return;
     _streamController.add(decoded);
   }
 
@@ -146,30 +127,11 @@ class RSAClientSocket {
     );
   }
 
-  void add(List<int> bytes) {
-    _socket.add(bytes);
-  }
-
   void writeJson(
     Map<String, dynamic> data, {
     Map<String, List<int>>? binaryObjects,
   }) {
-    if (_encrypter == null) return;
-    String encoded = jsonEncode(data);
-    IV _iv = IV.fromSecureRandom(16);
-    encoded = _iv.base64 + ',' + _encrypter!.encrypt(encoded, iv: _iv).base64;
-    if (binaryObjects != null) {
-      for (String key in binaryObjects.keys) {
-        List<int> val = binaryObjects[key]!;
-        IV _iv = IV.fromSecureRandom(16);
-        encoded += ' ' +
-            _iv.base64 +
-            ',' +
-            _encrypter!.encryptBytes(val, iv: _iv).base64 +
-            ',bin,' +
-            _encrypter!.encrypt(key, iv: _iv).base64;
-      }
-    }
-    _socket.writeln(encoded);
+    RSASocketHelpers.writeJson(data,
+        socket: _socket, binaryObjects: binaryObjects, encrypter: _encrypter);
   }
 }

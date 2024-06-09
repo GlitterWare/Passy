@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 /// A stream subscription delimited by newline characters.
@@ -9,39 +10,107 @@ class LineByteStreamSubscription implements StreamSubscription<List<int>> {
   List<int> _data = [];
   void Function(List<int>)? _handleData;
   Function? _handleError;
-  int? _binaryLength;
 
   LineByteStreamSubscription(this._subscription) {
     bool isExceeded = false;
+    bool isEscaped = false;
+    List<int> command = [];
+    List<int> leftToReadList = [];
+    bool isCommand = false;
+    int? leftToReadState;
+    int leftToRead = 0;
     _subscription.onData((data) {
       int i = 0;
-      int? binLen = _binaryLength;
-      bool binBreak = false;
-      if (binLen != null) {
-        for (i; i != data.length; i++) {
-          int n = data[i];
-          _data.add(n);
-          if (_data.length == binLen) {
-            _binaryLength = null;
-            _handleData?.call(_data);
-            _data = [];
-            binBreak = true;
-            i++;
-            break;
-          }
-        }
-        if (!binBreak) return;
-      }
       for (i; i != data.length; i++) {
         int n = data[i];
+        if (leftToReadState != null) {
+          switch (leftToReadState) {
+            case 0:
+              if (n == 60) {
+                isCommand = true;
+                leftToReadState = null;
+                n = 44;
+              }
+              if (n == 44) {
+                String leftToReadString;
+                try {
+                  leftToReadString = utf8.decode(leftToReadList);
+                  leftToRead = int.parse(leftToReadString);
+                } catch (_) {
+                  _handleError?.call('Failed to parse left to read.');
+                  leftToReadList.clear();
+                  leftToReadState = null;
+                  continue;
+                }
+                leftToReadList.clear();
+                continue;
+              }
+              if (leftToReadList.length > 67108864) {
+                leftToReadList.clear();
+                leftToReadState = null;
+                isExceeded = true;
+              } else {
+                leftToReadList.add(n);
+              }
+              continue;
+            case 1:
+              _data.add(n);
+              leftToRead -= 1;
+              if (leftToRead == 0) {
+                leftToReadState = null;
+                continue;
+              }
+              if (_data.length > 4 * 134217728) {
+                leftToReadState = null;
+                leftToRead = 0;
+                isExceeded = true;
+              }
+              continue;
+          }
+        }
+        if (isCommand) {
+          if (n == 62) {
+            isCommand = false;
+            if (command.isEmpty) continue;
+            String commandString;
+            try {
+              commandString = utf8.decode(command);
+            } catch (_) {
+              _handleError?.call('Failed to parse stream command.');
+              command.clear();
+              continue;
+            }
+            command.clear();
+            switch (commandString) {
+              case 'r':
+                leftToReadState = 0;
+                break;
+              case '/r':
+                leftToReadState = 1;
+                break;
+            }
+          } else if (command.length < 8) {
+            command.add(n);
+          }
+          continue;
+        }
+        if (isEscaped) {
+          isEscaped = false;
+          if (_data.length > 67108864) {
+            isExceeded = true;
+          } else {
+            _data.add(n);
+          }
+          continue;
+        }
         if (n == 10) {
           if (isExceeded) {
             try {
               _handleError?.call(
-                  'Maximum data length exceeded: ${_data.length} > 67108864');
+                  'Maximum data length exceeded: ${_data.length} > ${4 * 134217728}');
             } catch (_) {
               _handleError?.call(
-                  'Maximum data length exceeded: ${_data.length} > 67108864',
+                  'Maximum data length exceeded: ${_data.length} > ${4 * 134217728}',
                   null);
             }
             isExceeded = false;
@@ -50,10 +119,19 @@ class LineByteStreamSubscription implements StreamSubscription<List<int>> {
           _data = [];
           continue;
         }
-        if (_data.length > 67108864) {
+        if (_data.length > 4 * 134217728) {
           isExceeded = true;
         } else {
-          _data.add(n);
+          switch (n) {
+            case 60:
+              isCommand = true;
+              break;
+            case 92:
+              isEscaped = true;
+              break;
+            default:
+              _data.add(n);
+          }
         }
       }
     });
@@ -87,10 +165,4 @@ class LineByteStreamSubscription implements StreamSubscription<List<int>> {
 
   @override
   void resume() => _subscription.resume();
-
-  bool receiveBinary(int length) {
-    if (_binaryLength != null) return false;
-    _binaryLength = length;
-    return true;
-  }
 }
