@@ -134,6 +134,9 @@ class _PassyFileScreen extends State<StatefulWidget> {
         centerTitle: true,
       ),
       body: CustomScrollView(
+        physics: args.type == FileEntryType.photo
+            ? const NeverScrollableScrollPhysics()
+            : null,
         slivers: [
           SliverFillRemaining(
             hasScrollBody: true,

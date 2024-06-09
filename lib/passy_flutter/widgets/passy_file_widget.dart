@@ -78,41 +78,19 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         return SingleChildScrollView(
             child: Center(child: PassyMarkdownBody(data: text)));
       case FileEntryType.photo:
+        Widget imageViewer;
         if (widget.name.endsWith('.svg')) {
-          return InkWell(
-            onTap: () => showSnackBar(
-                message: localizations.scrollOrPinchToZoom,
-                icon: const Icon(
-                  Icons.zoom_in,
-                  color: PassyTheme.darkContentColor,
-                )),
-            splashFactory: InkRipple.splashFactory,
-            splashColor: Colors.white24,
-            hoverColor: Colors.transparent,
-            mouseCursor: SystemMouseCursors.zoomIn,
-            child: InteractiveViewer(
-              minScale: 1,
-              maxScale: 100,
-              child: SvgPicture.memory(
-                data,
-                height: 10000000000000,
-                width: 10000000000000,
-              ),
+          imageViewer = InteractiveViewer(
+            minScale: 1,
+            maxScale: 100,
+            child: SvgPicture.memory(
+              data,
+              height: 10000000000000,
+              width: 10000000000000,
             ),
           );
-        }
-        return InkWell(
-          onTap: () => showSnackBar(
-              message: localizations.scrollOrPinchToZoom,
-              icon: const Icon(
-                Icons.zoom_in,
-                color: PassyTheme.darkContentColor,
-              )),
-          splashFactory: InkRipple.splashFactory,
-          splashColor: Colors.white24,
-          hoverColor: Colors.transparent,
-          mouseCursor: SystemMouseCursors.zoomIn,
-          child: InteractiveViewer(
+        } else {
+          imageViewer = InteractiveViewer(
             minScale: 1,
             maxScale: 100,
             child: Image.memory(
@@ -123,8 +101,20 @@ class _PassyFileWidget extends State<PassyFileWidget> {
               height: 10000000000000,
               width: 10000000000000,
             ),
-          ),
-        );
+          );
+        }
+        return InkWell(
+            onTap: () => showSnackBar(
+                message: localizations.scrollOrPinchToZoom,
+                icon: const Icon(
+                  Icons.zoom_in,
+                  color: PassyTheme.darkContentColor,
+                )),
+            splashFactory: InkRipple.splashFactory,
+            splashColor: Colors.white24,
+            hoverColor: Colors.transparent,
+            mouseCursor: SystemMouseCursors.zoomIn,
+            child: imageViewer);
       case FileEntryType.folder:
         throw 'Unknown entry type.';
     }
