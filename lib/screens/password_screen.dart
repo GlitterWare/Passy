@@ -352,7 +352,7 @@ class _PasswordScreen extends State<PasswordScreen> {
               isPassword: true,
             )),
           if (tfaWidget != null) tfaWidget,
-          if (password!.website != '')
+          for (int i = 0; i != password!.websites.length; i++)
             Row(
               children: [
                 Flexible(
@@ -363,9 +363,11 @@ class _PasswordScreen extends State<PasswordScreen> {
                       top: PassyTheme.passyPadding.top,
                     ),
                     child: RecordButton(
-                      title: localizations.website,
-                      value: password!.website,
-                      left: FavIconImage(address: password!.website, width: 40),
+                      title:
+                          '${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}',
+                      value: password!.websites[i],
+                      left: FavIconImage(
+                          address: password!.websites[i], width: 40),
                     ),
                   ),
                 ),
@@ -375,7 +377,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                       heroTag: null,
                       tooltip: localizations.visit,
                       onPressed: () {
-                        String _url = password!.website;
+                        String _url = password!.websites[i];
                         if (!_url
                             .contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
                           _url = 'http://' + _url;

@@ -681,7 +681,7 @@ class LoadedAccount {
       String? email;
       String? password;
       TFA? tfa;
-      String? website;
+      List<String> websites = [];
       for (var e in entry.stringEntries) {
         String? val = e.value?.getText();
         if (val == null) continue;
@@ -705,7 +705,7 @@ class LoadedAccount {
             tfa = TFA(secret: val);
             continue;
           case KdbxKeyCommon.KEY_URL:
-            website = val;
+            websites.add(val);
             continue;
         }
         customFields.add(CustomField(
@@ -723,7 +723,7 @@ class LoadedAccount {
         email: email ?? '',
         password: password ?? '',
         tfa: tfa,
-        website: website ?? '',
+        websites: websites,
       );
     }
     await _history.reload();

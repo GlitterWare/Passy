@@ -34,9 +34,11 @@ class PassySearch {
             _positiveCount++;
             continue;
           }
-          if (_password.website.toLowerCase().contains(_term)) {
-            _positiveCount++;
-            continue;
+          for (String website in _password.websites) {
+            if (website.toLowerCase().contains(_term)) {
+              _positiveCount++;
+              continue;
+            }
           }
         }
         if (_positiveCount == _terms.length) {

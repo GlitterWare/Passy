@@ -406,18 +406,16 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
                 color: PassyTheme.darkContentColor));
       },
     ),
-    if (passwordMeta.website != '')
+    for (String website in passwordMeta.websites)
       getIconedPopupMenuItem(
-        content: Text(localizations.visit),
+        content: Text(website),
         icon: const Icon(Icons.open_in_browser_outlined),
         onTap: () {
-          String _url =
-              data.loadedAccount!.getPassword(passwordMeta.key)!.website;
-          if (!_url.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
-            _url = 'http://' + _url;
+          if (!website.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
+            website = 'http://' + website;
           }
           try {
-            openUrl(_url);
+            openUrl(website);
           } catch (_) {}
         },
       ),

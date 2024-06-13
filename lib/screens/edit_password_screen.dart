@@ -50,17 +50,28 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   bool _tfaIsExpanded = false;
   TFAType _tfaType = TFAType.TOTP;
   UniqueKey _tfaKey = UniqueKey();
-  String _website = '';
+  List<String> _websites = [''];
+  final List<TextEditingController> _websitesControllers = [];
   List<String> _attachments = [];
   String _steamSharedSecret = '';
   UniqueKey _tfaSecretFieldKey = UniqueKey();
+
+  @override
+  void dispose() {
+    super.dispose();
+    for (TextEditingController controller in _websitesControllers) {
+      controller.dispose();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded) {
       Object? _args = ModalRoute.of(context)!.settings.arguments;
       _isNew = _args == null;
-      if (!_isNew) {
+      if (_isNew) {
+        _websitesControllers.add(TextEditingController());
+      } else {
         Password _passwordArgs = _args as Password;
         TFA? _tfa = _passwordArgs.tfa;
         _key = _passwordArgs.key;
@@ -87,7 +98,12 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           _tfaIsGoogle = _tfa.isGoogle;
           _tfaType = _tfa.type;
         }
-        _website = _passwordArgs.website;
+        _websites = _passwordArgs.websites.toList();
+        _websites.add('');
+        for (int i = 0; i != _websites.length; i++) {
+          _websitesControllers.add(TextEditingController.fromValue(
+              TextEditingValue(text: _websites[i])));
+        }
         _attachments = List.from(_passwordArgs.attachments);
       }
       _isLoaded = true;
@@ -119,7 +135,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                     isGoogle: _tfaIsGoogle,
                     type: _tfaType,
                   ),
-            website: _website,
+            websites: _websites.sublist(0, _websites.length - 1),
             attachments: _attachments,
           );
           Navigator.pushNamed(context, SplashScreen.routeName);
@@ -335,8 +351,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                       )),
                       if (_tfaType != TFAType.Steam)
                         PassyPadding(DropdownButtonFormField(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(30)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(30)),
                           items: [
                             DropdownMenuItem(
                               child: Text(
@@ -358,11 +374,27 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                     ],
                   ))
             ]),
-        PassyPadding(TextFormField(
-          initialValue: _website,
-          decoration: const InputDecoration(labelText: 'Website'),
-          onChanged: (value) => setState(() => _website = value),
-        )),
+        for (int i = 0; i != _websites.length; i++)
+          PassyPadding(TextFormField(
+            controller: _websitesControllers[i],
+            decoration: InputDecoration(
+                labelText:
+                    "${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}"),
+            onChanged: (value) => setState(() {
+              if (value.isNotEmpty) {
+                if (i + 1 == _websites.length) {
+                  _websites.add('');
+                  _websitesControllers.add(TextEditingController());
+                }
+              } else if (i + 1 != _websites.length) {
+                FocusScope.of(context).unfocus();
+                _websites.removeAt(i);
+                _websitesControllers.removeAt(i);
+                return;
+              }
+              _websites[i] = value;
+            }),
+          )),
         CustomFieldsEditor(
           customFields: _customFields,
           shouldSort: true,
