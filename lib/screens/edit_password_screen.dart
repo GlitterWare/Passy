@@ -379,7 +379,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             controller: _websitesControllers[i],
             decoration: InputDecoration(
                 labelText:
-                    "${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}"),
+                    '${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}'),
             onChanged: (value) => setState(() {
               if (value.isNotEmpty) {
                 if (i + 1 == _websites.length) {
