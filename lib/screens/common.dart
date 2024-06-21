@@ -406,7 +406,8 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
                 color: PassyTheme.darkContentColor));
       },
     ),
-    for (String website in passwordMeta.websites)
+    for (String website in passwordMeta.websites.sublist(
+        0, passwordMeta.websites.length < 5 ? passwordMeta.websites.length : 5))
       getIconedPopupMenuItem(
         content: Text(website),
         icon: const Icon(Icons.open_in_browser_outlined),
