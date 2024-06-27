@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:camera/camera.dart';
@@ -157,34 +156,35 @@ Future<String?> backupAccount(
 // Color
 imglib.Image imageFromBGRA8888(CameraImage image) {
   return imglib.Image.fromBytes(
-    image.width,
-    image.height,
-    image.planes[0].bytes,
-    format: imglib.Format.bgra,
+    width: image.width,
+    height: image.height,
+    bytes: image.planes[0].bytes.buffer,
+    order: imglib.ChannelOrder.bgra,
   );
 }
 
 // CameraImage YUV420_888 -> PNG -> Image (compresion:0, filter: none)
 // Black
 imglib.Image imageFromYUV420(CameraImage image) {
-  var img = imglib.Image(image.width, image.height); // Create Image buffer
-
-  Plane plane = image.planes[0];
-  const int shift = (0xFF << 24);
-
-  // Fill image buffer with plane[0] from YUV420_888
-  for (int x = 0; x < image.width; x++) {
-    for (int planeOffset = 0;
-        planeOffset < image.height * image.width;
-        planeOffset += image.width) {
-      final pixelColor = plane.bytes[planeOffset + x];
-      // color: 0x FF  FF  FF  FF
-      //           A   B   G   R
-      // Calculate pixel color
-      var newVal = shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
-
-      img.data[planeOffset + x] = newVal;
-    }
+  final uvRowStride = image.planes[1].bytesPerRow;
+  final uvPixelStride = image.planes[1].bytesPerPixel ?? 0;
+  final img = imglib.Image(width: image.width, height: image.height);
+  for (final p in img) {
+    final x = p.x;
+    final y = p.y;
+    final uvIndex =
+        uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+    final index = y * uvRowStride +
+        x; // Use the row stride instead of the image width as some devices pad the image data, and in those cases the image width != bytesPerRow. Using width will give you a distored image.
+    final yp = image.planes[0].bytes[index];
+    final up = image.planes[1].bytes[uvIndex];
+    final vp = image.planes[2].bytes[uvIndex];
+    p.r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255).toInt();
+    p.g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+        .round()
+        .clamp(0, 255)
+        .toInt();
+    p.b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255).toInt();
   }
 
   return img;
@@ -213,7 +213,7 @@ imglib.Image? imageFromCameraImage(CameraImage image) {
 Result? qrResultFromImage(imglib.Image image) {
   try {
     LuminanceSource _src = RGBLuminanceSource(
-        image.width, image.height, Int32List.fromList(image.data));
+        image.width, image.height, image.data!.buffer.asInt32List());
     BinaryBitmap _bitmap = BinaryBitmap(HybridBinarizer(_src));
     QRCodeReader _reader = QRCodeReader();
     Result _result = _reader.decode(_bitmap);
