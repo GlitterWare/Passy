@@ -349,8 +349,9 @@ class SplashScreen extends StatelessWidget {
                       children: [
                         Spacer(),
                         Expanded(
-                            child: PassyPadding(
-                                LinearProgressIndicator(color: Colors.purple))),
+                            child: PassyPadding(LinearProgressIndicator(
+                                backgroundColor: Colors.black,
+                                color: Colors.purple))),
                         Spacer(),
                       ],
                     )),

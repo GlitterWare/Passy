@@ -87,6 +87,7 @@ dependencies:
       ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
   text_divider: ^1.0.0
   archive: ^3.6.1
+  win32: ^5.5.1
 
 dev_dependencies:
   flutter_test:
