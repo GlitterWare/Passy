@@ -392,7 +392,6 @@ class _LoginScreen extends State<LoginScreen> {
                                 Expanded(
                                   child: TextField(
                                     controller: _passwordController,
-                                    autofillHints: null,
                                     obscureText: true,
                                     onChanged: (a) => setState(() {
                                       if (HardwareKeyboard
