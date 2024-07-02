@@ -1064,6 +1064,7 @@ class Synchronization {
       }
 
       String lastAuth = '';
+      DateTime lastDate = DateTime.now().subtract(const Duration(hours: 12));
 
       Map<String, dynamic> auth() {
         lastAuth = util.generateAuth(
@@ -1128,8 +1129,9 @@ class Synchronization {
         ]));
         if (!response.containsKey('error')) {
           try {
-            util.verifyAuth(response['auth'],
+            lastDate = util.verifyAuth(response['auth'],
                 lastAuth: lastAuth,
+                lastDate: lastDate,
                 encrypter: remoteEncrypter,
                 usernameEncrypter: usernameEncrypter,
                 withIV: true);
@@ -1265,8 +1267,9 @@ class Synchronization {
         continue;
       }
       try {
-        util.verifyAuth(authResponse['auth'],
+        lastDate = util.verifyAuth(authResponse['auth'],
             lastAuth: lastAuth,
+            lastDate: lastDate,
             encrypter: remoteEncrypter,
             usernameEncrypter: usernameEncrypter,
             withIV: _authWithIV);

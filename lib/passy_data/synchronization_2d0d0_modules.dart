@@ -68,6 +68,8 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         required addModule,
         Map<String, List<int>>? binaryObjects,
       }) async {
+        String lastAuth = '';
+        DateTime lastDate = DateTime.now().subtract(const Duration(hours: 12));
         if (args.length == 3) {
           return {
             'commands': [
@@ -105,10 +107,13 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             };
           }
           try {
-            util.verifyAuth(decoded['auth'],
+            lastDate = util.verifyAuth(decoded['auth'],
+                lastAuth: lastAuth,
+                lastDate: lastDate,
                 encrypter: encrypter,
                 usernameEncrypter: usernameEncrypter,
                 withIV: authWithIV);
+            lastAuth = decoded['auth'];
           } catch (e) {
             if (e is Map<String, dynamic>) return e;
             rethrow;

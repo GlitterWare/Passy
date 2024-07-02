@@ -596,9 +596,10 @@ String generateAuth({
   }
 }
 
-void verifyAuth(
+DateTime verifyAuth(
   dynamic auth, {
   String lastAuth = '',
+  required DateTime lastDate,
   required Encrypter encrypter,
   required Encrypter usernameEncrypter,
   bool withIV = false,
@@ -685,10 +686,8 @@ void verifyAuth(
       },
     };
   }
-  if (DateTime.now()
-      .toUtc()
-      .subtract(const Duration(seconds: 5))
-      .isAfter(dateDecoded)) {
+  dateDecoded = dateDecoded.toUtc();
+  if (!dateDecoded.isAfter(lastDate)) {
     throw {
       'error': {
         'type': 'Stale auth',
@@ -698,4 +697,5 @@ void verifyAuth(
       },
     };
   }
+  return dateDecoded;
 }
