@@ -52,12 +52,13 @@ class ButtonedTextFormField extends StatelessWidget {
             autofocus: autofocus,
           ),
         ),
-        FloatingActionButton(
-          heroTag: null,
-          onPressed: onPressed,
-          child: buttonIcon,
-          tooltip: tooltip,
-        ),
+        if (buttonIcon != null)
+          FloatingActionButton(
+            heroTag: null,
+            onPressed: onPressed,
+            child: buttonIcon,
+            tooltip: tooltip,
+          ),
       ],
     );
   }
