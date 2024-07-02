@@ -99,6 +99,11 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           _tfaType = _tfa.type;
         }
         _websites = _passwordArgs.websites.toList();
+        if (_websites.length == 1) {
+          if (_websites.first.isEmpty) {
+            _websites.clear();
+          }
+        }
         _websites.add('');
         for (int i = 0; i != _websites.length; i++) {
           _websitesControllers.add(TextEditingController.fromValue(
@@ -375,11 +380,10 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                   ))
             ]),
         for (int i = 0; i != _websites.length; i++)
-          PassyPadding(TextFormField(
+          PassyPadding(ButtonedTextFormField(
             controller: _websitesControllers[i],
-            decoration: InputDecoration(
-                labelText:
-                    '${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}'),
+            labelText:
+                '${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}',
             onChanged: (value) => setState(() {
               if (value.isNotEmpty) {
                 if (i + 1 == _websites.length) {
@@ -388,12 +392,25 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                 }
               } else if (i + 1 != _websites.length) {
                 FocusScope.of(context).unfocus();
-                _websites.removeAt(i);
-                _websitesControllers.removeAt(i);
+                setState(() {
+                  _websites.removeAt(i);
+                  _websitesControllers.removeAt(i);
+                });
                 return;
               }
               _websites[i] = value;
             }),
+            buttonIcon: (_websites.length == 1 || i + 1 == _websites.length)
+                ? null
+                : const Icon(Icons.remove_rounded),
+            tooltip: localizations.remove,
+            onPressed: () {
+              FocusScope.of(context).unfocus();
+              setState(() {
+                _websites.removeAt(i);
+                _websitesControllers.removeAt(i);
+              });
+            },
           )),
         CustomFieldsEditor(
           customFields: _customFields,
