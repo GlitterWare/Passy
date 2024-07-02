@@ -20,6 +20,7 @@ abstract class RSASocketHelpers {
       List<int> command = [];
       IV? bobjIv;
       String? bobjKey;
+      String? bobjHash;
       List<int> leftToReadList = [];
       bool isEscaped = false;
       bool isCommand = false;
@@ -51,7 +52,8 @@ abstract class RSASocketHelpers {
                 try {
                   leftToRead = int.parse(leftToReadCSV[0]);
                   bobjIv = IV.fromBase64(leftToReadCSV[1]);
-                  bobjKey = encrypter.decrypt64(leftToReadCSV[2], iv: bobjIv);
+                  bobjHash = leftToReadCSV[2];
+                  bobjKey = encrypter.decrypt64(leftToReadCSV[3], iv: bobjIv);
                   curBobj = Uint8List(leftToRead);
                 } catch (_) {
                   leftToReadList.clear();
@@ -68,10 +70,14 @@ abstract class RSASocketHelpers {
               bobjIndex += 1;
               if (leftToRead == 0) {
                 leftToReadState = null;
-                binaryObjects[bobjKey!] =
-                    encrypter.decryptBytes(Encrypted(curBobj), iv: bobjIv);
+                String localBobjHash = getBytesChecksum(curBobj).toString();
+                if (bobjHash == localBobjHash) {
+                  binaryObjects[bobjKey!] =
+                      encrypter.decryptBytes(Encrypted(curBobj), iv: bobjIv);
+                }
                 bobjIv = null;
                 bobjKey = null;
+                bobjHash = null;
                 curBobj = null;
               }
               continue;
@@ -160,7 +166,7 @@ abstract class RSASocketHelpers {
         IV _iv = IV.fromSecureRandom(16);
         List<int> bytes = encrypter.encryptBytes(val, iv: _iv).bytes;
         socket.write(
-            ' \\<bobj\\>${bytes.length},${_iv.base64},${encrypter.encrypt(key, iv: _iv).base64}\\</bobj\\>');
+            ' \\<bobj\\>${bytes.length},${_iv.base64},${getBytesChecksum(bytes).toString()},${encrypter.encrypt(key, iv: _iv).base64}\\</bobj\\>');
         socket.write('<r>${bytes.length}</r>');
         socket.add(bytes);
       }

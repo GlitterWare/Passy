@@ -620,6 +620,14 @@ Future<Digest> getFileChecksum(File file) async {
   return output.events.single;
 }
 
+Digest getBytesChecksum(List<int> bytes) {
+  AccumulatorSink<Digest> output = AccumulatorSink<Digest>();
+  ByteConversionSink input = sha256.startChunkedConversion(output);
+  input.add(bytes);
+  input.close();
+  return output.events.single;
+}
+
 String encodeCSVEntryForSaving({
   required List<dynamic> entry,
   required Encrypter encrypter,
