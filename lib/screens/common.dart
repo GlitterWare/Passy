@@ -213,7 +213,13 @@ imglib.Image? imageFromCameraImage(CameraImage image) {
 Result? qrResultFromImage(imglib.Image image) {
   try {
     LuminanceSource _src = RGBLuminanceSource(
-        image.width, image.height, image.data!.buffer.asInt32List());
+        image.width,
+        image.height,
+        image
+            .convert(numChannels: 4)
+            .getBytes(order: imglib.ChannelOrder.abgr)
+            .buffer
+            .asInt32List());
     BinaryBitmap _bitmap = BinaryBitmap(HybridBinarizer(_src));
     QRCodeReader _reader = QRCodeReader();
     Result _result = _reader.decode(_bitmap);
@@ -679,7 +685,11 @@ Future<void> showConnectDialog(BuildContext context,
   });
   Future(() async {
     await _initializeControllerFuture;
+    bool isBusy = false;
     _controller.startImageStream((image) {
+      if (isBusy) return;
+      isBusy = true;
+      Future.delayed(const Duration(seconds: 1), () => isBusy = false);
       imglib.Image? _image = imageFromCameraImage(image);
       if (_image == null) return;
       Result? _result = qrResultFromImage(_image);

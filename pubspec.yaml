@@ -56,7 +56,7 @@ dependencies:
       ref: 16a37d2a6fee8054547d59f0adb27bbafbf5cb08
   url_launcher: ^6.0.20
   intranet_ip: ^1.0.2
-  zxing2: ^0.1.1
+  zxing2: ^0.2.3
   intl: any
   flutter_localizations:
     sdk: flutter
