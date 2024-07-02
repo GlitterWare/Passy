@@ -13,6 +13,7 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_search.dart';
 import 'package:passy/passy_flutter/common/common.dart';
+import 'package:passy/screens/autofill_splash_screen.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 import 'package:passy/screens/search_screen.dart';
 import 'package:passy/common/common.dart';
@@ -121,6 +122,7 @@ class _LoginScreen extends State<LoginScreen> {
       ],
       passwords: _found,
       onPressed: (passwordMeta) async {
+        Navigator.pushNamed(context, AutofillSplashScreen.routeName);
         PasswordMeta password = PasswordMeta(
             key: passwordMeta.key,
             tags: passwordMeta.tags,
@@ -141,7 +143,6 @@ class _LoginScreen extends State<LoginScreen> {
           ));
         }
         await AutofillService().resultWithDatasets(_dataSets);
-        Navigator.pop(context);
       },
       shouldSort: true,
     );
