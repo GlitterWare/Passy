@@ -102,8 +102,10 @@ class _AddFileScreen extends State<AddFileScreen> {
                   arguments: e.toString()),
             ),
           );
-          Future.delayed(const Duration(seconds: 2),
-              () => setState(() => _fileWidgetKey = UniqueKey()));
+          Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
+            setState(() => _fileWidgetKey = UniqueKey());
+          });
         });
       _previewKey = GlobalKey();
     });
