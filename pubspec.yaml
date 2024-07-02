@@ -87,6 +87,13 @@ dependencies:
       ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
   text_divider: ^1.0.0
   archive: ^3.6.1
+  media_kit: ^1.1.10+1
+  media_kit_video:
+    git:
+      url: https://github.com/media-kit/media-kit
+      path: media_kit_video
+      ref: cc06d55f682945a44686d2e2b186361edd3c2eba
+  media_kit_libs_video: ^1.0.4
   win32: ^5.5.1
 
 dev_dependencies:

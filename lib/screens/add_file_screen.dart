@@ -50,6 +50,7 @@ class AddFileScreenArgs {
 
 class _AddFileScreen extends State<AddFileScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  UniqueKey _fileWidgetKey = UniqueKey();
   bool isLoaded = false;
   FileMeta? _fileMeta;
   GlobalKey _previewKey = GlobalKey();
@@ -60,6 +61,8 @@ class _AddFileScreen extends State<AddFileScreen> {
     FileMeta newFileMeta =
         await FileMeta.fromFile(args.file, virtualParent: args.parent);
     switch (args.type) {
+      case FileEntryType.folder:
+        break;
       case FileEntryType.plainText:
         newFileMeta.type = PassyFileType.text;
         break;
@@ -75,16 +78,33 @@ class _AddFileScreen extends State<AddFileScreen> {
       case FileEntryType.file:
         args.type = fileEntryTypeFromPassyFileType(newFileMeta.type);
         break;
-      case FileEntryType.folder:
+      case FileEntryType.video:
+        newFileMeta.type = PassyFileType.video;
         break;
     }
     setState(() {
       _fileMeta = newFileMeta;
       _preview = PassyFileWidget(
-          path: args.file.path,
-          name: basename(args.file.path),
-          isEncrypted: false,
-          type: args.type);
+        key: _fileWidgetKey,
+        path: args.file.path,
+        name: basename(args.file.path),
+        isEncrypted: false,
+        type: args.type,
+      )..errorStream.listen((e) {
+          showSnackBar(
+            message: localizations.somethingWentWrong,
+            icon: const Icon(Icons.error_outline_rounded,
+                color: PassyTheme.darkContentColor),
+            action: SnackBarAction(
+              label: localizations.details,
+              onPressed: () => Navigator.pushNamed(
+                  navigatorKey.currentContext!, LogScreen.routeName,
+                  arguments: e.toString()),
+            ),
+          );
+          Future.delayed(const Duration(seconds: 2),
+              () => setState(() => _fileWidgetKey = UniqueKey()));
+        });
       _previewKey = GlobalKey();
     });
   }
@@ -141,6 +161,13 @@ class _AddFileScreen extends State<AddFileScreen> {
         title: Text(basename(args.file.path)),
         centerTitle: true,
         actions: [
+          IconButton(
+            padding: PassyTheme.appBarButtonPadding,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
+            onPressed: () => setState(() => _fileWidgetKey = UniqueKey()),
+            tooltip: localizations.refresh,
+            icon: const Icon(Icons.refresh),
+          ),
           IconButton(
             padding: PassyTheme.appBarButtonPadding,
             splashRadius: PassyTheme.appBarButtonSplashRadius,
@@ -209,12 +236,15 @@ class _AddFileScreen extends State<AddFileScreen> {
                             InputDecoration(labelText: localizations.fileType),
                         values: const [
                           FileEntryType.photo,
+                          FileEntryType.video,
                           FileEntryType.plainText,
                           FileEntryType.markdown,
                           FileEntryType.unknown,
                         ],
                         itemBuilder: (object) {
                           switch (object) {
+                            case FileEntryType.folder:
+                              return Text(localizations.folder);
                             case FileEntryType.plainText:
                               return Text(localizations.plainText);
                             case FileEntryType.markdown:
@@ -225,8 +255,8 @@ class _AddFileScreen extends State<AddFileScreen> {
                               return Text(localizations.unknown);
                             case FileEntryType.unknown:
                               return Text(localizations.unknown);
-                            case FileEntryType.folder:
-                              return Text(localizations.folder);
+                            case FileEntryType.video:
+                              return Text(localizations.video);
                           }
                         },
                         onChanged: (value) {

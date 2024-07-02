@@ -3,6 +3,7 @@ enum PassyFileType {
   text,
   markdown,
   photo,
+  video,
 }
 
 PassyFileType? passyFileTypeFromName(String name) {
@@ -17,6 +18,8 @@ PassyFileType? passyFileTypeFromName(String name) {
       return PassyFileType.photo;
     case 'imageRaster':
       return PassyFileType.photo;
+    case 'video':
+      return PassyFileType.video;
   }
   return null;
 }

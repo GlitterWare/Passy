@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kdbx/kdbx.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
@@ -76,6 +77,8 @@ final ThemeData theme = ThemeData(
 );
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
   runApp(const Passy());

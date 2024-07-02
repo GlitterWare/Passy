@@ -12,6 +12,8 @@ class FileButton extends StatelessWidget {
     switch (type) {
       case FileEntryType.unknown:
         return const Icon(Icons.file_open_outlined);
+      case FileEntryType.folder:
+        return const Icon(Icons.folder);
       case FileEntryType.file:
         return const Icon(Icons.file_open_outlined);
       case FileEntryType.plainText:
@@ -25,8 +27,8 @@ class FileButton extends StatelessWidget {
         );
       case FileEntryType.photo:
         return const Icon(Icons.image_outlined);
-      case FileEntryType.folder:
-        return const Icon(Icons.folder);
+      case FileEntryType.video:
+        return const Icon(Icons.video_file_outlined);
     }
   }
 

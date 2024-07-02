@@ -1,22 +1,29 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/glare/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/log_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class PassyFileWidget extends StatefulWidget {
   final String path;
   final String name;
   final bool isEncrypted;
   final FileEntryType type;
+  final StreamController<String> _errorStreamController =
+      StreamController<String>();
+  Stream<String> get errorStream => _errorStreamController.stream;
 
-  const PassyFileWidget({
+  PassyFileWidget({
     super.key,
     required this.path,
     required this.name,
@@ -32,6 +39,16 @@ class _PassyFileWidget extends State<PassyFileWidget> {
   final LoadedAccount _account = data.loadedAccount!;
   Widget? _widget;
   bool _isLoaded = false;
+  HttpServer? _server;
+  Player? _player;
+
+  @override
+  void dispose() {
+    widget._errorStreamController;
+    super.dispose();
+    _player?.dispose();
+    _server?.close();
+  }
 
   Widget _buildErrorWidget(e, s) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
@@ -64,6 +81,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
     }
     switch (widget.type) {
       case FileEntryType.unknown:
+        throw 'Unknown entry type.';
+      case FileEntryType.folder:
         throw 'Unknown entry type.';
       case FileEntryType.file:
         throw 'Unknown entry type.';
@@ -115,8 +134,36 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             hoverColor: Colors.transparent,
             mouseCursor: SystemMouseCursors.zoomIn,
             child: imageViewer);
-      case FileEntryType.folder:
-        throw 'Unknown entry type.';
+      case FileEntryType.video:
+        HttpServer server = await HttpServer.bind('127.0.0.1', 0);
+        _server = server;
+        String password = generatePassword();
+        server.forEach((HttpRequest request) {
+          String? remotePassword = request.headers.value('password');
+          if (remotePassword != password) {
+            request.response.close();
+            return;
+          }
+          request.response.headers.contentType =
+              ContentType('application', 'octet-stream');
+          request.response.add(data);
+          request.response.close();
+        });
+        Player player = Player(
+            configuration: const PlayerConfiguration(
+                bufferSize: 128 * 1024 * 1024 * 1024));
+        _player = player;
+        player.stream.error.listen((e) => widget._errorStreamController.add(e));
+        VideoController controller = VideoController(player);
+        player
+            .open(
+                Media('http://127.0.0.1:${server.port}',
+                    httpHeaders: {'password': password}),
+                play: false)
+            .then((_) => player.play().then((_) => Future.delayed(
+                const Duration(seconds: 1),
+                () => player.seek(const Duration(milliseconds: 1)))));
+        return Video(controller: controller);
     }
   }
 

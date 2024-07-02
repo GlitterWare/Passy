@@ -2,17 +2,20 @@ import 'package:passy/passy_data/passy_file_type.dart';
 
 enum FileEntryType {
   unknown,
+  folder,
   file,
   plainText,
   markdown,
   photo,
-  folder,
+  video,
 }
 
 PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
   switch (type) {
     case FileEntryType.unknown:
       return PassyFileType.unknown;
+    case FileEntryType.folder:
+      return null;
     case FileEntryType.file:
       return PassyFileType.unknown;
     case FileEntryType.plainText:
@@ -21,8 +24,8 @@ PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
       return PassyFileType.markdown;
     case FileEntryType.photo:
       return PassyFileType.photo;
-    case FileEntryType.folder:
-      return null;
+    case FileEntryType.video:
+      return PassyFileType.video;
   }
 }
 
@@ -36,5 +39,7 @@ FileEntryType fileEntryTypeFromPassyFileType(PassyFileType type) {
       return FileEntryType.markdown;
     case PassyFileType.photo:
       return FileEntryType.photo;
+    case PassyFileType.video:
+      return FileEntryType.video;
   }
 }

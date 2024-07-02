@@ -322,5 +322,6 @@
     "bestDecompression": "Best decompression",
     "text": "Text",
     "date": "Date",
-    "number": "Number"
+    "number": "Number",
+    "video": "Video"
 }
