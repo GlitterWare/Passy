@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
@@ -135,7 +136,16 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             mouseCursor: SystemMouseCursors.zoomIn,
             child: imageViewer);
       case FileEntryType.video:
-        HttpServer server = await HttpServer.bind('127.0.0.1', 0);
+        AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
+        ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
+        ECPublicKey pubKey = pair.publicKey as ECPublicKey;
+        String cert = generateSelfSignedCertificate(
+            privateKey: privKey, publicKey: pubKey, days: 2);
+        SecurityContext ctx = SecurityContext();
+        ctx.useCertificateChainBytes(utf8.encode(cert));
+        ctx.usePrivateKeyBytes(
+            utf8.encode(CryptoUtils.encodeEcPrivateKeyToPem(privKey)));
+        HttpServer server = await HttpServer.bindSecure('127.0.0.1', 0, ctx);
         _server = server;
         String password = generatePassword();
         server.forEach((HttpRequest request) {
@@ -157,7 +167,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         VideoController controller = VideoController(player);
         player
             .open(
-                Media('http://127.0.0.1:${server.port}',
+                Media('https://127.0.0.1:${server.port}',
                     httpHeaders: {'password': password}),
                 play: false)
             .then((_) => player.play().then((_) => Future.delayed(

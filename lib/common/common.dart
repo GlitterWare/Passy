@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -80,4 +81,21 @@ Future<String> getLatestVersion() async {
   } catch (_) {
     return passyVersion;
   }
+}
+
+String generateSelfSignedCertificate({
+  required ECPrivateKey privateKey,
+  required ECPublicKey publicKey,
+  int days = 365,
+}) {
+  Map<String, String> dn = {
+    'CN': 'Self-Signed',
+  };
+  String csr = X509Utils.generateEccCsrPem(dn, privateKey, publicKey);
+  String x509PEM = X509Utils.generateSelfSignedCertificate(
+    privateKey,
+    csr,
+    days,
+  );
+  return x509PEM;
 }

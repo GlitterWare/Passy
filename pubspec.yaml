@@ -95,6 +95,7 @@ dependencies:
       ref: cc06d55f682945a44686d2e2b186361edd3c2eba
   media_kit_libs_video: ^1.0.4
   win32: ^5.5.1
+  basic_utils: ^5.7.0
 
 dev_dependencies:
   flutter_test:
