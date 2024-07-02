@@ -53,7 +53,7 @@ dependencies:
   flutter_autofill_service:
     git:
       url: https://github.com/GlitterWare/flutter_autofill_service.git
-      ref: 23db7e69367606f91244884ea5c0abe3efee922e
+      ref: 16a37d2a6fee8054547d59f0adb27bbafbf5cb08
   url_launcher: ^6.0.20
   intranet_ip: ^1.0.2
   zxing2: ^0.1.1

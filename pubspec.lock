@@ -508,8 +508,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "23db7e69367606f91244884ea5c0abe3efee922e"
-      resolved-ref: "23db7e69367606f91244884ea5c0abe3efee922e"
+      ref: "16a37d2a6fee8054547d59f0adb27bbafbf5cb08"
+      resolved-ref: "16a37d2a6fee8054547d59f0adb27bbafbf5cb08"
       url: "https://github.com/GlitterWare/flutter_autofill_service.git"
     source: git
     version: "0.18.1"
