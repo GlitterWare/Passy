@@ -69,7 +69,8 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         Map<String, List<int>>? binaryObjects,
       }) async {
         String lastAuth = '';
-        DateTime lastDate = DateTime.now().subtract(const Duration(hours: 12));
+        DateTime lastDate =
+            DateTime.now().toUtc().subtract(const Duration(hours: 12));
         if (args.length == 3) {
           return {
             'commands': [

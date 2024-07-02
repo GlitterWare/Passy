@@ -1064,7 +1064,8 @@ class Synchronization {
       }
 
       String lastAuth = '';
-      DateTime lastDate = DateTime.now().subtract(const Duration(hours: 12));
+      DateTime lastDate =
+          DateTime.now().toUtc().subtract(const Duration(hours: 12));
 
       Map<String, dynamic> auth() {
         lastAuth = util.generateAuth(
