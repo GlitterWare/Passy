@@ -1565,6 +1565,9 @@ Future<void> executeCommand(List<String> command,
                   loadedModules['${module.key}_$username'] = module.value;
                 }
               }
+              String lastAuth = '';
+              DateTime lastDate =
+                  DateTime.now().toUtc().subtract(const Duration(hours: 12));
               GlareServer glareHost = await GlareServer.bind(
                 maxBindTries: 0,
                 address: host,
@@ -1595,10 +1598,13 @@ Future<void> executeCommand(List<String> command,
                       Encrypter usernameEncrypter =
                           pcommon.getPassyEncrypter(username);
                       try {
-                        util.verifyAuth(auth,
+                        lastDate = util.verifyAuth(auth,
+                            lastAuth: lastAuth,
+                            lastDate: lastDate,
                             encrypter: encrypter,
                             usernameEncrypter: usernameEncrypter,
                             withIV: true);
+                        lastAuth = auth;
                       } catch (_) {
                         return {
                           'error': {'type': 'Failed to authenticate'},
@@ -1865,10 +1871,13 @@ Future<void> executeCommand(List<String> command,
                         };
                       }
                       try {
-                        util.verifyAuth(auth,
+                        lastDate = util.verifyAuth(auth,
+                            lastAuth: lastAuth,
+                            lastDate: lastDate,
                             encrypter: encrypter,
                             usernameEncrypter: usernameEncrypter,
                             withIV: true);
+                        lastAuth = auth;
                       } catch (_) {
                         return {
                           'error': {'type': 'Failed to authenticate'},
