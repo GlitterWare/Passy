@@ -141,7 +141,6 @@ class _PassyFileScreen extends State<StatefulWidget> {
           ),
         ],
         title: Text(args.title),
-        centerTitle: true,
       ),
       body: CustomScrollView(
         physics: args.type == FileEntryType.photo

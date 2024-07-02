@@ -161,7 +161,6 @@ class _AddFileScreen extends State<AddFileScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(basename(args.file.path)),
-        centerTitle: true,
         actions: [
           IconButton(
             padding: PassyTheme.appBarButtonPadding,
