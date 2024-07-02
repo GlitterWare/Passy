@@ -849,7 +849,7 @@ Future<void> executeCommand(List<String> command,
     case 'hide':
       if (_isNativeMessaging) break;
       try {
-        ShowWindow(GetConsoleWindow(), SW_HIDE);
+        ShowWindow(GetConsoleWindow(), SHOW_WINDOW_CMD.SW_HIDE);
       } catch (e, s) {
         log('passy:hide:Failed to hide window:\n$e\n$s');
         return;
