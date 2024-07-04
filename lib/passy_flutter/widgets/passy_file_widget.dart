@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:basic_utils/basic_utils.dart';
+import 'package:chewie_media_kit/chewie.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/glare/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
@@ -173,7 +175,18 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             .then((_) => player.play().then((_) => Future.delayed(
                 const Duration(seconds: 1),
                 () => player.seek(const Duration(milliseconds: 1)))));
-        return Video(controller: controller);
+        return Chewie(
+          controller: ChewieController(
+            videoPlayerController: controller,
+            hideControlsTimer: const Duration(seconds: 2),
+            showControlsFade: false,
+            customControls: const CupertinoControls(
+              backgroundColor: Colors.black,
+              iconColor: PassyTheme.lightContentColor,
+              showPlayButtonWhilePlaying: true,
+            ),
+          ),
+        );
     }
   }
 

@@ -92,6 +92,10 @@ dependencies:
   media_kit_libs_video: ^1.0.4
   win32: ^5.5.1
   basic_utils: ^5.7.0
+  chewie_media_kit:
+    git:
+      url: https://github.com/GlitterWare/chewie_media_kit
+      ref: 68e1fdc7785f794390361a4cc3457ac43dd822ee
 
 dev_dependencies:
   flutter_test:
