@@ -300,7 +300,19 @@ class FileIndex {
 
   Future<void> removeFile(String key) async {
     File file = File(_saveDir.path + Platform.pathSeparator + key);
-    if (await file.exists()) await file.delete();
+    if (await file.exists()) {
+      FileStat stat = await file.stat();
+      IOSink sink = file.openWrite(mode: FileMode.write);
+      int curSize = 0;
+      List<int> list =
+          List<int>.filled(stat.size > 67108864 ? 67108864 : stat.size, 0);
+      while (curSize < stat.size) {
+        sink.add(list);
+        curSize += 67108864;
+      }
+      await sink.flush();
+      await file.delete();
+    }
     await _setEntry(key, null);
   }
 
