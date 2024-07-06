@@ -207,7 +207,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '${localizations.filePreview}:',
+                                localizations.filePreview,
                                 style: const TextStyle(
                                     color:
                                         PassyTheme.lightContentSecondaryColor),
