@@ -79,20 +79,12 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             play: false)
         .then((_) {
       if (!mounted) {
-        try {
-          _player?.dispose();
-          _server?.close();
-        } catch (_) {}
         return null;
       }
       return _player
           ?.play()
           .then((_) => Future.delayed(const Duration(seconds: 1), () {
                 if (!mounted) {
-                  try {
-                    _player?.dispose();
-                    _server?.close();
-                  } catch (_) {}
                   return null;
                 }
                 return _player?.seek(const Duration(milliseconds: 1));
