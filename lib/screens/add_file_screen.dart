@@ -295,7 +295,6 @@ class _AddFileScreen extends State<AddFileScreen> {
                         onChanged: (value) {
                           if (value == null) return;
                           setState(() => _compressionType = value);
-                          _load(context, args);
                         },
                       )),
                       Text.rich(
