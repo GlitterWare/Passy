@@ -49,8 +49,10 @@ class _PassyFileWidget extends State<PassyFileWidget> {
   void dispose() {
     widget._errorStreamController;
     super.dispose();
-    _player?.dispose();
-    _server?.close();
+    try {
+      _player?.dispose();
+      _server?.close();
+    } catch (_) {}
   }
 
   Widget _buildErrorWidget(e, s) {
@@ -69,6 +71,33 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         },
       )),
     ]);
+  }
+
+  void _playMedia({required String resource, required password}) {
+    _player
+        ?.open(Media(resource, httpHeaders: {'password': password}),
+            play: false)
+        .then((_) {
+      if (!mounted) {
+        try {
+          _player?.dispose();
+          _server?.close();
+        } catch (_) {}
+        return null;
+      }
+      return _player
+          ?.play()
+          .then((_) => Future.delayed(const Duration(seconds: 1), () {
+                if (!mounted) {
+                  try {
+                    _player?.dispose();
+                    _server?.close();
+                  } catch (_) {}
+                  return null;
+                }
+                return _player?.seek(const Duration(milliseconds: 1));
+              }));
+    });
   }
 
   Future<Widget?> _loadWidget() async {
@@ -167,14 +196,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         _player = player;
         player.stream.error.listen((e) => widget._errorStreamController.add(e));
         VideoController controller = VideoController(player);
-        player
-            .open(
-                Media('https://127.0.0.1:${server.port}',
-                    httpHeaders: {'password': password}),
-                play: false)
-            .then((_) => player.play().then((_) => Future.delayed(
-                const Duration(seconds: 1),
-                () => player.seek(const Duration(milliseconds: 1)))));
+        _playMedia(
+            resource: 'https://127.0.0.1:${server.port}', password: password);
         return PassyAudioProgressBar(
           controller: controller,
           colors: ChewieProgressColors(
@@ -213,14 +236,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         _player = player;
         player.stream.error.listen((e) => widget._errorStreamController.add(e));
         VideoController controller = VideoController(player);
-        player
-            .open(
-                Media('https://127.0.0.1:${server.port}',
-                    httpHeaders: {'password': password}),
-                play: false)
-            .then((_) => player.play().then((_) => Future.delayed(
-                const Duration(seconds: 1),
-                () => player.seek(const Duration(milliseconds: 1)))));
+        _playMedia(
+            resource: 'https://127.0.0.1:${server.port}', password: password);
         return Chewie(
           controller: ChewieController(
             videoPlayerController: controller,
