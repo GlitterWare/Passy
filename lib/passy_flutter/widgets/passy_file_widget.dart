@@ -49,10 +49,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
   void dispose() {
     widget._errorStreamController;
     super.dispose();
-    try {
-      _player?.dispose();
-      _server?.close();
-    } catch (_) {}
+    _player?.dispose();
+    _server?.close();
   }
 
   Widget _buildErrorWidget(e, s) {
