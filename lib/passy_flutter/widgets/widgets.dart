@@ -27,6 +27,7 @@ export 'note_button.dart';
 export 'password_button_list_view.dart';
 export 'password_button.dart';
 export 'passy_about_dialog.dart';
+export 'passy_audio_progress_bar.dart';
 export 'passy_entry_button_list_view.dart';
 export 'passy_file_widget.dart';
 export 'passy_markdown_body.dart';

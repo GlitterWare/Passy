@@ -78,6 +78,9 @@ class _AddFileScreen extends State<AddFileScreen> {
       case FileEntryType.file:
         args.type = fileEntryTypeFromPassyFileType(newFileMeta.type);
         break;
+      case FileEntryType.audio:
+        newFileMeta.type = PassyFileType.audio;
+        break;
       case FileEntryType.video:
         newFileMeta.type = PassyFileType.video;
         break;
@@ -237,6 +240,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                             InputDecoration(labelText: localizations.fileType),
                         values: const [
                           FileEntryType.photo,
+                          FileEntryType.audio,
                           FileEntryType.video,
                           FileEntryType.plainText,
                           FileEntryType.markdown,
@@ -256,6 +260,8 @@ class _AddFileScreen extends State<AddFileScreen> {
                               return Text(localizations.unknown);
                             case FileEntryType.unknown:
                               return Text(localizations.unknown);
+                            case FileEntryType.audio:
+                              return Text(localizations.audio);
                             case FileEntryType.video:
                               return Text(localizations.video);
                           }

@@ -155,6 +155,30 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
           case 'webp':
             type = PassyFileType.photo;
             break;
+          case 'mp3':
+            type = PassyFileType.audio;
+            break;
+          case 'wav':
+            type = PassyFileType.audio;
+            break;
+          case 'flac':
+            type = PassyFileType.audio;
+            break;
+          case 'ogg':
+            type = PassyFileType.audio;
+            break;
+          case 'wma':
+            type = PassyFileType.audio;
+            break;
+          case 'aiff':
+            type = PassyFileType.audio;
+            break;
+          case 'm4a':
+            type = PassyFileType.audio;
+            break;
+          case 'opus':
+            type = PassyFileType.audio;
+            break;
           case 'mp4':
             type = PassyFileType.video;
             break;

@@ -323,5 +323,6 @@
     "text": "Text",
     "date": "Date",
     "number": "Number",
-    "video": "Video"
+    "video": "Video",
+    "audio": "Audio"
 }

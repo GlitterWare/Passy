@@ -3,6 +3,7 @@ enum PassyFileType {
   text,
   markdown,
   photo,
+  audio,
   video,
 }
 

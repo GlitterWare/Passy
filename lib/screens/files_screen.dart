@@ -107,6 +107,9 @@ class _FilesScreen extends State<FilesScreen> {
         case PassyFileType.photo:
           type = FileEntryType.photo;
           break;
+        case PassyFileType.audio:
+          type = FileEntryType.audio;
+          break;
         case PassyFileType.video:
           type = FileEntryType.video;
           break;

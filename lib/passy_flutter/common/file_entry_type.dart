@@ -7,6 +7,7 @@ enum FileEntryType {
   plainText,
   markdown,
   photo,
+  audio,
   video,
 }
 
@@ -24,6 +25,8 @@ PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
       return PassyFileType.markdown;
     case FileEntryType.photo:
       return PassyFileType.photo;
+    case FileEntryType.audio:
+      return PassyFileType.audio;
     case FileEntryType.video:
       return PassyFileType.video;
   }
@@ -39,6 +42,8 @@ FileEntryType fileEntryTypeFromPassyFileType(PassyFileType type) {
       return FileEntryType.markdown;
     case PassyFileType.photo:
       return FileEntryType.photo;
+    case PassyFileType.audio:
+      return FileEntryType.audio;
     case PassyFileType.video:
       return FileEntryType.video;
   }

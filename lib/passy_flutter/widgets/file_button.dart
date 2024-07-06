@@ -27,6 +27,8 @@ class FileButton extends StatelessWidget {
         );
       case FileEntryType.photo:
         return const Icon(Icons.image_outlined);
+      case FileEntryType.audio:
+        return const Icon(Icons.music_note);
       case FileEntryType.video:
         return const Icon(Icons.video_file_outlined);
     }

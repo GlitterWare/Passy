@@ -137,6 +137,52 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             hoverColor: Colors.transparent,
             mouseCursor: SystemMouseCursors.zoomIn,
             child: imageViewer);
+      case FileEntryType.audio:
+        AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
+        ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
+        ECPublicKey pubKey = pair.publicKey as ECPublicKey;
+        String cert = generateSelfSignedCertificate(
+            privateKey: privKey, publicKey: pubKey, days: 2);
+        SecurityContext ctx = SecurityContext();
+        ctx.useCertificateChainBytes(utf8.encode(cert));
+        ctx.usePrivateKeyBytes(
+            utf8.encode(CryptoUtils.encodeEcPrivateKeyToPem(privKey)));
+        HttpServer server = await HttpServer.bindSecure('127.0.0.1', 0, ctx);
+        _server = server;
+        String password = generatePassword();
+        server.forEach((HttpRequest request) {
+          String? remotePassword = request.headers.value('password');
+          if (remotePassword != password) {
+            request.response.close();
+            return;
+          }
+          request.response.headers.contentType =
+              ContentType('application', 'octet-stream');
+          request.response.add(data);
+          request.response.close();
+        });
+        Player player = Player(
+            configuration: const PlayerConfiguration(
+                bufferSize: 128 * 1024 * 1024 * 1024));
+        _player = player;
+        player.stream.error.listen((e) => widget._errorStreamController.add(e));
+        VideoController controller = VideoController(player);
+        player
+            .open(
+                Media('https://127.0.0.1:${server.port}',
+                    httpHeaders: {'password': password}),
+                play: false)
+            .then((_) => player.play().then((_) => Future.delayed(
+                const Duration(seconds: 1),
+                () => player.seek(const Duration(milliseconds: 1)))));
+        return PassyAudioProgressBar(
+          controller: controller,
+          colors: ChewieProgressColors(
+            playedColor: PassyTheme.darkPassyPurple,
+            handleColor: PassyTheme.lightContentColor,
+          ),
+          iconColor: PassyTheme.lightContentColor,
+        );
       case FileEntryType.video:
         AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
         ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
