@@ -76,12 +76,15 @@ class _FilesScreen extends State<FilesScreen> {
         if (folders.contains(folderPath)) continue;
         folders.add(folderPath);
         String name;
+        Widget? icon;
         if (folderPath == '/sync') {
           namedDirectoriesAdded = true;
           name = localizations.synchronizedFiles;
+          icon = const Icon(Icons.sync);
         } else if (folderPath == '/sync/attach') {
           namedDirectoriesAdded = true;
           name = localizations.attachments;
+          icon = const Icon(Icons.attachment);
         } else {
           name = filePathSplit[selfPathSplit.length];
         }
@@ -90,6 +93,7 @@ class _FilesScreen extends State<FilesScreen> {
           path: folderPath,
           name: name,
           type: FileEntryType.folder,
+          icon: icon,
         ));
         continue;
       }
@@ -124,13 +128,16 @@ class _FilesScreen extends State<FilesScreen> {
     if (!namedDirectoriesAdded) {
       String name;
       String vPath;
+      Widget icon;
       if (path == '/') {
         name = localizations.synchronizedFiles;
         vPath = '/sync';
+        icon = const Icon(Icons.sync);
         namedDirectoriesAdded = true;
       } else {
         name = localizations.attachments;
         vPath = '/sync/attach';
+        icon = const Icon(Icons.attachment);
         namedDirectoriesAdded = true;
       }
       result.add(FileEntry(
@@ -138,6 +145,7 @@ class _FilesScreen extends State<FilesScreen> {
         path: vPath,
         name: name,
         type: FileEntryType.folder,
+        icon: icon,
       ));
     }
     return result;

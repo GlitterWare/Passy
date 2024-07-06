@@ -8,7 +8,16 @@ class FileButton extends StatelessWidget {
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
       popupMenuItemBuilder;
 
+  const FileButton({
+    Key? key,
+    required this.file,
+    this.onPressed,
+    this.popupMenuItemBuilder,
+  }) : super(key: key);
+
   Widget _buildIcon(FileEntryType type) {
+    Widget? icon = file.icon;
+    if (icon != null) return icon;
     switch (type) {
       case FileEntryType.unknown:
         return const Icon(Icons.file_open_outlined);
@@ -33,13 +42,6 @@ class FileButton extends StatelessWidget {
         return const Icon(Icons.video_file_outlined);
     }
   }
-
-  const FileButton({
-    Key? key,
-    required this.file,
-    this.onPressed,
-    this.popupMenuItemBuilder,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
