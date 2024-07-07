@@ -27,7 +27,7 @@ flutter doctor
 export LAST_PWD=$PWD
 cd submodules/flutter/bin/cache
 rm -rf dart-sdk
-wget --no-check-certificate https://storage.googleapis.com/dart-archive/channels/dev/release/3.5.0-311.0.dev/sdk/dartsdk-linux-arm-release.zip
+cp /passy-bin/dartsdk-linux-arm-release.zip .
 unzip dartsdk-linux-arm-release.zip
 rm dartsdk-linux-arm-release.zip
 cd $LAST_PWD

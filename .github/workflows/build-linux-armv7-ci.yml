@@ -29,10 +29,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu binfmt-support qemu-user-static qemu-system-arm
+      - name: Download Dart
+        shell: bash
+        run: |
+          cd ../bin
+          wget https://storage.googleapis.com/dart-archive/channels/dev/release/3.5.0-311.0.dev/sdk/dartsdk-linux-arm-release.zip
       - name: Build for ARMv7
         uses: tj-actions/docker-run@v2
         with:
-          image: ubuntu:20.04
+          image: ubuntu:22.04
           name: ubuntu
           options: --rm --platform linux/arm/v7 -v $PWD:/Passy -v /home/runner/work/Passy/build:/passy-build -v /home/runner/work/Passy/bin:/passy-bin
           args: /passy-bin/armv7.sh
