@@ -9,7 +9,7 @@ on:
 jobs:
   build_linux_armv7:
     name: Build Passy CLI for Linux ARMv7
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
