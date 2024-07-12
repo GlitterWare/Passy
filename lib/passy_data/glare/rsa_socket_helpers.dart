@@ -70,10 +70,15 @@ abstract class RSASocketHelpers {
               bobjIndex += 1;
               if (leftToRead == 0) {
                 leftToReadState = null;
-                String localBobjHash = getBytesChecksum(curBobj).toString();
-                if (bobjHash == localBobjHash) {
+                if (bobjHash == 'null') {
                   binaryObjects[bobjKey!] =
                       encrypter.decryptBytes(Encrypted(curBobj), iv: bobjIv);
+                } else {
+                  String localBobjHash = getBytesChecksum(curBobj).toString();
+                  if (bobjHash == localBobjHash) {
+                    binaryObjects[bobjKey!] =
+                        encrypter.decryptBytes(Encrypted(curBobj), iv: bobjIv);
+                  }
                 }
                 bobjIv = null;
                 bobjKey = null;
