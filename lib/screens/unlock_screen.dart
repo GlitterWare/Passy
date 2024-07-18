@@ -45,7 +45,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     });
   }
 
-  void _onWillPop(bool isPopped) {
+  void _onWillPop(bool isPopped, dynamic result) {
     if (isPopped) return;
     if (_shouldPop) {
       setState(() {
@@ -171,7 +171,7 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     }
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: Text(localizations.unlock),

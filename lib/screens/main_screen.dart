@@ -417,7 +417,7 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  void _onWillPop(bool isPopped) {
+  void _onWillPop(bool isPopped, dynamic result) {
     if (isPopped) return;
     _logOut();
   }
@@ -559,7 +559,7 @@ class _MainScreen extends State<MainScreen>
 
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
