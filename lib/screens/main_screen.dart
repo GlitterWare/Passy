@@ -432,6 +432,9 @@ class _MainScreen extends State<MainScreen>
   void dispose() {
     super.dispose();
     routeObserver.unsubscribe(this);
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      if (trayEnabled) toggleTray();
+    }
   }
 
   void _mainLoop() {
@@ -453,6 +456,10 @@ class _MainScreen extends State<MainScreen>
     if (Platform.isAndroid) {
       FlutterSecureScreen.singleton
           .setAndroidScreenSecure(_account.protectScreen);
+    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      if (_account.minimizeToTray) {
+        if (!trayEnabled) toggleTray();
+      }
     }
     DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
     if (lastSyncDate != null) {

@@ -10,6 +10,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/main_screen.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'common.dart';
 
@@ -25,7 +26,8 @@ class UnlockScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _UnlockScreen();
 }
 
-class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
+class _UnlockScreen extends State<UnlockScreen>
+    with WidgetsBindingObserver, WindowListener {
   bool _shouldPop = false;
   String _password = '';
   FloatingActionButton? _bioAuthButton;
@@ -115,6 +117,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       if (!_passwordFocus.hasFocus) _passwordFocus.requestFocus();
     });
     WidgetsBinding.instance.addObserver(this);
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.addListener(this);
+    }
   }
 
   @override
@@ -122,6 +127,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     super.dispose();
     _passwordFocus.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.removeListener(this);
+    }
   }
 
   @override
@@ -142,6 +150,21 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     if ((state != AppLifecycleState.resumed) &&
         (state != AppLifecycleState.inactive)) return;
     setState(() => _unlockScreenOn = true);
+  }
+
+  @override
+  void onWindowMinimize() async {
+    if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) return;
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
+    if (UnlockScreen.shouldLockScreen) {
+      if (account.autoScreenLock) {
+        setState(() => _unlockScreenOn = true);
+      }
+    }
+    if (!account.minimizeToTray) return;
+    await windowManager.restore();
+    await windowManager.hide();
   }
 
   @override

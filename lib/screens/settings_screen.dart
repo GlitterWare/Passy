@@ -30,6 +30,18 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreen extends State<SettingsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
 
+  void setMinimizeToTray(bool value) {
+    if (value) {
+      if (!trayEnabled) toggleTray();
+    } else {
+      if (trayEnabled) toggleTray();
+    }
+    setState(() {
+      _account.minimizeToTray = value;
+    });
+    _account.saveSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +90,20 @@ class _SettingsScreen extends State<SettingsScreen> {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () => openUrl(
                   'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
+            )),
+          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS)
+            PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.minimizeToTray),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.circle),
+              ),
+              right: Switch(
+                activeColor: Colors.greenAccent,
+                value: _account.minimizeToTray,
+                onChanged: (value) => setMinimizeToTray(value),
+              ),
+              onPressed: () => setMinimizeToTray(!_account.minimizeToTray),
             )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.backupAndRestore),

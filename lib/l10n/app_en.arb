@@ -324,5 +324,9 @@
     "date": "Date",
     "number": "Number",
     "video": "Video",
-    "audio": "Audio"
+    "audio": "Audio",
+    "minimizeToTray": "Minimize to tray",
+    "showWindow": "Show window",
+    "hideWindow": "Hide window",
+    "exitPassy": "Exit Passy"
 }

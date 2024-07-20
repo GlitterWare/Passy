@@ -23,7 +23,9 @@ import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/screens/payment_cards_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
+import 'package:system_tray/system_tray.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:zxing2/qrcode.dart';
 
 import 'connect_screen.dart';
@@ -801,4 +803,61 @@ setOnError(BuildContext context) {
     } catch (_) {}
     return false;
   };
+}
+
+bool _trayEnabled = false;
+bool get trayEnabled => _trayEnabled;
+SystemTray _systemTray = SystemTray();
+
+Future<void> toggleTray() async {
+  if (_trayEnabled) {
+    await _systemTray.destroy();
+  } else {
+    String path = Platform.isWindows
+        ? 'assets/images/icon.ico'
+        : 'assets/images/icon48.png';
+    final menu = Menu();
+    menu.buildFrom([
+      MenuItemLabel(
+        label: localizations.showWindow,
+        onClicked: (_) async {
+          while (!await windowManager.isVisible()) {
+            await windowManager.show();
+            await windowManager.focus();
+            await Future.delayed(const Duration(milliseconds: 100));
+          }
+        },
+      ),
+      MenuItemLabel(
+        label: localizations.hideWindow,
+        onClicked: (_) {
+          windowManager.hide();
+        },
+      ),
+      MenuSeparator(),
+      MenuItemLabel(
+        label: localizations.exitPassy,
+        onClicked: (_) => SystemNavigator.pop(),
+      ),
+    ]);
+
+    // We first init the systray menu and then add the menu entries
+    await _systemTray.initSystemTray(
+      title: 'Passy',
+      iconPath: path,
+    );
+
+    await _systemTray.setContextMenu(menu);
+
+    // handle system tray event
+    _systemTray.registerSystemTrayEventHandler((eventName) {
+      debugPrint("eventName: $eventName");
+      if (eventName == "leftMouseDown") {
+      } else if (eventName == "leftMouseUp") {
+        _systemTray.popUpContextMenu();
+      } else if (eventName == "rightMouseDown") {
+      } else if (eventName == "rightMouseUp") {}
+    });
+  }
+  _trayEnabled = !_trayEnabled;
 }

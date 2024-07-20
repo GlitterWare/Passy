@@ -11,6 +11,7 @@ typedef AccountSettingsFile = EncryptedJsonFile<AccountSettings>;
 class AccountSettings with JsonConvertable {
   bool protectScreen;
   bool autoScreenLock;
+  bool minimizeToTray;
   RSAKeypair? rsaKeypair;
   int serverSyncInterval;
   Map<String, Sync2d0d0ServerInfo> serverInfo;
@@ -19,6 +20,7 @@ class AccountSettings with JsonConvertable {
   AccountSettings.fromJson(Map<String, dynamic> json)
       : protectScreen = json['protectScreen'] ?? true,
         autoScreenLock = json['autoScreenLock'] ?? true,
+        minimizeToTray = json['minimizeToTray'] ?? false,
         rsaKeypair = json['rsaPrivateKey'] is String
             ? RSAKeypair(RSAPrivateKey.fromPEM(json['rsaPrivateKey']))
             : null,
@@ -38,6 +40,7 @@ class AccountSettings with JsonConvertable {
   AccountSettings({
     this.protectScreen = true,
     this.autoScreenLock = true,
+    this.minimizeToTray = false,
     RSAPrivateKey? rsaPrivateKey,
     this.serverSyncInterval = 15000,
     Map<String, Sync2d0d0ServerInfo>? serverInfo,
@@ -49,6 +52,7 @@ class AccountSettings with JsonConvertable {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'protectScreen': protectScreen,
+        'minimizeToTray': minimizeToTray,
         'autoScreenLock': autoScreenLock,
         'rsaPrivateKey': rsaKeypair?.privateKey.toPEM(),
         'serverSyncInterval': serverSyncInterval.toString(),
