@@ -852,11 +852,15 @@ Future<void> toggleTray() async {
     // handle system tray event
     _systemTray.registerSystemTrayEventHandler((eventName) {
       debugPrint("eventName: $eventName");
-      if (eventName == "leftMouseDown") {
-      } else if (eventName == "leftMouseUp") {
-        _systemTray.popUpContextMenu();
-      } else if (eventName == "rightMouseDown") {
-      } else if (eventName == "rightMouseUp") {}
+      if (eventName == kSystemTrayEventClick) {
+        Platform.isWindows
+            ? windowManager.show()
+            : _systemTray.popUpContextMenu();
+      } else if (eventName == kSystemTrayEventRightClick) {
+        Platform.isWindows
+            ? _systemTray.popUpContextMenu()
+            : windowManager.show();
+      }
     });
   }
   _trayEnabled = !_trayEnabled;
