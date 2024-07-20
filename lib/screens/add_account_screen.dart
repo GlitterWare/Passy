@@ -102,7 +102,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
     });
   }
 
-  void _onWillPop(bool isPopped, dynamic result) {
+  void _onWillPop(bool isPopped) {
     if (isPopped) return;
     if (data.noAccounts) {
       Navigator.pop(context);
@@ -115,7 +115,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: _onWillPop,
+      onPopInvoked: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
