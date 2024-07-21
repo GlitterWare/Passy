@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/main.dart';
-import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/bio_storage.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
