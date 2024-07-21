@@ -55,3 +55,4 @@ app.*.map.json
 # Passy CLI
 lib/passy_cli/bin/passy_cli
 
+.directory
