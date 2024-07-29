@@ -56,3 +56,4 @@ app.*.map.json
 lib/passy_cli/bin/passy_cli
 
 .directory
+__Flutter_Output__
