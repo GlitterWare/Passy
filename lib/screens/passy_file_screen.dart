@@ -123,11 +123,13 @@ class _PassyFileScreen extends State<StatefulWidget> {
     if (response.name != args.title) {
       _account.renameFile(args.key, name: response.name);
     }
-    Navigator.pop(context);
     setState(() {
       _args = PassyFileScreenArgs(
           title: response.name, key: args.key, type: response.type);
     });
+    _fileWidgetKey = UniqueKey();
+    await Future.delayed(const Duration(milliseconds: 200));
+    Navigator.pop(context);
     showSnackBar(
         message: localizations.fileSaved,
         icon: const Icon(Icons.edit_outlined,
@@ -138,7 +140,6 @@ class _PassyFileScreen extends State<StatefulWidget> {
   Widget build(BuildContext context) {
     PassyFileScreenArgs args = _args ??
         ModalRoute.of(context)!.settings.arguments as PassyFileScreenArgs;
-    _args = args;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
