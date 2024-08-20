@@ -20,6 +20,7 @@ import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'dart:io';
@@ -1514,9 +1515,45 @@ class LoadedAccount {
     }
   }
 
-  Future<void> removeFolder(String path) => _fileIndex.removeFolder(path);
-  Future<void> renameFile(String key, {required String name}) =>
-      _fileIndex.renameFile(key, name: name);
+  Future<void> removeFolder(String path) async {
+    List<PassyFsMeta> files = await _fileIndex.removeFolder(path);
+    if (path.startsWith('/sync/')) {
+      for (PassyFsMeta file in files) {
+        _fileSyncHistory.value.files[file.key] = EntryEvent(
+          file.key,
+          status: EntryStatus.removed,
+          lastModified: DateTime.now().toUtc(),
+        );
+      }
+    }
+  }
+
+  Future<void> renameFile(String key, {required String name}) async {
+    await _fileIndex.renameFile(key, name: name);
+    if (_fileSyncHistory.value.files.containsKey(key)) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[key] = EntryEvent(
+        key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+  }
+
+  Future<void> changeFileType(String key, {required PassyFileType type}) async {
+    await _fileIndex.changeFileType(key, type: type);
+    if (_fileSyncHistory.value.files.containsKey(key)) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[key] = EntryEvent(
+        key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+  }
+
   Future<void> exportFile(String key, {required File file}) =>
       _fileIndex.saveDecrypted(key, file: file);
 

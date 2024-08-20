@@ -328,5 +328,6 @@
     "minimizeToTray": "Minimize to tray",
     "showWindow": "Show window",
     "hideWindow": "Hide window",
-    "exitPassy": "Exit Passy"
+    "exitPassy": "Exit Passy",
+    "fileSaved": "File saved"
 }

@@ -6,6 +6,8 @@ export 'confirm_string_scaffold.dart';
 export 'custom_field_button.dart';
 export 'custom_fields_editor.dart';
 export 'double_action_button.dart';
+export 'edit_file_dialog.dart';
+export 'edit_file_type_dialog.dart';
 export 'edit_screen_appbar.dart';
 export 'entries_screen_appbar.dart';
 export 'entry_screen_appbar.dart';

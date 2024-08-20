@@ -15,6 +15,7 @@ import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -496,21 +497,32 @@ List<PopupMenuEntry> filePopupMenuBuilder(
   return [
     if (fileEntry.type != FileEntryType.folder)
       getIconedPopupMenuItem(
-        content: Text(localizations.rename),
+        content: Text(localizations.edit),
         icon: const Icon(Icons.edit_outlined),
         onTap: () async {
-          String? result = await showDialog(
+          EditFileDialogResponse? result = await showDialog(
               context: context,
-              builder: (context) => RenameFileDialog(name: fileEntry.name));
+              builder: (context) =>
+                  EditFileDialog(name: fileEntry.name, type: fileEntry.type));
           if (result == null) return;
+          PassyFileType? type = passyFileTypeFromFileEntryType(result.type);
           Navigator.pushNamed(context, SplashScreen.routeName);
           await Future.delayed(const Duration(milliseconds: 200));
-          await data.loadedAccount!.renameFile(fileEntry.key, name: result);
+          if (type != null) {
+            if (result.type != fileEntry.type) {
+              await data.loadedAccount!
+                  .changeFileType(fileEntry.key, type: type);
+            }
+          }
+          if (result.name != fileEntry.name) {
+            await data.loadedAccount!
+                .renameFile(fileEntry.key, name: result.name);
+          }
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
           showSnackBar(
-              message: 'File renamed',
+              message: localizations.fileSaved,
               icon: const Icon(Icons.edit_outlined,
                   color: PassyTheme.darkContentColor));
         },

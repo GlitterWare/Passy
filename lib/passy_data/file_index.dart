@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/passy_binary_file.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:path/path.dart' as p;
 
@@ -316,7 +317,8 @@ class FileIndex {
     await _setEntry(key, null);
   }
 
-  Future<void> removeFolder(String path) async {
+  Future<List<PassyFsMeta>> removeFolder(String path) async {
+    List<PassyFsMeta> result = [];
     if (path.isNotEmpty) {
       if (path[path.length - 1] != '/') path = path + '/';
     } else {
@@ -344,6 +346,7 @@ class FileIndex {
           decrypt(entrySplit[2], encrypter: _encrypter, iv: iv),
           recursive: true))!;
       if (meta.virtualPath.startsWith(path)) {
+        result.add(meta);
         skipLine(raf, lineDelimiter: '\n');
         return null;
       }
@@ -355,9 +358,11 @@ class FileIndex {
     await _file.delete();
     await tempFile.copy(_file.absolute.path);
     await tempFile.delete();
+    return result;
   }
 
-  Future<void> renameFile(String key, {required String name}) async {
+  Future<void> _transformMeta(String key,
+      {required PassyFsMeta Function(PassyFsMeta meta) transform}) async {
     File tempFile;
     {
       String tempPath = (Directory.systemTemp).path +
@@ -381,7 +386,7 @@ class FileIndex {
                 encrypter: _encrypter, iv: IV.fromBase64(entrySplit[0])),
             recursive: true));
         if (meta == null) return true;
-        meta.name = name;
+        meta = transform(meta);
         await tempRaf.writeString(_encodeEntryForSaving(meta));
         return null;
       }
@@ -393,6 +398,21 @@ class FileIndex {
     await _file.delete();
     await tempFile.copy(_file.absolute.path);
     await tempFile.delete();
+  }
+
+  Future<void> renameFile(String key, {required String name}) async {
+    return _transformMeta(key, transform: (meta) {
+      meta.name = name;
+      return meta;
+    });
+  }
+
+  Future<void> changeFileType(String key, {required PassyFileType type}) async {
+    return _transformMeta(key, transform: (meta) {
+      if (meta is! FileMeta) return meta;
+      meta.type = type;
+      return meta;
+    });
   }
 
   Future<void> setKey(Key key, {Encrypter? oldEncrypter}) async {
