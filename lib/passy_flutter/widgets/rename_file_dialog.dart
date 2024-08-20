@@ -46,7 +46,10 @@ class _RenameFileDialog extends State<RenameFileDialog> {
             onChanged: _onNameChanged,
             onFieldSubmitted: (value) => Navigator.pop(
                 context,
-                (_value == '' || _value == '.' || _value == '..')
+                (_value.isEmpty ||
+                        _value == '' ||
+                        _value == '.' ||
+                        _value == '..')
                     ? null
                     : _value),
           )),
@@ -65,8 +68,14 @@ class _RenameFileDialog extends State<RenameFileDialog> {
                 FloatingActionButton(
                   heroTag: null,
                   tooltip: localizations.rename,
-                  onPressed: () =>
-                      Navigator.pop(context, _value.isEmpty ? null : _value),
+                  onPressed: () => Navigator.pop(
+                      context,
+                      (_value.isEmpty ||
+                              _value == '' ||
+                              _value == '.' ||
+                              _value == '..')
+                          ? null
+                          : _value),
                   child: const Icon(Icons.check_rounded),
                 ),
               ),
