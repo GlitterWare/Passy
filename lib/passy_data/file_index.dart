@@ -256,7 +256,10 @@ class FileIndex {
           encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
       PassyFsMeta meta =
           PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
-      if (!(meta.virtualPath.startsWith(path))) return null;
+      if (!(meta.virtualPath.startsWith(path))) {
+        if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
+        return null;
+      }
       _meta[meta.key] = meta;
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
