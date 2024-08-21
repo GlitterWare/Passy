@@ -1637,18 +1637,14 @@ class Synchronization {
             _handleException('Failed to decode history entry:\n$e\n$s`.');
             return;
           }
-          // Check that data is received successfully before deletion
-          if (message.binaryObjects != null && remoteFsMeta != null) {
-            if (message.binaryObjects!.isNotEmpty) {
-              _passyEntries.fileIndex!.removeFile(key);
-            }
-          } else if (remoteHistoryEntry.status == EntryStatus.removed) {
-            _passyEntries.fileIndex!.removeFile(key);
-          }
-          if (message.binaryObjects != null && remoteFsMeta != null) {
+          if (remoteHistoryEntry.status == EntryStatus.removed) {
+            await _passyEntries.fileIndex!.removeFile(key);
+            // Check that data is received successfully before deletion
+          } else if (message.binaryObjects != null && remoteFsMeta != null) {
             if (message.binaryObjects!.isNotEmpty) {
               // Save file
-              _passyEntries.fileIndex!.addBytes(
+              await _passyEntries.fileIndex!.removeFile(key);
+              await _passyEntries.fileIndex!.addBytes(
                   Uint8List.fromList(message.binaryObjects!.values.first),
                   meta: remoteFsMeta);
             }

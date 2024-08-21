@@ -350,11 +350,14 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             } catch (e, s) {
               throw 'Failed to decode history entry:\n$e\n$s`.';
             }
-            passyEntries.fileIndex!.removeFile(key);
-            if (binaryObjects != null && remoteFsMeta != null) {
+            if (remoteHistoryEntry.status == EntryStatus.removed) {
+              await passyEntries.fileIndex!.removeFile(key);
+              // Check that data is received successfully before deletion
+            } else if (binaryObjects != null && remoteFsMeta != null) {
               if (binaryObjects.isNotEmpty) {
                 // Save file
-                passyEntries.fileIndex!.addBytes(
+                await passyEntries.fileIndex!.removeFile(key);
+                await passyEntries.fileIndex!.addBytes(
                     Uint8List.fromList(binaryObjects.values.first),
                     meta: remoteFsMeta);
               }
