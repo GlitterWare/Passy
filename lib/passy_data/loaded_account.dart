@@ -1469,11 +1469,15 @@ class LoadedAccount {
     FileMeta? meta,
     CompressionType compressionType = CompressionType.none,
     String? parent,
+    bool eraseOriginalFile = false,
   }) async {
     if (useIsolate) {
       meta = await compute<FileIndex, FileMeta>(
           (index) => index.addFile(file,
-              meta: meta, compressionType: compressionType, parent: parent),
+              meta: meta,
+              compressionType: compressionType,
+              parent: parent,
+              eraseOriginalFile: eraseOriginalFile),
           _fileIndex);
     } else {
       meta = await _fileIndex.addFile(file, meta: meta, parent: parent);

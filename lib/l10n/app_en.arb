@@ -329,5 +329,7 @@
     "showWindow": "Show window",
     "hideWindow": "Hide window",
     "exitPassy": "Exit Passy",
-    "fileSaved": "File saved"
+    "fileSaved": "File saved",
+    "parentFolder": "Parent folder",
+    "eraseOriginalFile": "Erase original file"
 }

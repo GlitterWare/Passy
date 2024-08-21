@@ -241,6 +241,13 @@ class _FilesScreen extends State<FilesScreen> {
     FilesScreenArgs args =
         ModalRoute.of(context)!.settings.arguments as FilesScreenArgs? ??
             FilesScreenArgs();
+    List<String> pathSplit = args.path.split('/');
+    String parentPath = '/';
+    if (pathSplit.length > 2) {
+      List<String> parentPathSplit = pathSplit.toList();
+      parentPathSplit.removeLast();
+      parentPath = parentPathSplit.join('/');
+    }
     if (_title == null) {
       if (args.path == '/sync') {
         _title = localizations.synchronizedFiles;
@@ -299,6 +306,27 @@ class _FilesScreen extends State<FilesScreen> {
         }
       },
     );
+
+    Widget parentFolderWidget = PassyPadding(ThreeWidgetButton(
+      left: const Padding(
+        padding: EdgeInsets.only(right: 30),
+        child: Icon(Icons.arrow_upward_rounded),
+      ),
+      right: const Icon(Icons.arrow_forward_ios_rounded),
+      onPressed: () {
+        _onOpenFolderPressed(args, parentPath);
+      },
+      center: Column(
+        children: [
+          Align(
+            child: Text(
+              localizations.parentFolder,
+            ),
+            alignment: Alignment.centerLeft,
+          ),
+        ],
+      ),
+    ));
 
     return Scaffold(
       appBar: AppBar(
@@ -375,6 +403,7 @@ class _FilesScreen extends State<FilesScreen> {
                             ),
                             const SizedBox(height: 16),
                             addDropdown,
+                            if (args.path != '/') parentFolderWidget,
                             const Spacer(flex: 7),
                           ],
                   ),
@@ -382,7 +411,10 @@ class _FilesScreen extends State<FilesScreen> {
               ],
             )
           : FileButtonListView(
-              topWidgets: [addDropdown],
+              topWidgets: [
+                addDropdown,
+                if (args.path != '/') parentFolderWidget,
+              ],
               files: _files!,
               shouldSort: true,
               onPressed: (file) {

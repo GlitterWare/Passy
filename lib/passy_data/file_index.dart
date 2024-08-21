@@ -283,10 +283,27 @@ class FileIndex {
     FileMeta? meta,
     CompressionType compressionType = CompressionType.none,
     String? parent,
+    bool eraseOriginalFile = false,
   }) async {
     meta ??= await FileMeta.fromFile(file, virtualParent: parent);
-    return await addBytes(await file.readAsBytes(),
+    FileMeta result = await addBytes(await file.readAsBytes(),
         meta: meta, compressionType: compressionType);
+    if (eraseOriginalFile) {
+      if (await file.exists()) {
+        FileStat stat = await file.stat();
+        IOSink sink = file.openWrite(mode: FileMode.write);
+        int curSize = 0;
+        List<int> list =
+            List<int>.filled(stat.size > 67108864 ? 67108864 : stat.size, 0);
+        while (curSize < stat.size) {
+          sink.add(list);
+          curSize += 67108864;
+        }
+        await sink.flush();
+        await file.delete();
+      }
+    }
+    return result;
   }
 
   Future<Uint8List> readAsBytes(String key) {

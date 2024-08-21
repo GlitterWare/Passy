@@ -56,6 +56,7 @@ class _AddFileScreen extends State<AddFileScreen> {
   GlobalKey _previewKey = GlobalKey();
   Widget? _preview;
   CompressionType _compressionType = CompressionType.none;
+  bool _eraseFile = false;
 
   Future<void> _load(BuildContext context, AddFileScreenArgs args) async {
     FileMeta newFileMeta =
@@ -122,7 +123,8 @@ class _AddFileScreen extends State<AddFileScreen> {
       key = (await _account.addFile(args.file,
               useIsolate: true,
               meta: _fileMeta,
-              compressionType: _compressionType))
+              compressionType: _compressionType,
+              eraseOriginalFile: _eraseFile))
           .key;
     } catch (e, s) {
       showSnackBar(
@@ -296,6 +298,21 @@ class _AddFileScreen extends State<AddFileScreen> {
                           if (value == null) return;
                           setState(() => _compressionType = value);
                         },
+                      )),
+                      PassyPadding(ThreeWidgetButton(
+                        center: Text(localizations.eraseOriginalFile),
+                        left: const Padding(
+                          padding: EdgeInsets.only(right: 30),
+                          child: Icon(Icons.hide_source),
+                        ),
+                        right: Switch(
+                          activeColor: Colors.greenAccent,
+                          value: _eraseFile,
+                          onChanged: (value) =>
+                              setState(() => _eraseFile = value),
+                        ),
+                        onPressed: () =>
+                            setState(() => _eraseFile = !_eraseFile),
                       )),
                       Text.rich(
                         TextSpan(
