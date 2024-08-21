@@ -77,6 +77,15 @@ class PassyAboutDialog extends StatelessWidget {
               'https://github.com/GlitterWare/Passy',
             ),
           )),
+          PassyPadding(ThreeWidgetButton(
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.notes),
+            ),
+            center: const Text('Licenses'),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => showLicensePage(context: context),
+          )),
         ],
       ),
     );
