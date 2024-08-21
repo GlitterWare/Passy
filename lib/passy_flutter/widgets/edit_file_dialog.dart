@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class EditFileDialogResponse {
@@ -114,10 +115,7 @@ class _EditFileDialog extends State<EditFileDialog> {
                   heroTag: null,
                   tooltip: localizations.fileType,
                   onPressed: () {
-                    if (_name.isEmpty ||
-                        _name == '' ||
-                        _name == '.' ||
-                        _name == '..') {
+                    if (prohibitedFileNames.contains(_name)) {
                       Navigator.pop(context);
                       return;
                     }
