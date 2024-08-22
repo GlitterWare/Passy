@@ -1,8 +1,8 @@
 -dontwarn dalvik.system.VMStack
--dontwarn java.lang.ProcessHandle
--dontwarn java.lang.management.ManagementFactory
--dontwarn java.lang.management.RuntimeMXBean
--dontwarn javax.naming.InitialContext
--dontwarn javax.naming.NameNotFoundException
--dontwarn javax.naming.NamingException
+-dontwarn java.lang.**
+-dontwarn javax.naming.**
 -dontwarn sun.reflect.Reflection
+
+-keepnames interface org.tinylog.**
+-keepnames class * implements org.tinylog.**
+-keepclassmembers class * implements org.tinylog.** { <init>(...); }

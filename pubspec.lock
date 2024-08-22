@@ -525,11 +525,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "16a37d2a6fee8054547d59f0adb27bbafbf5cb08"
-      resolved-ref: "16a37d2a6fee8054547d59f0adb27bbafbf5cb08"
-      url: "https://github.com/GlitterWare/flutter_autofill_service.git"
+      ref: f49e062c0eab85170e26712b2ba438b5f713a2b7
+      resolved-ref: f49e062c0eab85170e26712b2ba438b5f713a2b7
+      url: "https://github.com/kee-org/flutter_autofill_service"
     source: git
-    version: "0.18.1"
+    version: "0.19.0"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -1483,10 +1483,10 @@ packages:
     dependency: transitive
     description:
       name: universal_platform
-      sha256: d315be0f6641898b280ffa34e2ddb14f3d12b1a37882557869646e0cc363d0cc
+      sha256: "64e16458a0ea9b99260ceb5467a214c1f298d647c659af1bff6d3bf82536b1ec"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0+1"
+    version: "1.1.0"
   uri_parser:
     dependency: transitive
     description:

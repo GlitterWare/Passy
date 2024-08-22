@@ -14,6 +14,10 @@ subprojects {
             project.android {
                 if (project.toString() == "project ':dargon2_flutter_mobile'" || project.toString() == "project ':flutter_secure_screen'") {
                     compileSdkVersion 34
+
+                    defaultConfig {
+                        minSdkVersion 29
+                    }
                 }
                 if (namespace == null) {
                     namespace project.group
