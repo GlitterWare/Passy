@@ -54,7 +54,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
           decoration: InputDecoration(labelText: localizations.type),
           onChanged: (value) {
             if (value == null) return;
-            dynamic type = value as FieldType;
+            dynamic type = value;
             bool obscured;
             if (type == FieldType.password) {
               obscured = true;
