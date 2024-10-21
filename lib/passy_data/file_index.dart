@@ -186,6 +186,7 @@ class FileIndex {
     }
     RandomAccessFile raf = await _file.open();
     RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
+    await tempRaf.lock();
     bool isEntrySet = false;
     void onEOF() {
       if (isEntrySet) return;
@@ -218,6 +219,7 @@ class FileIndex {
           return null;
         }
         await raf.close();
+        await tempRaf.unlock();
         await tempRaf.close();
         await tempFile.delete();
         throw 'Matching key found: duplicate files not allowed.';
@@ -230,6 +232,7 @@ class FileIndex {
       List<String> entrySplit = _entry.split(',');
       if (fileHash == entrySplit[1]) {
         await raf.close();
+        await tempRaf.unlock();
         await tempRaf.close();
         await tempFile.delete();
         throw 'Matching file path found: duplicate paths not allowed.';
@@ -239,6 +242,7 @@ class FileIndex {
     });
     onEOF();
     await raf.close();
+    await tempRaf.unlock();
     await tempRaf.close();
     await _file.delete();
     await tempFile.copy(_file.absolute.path);
@@ -377,6 +381,7 @@ class FileIndex {
     }
     RandomAccessFile raf = await _file.open();
     RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
+    await tempRaf.lock();
 
     await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (key, eofReached) async {
@@ -397,6 +402,7 @@ class FileIndex {
       return null;
     });
     await raf.close();
+    await tempRaf.unlock();
     await tempRaf.close();
     await _file.delete();
     await tempFile.copy(_file.absolute.path);
@@ -416,6 +422,7 @@ class FileIndex {
     }
     RandomAccessFile raf = await _file.open();
     RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
+    await tempRaf.lock();
 
     await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
@@ -433,6 +440,7 @@ class FileIndex {
           meta = transform(meta);
         } catch (_) {
           await raf.close();
+          await tempRaf.unlock();
           await tempRaf.close();
           await tempFile.delete();
           rethrow;
@@ -444,6 +452,7 @@ class FileIndex {
       return null;
     });
     await raf.close();
+    await tempRaf.unlock();
     await tempRaf.close();
     await _file.delete();
     await tempFile.copy(_file.absolute.path);
@@ -533,6 +542,7 @@ class FileIndex {
     }
     RandomAccessFile raf = await _file.open();
     RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
+    await tempRaf.lock();
     List<String> keys = [];
 
     await processLinesAsync(raf, lineDelimiter: ',',
@@ -550,6 +560,7 @@ class FileIndex {
       return null;
     });
     await raf.close();
+    await tempRaf.unlock();
     await tempRaf.close();
     await _file.delete();
     await tempFile.copy(_file.absolute.path);
@@ -585,6 +596,7 @@ class FileIndex {
     }
     const int _tagIndex = 2;
     RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await _tempRaf.lock();
     await processLinesAsync(_raf, onLine: (entry, eofReached) async {
       if (eofReached) return true;
       List<String> _decoded = entry.split(',');
@@ -610,6 +622,7 @@ class FileIndex {
       return null;
     });
     await _raf.close();
+    await _tempRaf.unlock();
     await _tempRaf.close();
     await _file.delete();
     await _tempFile.copy(_file.absolute.path);

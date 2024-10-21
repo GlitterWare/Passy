@@ -116,6 +116,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     }
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await _tempRaf.lock();
 
     await processLinesAsync(_raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
@@ -131,6 +132,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       return null;
     });
     await _raf.close();
+    await _tempRaf.unlock();
     await _tempRaf.close();
     await _file.delete();
     await _tempFile.copy(_file.absolute.path);
@@ -240,6 +242,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     }
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await _tempRaf.lock();
     bool _isEntrySet = false;
     void _onEOF() {
       if (_isEntrySet) return;
@@ -271,6 +274,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     });
     _onEOF();
     await _raf.close();
+    await _tempRaf.unlock();
     await _tempRaf.close();
     await _file.delete();
     await _tempFile.copy(_file.absolute.path);
@@ -288,6 +292,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     }
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await _tempRaf.lock();
     void _onEOF() {
       for (T? entry in entries.values) {
         if (entry == null) continue;
@@ -319,6 +324,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     });
     _onEOF();
     await _raf.close();
+    await _tempRaf.unlock();
     await _tempRaf.close();
     await _file.delete();
     await _tempFile.copy(_file.absolute.path);
@@ -330,8 +336,11 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     if (!await file.exists()) await file.create(recursive: true);
     RandomAccessFile _raf = await _file.open();
     RandomAccessFile rafExport = await file.open(mode: FileMode.write);
+    await rafExport.lock();
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
       await _raf.close();
+      await rafExport.unlock();
+      await rafExport.close();
       return;
     }
     if (annotation != null) {
@@ -349,6 +358,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       return null;
     });
     await _raf.close();
+    await rafExport.unlock();
     await rafExport.close();
   }
 
@@ -396,6 +406,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     }
     int _tagIndex = T.toString() == 'Note' ? 4 : 3;
     RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
+    await _tempRaf.lock();
     await processLinesAsync(_raf, onLine: (entry, eofReached) async {
       if (eofReached) return true;
       List<String> _decoded = entry.split(',');
@@ -421,6 +432,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
       return null;
     });
     await _raf.close();
+    await _tempRaf.unlock();
     await _tempRaf.close();
     await _file.delete();
     await _tempFile.copy(_file.absolute.path);
