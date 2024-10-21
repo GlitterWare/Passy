@@ -18,6 +18,7 @@ class FileIndex {
   final Directory _saveDir;
   Key _key;
   Encrypter _encrypter;
+  final List<String> _vPaths = [];
 
   List<String> get tags {
     List<String> _tags = [];
@@ -47,6 +48,14 @@ class FileIndex {
     return _tags;
   }
 
+  void _loadIndex() {
+    Map<String, PassyFsMeta> meta = metadataSync;
+    for (PassyFsMeta entry in meta.values) {
+      if (entry is! FileMeta) continue;
+      _vPaths.add(entry.virtualPath);
+    }
+  }
+
   FileIndex({
     required File file,
     required Directory saveDir,
@@ -56,6 +65,7 @@ class FileIndex {
         _key = key,
         _encrypter = Encrypter(AES(key)) {
     if (!_file.existsSync()) _file.createSync(recursive: true);
+    _loadIndex();
   }
 
   Map<String, PassyFsMeta> get metadataSync {
@@ -182,6 +192,7 @@ class FileIndex {
       if (entry == null) return;
       tempRaf.writeStringSync(_encodeEntryForSaving(entry));
       isEntrySet = true;
+      _vPaths.add(entry.virtualPath);
     }
 
     await processLinesAsync(raf, lineDelimiter: ',',
@@ -192,10 +203,21 @@ class FileIndex {
       }
       if (_key == key) {
         if (entry == null) {
-          skipLine(raf, lineDelimiter: '\n', onEOF: onEOF);
+          String? _entry = readLine(raf, lineDelimiter: '\n', onEOF: onEOF);
+          if (_entry == null) {
+            onEOF();
+            return true;
+          }
+          List<String> decoded = _entry.split(',');
+          String decrypted = decrypt(decoded[2],
+              encrypter: _encrypter, iv: IV.fromBase64(decoded[0]));
+          PassyFsMeta meta =
+              PassyFsMeta.fromCSV(csvDecode(decrypted, recursive: true))!;
+          _vPaths.remove(meta.virtualPath);
           isEntrySet = true;
           return null;
         }
+        await raf.close();
         await tempRaf.close();
         await tempFile.delete();
         throw 'Matching key found: duplicate files not allowed.';
@@ -207,6 +229,7 @@ class FileIndex {
       }
       List<String> entrySplit = _entry.split(',');
       if (fileHash == entrySplit[1]) {
+        await raf.close();
         await tempRaf.close();
         await tempFile.delete();
         throw 'Matching file path found: duplicate paths not allowed.';
@@ -406,7 +429,14 @@ class FileIndex {
                 encrypter: _encrypter, iv: IV.fromBase64(entrySplit[0])),
             recursive: true));
         if (meta == null) return true;
-        meta = transform(meta);
+        try {
+          meta = transform(meta);
+        } catch (_) {
+          await raf.close();
+          await tempRaf.close();
+          await tempFile.delete();
+          rethrow;
+        }
         await tempRaf.writeString(_encodeEntryForSaving(meta));
         return null;
       }
@@ -422,8 +452,63 @@ class FileIndex {
 
   Future<void> renameFile(String key, {required String name}) async {
     return _transformMeta(key, transform: (meta) {
-      meta.name = name;
-      return meta;
+      List<String> vPathSplit = meta.virtualPath.split('/');
+      vPathSplit.removeLast();
+      vPathSplit.add(name);
+      String newVPath = vPathSplit.join('/');
+      if (_vPaths.contains(newVPath)) {
+        throw 'Matching file path found: duplicate paths not allowed.';
+      }
+      PassyFsMeta result;
+      if (meta is FileMeta) {
+        result = FileMeta(
+          key: meta.key,
+          synchronized: meta.synchronized,
+          tags: meta.tags,
+          name: name,
+          virtualPath: newVPath,
+          path: meta.path,
+          changed: meta.changed,
+          modified: meta.modified,
+          accessed: meta.accessed,
+          size: meta.size,
+          type: meta.type,
+        );
+      } else {
+        throw 'Unknown FS metadata type: ${meta.runtimeType}';
+      }
+      _vPaths.remove(meta.virtualPath);
+      _vPaths.add(newVPath);
+      return result;
+    });
+  }
+
+  Future<void> moveFile(String key, {required String path}) async {
+    if (_vPaths.contains(path)) {
+      throw 'Matching file path found: duplicate paths not allowed.';
+    }
+    return _transformMeta(key, transform: (meta) {
+      PassyFsMeta result;
+      if (meta is FileMeta) {
+        result = FileMeta(
+          key: meta.key,
+          synchronized: meta.synchronized,
+          tags: meta.tags,
+          name: meta.name,
+          virtualPath: path,
+          path: meta.path,
+          changed: meta.changed,
+          modified: meta.modified,
+          accessed: meta.accessed,
+          size: meta.size,
+          type: meta.type,
+        );
+      } else {
+        throw 'Unknown FS metadata type: ${meta.runtimeType}';
+      }
+      _vPaths.remove(meta.virtualPath);
+      _vPaths.add(path);
+      return result;
     });
   }
 

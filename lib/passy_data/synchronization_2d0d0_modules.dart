@@ -150,6 +150,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             await Future.wait([
               history.reload(),
               favorites.reload(),
+              fileSyncHistory.reload(),
             ]);
             Map<String, dynamic> historyJson = history.value.toJson();
             Map<String, dynamic> favoritesJson = favorites.value.toJson();

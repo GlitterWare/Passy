@@ -1545,6 +1545,20 @@ class LoadedAccount {
     }
   }
 
+  Future<void> moveFile(String key, {required String path}) async {
+    await _fileIndex.moveFile(key, path: path);
+    if (_fileSyncHistory.value.files.containsKey(key)) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[key] = EntryEvent(
+        key,
+        status:
+            path.startsWith('/sync/') ? EntryStatus.alive : EntryStatus.removed,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+  }
+
   Future<void> changeFileType(String key, {required PassyFileType type}) async {
     await _fileIndex.changeFileType(key, type: type);
     if (_fileSyncHistory.value.files.containsKey(key)) {
