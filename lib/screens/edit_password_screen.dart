@@ -227,13 +227,18 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                                     .highlightContentSecondaryColor),
                             child: PassyPadding(Row(
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 5),
-                                  child: Icon(Icons.security),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Icon(Icons.security,
+                                      color: PassyTheme.of(context)
+                                          .highlightContentTextColor),
                                 ),
                                 Padding(
                                     padding: const EdgeInsets.only(left: 15),
                                     child: Text(
+                                        style: TextStyle(
+                                            color: PassyTheme.of(context)
+                                                .highlightContentTextColor),
                                         localizations.twoFactorAuthentication)),
                               ],
                             ))));
