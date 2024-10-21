@@ -28,6 +28,7 @@ enum _ExportType { passy, csv }
 
 class _ExportScreen extends State<ExportScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  late FormattedTextParser formattedTextParser;
 
   Future<bool?> _showExportWarningDialog() {
     return showDialog<bool>(
@@ -45,15 +46,17 @@ class _ExportScreen extends State<ExportScreen> {
               onPressed: () => Navigator.pop(context, false),
               child: Text(
                 localizations.cancel,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
+                style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor),
               )),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text(
                 localizations.confirm,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
+                style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor),
               )),
         ],
       ),
@@ -106,20 +109,19 @@ class _ExportScreen extends State<ExportScreen> {
           break;
       }
       showSnackBar(
-          message: localizations.exportSaved,
-          icon: const Icon(Icons.ios_share_rounded,
-              color: PassyTheme.darkContentColor));
+        message: localizations.exportSaved,
+        icon: const Icon(Icons.ios_share_rounded),
+      );
     } catch (e, s) {
       if (e is FileSystemException) {
         showSnackBar(
-            message: localizations.accessDeniedTryAnotherFolder,
-            icon: const Icon(Icons.ios_share_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.accessDeniedTryAnotherFolder,
+          icon: const Icon(Icons.ios_share_rounded),
+        );
       } else {
         showSnackBar(
           message: localizations.couldNotExport,
-          icon: const Icon(Icons.ios_share_rounded,
-              color: PassyTheme.darkContentColor),
+          icon: const Icon(Icons.ios_share_rounded),
           action: SnackBarAction(
             label: localizations.details,
             onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -130,6 +132,12 @@ class _ExportScreen extends State<ExportScreen> {
     }
     Future.delayed(const Duration(seconds: 2))
         .then((value) => UnlockScreen.shouldLockScreen = true);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
   }
 
   @override

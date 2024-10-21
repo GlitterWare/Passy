@@ -64,10 +64,10 @@ class _AttachmentsListView extends State<AttachmentsListView> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: _attachments == null
-          ? const [
+          ? [
               Center(
                 child: CircularProgressIndicator(
-                  color: PassyTheme.lightContentColor,
+                  color: PassyTheme.of(context).contentTextColor,
                 ),
               ),
             ]

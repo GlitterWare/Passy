@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PasswordButton extends StatelessWidget {
   final Widget? leftWidget;
@@ -27,7 +28,15 @@ class PasswordButton extends StatelessWidget {
           left: Padding(
             padding: const EdgeInsets.only(right: 30),
             child: password.websites[0] == ''
-                ? logoCircle50White
+                ? SvgPicture.asset(
+                    logoCircleSvg,
+                    colorFilter: ColorFilter.mode(
+                        PassyTheme.of(context)
+                            .highlightContentColor
+                            .withAlpha(180),
+                        BlendMode.srcIn),
+                    width: 50,
+                  )
                 : FavIconImage(address: password.websites[0]),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),

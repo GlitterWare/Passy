@@ -3,6 +3,7 @@ import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/common/common.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class PaymentCardButton extends StatelessWidget {
   final PaymentCardMeta paymentCard;
@@ -29,12 +30,19 @@ class PaymentCardButton extends StatelessWidget {
         children: [
           InkWell(
             borderRadius: const BorderRadius.all(Radius.circular(12)),
+            splashColor: PassyTheme.of(context).accentContentColor,
             onTap: onPressed,
             child: ClipRect(
               child: Align(
                 heightFactor: 0.857,
                 widthFactor: 0.917,
                 child: CreditCardWidget(
+                  frontCardBorder: Border.all(
+                      width: 10,
+                      color: PassyTheme.of(context)
+                          .accentContentColor
+                          .withAlpha(100)),
+                  textColor: PassyTheme.of(context).contentTextColor,
                   glassmorphismConfig: Glassmorphism.defaultConfig(),
                   width: 350,
                   height: 200,

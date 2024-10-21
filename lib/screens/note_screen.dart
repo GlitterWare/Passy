@@ -44,8 +44,9 @@ class _NoteScreen extends State<NoteScreen> {
               TextButton(
                 child: Text(
                   localizations.cancel,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -116,19 +117,15 @@ class _NoteScreen extends State<NoteScreen> {
           if (isFavorite) {
             await _account.removeFavoriteNote(_note!.key);
             showSnackBar(
-                message: localizations.removedFromFavorites,
-                icon: const Icon(
-                  Icons.star_outline_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.removedFromFavorites,
+              icon: const Icon(Icons.star_outline_rounded),
+            );
           } else {
             await _account.addFavoriteNote(_note!.key);
             showSnackBar(
-                message: localizations.addedToFavorites,
-                icon: const Icon(
-                  Icons.star_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.addedToFavorites,
+              icon: const Icon(Icons.star_rounded),
+            );
           }
           setState(() {});
         },
@@ -137,8 +134,8 @@ class _NoteScreen extends State<NoteScreen> {
         Center(
           child: Padding(
             padding: EdgeInsets.only(
-                top: PassyTheme.passyPadding.top / 2,
-                bottom: PassyTheme.passyPadding.bottom / 2),
+                top: PassyTheme.of(context).passyPadding.top / 2,
+                bottom: PassyTheme.of(context).passyPadding.bottom / 2),
             child: !_tagsLoaded
                 ? const CircularProgressIndicator()
                 : EntryTagList(
@@ -159,8 +156,7 @@ class _NoteScreen extends State<NoteScreen> {
                         Navigator.pop(context);
                         showSnackBar(
                           message: localizations.somethingWentWrong,
-                          icon: const Icon(Icons.error_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.error_outline_rounded),
                           action: SnackBarAction(
                             label: localizations.details,
                             onPressed: () => Navigator.pushNamed(
@@ -222,13 +218,16 @@ class _NoteScreen extends State<NoteScreen> {
         if (_note!.isMarkdown)
           PassyPadding(Text(
             localizations.note,
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            style: TextStyle(
+                color: PassyTheme.of(context).highlightContentSecondaryColor),
           )),
         if (_note!.isMarkdown)
           Padding(
-            padding: EdgeInsets.fromLTRB(20, PassyTheme.passyPadding.top,
-                PassyTheme.passyPadding.right, PassyTheme.passyPadding.bottom),
+            padding: EdgeInsets.fromLTRB(
+                20,
+                PassyTheme.of(context).passyPadding.top,
+                PassyTheme.of(context).passyPadding.right,
+                PassyTheme.of(context).passyPadding.bottom),
             child: PassyMarkdownBody(data: _note!.note),
           ),
       ]),

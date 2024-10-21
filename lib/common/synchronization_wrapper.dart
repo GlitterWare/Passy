@@ -91,11 +91,10 @@ class SynchronizationWrapper {
                   '${localizations.entriesAdded}: ${report.entriesAdded}\n${localizations.entriesRemoved}: ${report.entriesRemoved}\n${localizations.entriesChanged}: ${report.entriesChanged}'),
               actions: [
                 TextButton(
-                  child: Text(
-                    localizations.details,
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor),
-                  ),
+                  child: Text(localizations.details,
+                      style: TextStyle(
+                          color: PassyTheme.of(_context)
+                              .highlightContentSecondaryColor)),
                   onPressed: () => Navigator.pushNamed(
                       navigatorKey.currentContext!, SyncDetailsScreen.routeName,
                       arguments: SyncDetailsScreenArgs(
@@ -129,11 +128,10 @@ class SynchronizationWrapper {
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text(
-                    localizations.close,
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor),
-                  ),
+                  child: Text(localizations.close,
+                      style: TextStyle(
+                          color: PassyTheme.of(_context)
+                              .highlightContentSecondaryColor)),
                 ),
               ],
             ));
@@ -144,8 +142,7 @@ class SynchronizationWrapper {
         .pushNamed(LogScreen.routeName, arguments: log);
     showSnackBar(
         message: localizations.syncError,
-        icon: const Icon(Icons.sync_problem_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.sync_problem_rounded),
         action:
             SnackBarAction(label: localizations.details, onPressed: _showLog));
   }
@@ -161,8 +158,7 @@ class SynchronizationWrapper {
     } catch (e) {
       showSnackBar(
         message: localizations.invalidAddressFormat,
-        icon: const Icon(Icons.sync_problem_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.sync_problem_rounded),
       );
       return;
     }
@@ -180,8 +176,7 @@ class SynchronizationWrapper {
     _sync!.connect(_hostAddress).onError((error, stackTrace) {
       showSnackBar(
         message: localizations.connectionFailed,
-        icon: const Icon(Icons.sync_problem_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.sync_problem_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(_context, LogScreen.routeName,
@@ -225,10 +220,11 @@ class SynchronizationWrapper {
                     QrImageView(
                       data: value.toString(),
                       eyeStyle: QrEyeStyle(
-                          eyeShape: QrEyeShape.square, color: Colors.blue[50]),
+                          eyeShape: QrEyeShape.square,
+                          color: PassyTheme.of(_context).contentTextColor),
                       dataModuleStyle: QrDataModuleStyle(
                           dataModuleShape: QrDataModuleShape.square,
-                          color: Colors.blue[50]),
+                          color: PassyTheme.of(_context).contentTextColor),
                     ),
                     Expanded(
                       child: Center(

@@ -148,8 +148,9 @@ class _PasswordsScreen extends State<PasswordsScreen> {
                   Center(
                     child: Padding(
                       padding: EdgeInsets.only(
-                          top: PassyTheme.passyPadding.top / 2,
-                          bottom: PassyTheme.passyPadding.bottom / 2),
+                          top: PassyTheme.of(context).passyPadding.top / 2,
+                          bottom:
+                              PassyTheme.of(context).passyPadding.bottom / 2),
                       child: EntryTagList(
                         notSelected: _tags,
                         onAdded: (tag) => setState(() {

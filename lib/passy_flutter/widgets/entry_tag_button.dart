@@ -3,7 +3,7 @@ import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class EntryTagButton extends StatelessWidget {
   final String tag;
-  final Color color;
+  final Color? color;
   final bool isSelected;
   final void Function()? onPressed;
   final void Function()? onSecondary;
@@ -11,7 +11,7 @@ class EntryTagButton extends StatelessWidget {
   const EntryTagButton(
     this.tag, {
     super.key,
-    this.color = PassyTheme.lightContentColor,
+    this.color,
     this.isSelected = false,
     this.onPressed,
     this.onSecondary,
@@ -25,19 +25,21 @@ class EntryTagButton extends StatelessWidget {
           onLongPress: onSecondary,
           onPressed: onPressed ?? () {},
           style: ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(color),
+            backgroundColor: WidgetStatePropertyAll(
+                color ?? PassyTheme.of(context).highlightContentColor),
           ),
           icon: Icon(isSelected ? Icons.close_rounded : Icons.add_rounded,
-              color: PassyTheme.theme.colorScheme.onPrimary),
+              color: Theme.of(context).colorScheme.onPrimary),
           label: Padding(
             padding: EdgeInsets.only(
-                top: PassyTheme.passyPadding.top / 1.5,
-                bottom: PassyTheme.passyPadding.bottom / 1.5,
-                right: PassyTheme.passyPadding.right),
+                top: PassyTheme.of(context).passyPadding.top / 1.5,
+                bottom: PassyTheme.of(context).passyPadding.bottom / 1.5,
+                right: PassyTheme.of(context).passyPadding.right),
             child: Text(
               tag,
-              style: const TextStyle(
-                  color: PassyTheme.darkContentColor, height: 0.01),
+              style: TextStyle(
+                  color: PassyTheme.of(context).highlightContentTextColor,
+                  height: 0.01),
             ),
           ),
         ));

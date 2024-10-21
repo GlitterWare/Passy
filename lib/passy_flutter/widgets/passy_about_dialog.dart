@@ -26,15 +26,16 @@ class PassyAboutDialog extends StatelessWidget {
             width: 128,
           )),
           const SizedBox(height: 32),
-          const Text.rich(
+          Text.rich(
             TextSpan(
               text: 'Passy ',
-              style: TextStyle(fontFamily: 'FiraCode'),
+              style: const TextStyle(fontFamily: 'FiraCode'),
               children: [
                 TextSpan(
                   text: 'v$passyVersion',
                   style: TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor,
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor,
                   ),
                 )
               ],
@@ -42,13 +43,13 @@ class PassyAboutDialog extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Account version: $accountVersion\nSync version: $syncVersion',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
               fontFamily: 'FiraCode',
-              color: PassyTheme.lightContentSecondaryColor,
+              color: PassyTheme.of(context).highlightContentSecondaryColor,
             ),
           ),
           const SizedBox(height: 24),
@@ -67,8 +68,9 @@ class PassyAboutDialog extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).highlightContentColor,
+                    BlendMode.srcIn),
               ),
             ),
             center: const Text('GitHub'),

@@ -16,8 +16,15 @@ class ConnectScreen extends StatefulWidget {
 
 class _ConnectScreen extends State<ConnectScreen> {
   String _address = '';
+  late FormattedTextParser formattedTextParser;
 
   _ConnectScreen();
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +59,9 @@ class _ConnectScreen extends State<ConnectScreen> {
                 Flexible(
                   child: Padding(
                     padding: EdgeInsets.only(
-                        left: PassyTheme.passyPadding.right,
-                        top: PassyTheme.passyPadding.top,
-                        bottom: PassyTheme.passyPadding.bottom),
+                        left: PassyTheme.of(context).passyPadding.right,
+                        top: PassyTheme.of(context).passyPadding.top,
+                        bottom: PassyTheme.of(context).passyPadding.bottom),
                     child: TextFormField(
                       initialValue: _address,
                       decoration: InputDecoration(
@@ -66,8 +73,8 @@ class _ConnectScreen extends State<ConnectScreen> {
                 ),
                 SizedBox(
                   child: Padding(
-                    padding:
-                        EdgeInsets.only(right: PassyTheme.passyPadding.right),
+                    padding: EdgeInsets.only(
+                        right: PassyTheme.of(context).passyPadding.right),
                     child: FloatingActionButton(
                       tooltip: localizations.connect,
                       onPressed: () => SynchronizationWrapper(context: context)

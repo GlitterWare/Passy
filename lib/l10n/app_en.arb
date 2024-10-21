@@ -331,5 +331,7 @@
     "exitPassy": "Exit Passy",
     "fileSaved": "File saved",
     "parentFolder": "Parent folder",
-    "eraseOriginalFile": "Erase original file"
+    "eraseOriginalFile": "Erase original file",
+    "move": "Move",
+    "moveHere": "Move here"
 }

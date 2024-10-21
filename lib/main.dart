@@ -65,54 +65,20 @@ import 'screens/synchronization_logs_screen.dart';
 import 'screens/unlock_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-final ThemeData theme = ThemeData(
-  fontFamily: 'Roboto',
-  colorScheme: PassyTheme.theme.colorScheme,
-  snackBarTheme: PassyTheme.theme.snackBarTheme,
-  scaffoldBackgroundColor: PassyTheme.theme.scaffoldBackgroundColor,
-  inputDecorationTheme: PassyTheme.theme.inputDecorationTheme,
-  elevatedButtonTheme: PassyTheme.theme.elevatedButtonTheme,
-  textSelectionTheme: PassyTheme.theme.textSelectionTheme,
-  popupMenuTheme: PassyTheme.theme.popupMenuTheme,
-);
+ThemeData _theme = PassyTheme.classicTheme;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
-  runApp(const Passy());
+  runApp(PassyThemeWidget(theme: _theme, child: const Passy()));
 }
 
 @pragma('vm:entry-point')
 void autofillEntryPoint() {
   isAutofill = true;
-  runApp(MaterialApp(
-    title: 'Passy',
-    theme: theme,
-    navigatorKey: navigatorKey,
-    navigatorObservers: [
-      routeObserver,
-    ],
-    routes: {
-      AutofillSplashScreen.routeName: (context) => const AutofillSplashScreen(),
-      EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
-      LogScreen.routeName: (context) => const LogScreen(),
-      LoginScreen.routeName: (context) => const LoginScreen(),
-      NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
-      SearchScreen.routeName: (context) => const SearchScreen(),
-      UnlockScreen.routeName: (context) => const UnlockScreen(),
-    },
-    localizationsDelegates: const [
-      AppLocalizations.delegate, // Add this line
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    // LOCALIZATION TEST
-    //locale: const Locale('it'),
-    supportedLocales: supportedLocales,
-  ));
+  runApp(PassyThemeWidget(theme: _theme, child: const PassyAutofillApp()));
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -130,7 +96,7 @@ class Passy extends StatelessWidget {
     }
     return MaterialApp(
       title: 'Passy',
-      theme: theme,
+      theme: Theme.of(context),
       navigatorKey: navigatorKey,
       navigatorObservers: [
         routeObserver,
@@ -223,6 +189,41 @@ class Passy extends StatelessWidget {
             ),
           ],
         );
+      },
+      localizationsDelegates: const [
+        AppLocalizations.delegate, // Add this line
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      // LOCALIZATION TEST
+      //locale: const Locale('it'),
+      supportedLocales: supportedLocales,
+    );
+  }
+}
+
+class PassyAutofillApp extends StatelessWidget {
+  const PassyAutofillApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Passy',
+      theme: Theme.of(context),
+      navigatorKey: navigatorKey,
+      navigatorObservers: [
+        routeObserver,
+      ],
+      routes: {
+        AutofillSplashScreen.routeName: (context) =>
+            const AutofillSplashScreen(),
+        EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
+        LogScreen.routeName: (context) => const LogScreen(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
+        SearchScreen.routeName: (context) => const SearchScreen(),
+        UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
       localizationsDelegates: const [
         AppLocalizations.delegate, // Add this line

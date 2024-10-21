@@ -152,8 +152,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 if (!data.loadedAccount!.isRSAKeypairLoaded) {
                   showSnackBar(
                     message: localizations.settingUpSynchronization,
-                    icon: const Icon(CupertinoIcons.clock_solid,
-                        color: PassyTheme.darkContentColor),
+                    icon: const Icon(CupertinoIcons.clock_solid),
                   );
                   return;
                 }
@@ -165,8 +164,8 @@ class _SettingsScreen extends State<SettingsScreen> {
               child: WebsafeSvg.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
               ),
             ),
             center: Text(localizations.requestAFeature),

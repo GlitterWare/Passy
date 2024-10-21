@@ -37,8 +37,8 @@ class PasswordButtonListView extends StatelessWidget {
           stateIcon = const Icon(Icons.add, color: Colors.green, size: 28);
           break;
         case SyncEntryState.removed:
-          stateIcon = const Icon(Icons.delete_rounded,
-              color: Colors.red, size: 28);
+          stateIcon =
+              const Icon(Icons.delete_rounded, color: Colors.red, size: 28);
           break;
         case SyncEntryState.modified:
           stateIcon = const Icon(Icons.edit, color: Colors.yellow, size: 28);
@@ -49,10 +49,10 @@ class PasswordButtonListView extends StatelessWidget {
             ? null
             : Padding(
                 padding: EdgeInsets.fromLTRB(
-                  PassyTheme.passyPadding.left,
-                  PassyTheme.passyPadding.top,
-                  PassyTheme.passyPadding.right * 2,
-                  PassyTheme.passyPadding.bottom,
+                  PassyTheme.of(context).passyPadding.left,
+                  PassyTheme.of(context).passyPadding.top,
+                  PassyTheme.of(context).passyPadding.right * 2,
+                  PassyTheme.of(context).passyPadding.bottom,
                 ),
                 child: stateIcon,
               ),

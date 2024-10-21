@@ -9,6 +9,7 @@ class FileButtonListView extends StatelessWidget {
       BuildContext context, FileEntry file)? popupMenuItemBuilder;
   final Widget Function(BuildContext context, FileEntry file)? buttonBuilder;
   final List<Widget>? topWidgets;
+  final List<Widget>? bottomWidgets;
 
   const FileButtonListView({
     Key? key,
@@ -18,43 +19,37 @@ class FileButtonListView extends StatelessWidget {
     this.popupMenuItemBuilder,
     this.buttonBuilder,
     this.topWidgets,
+    this.bottomWidgets,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (shouldSort) PassySort.sortFiles(files);
-    return ListView(
-      shrinkWrap: true,
+    return Column(
       children: [
         if (topWidgets != null) ...topWidgets!,
         for (FileEntry file in files)
           Row(
             children: [
               Expanded(
-                  child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          PassyTheme.passyPadding.left,
-                          PassyTheme.passyPadding.top,
-                          0,
-                          PassyTheme.passyPadding.bottom),
-                      child: FileButton(
-                        file: file,
-                        onPressed:
-                            onPressed == null ? null : () => onPressed!(file),
-                        popupMenuItemBuilder: popupMenuItemBuilder == null
-                            ? null
-                            : (context) => popupMenuItemBuilder!(context, file),
-                      ))),
+                  child: PassyPadding(FileButton(
+                file: file,
+                onPressed: onPressed == null ? null : () => onPressed!(file),
+                popupMenuItemBuilder: popupMenuItemBuilder == null
+                    ? null
+                    : (context) => popupMenuItemBuilder!(context, file),
+              ))),
               if (buttonBuilder != null)
                 Padding(
                     padding: EdgeInsets.fromLTRB(
                         0,
-                        PassyTheme.passyPadding.top,
-                        PassyTheme.passyPadding.right,
-                        PassyTheme.passyPadding.bottom),
+                        PassyTheme.of(context).passyPadding.top,
+                        PassyTheme.of(context).passyPadding.right,
+                        PassyTheme.of(context).passyPadding.bottom),
                     child: buttonBuilder!.call(context, file)),
             ],
           ),
+        if (bottomWidgets != null) ...bottomWidgets!,
       ],
     );
   }

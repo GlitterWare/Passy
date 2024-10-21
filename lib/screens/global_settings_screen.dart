@@ -72,8 +72,8 @@ class _GlobalSettingsScreen extends State<GlobalSettingsScreen> {
           Center(
               child: Text(
             '${localizations.updatesPopupEnabled}: ${const String.fromEnvironment('UPDATES_POPUP_ENABLED') != 'false'}',
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            style: TextStyle(
+                color: PassyTheme.of(context).highlightContentSecondaryColor),
           )),
         ],
       ),

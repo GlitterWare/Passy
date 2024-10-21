@@ -119,13 +119,11 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         onSave: _onSave,
       ),
       body: ListView(children: [
-        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
-        */
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(labelText: localizations.nickname),
@@ -207,7 +205,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
         CustomFieldsEditor(
           customFields: _customFields,
           shouldSort: true,
-          padding: PassyTheme.passyPadding,
+          padding: PassyTheme.of(context).passyPadding,
           constructCustomField: () async => (await Navigator.pushNamed(
             context,
             EditCustomFieldScreen.routeName,
@@ -221,16 +219,18 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
             labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide:
-                  const BorderSide(color: PassyTheme.darkContentSecondaryColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).contentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),

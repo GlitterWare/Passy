@@ -40,8 +40,8 @@ class SplashScreen extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
               ),
             ),
             center: Text(localizations.download),
@@ -267,22 +267,23 @@ class SplashScreen extends StatelessWidget {
         if (isSnap()) {
           dynamic hasAccess = await _testNativeMessagingHostsInterfaceAccess();
           if (hasAccess != true) {
-            if (context.mounted) {
-              showSnackBar(
-                message: localizations.unableToConnectBrowserExtension,
-                icon: const Icon(Icons.extension_rounded,
-                    color: PassyTheme.lightContentColor),
-                duration: const Duration(seconds: 10),
-                action: SnackBarAction(
-                  textColor: PassyTheme.lightContentColor,
-                  label: localizations.details,
-                  onPressed: () => openUrl(
-                      'https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md#enabling-browser-extension-support'),
-                ),
-                textStyle: const TextStyle(color: PassyTheme.lightContentColor),
-                backgroundColor: const Color.fromRGBO(255, 82, 82, 1),
-              );
-            }
+            showSnackBar(
+              backgroundColor: const Color.fromRGBO(255, 82, 82, 1),
+              message: localizations.unableToConnectBrowserExtension,
+              icon: const Icon(Icons.extension_rounded,
+                  color: Color.fromRGBO(227, 242, 253, 1)),
+              duration: const Duration(seconds: 10),
+              action: SnackBarAction(
+                textColor: const Color.fromRGBO(227, 242, 253, 1),
+                label: localizations.details,
+                onPressed: () => openUrl(
+                    'https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md#enabling-browser-extension-support'),
+              ),
+              textStyle: const TextStyle(
+                color: Color.fromRGBO(227, 242, 253, 1),
+                backgroundColor: Color.fromRGBO(255, 82, 82, 1),
+              ),
+            );
             return;
           }
         }

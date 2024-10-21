@@ -28,45 +28,48 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _password = '';
   String _confirmPassword = '';
   bool isCapsLockEnabled = false;
+  late FormattedTextParser formattedTextParser;
 
   void _addAccount() async {
     if (_username.isEmpty) {
       showSnackBar(
         message: localizations.usernameIsEmpty,
-        icon: const Icon(Icons.person_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.person_rounded),
       );
       return;
     }
     if (_username.length < 2) {
       showSnackBar(
         message: localizations.usernameShorterThan2Letters,
-        icon: const Icon(Icons.person_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.person_rounded),
+      );
+      return;
+    }
+    if (_username.startsWith('__gw__')) {
+      showSnackBar(
+        message: localizations.usernameAlreadyInUse,
+        icon: const Icon(Icons.person_rounded),
       );
       return;
     }
     if (data.hasAccount(_username)) {
       showSnackBar(
         message: localizations.usernameAlreadyInUse,
-        icon: const Icon(Icons.person_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.person_rounded),
       );
       return;
     }
     if (_password.isEmpty) {
       showSnackBar(
         message: localizations.passwordIsEmpty,
-        icon:
-            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.lock_rounded),
       );
       return;
     }
     if (_password != _confirmPassword) {
       showSnackBar(
         message: localizations.passwordsDoNotMatch,
-        icon:
-            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.lock_rounded),
       );
       return;
     }
@@ -79,8 +82,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       if (!mounted) return;
       showSnackBar(
         message: localizations.couldNotAddAccount,
-        icon: const Icon(Icons.error_outline_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.error_outline_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -109,6 +111,12 @@ class _AddAccountScreen extends State<StatefulWidget> {
       return;
     }
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
   }
 
   @override

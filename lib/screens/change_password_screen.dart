@@ -24,44 +24,37 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   bool _advancedSettingsIsExpanded = false;
   bool _doNotReencryptEntries = false;
   bool _isBackupComplete = false;
+  late FormattedTextParser formattedTextParser;
 
   void _onConfirmPressed() async {
     if (!_isBackupComplete) {
       showSnackBar(
-          message: localizations.backupYourAccountBeforeProceeding,
-          icon: const Icon(
-            Icons.save_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.backupYourAccountBeforeProceeding,
+        icon: const Icon(Icons.save_rounded),
+      );
       return;
     }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
         data.getPasswordHash(_account.username)) {
       showSnackBar(
-          message: localizations.incorrectPassword,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.incorrectPassword,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     if (_newPassword.isEmpty) {
       showSnackBar(
-          message: localizations.passwordIsEmpty,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.passwordIsEmpty,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     if (_newPassword != _newPasswordConfirm) {
       showSnackBar(
-          message: localizations.passwordsDoNotMatch,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.passwordsDoNotMatch,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     Navigator.pushNamed(context, SplashScreen.routeName);
@@ -93,6 +86,12 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -117,8 +116,9 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                   placeholders: {
                     'u': TextSpan(
                       text: _account.username,
-                      style: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor,
+                      style: TextStyle(
+                        color: PassyTheme.of(context)
+                            .highlightContentSecondaryColor,
                       ),
                     ),
                   },
@@ -145,15 +145,23 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                              child: PassyPadding(ThreeWidgetButton(
-                                  center: Text(localizations.backup),
-                                  left: const Padding(
-                                    padding: EdgeInsets.only(right: 30),
-                                    child: Icon(Icons.save_rounded),
-                                  ),
-                                  right: const Icon(
-                                      Icons.arrow_forward_ios_rounded),
-                                  onPressed: () => _onBackupPressed()))),
+                              child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: PassyTheme.of(context)
+                                          .passyPadding
+                                          .left,
+                                      bottom: PassyTheme.of(context)
+                                          .passyPadding
+                                          .left),
+                                  child: ThreeWidgetButton(
+                                      center: Text(localizations.backup),
+                                      left: const Padding(
+                                        padding: EdgeInsets.only(right: 30),
+                                        child: Icon(Icons.save_rounded),
+                                      ),
+                                      right: const Icon(
+                                          Icons.arrow_forward_ios_rounded),
+                                      onPressed: () => _onBackupPressed()))),
                           if (_isBackupComplete)
                             const Flexible(
                                 child: PassyPadding(Icon(
@@ -181,20 +189,22 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                   expansionCallback: (panelIndex, isExpanded) =>
                       setState(() => _advancedSettingsIsExpanded = isExpanded),
                   elevation: 0,
-                  dividerColor: PassyTheme.lightContentSecondaryColor,
+                  dividerColor:
+                      PassyTheme.of(context).highlightContentSecondaryColor,
                   children: [
                     ExpansionPanel(
-                        backgroundColor: PassyTheme.darkContentColor,
+                        backgroundColor: PassyTheme.of(context).contentColor,
                         isExpanded: _advancedSettingsIsExpanded,
                         canTapOnHeader: true,
                         headerBuilder: (context, isExpanded) {
                           return Padding(
                               padding: const EdgeInsets.only(left: 8),
                               child: Container(
-                                  decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(32.0)),
-                                      color: PassyTheme.darkPassyPurple),
+                                      color: PassyTheme.of(context)
+                                          .accentContentColor),
                                   child: PassyPadding(Row(
                                     children: [
                                       const Padding(

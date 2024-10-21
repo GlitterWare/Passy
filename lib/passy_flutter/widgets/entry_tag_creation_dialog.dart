@@ -61,30 +61,32 @@ class _EntryTagCreationDialog extends State<EntryTagCreationDialog> {
               height: 200,
               child: Theme(
                 data: ThemeData(
-                  colorScheme: const ColorScheme.dark(
+                  colorScheme: ColorScheme.dark(
                     //primary: Color.fromRGBO(74, 20, 140, 1),
-                    primary: PassyTheme.lightContentColor,
-                    onPrimary: PassyTheme.darkContentColor,
-                    secondary: PassyTheme.lightContentColor,
-                    onSecondary: PassyTheme.lightContentColor,
-                    onSurface: PassyTheme.lightContentColor,
+                    primary: PassyTheme.of(context).highlightContentColor,
+                    onPrimary: PassyTheme.of(context).contentColor,
+                    secondary: PassyTheme.of(context).highlightContentColor,
+                    onSecondary: PassyTheme.of(context).highlightContentColor,
+                    onSurface: PassyTheme.of(context).highlightContentColor,
                   ),
                   inputDecorationTheme: InputDecorationTheme(
-                    floatingLabelStyle: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor),
+                    floatingLabelStyle: TextStyle(
+                        color: PassyTheme.of(context)
+                            .highlightContentSecondaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(100),
-                      borderSide: const BorderSide(
-                        color: PassyTheme.darkContentSecondaryColor,
+                      borderSide: BorderSide(
+                        color: PassyTheme.of(context).contentSecondaryColor,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(100),
-                        borderSide: const BorderSide(
-                            color: PassyTheme.lightContentColor)),
+                        borderSide: BorderSide(
+                            color:
+                                PassyTheme.of(context).highlightContentColor)),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
                   ),
@@ -96,7 +98,7 @@ class _EntryTagCreationDialog extends State<EntryTagCreationDialog> {
                     height: 256,
                     checkPlatformCompatibility: true,
                     emojiViewConfig: ep.EmojiViewConfig(
-                      backgroundColor: PassyTheme.darkContentColor,
+                      backgroundColor: PassyTheme.of(context).contentColor,
                       // Issue: https://github.com/flutter/flutter/issues/28894
                       emojiSizeMax: 28 *
                           (defaultTargetPlatform == TargetPlatform.iOS
@@ -105,13 +107,14 @@ class _EntryTagCreationDialog extends State<EntryTagCreationDialog> {
                     ),
                     swapCategoryAndBottomBar: false,
                     skinToneConfig: const ep.SkinToneConfig(),
-                    categoryViewConfig: const ep.CategoryViewConfig(
-                        backgroundColor: PassyTheme.darkContentColor),
-                    bottomActionBarConfig: const ep.BottomActionBarConfig(
-                        backgroundColor: PassyTheme.darkContentColor),
-                    searchViewConfig: const ep.SearchViewConfig(
-                        buttonIconColor: PassyTheme.lightContentColor,
-                        backgroundColor: PassyTheme.darkContentColor),
+                    categoryViewConfig: ep.CategoryViewConfig(
+                        backgroundColor: PassyTheme.of(context).contentColor),
+                    bottomActionBarConfig: ep.BottomActionBarConfig(
+                        backgroundColor: PassyTheme.of(context).contentColor),
+                    searchViewConfig: ep.SearchViewConfig(
+                        buttonIconColor:
+                            PassyTheme.of(context).highlightContentColor,
+                        backgroundColor: PassyTheme.of(context).contentColor),
                   ),
                 ),
               ),
@@ -125,8 +128,9 @@ class _EntryTagCreationDialog extends State<EntryTagCreationDialog> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(localizations.cancel,
-                        style: const TextStyle(
-                            color: PassyTheme.lightContentSecondaryColor)),
+                        style: TextStyle(
+                            color: PassyTheme.of(context)
+                                .highlightContentSecondaryColor)),
                   ),
                   const SizedBox(width: 8),
                   TextButton(
@@ -134,8 +138,9 @@ class _EntryTagCreationDialog extends State<EntryTagCreationDialog> {
                       Navigator.pop(context, _tag);
                     },
                     child: Text(localizations.create,
-                        style: const TextStyle(
-                            color: PassyTheme.lightContentSecondaryColor)),
+                        style: TextStyle(
+                            color: PassyTheme.of(context)
+                                .highlightContentSecondaryColor)),
                   ),
                 ],
               ),

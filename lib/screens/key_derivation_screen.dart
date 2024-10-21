@@ -31,26 +31,23 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
   bool _isChanged = false;
   bool _advancedSettingsIsExpanded = false;
   bool _isBackupComplete = false;
+  late FormattedTextParser formattedTextParser;
 
   Future<void> _onConfirmPressed() async {
     if (!_isBackupComplete) {
       showSnackBar(
-          message: localizations.backupYourAccountBeforeProceeding,
-          icon: const Icon(
-            Icons.save_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.backupYourAccountBeforeProceeding,
+        icon: const Icon(Icons.save_rounded),
+      );
       return;
     }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
         _account.passwordHash) {
       showSnackBar(
-          message: localizations.incorrectPassword,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.incorrectPassword,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     Navigator.pushNamed(context, SplashScreen.routeName);
@@ -80,6 +77,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
     super.initState();
     _type = _account.keyDerivationType;
     _info = _account.keyDerivationInfo;
+    formattedTextParser = FormattedTextParser(context: context);
   }
 
   @override
@@ -109,8 +107,9 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
               PassyPadding(Text(
                 localizations.keyDerivationWarning1,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
+                style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor),
               )),
               const SizedBox(height: 24),
               PassyPadding(Text.rich(
@@ -188,20 +187,22 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                     expansionCallback: (panelIndex, isExpanded) => setState(
                         () => _advancedSettingsIsExpanded = isExpanded),
                     elevation: 0,
-                    dividerColor: PassyTheme.lightContentSecondaryColor,
+                    dividerColor:
+                        PassyTheme.of(context).highlightContentSecondaryColor,
                     children: [
                       ExpansionPanel(
-                          backgroundColor: PassyTheme.darkContentColor,
+                          backgroundColor: PassyTheme.of(context).contentColor,
                           isExpanded: _advancedSettingsIsExpanded,
                           canTapOnHeader: true,
                           headerBuilder: (context, isExpanded) {
                             return Padding(
                                 padding: const EdgeInsets.only(left: 8),
                                 child: Container(
-                                    decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
+                                    decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
                                             Radius.circular(32.0)),
-                                        color: PassyTheme.darkPassyPurple),
+                                        color: PassyTheme.of(context)
+                                            .accentContentColor),
                                     child: PassyPadding(Row(
                                       children: [
                                         const Padding(
@@ -224,9 +225,9 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                                   localizations
                                       .backupYourAccountBeforeMakingChangesToTheseSettings,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      color: PassyTheme
-                                          .lightContentSecondaryColor),
+                                  style: TextStyle(
+                                      color: PassyTheme.of(context)
+                                          .highlightContentSecondaryColor),
                                 ),
                               ),
                               PassyPadding(TextFormField(
@@ -314,8 +315,9 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                       placeholders: {
                         'u': TextSpan(
                           text: _account.username,
-                          style: const TextStyle(
-                            color: PassyTheme.lightContentSecondaryColor,
+                          style: TextStyle(
+                            color: PassyTheme.of(context)
+                                .highlightContentSecondaryColor,
                           ),
                         ),
                       },

@@ -97,11 +97,9 @@ class _UnlockScreen extends State<UnlockScreen>
       return;
     }
     showSnackBar(
-        message: localizations.incorrectPassword,
-        icon: const Icon(
-          Icons.lock_rounded,
-          color: PassyTheme.darkContentColor,
-        ));
+      message: localizations.incorrectPassword,
+      icon: const Icon(Icons.lock_rounded),
+    );
     setState(() {
       _password = '';
       _passwordController.text = '';

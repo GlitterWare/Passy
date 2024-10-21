@@ -42,6 +42,7 @@ class ConfirmImportScreen extends StatefulWidget {
 
 class _ConfirmImportScreen extends State<ConfirmImportScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  late FormattedTextParser formattedTextParser;
 
   Future<void> _onConfirmPressed(
       BuildContext context, String value, ConfirmImportScreenArgs args) async {
@@ -62,7 +63,7 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
           Navigator.pushReplacementNamed(context, LoginScreen.routeName);
           showSnackBar(
             message: localizations.imported,
-            icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
+            icon: const Icon(Icons.check),
           );
           break;
         case ImportType.kdbx:
@@ -75,7 +76,7 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
               (route) => route.settings.name == ImportScreen.routeName);
           showSnackBar(
             message: localizations.imported,
-            icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
+            icon: const Icon(Icons.check),
           );
           break;
         case ImportType.aegis:
@@ -86,7 +87,7 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
               (route) => route.settings.name == ImportScreen.routeName);
           showSnackBar(
             message: localizations.imported,
-            icon: const Icon(Icons.check, color: PassyTheme.darkContentColor),
+            icon: const Icon(Icons.check),
           );
           break;
       }
@@ -97,8 +98,7 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
       if (e.runtimeType.toString() == 'InvalidCipherTextException') {
         showSnackBar(
           message: localizations.incorrectPassword,
-          icon: const Icon(Icons.download_for_offline_outlined,
-              color: PassyTheme.darkContentColor),
+          icon: const Icon(Icons.download_for_offline_outlined),
           action: SnackBarAction(
             label: localizations.details,
             onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -109,8 +109,7 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
       }
       showSnackBar(
         message: localizations.couldNotImportAccount,
-        icon: const Icon(Icons.download_for_offline_outlined,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.download_for_offline_outlined),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -118,6 +117,12 @@ class _ConfirmImportScreen extends State<ConfirmImportScreen> {
         ),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
   }
 
   @override

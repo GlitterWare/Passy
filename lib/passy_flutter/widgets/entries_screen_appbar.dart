@@ -45,8 +45,7 @@ class EntriesScreenAppBar extends StatelessWidget
             if (!data.loadedAccount!.isRSAKeypairLoaded) {
               showSnackBar(
                 message: localizations.settingUpSynchronization,
-                icon: const Icon(CupertinoIcons.clock_solid,
-                    color: PassyTheme.darkContentColor),
+                icon: const Icon(CupertinoIcons.clock_solid),
               );
               return;
             }

@@ -49,10 +49,10 @@ class NoteButtonListView extends StatelessWidget {
             ? null
             : Padding(
                 padding: EdgeInsets.fromLTRB(
-                  PassyTheme.passyPadding.left,
-                  PassyTheme.passyPadding.top,
-                  PassyTheme.passyPadding.right * 2,
-                  PassyTheme.passyPadding.bottom,
+                  PassyTheme.of(context).passyPadding.left,
+                  PassyTheme.of(context).passyPadding.top,
+                  PassyTheme.of(context).passyPadding.right * 2,
+                  PassyTheme.of(context).passyPadding.bottom,
                 ),
                 child: stateIcon,
               ),

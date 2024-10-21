@@ -157,9 +157,9 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
           )),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              PassyTheme.passyPadding.left,
-              PassyTheme.passyPadding.top,
-              PassyTheme.passyPadding.right,
+              PassyTheme.of(context).passyPadding.left,
+              PassyTheme.of(context).passyPadding.top,
+              PassyTheme.of(context).passyPadding.right,
               0,
             ),
             child: Text(
@@ -169,9 +169,9 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              PassyTheme.passyPadding.left,
+              PassyTheme.of(context).passyPadding.left,
               0,
-              PassyTheme.passyPadding.right,
+              PassyTheme.of(context).passyPadding.right,
               0,
             ),
             child: Slider(
@@ -184,7 +184,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               max: 200.0,
               activeColor: Colors.cyan,
               thumbColor: Colors.cyanAccent,
-              inactiveColor: PassyTheme.darkContentSecondaryColor,
+              inactiveColor: PassyTheme.of(context).contentSecondaryColor,
             ),
           ),
           PassyPadding(SelectableText(

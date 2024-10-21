@@ -30,16 +30,15 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (!testRun) {
       if (_nickname.isEmpty) {
         showSnackBar(
-            message: localizations.nicknameCanNotBeEmpty,
-            icon: const Icon(Icons.desktop_windows_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.nicknameCanNotBeEmpty,
+          icon: const Icon(Icons.desktop_windows_rounded),
+        );
         return;
       }
       if (_account.sync2d0d0ServerInfo.keys.contains(_nickname)) {
         showSnackBar(
             message: localizations.nicknameAlreadyInUse,
-            icon: const Icon(Icons.desktop_windows_rounded,
-                color: PassyTheme.darkContentColor));
+            icon: const Icon(Icons.desktop_windows_rounded));
         return;
       }
     }
@@ -47,24 +46,21 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (address == null) {
       showSnackBar(
         message: localizations.hostAddressIsEmpty,
-        icon: const Icon(Icons.desktop_windows_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.desktop_windows_rounded),
       );
       return;
     }
     if (address.isEmpty) {
       showSnackBar(
         message: localizations.hostAddressIsEmpty,
-        icon: const Icon(Icons.desktop_windows_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.desktop_windows_rounded),
       );
       return;
     }
     if (_port == 0) {
       showSnackBar(
         message: localizations.invalidPortSpecified,
-        icon: const Icon(Icons.numbers_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.numbers_rounded),
       );
       return;
     }
@@ -73,10 +69,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotConnectToServer,
-        icon: const Icon(
-          Icons.cast_rounded,
-          color: PassyTheme.darkContentColor,
-        ),
+        icon: const Icon(Icons.cast_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -90,7 +83,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (testRun) return;
     showSnackBar(
       message: localizations.connecting,
-      icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
+      icon: const Icon(Icons.cast_rounded),
     );
     try {
       await _account.trustServer(Sync2d0d0ServerInfo(
@@ -99,8 +92,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
       if (navigatorKey.currentContext == null) return;
       showSnackBar(
         message: localizations.couldNotConnectToServer,
-        icon:
-            const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.cast_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -116,7 +108,7 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
     if (navigatorKey.currentContext == null) return;
     showSnackBar(
       message: localizations.connectionEstablished,
-      icon: const Icon(Icons.cast_rounded, color: PassyTheme.darkContentColor),
+      icon: const Icon(Icons.cast_rounded),
     );
   }
 
@@ -145,16 +137,16 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
             hasScrollBody: false,
             child: Column(
               children: _address == null
-                  ? const [
-                      Spacer(),
+                  ? [
+                      const Spacer(),
                       Expanded(
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: PassyTheme.lightContentColor,
+                            color: PassyTheme.of(context).contentTextColor,
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ]
                   : [
                       PassyPadding(
@@ -164,9 +156,9 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             children: [
                               TextSpan(
                                 text: localizations.chooseHostAddressAndPort,
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -178,9 +170,12 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                           Flexible(
                             child: Padding(
                               padding: EdgeInsets.only(
-                                  left: PassyTheme.passyPadding.right,
-                                  top: PassyTheme.passyPadding.top,
-                                  bottom: PassyTheme.passyPadding.bottom),
+                                  left:
+                                      PassyTheme.of(context).passyPadding.right,
+                                  top: PassyTheme.of(context).passyPadding.top,
+                                  bottom: PassyTheme.of(context)
+                                      .passyPadding
+                                      .bottom),
                               child: TextFormField(
                                 initialValue: _address,
                                 decoration: InputDecoration(
@@ -193,9 +188,12 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                           Flexible(
                             child: Padding(
                               padding: EdgeInsets.only(
-                                  left: PassyTheme.passyPadding.right,
-                                  top: PassyTheme.passyPadding.top,
-                                  bottom: PassyTheme.passyPadding.bottom),
+                                  left:
+                                      PassyTheme.of(context).passyPadding.right,
+                                  top: PassyTheme.of(context).passyPadding.top,
+                                  bottom: PassyTheme.of(context)
+                                      .passyPadding
+                                      .bottom),
                               child: TextFormField(
                                 initialValue: _port.toString(),
                                 decoration: InputDecoration(
@@ -220,9 +218,9 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             children: [
                               TextSpan(
                                 text: localizations.testConnection,
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -266,9 +264,9 @@ class _ServerConnectScreen extends State<ServerConnectScreen> {
                             children: [
                               TextSpan(
                                 text: localizations.connectToServer,
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),

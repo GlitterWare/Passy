@@ -25,13 +25,19 @@ class FilesScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _FilesScreen();
 }
 
+enum FilesScreenSelectMode {
+  none,
+  file,
+  folder,
+}
+
 class FilesScreenArgs {
   final String path;
-  final bool attach;
+  final FilesScreenSelectMode select;
 
   FilesScreenArgs({
     this.path = '/',
-    this.attach = false,
+    this.select = FilesScreenSelectMode.none,
   });
 }
 
@@ -48,7 +54,8 @@ class _FilesScreen extends State<FilesScreen> {
   String? _title;
   List<FileEntry>? _files;
 
-  Future<List<FileEntry>> listFiles(String path) async {
+  Future<List<FileEntry>> listFiles(FilesScreenArgs args) async {
+    String path = args.path;
     Iterable<PassyFsMeta> filesMeta = (await _account.getFsMetadata()).values;
     List<FileEntry> result = [];
     List<String> folders = [];
@@ -97,33 +104,35 @@ class _FilesScreen extends State<FilesScreen> {
         ));
         continue;
       }
-      FileEntryType type;
-      switch (meta.type) {
-        case PassyFileType.unknown:
-          type = FileEntryType.file;
-          break;
-        case PassyFileType.text:
-          type = FileEntryType.plainText;
-          break;
-        case PassyFileType.markdown:
-          type = FileEntryType.markdown;
-          break;
-        case PassyFileType.photo:
-          type = FileEntryType.photo;
-          break;
-        case PassyFileType.audio:
-          type = FileEntryType.audio;
-          break;
-        case PassyFileType.video:
-          type = FileEntryType.video;
-          break;
+      if (args.select != FilesScreenSelectMode.folder) {
+        FileEntryType type;
+        switch (meta.type) {
+          case PassyFileType.unknown:
+            type = FileEntryType.file;
+            break;
+          case PassyFileType.text:
+            type = FileEntryType.plainText;
+            break;
+          case PassyFileType.markdown:
+            type = FileEntryType.markdown;
+            break;
+          case PassyFileType.photo:
+            type = FileEntryType.photo;
+            break;
+          case PassyFileType.audio:
+            type = FileEntryType.audio;
+            break;
+          case PassyFileType.video:
+            type = FileEntryType.video;
+            break;
+        }
+        result.add(FileEntry(
+          key: meta.key,
+          path: meta.virtualPath,
+          name: meta.name,
+          type: type,
+        ));
       }
-      result.add(FileEntry(
-        key: meta.key,
-        path: meta.virtualPath,
-        name: meta.name,
-        type: type,
-      ));
     }
     if (!namedDirectoriesAdded) {
       String name;
@@ -154,7 +163,7 @@ class _FilesScreen extends State<FilesScreen> {
   void _push(FilesScreenArgs args, BuildContext context, String screenName,
       dynamic screenArgs) {
     if (screenName == PassyFileScreen.routeName) {
-      if (args.attach) {
+      if (args.select == FilesScreenSelectMode.file) {
         FilesScreenResult result =
             FilesScreenResult(key: (screenArgs as PassyFileScreenArgs).key);
         Navigator.pop(context, result);
@@ -163,7 +172,7 @@ class _FilesScreen extends State<FilesScreen> {
     }
     Navigator.pushNamed(context, screenName, arguments: screenArgs)
         .then((value) async {
-      _files = await listFiles(args.path);
+      _files = await listFiles(args);
       if (!mounted) return;
       setState(() {});
 
@@ -175,7 +184,7 @@ class _FilesScreen extends State<FilesScreen> {
           return;
         case AddFileScreen.routeName:
           if (value is! AddFileScreenResult) return;
-          if (args.attach) {
+          if (args.select == FilesScreenSelectMode.file) {
             Navigator.pop(context, FilesScreenResult(key: value.key));
             return;
           }
@@ -232,7 +241,7 @@ class _FilesScreen extends State<FilesScreen> {
       args,
       context,
       FilesScreen.routeName,
-      FilesScreenArgs(path: path, attach: args.attach),
+      FilesScreenArgs(path: path, select: args.select),
     );
   }
 
@@ -257,7 +266,7 @@ class _FilesScreen extends State<FilesScreen> {
         _title ??=
             args.path == '/' ? localizations.files : args.path.split('/').last;
       }
-      listFiles(args.path).then((value) => setState(() => _files = value));
+      listFiles(args).then((value) => setState(() => _files = value));
     }
 
     Widget addDropdown = EnumDropdownButton2<FileEntryType>(
@@ -269,6 +278,15 @@ class _FilesScreen extends State<FilesScreen> {
       isExpanded: true,
       alignment: Alignment.centerRight,
       items: [
+        if (args.select != FilesScreenSelectMode.folder)
+          EnumDropdownButton2Item(
+            value: FileEntryType.plainText,
+            text: Text(
+              localizations.cancel,
+              textAlign: TextAlign.center,
+            ),
+            icon: const Icon(Icons.close),
+          ),
         EnumDropdownButton2Item(
           value: FileEntryType.file,
           text: Text(
@@ -300,8 +318,10 @@ class _FilesScreen extends State<FilesScreen> {
           case FileEntryType.folder:
             _onOpenFolderPressed(args, null);
             return;
-          default:
+          case FileEntryType.file:
             _onAddFilePressed(args);
+            return;
+          default:
             return;
         }
       },
@@ -326,6 +346,28 @@ class _FilesScreen extends State<FilesScreen> {
           ),
         ],
       ),
+    ));
+
+    Widget moveWidget = PassyPadding(ThreeWidgetButton(
+      color: PassyTheme.of(context).highlightContentColor,
+      left: Padding(
+        padding: const EdgeInsets.only(right: 30),
+        child: Icon(
+          Icons.move_down,
+          color: PassyTheme.of(context).highlightContentTextColor,
+        ),
+      ),
+      center: Text(localizations.moveHere,
+          style: TextStyle(
+            color: PassyTheme.of(context).highlightContentTextColor,
+          )),
+      right: Icon(
+        Icons.arrow_forward_ios_rounded,
+        color: PassyTheme.of(context).highlightContentTextColor,
+      ),
+      onPressed: () {
+        Navigator.pop(context, FilesScreenResult(key: args.path));
+      },
     ));
 
     return Scaffold(
@@ -354,15 +396,16 @@ class _FilesScreen extends State<FilesScreen> {
                     ],
                   ),
                 ),
-                PopupMenuItem(
-                  child: Row(
-                    children: [
-                      const PassyPadding(Icon(Icons.file_open_outlined)),
-                      PassyPadding(Text(localizations.file)),
-                    ],
+                if (args.select != FilesScreenSelectMode.folder)
+                  PopupMenuItem(
+                    child: Row(
+                      children: [
+                        const PassyPadding(Icon(Icons.file_open_outlined)),
+                        PassyPadding(Text(localizations.file)),
+                      ],
+                    ),
+                    onTap: () => _onAddFilePressed(args),
                   ),
-                  onTap: () => _onAddFilePressed(args),
-                ),
                 PopupMenuItem(
                   child: Row(
                     children: [
@@ -384,27 +427,31 @@ class _FilesScreen extends State<FilesScreen> {
                   hasScrollBody: false,
                   child: Column(
                     children: _files == null
-                        ? const [
-                            Spacer(),
+                        ? [
+                            const Spacer(),
                             Expanded(
                               child: Center(
                                 child: CircularProgressIndicator(
-                                  color: PassyTheme.lightContentColor,
+                                  color:
+                                      PassyTheme.of(context).contentTextColor,
                                 ),
                               ),
                             ),
-                            Spacer(),
+                            const Spacer(),
                           ]
                         : [
                             const Spacer(flex: 7),
-                            Text(
-                              '${localizations.noFiles}.',
-                              textAlign: TextAlign.center,
-                            ),
+                            if (args.select != FilesScreenSelectMode.folder)
+                              Text(
+                                '${localizations.noFiles}.',
+                                textAlign: TextAlign.center,
+                              ),
                             const SizedBox(height: 16),
                             addDropdown,
                             if (args.path != '/') parentFolderWidget,
                             const Spacer(flex: 7),
+                            if (args.select == FilesScreenSelectMode.folder)
+                              moveWidget,
                           ],
                   ),
                 ),
@@ -415,6 +462,12 @@ class _FilesScreen extends State<FilesScreen> {
                 addDropdown,
                 if (args.path != '/') parentFolderWidget,
               ],
+              bottomWidgets: args.select != FilesScreenSelectMode.folder
+                  ? null
+                  : [
+                      const Spacer(),
+                      moveWidget,
+                    ],
               files: _files!,
               shouldSort: true,
               onPressed: (file) {
@@ -436,15 +489,17 @@ class _FilesScreen extends State<FilesScreen> {
                     );
                 }
               },
-              popupMenuItemBuilder: (context, file) => filePopupMenuBuilder(
-                context,
-                file,
-                onChanged: () async {
-                  _files = await listFiles(args.path);
-                  if (!mounted) return;
-                  setState(() {});
-                },
-              ),
+              popupMenuItemBuilder: args.select != FilesScreenSelectMode.none
+                  ? null
+                  : (context, file) => filePopupMenuBuilder(
+                        context,
+                        file,
+                        onChanged: () async {
+                          _files = await listFiles(args);
+                          if (!mounted) return;
+                          setState(() {});
+                        },
+                      ),
             ),
     );
   }

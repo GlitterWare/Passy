@@ -17,6 +17,14 @@ class RemoveAccountScreen extends StatefulWidget {
 }
 
 class _RemoveAccountScreen extends State<RemoveAccountScreen> {
+  late FormattedTextParser formattedTextParser;
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     String _username = ModalRoute.of(context)!.settings.arguments as String;
@@ -29,8 +37,8 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
           placeholders: {
             'u': TextSpan(
               text: '\'$_username\'',
-              style:
-                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+              style: TextStyle(
+                  color: PassyTheme.of(context).highlightContentSecondaryColor),
             ),
           },
         ),
@@ -42,9 +50,9 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
       onConfirmPressed: (context, value) {
         if (value != _username) {
           showSnackBar(
-              message: localizations.usernamesDoNotMatch,
-              icon: const Icon(Icons.error_outline_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.usernamesDoNotMatch,
+            icon: const Icon(Icons.error_outline_rounded),
+          );
           return;
         }
         Navigator.pop(context);

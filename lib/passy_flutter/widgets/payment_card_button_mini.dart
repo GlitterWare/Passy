@@ -24,7 +24,7 @@ class PaymentCardButtonMini extends StatelessWidget {
     CardType _cardType =
         cardTypeFromNumber(paymentCard.cardNumber.replaceAll('*', '0'));
     return Row(children: [
-        if (leftWidget != null) leftWidget!,
+      if (leftWidget != null) leftWidget!,
       Flexible(
         child: ThreeWidgetButton(
           left: Padding(

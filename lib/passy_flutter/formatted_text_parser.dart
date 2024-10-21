@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'passy_theme.dart';
 
-FormattedTextParser formattedTextParser = FormattedTextParser();
-
 class FormattedTextParser {
+  BuildContext context;
+
+  FormattedTextParser({required this.context});
+
   InlineSpan parse({
     required String text,
     Map<String, InlineSpan>? placeholders,
@@ -21,7 +23,9 @@ class FormattedTextParser {
         TextSpan(
             text: curMsg,
             style: isBold
-                ? const TextStyle(color: PassyTheme.lightContentSecondaryColor)
+                ? TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor)
                 : null),
       );
       curMsg = '';

@@ -241,8 +241,9 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
                   children: [
                     TextSpan(
                       text: _account.autoBackup!.path,
-                      style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor),
+                      style: TextStyle(
+                          color: PassyTheme.of(context)
+                              .highlightContentSecondaryColor),
                     )
                   ],
                 ),

@@ -166,13 +166,11 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         },
       ),
       body: ListView(children: [
-        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
-        */
         PassyPadding(TextFormField(
           initialValue: _nickname,
           decoration: InputDecoration(
@@ -212,20 +210,21 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             expansionCallback: (panelIndex, isExpanded) =>
                 setState(() => _tfaIsExpanded = isExpanded),
             elevation: 0,
-            dividerColor: PassyTheme.lightContentSecondaryColor,
+            dividerColor: PassyTheme.of(context).highlightContentSecondaryColor,
             children: [
               ExpansionPanel(
-                  backgroundColor: PassyTheme.darkContentColor,
+                  backgroundColor: PassyTheme.of(context).contentColor,
                   isExpanded: _tfaIsExpanded,
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return Padding(
                         padding: const EdgeInsets.only(left: 8),
                         child: Container(
-                            decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(32.0)),
-                                color: PassyTheme.darkPassyPurple),
+                            decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(32.0)),
+                                color: PassyTheme.of(context)
+                                    .highlightContentSecondaryColor),
                             child: PassyPadding(Row(
                               children: [
                                 const Padding(
@@ -415,7 +414,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         CustomFieldsEditor(
           customFields: _customFields,
           shouldSort: true,
-          padding: PassyTheme.passyPadding,
+          padding: PassyTheme.of(context).passyPadding,
           constructCustomField: () async => (await Navigator.pushNamed(
             context,
             EditCustomFieldScreen.routeName,
@@ -429,16 +428,18 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
             labelText: localizations.additionalInfo,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide:
-                  const BorderSide(color: PassyTheme.darkContentSecondaryColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).contentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),

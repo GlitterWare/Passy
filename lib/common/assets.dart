@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../passy_flutter/passy_flutter.dart';
-
 const String logoSvg = 'assets/images/logo.svg';
 const String logoCircleSvg = 'assets/images/logo_circle.svg';
 
 SvgPicture logoCircle50White = SvgPicture.asset(
   logoCircleSvg,
   colorFilter:
-      const ColorFilter.mode(PassyTheme.lightContentColor, BlendMode.srcIn),
+      const ColorFilter.mode(Color.fromRGBO(227, 242, 253, 1), BlendMode.srcIn),
   width: 50,
 );
 

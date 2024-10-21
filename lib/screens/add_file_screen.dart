@@ -97,8 +97,7 @@ class _AddFileScreen extends State<AddFileScreen> {
       )..errorStream.listen((e) {
           showSnackBar(
             message: localizations.somethingWentWrong,
-            icon: const Icon(Icons.error_outline_rounded,
-                color: PassyTheme.darkContentColor),
+            icon: const Icon(Icons.error_outline_rounded),
             action: SnackBarAction(
               label: localizations.details,
               onPressed: () => Navigator.pushNamed(
@@ -129,8 +128,7 @@ class _AddFileScreen extends State<AddFileScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.failedToAddFile,
-        icon:
-            const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.save_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(
@@ -189,16 +187,16 @@ class _AddFileScreen extends State<AddFileScreen> {
             hasScrollBody: true,
             child: Column(
               children: _fileMeta == null
-                  ? const [
-                      Spacer(),
+                  ? [
+                      const Spacer(),
                       Expanded(
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: PassyTheme.lightContentColor,
+                            color: PassyTheme.of(context).contentTextColor,
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ]
                   : [
                       const Spacer(),
@@ -210,9 +208,9 @@ class _AddFileScreen extends State<AddFileScreen> {
                             children: [
                               Text(
                                 localizations.filePreview,
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                               Flexible(
                                   flex: 10,
@@ -221,8 +219,8 @@ class _AddFileScreen extends State<AddFileScreen> {
                                       borderRadius: BorderRadius.circular(18),
                                       border: Border.all(
                                         width: 10,
-                                        color: PassyTheme
-                                            .darkContentSecondaryColor,
+                                        color: PassyTheme.of(context)
+                                            .contentSecondaryColor,
                                       ),
                                     ),
                                     child: ClipRRect(

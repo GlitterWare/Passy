@@ -66,9 +66,9 @@ class _PassyFileScreen extends State<StatefulWidget> {
     await _account.exportFile(args.key, file: File(expFile));
     Navigator.pop(context);
     showSnackBar(
-        message: localizations.exportSaved,
-        icon: const Icon(Icons.ios_share_rounded,
-            color: PassyTheme.darkContentColor));
+      message: localizations.exportSaved,
+      icon: const Icon(Icons.ios_share_rounded),
+    );
   }
 
   Future<void> _onRemovePressed(PassyFileScreenArgs args) async {
@@ -84,8 +84,9 @@ class _PassyFileScreen extends State<StatefulWidget> {
               TextButton(
                 child: Text(
                   localizations.cancel,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -131,9 +132,9 @@ class _PassyFileScreen extends State<StatefulWidget> {
     await Future.delayed(const Duration(milliseconds: 200));
     Navigator.pop(context);
     showSnackBar(
-        message: localizations.fileSaved,
-        icon: const Icon(Icons.edit_outlined,
-            color: PassyTheme.darkContentColor));
+      message: localizations.fileSaved,
+      icon: const Icon(Icons.edit_outlined),
+    );
   }
 
   @override
@@ -200,8 +201,7 @@ class _PassyFileScreen extends State<StatefulWidget> {
                   )..errorStream.listen((e) {
                       showSnackBar(
                         message: localizations.somethingWentWrong,
-                        icon: const Icon(Icons.error_outline_rounded,
-                            color: PassyTheme.darkContentColor),
+                        icon: const Icon(Icons.error_outline_rounded),
                         action: SnackBarAction(
                           label: localizations.details,
                           onPressed: () => Navigator.pushNamed(

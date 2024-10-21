@@ -69,8 +69,11 @@ class _EnumDropdownButton2<T extends Enum>
           children: [
             Padding(
                 child: item.icon,
-                padding: EdgeInsets.fromLTRB(PassyTheme.passyPadding.left + 6,
-                    0, PassyTheme.passyPadding.right, 0)),
+                padding: EdgeInsets.fromLTRB(
+                    PassyTheme.of(context).passyPadding.left + 6,
+                    0,
+                    PassyTheme.of(context).passyPadding.right,
+                    0)),
             Expanded(child: item.text),
           ],
         )),
@@ -91,7 +94,7 @@ class _EnumDropdownButton2<T extends Enum>
     return DropdownButton2(
       dropdownStyleData: widget.dropdownStyleData,
       buttonStyleData: const ButtonStyleData(
-          overlayColor: MaterialStatePropertyAll(Colors.transparent)),
+          overlayColor: WidgetStatePropertyAll(Colors.transparent)),
       key: _dropdownButtonKey,
       items: _menuItems,
       value: widget.value,
@@ -101,7 +104,7 @@ class _EnumDropdownButton2<T extends Enum>
       alignment: widget.alignment,
       underline: const SizedBox.shrink(),
       customButton: PassyPadding(Material(
-          color: PassyTheme.darkPassyPurple,
+          color: PassyTheme.of(context).accentContentColor,
           borderRadius: BorderRadius.circular(100),
           child: InkWell(
             splashFactory: InkRipple.splashFactory,
@@ -118,14 +121,14 @@ class _EnumDropdownButton2<T extends Enum>
                   Padding(
                       child: selected.icon,
                       padding: EdgeInsets.fromLTRB(
-                          PassyTheme.passyPadding.left + 6,
+                          PassyTheme.of(context).passyPadding.left + 6,
                           0,
-                          PassyTheme.passyPadding.right,
+                          PassyTheme.of(context).passyPadding.right,
                           0)),
                   Expanded(
                       child: DefaultTextStyle(
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentColor,
+                    style: TextStyle(
+                        color: PassyTheme.of(context).highlightContentColor,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w500),
                     child: selected.text,
@@ -136,9 +139,9 @@ class _EnumDropdownButton2<T extends Enum>
                         size: 35,
                       ),
                       padding: EdgeInsets.fromLTRB(
-                          PassyTheme.passyPadding.left + 6,
+                          PassyTheme.of(context).passyPadding.left + 6,
                           0,
-                          PassyTheme.passyPadding.right,
+                          PassyTheme.of(context).passyPadding.right,
                           0)),
                 ],
               )),

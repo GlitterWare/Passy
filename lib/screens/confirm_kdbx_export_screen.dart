@@ -31,20 +31,16 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
   void _onConfirmPressed() async {
     if (_newPassword.isEmpty) {
       showSnackBar(
-          message: localizations.passwordIsEmpty,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.passwordIsEmpty,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     if (_newPassword != _newPasswordConfirm) {
       showSnackBar(
-          message: localizations.passwordsDoNotMatch,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.passwordsDoNotMatch,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     try {
@@ -77,20 +73,19 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
       Navigator.pop(context);
       Navigator.pop(context);
       showSnackBar(
-          message: localizations.exportSaved,
-          icon: const Icon(Icons.ios_share_rounded,
-              color: PassyTheme.darkContentColor));
+        message: localizations.exportSaved,
+        icon: const Icon(Icons.ios_share_rounded),
+      );
     } catch (e, s) {
       if (e is FileSystemException) {
         showSnackBar(
-            message: localizations.accessDeniedTryAnotherFolder,
-            icon: const Icon(Icons.ios_share_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.accessDeniedTryAnotherFolder,
+          icon: const Icon(Icons.ios_share_rounded),
+        );
       } else {
         showSnackBar(
           message: localizations.couldNotExport,
-          icon: const Icon(Icons.ios_share_rounded,
-              color: PassyTheme.darkContentColor),
+          icon: const Icon(Icons.ios_share_rounded),
           action: SnackBarAction(
             label: localizations.details,
             onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,

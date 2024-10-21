@@ -114,8 +114,7 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                       } catch (e) {
                         showSnackBar(
                           message: localizations.entryDoesNotExist,
-                          icon: const Icon(Icons.delete_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.delete_outline_rounded),
                         );
                       }
                     },
@@ -151,8 +150,7 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                       } catch (e) {
                         showSnackBar(
                           message: localizations.entryDoesNotExist,
-                          icon: const Icon(Icons.delete_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.delete_outline_rounded),
                         );
                       }
                     },
@@ -186,8 +184,7 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                       } catch (e) {
                         showSnackBar(
                           message: localizations.entryDoesNotExist,
-                          icon: const Icon(Icons.delete_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.delete_outline_rounded),
                         );
                       }
                     },
@@ -221,8 +218,7 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                       } catch (e) {
                         showSnackBar(
                           message: localizations.entryDoesNotExist,
-                          icon: const Icon(Icons.delete_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.delete_outline_rounded),
                         );
                       }
                     },
@@ -256,8 +252,7 @@ class _SyncDetailsScreen extends State<SyncDetailsScreen> {
                       } catch (e) {
                         showSnackBar(
                           message: localizations.entryDoesNotExist,
-                          icon: const Icon(Icons.delete_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.delete_outline_rounded),
                         );
                       }
                     },

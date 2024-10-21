@@ -242,8 +242,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                     Navigator.pop(context);
                     showSnackBar(
                       message: localizations.couldNotImportAccount,
-                      icon: const Icon(Icons.download_for_offline_outlined,
-                          color: PassyTheme.darkContentColor),
+                      icon: const Icon(Icons.download_for_offline_outlined),
                       action: SnackBarAction(
                         label: localizations.details,
                         onPressed: () => Navigator.pushNamed(

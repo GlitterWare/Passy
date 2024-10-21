@@ -8,7 +8,7 @@ import 'widgets.dart';
 
 class RecordButton extends StatelessWidget {
   final String title;
-  final TextStyle titleStyle;
+  final TextStyle? titleStyle;
   final String value;
   final bool obscureValue;
   final bool isPassword;
@@ -18,16 +18,13 @@ class RecordButton extends StatelessWidget {
   const RecordButton({
     Key? key,
     required this.title,
-    TextStyle? titleStyle,
+    this.titleStyle,
     required this.value,
     this.obscureValue = false,
     this.isPassword = false,
     this.valueAlign = TextAlign.center,
     this.left,
-  })  : titleStyle = titleStyle ??
-            const TextStyle(
-                color: PassyTheme.lightContentSecondaryColor, height: 0.94),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +34,11 @@ class RecordButton extends StatelessWidget {
         children: [
           Text(
             title,
-            style: titleStyle,
+            style: titleStyle ??
+                TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor,
+                    height: 0.94),
           ),
           Text(
             obscureValue ? '\u2022' * 6 : value,
@@ -51,6 +52,7 @@ class RecordButton extends StatelessWidget {
             value: value, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
       right: CircleAvatar(
+        backgroundColor: PassyTheme.of(context).highlightContentColor,
         child: IconButton(
           padding: EdgeInsets.zero,
           icon: const Icon(Icons.copy_rounded),
@@ -58,9 +60,9 @@ class RecordButton extends StatelessWidget {
           onPressed: () {
             Clipboard.setData(ClipboardData(text: value));
             showSnackBar(
-                message: '$title ${localizations.copied.toLowerCase()}',
-                icon: const Icon(Icons.copy_rounded,
-                    color: PassyTheme.darkContentColor));
+              message: '$title ${localizations.copied.toLowerCase()}',
+              icon: const Icon(Icons.copy_rounded),
+            );
           },
         ),
       ),

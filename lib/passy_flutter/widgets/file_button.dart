@@ -15,7 +15,7 @@ class FileButton extends StatelessWidget {
     this.popupMenuItemBuilder,
   }) : super(key: key);
 
-  Widget _buildIcon(FileEntryType type) {
+  Widget _buildIcon(BuildContext context, FileEntryType type) {
     Widget? icon = file.icon;
     if (icon != null) return icon;
     switch (type) {
@@ -31,8 +31,8 @@ class FileButton extends StatelessWidget {
         return SvgPicture.asset(
           'assets/images/file-markdown-svgrepo-com.svg',
           width: 26,
-          colorFilter: const ColorFilter.mode(
-              PassyTheme.lightContentColor, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+              PassyTheme.of(context).highlightContentColor, BlendMode.srcIn),
         );
       case FileEntryType.photo:
         return const Icon(Icons.image_outlined);
@@ -45,7 +45,7 @@ class FileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget icon = _buildIcon(file.type);
+    Widget icon = _buildIcon(context, file.type);
     return Row(
       children: [
         Flexible(
@@ -61,6 +61,9 @@ class FileButton extends StatelessWidget {
                 Align(
                   child: Text(
                     file.name,
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   alignment: Alignment.centerLeft,
                 ),

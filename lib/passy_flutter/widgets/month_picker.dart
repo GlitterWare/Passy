@@ -7,9 +7,9 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 class MonthPickerFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? initialValue;
-  final TextStyle buttonStyle;
-  final TextStyle currentDateStyle;
-  final TextStyle selectedDateStyle;
+  final TextStyle? buttonStyle;
+  final TextStyle? currentDateStyle;
+  final TextStyle? selectedDateStyle;
   final String title;
   final DateTime Function()? getSelectedDate;
   final Function(DateTime)? onChanged;
@@ -18,19 +18,13 @@ class MonthPickerFormField extends StatelessWidget {
     Key? key,
     this.controller,
     this.initialValue,
-    TextStyle? buttonStyle,
-    TextStyle? currentDateStyle,
-    TextStyle? selectedDateStyle,
+    this.buttonStyle,
+    this.currentDateStyle,
+    this.selectedDateStyle,
     this.title = '',
     this.getSelectedDate,
     this.onChanged,
-  })  : buttonStyle = buttonStyle ??
-            const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-        currentDateStyle = currentDateStyle ??
-            const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-        selectedDateStyle = selectedDateStyle ??
-            const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(context) {
@@ -53,13 +47,19 @@ class MonthPickerFormField extends StatelessWidget {
                         onPressed: () => Navigator.pop(ctx),
                         child: Text(
                           localizations.cancel,
-                          style: buttonStyle,
+                          style: buttonStyle ??
+                              TextStyle(
+                                  color: PassyTheme.of(context)
+                                      .highlightContentSecondaryColor),
                         )),
                     TextButton(
                         onPressed: () => Navigator.pop(ctx, _selectedDate),
                         child: Text(
                           localizations.confirm,
-                          style: buttonStyle,
+                          style: buttonStyle ??
+                              TextStyle(
+                                  color: PassyTheme.of(context)
+                                      .highlightContentSecondaryColor),
                         )),
                   ],
                   content: StatefulBuilder(
@@ -72,8 +72,14 @@ class MonthPickerFormField extends StatelessWidget {
                           setState(() => _selectedDate = date);
                         },
                         datePickerStyles: DatePickerStyles(
-                            currentDateStyle: currentDateStyle,
-                            selectedDateStyle: selectedDateStyle),
+                            currentDateStyle: currentDateStyle ??
+                                TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
+                            selectedDateStyle: selectedDateStyle ??
+                                TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor)),
                       );
                     },
                   ),

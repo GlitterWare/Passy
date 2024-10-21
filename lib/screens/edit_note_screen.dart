@@ -69,13 +69,11 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         },
       ),
       body: ListView(children: [
-        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
-        */
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.enableMarkdown),
           left: Padding(
@@ -83,8 +81,8 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             child: SvgPicture.asset(
               'assets/images/markdown-svgrepo-com.svg',
               width: 26,
-              colorFilter: const ColorFilter.mode(
-                  PassyTheme.lightContentColor, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                  PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
             ),
           ),
           right: Switch(
@@ -107,16 +105,18 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             labelText: localizations.note,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide:
-                  const BorderSide(color: PassyTheme.darkContentSecondaryColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).contentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _note = value),
@@ -124,16 +124,16 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         if (_isMarkdown)
           PassyPadding(Text(
             localizations.markdownPreview,
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            style: TextStyle(
+                color: PassyTheme.of(context).highlightContentSecondaryColor),
           )),
         if (_isMarkdown)
           Padding(
               padding: EdgeInsets.fromLTRB(
                   20,
-                  PassyTheme.passyPadding.top,
-                  PassyTheme.passyPadding.right,
-                  PassyTheme.passyPadding.bottom),
+                  PassyTheme.of(context).passyPadding.top,
+                  PassyTheme.of(context).passyPadding.right,
+                  PassyTheme.of(context).passyPadding.bottom),
               child: PassyMarkdownBody(data: _note)),
       ]),
     );

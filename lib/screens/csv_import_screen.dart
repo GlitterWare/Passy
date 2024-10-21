@@ -40,8 +40,7 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotImportAccount,
-        icon: const Icon(Icons.download_for_offline_outlined,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.download_for_offline_outlined),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -62,8 +61,7 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotImportAccount,
-        icon: const Icon(Icons.download_for_offline_outlined,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.download_for_offline_outlined),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -79,8 +77,7 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotImportAccount,
-        icon: const Icon(Icons.download_for_offline_outlined,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.download_for_offline_outlined),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -92,8 +89,7 @@ class _CSVImportScreen extends State<CSVImportScreen> {
     if (fileDataDecoded.isEmpty) {
       showSnackBar(
         message: localizations.noCSVDataFound,
-        icon: const Icon(Icons.download_for_offline_outlined,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.download_for_offline_outlined),
       );
       return;
     }

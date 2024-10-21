@@ -3,9 +3,9 @@ export 'always_disabled_focus_node.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CardAssetPaths {
   const CardAssetPaths._();
@@ -94,17 +94,20 @@ DateTime stringToDate(String value) {
   return DateTime(yy, mm, dd);
 }
 
-Future<DateTime?> showPassyDatePicker(
-    {required BuildContext context,
-    required DateTime date,
-    ColorScheme colorScheme = PassyTheme.datePickerColorScheme}) {
+Future<DateTime?> showPassyDatePicker({
+  required BuildContext context,
+  required DateTime date,
+  ColorScheme? colorScheme,
+}) {
   return showDatePicker(
     context: context,
     initialDate: date,
     firstDate: DateTime.utc(0, 04, 20),
     lastDate: DateTime.utc(275760, 09, 13),
     builder: (context, w) => Theme(
-      data: ThemeData(colorScheme: colorScheme),
+      data: ThemeData(
+          colorScheme:
+              colorScheme ?? PassyTheme.of(context).datePickerColorScheme),
       child: w!,
     ),
   );
@@ -112,7 +115,11 @@ Future<DateTime?> showPassyDatePicker(
 
 Widget getCardTypeImage(CardType? cardType) {
   if (cardType == CardType.otherBrand) {
-    return logoCircle50White;
+    return SvgPicture.asset(
+      'assets/images/logo_circle.svg',
+      colorFilter: const ColorFilter.mode(Colors.purple, BlendMode.srcIn),
+      width: 50,
+    );
   }
 
   return Image.asset(

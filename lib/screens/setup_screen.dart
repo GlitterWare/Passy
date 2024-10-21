@@ -73,21 +73,21 @@ class _SetupScreen extends State<SetupScreen> {
                 arguments: data.loadedAccount!.username),
           )),
           PassyPadding(ThreeWidgetButton(
-            color: PassyTheme.lightContentColor,
+            color: PassyTheme.of(context).highlightContentColor,
             center: Text(
               localizations.done,
-              style: const TextStyle(color: PassyTheme.darkContentColor),
+              style: TextStyle(color: PassyTheme.of(context).contentColor),
             ),
-            left: const Padding(
-              padding: EdgeInsets.only(right: 30),
+            left: Padding(
+              padding: const EdgeInsets.only(right: 30),
               child: Icon(
                 Icons.check_rounded,
-                color: PassyTheme.darkContentColor,
+                color: PassyTheme.of(context).contentColor,
               ),
             ),
-            right: const Icon(
+            right: Icon(
               Icons.arrow_forward_ios_rounded,
-              color: PassyTheme.darkContentColor,
+              color: PassyTheme.of(context).contentColor,
             ),
             onPressed: () =>
                 Navigator.pushReplacementNamed(context, MainScreen.routeName),

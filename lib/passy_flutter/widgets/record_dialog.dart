@@ -14,7 +14,7 @@ class RecordDialog extends StatelessWidget {
     this.highlightSpecial = false,
     this.textAlign = TextAlign.center,
     this.shape = PassyTheme.dialogShape,
-    this.specialColor = PassyTheme.lightContentSecondaryColor,
+    this.specialColor,
   }) : super(key: key);
 
   @override
@@ -33,7 +33,8 @@ class RecordDialog extends StatelessWidget {
               text: _iterator.current,
               style: TextStyle(
                 fontFamily: 'FiraCode',
-                color: specialColor,
+                color: specialColor ??
+                    PassyTheme.of(context).highlightContentSecondaryColor,
               )));
         }
       }

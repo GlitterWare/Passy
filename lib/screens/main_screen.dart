@@ -48,6 +48,7 @@ class _MainScreen extends State<MainScreen>
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
   String? _lastSyncDate;
+  late FormattedTextParser formattedTextParser;
 
   Widget _searchBuilder(
       String terms, List<String> tags, void Function() rebuild) {
@@ -395,8 +396,9 @@ class _MainScreen extends State<MainScreen>
                 onPressed: () => Navigator.pop(ctx),
                 child: Text(
                   localizations.stay,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 )),
             TextButton(
                 onPressed: () {
@@ -407,8 +409,9 @@ class _MainScreen extends State<MainScreen>
                 },
                 child: Text(
                   localizations.logOut,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 )),
           ],
           content: Text(localizations.areYouSureYouWantToLogOutQuestion),
@@ -453,6 +456,7 @@ class _MainScreen extends State<MainScreen>
   @override
   void initState() {
     super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
     if (Platform.isAndroid) {
       FlutterSecureScreen.singleton
           .setAndroidScreenSecure(_account.protectScreen);
@@ -591,8 +595,7 @@ class _MainScreen extends State<MainScreen>
                 if (!_account.isRSAKeypairLoaded) {
                   showSnackBar(
                     message: localizations.settingUpSynchronization,
-                    icon: const Icon(CupertinoIcons.clock_solid,
-                        color: PassyTheme.darkContentColor),
+                    icon: const Icon(CupertinoIcons.clock_solid),
                   );
                   return;
                 }
@@ -686,8 +689,9 @@ class _MainScreen extends State<MainScreen>
               PassyPadding(Text(
                 '${localizations.lastSynchronization}: $_lastSyncDate',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
+                style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor),
               )),
           ],
         ),

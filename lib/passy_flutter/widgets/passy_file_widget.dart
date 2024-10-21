@@ -146,11 +146,9 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         }
         return InkWell(
             onTap: () => showSnackBar(
-                message: localizations.scrollOrPinchToZoom,
-                icon: const Icon(
-                  Icons.zoom_in,
-                  color: PassyTheme.darkContentColor,
-                )),
+                  message: localizations.scrollOrPinchToZoom,
+                  icon: const Icon(Icons.zoom_in),
+                ),
             splashFactory: InkRipple.splashFactory,
             splashColor: Colors.white24,
             hoverColor: Colors.transparent,
@@ -191,10 +189,10 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         return PassyAudioProgressBar(
           controller: controller,
           colors: ChewieProgressColors(
-            playedColor: PassyTheme.darkPassyPurple,
-            handleColor: PassyTheme.lightContentColor,
+            playedColor: PassyTheme.of(context).accentContentColor,
+            handleColor: PassyTheme.of(context).highlightContentColor,
           ),
-          iconColor: PassyTheme.lightContentColor,
+          iconColor: PassyTheme.of(context).highlightContentColor,
         );
       case FileEntryType.video:
         AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
@@ -230,12 +228,16 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             resource: 'https://127.0.0.1:${server.port}', password: password);
         return Chewie(
           controller: ChewieController(
+            cupertinoProgressColors: ChewieProgressColors(
+              playedColor: PassyTheme.of(context).accentContentColor,
+              handleColor: PassyTheme.of(context).highlightContentColor,
+            ),
             videoPlayerController: controller,
             hideControlsTimer: const Duration(seconds: 2),
             showControlsFade: false,
-            customControls: const CupertinoControls(
-              backgroundColor: Colors.black,
-              iconColor: PassyTheme.lightContentColor,
+            customControls: CupertinoControls(
+              backgroundColor: PassyTheme.of(context).contentColor,
+              iconColor: PassyTheme.of(context).highlightContentColor,
               showPlayButtonWhilePlaying: true,
             ),
           ),
@@ -256,8 +258,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
       });
     }
     return _widget ??
-        const CircularProgressIndicator(
-          color: PassyTheme.lightContentColor,
+        CircularProgressIndicator(
+          color: PassyTheme.of(context).highlightContentColor,
         );
   }
 }

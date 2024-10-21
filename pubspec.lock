@@ -541,10 +541,11 @@ packages:
   flutter_credit_card:
     dependency: "direct main"
     description:
-      name: flutter_credit_card
-      sha256: dffaee369b0e64fb81e63e78d6410762f73b67346692bd2ae7bdcc6d911452e3
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "7a754b0a44cd75d0689a3adfd778205da9c69f95"
+      resolved-ref: "7a754b0a44cd75d0689a3adfd778205da9c69f95"
+      url: "https://github.com/SimformSolutionsPvtLtd/flutter_credit_card"
+    source: git
     version: "4.0.1"
   flutter_date_pickers:
     dependency: "direct main"

@@ -150,8 +150,8 @@ class _ImportScreen extends State<ImportScreen> {
             child: SvgPicture.asset(
               logoCircleSvg,
               width: 24,
-              colorFilter: const ColorFilter.mode(
-                  PassyTheme.lightContentColor, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                  PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
             ),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),

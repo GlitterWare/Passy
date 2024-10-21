@@ -19,6 +19,14 @@ class ConfirmRestoreScreen extends StatefulWidget {
 }
 
 class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
+  late FormattedTextParser formattedTextParser;
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     String _path = ModalRoute.of(context)!.settings.arguments as String;
@@ -44,8 +52,7 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
             onError: (e, s) {
               showSnackBar(
                 message: localizations.couldNotRestoreAccount,
-                icon: const Icon(Icons.settings_backup_restore_rounded,
-                    color: PassyTheme.darkContentColor),
+                icon: const Icon(Icons.settings_backup_restore_rounded),
                 action: SnackBarAction(
                   label: localizations.details,
                   onPressed: () => Navigator.pushNamed(
