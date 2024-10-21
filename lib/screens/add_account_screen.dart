@@ -173,8 +173,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     autofocus: true,
                                     inputFormatters: [
                                       FilteringTextInputFormatter(
-                                          RegExp(
-                                              '^[a-zA-Z0-9](?:[a-zA-Z0-9 ._-]*[a-zA-Z0-9])?\$'),
+                                          RegExp('[a-zA-Z0-9 ._-]'),
                                           replacementString: _username,
                                           allow: true)
                                     ],
