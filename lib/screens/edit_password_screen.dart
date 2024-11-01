@@ -245,6 +245,48 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                   },
                   body: Column(
                     children: [
+                      if (_tfaType == TFAType.Steam)
+                        PassyPadding(TextFormField(
+                          initialValue: _steamSharedSecret,
+                          decoration: const InputDecoration(
+                              labelText: 'Steam shared_secret'),
+                          onChanged: (value) {
+                            String? newTfaSecret;
+                            try {
+                              newTfaSecret = base32.encode(base64Decode(value));
+                              if (newTfaSecret.length.isOdd) {
+                                newTfaSecret += '=';
+                              }
+                            } catch (_) {}
+                            setState(() {
+                              _steamSharedSecret = value;
+                              if (newTfaSecret != null) {
+                                _tfaSecret = newTfaSecret;
+                                _tfaSecretFieldKey = UniqueKey();
+                              }
+                            });
+                          },
+                        )),
+                      PassyPadding(TextFormField(
+                        key: _tfaSecretFieldKey,
+                        enabled: _tfaType != TFAType.Steam,
+                        initialValue: _tfaSecret.replaceFirst('=', ''),
+                        decoration: InputDecoration(
+                            labelText:
+                                '2FA ${localizations.secret.toLowerCase()}'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-z]|[A-Z]|[2-7]')),
+                          TextInputFormatter.withFunction(
+                              (oldValue, newValue) => TextEditingValue(
+                                  text: newValue.text.toUpperCase(),
+                                  selection: newValue.selection)),
+                        ],
+                        onChanged: (value) {
+                          if (value.length.isOdd) value += '=';
+                          setState(() => _tfaSecret = value);
+                        },
+                      )),
                       PassyPadding(EnumDropDownButtonFormField<TFAType>(
                         value: _tfaType,
                         values: TFAType.values,
@@ -274,47 +316,6 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                             _tfaIsGoogle = true;
                             _tfaKey = UniqueKey();
                           });
-                        },
-                      )),
-                      if (_tfaType == TFAType.Steam)
-                        PassyPadding(TextFormField(
-                          initialValue: _steamSharedSecret,
-                          decoration: const InputDecoration(
-                              labelText: 'Steam shared_secret'),
-                          onChanged: (value) {
-                            String? newTfaSecret;
-                            try {
-                              newTfaSecret = base32.encode(base64Decode(value));
-                              if (newTfaSecret.length.isOdd) {
-                                newTfaSecret += '=';
-                              }
-                            } catch (_) {}
-                            setState(() {
-                              _steamSharedSecret = value;
-                              if (newTfaSecret != null) {
-                                _tfaSecret = newTfaSecret;
-                                _tfaSecretFieldKey = UniqueKey();
-                              }
-                            });
-                          },
-                        )),
-                      PassyPadding(TextFormField(
-                        key: _tfaSecretFieldKey,
-                        initialValue: _tfaSecret.replaceFirst('=', ''),
-                        decoration: InputDecoration(
-                            labelText:
-                                '2FA ${localizations.secret.toLowerCase()}'),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-z]|[A-Z]|[2-7]')),
-                          TextInputFormatter.withFunction(
-                              (oldValue, newValue) => TextEditingValue(
-                                  text: newValue.text.toUpperCase(),
-                                  selection: newValue.selection)),
-                        ],
-                        onChanged: (value) {
-                          if (value.length.isOdd) value += '=';
-                          setState(() => _tfaSecret = value);
                         },
                       )),
                       PassyPadding(TextFormField(
