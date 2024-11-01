@@ -41,6 +41,7 @@ import 'key_derivation_info.dart';
 import 'key_derivation_type.dart';
 import 'note.dart';
 import 'password.dart';
+import 'passy_app_theme.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
 import 'passy_fs_meta.dart';
@@ -836,6 +837,8 @@ class LoadedAccount {
   AutoBackupSettings? get autoBackup => _localSettings.value.autoBackup;
   set autoBackup(AutoBackupSettings? value) =>
       _localSettings.value.autoBackup = value;
+  PassyAppTheme get appTheme => _localSettings.value.appTheme;
+  set appTheme(PassyAppTheme value) => _localSettings.value.appTheme = value;
   Future<void> saveLocalSettings() => _localSettings.save();
   void saveLocalSettingsSync() => _localSettings.saveSync();
 

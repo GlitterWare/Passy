@@ -333,5 +333,6 @@
     "parentFolder": "Parent folder",
     "eraseOriginalFile": "Erase original file",
     "move": "Move",
-    "moveHere": "Move here"
+    "moveHere": "Move here",
+    "theme": "Theme"
 }

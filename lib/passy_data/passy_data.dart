@@ -18,6 +18,7 @@ import 'dart:io';
 import 'account_credentials.dart';
 import 'common.dart';
 import 'key_derivation_info.dart';
+import 'passy_app_theme.dart';
 import 'passy_info.dart';
 
 import 'common.dart' as common;
@@ -45,12 +46,17 @@ class PassyData {
   final String accountsPath;
   final Map<String, AccountCredentialsFile> _accounts = {};
   final Map<String, Timer> _autoBackupTimers = {};
+  final Map<String, PassyAppTheme> _appThemes = {};
   LoadedAccount? _loadedAccount;
 
   String? getPasswordHash(String username) {
     AccountCredentialsFile? account = _accounts[username];
     if (account == null) return null;
     return account.value.passwordHash;
+  }
+
+  PassyAppTheme? getAppTheme(String username) {
+    return _appThemes[username];
   }
 
   Future<String?> createPasswordHash(String username,
@@ -235,6 +241,7 @@ class PassyData {
             Platform.pathSeparator +
             'local_settings.json'),
       );
+      _appThemes[_username] = _localSettings.value.appTheme;
       AutoBackupSettings? _autoBackup = _localSettings.value.autoBackup;
       if (_autoBackup != null) {
         void _autoBackupCycle() {

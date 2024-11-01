@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:passy/main.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -298,6 +299,8 @@ class SplashScreen extends StatelessWidget {
       if (Platform.isWindows || Platform.isLinux) _copyExtensionFiles();
       data = await loadPassyData();
       loaded = true;
+      PassyAppTheme? appTheme = data.getAppTheme(data.info.value.lastUsername);
+      switchAppTheme(context, appTheme);
       if (data.noAccounts) {
         Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
         return;

@@ -3,12 +3,13 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/screens/backup_and_restore_screen.dart';
-import 'package:passy/screens/import_screen.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/security_screen.dart';
 
 import 'common.dart';
+import 'main_screen.dart';
+import 'theme_screen.dart';
+import 'security_screen.dart';
+import 'import_screen.dart';
+import 'backup_and_restore_screen.dart';
 
 class SetupScreen extends StatefulWidget {
   static const String routeName = '/setupScreen';
@@ -71,6 +72,16 @@ class _SetupScreen extends State<SetupScreen> {
             onPressed: () => Navigator.pushNamed(
                 context, BackupAndRestoreScreen.routeName,
                 arguments: data.loadedAccount!.username),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.theme),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.colorize),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, ThemeScreen.routeName),
           )),
           PassyPadding(ThreeWidgetButton(
             color: PassyTheme.of(context).highlightContentColor,

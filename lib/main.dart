@@ -62,6 +62,7 @@ import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/sync_details_screen.dart';
 import 'screens/synchronization_logs_screen.dart';
+import 'screens/theme_screen.dart';
 import 'screens/unlock_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -163,6 +164,7 @@ class Passy extends StatelessWidget {
         SyncDetailsScreen.routeName: (context) => const SyncDetailsScreen(),
         SynchronizationLogsScreen.routeName: (context) =>
             const SynchronizationLogsScreen(),
+        ThemeScreen.routeName: (context) => const ThemeScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
       builder: (context, child) {

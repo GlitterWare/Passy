@@ -15,6 +15,7 @@ import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
@@ -955,4 +956,23 @@ Future<void> toggleTray() async {
     });
   }
   _trayEnabled = !_trayEnabled;
+}
+
+Future<void> switchAppTheme(
+    BuildContext context, PassyAppTheme? appTheme) async {
+  if (!context.mounted) return;
+  switch (appTheme) {
+    case PassyAppTheme.classicDark:
+      PassyThemeNotification(PassyTheme.classicTheme).dispatch(context);
+      break;
+    case PassyAppTheme.classicLight:
+      PassyThemeNotification(PassyTheme.lightTheme).dispatch(context);
+      break;
+    case PassyAppTheme.custom:
+      PassyThemeNotification(PassyTheme.classicTheme).dispatch(context);
+      break;
+    case null:
+      PassyThemeNotification(PassyTheme.classicTheme).dispatch(context);
+      break;
+  }
 }
