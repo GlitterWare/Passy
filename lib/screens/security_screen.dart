@@ -54,7 +54,7 @@ class _SecurityScreen extends State<SecurityScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Security'),
+        title: Text(localizations.security),
         centerTitle: true,
       ),
       body: ListView(
