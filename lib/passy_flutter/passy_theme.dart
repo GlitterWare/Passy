@@ -183,8 +183,39 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
   @override
   ThemeExtension<PassyTheme> lerp(
       covariant ThemeExtension<PassyTheme>? other, double t) {
-    // TODO: implement lerp
-    throw UnimplementedError();
+    if (other == null) return this;
+    if (other is! PassyTheme) return this;
+    return PassyTheme(
+      passyPadding: other.passyPadding,
+      contentColor:
+          Color.lerp(contentColor, other.contentColor, t) ?? other.contentColor,
+      contentSecondaryColor:
+          Color.lerp(contentSecondaryColor, other.contentSecondaryColor, t) ??
+              other.contentSecondaryColor,
+      contentTextColor:
+          Color.lerp(contentTextColor, other.contentTextColor, t) ??
+              other.contentTextColor,
+      secondaryContentColor:
+          Color.lerp(secondaryContentColor, other.secondaryContentColor, t) ??
+              other.secondaryContentColor,
+      highlightContentColor:
+          Color.lerp(highlightContentColor, other.highlightContentColor, t) ??
+              other.highlightContentColor,
+      highlightContentSecondaryColor: Color.lerp(highlightContentSecondaryColor,
+              other.highlightContentSecondaryColor, t) ??
+          other.highlightContentSecondaryColor,
+      highlightContentTextColor: Color.lerp(
+              highlightContentTextColor, other.highlightContentTextColor, t) ??
+          other.highlightContentTextColor,
+      accentContentColor:
+          Color.lerp(accentContentColor, other.accentContentColor, t) ??
+              other.accentContentColor,
+      accentContentTextColor:
+          Color.lerp(accentContentTextColor, other.accentContentTextColor, t) ??
+              other.accentContentTextColor,
+      datePickerColorScheme: ColorScheme.lerp(
+          datePickerColorScheme, other.datePickerColorScheme, t),
+    );
   }
 }
 
