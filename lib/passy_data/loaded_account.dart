@@ -1525,6 +1525,7 @@ class LoadedAccount {
   Future<void> removeFolder(String path) async {
     List<PassyFsMeta> files = await _fileIndex.removeFolder(path);
     if (path.startsWith('/sync/')) {
+      await _fileSyncHistory.reload();
       for (PassyFsMeta file in files) {
         _fileSyncHistory.value.files[file.key] = EntryEvent(
           file.key,
@@ -1532,6 +1533,7 @@ class LoadedAccount {
           lastModified: DateTime.now().toUtc(),
         );
       }
+      await _fileSyncHistory.save();
     }
   }
 
@@ -1550,7 +1552,8 @@ class LoadedAccount {
 
   Future<void> moveFile(String key, {required String path}) async {
     await _fileIndex.moveFile(key, path: path);
-    if (_fileSyncHistory.value.files.containsKey(key)) {
+    if (_fileSyncHistory.value.files.containsKey(key) ||
+        path.startsWith('/sync/')) {
       await _fileSyncHistory.reload();
       _fileSyncHistory.value.files[key] = EntryEvent(
         key,
