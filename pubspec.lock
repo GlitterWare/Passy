@@ -237,8 +237,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "68e1fdc7785f794390361a4cc3457ac43dd822ee"
-      resolved-ref: "68e1fdc7785f794390361a4cc3457ac43dd822ee"
+      ref: "1720bb4c07aee96c1de3ad6753184265b91aaea7"
+      resolved-ref: "1720bb4c07aee96c1de3ad6753184265b91aaea7"
       url: "https://github.com/GlitterWare/chewie_media_kit"
     source: git
     version: "1.8.1"
