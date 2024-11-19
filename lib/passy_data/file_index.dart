@@ -300,9 +300,11 @@ class FileIndex {
     required FileMeta meta,
     CompressionType compressionType = CompressionType.none,
   }) async {
-    PassyBinaryFile binaryFile = PassyBinaryFile(
-        file: File(_saveDir.path + Platform.pathSeparator + meta.key),
-        key: _key);
+    File file = File(_saveDir.path + Platform.pathSeparator + meta.key);
+    if (await file.exists()) {
+      throw Exception('File index error: index key exists.');
+    }
+    PassyBinaryFile binaryFile = PassyBinaryFile(file: file, key: _key);
     await binaryFile.encrypt(input: bytes, compressionType: compressionType);
     await _setEntry(meta.key, meta);
     return meta;
