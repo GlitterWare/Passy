@@ -449,9 +449,9 @@ class _FilesScreen extends State<FilesScreen> {
                             const SizedBox(height: 16),
                             addDropdown,
                             if (args.path != '/') parentFolderWidget,
-                            const Spacer(flex: 7),
                             if (args.select == FilesScreenSelectMode.folder)
                               moveWidget,
+                            const Spacer(flex: 7),
                           ],
                   ),
                 ),
@@ -465,7 +465,6 @@ class _FilesScreen extends State<FilesScreen> {
               bottomWidgets: args.select != FilesScreenSelectMode.folder
                   ? null
                   : [
-                      const Spacer(),
                       moveWidget,
                     ],
               files: _files!,
