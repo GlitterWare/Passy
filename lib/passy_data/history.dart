@@ -17,7 +17,7 @@ class History with JsonConvertable {
   final Map<String, EntryEvent> notes;
   final Map<String, EntryEvent> idCards;
   final Map<String, EntryEvent> identities;
-  final Map<String, EntryEvent> localSettings;
+  final Map<String, EntryEvent> appSettings;
 
   int get length =>
       passwords.length +
@@ -26,12 +26,12 @@ class History with JsonConvertable {
       notes.length +
       idCards.length +
       identities.length +
-      localSettings.length;
+      appSettings.length;
 
   void _init() {
-    DateTime _time = DateTime.now().toUtc();
-    if (!localSettings.containsKey('theme')) {
-      localSettings['theme'] =
+    DateTime _time = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    if (!appSettings.containsKey('theme')) {
+      appSettings['theme'] =
           EntryEvent('theme', status: EntryStatus.alive, lastModified: _time);
     }
   }
@@ -44,14 +44,14 @@ class History with JsonConvertable {
     Map<String, EntryEvent>? notes,
     Map<String, EntryEvent>? idCards,
     Map<String, EntryEvent>? identities,
-    Map<String, EntryEvent>? localSettings,
+    Map<String, EntryEvent>? appSettings,
   })  : passwords = passwords ?? {},
         passwordIcons = passwordIcons ?? {},
         notes = notes ?? {},
         paymentCards = paymentCards ?? {},
         idCards = idCards ?? {},
         identities = identities ?? {},
-        localSettings = localSettings ?? {} {
+        appSettings = appSettings ?? {} {
     _init();
   }
 
@@ -63,7 +63,7 @@ class History with JsonConvertable {
         notes = Map<String, EntryEvent>.from(other.notes),
         idCards = Map<String, EntryEvent>.from(other.idCards),
         identities = Map<String, EntryEvent>.from(other.identities),
-        localSettings = Map<String, EntryEvent>.from(other.localSettings) {
+        appSettings = Map<String, EntryEvent>.from(other.appSettings) {
     _init();
   }
 
@@ -81,7 +81,7 @@ class History with JsonConvertable {
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
         identities = (json['identities'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
-        localSettings = ((json['localSettings'] ?? <String, dynamic>{})
+        appSettings = ((json['appSettings'] ?? <String, dynamic>{})
                 as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))) {
     _init();
@@ -102,7 +102,7 @@ class History with JsonConvertable {
             (key, value) => MapEntry(key, value.toJson())),
         'identities': identities.map<String, dynamic>(
             (key, value) => MapEntry(key, value.toJson())),
-        'localSettings': localSettings.map<String, dynamic>(
+        'appSettings': appSettings.map<String, dynamic>(
             (key, value) => MapEntry(key, value.toJson())),
       };
 
@@ -155,7 +155,7 @@ class History with JsonConvertable {
     notes.removeWhere((key, value) => value.status == EntryStatus.removed);
     idCards.removeWhere((key, value) => value.status == EntryStatus.removed);
     identities.removeWhere((key, value) => value.status == EntryStatus.removed);
-    localSettings
+    appSettings
         .removeWhere((key, value) => value.status == EntryStatus.removed);
   }
 
@@ -167,6 +167,6 @@ class History with JsonConvertable {
     notes.forEach((key, value) => value.lastModified = _time);
     idCards.forEach((key, value) => value.lastModified = _time);
     identities.forEach((key, value) => value.lastModified = _time);
-    localSettings.forEach((key, value) => value.lastModified = _time);
+    appSettings.forEach((key, value) => value.lastModified = _time);
   }
 }
