@@ -21,7 +21,11 @@ class _ThemeScreen extends State<ThemeScreen> {
 
   Future<void> setTheme(PassyAppTheme? theme) async {
     if (theme == null) return;
-    setState(() => loadedAccount.appTheme = theme);
+    setState(() {
+      loadedAccount.appTheme = theme;
+      loadedAccount.saveLocalSettings();
+      loadedAccount.saveHistory();
+    });
     await loadedAccount.saveLocalSettings();
     switchAppTheme(context, theme);
   }
