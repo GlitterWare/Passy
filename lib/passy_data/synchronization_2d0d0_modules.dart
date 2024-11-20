@@ -188,7 +188,6 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
                   getPassyHash(jsonEncode(favoritesJson[entryTypeNamePlural]))
                       .toString();
             }
-            print(fileSyncHistory.value.toJson());
             return {
               'historyHash': historyHash,
               'historyHashes': historyHashes,
