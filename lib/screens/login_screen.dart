@@ -12,7 +12,6 @@ import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
-import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/passy_data/passy_search.dart';
 import 'package:passy/passy_flutter/common/common.dart';
