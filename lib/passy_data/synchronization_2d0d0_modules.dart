@@ -5,9 +5,11 @@ import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
 import 'package:passy/passy_data/file_meta.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:passy/passy_data/passy_fs_meta.dart';
 
 import 'file_sync_history.dart';
+import 'local_settings.dart';
 import 'passy_entries_file_collection.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
@@ -27,6 +29,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required FileSyncHistoryFile fileSyncHistory,
   required FavoritesFile favorites,
   required AccountSettingsFile settings,
+  required LocalSettingsFile localSettings,
   required AccountCredentialsFile credentials,
   required authWithIV,
   Map<EntryType, List<String>>? sharedEntryKeys,
@@ -86,6 +89,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               {'name': 'getFileSyncHistoryEntries'},
               {'name': 'getFile'},
               {'name': 'setFile'},
+              {'name': 'exchangeAppSettings'},
             ]
           };
         }
@@ -152,7 +156,8 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               favorites.reload(),
               fileSyncHistory.reload(),
             ]);
-            Map<String, dynamic> historyJson = history.value.toJson();
+            Map<String, dynamic> historyJson = history.value.toJson()
+              ..remove('appSettings');
             Map<String, dynamic> favoritesJson = favorites.value.toJson();
             Map<String, dynamic> fileSyncHistoryJson =
                 fileSyncHistory.value.toJson();
@@ -369,6 +374,58 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             await fileSyncHistory.save();
             return {
               'status': {'type': 'Success'}
+            };
+          case 'exchangeAppSettings':
+            Map<String, dynamic> check = checkArgs(args);
+            if (check.containsKey('error')) return check;
+            dynamic settings = check['appSettings'];
+            if (settings == null) {
+              return {
+                'error': {'type': 'Failed to decode app settings.'},
+              };
+            }
+            Map<String, dynamic> hostAppSettings = {};
+            await history.reload();
+            for (MapEntry entry in settings.entries) {
+              EntryEvent remoteHistoryEntry;
+              try {
+                remoteHistoryEntry =
+                    EntryEvent.fromJson(entry.value['historyEntry']);
+              } catch (e, s) {
+                throw 'Failed to decode history entry:\n$e\n$s`.';
+              }
+              if (entry.key == 'appTheme') {
+                EntryEvent? localHistoryEntry =
+                    history.value.appSettings['appTheme'];
+                if (localHistoryEntry == null) {
+                  return {
+                    'error': {'type': 'History entry not found.'},
+                    'key': 'appTheme',
+                  };
+                }
+                if (localHistoryEntry.lastModified
+                    .isAfter(remoteHistoryEntry.lastModified)) {
+                  hostAppSettings['appTheme'] = {
+                    'historyEntry': localHistoryEntry.toJson(),
+                    'value': localSettings.value.appTheme.name
+                  };
+                } else if (remoteHistoryEntry.lastModified
+                    .isAfter(localHistoryEntry.lastModified)) {
+                  String appThemeName = entry.value['value'];
+                  PassyAppTheme? theme = passyAppThemeFromName(appThemeName);
+                  // Fail silently on unkown theme and continue synchronization - I don't want to deal with this, fixed by keeping the app up to date
+                  if (theme == null) continue;
+                  await localSettings.reload();
+                  localSettings.value.appTheme = theme;
+                  await localSettings.save();
+                  history.value.appSettings['appTheme'] = remoteHistoryEntry;
+                }
+              }
+            }
+            await history.save();
+            return {
+              'status': {'type': 'Success'},
+              'hostAppSettings': hostAppSettings,
             };
         }
         throw {

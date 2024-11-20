@@ -28,6 +28,7 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
@@ -1364,6 +1365,8 @@ Future<void> executeCommand(List<String> command,
               AccountSettingsFile settings = AccountSettings.fromFile(
                   File('${accPath}settings.enc'),
                   encrypter: encrypter);
+              LocalSettingsFile localSettings =
+                  LocalSettings.fromFile(File('${accPath}local_settings.json'));
               Completer<void> syncCompleter = Completer();
               Completer<void> detachedCompleter = Completer();
               HostAddress? addr;
@@ -1398,6 +1401,7 @@ Future<void> executeCommand(List<String> command,
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                localSettings: localSettings,
                 credentials: AccountCredentials.fromFile(
                     File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
@@ -1555,6 +1559,8 @@ Future<void> executeCommand(List<String> command,
                   settings: AccountSettings.fromFile(
                       File('${accPath}settings.enc'),
                       encrypter: encrypter),
+                  localSettings: LocalSettings.fromFile(
+                      File('${accPath}local_settings.json')),
                   credentials: AccountCredentials.fromFile(
                       File('${accPath}credentials.json')),
                   authWithIV: _accounts[username]!.value.keyDerivationType !=
@@ -1757,6 +1763,8 @@ Future<void> executeCommand(List<String> command,
                         settings: AccountSettings.fromFile(
                             File('${accPath}settings.enc'),
                             encrypter: encrypter),
+                        localSettings: LocalSettings.fromFile(
+                            File('${accPath}local_settings.json')),
                         credentials: AccountCredentials.fromFile(
                             File('${accPath}credentials.json')),
                         authWithIV:
@@ -1988,6 +1996,8 @@ Future<void> executeCommand(List<String> command,
               AccountSettingsFile settings = AccountSettings.fromFile(
                   File('${accPath}settings.enc'),
                   encrypter: encrypter);
+              LocalSettingsFile localSettings =
+                  LocalSettings.fromFile(File('${accPath}local_settings.json'));
               Completer<void> syncCompleter = Completer();
               Synchronization? serverNullable;
               serverNullable = Synchronization(
@@ -2020,6 +2030,7 @@ Future<void> executeCommand(List<String> command,
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                localSettings: localSettings,
                 credentials: AccountCredentials.fromFile(
                     File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
@@ -2130,6 +2141,8 @@ Future<void> executeCommand(List<String> command,
               AccountSettingsFile settings = AccountSettings.fromFile(
                   File('${accPath}settings.enc'),
                   encrypter: encrypter);
+              LocalSettingsFile localSettings =
+                  LocalSettings.fromFile(File('${accPath}local_settings.json'));
               serverNullable = Synchronization(
                 encrypter: encrypter,
                 encryptedPassword: encryptedPassword,
@@ -2160,6 +2173,7 @@ Future<void> executeCommand(List<String> command,
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                localSettings: localSettings,
                 credentials: AccountCredentials.fromFile(
                     File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
@@ -31,6 +32,9 @@ class SynchronizationWrapper {
   late Map<String, PaymentCardMeta> _paymentCardsMetadata;
   late Map<String, IDCardMeta> _idCardsMetadata;
   late Map<String, IdentityMeta> _identitiesMetadata;
+  EntryEvent _appThemeEvent = EntryEvent('appTheme',
+      status: EntryStatus.alive,
+      lastModified: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true));
   Synchronization? _sync;
 
   SynchronizationWrapper({required BuildContext context}) : _context = context {
@@ -50,6 +54,12 @@ class SynchronizationWrapper {
     required LoadedAccount account,
     String popUntilRouteName = MainScreen.routeName,
   }) {
+    EntryEvent? appThemeEvent = account.appSettingsHistory['appTheme'];
+    if (appThemeEvent != null) {
+      if (appThemeEvent.lastModified.isAfter(_appThemeEvent.lastModified)) {
+        switchAppTheme(_context, account.appTheme);
+      }
+    }
     Navigator.popUntil(_context, (r) => r.settings.name == popUntilRouteName);
     Map<EntryType, List<util.ExchangeEntry>>? sharedEntries =
         results.sharedEntries;
@@ -152,6 +162,7 @@ class SynchronizationWrapper {
     required String address,
     String popUntilRouteName = MainScreen.routeName,
   }) {
+    _appThemeEvent = account.appSettingsHistory['appTheme'] ?? _appThemeEvent;
     HostAddress _hostAddress;
     try {
       _hostAddress = HostAddress.parse(address);
@@ -192,6 +203,7 @@ class SynchronizationWrapper {
     String popUntilRouteName = MainScreen.routeName,
     Widget? title,
   }) {
+    _appThemeEvent = account.appSettingsHistory['appTheme'] ?? _appThemeEvent;
     _sync = account.getSynchronization(
       onConnected: _onConnected,
       onComplete: (results) => _onSyncComplete(

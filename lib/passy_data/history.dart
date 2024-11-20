@@ -30,9 +30,9 @@ class History with JsonConvertable {
 
   void _init() {
     DateTime _time = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
-    if (!appSettings.containsKey('theme')) {
-      appSettings['theme'] =
-          EntryEvent('theme', status: EntryStatus.alive, lastModified: _time);
+    if (!appSettings.containsKey('appTheme')) {
+      appSettings['appTheme'] = EntryEvent('appTheme',
+          status: EntryStatus.alive, lastModified: _time);
     }
   }
 

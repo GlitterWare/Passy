@@ -17,6 +17,8 @@ import 'package:passy/passy_data/trusted_connection_data.dart';
 
 import 'favorites.dart';
 import 'glare/glare_message.dart';
+import 'local_settings.dart';
+import 'passy_app_theme.dart';
 import 'passy_entries_encrypted_csv_file.dart';
 import 'sync_entry_state.dart';
 import 'synchronization_2d0d0_modules.dart';
@@ -243,6 +245,7 @@ class Synchronization {
   final FileSyncHistoryFile _fileSyncHistory;
   final FavoritesFile _favorites;
   final AccountSettingsFile _settings;
+  final LocalSettingsFile _localSettings;
   final AccountCredentialsFile _credentials;
   final Encrypter _encrypter;
   final SynchronizationResults _synchronizationResults =
@@ -277,6 +280,7 @@ class Synchronization {
     required FileSyncHistoryFile fileSyncHistory,
     required FavoritesFile favorites,
     required AccountSettingsFile settings,
+    required LocalSettingsFile localSettings,
     required AccountCredentialsFile credentials,
     required Encrypter encrypter,
     required RSAKeypair rsaKeypair,
@@ -291,6 +295,7 @@ class Synchronization {
         _fileSyncHistory = fileSyncHistory,
         _favorites = favorites,
         _settings = settings,
+        _localSettings = localSettings,
         _credentials = credentials,
         _encrypter = encrypter,
         _rsaKeypair = rsaKeypair,
@@ -530,6 +535,7 @@ class Synchronization {
           fileSyncHistory: _fileSyncHistory,
           favorites: _favorites,
           settings: _settings,
+          localSettings: _localSettings,
           sharedEntryKeys: sharedEntryKeys,
           credentials: _credentials,
           authWithIV: _authWithIV,
@@ -798,6 +804,7 @@ class Synchronization {
                   fileSyncHistory: _fileSyncHistory,
                   favorites: _favorites,
                   settings: _settings,
+                  localSettings: _localSettings,
                   credentials: _credentials,
                   sharedEntryKeys: sharedEntryKeys,
                   authWithIV: _authWithIV,
@@ -972,7 +979,6 @@ class Synchronization {
       Encrypter usernameEncrypter = getPassyEncrypter(_username);
       String apiVersion = '2d0d1';
 
-      /*
       _syncLog += 'done.\nListing server commands... ';
       Map<String, dynamic> serverCommands =
           _checkResponse(await _safeSync2d0d0Client.runModule([
@@ -993,7 +999,6 @@ class Synchronization {
       List<String?> serverCommandsList = (serverCommandsListJson)
           .map((val) => val['name']?.toString())
           .toList();
-      */
       Key? derivedPassword;
       Encrypter remoteEncrypter;
       _syncLog += 'done.\nReceiving remote credentials metadata... ';
@@ -1319,7 +1324,8 @@ class Synchronization {
       }
       //dynamic fileSyncHistoryHashesJson = response['fileSyncHistoryHashesJson'];
       await _history.reload();
-      Map<String, dynamic> historyJson = _history.value.toJson();
+      Map<String, dynamic> historyJson = _history.value.toJson()
+        ..remove('appSettings');
       _syncLog += 'done.\nComparing history hashes... ';
       if (remoteHistoryHash !=
           getPassyHash(jsonEncode(historyJson)).toString()) {
@@ -1686,6 +1692,67 @@ class Synchronization {
           }
         }
       }
+      _syncLog += 'done.\nExchanging app settings... ';
+      if (serverCommandsList.contains('exchangeAppSettings')) {
+        await _history.reload();
+        await _localSettings.reload();
+        EntryEvent? localAppThemeHistoryEntry =
+            _history.value.appSettings['appTheme'];
+        GlareMessage message =
+            _checkResponseMsg(await _safeSync2d0d0Client.runModule([
+          apiVersion,
+          'exchangeAppSettings',
+          jsonEncode({
+            ...auth(),
+            'appSettings': {
+              'appTheme': {
+                'historyEntry': localAppThemeHistoryEntry,
+                'value': _localSettings.value.appTheme.name
+              },
+            }
+          }),
+        ]));
+        response = message.data;
+        if (response.containsKey('error')) {
+          _handleException(
+              '2.0.0+ synchronization host error:\n${jsonEncode(response)}');
+          return;
+        }
+        dynamic hostAppSettings = response['hostAppSettings'];
+        await _history.reload();
+        if (hostAppSettings != null) {
+          for (MapEntry entry in hostAppSettings.entries) {
+            EntryEvent remoteHistoryEntry;
+            try {
+              remoteHistoryEntry =
+                  EntryEvent.fromJson(entry.value['historyEntry']);
+            } catch (e, s) {
+              _handleException('Failed to decode history entry:\n$e\n$s`.');
+              return;
+            }
+            if (entry.key == 'appTheme') {
+              EntryEvent? localHistoryEntry =
+                  _history.value.appSettings['appTheme'];
+              if (localHistoryEntry == null) {
+                _handleException('History entry not found: `appTheme`.');
+                return;
+              }
+              if (remoteHistoryEntry.lastModified
+                  .isAfter(localHistoryEntry.lastModified)) {
+                String appThemeName = entry.value['value'];
+                PassyAppTheme? theme = passyAppThemeFromName(appThemeName);
+                // Fail silently on unkown theme and continue synchronization - I don't want to deal with this, fixed by keeping the app up to date
+                if (theme == null) continue;
+                await _localSettings.reload();
+                _localSettings.value.appTheme = theme;
+                await _localSettings.save();
+                _history.value.appSettings['appTheme'] = remoteHistoryEntry;
+              }
+            }
+          }
+        }
+        await _history.save();
+      }
     }
     _syncLog += '\nAll done.\nDisconnecting... ';
     _safeSync2d0d0Client.disconnect();
@@ -1830,7 +1897,8 @@ class Synchronization {
 
       void _handleHistoryHash(List<int> data) {
         _syncLog += 'done.\nDecoding history hash... ';
-        String _historyJson = jsonEncode(_history.value.toJson());
+        String _historyJson =
+            jsonEncode(_history.value.toJson()..remove('appSettings'));
         bool _same = true;
         try {
           _same = getPassyHash(_historyJson) == Digest(data);
