@@ -377,6 +377,7 @@ class LoadedAccount {
       fileSyncHistory: _fileSyncHistory,
       favorites: _favorites,
       settings: _settings,
+      localSettings: _localSettings,
       credentials: _credentials,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
@@ -838,7 +839,13 @@ class LoadedAccount {
   set autoBackup(AutoBackupSettings? value) =>
       _localSettings.value.autoBackup = value;
   PassyAppTheme get appTheme => _localSettings.value.appTheme;
-  set appTheme(PassyAppTheme value) => _localSettings.value.appTheme = value;
+  set appTheme(PassyAppTheme value) {
+    _history.reloadSync();
+    _history.value.appSettings['appTheme'] = EntryEvent('appTheme',
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    _localSettings.value.appTheme = value;
+  }
+
   Future<void> saveLocalSettings() => _localSettings.save();
   void saveLocalSettingsSync() => _localSettings.saveSync();
 
@@ -890,6 +897,8 @@ class LoadedAccount {
   Future<void> saveHistory() => _history.save();
   void saveHistorySync() => _history.saveSync();
   Digest get historyHash => getPassyHash(jsonEncode(_history.value.toJson()));
+  Map<String, EntryEvent> get appSettingsHistory =>
+      Map.from(_history.value.appSettings);
 
   // Favorites wrappers
   void clearRemovedFavorites() => _favorites.value.clearRemoved();
