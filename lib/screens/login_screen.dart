@@ -45,7 +45,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreen extends State<LoginScreen> {
   static bool didRun = false;
   bool initialized = false;
-  Widget? _floatingActionButton;
   String _password = '';
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
@@ -289,32 +288,6 @@ class _LoginScreen extends State<LoginScreen> {
         if (Platform.isAndroid) {
           FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
         }
-        _floatingActionButton =
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          FloatingActionButton(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.purple,
-            child: const Icon(Icons.settings_rounded),
-            tooltip: localizations.settings,
-            heroTag: null,
-            onPressed: () =>
-                Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
-          ),
-          if (!Platform.isAndroid && !Platform.isIOS)
-            Padding(
-              padding: EdgeInsets.only(
-                  left: PassyTheme.of(context).passyPadding.left),
-              child: FloatingActionButton(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.purple,
-                child: const Icon(Icons.extension_rounded),
-                tooltip: localizations.passyBrowserExtension,
-                heroTag: null,
-                onPressed: () => openUrl(
-                    'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
-              ),
-            ),
-        ]);
       }
       initialized = true;
     }
@@ -355,7 +328,32 @@ class _LoginScreen extends State<LoginScreen> {
         .toList();
 
     return Scaffold(
-      floatingActionButton: _floatingActionButton,
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        FloatingActionButton(
+          foregroundColor: PassyTheme.of(context).logoTextColor,
+          backgroundColor: PassyTheme.of(context).logoColor,
+          child: const Icon(Icons.settings_rounded),
+          tooltip: localizations.settings,
+          heroTag: null,
+          onPressed: () =>
+              Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
+        ),
+        if (!Platform.isAndroid && !Platform.isIOS)
+          Padding(
+            padding:
+                EdgeInsets.only(left: PassyTheme.of(context).passyPadding.left),
+            child: FloatingActionButton(
+              foregroundColor: PassyTheme.of(context).logoTextColor,
+              backgroundColor: PassyTheme.of(context).logoColor,
+              child: const Icon(Icons.extension_rounded),
+              tooltip: localizations.passyBrowserExtension,
+              heroTag: null,
+              onPressed: () => openUrl(
+                  'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
+            ),
+          ),
+      ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: CustomScrollView(
         slivers: [
@@ -377,8 +375,10 @@ class _LoginScreen extends State<LoginScreen> {
                               children: [
                                 if (!isAutofill)
                                   FloatingActionButton(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.purple,
+                                    foregroundColor:
+                                        PassyTheme.of(context).logoTextColor,
+                                    backgroundColor:
+                                        PassyTheme.of(context).logoColor,
                                     onPressed: () =>
                                         Navigator.pushReplacementNamed(context,
                                             AddAccountScreen.routeName),

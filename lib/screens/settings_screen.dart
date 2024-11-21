@@ -110,7 +110,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 child: Icon(Icons.circle),
               ),
               right: Switch(
-                activeColor: Colors.greenAccent,
+                //activeColor: Colors.deepPurpleAccent,
                 value: _account.minimizeToTray,
                 onChanged: (value) => setMinimizeToTray(value),
               ),

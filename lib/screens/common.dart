@@ -961,18 +961,15 @@ Future<void> toggleTray() async {
 Future<void> switchAppTheme(
     BuildContext context, PassyAppTheme? appTheme) async {
   if (!context.mounted) return;
-  switch (appTheme) {
-    case PassyAppTheme.classicDark:
-      PassyThemeNotification(PassyTheme.classicTheme).dispatch(context);
-      break;
-    case PassyAppTheme.classicLight:
-      PassyThemeNotification(PassyTheme.lightTheme).dispatch(context);
-      break;
-    case PassyAppTheme.custom:
-      PassyThemeNotification(PassyTheme.classicTheme).dispatch(context);
-      break;
-    case null:
-      PassyThemeNotification(PassyTheme.classicTheme).dispatch(context);
-      break;
+  ThemeData? data;
+  if (appTheme == null) {
+    data = null;
+  } else {
+    data = PassyTheme.themes[appTheme];
+  }
+  if (data == null) {
+    PassyThemeNotification(PassyTheme.classicDark).dispatch(context);
+  } else {
+    PassyThemeNotification(data).dispatch(context);
   }
 }

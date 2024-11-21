@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 
 class PassyTheme extends ThemeExtension<PassyTheme> {
   final EdgeInsets passyPadding;
+  final Color logoColor;
+  final Color logoTextColor;
   final Color contentColor;
   final Color contentSecondaryColor;
   final Color contentTextColor;
@@ -12,9 +15,13 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
   final Color accentContentColor;
   final Color accentContentTextColor;
   final ColorScheme datePickerColorScheme;
+  final Color? switchThumbColor;
+  final Color? switchTrackColor;
 
   const PassyTheme({
     this.passyPadding = const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+    this.logoColor = Colors.purple,
+    this.logoTextColor = Colors.white,
     this.contentColor = const Color.fromRGBO(38, 50, 56, 1),
     this.secondaryContentColor = const Color.fromRGBO(0, 0, 0, 1),
     this.contentSecondaryColor = const Color.fromRGBO(84, 110, 122, 1),
@@ -29,6 +36,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
       primary: Color.fromRGBO(144, 202, 249, 1),
       onPrimary: Color.fromRGBO(227, 242, 253, 1),
     ),
+    this.switchThumbColor = const Color.fromRGBO(105, 240, 174, 1),
+    this.switchTrackColor = const Color.fromRGBO(90, 130, 157, 1),
   });
 
   static PassyTheme? maybeOf(BuildContext context) =>
@@ -44,6 +53,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     ColorScheme colorScheme = const ColorScheme.dark(),
     EdgeInsets passyPadding =
         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+    Color logoColor = Colors.purple,
+    Color logoTextColor = Colors.white,
     Color contentColor = const Color.fromRGBO(38, 50, 56, 1),
     Color secondaryContentColor = const Color.fromRGBO(0, 0, 0, 1),
     Color contentSecondaryColor = const Color.fromRGBO(84, 110, 122, 1),
@@ -58,11 +69,15 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
       primary: Color.fromRGBO(144, 202, 249, 1),
       onPrimary: Color.fromRGBO(227, 242, 253, 1),
     ),
+    Color? switchThumbColor = const Color.fromRGBO(105, 240, 174, 1),
+    Color? switchTrackColor = const Color.fromRGBO(90, 130, 157, 1),
   }) {
     return ThemeData(
       extensions: [
         PassyTheme(
           passyPadding: passyPadding,
+          logoColor: logoColor,
+          logoTextColor: logoTextColor,
           contentColor: contentColor,
           secondaryContentColor: secondaryContentColor,
           contentSecondaryColor: contentSecondaryColor,
@@ -73,6 +88,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
           accentContentColor: accentContentColor,
           accentContentTextColor: accentContentTextColor,
           datePickerColorScheme: datePickerColorScheme,
+          switchThumbColor: switchThumbColor,
+          switchTrackColor: switchTrackColor,
         )
       ],
       colorScheme: colorScheme.copyWith(
@@ -145,11 +162,37 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
         color: secondaryContentColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       ),
+      switchTheme: SwitchThemeData(
+        thumbColor:
+            WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.disabled)) {
+            return null;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return switchThumbColor;
+          }
+          return null;
+        }),
+        trackColor:
+            WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.disabled)) {
+            return null;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return switchTrackColor;
+          }
+          return null;
+        }),
+      ),
+      sliderTheme: SliderThemeData(
+        thumbColor: switchThumbColor,
+        activeTrackColor: switchTrackColor,
+      ),
     );
   }
 
-  static final classicTheme = PassyTheme.buildThemeData();
-  static final lightTheme = PassyTheme.buildThemeData(
+  static final classicDark = PassyTheme.buildThemeData();
+  static final classicLight = PassyTheme.buildThemeData(
     colorScheme: const ColorScheme.light(),
     contentColor: const Color.fromRGBO(227, 242, 253, 1),
     contentSecondaryColor: const Color.fromRGBO(144, 202, 249, 1),
@@ -164,7 +207,50 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
       primary: Color.fromRGBO(84, 110, 122, 1),
       onPrimary: Color.fromRGBO(38, 50, 56, 1),
     ),
+    switchTrackColor: const Color.fromRGBO(38, 50, 56, 1),
   );
+  static final emeraldDark = PassyTheme.buildThemeData(
+    logoColor: const Color.fromRGBO(0, 165, 145, 1),
+    contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
+    contentTextColor: const Color.fromRGBO(255, 255, 255, 1),
+    highlightContentColor: const Color.fromRGBO(255, 255, 255, 1),
+    highlightContentSecondaryColor: const Color.fromRGBO(0, 235, 205, 1),
+    highlightContentTextColor: const Color.fromRGBO(0, 0, 0, 1),
+    accentContentColor: const Color.fromRGBO(0, 138, 120, 1),
+    accentContentTextColor: const Color.fromRGBO(255, 255, 255, 1),
+    datePickerColorScheme: const ColorScheme.light(
+      primary: Color.fromRGBO(84, 110, 122, 1),
+      onPrimary: Color.fromRGBO(38, 50, 56, 1),
+    ),
+    switchThumbColor: Colors.deepPurpleAccent,
+    switchTrackColor: Colors.deepPurple[50]!,
+  );
+  static final emeraldLight = PassyTheme.buildThemeData(
+    colorScheme: const ColorScheme.light(),
+    logoColor: const Color.fromRGBO(0, 165, 145, 1),
+    contentColor: const Color.fromRGBO(227, 255, 252, 1),
+    contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
+    contentTextColor: const Color.fromRGBO(0, 0, 0, 1),
+    secondaryContentColor: const Color.fromRGBO(255, 255, 255, 1),
+    highlightContentColor: const Color.fromRGBO(0, 0, 0, 1),
+    highlightContentSecondaryColor: const Color.fromRGBO(0, 128, 114, 1),
+    highlightContentTextColor: const Color.fromRGBO(227, 255, 252, 1),
+    accentContentColor: const Color.fromRGBO(0, 235, 205, 1),
+    accentContentTextColor: const Color.fromRGBO(0, 0, 0, 1),
+    datePickerColorScheme: const ColorScheme.light(
+      primary: Color.fromRGBO(84, 110, 122, 1),
+      onPrimary: Color.fromRGBO(38, 50, 56, 1),
+    ),
+    switchThumbColor: Colors.deepPurpleAccent,
+    switchTrackColor: Colors.grey[800],
+  );
+
+  static final themes = {
+    PassyAppTheme.classicDark: classicDark,
+    PassyAppTheme.classicLight: classicLight,
+    PassyAppTheme.emeraldDark: emeraldDark,
+    PassyAppTheme.emeraldLight: emeraldLight,
+  };
 
   static const appBarButtonSplashRadius = 28.0;
   static const appBarButtonPadding = EdgeInsets.all(16.0);
@@ -245,7 +331,7 @@ class _PassyDynamicThemeWidget extends State<PassyThemeWidget> {
   @override
   void initState() {
     super.initState();
-    theme = widget.theme ?? PassyTheme.classicTheme;
+    theme = widget.theme ?? PassyTheme.classicDark;
   }
 
   @override

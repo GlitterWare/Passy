@@ -66,7 +66,7 @@ import 'screens/theme_screen.dart';
 import 'screens/unlock_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-ThemeData _theme = PassyTheme.classicTheme;
+ThemeData _theme = PassyTheme.classicDark;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

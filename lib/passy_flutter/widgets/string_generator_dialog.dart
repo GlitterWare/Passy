@@ -136,7 +136,6 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               child: Icon(Icons.numbers),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
               value: _numbersEnabled,
               onChanged: (value) => _setNumbersEnabled(value),
             ),
@@ -149,7 +148,6 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               child: Icon(Icons.star),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
               value: _symbolsEnabled,
               onChanged: (value) => _setSymbolsEnabled(_symbolsEnabled = value),
             ),
@@ -182,8 +180,6 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               }),
               min: 4.0,
               max: 200.0,
-              activeColor: Colors.cyan,
-              thumbColor: Colors.cyanAccent,
               inactiveColor: PassyTheme.of(context).contentSecondaryColor,
             ),
           ),
