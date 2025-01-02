@@ -313,7 +313,7 @@
     "backupPassy": "Резервная копия Passy",
     "backupSaved": "Резервная копия сохранена",
     "couldNotBackup": "Не удалось создать резервную копию",
-    "renameTag": "Переименовать тег"
+    "renameTag": "Переименовать тег",
     "noChanges": "Нет изменений",
     "close": "Закрыть",
     "entryDoesNotExist": "Запись не существует",
