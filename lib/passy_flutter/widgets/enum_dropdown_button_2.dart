@@ -107,9 +107,9 @@ class _EnumDropdownButton2<T extends Enum>
           color: PassyTheme.of(context).accentContentColor,
           borderRadius: BorderRadius.circular(100),
           child: InkWell(
-            splashFactory: InkRipple.splashFactory,
-            splashColor: Colors.white24,
-            hoverColor: Colors.white12,
+            splashFactory: Theme.of(context).splashFactory,
+            splashColor: Theme.of(context).splashColor,
+            hoverColor: Theme.of(context).hoverColor,
             child: Container(
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(100)),
