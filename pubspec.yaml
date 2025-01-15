@@ -100,6 +100,7 @@ dependencies:
       ref: 1720bb4c07aee96c1de3ad6753184265b91aaea7
   window_manager: ^0.3.9
   system_tray: ^2.0.3
+  flex_color_picker: ^3.6.0
 
 dependency_overrides:
   uuid: ^4.0.0

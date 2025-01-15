@@ -1,3 +1,4 @@
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:passy/common/common.dart';
@@ -18,11 +19,12 @@ class ThemeScreen extends StatefulWidget {
 
 class _ThemeScreen extends State<ThemeScreen> {
   final LoadedAccount loadedAccount = data.loadedAccount!;
+  String themeMode =
+      data.loadedAccount!.appTheme.name.contains('Dark') ? 'dark' : 'light';
 
   Future<void> setTheme(PassyAppTheme? theme) async {
-    if (theme == null) return;
     setState(() {
-      loadedAccount.appTheme = theme;
+      loadedAccount.appTheme = theme!;
       loadedAccount.saveLocalSettings();
       loadedAccount.saveHistory();
     });
@@ -45,11 +47,92 @@ class _ThemeScreen extends State<ThemeScreen> {
       ),
       body: ListView(
         children: [
-          PassyPadding(EnumDropDownButtonFormField(
-            value: loadedAccount.appTheme,
-            values: PassyAppTheme.values,
-            onChanged: setTheme,
-          )),
+          ColorPicker(
+            customColorSwatchesAndNames: {
+              ColorTools.createPrimarySwatch(PassyTheme.classicDark
+                  .extension<PassyTheme>()!
+                  .accentContentColor): 'classic',
+              ColorTools.createPrimarySwatch(PassyTheme.emeraldDark
+                  .extension<PassyTheme>()!
+                  .accentContentColor): 'emerald',
+            },
+            pickersEnabled: const {
+              ColorPickerType.primary: false,
+              ColorPickerType.accent: false,
+              ColorPickerType.custom: true,
+            },
+            enableShadesSelection: false,
+            onColorChanged: (color) {
+              if (color ==
+                  PassyTheme.classicDark
+                      .extension<PassyTheme>()!
+                      .accentContentColor) {
+                switch (themeMode) {
+                  case 'light':
+                    setTheme(PassyAppTheme.classicLight);
+                  default:
+                    setTheme(PassyAppTheme.classicDark);
+                }
+              }
+              if (color ==
+                  PassyTheme.emeraldDark
+                      .extension<PassyTheme>()!
+                      .accentContentColor) {
+                switch (themeMode) {
+                  case 'light':
+                    setTheme(PassyAppTheme.emeraldLight);
+                  default:
+                    setTheme(PassyAppTheme.emeraldDark);
+                }
+              }
+            },
+          ),
+          Row(children: [
+            const Spacer(),
+            PassyPadding(Column(children: [
+              Checkbox(
+                value: themeMode == 'dark',
+                onChanged: (bool? value) {
+                  setState(() {
+                    themeMode = 'dark';
+                  });
+                  if (loadedAccount.appTheme.name.contains('Dark')) return;
+                  setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
+                      .replaceFirst('Light', 'Dark')));
+                },
+              ),
+              const Icon(Icons.dark_mode),
+            ])),
+            PassyPadding(Column(children: [
+              Checkbox(
+                value: themeMode == 'light',
+                onChanged: (bool? value) {
+                  setState(() {
+                    themeMode = 'light';
+                  });
+                  if (loadedAccount.appTheme.name.contains('Light')) return;
+                  setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
+                      .replaceFirst('Dark', 'Light')));
+                },
+              ),
+              const Icon(Icons.light_mode),
+            ])),
+            /*
+            PassyPadding(Column(children: [
+              Checkbox(
+                value: themeMode == 'auto',
+                onChanged: (bool? value) {
+                  setState(() {
+                    themeMode = 'auto';
+                    setTheme(null);
+                  });
+                },
+              ),
+              const Icon(Icons.auto_fix_high),
+            ])),
+            */
+            const Spacer(),
+          ]),
         ],
       ),
     );
