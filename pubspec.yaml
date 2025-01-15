@@ -75,7 +75,6 @@ dependencies:
       path: dargon2
       ref: 180ec98990f8e1d7190a34f2c131e9d587d1a4ff
   dargon2_interface: ^1.1.1
-  system_info2: ^4.0.0
   flutter_markdown: ^0.6.17+1
   compute: ^1.0.2
   launch_at_startup: ^0.2.2

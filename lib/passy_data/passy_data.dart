@@ -12,7 +12,6 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:system_info2/system_info2.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
@@ -272,22 +271,30 @@ class PassyData {
   Future<LoadedAccount> createAccount(String username, String password) async {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
     Salt _salt = Salt.newSalt();
-    int _memory = SysInfo.getFreePhysicalMemory();
-    if (_memory > 67108864) {
-      _memory = 65536;
-    } else if (_memory > 33554432) {
-      _memory = 32768;
-    } else if (_memory > 16777216) {
-      _memory = 16384;
-    } else if (_memory > 8388608) {
-      _memory = 8192;
-    } else if (_memory > 4194304) {
-      _memory = 4096;
-    } else if (_memory > 2097152) {
-      _memory = 2048;
+    DArgon2Result? result;
+    int _memory = 65536;
+    Object? lastE;
+    // Test 64MB allocation up to 3 times to provide the best security in environments with volatile memory
+    for (int memory in [65536, 65536, 65536, 32768, 16384, 8192, 4096, 2048]) {
+      try {
+        result =
+            await common.argon2ifyString(password, salt: _salt, memory: memory);
+        _memory = memory;
+        break;
+      } catch (e) {
+        if (e is! DArgon2Exception) {
+          rethrow;
+        } else if (e.errorCode !=
+            DArgon2ErrorCode.ARGON2_MEMORY_ALLOCATION_ERROR) {
+          rethrow;
+        }
+        lastE = e;
+      }
     }
-    DArgon2Result result =
-        await common.argon2ifyString(password, salt: _salt, memory: _memory);
+    if (result == null) {
+      lastE ??= 'Unknown Exception';
+      throw lastE;
+    }
     AccountCredentialsFile _file = AccountCredentials.fromFile(
         File(_accountPath + Platform.pathSeparator + 'credentials.json'),
         value: AccountCredentials(
