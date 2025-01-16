@@ -640,9 +640,9 @@ class FileIndex {
           PassyBinaryFile binaryFile = PassyBinaryFile(
               file: File(_saveDir.path + Platform.pathSeparator + meta.key),
               key: _key);
-          List<String> vParent = meta.virtualPath.split('/');
-          vParent = vParent.sublist(0, vParent.length - 1);
-          String filePath = p.join(path, vParent.join(Platform.pathSeparator));
+          List<String> vPath = meta.virtualPath.split('/');
+          vPath = vPath.sublist(1, vPath.length);
+          String filePath = p.join(path, vPath.join(Platform.pathSeparator));
           await binaryFile.export(File(filePath));
         }(),
     ]);
