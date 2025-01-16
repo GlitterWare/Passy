@@ -216,7 +216,7 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     highlightContentColor: const Color.fromRGBO(255, 255, 255, 1),
     highlightContentSecondaryColor: const Color.fromRGBO(0, 235, 205, 1),
     highlightContentTextColor: const Color.fromRGBO(0, 0, 0, 1),
-    accentContentColor: const Color.fromRGBO(0, 138, 120, 1),
+    accentContentColor: const Color.fromRGBO(0, 105, 95, 1),
     accentContentTextColor: const Color.fromRGBO(255, 255, 255, 1),
     datePickerColorScheme: const ColorScheme.light(
       primary: Color.fromRGBO(84, 110, 122, 1),
