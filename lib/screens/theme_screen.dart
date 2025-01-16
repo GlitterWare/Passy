@@ -23,12 +23,9 @@ class _ThemeScreen extends State<ThemeScreen> {
       data.loadedAccount!.appTheme.name.contains('Dark') ? 'dark' : 'light';
 
   Future<void> setTheme(PassyAppTheme? theme) async {
-    setState(() {
-      loadedAccount.appTheme = theme!;
-      loadedAccount.saveLocalSettings();
-      loadedAccount.saveHistory();
-    });
+    setState(() => loadedAccount.appTheme = theme!);
     await loadedAccount.saveLocalSettings();
+    await loadedAccount.saveHistory();
     switchAppTheme(context, theme);
   }
 
