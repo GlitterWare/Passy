@@ -544,7 +544,7 @@ class _MainScreen extends State<MainScreen>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
       PassyPadding(ThreeWidgetButton(
-          center: Text(localizations.files + ' (Coming soon)'),
+          center: Text(localizations.files),
           left: const Padding(
             padding: EdgeInsets.only(right: 30),
             child: Icon(Icons.description_outlined),
