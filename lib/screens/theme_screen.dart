@@ -49,10 +49,14 @@ class _ThemeScreen extends State<ThemeScreen> {
         children: [
           ColorPicker(
             customColorSwatchesAndNames: {
-              ColorTools.createPrimarySwatch(PassyTheme.classicDark
+              ColorTools.createPrimarySwatch((themeMode == 'dark'
+                      ? PassyTheme.classicDark
+                      : PassyTheme.classicLight)
                   .extension<PassyTheme>()!
                   .accentContentColor): 'classic',
-              ColorTools.createPrimarySwatch(PassyTheme.emeraldDark
+              ColorTools.createPrimarySwatch((themeMode == 'dark'
+                      ? PassyTheme.emeraldDark
+                      : PassyTheme.emeraldLight)
                   .extension<PassyTheme>()!
                   .accentContentColor): 'emerald',
             },
@@ -67,23 +71,22 @@ class _ThemeScreen extends State<ThemeScreen> {
                   PassyTheme.classicDark
                       .extension<PassyTheme>()!
                       .accentContentColor) {
-                switch (themeMode) {
-                  case 'light':
-                    setTheme(PassyAppTheme.classicLight);
-                  default:
-                    setTheme(PassyAppTheme.classicDark);
-                }
-              }
-              if (color ==
+                setTheme(PassyAppTheme.classicDark);
+              } else if (color ==
+                  PassyTheme.classicLight
+                      .extension<PassyTheme>()!
+                      .accentContentColor) {
+                setTheme(PassyAppTheme.classicLight);
+              } else if (color ==
                   PassyTheme.emeraldDark
                       .extension<PassyTheme>()!
                       .accentContentColor) {
-                switch (themeMode) {
-                  case 'light':
-                    setTheme(PassyAppTheme.emeraldLight);
-                  default:
-                    setTheme(PassyAppTheme.emeraldDark);
-                }
+                setTheme(PassyAppTheme.emeraldDark);
+              } else if (color ==
+                  PassyTheme.emeraldLight
+                      .extension<PassyTheme>()!
+                      .accentContentColor) {
+                setTheme(PassyAppTheme.emeraldLight);
               }
             },
           ),
