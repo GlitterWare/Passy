@@ -68,11 +68,21 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 ThemeData _theme = PassyTheme.classicDark;
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
+  HttpOverrides.global = MyHttpOverrides();
   runApp(PassyThemeWidget(theme: _theme, child: const Passy()));
 }
 

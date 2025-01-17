@@ -85,6 +85,9 @@ class _AddFileScreen extends State<AddFileScreen> {
       case FileEntryType.video:
         newFileMeta.type = PassyFileType.video;
         break;
+      case FileEntryType.pdf:
+        newFileMeta.type = PassyFileType.pdf;
+        break;
     }
     setState(() {
       _fileMeta = newFileMeta;
@@ -244,6 +247,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                           FileEntryType.video,
                           FileEntryType.plainText,
                           FileEntryType.markdown,
+                          FileEntryType.pdf,
                           FileEntryType.unknown,
                         ],
                         itemBuilder: (object) {
@@ -264,6 +268,8 @@ class _AddFileScreen extends State<AddFileScreen> {
                               return Text(localizations.audio);
                             case FileEntryType.video:
                               return Text(localizations.video);
+                            case FileEntryType.pdf:
+                              return const Text('PDF');
                           }
                         },
                         onChanged: (value) {

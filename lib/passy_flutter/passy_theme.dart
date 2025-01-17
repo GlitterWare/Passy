@@ -244,6 +244,41 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     switchThumbColor: Colors.deepPurpleAccent,
     switchTrackColor: Colors.grey[800],
   );
+  static final goldDark = PassyTheme.buildThemeData(
+    logoColor: const Color.fromRGBO(0, 165, 145, 1),
+    contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
+    contentTextColor: const Color.fromRGBO(255, 255, 255, 1),
+    highlightContentColor: const Color.fromRGBO(255, 255, 255, 1),
+    highlightContentSecondaryColor: const Color.fromRGBO(0, 235, 205, 1),
+    highlightContentTextColor: const Color.fromRGBO(0, 0, 0, 1),
+    accentContentColor: const Color.fromRGBO(0, 138, 120, 1),
+    accentContentTextColor: const Color.fromRGBO(255, 255, 255, 1),
+    datePickerColorScheme: const ColorScheme.light(
+      primary: Color.fromRGBO(84, 110, 122, 1),
+      onPrimary: Color.fromRGBO(38, 50, 56, 1),
+    ),
+    switchThumbColor: Colors.deepPurpleAccent,
+    switchTrackColor: Colors.deepPurple[50]!,
+  );
+  static final goldLight = PassyTheme.buildThemeData(
+    colorScheme: const ColorScheme.light(),
+    logoColor: const Color.fromRGBO(0, 165, 145, 1),
+    contentColor: const Color.fromRGBO(227, 255, 252, 1),
+    contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
+    contentTextColor: const Color.fromRGBO(0, 0, 0, 1),
+    secondaryContentColor: const Color.fromRGBO(255, 255, 255, 1),
+    highlightContentColor: const Color.fromRGBO(0, 0, 0, 1),
+    highlightContentSecondaryColor: const Color.fromRGBO(0, 128, 114, 1),
+    highlightContentTextColor: const Color.fromRGBO(227, 255, 252, 1),
+    accentContentColor: const Color.fromRGBO(0, 235, 205, 1),
+    accentContentTextColor: const Color.fromRGBO(0, 0, 0, 1),
+    datePickerColorScheme: const ColorScheme.light(
+      primary: Color.fromRGBO(84, 110, 122, 1),
+      onPrimary: Color.fromRGBO(38, 50, 56, 1),
+    ),
+    switchThumbColor: Colors.deepPurpleAccent,
+    switchTrackColor: Colors.grey[800],
+  );
 
   static final themes = {
     PassyAppTheme.classicDark: classicDark,

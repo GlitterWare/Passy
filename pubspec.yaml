@@ -101,6 +101,7 @@ dependencies:
   window_manager: ^0.3.9
   system_tray: ^2.0.3
   flex_color_picker: ^3.6.0
+  pdfrx: ^1.0.94
 
 dependency_overrides:
   uuid: ^4.0.0

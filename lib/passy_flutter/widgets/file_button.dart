@@ -40,6 +40,8 @@ class FileButton extends StatelessWidget {
         return const Icon(Icons.music_note);
       case FileEntryType.video:
         return const Icon(Icons.video_file_outlined);
+      case FileEntryType.pdf:
+        return const Icon(Icons.note_outlined);
     }
   }
 

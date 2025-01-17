@@ -197,6 +197,9 @@ class FileMeta extends PassyFsMeta with JsonConvertable {
           case 'wmv':
             type = PassyFileType.video;
             break;
+          case 'pdf':
+            type = PassyFileType.pdf;
+            break;
           default:
             type = PassyFileType.unknown;
             break;

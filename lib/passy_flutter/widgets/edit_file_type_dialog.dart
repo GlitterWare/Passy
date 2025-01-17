@@ -64,6 +64,8 @@ class _EditFileTypeDialog extends State<EditFileTypeDialog> {
                     return Text(localizations.audio);
                   case FileEntryType.video:
                     return Text(localizations.video);
+                  case FileEntryType.pdf:
+                    return const Text('PDF');
                 }
               },
               onChanged: (value) {

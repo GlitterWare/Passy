@@ -9,6 +9,7 @@ enum FileEntryType {
   photo,
   audio,
   video,
+  pdf,
 }
 
 PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
@@ -29,6 +30,8 @@ PassyFileType? passyFileTypeFromFileEntryType(FileEntryType type) {
       return PassyFileType.audio;
     case FileEntryType.video:
       return PassyFileType.video;
+    case FileEntryType.pdf:
+      return PassyFileType.pdf;
   }
 }
 
@@ -46,5 +49,7 @@ FileEntryType fileEntryTypeFromPassyFileType(PassyFileType type) {
       return FileEntryType.audio;
     case PassyFileType.video:
       return FileEntryType.video;
+    case PassyFileType.pdf:
+      return FileEntryType.pdf;
   }
 }

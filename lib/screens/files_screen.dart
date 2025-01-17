@@ -125,6 +125,9 @@ class _FilesScreen extends State<FilesScreen> {
           case PassyFileType.video:
             type = FileEntryType.video;
             break;
+          case PassyFileType.pdf:
+            type = FileEntryType.pdf;
+            break;
         }
         result.add(FileEntry(
           key: meta.key,
