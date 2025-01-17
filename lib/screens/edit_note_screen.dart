@@ -30,6 +30,22 @@ class _EditNoteScreen extends State<EditNoteScreen> {
   bool _isMarkdown = false;
   List<String> _attachments = [];
 
+  void _onSave() async {
+    final LoadedAccount _account = data.loadedAccount!;
+    Note _noteArgs = Note(
+      key: _key,
+      title: _title,
+      note: _note,
+      isMarkdown: _isMarkdown,
+      attachments: _attachments,
+    );
+    Navigator.pushNamed(context, SplashScreen.routeName);
+    await _account.setNote(_noteArgs);
+    Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
+    Navigator.pushNamed(context, NotesScreen.routeName);
+    Navigator.pushNamed(context, NoteScreen.routeName, arguments: _noteArgs);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded) {
@@ -47,26 +63,15 @@ class _EditNoteScreen extends State<EditNoteScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: _onSave,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.note.toLowerCase(),
         isNew: _isNew,
-        onSave: () async {
-          final LoadedAccount _account = data.loadedAccount!;
-          Note _noteArgs = Note(
-            key: _key,
-            title: _title,
-            note: _note,
-            isMarkdown: _isMarkdown,
-            attachments: _attachments,
-          );
-          Navigator.pushNamed(context, SplashScreen.routeName);
-          await _account.setNote(_noteArgs);
-          Navigator.popUntil(
-              context, (r) => r.settings.name == MainScreen.routeName);
-          Navigator.pushNamed(context, NotesScreen.routeName);
-          Navigator.pushNamed(context, NoteScreen.routeName,
-              arguments: _noteArgs);
-        },
+        onSave: _onSave,
       ),
       body: ListView(children: [
         AttachmentsEditor(

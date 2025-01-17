@@ -64,6 +64,52 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
     }
   }
 
+  void _onSave() async {
+    final LoadedAccount _account = data.loadedAccount!;
+    _customFields.removeWhere((element) => element.value == '');
+    Password _passwordArgs = Password(
+      key: _key,
+      customFields: _customFields,
+      additionalInfo: _additionalInfo,
+      tags: _tags,
+      nickname: _nickname,
+      username: _username,
+      email: _email,
+      password: _password,
+      tfa: _tfaSecret == ''
+          ? null
+          : TFA(
+              secret: _tfaSecret,
+              length: _tfaLength,
+              interval: _tfaInterval,
+              algorithm: _tfaAlgorithm,
+              isGoogle: _tfaIsGoogle,
+              type: _tfaType,
+            ),
+      websites: _websites.sublist(0, _websites.length - 1),
+      attachments: _attachments,
+    );
+    Navigator.pushNamed(context, SplashScreen.routeName);
+    await _account.setPassword(_passwordArgs);
+    if (isAutofill) {
+      await AutofillService().resultWithDatasets([
+        PwDataset(
+          label: _passwordArgs.nickname,
+          username: _passwordArgs.username.isNotEmpty
+              ? _passwordArgs.username
+              : _passwordArgs.email,
+          password: _passwordArgs.password,
+        ),
+      ]);
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
+    Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
+    Navigator.pushNamed(context, PasswordsScreen.routeName);
+    Navigator.pushNamed(context, PasswordScreen.routeName,
+        arguments: _passwordArgs);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded) {
@@ -115,55 +161,15 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: _onSave,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.password.toLowerCase(),
         isNew: _isNew,
-        onSave: () async {
-          final LoadedAccount _account = data.loadedAccount!;
-          _customFields.removeWhere((element) => element.value == '');
-          Password _passwordArgs = Password(
-            key: _key,
-            customFields: _customFields,
-            additionalInfo: _additionalInfo,
-            tags: _tags,
-            nickname: _nickname,
-            username: _username,
-            email: _email,
-            password: _password,
-            tfa: _tfaSecret == ''
-                ? null
-                : TFA(
-                    secret: _tfaSecret,
-                    length: _tfaLength,
-                    interval: _tfaInterval,
-                    algorithm: _tfaAlgorithm,
-                    isGoogle: _tfaIsGoogle,
-                    type: _tfaType,
-                  ),
-            websites: _websites.sublist(0, _websites.length - 1),
-            attachments: _attachments,
-          );
-          Navigator.pushNamed(context, SplashScreen.routeName);
-          await _account.setPassword(_passwordArgs);
-          if (isAutofill) {
-            await AutofillService().resultWithDatasets([
-              PwDataset(
-                label: _passwordArgs.nickname,
-                username: _passwordArgs.username.isNotEmpty
-                    ? _passwordArgs.username
-                    : _passwordArgs.email,
-                password: _passwordArgs.password,
-              ),
-            ]);
-            Navigator.pop(context);
-            Navigator.pop(context);
-          }
-          Navigator.popUntil(
-              context, (r) => r.settings.name == MainScreen.routeName);
-          Navigator.pushNamed(context, PasswordsScreen.routeName);
-          Navigator.pushNamed(context, PasswordScreen.routeName,
-              arguments: _passwordArgs);
-        },
+        onSave: _onSave,
       ),
       body: ListView(children: [
         AttachmentsEditor(

@@ -50,6 +50,30 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
     }
   }
 
+  void _onSave() async {
+          final LoadedAccount _account = data.loadedAccount!;
+          _customFields.removeWhere((element) => element.value == '');
+          PaymentCard _paymentCardArgs = PaymentCard(
+            key: _key,
+            customFields: _customFields,
+            additionalInfo: _additionalInfo,
+            tags: _tags,
+            nickname: _nickname,
+            cardNumber: _cardNumber,
+            cardholderName: _cardholderName,
+            cvv: _cvv,
+            exp: _exp,
+            attachments: _attachments,
+          );
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await _account.setPaymentCard(_paymentCardArgs);
+          Navigator.popUntil(
+              context, (r) => r.settings.name == MainScreen.routeName);
+          Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+          Navigator.pushNamed(context, PaymentCardScreen.routeName,
+              arguments: _paymentCardArgs);
+        }
+
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded) {
@@ -79,31 +103,14 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: _onSave,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.paymentCard.toLowerCase(),
-        onSave: () async {
-          final LoadedAccount _account = data.loadedAccount!;
-          _customFields.removeWhere((element) => element.value == '');
-          PaymentCard _paymentCardArgs = PaymentCard(
-            key: _key,
-            customFields: _customFields,
-            additionalInfo: _additionalInfo,
-            tags: _tags,
-            nickname: _nickname,
-            cardNumber: _cardNumber,
-            cardholderName: _cardholderName,
-            cvv: _cvv,
-            exp: _exp,
-            attachments: _attachments,
-          );
-          Navigator.pushNamed(context, SplashScreen.routeName);
-          await _account.setPaymentCard(_paymentCardArgs);
-          Navigator.popUntil(
-              context, (r) => r.settings.name == MainScreen.routeName);
-          Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-          Navigator.pushNamed(context, PaymentCardScreen.routeName,
-              arguments: _paymentCardArgs);
-        },
+        onSave: _onSave,
         isNew: _isNew,
       ),
       body: ListView(

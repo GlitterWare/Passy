@@ -96,6 +96,11 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: _onSave,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.idCard,
         onSave: _onSave,

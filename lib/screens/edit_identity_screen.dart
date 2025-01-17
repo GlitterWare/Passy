@@ -113,6 +113,11 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: _onSave,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.identity.toLowerCase(),
         isNew: _isNew,

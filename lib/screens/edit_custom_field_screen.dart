@@ -20,6 +20,11 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: () => Navigator.pop(context, _customField),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.customField.toLowerCase(),
         onSave: () => Navigator.pop(context, _customField),
