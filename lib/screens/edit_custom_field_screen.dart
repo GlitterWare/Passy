@@ -21,7 +21,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.done),
+        child: const Icon(Icons.add),
         onPressed: () => Navigator.pop(context, _customField),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
