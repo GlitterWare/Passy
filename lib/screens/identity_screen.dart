@@ -109,6 +109,11 @@ class _IdentityScreen extends State<IdentityScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: _onEditPressed,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.identity,
         entryKey: _identity!.key,

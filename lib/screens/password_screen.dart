@@ -227,6 +227,11 @@ class _PasswordScreen extends State<PasswordScreen> {
         _account.favoritePasswords[password!.key]?.status == EntryStatus.alive;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () => _onEditPressed(password!),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.password,
         entryKey: password!.key,

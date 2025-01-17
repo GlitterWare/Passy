@@ -106,6 +106,11 @@ class _NoteScreen extends State<NoteScreen> {
         _account.favoriteNotes[_note!.key]?.status == EntryStatus.alive;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () => _onEditPressed(_note!),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.note,
         entryKey: _note!.key,

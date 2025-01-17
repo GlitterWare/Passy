@@ -108,6 +108,11 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         EntryStatus.alive;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () => _onEditPressed(_paymentCard!),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.paymentCard,
         entryKey: _paymentCard!.key,

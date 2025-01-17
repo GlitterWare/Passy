@@ -107,6 +107,11 @@ class _IDCardScreen extends State<IDCardScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: _onEditPressed,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.idCard,
         entryKey: _idCard!.key,
