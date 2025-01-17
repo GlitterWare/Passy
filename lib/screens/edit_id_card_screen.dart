@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -132,59 +133,97 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
           decoration: InputDecoration(labelText: localizations.name),
           onChanged: (value) => setState(() => _name = value.trim()),
         )),
-        PassyPadding(MonthPickerFormField(
-          key: UniqueKey(),
-          initialValue: _issDate,
-          title: localizations.dateOfIssue,
-          getSelectedDate: () {
-            DateTime _now = DateTime.now();
-            List<String> _date = _issDate.split('/');
-            if (_date.length < 2) return DateTime.now();
-            String _month = _date[0];
-            String _year = _date[1];
-            if (_month[0] == '0') {
-              _month = _month[1];
-            }
-            int? _monthDecoded = int.tryParse(_month);
-            if (_monthDecoded == null) return _now;
-            int? _yearDecoded = int.tryParse(_year);
-            if (_yearDecoded == null) return _now;
-            if (_yearDecoded < _now.year) _yearDecoded = _now.year;
-            return DateTime.utc(_yearDecoded, _monthDecoded);
-          },
-          onChanged: (selectedDate) {
-            String _month = selectedDate.month.toString();
-            String _year = selectedDate.year.toString();
-            if (_month.length == 1) _month = '0' + _month;
-            setState(() => _issDate = _month + '/' + _year);
-          },
+        PassyPadding(Row(
+          children: [
+            Expanded(
+                child: MonthPickerFormField(
+              key: UniqueKey(),
+              initialValue: _issDate,
+              title: localizations.dateOfIssue,
+              getSelectedDate: () {
+                DateTime _now = DateTime.now();
+                List<String> _date = _issDate.split('/');
+                if (_date.length < 2) return DateTime.now();
+                String _month = _date[0];
+                String _year = _date[1];
+                if (_month[0] == '0') {
+                  _month = _month[1];
+                }
+                int? _monthDecoded = int.tryParse(_month);
+                if (_monthDecoded == null) return _now;
+                int? _yearDecoded = int.tryParse(_year);
+                if (_yearDecoded == null) return _now;
+                if (_yearDecoded < _now.year) _yearDecoded = _now.year;
+                return DateTime.utc(_yearDecoded, _monthDecoded);
+              },
+              onChanged: (selectedDate) {
+                String _month = selectedDate.month.toString();
+                String _year = selectedDate.year.toString();
+                if (_month.length == 1) _month = '0' + _month;
+                setState(() => _issDate = _month + '/' + _year);
+              },
+            )),
+            FloatingActionButton(
+              heroTag: null,
+              tooltip: localizations.selectDate,
+              onPressed: () => showPassyDatePicker(
+                context: context,
+                date: _issDate == '' ? DateTime.now() : stringToDate(_issDate),
+              ).then(
+                (value) {
+                  if (value == null) return;
+                  setState(() => _issDate = dateToString(value));
+                },
+              ),
+              child: const Icon(Icons.date_range),
+            ),
+          ],
         )),
-        PassyPadding(MonthPickerFormField(
-          key: UniqueKey(),
-          initialValue: _expDate,
-          title: localizations.expirationDate,
-          getSelectedDate: () {
-            DateTime _now = DateTime.now();
-            List<String> _date = _expDate.split('/');
-            if (_date.length < 2) return DateTime.now();
-            String _month = _date[0];
-            String _year = _date[1];
-            if (_month[0] == '0') {
-              _month = _month[1];
-            }
-            int? _monthDecoded = int.tryParse(_month);
-            if (_monthDecoded == null) return _now;
-            int? _yearDecoded = int.tryParse(_year);
-            if (_yearDecoded == null) return _now;
-            if (_yearDecoded < _now.year) _yearDecoded = _now.year;
-            return DateTime.utc(_yearDecoded, _monthDecoded);
-          },
-          onChanged: (selectedDate) {
-            String _month = selectedDate.month.toString();
-            String _year = selectedDate.year.toString();
-            if (_month.length == 1) _month = '0' + _month;
-            setState(() => _expDate = _month + '/' + _year);
-          },
+        PassyPadding(Row(
+          children: [
+            Expanded(
+                child: MonthPickerFormField(
+              key: UniqueKey(),
+              initialValue: _expDate,
+              title: localizations.expirationDate,
+              getSelectedDate: () {
+                DateTime _now = DateTime.now();
+                List<String> _date = _expDate.split('/');
+                if (_date.length < 2) return DateTime.now();
+                String _month = _date[0];
+                String _year = _date[1];
+                if (_month[0] == '0') {
+                  _month = _month[1];
+                }
+                int? _monthDecoded = int.tryParse(_month);
+                if (_monthDecoded == null) return _now;
+                int? _yearDecoded = int.tryParse(_year);
+                if (_yearDecoded == null) return _now;
+                if (_yearDecoded < _now.year) _yearDecoded = _now.year;
+                return DateTime.utc(_yearDecoded, _monthDecoded);
+              },
+              onChanged: (selectedDate) {
+                String _month = selectedDate.month.toString();
+                String _year = selectedDate.year.toString();
+                if (_month.length == 1) _month = '0' + _month;
+                setState(() => _expDate = _month + '/' + _year);
+              },
+            )),
+            FloatingActionButton(
+              heroTag: null,
+              tooltip: localizations.selectDate,
+              onPressed: () => showPassyDatePicker(
+                context: context,
+                date: _expDate == '' ? DateTime.now() : stringToDate(_expDate),
+              ).then(
+                (value) {
+                  if (value == null) return;
+                  setState(() => _expDate = dateToString(value));
+                },
+              ),
+              child: const Icon(Icons.date_range),
+            ),
+          ],
         )),
         PassyPadding(TextFormField(
           initialValue: _country,
