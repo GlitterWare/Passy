@@ -24,7 +24,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
         child: const Icon(Icons.done),
         onPressed: () => Navigator.pop(context, _customField),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: EditScreenAppBar(
         title: localizations.customField.toLowerCase(),
         onSave: () => Navigator.pop(context, _customField),
