@@ -74,11 +74,11 @@ class MonthPickerFormField extends StatelessWidget {
                         datePickerStyles: DatePickerStyles(
                             currentDateStyle: currentDateStyle ??
                                 TextStyle(
-                                    color: PassyTheme.of(context)
+                                    color: PassyTheme.of(ctx)
                                         .highlightContentSecondaryColor),
                             selectedDateStyle: selectedDateStyle ??
                                 TextStyle(
-                                    color: PassyTheme.of(context)
+                                    color: PassyTheme.of(ctx)
                                         .highlightContentSecondaryColor)),
                       );
                     },
