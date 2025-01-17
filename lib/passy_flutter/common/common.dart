@@ -84,7 +84,8 @@ String dateToString(DateTime date) {
 DateTime stringToDate(String value) {
   if (value == '') return DateTime.now();
   List<String> _dateSplit = value.split('/');
-  if (_dateSplit.length < 3) return DateTime.now();
+  if (_dateSplit.length < 2) return DateTime.now();
+  if (_dateSplit.length < 3) _dateSplit.insert(0, '01');
   int? yy = int.tryParse(_dateSplit[2]);
   if (yy == null) return DateTime.now();
   int? mm = int.tryParse(_dateSplit[1]);
