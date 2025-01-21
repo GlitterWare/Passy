@@ -9,6 +9,7 @@ import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
 import 'package:passy/passy_cli/lib/qr.dart' as qr;
 import 'package:encrypt/encrypt.dart';
+import 'package:hotreloader/hotreloader.dart';
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
@@ -252,6 +253,7 @@ Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
 String _curRunFile = '';
 int _curRunIndex = 0;
+HotReloader? _hotReloader;
 
 Future<List<String>> parseCommand(List<String> command) async {
   List<String> parsedCommand = [];
@@ -449,6 +451,7 @@ Future<void> cleanup() async {
     stdin.echoMode = _stdinEchoMode;
     stdin.lineMode = _stdinLineMode;
   } catch (_) {}
+  await _hotReloader?.stop();
   exit(0);
 }
 
@@ -2586,7 +2589,9 @@ Future<void> executeCommand(List<String> command,
   if (!_isInteractive) log('Use `help` for guidance.', id: id);
 }
 
-void main(List<String> arguments) {
+Future<void> main(List<String> arguments) async {
+  _hotReloader = await HotReloader.create(
+      onAfterReload: (ctx) => log('Hot reload complete.\n[passy]\$ '));
   try {
     _stdinEchoMode = stdin.echoMode;
     _stdinLineMode = stdin.lineMode;
