@@ -73,7 +73,7 @@ dependencies:
     git:
       url: https://github.com/GlitterWare/dargon2.git
       path: dargon2
-      ref: 180ec98990f8e1d7190a34f2c131e9d587d1a4ff
+      ref: 83c67239018b488512d9a553a93cf99d34ab2546
   dargon2_interface: ^1.1.1
   flutter_markdown: ^0.6.17+1
   compute: ^1.0.2
@@ -81,7 +81,7 @@ dependencies:
   kdbx:
     git:
       url: https://github.com/GlitterWare/kdbx.dart.git
-      ref: 7e24cacc9e469b2391cefb6e2619e5ffa9db84f8
+      ref: b248b712c7bf2684ee241543bc5553313bb94018
   dropdown_button2: ^2.3.9
   emoji_picker_flutter:
     git:
