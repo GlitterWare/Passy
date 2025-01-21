@@ -82,6 +82,10 @@ Commands:
           Each line is in CSV format and provides a username and a SHA512 password hash.
     accounts verify <username> <password>
         - Returns `true` if the password is correct, `false` otherwise.
+    accounts login <username>
+        - Save account encrypter for the current interactive session.
+          Takes password from stdin.
+          Returns `true` if the password is correct, `false` otherwise.
     accounts login <username> <password>
         - Save account encrypter for the current interactive session.
           Returns `true` if the password is correct, `false` otherwise.
@@ -914,8 +918,16 @@ Future<void> executeCommand(List<String> command,
           log(match.toString(), id: id);
           return;
         case 'login':
-          if (command.length < 4) break;
+          if (command.length < 3) break;
           String accountName = command[2];
+          if (command.length < 4) {
+            if (!_isInteractive) break;
+            bool _stdinEchoMode = stdin.echoMode;
+            stdin.echoMode = false;
+            log('[accounts login] password for `$accountName`: ');
+            command.add(stdin.readLineSync()!);
+            stdin.echoMode = _stdinEchoMode;
+          }
           String password = command[3];
           log(await _login(accountName, password), id: id);
           return;
