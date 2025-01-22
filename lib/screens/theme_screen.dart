@@ -21,6 +21,7 @@ class _ThemeScreen extends State<ThemeScreen> {
   final LoadedAccount loadedAccount = data.loadedAccount!;
   String themeMode =
       data.loadedAccount!.appTheme.name.contains('Dark') ? 'dark' : 'light';
+  UniqueKey colorPickerKey = UniqueKey();
 
   Future<void> setTheme(PassyAppTheme? theme) async {
     setState(() => loadedAccount.appTheme = theme!);
@@ -45,6 +46,7 @@ class _ThemeScreen extends State<ThemeScreen> {
       body: ListView(
         children: [
           ColorPicker(
+            key: colorPickerKey,
             customColorSwatchesAndNames: {
               ColorTools.createPrimarySwatch((themeMode == 'dark'
                       ? PassyTheme.classicDark
@@ -95,6 +97,7 @@ class _ThemeScreen extends State<ThemeScreen> {
                 onChanged: (bool? value) {
                   setState(() {
                     themeMode = 'dark';
+                    colorPickerKey = UniqueKey();
                   });
                   if (loadedAccount.appTheme.name.contains('Dark')) return;
                   setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
@@ -109,6 +112,7 @@ class _ThemeScreen extends State<ThemeScreen> {
                 onChanged: (bool? value) {
                   setState(() {
                     themeMode = 'light';
+                    colorPickerKey = UniqueKey();
                   });
                   if (loadedAccount.appTheme.name.contains('Light')) return;
                   setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
