@@ -133,6 +133,15 @@ Commands:
         - Toggle a favorite.
           The allowed value for toggle is `true` or `false`.
 
+  Tags
+    For all commands in this section, <entry type> argument is one of the following:
+    password, paymentCard, note, idCard, identity.
+
+    tags list <username> <entry type>
+        - List all tags of entry type.
+    tags list all
+        - List all tags of all entry types.
+
   Installation
     install temp
         - Copy the executable to a temporary directory and assign it a random name
@@ -1321,6 +1330,58 @@ Future<void> executeCommand(List<String> command,
             return;
           }
           log(true, id: id);
+          return;
+      }
+      break;
+    case 'tags':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'list':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:tags:list:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          if (command[3] == 'all') {
+            List<String> tags = [];
+            for (EntryType entryType in EntryType.values) {
+              PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+                  File(_accountsPath +
+                      Platform.pathSeparator +
+                      accountName +
+                      Platform.pathSeparator +
+                      entryTypeToFilename(entryType)),
+                  type: entryType,
+                  encrypter: encrypter);
+              for (String tag in entriesFile.tags) {
+                if (tags.contains(tag)) continue;
+                tags.add(tag);
+              }
+            }
+            tags.sort();
+            log(tags.join('\n'), id: id);
+            return;
+          }
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:tags:list:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  entryTypeToFilename(entryType)),
+              type: entryType,
+              encrypter: encrypter);
+          List<String> tags = entriesFile.tags;
+          tags.sort();
+          log(tags.join('\n'), id: id);
           return;
       }
       break;
