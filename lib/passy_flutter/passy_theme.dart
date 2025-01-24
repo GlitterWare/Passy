@@ -279,9 +279,47 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
   static const darkPassyPurple = Color.fromRGBO(74, 20, 140, 1);
 
   @override
-  ThemeExtension<PassyTheme> copyWith() {
-    // TODO: implement copyWith
-    throw UnimplementedError();
+  ThemeExtension<PassyTheme> copyWith({
+    EdgeInsets? passyPadding,
+    Color? logoColor,
+    Color? logoTextColor,
+    Color? contentColor,
+    Color? secondaryContentColor,
+    Color? contentSecondaryColor,
+    Color? contentTextColor,
+    Color? highlightContentColor,
+    Color? highlightContentSecondaryColor,
+    Color? highlightContentTextColor,
+    Color? accentContentColor,
+    Color? accentContentTextColor,
+    ColorScheme? datePickerColorScheme,
+    Color? switchThumbColor,
+    Color? switchTrackColor,
+  }) {
+    return PassyTheme(
+      passyPadding: passyPadding ?? this.passyPadding,
+      logoColor: logoColor ?? this.logoColor,
+      logoTextColor: logoTextColor ?? this.logoTextColor,
+      contentColor: contentColor ?? this.contentColor,
+      secondaryContentColor:
+          secondaryContentColor ?? this.secondaryContentColor,
+      contentSecondaryColor:
+          contentSecondaryColor ?? this.contentSecondaryColor,
+      contentTextColor: contentTextColor ?? this.contentTextColor,
+      highlightContentColor:
+          highlightContentColor ?? this.highlightContentColor,
+      highlightContentSecondaryColor:
+          highlightContentSecondaryColor ?? this.highlightContentSecondaryColor,
+      highlightContentTextColor:
+          highlightContentTextColor ?? this.highlightContentTextColor,
+      accentContentColor: accentContentColor ?? this.accentContentColor,
+      accentContentTextColor:
+          accentContentTextColor ?? this.accentContentTextColor,
+      datePickerColorScheme:
+          datePickerColorScheme ?? this.datePickerColorScheme,
+      switchThumbColor: switchThumbColor ?? this.switchThumbColor,
+      switchTrackColor: switchTrackColor ?? this.switchTrackColor,
+    );
   }
 
   @override
