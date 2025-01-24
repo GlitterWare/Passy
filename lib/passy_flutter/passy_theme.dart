@@ -49,28 +49,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     return result!;
   }
 
-  static ThemeData buildThemeData({
+  ThemeData buildThemeData({
     ColorScheme colorScheme = const ColorScheme.dark(),
-    EdgeInsets passyPadding =
-        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-    Color logoColor = Colors.purple,
-    Color logoTextColor = Colors.white,
-    Color contentColor = const Color.fromRGBO(38, 50, 56, 1),
-    Color secondaryContentColor = const Color.fromRGBO(0, 0, 0, 1),
-    Color contentSecondaryColor = const Color.fromRGBO(84, 110, 122, 1),
-    Color contentTextColor = const Color.fromRGBO(227, 242, 253, 1),
-    Color highlightContentColor = const Color.fromRGBO(227, 242, 253, 1),
-    Color highlightContentSecondaryColor =
-        const Color.fromRGBO(144, 202, 249, 1),
-    Color highlightContentTextColor = const Color.fromRGBO(38, 50, 56, 1),
-    Color accentContentColor = darkPassyPurple,
-    Color accentContentTextColor = const Color.fromRGBO(227, 242, 253, 1),
-    ColorScheme datePickerColorScheme = const ColorScheme.dark(
-      primary: Color.fromRGBO(144, 202, 249, 1),
-      onPrimary: Color.fromRGBO(227, 242, 253, 1),
-    ),
-    Color? switchThumbColor = const Color.fromRGBO(105, 240, 174, 1),
-    Color? switchTrackColor = const Color.fromRGBO(90, 130, 157, 1),
   }) {
     return ThemeData(
       extensions: [
@@ -191,25 +171,26 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     );
   }
 
-  static final classicDark = PassyTheme.buildThemeData();
-  static final classicLight = PassyTheme.buildThemeData(
-    colorScheme: const ColorScheme.light(),
-    contentColor: const Color.fromRGBO(227, 242, 253, 1),
-    contentSecondaryColor: const Color.fromRGBO(144, 202, 249, 1),
-    contentTextColor: const Color.fromRGBO(38, 50, 56, 1),
-    secondaryContentColor: const Color.fromRGBO(255, 255, 255, 1),
-    highlightContentColor: const Color.fromRGBO(38, 50, 56, 1),
-    highlightContentSecondaryColor: const Color.fromRGBO(171, 102, 255, 1),
-    highlightContentTextColor: const Color.fromRGBO(227, 242, 253, 1),
-    accentContentColor: const Color.fromRGBO(213, 179, 255, 1),
-    accentContentTextColor: const Color.fromRGBO(38, 50, 56, 1),
-    datePickerColorScheme: const ColorScheme.light(
+  static final classicDark = const PassyTheme().buildThemeData();
+  static final classicLight = const PassyTheme(
+    contentColor: Color.fromRGBO(227, 242, 253, 1),
+    contentSecondaryColor: Color.fromRGBO(144, 202, 249, 1),
+    contentTextColor: Color.fromRGBO(38, 50, 56, 1),
+    secondaryContentColor: Color.fromRGBO(255, 255, 255, 1),
+    highlightContentColor: Color.fromRGBO(38, 50, 56, 1),
+    highlightContentSecondaryColor: Color.fromRGBO(171, 102, 255, 1),
+    highlightContentTextColor: Color.fromRGBO(227, 242, 253, 1),
+    accentContentColor: Color.fromRGBO(213, 179, 255, 1),
+    accentContentTextColor: Color.fromRGBO(38, 50, 56, 1),
+    datePickerColorScheme: ColorScheme.light(
       primary: Color.fromRGBO(84, 110, 122, 1),
       onPrimary: Color.fromRGBO(38, 50, 56, 1),
     ),
-    switchTrackColor: const Color.fromRGBO(38, 50, 56, 1),
+    switchTrackColor: Color.fromRGBO(38, 50, 56, 1),
+  ).buildThemeData(
+    colorScheme: const ColorScheme.light(),
   );
-  static final emeraldDark = PassyTheme.buildThemeData(
+  static final emeraldDark = PassyTheme(
     logoColor: const Color.fromRGBO(0, 165, 145, 1),
     contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
     contentTextColor: const Color.fromRGBO(255, 255, 255, 1),
@@ -224,9 +205,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     ),
     switchThumbColor: Colors.deepPurpleAccent,
     switchTrackColor: Colors.deepPurple[50]!,
-  );
-  static final emeraldLight = PassyTheme.buildThemeData(
-    colorScheme: const ColorScheme.light(),
+  ).buildThemeData();
+  static final emeraldLight = PassyTheme(
     logoColor: const Color.fromRGBO(0, 165, 145, 1),
     contentColor: const Color.fromRGBO(227, 255, 252, 1),
     contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
@@ -243,8 +223,10 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     ),
     switchThumbColor: Colors.deepPurpleAccent,
     switchTrackColor: Colors.grey[800],
+  ).buildThemeData(
+    colorScheme: const ColorScheme.light(),
   );
-  static final goldDark = PassyTheme.buildThemeData(
+  static final goldDark = PassyTheme(
     logoColor: const Color.fromRGBO(0, 165, 145, 1),
     contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
     contentTextColor: const Color.fromRGBO(255, 255, 255, 1),
@@ -259,9 +241,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     ),
     switchThumbColor: Colors.deepPurpleAccent,
     switchTrackColor: Colors.deepPurple[50]!,
-  );
-  static final goldLight = PassyTheme.buildThemeData(
-    colorScheme: const ColorScheme.light(),
+  ).buildThemeData();
+  static final goldLight = PassyTheme(
     logoColor: const Color.fromRGBO(0, 165, 145, 1),
     contentColor: const Color.fromRGBO(227, 255, 252, 1),
     contentSecondaryColor: const Color.fromRGBO(0, 107, 94, 1),
@@ -278,6 +259,8 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
     ),
     switchThumbColor: Colors.deepPurpleAccent,
     switchTrackColor: Colors.grey[800],
+  ).buildThemeData(
+    colorScheme: const ColorScheme.light(),
   );
 
   static final themes = {
