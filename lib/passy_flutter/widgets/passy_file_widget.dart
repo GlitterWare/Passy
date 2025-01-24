@@ -150,12 +150,16 @@ class _PassyFileWidget extends State<PassyFileWidget> {
       data = await File(widget.path).readAsBytes();
     }
     switch (widget.type) {
+      // #region Unknown
       case FileEntryType.unknown:
         throw 'Unknown entry type.';
       case FileEntryType.folder:
         throw 'Unknown entry type.';
       case FileEntryType.file:
         throw 'Unknown entry type.';
+      // #endregion
+
+      // #region Text
       case FileEntryType.plainText:
         String text = await compute<Uint8List, String>(
             (data) => utf8.decode(data, allowMalformed: true), data);
@@ -166,6 +170,9 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             await compute<Uint8List, String>((data) => utf8.decode(data), data);
         return SingleChildScrollView(
             child: Center(child: PassyMarkdownBody(data: text)));
+      // #endregion
+
+      // #region Photo
       case FileEntryType.photo:
         Widget imageViewer;
         if (widget.name.endsWith('.svg')) {
@@ -202,6 +209,9 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             hoverColor: Colors.transparent,
             mouseCursor: SystemMouseCursors.zoomIn,
             child: imageViewer);
+      // #endregion
+
+      // #region Audio
       case FileEntryType.audio:
         AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
         ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
@@ -242,6 +252,9 @@ class _PassyFileWidget extends State<PassyFileWidget> {
           ),
           iconColor: PassyTheme.of(context).highlightContentColor,
         );
+      // #endregion
+
+      // #region Video
       case FileEntryType.video:
         AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
         ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
@@ -290,6 +303,9 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             ),
           ),
         );
+      // #endregion
+
+      // #region PDF
       case FileEntryType.pdf:
         return Scaffold(
           backgroundColor: PassyTheme.of(context).secondaryContentColor,
@@ -576,6 +592,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
             ],
           ),
         );
+      // #endregion
     }
   }
 
