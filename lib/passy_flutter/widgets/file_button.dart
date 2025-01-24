@@ -41,7 +41,12 @@ class FileButton extends StatelessWidget {
       case FileEntryType.video:
         return const Icon(Icons.video_file_outlined);
       case FileEntryType.pdf:
-        return const Icon(Icons.note_outlined);
+        return SvgPicture.asset(
+          'assets/images/pdf-file.svg',
+          width: 26,
+          colorFilter: ColorFilter.mode(
+              PassyTheme.of(context).highlightContentColor, BlendMode.srcIn),
+        );
     }
   }
 
