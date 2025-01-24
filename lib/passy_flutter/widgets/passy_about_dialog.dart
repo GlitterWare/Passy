@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/assets.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/screens/common.dart';
 
@@ -87,6 +88,16 @@ class PassyAboutDialog extends StatelessWidget {
             center: const Text('Licenses'),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => showLicensePage(context: context),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.privacyPolicy),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.shield_moon_outlined),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => openUrl(
+                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md'),
           )),
         ],
       ),
