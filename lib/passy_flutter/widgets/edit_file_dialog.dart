@@ -72,6 +72,7 @@ class _EditFileDialog extends State<EditFileDialog> {
                 FileEntryType.video,
                 FileEntryType.plainText,
                 FileEntryType.markdown,
+                FileEntryType.pdf,
                 FileEntryType.unknown,
               ],
               itemBuilder: (object) {
