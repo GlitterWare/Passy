@@ -880,6 +880,7 @@ class Synchronization {
     void Function()? onTrustSaveComplete,
     void Function()? onTrustSaveFailed,
   }) async {
+    // #region Synchronization helpers
     void _handleApiException(String message, Object exception) {
       if (exception is Map<String, dynamic>) {
         _handleException('$message: ${jsonEncode(exception)}');
@@ -922,7 +923,9 @@ class Synchronization {
       }
       return response.data;
     }
+    // #endregion
 
+    // #region Connection
     List<String> _addressSplit = address.split(':');
     if (_addressSplit.length < 2) {
       _handleException(
@@ -953,12 +956,16 @@ class Synchronization {
       _handleException('Could not connect.\n${e.toString()}\n${s.toString()}');
       return;
     }
+    // #endregion
+
+    // #region User processing
     _syncLog += 'done.\nReceiving users list... ';
     Map<String, dynamic> response;
     dynamic users = [
       {'username': _username}
     ];
     for (dynamic user in users) {
+      // #region User variables
       _syncLog += 'done.\nProcessing next user... ';
       if (user is! Map<String, dynamic>) {
         _handleException(
@@ -978,7 +985,9 @@ class Synchronization {
       }
       Encrypter usernameEncrypter = getPassyEncrypter(_username);
       String apiVersion = '2d0d1';
+      // #endregion
 
+      // #region Server commands
       _syncLog += 'done.\nListing server commands... ';
       Map<String, dynamic> serverCommands =
           _checkResponse(await _safeSync2d0d0Client.runModule([
@@ -999,6 +1008,9 @@ class Synchronization {
       List<String?> serverCommandsList = (serverCommandsListJson)
           .map((val) => val['name']?.toString())
           .toList();
+      // #endregion
+
+      // #region Server credentials
       Key? derivedPassword;
       Encrypter remoteEncrypter;
       _syncLog += 'done.\nReceiving remote credentials metadata... ';
@@ -1067,7 +1079,9 @@ class Synchronization {
           return;
         }
       }
+      // #endregion
 
+      // #region Authentication helpers and variables
       String lastAuth = '';
       DateTime lastDate =
           DateTime.now().toUtc().subtract(const Duration(hours: 12));
@@ -1081,7 +1095,9 @@ class Synchronization {
           'auth': lastAuth,
         };
       }
+      // #endregion
 
+      // #region Trusted connection data verification for standalone servers
       if (verifyTrustedConnectionData) {
         if (deviceId != null && trustedConnectionsDir != null) {
           _syncLog += 'done.\nVerifying trusted connection data... ';
@@ -1122,6 +1138,9 @@ class Synchronization {
           }
         }
       }
+      // #endregion
+
+      // #region Standalone server login
       if (isDedicatedServer && derivedPassword != null) {
         _syncLog += 'done.\nLogging in... ';
         bool loggedIn = false;
@@ -1164,6 +1183,9 @@ class Synchronization {
           apiVersion += '_$_username';
         }
       }
+      // #endregion
+
+      // #region Trusted connection data update transmission for standalone servers
       if (deviceId != null && trustedConnectionsDir != null) {
         _syncLog += 'done.\nUpdating trusted connection data... ';
         response = _checkResponse(await _safeSync2d0d0Client.runModule([
@@ -1211,6 +1233,9 @@ class Synchronization {
             .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
         onTrustSaveComplete?.call();
       }
+      // #endregion
+
+      // #region Authentication / entry sharing
       _syncLog += 'done.\nAuthenticating... ';
       Map<String, dynamic> authResponse = _checkResponse(
         await _safeSync2d0d0Client.runModule(
@@ -1283,7 +1308,10 @@ class Synchronization {
         _handleApiException('Failed to verify host auth', e);
         return;
       }
-      // 1. Receive hashes
+      // #endregion
+
+      // #region Primary entry synchronization (passwords, notes, payment cards...)
+      // #region 1. Receive hashes
       _syncLog += 'done.\nReceiving hashes... ';
       response = _checkResponse(await _safeSync2d0d0Client.runModule([
         apiVersion,
@@ -1322,6 +1350,7 @@ class Synchronization {
         _handleApiException('Received malformed favorites hashes', e);
         return;
       }
+      // #endregion
       //dynamic fileSyncHistoryHashesJson = response['fileSyncHistoryHashesJson'];
       await _history.reload();
       Map<String, dynamic> historyJson = _history.value.toJson()
@@ -1329,7 +1358,7 @@ class Synchronization {
       _syncLog += 'done.\nComparing history hashes... ';
       if (remoteHistoryHash !=
           getPassyHash(jsonEncode(historyJson)).toString()) {
-        // 2. Compare history hashes and find entry types that require synchronization
+        // #region 2. Compare history hashes and find entry types that require synchronization
         Map<EntryType, String> localHistoryHashes;
         try {
           localHistoryHashes = util.findEntriesHashes(json: historyJson);
@@ -1345,7 +1374,9 @@ class Synchronization {
           _handleApiException('Failed to compare history hashes', e);
           return;
         }
-        // 3. Receive history for entry types that require synchronization
+        // #endregion
+
+        // #region 3. Receive history for entry types that require synchronization
         _syncLog += 'done.\nReceiving history entries... ';
         response = _checkResponse(await _safeSync2d0d0Client.runModule([
           apiVersion,
@@ -1449,7 +1480,11 @@ class Synchronization {
             return;
           }
         }
+        // #endregion
       }
+      // #endregion
+
+      // #region Favorites
       await _favorites.reload();
       Map<String, dynamic> favoritesJson = _favorites.value.toJson();
       _syncLog += 'done.\nComparing favorites hashes... ';
@@ -1559,6 +1594,9 @@ class Synchronization {
           await _favorites.save();
         }
       }
+      // #endregion
+
+      // #region Files
       await _fileSyncHistory.reload();
       Map<String, dynamic> fileSyncHistoryJson =
           _fileSyncHistory.value.toJson();
@@ -1692,6 +1730,9 @@ class Synchronization {
           }
         }
       }
+      // #endregion
+
+      // #region App settings
       _syncLog += 'done.\nExchanging app settings... ';
       if (serverCommandsList.contains('exchangeAppSettings')) {
         await _history.reload();
@@ -1753,7 +1794,11 @@ class Synchronization {
         }
         await _history.save();
       }
+      // #endregion
     }
+    // #endregion
+
+    // #region Disconnection
     _syncLog += '\nAll done.\nDisconnecting... ';
     _safeSync2d0d0Client.disconnect();
     _socket = null;
@@ -1768,9 +1813,14 @@ class Synchronization {
         _syncLog += 'done.';
       });
     }
+    // #endregion
+
+    // #region Cleanup
     await _settings.reload();
     _settings.value.lastSyncDate = DateTime.now().toUtc();
     await _settings.save();
+    // #endregion
+
     _syncLog += 'done.';
     _callOnComplete();
   }
