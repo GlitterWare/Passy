@@ -82,12 +82,9 @@ Commands:
           Each line is in CSV format and provides a username and a SHA512 password hash.
     accounts verify <username> <password>
         - Returns `true` if the password is correct, `false` otherwise.
-    accounts login <username>
+    accounts login <username> [password]
         - Save account encrypter for the current interactive session.
-          Takes password from stdin.
-          Returns `true` if the password is correct, `false` otherwise.
-    accounts login <username> <password>
-        - Save account encrypter for the current interactive session.
+          If [password] is not supplied, takes password from stdin.
           Returns `true` if the password is correct, `false` otherwise.
     accounts is_logged_in <username>
         - Check if account encrypter is loaded for the specified username
