@@ -1097,6 +1097,8 @@ class Synchronization {
       }
       // #endregion
 
+      // #region Standalone servers
+
       // #region Trusted connection data verification for standalone servers
       if (verifyTrustedConnectionData) {
         if (deviceId != null && trustedConnectionsDir != null) {
@@ -1233,6 +1235,8 @@ class Synchronization {
             .writeAsString(trustedConnectionData.toEncrypted(_encrypter));
         onTrustSaveComplete?.call();
       }
+      // #endregion
+
       // #endregion
 
       // #region Authentication / entry sharing
