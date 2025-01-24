@@ -265,8 +265,18 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
 
   static final themes = {
     PassyAppTheme.classicDark: classicDark,
+    PassyAppTheme.classicDarkOLED: (classicDark
+                .extension<PassyTheme>()!
+                .copyWith(contentColor: const Color.fromRGBO(0, 0, 0, 1))
+            as PassyTheme)
+        .buildThemeData(),
     PassyAppTheme.classicLight: classicLight,
     PassyAppTheme.emeraldDark: emeraldDark,
+    PassyAppTheme.emeraldDarkOLED: (emeraldDark
+                .extension<PassyTheme>()!
+                .copyWith(contentColor: const Color.fromRGBO(0, 0, 0, 1))
+            as PassyTheme)
+        .buildThemeData(),
     PassyAppTheme.emeraldLight: emeraldLight,
   };
 

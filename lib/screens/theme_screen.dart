@@ -19,8 +19,11 @@ class ThemeScreen extends StatefulWidget {
 
 class _ThemeScreen extends State<ThemeScreen> {
   final LoadedAccount loadedAccount = data.loadedAccount!;
-  String themeMode =
-      data.loadedAccount!.appTheme.name.contains('Dark') ? 'dark' : 'light';
+  String themeMode = data.loadedAccount!.appTheme.name.contains('Light')
+      ? 'Light'
+      : data.loadedAccount!.appTheme.name.contains('DarkOLED')
+          ? 'DarkOLED'
+          : 'Dark';
   UniqueKey colorPickerKey = UniqueKey();
 
   Future<void> setTheme(PassyAppTheme? theme) async {
@@ -48,14 +51,14 @@ class _ThemeScreen extends State<ThemeScreen> {
           ColorPicker(
             key: colorPickerKey,
             customColorSwatchesAndNames: {
-              ColorTools.createPrimarySwatch((themeMode == 'dark'
-                      ? PassyTheme.classicDark
-                      : PassyTheme.classicLight)
+              ColorTools.createPrimarySwatch((themeMode == 'Light'
+                      ? PassyTheme.classicLight
+                      : PassyTheme.classicDark)
                   .extension<PassyTheme>()!
                   .accentContentColor): 'classic',
-              ColorTools.createPrimarySwatch((themeMode == 'dark'
-                      ? PassyTheme.emeraldDark
-                      : PassyTheme.emeraldLight)
+              ColorTools.createPrimarySwatch((themeMode == 'Light'
+                      ? PassyTheme.emeraldLight
+                      : PassyTheme.emeraldDark)
                   .extension<PassyTheme>()!
                   .accentContentColor): 'emerald',
             },
@@ -70,7 +73,11 @@ class _ThemeScreen extends State<ThemeScreen> {
                   PassyTheme.classicDark
                       .extension<PassyTheme>()!
                       .accentContentColor) {
-                setTheme(PassyAppTheme.classicDark);
+                if (themeMode == 'DarkOLED') {
+                  setTheme(PassyAppTheme.classicDarkOLED);
+                } else {
+                  setTheme(PassyAppTheme.classicDark);
+                }
               } else if (color ==
                   PassyTheme.classicLight
                       .extension<PassyTheme>()!
@@ -80,7 +87,11 @@ class _ThemeScreen extends State<ThemeScreen> {
                   PassyTheme.emeraldDark
                       .extension<PassyTheme>()!
                       .accentContentColor) {
-                setTheme(PassyAppTheme.emeraldDark);
+                if (themeMode == 'DarkOLED') {
+                  setTheme(PassyAppTheme.emeraldDarkOLED);
+                } else {
+                  setTheme(PassyAppTheme.emeraldDark);
+                }
               } else if (color ==
                   PassyTheme.emeraldLight
                       .extension<PassyTheme>()!
@@ -93,14 +104,16 @@ class _ThemeScreen extends State<ThemeScreen> {
             const Spacer(),
             PassyPadding(Column(children: [
               Checkbox(
-                value: themeMode == 'dark',
+                value: themeMode == 'Dark',
                 onChanged: (bool? value) {
                   setState(() {
-                    themeMode = 'dark';
+                    themeMode = 'Dark';
                     colorPickerKey = UniqueKey();
                   });
-                  if (loadedAccount.appTheme.name.contains('Dark')) return;
+                  if (!loadedAccount.appTheme.name.contains('DarkOLED') &&
+                      loadedAccount.appTheme.name.contains('Dark')) return;
                   setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
+                      .replaceFirst('DarkOLED', 'Dark')
                       .replaceFirst('Light', 'Dark')));
                 },
               ),
@@ -108,14 +121,15 @@ class _ThemeScreen extends State<ThemeScreen> {
             ])),
             PassyPadding(Column(children: [
               Checkbox(
-                value: themeMode == 'light',
+                value: themeMode == 'Light',
                 onChanged: (bool? value) {
                   setState(() {
-                    themeMode = 'light';
+                    themeMode = 'Light';
                     colorPickerKey = UniqueKey();
                   });
                   if (loadedAccount.appTheme.name.contains('Light')) return;
                   setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
+                      .replaceFirst('DarkOLED', 'Light')
                       .replaceFirst('Dark', 'Light')));
                 },
               ),
@@ -137,6 +151,25 @@ class _ThemeScreen extends State<ThemeScreen> {
             */
             const Spacer(),
           ]),
+          PassyPadding(Column(children: [
+            Checkbox(
+              value: themeMode == 'DarkOLED',
+              onChanged: (bool? value) {
+                setState(() {
+                  themeMode = 'DarkOLED';
+                  colorPickerKey = UniqueKey();
+                });
+                if (loadedAccount.appTheme.name.contains('DarkOLED')) return;
+                setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
+                    .replaceFirst('Dark', 'DarkOLED')
+                    .replaceFirst('Light', 'DarkOLED')));
+              },
+            ),
+            const Text(
+              'OLED',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ])),
         ],
       ),
     );
