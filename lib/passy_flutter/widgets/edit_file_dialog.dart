@@ -41,7 +41,8 @@ class _EditFileDialog extends State<EditFileDialog> {
   void initState() {
     super.initState();
     _name = widget.name;
-    _type = widget.type;
+    _type =
+        widget.type == FileEntryType.file ? FileEntryType.unknown : widget.type;
   }
 
   @override
@@ -115,7 +116,7 @@ class _EditFileDialog extends State<EditFileDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
-                  tooltip: localizations.fileType,
+                  tooltip: localizations.save,
                   onPressed: () {
                     if (prohibitedFileNames.contains(_name)) {
                       Navigator.pop(context);
