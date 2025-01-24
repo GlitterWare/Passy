@@ -31,7 +31,7 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
         const Color.fromRGBO(144, 202, 249, 1),
     this.highlightContentTextColor = const Color.fromRGBO(38, 50, 56, 1),
     this.accentContentColor = darkPassyPurple,
-    this.accentContentTextColor = const Color.fromRGBO(38, 50, 56, 1),
+    this.accentContentTextColor = const Color.fromRGBO(227, 242, 253, 1),
     this.datePickerColorScheme = const ColorScheme.dark(
       primary: Color.fromRGBO(144, 202, 249, 1),
       onPrimary: Color.fromRGBO(227, 242, 253, 1),
