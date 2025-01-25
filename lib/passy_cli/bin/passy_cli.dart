@@ -44,6 +44,7 @@ import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
 import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'package:win32/win32.dart';
 
+// #region Help message
 const String helpMsg = '''
 
 Passy Password Manager CLI.
@@ -216,7 +217,9 @@ Commands:
         - Remove path from autostart by name.
           Returns `true` on success.
 ''';
+// #endregion
 
+// #region Constants
 final List<String> upgradeCommands = [
   'sleep',
   '500',
@@ -243,7 +246,9 @@ const String passyShellVersion = '2.0.0';
 // (1000000/4)/2
 // + minus the extra messaging space
 const int maxNativeMessageLength = 120000;
+// #endregion
 
+// #region Runtime variables
 bool _isBigEndian = Endian.host == Endian.big;
 bool _isBusy = false;
 bool _isInteractive = false;
@@ -264,6 +269,7 @@ Map<String, Future Function()> _syncCloseMethods = {};
 String _curRunFile = '';
 int _curRunIndex = 0;
 HotReloader? _hotReloader;
+// #endregion
 
 Future<List<String>> parseCommand(List<String> command) async {
   List<String> parsedCommand = [];
@@ -725,6 +731,7 @@ Future<void> executeCommand(List<String> command,
     {dynamic id, void Function(Object? object, {dynamic id}) log = log}) async {
   command = await parseCommand(command);
   switch (command[0]) {
+    // #region help
     case 'help':
       int index;
       if (command.length == 1) {
@@ -760,10 +767,16 @@ Future<void> executeCommand(List<String> command,
       help += '\n[Page $index/$maxIndex]';
       log(help, id: id);
       return;
+    // #endregion
+
+    // #region exit
     case 'exit':
       log('Have a splendid day!\n', id: id);
       cleanup();
       return;
+    // #endregion
+
+    // #region run
     case 'run':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -816,6 +829,9 @@ Future<void> executeCommand(List<String> command,
       _curRunFile = '';
       _curRunIndex = 0;
       return;
+    // #endregion
+
+    // #region sleep
     case 'sleep':
       if (command.length == 1) break;
       String msString = command[1];
@@ -828,6 +844,9 @@ Future<void> executeCommand(List<String> command,
       }
       await Future.delayed(Duration(milliseconds: ms));
       return;
+    // #endregion
+
+    // #region exec
     case 'exec':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -840,9 +859,15 @@ Future<void> executeCommand(List<String> command,
       }
       await Process.start(program, args, mode: ProcessStartMode.detached);
       return;
+    // #endregion
+
+    // #region $0
     case '\$0':
       log(Platform.resolvedExecutable, id: id);
       return;
+    // #endregion
+
+    // #region dirname
     case 'dirname':
       if (command.length == 1) break;
       File file = File(command[1]);
@@ -856,10 +881,16 @@ Future<void> executeCommand(List<String> command,
         log('.', id: id);
       }
       return;
+    // #endregion
+
+    // #region echo
     case 'echo':
       if (command.length == 1) break;
       log(command.sublist(1).join(' '), id: id);
       return;
+    // #endregion
+
+    // #region hide
     case 'hide':
       if (_isNativeMessaging) break;
       try {
@@ -870,6 +901,9 @@ Future<void> executeCommand(List<String> command,
       }
       log('true');
       return;
+    // #endregion
+
+    // #region version
     case 'version':
       if (command.length == 1) break;
       String? version;
@@ -894,9 +928,13 @@ Future<void> executeCommand(List<String> command,
       }
       log('v$version', id: id);
       return;
+    // #endregion
+
+    // #region accounts
     case 'accounts':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region accounts list
         case 'list':
           refreshAccounts();
           log(
@@ -906,6 +944,9 @@ Future<void> executeCommand(List<String> command,
                   .join('\n'),
               id: id);
           return;
+        // #endregion
+
+        // #region accounts verify
         case 'verify':
           refreshAccounts();
           if (command.length < 4) break;
@@ -923,6 +964,9 @@ Future<void> executeCommand(List<String> command,
                   .toString();
           log(match.toString(), id: id);
           return;
+        // #endregion
+
+        // #region accounts login
         case 'login':
           if (command.length < 3) break;
           String accountName = command[2];
@@ -937,6 +981,9 @@ Future<void> executeCommand(List<String> command,
           String password = command[3];
           log(await _login(accountName, password), id: id);
           return;
+        // #endregion
+
+        // #region accounts is_logged_in
         case 'is_logged_in':
           if (command.length == 2) break;
           String accountName = command[2];
@@ -946,19 +993,29 @@ Future<void> executeCommand(List<String> command,
             log('false', id: id);
           }
           return;
+        // #endregion
+
+        // #region accounts logout
         case 'logout':
           if (command.length == 2) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region accounts logout_all
         case 'logout_all':
           _encrypters.clear();
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region accounts export
         case 'export':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region accounts export json
             case 'json':
               if (command.length < 5) break;
               String accountName = command[3];
@@ -995,6 +1052,9 @@ Future<void> executeCommand(List<String> command,
               }
               log(fileName, id: id);
               return;
+            // #endregion
+
+            // #region accounts export csv
             case 'csv':
               if (command.length < 5) break;
               String accountName = command[3];
@@ -1032,6 +1092,9 @@ Future<void> executeCommand(List<String> command,
               }
               log(fileName, id: id);
               return;
+            // #endregion
+
+            // #region accounts export kdbx
             case 'kdbx':
               if (command.length < 6) break;
               String accountName = command[3];
@@ -1071,13 +1134,19 @@ Future<void> executeCommand(List<String> command,
               }
               log(fileName, id: id);
               return;
+            // #endregion
           }
           break;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region entries
     case 'entries':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region entries list
         case 'list':
           if (command.length < 4) break;
           String accountName = command[2];
@@ -1107,6 +1176,9 @@ Future<void> executeCommand(List<String> command,
                   .join('\n'),
               id: id);
           return;
+        // #endregion
+
+        // #region entries get
         case 'get':
           if (command.length < 5) break;
           String accountName = command[2];
@@ -1133,6 +1205,9 @@ Future<void> executeCommand(List<String> command,
               encrypter: encrypter);
           log(entriesFile.getEntryString(entryKey), id: id);
           return;
+        // #endregion
+
+        // #region entries set
         case 'set':
           if (command.length < 5) break;
           String accountName = command[2];
@@ -1191,6 +1266,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(true, id: id);
           return;
+        // #endregion
+
+        // #region entries remove
         case 'remove':
           if (command.length < 5) break;
           String accountName = command[2];
@@ -1246,11 +1324,16 @@ Future<void> executeCommand(List<String> command,
           }
           log(true, id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region favorites
     case 'favorites':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region favorites list
         case 'list':
           if (command.length < 4) break;
           String accountName = command[2];
@@ -1285,6 +1368,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(result.join('\n'), id: id);
           return;
+        // #endregion
+
+        // #region favorites toggle
         case 'toggle':
           if (command.length < 6) break;
           String accountName = command[2];
@@ -1328,8 +1414,12 @@ Future<void> executeCommand(List<String> command,
           }
           log(true, id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region tags
     case 'tags':
       if (command.length == 1) break;
       switch (command[1]) {
@@ -1382,12 +1472,17 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
+
+    // #region sync
     case 'sync':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region sync host
         case 'host':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region sync host classic
             case 'classic':
               if (command.length < 6) break;
               String accountName = command[5];
@@ -1554,6 +1649,9 @@ Future<void> executeCommand(List<String> command,
               } catch (_) {}
               _pauseMainInput = false;
               return;
+            // #endregion
+
+            // #region sync host 2d0d0
             case '2d0d0':
               if (command.length < 5) break;
               String host = command[3];
@@ -2004,11 +2102,16 @@ Future<void> executeCommand(List<String> command,
               }
               log('$host:$port');
               return;
+            // #endregion
           }
           break;
+        // #endregion
+
+        // #region sync connect
         case 'connect':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region sync connect classic
             case 'classic':
               if (command.length == 5) break;
               String accountName = command[5];
@@ -2147,6 +2250,9 @@ Future<void> executeCommand(List<String> command,
                 log('', id: id);
               }
               return;
+            // #endregion
+
+            // #region sync connect 2d0d0
             case '2d0d0':
               if (command.length == 6) break;
               Synchronization? serverNullable;
@@ -2299,8 +2405,12 @@ Future<void> executeCommand(List<String> command,
                         Directory('${accPath}trusted_connections'));
               }
               return;
+            // #endregion
           }
           break;
+        // #endregion
+
+        // #region sync close
         case 'close':
           if (command.length == 2) break;
           Future<void> Function()? close = _syncCloseMethods[command[2]];
@@ -2311,6 +2421,9 @@ Future<void> executeCommand(List<String> command,
           await close();
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region sync report
         case 'report':
           if (command.length == 2) break;
           switch (command[2]) {
@@ -2331,12 +2444,17 @@ Future<void> executeCommand(List<String> command,
               return;
           }
           break;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region install
     case 'install':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region install temp
         case 'temp':
           File copy;
           try {
@@ -2348,6 +2466,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(copy.path, id: id);
           return;
+        // #endregion
+
+        // #region install full
         case 'full':
           if (command.length == 2) break;
           String installPath = command[2];
@@ -2363,6 +2484,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(exe.path, id: id);
           return;
+        // #endregion
+
+        // #region install server
         case 'server':
           if (command.length < 5) break;
           String address = command[3];
@@ -2395,12 +2519,17 @@ Future<void> executeCommand(List<String> command,
           }
           log(exeFile.path, id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region uninstall
     case 'uninstall':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region uninstall full
         case 'full':
           if (command.length == 2) break;
           Directory installPath = Directory(command[2]);
@@ -2411,6 +2540,9 @@ Future<void> executeCommand(List<String> command,
           }
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region uninstall dir
         case 'dir':
           if (command.length == 2) break;
           Directory installPath = Directory(command[2]);
@@ -2422,8 +2554,12 @@ Future<void> executeCommand(List<String> command,
           }
           log('true', id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region upgrade
     case 'upgrade':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -2455,6 +2591,9 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
+
+    // #region native_messaging
     case 'native_messaging':
       if (command.length == 1) break;
       switch (command[1]) {
@@ -2464,6 +2603,9 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
+
+    // #region ipc
     case 'ipc':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -2471,6 +2613,7 @@ Future<void> executeCommand(List<String> command,
         case 'server':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region ipc server start
             case 'start':
               File? save;
               if (command.length == 3) {
@@ -2553,6 +2696,9 @@ Future<void> executeCommand(List<String> command,
               log("${serverSocket.address.address}:${serverSocket.port}",
                   id: id);
               return;
+            // #endregion
+
+            // #region ipc server connect
             case 'connect':
               if (command.length == 3) break;
               List<String> arg4 = command[3].split(':');
@@ -2584,6 +2730,9 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               return;
+            // #endregion
+
+            // #region ipc server run
             case 'run':
               if (command.length < 5) break;
               List<String> arg4 = command[3].split(':');
@@ -2617,10 +2766,14 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               return;
+            // #endregion
           }
           break;
       }
       break;
+    // #endregion
+
+    // #region autostart
     case 'autostart':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -2653,6 +2806,7 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
   }
   if (_isNativeMessaging) return;
   log('passy:Unknown command:${command.join(' ')}.', id: id);
