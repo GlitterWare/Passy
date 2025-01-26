@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/file_utils.dart';
 import 'package:passy/passy_data/glare/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -111,33 +112,6 @@ class _PassyFileWidget extends State<PassyFileWidget> {
     });
   }
 
-  Future<Uri> _createPdfPage(List<int> data) async {
-    AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
-    ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
-    ECPublicKey pubKey = pair.publicKey as ECPublicKey;
-    String cert = generateSelfSignedCertificate(
-        privateKey: privKey, publicKey: pubKey, days: 2);
-    SecurityContext ctx = SecurityContext();
-    ctx.useCertificateChainBytes(utf8.encode(cert));
-    ctx.usePrivateKeyBytes(
-        utf8.encode(CryptoUtils.encodeEcPrivateKeyToPem(privKey)));
-    HttpServer server = await HttpServer.bindSecure('127.0.0.1', 0, ctx);
-    _server = server;
-    String password = generatePassword();
-    server.forEach((HttpRequest request) {
-      String? remotePassword = request.uri.queryParameters['password'];
-      if (remotePassword != password) {
-        request.response.close();
-        return;
-      }
-      request.response.headers.contentType = ContentType('application', 'pdf');
-      request.response.add(data);
-      request.response.close();
-    });
-    return Uri.https(
-        '127.0.0.1:${server.port}', '/document.pdf', {'password': password});
-  }
-
   Future<Widget?> _loadWidget() async {
     if (widget.type == FileEntryType.unknown ||
         widget.type == FileEntryType.file) {
@@ -213,29 +187,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
 
       // #region Audio
       case FileEntryType.audio:
-        AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
-        ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
-        ECPublicKey pubKey = pair.publicKey as ECPublicKey;
-        String cert = generateSelfSignedCertificate(
-            privateKey: privKey, publicKey: pubKey, days: 2);
-        SecurityContext ctx = SecurityContext();
-        ctx.useCertificateChainBytes(utf8.encode(cert));
-        ctx.usePrivateKeyBytes(
-            utf8.encode(CryptoUtils.encodeEcPrivateKeyToPem(privKey)));
-        HttpServer server = await HttpServer.bindSecure('127.0.0.1', 0, ctx);
-        _server = server;
-        String password = generatePassword();
-        server.forEach((HttpRequest request) {
-          String? remotePassword = request.headers.value('password');
-          if (remotePassword != password) {
-            request.response.close();
-            return;
-          }
-          request.response.headers.contentType =
-              ContentType('application', 'octet-stream');
-          request.response.add(data);
-          request.response.close();
-        });
+        FilePageResult pageResult = await createOctetStreamPage(data);
+        _server = pageResult.server;
         Player player = Player(
             configuration: const PlayerConfiguration(
                 bufferSize: 128 * 1024 * 1024 * 1024));
@@ -243,7 +196,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         player.stream.error.listen((e) => widget._errorStreamController.add(e));
         VideoController controller = VideoController(player);
         _playMedia(
-            resource: 'https://127.0.0.1:${server.port}', password: password);
+            resource: pageResult.uri.toString(), password: pageResult.password);
         return PassyAudioProgressBar(
           controller: controller,
           colors: ChewieProgressColors(
@@ -256,29 +209,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
 
       // #region Video
       case FileEntryType.video:
-        AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
-        ECPrivateKey privKey = pair.privateKey as ECPrivateKey;
-        ECPublicKey pubKey = pair.publicKey as ECPublicKey;
-        String cert = generateSelfSignedCertificate(
-            privateKey: privKey, publicKey: pubKey, days: 2);
-        SecurityContext ctx = SecurityContext();
-        ctx.useCertificateChainBytes(utf8.encode(cert));
-        ctx.usePrivateKeyBytes(
-            utf8.encode(CryptoUtils.encodeEcPrivateKeyToPem(privKey)));
-        HttpServer server = await HttpServer.bindSecure('127.0.0.1', 0, ctx);
-        _server = server;
-        String password = generatePassword();
-        server.forEach((HttpRequest request) {
-          String? remotePassword = request.headers.value('password');
-          if (remotePassword != password) {
-            request.response.close();
-            return;
-          }
-          request.response.headers.contentType =
-              ContentType('application', 'octet-stream');
-          request.response.add(data);
-          request.response.close();
-        });
+        FilePageResult pageResult = await createOctetStreamPage(data);
+        _server = pageResult.server;
         Player player = Player(
             configuration: const PlayerConfiguration(
                 bufferSize: 128 * 1024 * 1024 * 1024));
@@ -286,7 +218,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         player.stream.error.listen((e) => widget._errorStreamController.add(e));
         VideoController controller = VideoController(player);
         _playMedia(
-            resource: 'https://127.0.0.1:${server.port}', password: password);
+            resource: pageResult.uri.toString(), password: pageResult.password);
         return Chewie(
           controller: ChewieController(
             cupertinoProgressColors: ChewieProgressColors(
@@ -307,6 +239,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
 
       // #region PDF
       case FileEntryType.pdf:
+        FilePageResult pageResult = await createPdfPage(data);
+        _server = pageResult.server;
         return Scaffold(
           backgroundColor: PassyTheme.of(context).secondaryContentColor,
           appBar: AppBar(
@@ -411,7 +345,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
                 child: Stack(
                   children: [
                     PdfViewer.uri(
-                      await _createPdfPage(data),
+                      pageResult.uri,
                       // PdfViewer.file(
                       //   r"D:\pdfrx\example\assets\hello.pdf",
                       // PdfViewer.uri(
