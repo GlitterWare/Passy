@@ -127,12 +127,16 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         }
 
         switch (args[3]) {
+          // #region checkAccount
           case 'checkAccount':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
             return {
               'status': {'type': 'Success'}
             };
+          // #endregion
+
+          // #region getAccountCredentials
           case 'getAccountCredentials':
             await credentials.reload();
             Map<String, dynamic> credsJson = credentials.value.toJson();
@@ -141,6 +145,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'credentials': credsJson,
             };
+          // #endregion
+
+          // #region authenticate
           case 'authenticate':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -148,6 +155,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               'status': {'type': 'Success'},
               'auth': generateAuth(),
             };
+          // #endregion
+
+          // #region getHashes
           case 'getHashes':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -198,6 +208,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               //  'files': filesHash,
               //},
             };
+          // #endregion
+
+          // #region getHistoryEntries
           case 'getHistoryEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -215,6 +228,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'historyEntries': result,
             };
+          // #endregion
+
+          // #region getEntries
           case 'getEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -239,10 +255,16 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
                 );
               }),
             };
+          // #endregion
+
+          // #region getSharedEntries
           case 'getSharedEntries':
             return {
               'entries': sharedEntries,
             };
+          // #endregion
+
+          // #region setEntries
           case 'setEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -260,6 +282,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'status': {'type': 'Success'}
             };
+          // #endregion
+
+          // #region getFavoritesEntries
           case 'getFavoritesEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -277,6 +302,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'favoritesEntries': result,
             };
+          // #endregion
+
+          // #region setFavoritesEntries
           case 'setFavoritesEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -301,6 +329,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'status': {'type': 'Success'}
             };
+          // #endregion
+
+          // #region getFileSyncHistoryEntries
           case 'getFileSyncHistoryEntries':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -312,6 +343,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'historyEntries': result,
             };
+          // #endregion
+
+          // #region getFile
           case 'getFile':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -332,6 +366,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               };
             }
             return result;
+          // #endregion
+
+          // #region setFile
           case 'setFile':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -374,6 +411,9 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
             return {
               'status': {'type': 'Success'}
             };
+          // #endregion
+
+          // #region exchangeAppSettings
           case 'exchangeAppSettings':
             Map<String, dynamic> check = checkArgs(args);
             if (check.containsKey('error')) return check;
@@ -426,6 +466,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
               'status': {'type': 'Success'},
               'hostAppSettings': hostAppSettings,
             };
+          // #endregion
         }
         throw {
           'error': {'type': 'No such command'}
