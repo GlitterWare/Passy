@@ -1752,6 +1752,8 @@ Future<void> executeCommand(List<String> command,
                 keypair: RSAKeypair.fromRandom(keySize: 4096),
                 modules: {
                   ...loadedModules,
+
+                  // #region authenticate
                   'authenticate': GlareModule(
                     name: 'authenticate',
                     target: (
@@ -1796,6 +1798,9 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region getAccountCredentials
                   'getAccountCredentials': GlareModule(
                     name: 'getAccountCredentials',
                     target: (
@@ -1826,6 +1831,9 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region login
                   'login': GlareModule(
                     name: 'login',
                     target: (
@@ -1952,6 +1960,9 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region getDeviceId
                   'getDeviceId': GlareModule(
                     name: 'getDeviceId',
                     target: (
@@ -1974,6 +1985,9 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region getTrustedConnection
                   'getTrustedConnection': GlareModule(
                     name: 'getTrustedConnection',
                     target: (
@@ -2020,6 +2034,9 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region setTrustedConnection
                   'setTrustedConnection': GlareModule(
                     name: 'setTrustedConnection',
                     target: (
@@ -2089,6 +2106,7 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
                 },
                 serviceInfo:
                     'Passy cross-platform password manager dedicated entry synchronization server v${pcommon.syncVersion}',
