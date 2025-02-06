@@ -958,8 +958,7 @@ Future<void> toggleTray() async {
   _trayEnabled = !_trayEnabled;
 }
 
-Future<void> switchAppTheme(
-    BuildContext context, PassyAppTheme? appTheme) async {
+void switchAppTheme(BuildContext context, PassyAppTheme? appTheme) {
   if (!context.mounted) return;
   ThemeData? data;
   if (appTheme == null) {
