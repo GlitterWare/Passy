@@ -82,20 +82,3 @@ Future<String> getLatestVersion() async {
     return passyVersion;
   }
 }
-
-String generateSelfSignedCertificate({
-  required ECPrivateKey privateKey,
-  required ECPublicKey publicKey,
-  int days = 365,
-}) {
-  Map<String, String> dn = {
-    'CN': 'Self-Signed',
-  };
-  String csr = X509Utils.generateEccCsrPem(dn, privateKey, publicKey);
-  String x509PEM = X509Utils.generateSelfSignedCertificate(
-    privateKey,
-    csr,
-    days,
-  );
-  return x509PEM;
-}

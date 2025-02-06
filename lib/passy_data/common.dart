@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:basic_utils/basic_utils.dart' as bu;
 import 'package:characters/characters.dart';
 import 'package:compute/compute.dart';
 import 'package:convert/convert.dart';
@@ -516,6 +517,16 @@ Future<File> copyPassyCLI(Directory from, Directory to) async {
       rethrow;
     }
   }
+  if (!Platform.resolvedExecutable
+      .split(Platform.pathSeparator)
+      .last
+      .contains('passy_cli')) {
+    try {
+      File passyAppPathFile =
+          File(to.path + Platform.pathSeparator + 'passy_app_path.txt');
+      await passyAppPathFile.writeAsString(Platform.resolvedExecutable);
+    } catch (_) {}
+  }
   return File(to.path + Platform.pathSeparator + _cliFiles.first);
 }
 
@@ -635,4 +646,21 @@ String encodeCSVEntryForSaving({
   String key = entry[0];
   IV iv = IV.fromSecureRandom(16);
   return '$key,${iv.base64},${encrypt(csvEncode(entry), encrypter: encrypter, iv: iv)}\n';
+}
+
+String generateSelfSignedCertificate({
+  required bu.ECPrivateKey privateKey,
+  required bu.ECPublicKey publicKey,
+  int days = 365,
+}) {
+  Map<String, String> dn = {
+    'CN': 'Self-Signed',
+  };
+  String csr = bu.X509Utils.generateEccCsrPem(dn, privateKey, publicKey);
+  String x509PEM = bu.X509Utils.generateSelfSignedCertificate(
+    privateKey,
+    csr,
+    days,
+  );
+  return x509PEM;
 }
