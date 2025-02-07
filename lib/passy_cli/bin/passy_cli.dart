@@ -467,7 +467,9 @@ Future<void> cleanup() async {
     stdin.echoMode = _stdinEchoMode;
     stdin.lineMode = _stdinLineMode;
   } catch (_) {}
-  await _hotReloader?.stop();
+  try {
+    await _hotReloader?.stop();
+  } catch (_) {}
   exit(0);
 }
 
@@ -2832,8 +2834,10 @@ Future<void> executeCommand(List<String> command,
 }
 
 Future<void> main(List<String> arguments) async {
-  _hotReloader = await HotReloader.create(
-      onAfterReload: (ctx) => log('Hot reload complete.\n[passy]\$ '));
+  try {
+    _hotReloader = await HotReloader.create(
+        onAfterReload: (ctx) => log('Hot reload complete.\n[passy]\$ '));
+  } catch (_) {}
   try {
     _stdinEchoMode = stdin.echoMode;
     _stdinLineMode = stdin.lineMode;
