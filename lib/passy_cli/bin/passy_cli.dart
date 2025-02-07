@@ -4,12 +4,15 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:base85/base85.dart';
+import 'package:basic_utils/basic_utils.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
 import 'package:passy/passy_cli/lib/qr.dart' as qr;
 import 'package:encrypt/encrypt.dart';
 import 'package:hotreloader/hotreloader.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
@@ -18,7 +21,9 @@ import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
 import 'package:passy/passy_data/file_index.dart';
+import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/file_sync_history.dart';
+import 'package:passy/passy_data/file_utils.dart';
 import 'package:passy/passy_data/glare/glare_module.dart';
 import 'package:passy/passy_data/glare/glare_server.dart';
 import 'package:passy/passy_data/glare/line_stream_subscription.dart';
@@ -35,6 +40,8 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/passy_info.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
@@ -139,6 +146,19 @@ Commands:
         - List all tags of entry type.
     tags list all
         - List all tags of all entry types.
+
+  Files
+    files list <username> [path]
+        - List encrypted files.
+          If [path] is specified, lists files in the directory path, otherwise lists all files.
+    files get <username> <key> [encoding]
+        - Get decrypted file data.
+          [encoding] can be either `base64`, `hex` or `ascii85`, `base64` by default.
+    files serve <protocol> <username> <key> [content type] [run duration]
+        - Serve decrypted file data through an http server.
+          <protocol> can be either `http` or `https`.
+          [content type] can be any media type, `auto` by default - chooses content type automatically, see https://www.iana.org/assignments/media-types/media-types.xhtml
+          [run duration] specifies how long the server will run for in seconds, 15 minutes by default.
 
   Installation
     install temp
@@ -1472,6 +1492,279 @@ Future<void> executeCommand(List<String> command,
           tags.sort();
           log(tags.join('\n'), id: id);
           return;
+      }
+      break;
+    // #endregion
+
+    // #region files
+    case 'files':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        // #region files list
+        case 'list':
+          if (command.length == 2) break;
+          String accountName = command[2];
+          String? path = command.length == 3 ? null : command[3];
+          Key? key = _keys[accountName];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (key == null || encrypter == null) {
+            log('passy:files:list:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          FileIndex fileIndex = FileIndex(
+              file: File('${accPath}file_index.enc'),
+              saveDir: Directory('${accPath}files'),
+              key: key);
+          Map<String, PassyFsMeta> fileMeta = path == null
+              ? await fileIndex.getMetadata()
+              : await fileIndex.getPathMetadata(path);
+          log(
+              fileMeta
+                  .map<String, String>((index, meta) =>
+                      MapEntry(index, pcommon.csvEncode(meta.toCSV())))
+                  .values
+                  .join('\n'),
+              id: id);
+          return;
+        // #endregion
+
+        // #region files get
+        case 'get':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          String indexKey = command[3];
+          String encoding = command.length == 4 ? 'base64' : command[4];
+          Key? key = _keys[accountName];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (key == null || encrypter == null) {
+            log('passy:files:get:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          FileIndex fileIndex = FileIndex(
+              file: File('${accPath}file_index.enc'),
+              saveDir: Directory('${accPath}files'),
+              key: key);
+          if (!(await fileIndex.getMetadata()).containsKey(indexKey)) {
+            log('passy:files:get:Requested file does not exist.', id: id);
+            return;
+          }
+          Uint8List data;
+          try {
+            data = await fileIndex.readAsBytes(indexKey);
+          } catch (e, s) {
+            log('passy:files:get:Failed to read file:\n$e\n$s', id: id);
+            return;
+          }
+          String encoded;
+          try {
+            switch (encoding) {
+              case 'base64':
+                encoded = base64Encode(data);
+                break;
+              case 'hex':
+                encoded = HexUtils.encode(data);
+                break;
+              case 'ascii85':
+                encoded = Base85Codec(Alphabets.ascii85, AlgoType.ascii85)
+                    .encode(data);
+                break;
+              default:
+                log('passy:files:get:Unknown encoding provided:`$encoding`',
+                    id: id);
+                return;
+            }
+          } catch (e, s) {
+            log('passy:files:get:Failed to decode file:\n$e\n$s', id: id);
+            return;
+          }
+          log(encoded, id: id);
+          return;
+        // #endregion
+
+        // #region files serve
+        case 'serve':
+          if (command.length < 5) break;
+          String protocol = command[2];
+          if (protocol != 'http' && protocol != 'https') {
+            log('passy:files:serve:Unknown protocol provided:`$protocol`.',
+                id: id);
+            return;
+          }
+          String accountName = command[3];
+          String indexKey = command[4];
+          String? contentType = command.length < 6 ? null : command[5];
+          if (contentType == 'auto') contentType = null;
+          ContentType? parsedContentType;
+          if (contentType != null) {
+            try {
+              parsedContentType = ContentType.parse(contentType);
+            } catch (_) {
+              log('passy:files:serve:`$contentType` is not a valid MIME type.',
+                  id: id);
+              return;
+            }
+          }
+          String? runDuration = command.length < 7 ? null : command[6];
+          Duration? parsedRunDuration;
+          if (runDuration != null) {
+            try {
+              parsedRunDuration = Duration(seconds: int.parse(runDuration));
+            } catch (_) {
+              log('passy:files:serve:`$runDuration` is not a valid integer.',
+                  id: id);
+              return;
+            }
+          }
+          Key? key = _keys[accountName];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (key == null || encrypter == null) {
+            log('passy:files:serve:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          FileIndex fileIndex = FileIndex(
+              file: File('${accPath}file_index.enc'),
+              saveDir: Directory('${accPath}files'),
+              key: key);
+          PassyFsMeta? meta = (await fileIndex.getMetadata())[indexKey];
+          if (meta == null || meta is! FileMeta) {
+            log('passy:files:serve:Requested file does not exist.', id: id);
+            return;
+          }
+          bool renderMarkdown = false;
+          if (parsedContentType == null) {
+            switch (meta.type) {
+              case PassyFileType.unknown:
+                parsedContentType = ContentType.binary;
+                break;
+              case PassyFileType.text:
+                parsedContentType = ContentType.text;
+                break;
+              case PassyFileType.markdown:
+                if (parsedContentType == null) {
+                  parsedContentType = ContentType.html;
+                  renderMarkdown = true;
+                }
+                break;
+              case PassyFileType.photo:
+                if (meta.name.endsWith('.apng')) {
+                  parsedContentType = ContentType('image', 'apng');
+                } else if (meta.name.endsWith('.avif')) {
+                  parsedContentType = ContentType('image', 'avif');
+                } else if (meta.name.endsWith('.bmp')) {
+                  parsedContentType = ContentType('image', 'bmp');
+                } else if (meta.name.endsWith('.gif')) {
+                  parsedContentType = ContentType('image', 'gif');
+                } else if (meta.name.endsWith('.ico')) {
+                  parsedContentType =
+                      ContentType('image', 'vnd.microsoft.icon');
+                } else if (meta.name.endsWith('.jpg') ||
+                    meta.name.endsWith('.jpeg')) {
+                  parsedContentType = ContentType('image', 'jpeg');
+                } else if (meta.name.endsWith('.png')) {
+                  parsedContentType = ContentType('image', 'png');
+                } else if (meta.name.endsWith('.svg')) {
+                  parsedContentType = ContentType('image', 'svg+xml');
+                } else if (meta.name.endsWith('.tif') ||
+                    meta.name.endsWith('.tiff')) {
+                  parsedContentType = ContentType('image', 'tiff');
+                } else if (meta.name.endsWith('.webp')) {
+                  parsedContentType = ContentType('image', 'webp');
+                } else {
+                  parsedContentType = ContentType.binary;
+                }
+                break;
+              case PassyFileType.audio:
+                if (meta.name.endsWith('.aac')) {
+                  parsedContentType = ContentType('audio', 'aac');
+                } else if (meta.name.endsWith('.mpeg') ||
+                    meta.name.endsWith('.mp3')) {
+                  parsedContentType = ContentType('audio', 'mpeg');
+                } else if (meta.name.endsWith('.ogg')) {
+                  parsedContentType = ContentType('audio', 'ogg');
+                } else if (meta.name.endsWith('.wav')) {
+                  parsedContentType = ContentType('audio', 'wav');
+                } else if (meta.name.endsWith('.weba')) {
+                  parsedContentType = ContentType('audio', 'webm');
+                } else if (meta.name.endsWith('.3gp')) {
+                  parsedContentType = ContentType('audio', '3gpp');
+                } else if (meta.name.endsWith('.3g2')) {
+                  parsedContentType = ContentType('audio', '3gpp2');
+                } else {
+                  parsedContentType = ContentType.binary;
+                }
+                break;
+              case PassyFileType.video:
+                if (meta.name.endsWith('.avi')) {
+                  parsedContentType = ContentType('video', 'x-msvideo');
+                } else if (meta.name.endsWith('.mp4') ||
+                    meta.name.endsWith('.m4v') ||
+                    meta.name.endsWith('.mov')) {
+                  parsedContentType = ContentType('video', 'mp4');
+                } else if (meta.name.endsWith('.mpeg')) {
+                  parsedContentType = ContentType('video', 'mpeg');
+                } else if (meta.name.endsWith('.ogg')) {
+                  parsedContentType = ContentType('video', 'ogg');
+                } else if (meta.name.endsWith('.ts')) {
+                  parsedContentType = ContentType('video', 'mp2t');
+                } else if (meta.name.endsWith('.webm')) {
+                  parsedContentType = ContentType('video', 'webm');
+                } else if (meta.name.endsWith('.3gp')) {
+                  parsedContentType = ContentType('video', '3gpp');
+                } else if (meta.name.endsWith('.3g2')) {
+                  parsedContentType = ContentType('video', '3gpp2');
+                } else {
+                  parsedContentType = ContentType.binary;
+                }
+                break;
+              case PassyFileType.pdf:
+                parsedContentType = ContentType('application', 'pdf');
+                break;
+            }
+          }
+          Uint8List data;
+          try {
+            data = await fileIndex.readAsBytes(indexKey);
+            if (renderMarkdown) {
+              data = Uint8List.fromList(
+                  md.markdownToHtml(utf8.decode(data)).codeUnits);
+            }
+          } catch (e, s) {
+            log('passy:files:serve:Failed to read file:\n$e\n$s', id: id);
+            return;
+          }
+
+          FilePageResult result;
+          try {
+            result = await createFilePage(
+              data,
+              includePasswordInUrl: true,
+              contentType: parsedContentType,
+              runDuration: parsedRunDuration,
+              secure: protocol == 'https',
+            );
+          } catch (e, s) {
+            log('passy:files:serve:Failed to create file page:\n$e\n$s',
+                id: id);
+            return;
+          }
+          log(result.uri.toString(), id: id);
+          return;
+        // #endregion
       }
       break;
     // #endregion
