@@ -48,3 +48,7 @@ app.*.map.json
 /android/
 /windows/
 /linux/
+__Flutter_Output__
+lib/passy_cli/bin/passy_cli
+log/untranslated-messages.txt
+submodules/flutter/
