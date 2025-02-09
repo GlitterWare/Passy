@@ -885,6 +885,9 @@ class LoadedAccount {
 
   set lastSyncDate(DateTime? value) => _settings.value.lastSyncDate = value;
   DateTime? get lastSyncDate => _settings.value.lastSyncDate;
+  int get autoScreenLockDelay => _settings.value.autoScreenLockDelay;
+  set autoScreenLockDelay(int value) =>
+      _settings.value.autoScreenLockDelay = value;
 
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();

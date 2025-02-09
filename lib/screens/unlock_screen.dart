@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -34,6 +35,7 @@ class _UnlockScreen extends State<UnlockScreen>
   final TextEditingController _passwordController = TextEditingController();
   bool _unlockScreenOn = false;
   final FocusNode _passwordFocus = FocusNode();
+  Completer? _lockCompleter = Completer();
 
   void _logOut() {
     Navigator.popUntil(navigatorKey.currentContext!,
@@ -130,6 +132,28 @@ class _UnlockScreen extends State<UnlockScreen>
     }
   }
 
+  void _lockScreen({bool isResumed = false}) {
+    if (!UnlockScreen.shouldLockScreen) return;
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
+    if (!account.autoScreenLock) return;
+    if (account.autoScreenLockDelay == 0) {
+      setState(() => _unlockScreenOn = true);
+      return;
+    }
+    Completer? lockCompleter = _lockCompleter;
+    if (isResumed && lockCompleter != null) {
+      if (lockCompleter.isCompleted) setState(() => _unlockScreenOn = true);
+      _lockCompleter = null;
+    } else if (lockCompleter == null) {
+      lockCompleter = Completer();
+      _lockCompleter = lockCompleter;
+      Future.delayed(Duration(milliseconds: account.autoScreenLockDelay))
+          .then((value) => lockCompleter!.complete());
+      return;
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
@@ -140,14 +164,10 @@ class _UnlockScreen extends State<UnlockScreen>
       }
       return;
     }
-    if (!UnlockScreen.shouldLockScreen) return;
-    LoadedAccount? account = data.loadedAccount;
-    if (account == null) return;
-    if (!account.autoScreenLock) return;
     if (UnlockScreen.isAuthenticating) return;
     if ((state != AppLifecycleState.resumed) &&
         (state != AppLifecycleState.inactive)) return;
-    setState(() => _unlockScreenOn = true);
+    _lockScreen(isResumed: state == AppLifecycleState.resumed);
   }
 
   @override
@@ -155,11 +175,7 @@ class _UnlockScreen extends State<UnlockScreen>
     if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
-    if (UnlockScreen.shouldLockScreen) {
-      if (account.autoScreenLock) {
-        setState(() => _unlockScreenOn = true);
-      }
-    }
+    _lockScreen();
     if (!account.minimizeToTray) return;
     await windowManager.restore();
     await windowManager.hide();
