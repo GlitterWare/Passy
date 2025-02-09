@@ -150,7 +150,6 @@ class _UnlockScreen extends State<UnlockScreen>
       _lockCompleter = lockCompleter;
       Future.delayed(Duration(milliseconds: account.autoScreenLockDelay))
           .then((value) => lockCompleter!.complete());
-      return;
     }
   }
 
