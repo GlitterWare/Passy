@@ -1,12 +1,19 @@
 #include <string>
+#include <limits.h>
 #include <unistd.h>
 #include "my_application.h"
+
+std::string getexepath() {
+  char result[ PATH_MAX ];
+  ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
+  return std::string( result, (count > 0) ? count : 0 );
+}
 
 int main(int argc, char** argv) {
   if (argc != 1) {
     std::string arg1 = argv[1];
     if (arg1 == "cli") {
-      std::string path = argv[0];
+      std::string path = getexepath();
       path += "_cli";
       char* pathptr = new char [path.length()+1];
       strcpy (pathptr, path.c_str());
