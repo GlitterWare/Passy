@@ -79,7 +79,12 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
+  try {
+    MediaKit.ensureInitialized();
+  } catch (e) {
+    // ignore: avoid_print
+    print('E:`MediaKit.ensureInitialized()` failed: $e');
+  }
   KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
   HttpOverrides.global = MyHttpOverrides();
