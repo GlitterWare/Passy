@@ -21,14 +21,25 @@ jobs:
       - name: Build Passy for Windows
         shell: bash
         run: flutter --no-version-check --suppress-analytics build windows
+      - name: Build Windows .exe installer
+        shell: bash
+        run: |
+          echo "C:/Program Files (x86)/Inno Setup 6" >> $GITHUB_PATH
+          iscc passy.iss
       - name: Prepare releases
         shell: bash
         run: |
           cd ..
           mkdir -p build/windows-portable/Passy
           cp -r Passy/build/windows/x64/runner/Release/. build/windows-portable/Passy
+          cp Passy/build/Passy-Windows-Installer.exe build/Passy-Windows-Installer.exe
       - name: Upload Windows portable build
         uses: actions/upload-artifact@v4
         with:
           name: windows-portable
           path: D:\a\Passy\build\windows-portable
+      - name: Upload Windows .exe installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe-installer
+          path: D:\a\Passy\build\Passy-Windows-Installer.exe
