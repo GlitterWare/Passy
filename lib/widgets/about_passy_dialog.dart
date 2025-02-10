@@ -56,18 +56,6 @@ class AboutPassyDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             PassyPadding(ThreeWidgetButton(
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.shield_moon_outlined),
-              ),
-              center: const Text('Privacy policy'),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () => window.open(
-                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md#privacy-policy',
-                'Privacy policy',
-              ),
-            )),
-            PassyPadding(ThreeWidgetButton(
               left: Padding(
                 padding: const EdgeInsets.only(right: 30),
                 child: SvgPicture.asset(
@@ -79,6 +67,21 @@ class AboutPassyDialog extends StatelessWidget {
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () =>
                   window.open('https://github.com/GlitterWare/Passy', 'GitHub'),
+            )),
+            PassyPadding(ThreeWidgetButton(
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.shield_moon_outlined),
+              ),
+              center: const Text(
+                'Privacy policy',
+                textAlign: TextAlign.center,
+              ),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () => window.open(
+                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md#privacy-policy',
+                'Privacy policy',
+              ),
             )),
             const SizedBox(height: 24),
           ],
