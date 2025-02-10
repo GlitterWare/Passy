@@ -1,5 +1,9 @@
 # Snap Store Instructions
 
+<details>
+
+<summary>Contents</summary>
+
 ## Contents
 
 1. [Installing Passy](#installing-passy)
@@ -9,6 +13,8 @@
    - [The GUI Way (Recommended)](#the-gui-way-recommended-1)
    - [Command-line](#command-line-1)
    - [What permissions am I granting?](#what-permissions-am-i-granting)
+
+</details>
 
 ## Installing Passy
 
@@ -29,12 +35,18 @@ If you are interested in using **Passy browser extension**, don't forget to chec
 4. When the installation completes, you should be able to find Passy in your application drawer.
 5. [Enable browser extension support](#enabling-browser-extension-support) (Optional).
 
+<details>
+
+<summary>Command-line</summary>
+
 ### Command-line
 
 To install Passy via your terminal, use the following command:
 ```sh
 snap install passy
 ```
+
+</details>
 
 ## Enabling Browser Extension Support
 
@@ -51,12 +63,18 @@ If you have Ubuntu/Debian store app installed, you can make use of it to enable 
 3. You may need to enter your system user password to allow the Snap client to connect the interface:  
 ![Enter your system user password to connect the interface](https://github.com/GlitterWare/Passy/assets/101527589/b4c476e1-8710-4ca9-91e1-2d68f62a9874)
 
+<details>
+
+<summary>Command-line</summary>
+
 ### Command-line
 
 Granting the permission via the terminal is a one-liner, execute the following:
 ```sh
 snap connect passy:native-messaging-hosts
 ```
+
+</details>
 
 ### What permissions am I granting?
 

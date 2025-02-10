@@ -1,5 +1,7 @@
 # Downloads
 
+### Visit https://glitterware.github.io/Passy/ for easier installation with direct links to downloads, the website has recently been updated to provide a user-friendly installation experience.
+
 ## Contents
 
 1. [Windows](#windows)
@@ -14,6 +16,10 @@
     - [AppImage](#appimage)
     - [Bundle](#bundle)
 
+<details>
+
+<summary>Windows</summary>
+
 ## Windows
 
 ### Installer (Recommended)
@@ -26,17 +32,35 @@ To update Passy, simply repeat same steps with a newer version.
 
 Passy can be removed by running its uninstaller from Programs and Features in the Control Panel. Your data will remain in `C:\Users\<username>\Documents\Passy`.
 
+<details>
+
+<summary>Windows Portable</summary>
+
 ### Portable
 
 1. Download the archive from [latest release](https://github.com/GlitterWare/Passy/releases/latest). Windows portable archives are named in format `Passy-<version>-Windows-Portable.zip`.
 2. Extract the archive to desired installation location.
 3. Run `passy.exe` inside the extracted folder to launch the app.
 
+</details>
+
+</details>
+
+<details>
+
+<summary>Android</summary>
+
 ## Android
 
 ### F-Droid
 
 <a href="https://f-droid.org/en/packages/com.glitterware.passy"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75"></a>
+
+</details>
+
+<details>
+
+<summary>Linux</summary>
 
 ## Linux
 
@@ -52,6 +76,10 @@ For instructions on how to easily set up Passy using Ubuntu/Debian software app 
 
 [![AUR Latest Release](https://img.shields.io/aur/version/passy?logo=Arch%20Linux&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://aur.archlinux.org/packages/passy)
 
+<details>
+
+<summary>Linux AppImage</summary>
+
 ### AppImage
 
 It's most comfortable to run AppImages with the [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher/releases/latest) installed. It automatically integrates AppImages and their `.desktop` files into your program launcher for best user experience.
@@ -60,8 +88,18 @@ It's most comfortable to run AppImages with the [AppImageLauncher](https://githu
 2. Extract the `.AppImage` file to desired installation location.
 3. Run the `.AppImage` as a program.
 
+</details>
+
+<details>
+
+<summary>Linux Bundle</summary>
+
 ### Bundle
 
 1. Download the archive from [latest release](https://github.com/GlitterWare/Passy/releases/latest). Linux bundle archives are named in format `Passy-<version>-Linux-Bundle.zip`.
 2. Extract the archive to desired installation location.
 3. Run `passy` inside the extracted folder to launch the app.
+
+</details>
+
+</details>
