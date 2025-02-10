@@ -1116,7 +1116,7 @@ class LoadedAccount {
       paymentCardTags,
       idCardsTags,
       identitiesTags,
-      getFsTags,
+      fsTags,
     ]);
     List<String> result = tags.removeLast();
     for (List<String> list in tags) {
@@ -1472,9 +1472,8 @@ class LoadedAccount {
   }
 
   // File index wrappers
-  Future<List<String>> get getFsTags => compute(
-      (PassyEntriesEncryptedCSVFile _identities) => _fileIndex.tags,
-      _identities);
+  Future<List<String>> get fsTags =>
+      compute((FileIndex _fileIndex) => _fileIndex.tags, _fileIndex);
   Future<Map<String, PassyFsMeta>> getFsMetadata() => _fileIndex.getMetadata();
   Future<Map<String, PassyFsMeta>> getFsEntries(List<String> keys) =>
       _fileIndex.getEntries(keys);
