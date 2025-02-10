@@ -83,6 +83,7 @@ Commands:
     version passy  Show Passy version.
     version data   Show account data version.
     version sync   Show synchronization version.
+    version all    Show all versions.
 
   Accounts
     accounts list
@@ -261,7 +262,7 @@ final List<String> upgradeCommands = [
   '\$',
 ];
 
-const String passyShellVersion = '2.0.0';
+const String passyShellVersion = '2.1.0';
 // Worst case scenario: all characters weigh 4 bytes and each is escaped
 // (1000000/4)/2
 // + minus the extra messaging space
@@ -942,6 +943,13 @@ Future<void> executeCommand(List<String> command,
         case 'sync':
           version = pcommon.syncVersion;
           break;
+        case 'all':
+          version = 'shell,$passyShellVersion\n'
+              'passy,${pcommon.passyVersion}\n'
+              'data,${pcommon.accountVersion}\n'
+              'sync,${pcommon.syncVersion}\n';
+          log(version, id: id);
+          return;
       }
       if (version == null) {
         log('passy:version:Unknown version type provided: ${command[1]}.',
