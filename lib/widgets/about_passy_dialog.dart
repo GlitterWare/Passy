@@ -73,10 +73,7 @@ class AboutPassyDialog extends StatelessWidget {
                 padding: EdgeInsets.only(right: 30),
                 child: Icon(Icons.shield_moon_outlined),
               ),
-              center: const Text(
-                'Privacy policy',
-                textAlign: TextAlign.center,
-              ),
+              center: const Text('Privacy policy'),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () => window.open(
                 'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md#privacy-policy',
