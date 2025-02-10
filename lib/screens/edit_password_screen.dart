@@ -456,6 +456,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
         )),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

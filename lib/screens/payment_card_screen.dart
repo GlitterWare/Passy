@@ -254,6 +254,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
             title: localizations.additionalInfo,
             value: _paymentCard!.additionalInfo,
           )),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

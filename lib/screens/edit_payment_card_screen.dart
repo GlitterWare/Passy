@@ -5,6 +5,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/common.dart';
 
 import 'edit_custom_field_screen.dart';
 import 'main_screen.dart';
@@ -51,28 +52,27 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
   }
 
   void _onSave() async {
-          final LoadedAccount _account = data.loadedAccount!;
-          _customFields.removeWhere((element) => element.value == '');
-          PaymentCard _paymentCardArgs = PaymentCard(
-            key: _key,
-            customFields: _customFields,
-            additionalInfo: _additionalInfo,
-            tags: _tags,
-            nickname: _nickname,
-            cardNumber: _cardNumber,
-            cardholderName: _cardholderName,
-            cvv: _cvv,
-            exp: _exp,
-            attachments: _attachments,
-          );
-          Navigator.pushNamed(context, SplashScreen.routeName);
-          await _account.setPaymentCard(_paymentCardArgs);
-          Navigator.popUntil(
-              context, (r) => r.settings.name == MainScreen.routeName);
-          Navigator.pushNamed(context, PaymentCardsScreen.routeName);
-          Navigator.pushNamed(context, PaymentCardScreen.routeName,
-              arguments: _paymentCardArgs);
-        }
+    final LoadedAccount _account = data.loadedAccount!;
+    _customFields.removeWhere((element) => element.value == '');
+    PaymentCard _paymentCardArgs = PaymentCard(
+      key: _key,
+      customFields: _customFields,
+      additionalInfo: _additionalInfo,
+      tags: _tags,
+      nickname: _nickname,
+      cardNumber: _cardNumber,
+      cardholderName: _cardholderName,
+      cvv: _cvv,
+      exp: _exp,
+      attachments: _attachments,
+    );
+    Navigator.pushNamed(context, SplashScreen.routeName);
+    await _account.setPaymentCard(_paymentCardArgs);
+    Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
+    Navigator.pushNamed(context, PaymentCardsScreen.routeName);
+    Navigator.pushNamed(context, PaymentCardScreen.routeName,
+        arguments: _paymentCardArgs);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -217,6 +217,7 @@ class _EditPaymentCardScreen extends State<EditPaymentCardScreen> {
             ),
             onChanged: (value) => setState(() => _additionalInfo = value),
           )),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

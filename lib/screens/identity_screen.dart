@@ -284,6 +284,7 @@ class _IdentityScreen extends State<IdentityScreen> {
             PassyPadding(RecordButton(
                 title: localizations.additionalInfo,
                 value: _identity!.additionalInfo)),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

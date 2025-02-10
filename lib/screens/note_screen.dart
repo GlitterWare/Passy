@@ -235,6 +235,7 @@ class _NoteScreen extends State<NoteScreen> {
                 PassyTheme.of(context).passyPadding.bottom),
             child: PassyMarkdownBody(data: _note!.note),
           ),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

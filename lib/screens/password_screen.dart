@@ -401,6 +401,7 @@ class _PasswordScreen extends State<PasswordScreen> {
             PassyPadding(RecordButton(
                 title: localizations.additionalInfo,
                 value: password!.additionalInfo)),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

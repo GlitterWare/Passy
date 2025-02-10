@@ -240,6 +240,7 @@ class _EditIdentityScreen extends State<EditIdentityScreen> {
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
         )),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

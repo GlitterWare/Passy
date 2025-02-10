@@ -5,6 +5,8 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 
+import 'common.dart';
+
 class EditCustomFieldScreen extends StatefulWidget {
   const EditCustomFieldScreen({Key? key}) : super(key: key);
 
@@ -101,6 +103,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
           onPressed: () =>
               setState(() => _customField.multiline = !_customField.multiline),
         )),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

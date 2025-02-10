@@ -6,6 +6,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'common.dart';
 import 'note_screen.dart';
 import 'notes_screen.dart';
 import 'splash_screen.dart';
@@ -140,6 +141,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
                   PassyTheme.of(context).passyPadding.right,
                   PassyTheme.of(context).passyPadding.bottom),
               child: PassyMarkdownBody(data: _note)),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

@@ -57,6 +57,8 @@ const screenToRouteName = {
   Screen.identities: IdentitiesScreen.routeName,
 };
 
+const double floatingActionButtonPadding = 72.0;
+
 String entryTypeToEntriesRouteName(EntryType entryType) {
   switch (entryType) {
     case EntryType.password:

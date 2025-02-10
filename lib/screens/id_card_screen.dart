@@ -246,6 +246,7 @@ class _IDCardScreen extends State<IDCardScreen> {
             PassyPadding(RecordButton(
                 title: localizations.additionalInfo,
                 value: _idCard!.additionalInfo)),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

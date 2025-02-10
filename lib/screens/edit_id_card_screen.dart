@@ -6,6 +6,7 @@ import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
+import 'common.dart';
 import 'edit_custom_field_screen.dart';
 import 'id_cards_screen.dart';
 import 'splash_screen.dart';
@@ -262,6 +263,7 @@ class _EditIDCardScreen extends State<EditIDCardScreen> {
           ),
           onChanged: (value) => setState(() => _additionalInfo = value),
         )),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }
