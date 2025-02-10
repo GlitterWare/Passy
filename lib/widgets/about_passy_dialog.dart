@@ -63,7 +63,7 @@ class AboutPassyDialog extends StatelessWidget {
               center: const Text('Privacy policy'),
               right: const Icon(Icons.arrow_forward_ios_rounded),
               onPressed: () => window.open(
-                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md',
+                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md#privacy-policy',
                 'Privacy policy',
               ),
             )),
