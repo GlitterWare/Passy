@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:base85/base85.dart';
 import 'package:basic_utils/basic_utils.dart';
+import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
@@ -1464,6 +1465,7 @@ Future<void> executeCommand(List<String> command,
           }
           if (command[3] == 'all') {
             List<String> tags = [];
+            List<Future<List<String>>> tagsFutures = [];
             for (EntryType entryType in EntryType.values) {
               PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
                   File(_accountsPath +
@@ -1473,7 +1475,12 @@ Future<void> executeCommand(List<String> command,
                       entryTypeToFilename(entryType)),
                   type: entryType,
                   encrypter: encrypter);
-              for (String tag in entriesFile.tags) {
+              tagsFutures
+                  .add(compute((entriesFile) => entriesFile.tags, entriesFile));
+            }
+            for (Future<List<String>> tagsFuture in tagsFutures) {
+              List<String> newTags = await tagsFuture;
+              for (String tag in newTags) {
                 if (tags.contains(tag)) continue;
                 tags.add(tag);
               }
