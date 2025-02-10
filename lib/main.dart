@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
+import 'package:passy_website/screens/downloads_screen.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'screens/main_screen.dart';
 
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
       theme: PassyTheme.theme,
       routes: {
         MainScreen.routeName: (context) => const MainScreen(),
+        DownloadsScreen.routeName: (context) => const DownloadsScreen(),
       },
     );
   }

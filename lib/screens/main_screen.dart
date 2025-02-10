@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
 import 'package:passy_website/widgets/about_passy_dialog.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import 'common.dart';
+import 'downloads_screen.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/';
@@ -24,8 +26,8 @@ class _MainScreen extends State<MainScreen> {
       if (value == null) return;
       Clipboard.setData(ClipboardData(text: value));
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Row(children: const [
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Row(children: [
         Icon(
           Icons.password,
           color: PassyTheme.darkContentColor,
@@ -39,93 +41,99 @@ class _MainScreen extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-              'Passy - Offline password manager with cross-platform synchronization'),
-          centerTitle: true,
-        ),
-        body: CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Column(children: [
-                PassyPadding(ThreeWidgetButton(
-                  left: Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: SvgPicture.asset(
-                        'assets/images/github_icon.svg',
-                        width: 25,
-                      )),
-                  center: const Text('GitHub'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                      'https://github.com/GlitterWare/Passy', 'GitHub'),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: const Padding(
-                    padding: EdgeInsets.only(right: 30),
-                    child: Icon(Icons.extension_rounded),
+      appBar: AppBar(
+        title: const Text(
+            'Passy - Offline password manager with cross-platform synchronization'),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: [
+          const PassyPadding(
+            Text.rich(
+              textAlign: TextAlign.center,
+              TextSpan(
+                text:
+                    '\nThis page hosts information and downloads for various Passy applications and plugins, as well as a small demo of its UI experience.\n\nFor the full experience, ',
+                children: [
+                  TextSpan(
+                    text:
+                        'please click the "Downloads" button found below this text.\n',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: PassyTheme.lightContentSecondaryColor,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          PassyPadding(SizedBox(
+              height: 200,
+              child: IconedRectangleButton(
+                backgroundColor: PassyTheme.lightContentColor,
+                icon: const Padding(
+                  padding: EdgeInsets.only(top: 35),
+                  child: Icon(
+                    Icons.download_rounded,
+                    size: iconSize,
+                    color: PassyTheme.darkContentColor,
                   ),
-                  center: const Text('Browser Extension'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                      'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md',
-                      'Browser Extension'),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: const Padding(
-                    padding: EdgeInsets.only(right: 30),
-                    child: Icon(Icons.download_rounded),
-                  ),
-                  center: const Text('Downloads'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                      'https://github.com/GlitterWare/Passy/blob/dev/DOWNLOADS.md',
-                      'Downloads'),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: const Padding(
-                      padding: EdgeInsets.only(right: 30),
-                      child: Icon(Icons.password)),
-                  center: const Text('Password generator'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: _generatePassword,
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: const Padding(
-                    padding: EdgeInsets.only(right: 30),
-                    child: Icon(Icons.money_rounded),
-                  ),
-                  center: const Text('Donate'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                      'https://github.com/sponsors/GlitterWare', 'Donate'),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: const Padding(
-                    padding: EdgeInsets.only(right: 30),
-                    child: Icon(Icons.shield_moon_outlined),
-                  ),
-                  center: const Text('Privacy policy'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => window.open(
-                    'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md',
-                    'Privacy policy',
-                  ),
-                )),
-                PassyPadding(ThreeWidgetButton(
-                  left: const Padding(
-                      padding: EdgeInsets.only(right: 30),
-                      child: Icon(Icons.info_outline_rounded)),
-                  center: const Text('About'),
-                  right: const Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => const AboutPassyDialog()),
-                )),
-              ]),
-            )
-          ],
-        ));
+                ),
+                label: const Text('Downloads',
+                    style: TextStyle(color: PassyTheme.darkContentColor)),
+                onPressed: () =>
+                    Navigator.pushNamed(context, DownloadsScreen.routeName),
+              ))),
+          PassyPadding(SizedBox(
+              height: 200,
+              child: IconedRectangleButton(
+                icon: const Padding(
+                    padding: EdgeInsets.only(top: 35),
+                    child: Icon(
+                      Icons.password,
+                      size: iconSize,
+                    )),
+                label: const Text('Password generator'),
+                onPressed: _generatePassword,
+              ))),
+          Row(
+            children: [
+              Expanded(
+                child: PassyPadding(SizedBox(
+                    height: 200,
+                    child: IconedRectangleButton(
+                      icon: const Padding(
+                        padding: EdgeInsets.only(top: 35),
+                        child: Icon(
+                          Icons.money_rounded,
+                          size: iconSize,
+                        ),
+                      ),
+                      label: const Text('Donate'),
+                      onPressed: () => window.open(
+                          'https://github.com/sponsors/GlitterWare', 'Donate'),
+                    ))),
+              ),
+              Expanded(
+                child: PassyPadding(SizedBox(
+                    height: 200,
+                    child: IconedRectangleButton(
+                      icon: const Padding(
+                          padding: EdgeInsets.only(top: 35),
+                          child: Icon(
+                            Icons.info_outline_rounded,
+                            size: iconSize,
+                          )),
+                      label: const Text('About'),
+                      onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => const AboutPassyDialog()),
+                    ))),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -5,6 +5,7 @@ export 'edit_screen_appbar.dart';
 export 'entries_screen_appbar.dart';
 export 'entry_screen_appbar.dart';
 export 'enum_dropdown_button_form_field.dart';
+export 'iconed_rectangle_button.dart';
 export 'passy_padding.dart';
 export 'record_button.dart';
 export 'record_dialog.dart';

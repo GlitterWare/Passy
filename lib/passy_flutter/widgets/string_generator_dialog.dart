@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../passy_flutter.dart';
+import 'package:passy_website/passy_flutter/passy_flutter.dart';
 
 class StringGeneratorDialog extends StatefulWidget {
   const StringGeneratorDialog({Key? key}) : super(key: key);
@@ -13,6 +13,8 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   static const String _numbers = '1234567890';
   static const String _symbols = '.,;#&()^*_-';
+  static const double _minSpecial = 8 / 25;
+  static const double _halfMinSpecial = 4 / 25;
 
   String _value = '';
   int _length = 18;
@@ -25,7 +27,52 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   }
 
   void _generatePassword() {
-    _value = PassyGen.generateString(_characterSet, _length);
+    int minSpecial;
+    if (_numbersEnabled && _symbolsEnabled) {
+      minSpecial = (_halfMinSpecial * _length).round();
+      while (true) {
+        _value = PassyGen.generateString(_characterSet, _length);
+        int numCount = 0;
+        int symCount = 0;
+        for (String c in _value.characters) {
+          if (_numbers.contains(c)) {
+            numCount++;
+            continue;
+          }
+          if (_symbols.contains(c)) {
+            symCount++;
+            continue;
+          }
+        }
+        if (numCount >= minSpecial) {
+          if (symCount >= minSpecial) {
+            break;
+          }
+        }
+      }
+    } else if (_numbersEnabled || _symbolsEnabled) {
+      minSpecial = (_minSpecial * _length).round();
+      String special;
+      if (_numbersEnabled) {
+        special = _numbers;
+      } else {
+        special = _symbols;
+      }
+      while (true) {
+        _value = PassyGen.generateString(_characterSet, _length);
+        int specialCount = 0;
+        for (String c in _value.characters) {
+          if (special.contains(c)) {
+            specialCount++;
+            continue;
+          }
+        }
+        if (specialCount >= minSpecial) break;
+      }
+    } else {
+      _value = PassyGen.generateString(_characterSet, _length);
+      return;
+    }
   }
 
   void _buildCharacterSet() {
@@ -53,9 +100,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
+      shape: PassyTheme.dialogShape,
       child: ListView(
         shrinkWrap: true,
         children: [
@@ -66,6 +111,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               child: Icon(Icons.numbers),
             ),
             right: Switch(
+              activeColor: Colors.greenAccent,
               value: _numbersEnabled,
               onChanged: (value) => _setNumbersEnabled(value),
             ),
@@ -78,6 +124,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               child: Icon(Icons.star),
             ),
             right: Switch(
+              activeColor: Colors.greenAccent,
               value: _symbolsEnabled,
               onChanged: (value) => _setSymbolsEnabled(_symbolsEnabled = value),
             ),
@@ -127,6 +174,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
+                  tooltip: 'Cancel',
                   onPressed: () => Navigator.pop(context),
                   child: const Icon(Icons.close_rounded),
                 ),
@@ -134,6 +182,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
+                  tooltip: 'Generate',
                   onPressed: () => setState(() => _generatePassword()),
                   child: const Icon(Icons.refresh_rounded),
                 ),
@@ -141,6 +190,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               PassyPadding(
                 FloatingActionButton(
                   heroTag: null,
+                  tooltip: 'Done',
                   onPressed: () => Navigator.pop(context, _value),
                   child: const Icon(Icons.check_rounded),
                 ),

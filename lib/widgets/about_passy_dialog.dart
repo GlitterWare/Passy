@@ -1,3 +1,7 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
@@ -13,7 +17,7 @@ class AboutPassyDialog extends StatelessWidget {
       ),
       child: SizedBox(
         width: 350,
-        height: 350,
+        height: 510,
         child: ListView(
           children: [
             const SizedBox(height: 24),
@@ -50,6 +54,32 @@ class AboutPassyDialog extends StatelessWidget {
                 fontFamily: 'FiraCode',
               ),
             ),
+            const SizedBox(height: 24),
+            PassyPadding(ThreeWidgetButton(
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.shield_moon_outlined),
+              ),
+              center: const Text('Privacy policy'),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () => window.open(
+                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md',
+                'Privacy policy',
+              ),
+            )),
+            PassyPadding(ThreeWidgetButton(
+              left: Padding(
+                padding: const EdgeInsets.only(right: 30),
+                child: SvgPicture.asset(
+                  'assets/images/github_icon.svg',
+                  width: 24,
+                ),
+              ),
+              center: const Text('GitHub'),
+              right: const Icon(Icons.arrow_forward_ios_rounded),
+              onPressed: () =>
+                  window.open('https://github.com/GlitterWare/Passy', 'GitHub'),
+            )),
             const SizedBox(height: 24),
           ],
         ),
