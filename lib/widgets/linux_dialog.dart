@@ -64,7 +64,7 @@ class LinuxDialog extends StatelessWidget {
               Expanded(
                 child: PassyPadding(IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/app_image_logo.svg',
                       width: dialogIconSize,
@@ -83,7 +83,7 @@ class LinuxDialog extends StatelessWidget {
               Expanded(
                 child: PassyPadding(IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/snap_store_icon.svg',
                       width: dialogIconSize,
@@ -104,7 +104,7 @@ class LinuxDialog extends StatelessWidget {
               Expanded(
                 child: PassyPadding(IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/archlinux.svg',
                       width: dialogIconSize,
@@ -123,7 +123,7 @@ class LinuxDialog extends StatelessWidget {
               Expanded(
                 child: PassyPadding(IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/github_icon.svg',
                       width: dialogIconSize,

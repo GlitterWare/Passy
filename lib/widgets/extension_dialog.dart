@@ -46,7 +46,7 @@ class ExtensionDialog extends StatelessWidget {
               Expanded(
                 child: PassyPadding(IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/google_chrome.svg',
                       width: dialogIconSize,
@@ -65,7 +65,7 @@ class ExtensionDialog extends StatelessWidget {
               Expanded(
                 child: PassyPadding(IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/microsoft_edge.svg',
                       width: dialogIconSize,
@@ -84,7 +84,7 @@ class ExtensionDialog extends StatelessWidget {
             ]),
             PassyPadding(IconedRectangleButton(
               icon: Padding(
-                padding: const EdgeInsets.only(top: 5),
+                padding: const EdgeInsets.only(top: dialogIconTopPadding),
                 child: SvgPicture.asset(
                   'assets/images/firefox_focus.svg',
                   width: dialogIconSize,

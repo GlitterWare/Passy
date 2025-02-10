@@ -41,10 +41,10 @@ class _DownloadsScreen extends State<DownloadsScreen> {
               children: [
                 Expanded(
                   child: PassyPadding(SizedBox(
-                      height: 200,
+                      height: buttonHeight,
                       child: IconedRectangleButton(
                         icon: const Padding(
-                          padding: EdgeInsets.only(top: 35),
+                          padding: EdgeInsets.only(top: iconTopPadding),
                           child: Icon(
                             Icons.window,
                             size: iconSize,
@@ -61,10 +61,10 @@ class _DownloadsScreen extends State<DownloadsScreen> {
                 ),
                 Expanded(
                   child: PassyPadding(SizedBox(
-                      height: 200,
+                      height: buttonHeight,
                       child: IconedRectangleButton(
                         icon: const Padding(
-                          padding: EdgeInsets.only(top: 35),
+                          padding: EdgeInsets.only(top: iconTopPadding),
                           child: Icon(
                             Icons.extension_rounded,
                             size: iconSize,
@@ -86,10 +86,10 @@ class _DownloadsScreen extends State<DownloadsScreen> {
               children: [
                 Expanded(
                   child: PassyPadding(SizedBox(
-                      height: 200,
+                      height: buttonHeight,
                       child: IconedRectangleButton(
                         icon: Padding(
-                          padding: const EdgeInsets.only(top: 35),
+                          padding: const EdgeInsets.only(top: iconTopPadding),
                           child: SvgPicture.asset(
                             'assets/images/android_logo.svg',
                             width: iconSize,
@@ -104,10 +104,10 @@ class _DownloadsScreen extends State<DownloadsScreen> {
                 ),
                 Expanded(
                   child: PassyPadding(SizedBox(
-                      height: 200,
+                      height: buttonHeight,
                       child: IconedRectangleButton(
                         icon: Padding(
-                          padding: const EdgeInsets.only(top: 35),
+                          padding: const EdgeInsets.only(top: iconTopPadding),
                           child: SvgPicture.asset(
                             'assets/images/linux.svg',
                             width: iconSize,
@@ -123,10 +123,10 @@ class _DownloadsScreen extends State<DownloadsScreen> {
               ],
             ),
             PassyPadding(SizedBox(
-                height: 200,
+                height: buttonHeight,
                 child: IconedRectangleButton(
                   icon: Padding(
-                    padding: const EdgeInsets.only(top: 35),
+                    padding: const EdgeInsets.only(top: iconTopPadding),
                     child: SvgPicture.asset(
                       'assets/images/github_icon.svg',
                       width: iconSize,

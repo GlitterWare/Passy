@@ -68,11 +68,11 @@ class _MainScreen extends State<MainScreen> {
             ),
           ),
           PassyPadding(SizedBox(
-              height: 200,
+              height: buttonHeight,
               child: IconedRectangleButton(
                 backgroundColor: PassyTheme.lightContentColor,
                 icon: const Padding(
-                  padding: EdgeInsets.only(top: 35),
+                  padding: EdgeInsets.only(top: iconTopPadding),
                   child: Icon(
                     Icons.download_rounded,
                     size: iconSize,
@@ -85,10 +85,10 @@ class _MainScreen extends State<MainScreen> {
                     Navigator.pushNamed(context, DownloadsScreen.routeName),
               ))),
           PassyPadding(SizedBox(
-              height: 200,
+              height: buttonHeight,
               child: IconedRectangleButton(
                 icon: const Padding(
-                    padding: EdgeInsets.only(top: 35),
+                    padding: EdgeInsets.only(top: iconTopPadding),
                     child: Icon(
                       Icons.password,
                       size: iconSize,
@@ -100,10 +100,10 @@ class _MainScreen extends State<MainScreen> {
             children: [
               Expanded(
                 child: PassyPadding(SizedBox(
-                    height: 200,
+                    height: buttonHeight,
                     child: IconedRectangleButton(
                       icon: const Padding(
-                        padding: EdgeInsets.only(top: 35),
+                        padding: EdgeInsets.only(top: iconTopPadding),
                         child: Icon(
                           Icons.money_rounded,
                           size: iconSize,
@@ -116,10 +116,10 @@ class _MainScreen extends State<MainScreen> {
               ),
               Expanded(
                 child: PassyPadding(SizedBox(
-                    height: 200,
+                    height: buttonHeight,
                     child: IconedRectangleButton(
                       icon: const Padding(
-                          padding: EdgeInsets.only(top: 35),
+                          padding: EdgeInsets.only(top: iconTopPadding),
                           child: Icon(
                             Icons.info_outline_rounded,
                             size: iconSize,
