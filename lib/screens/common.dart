@@ -907,7 +907,6 @@ Future<void> toggleTray(BuildContext context) async {
   SystemTray systemTray;
   if (_systemTray == null) {
     try {
-      throw 'test';
       systemTray = SystemTray();
       _systemTray = systemTray;
     } catch (e, s) {
