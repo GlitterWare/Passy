@@ -53,3 +53,4 @@ lib/passy_cli/bin/passy_cli
 log/untranslated-messages.txt
 submodules/flutter/
 .directory
+submodules/phc-winner-argon2/
