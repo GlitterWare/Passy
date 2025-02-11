@@ -436,7 +436,7 @@ class _MainScreen extends State<MainScreen>
     super.dispose();
     routeObserver.unsubscribe(this);
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      if (trayEnabled) toggleTray();
+      if (trayEnabled) toggleTray(context);
     }
   }
 
@@ -462,7 +462,7 @@ class _MainScreen extends State<MainScreen>
           .setAndroidScreenSecure(_account.protectScreen);
     } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       if (_account.minimizeToTray) {
-        if (!trayEnabled) toggleTray();
+        if (!trayEnabled) toggleTray(context);
       }
     }
     DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();

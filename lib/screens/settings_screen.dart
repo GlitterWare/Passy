@@ -33,9 +33,9 @@ class _SettingsScreen extends State<SettingsScreen> {
 
   void setMinimizeToTray(bool value) {
     if (value) {
-      if (!trayEnabled) toggleTray();
+      if (!trayEnabled) toggleTray(context);
     } else {
-      if (trayEnabled) toggleTray();
+      if (trayEnabled) toggleTray(context);
     }
     setState(() {
       _account.minimizeToTray = value;

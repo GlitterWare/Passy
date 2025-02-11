@@ -901,11 +901,33 @@ setOnError(BuildContext context) {
 
 bool _trayEnabled = false;
 bool get trayEnabled => _trayEnabled;
-SystemTray _systemTray = SystemTray();
+SystemTray? _systemTray;
 
-Future<void> toggleTray() async {
+Future<void> toggleTray(BuildContext context) async {
+  SystemTray systemTray;
+  if (_systemTray == null) {
+    try {
+      throw 'test';
+      systemTray = SystemTray();
+      _systemTray = systemTray;
+    } catch (e, s) {
+      if (!context.mounted) return;
+      showSnackBar(
+        message: localizations.somethingWentWrong,
+        icon: const Icon(Icons.error_outline_rounded),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
+      return;
+    }
+  } else {
+    systemTray = _systemTray!;
+  }
   if (_trayEnabled) {
-    await _systemTray.destroy();
+    await systemTray.destroy();
   } else {
     String path = Platform.isWindows
         ? 'assets/images/icon.ico'
@@ -936,23 +958,23 @@ Future<void> toggleTray() async {
     ]);
 
     // We first init the systray menu and then add the menu entries
-    await _systemTray.initSystemTray(
+    await systemTray.initSystemTray(
       title: 'Passy',
       iconPath: path,
     );
 
-    await _systemTray.setContextMenu(menu);
+    await systemTray.setContextMenu(menu);
 
     // handle system tray event
-    _systemTray.registerSystemTrayEventHandler((eventName) {
+    systemTray.registerSystemTrayEventHandler((eventName) {
       debugPrint("eventName: $eventName");
       if (eventName == kSystemTrayEventClick) {
         Platform.isWindows
             ? windowManager.show()
-            : _systemTray.popUpContextMenu();
+            : systemTray.popUpContextMenu();
       } else if (eventName == kSystemTrayEventRightClick) {
         Platform.isWindows
-            ? _systemTray.popUpContextMenu()
+            ? systemTray.popUpContextMenu()
             : windowManager.show();
       }
     });
