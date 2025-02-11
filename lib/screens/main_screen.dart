@@ -45,6 +45,14 @@ class _MainScreen extends State<MainScreen> {
         title: const Text(
             'Passy - Offline password manager with cross-platform synchronization'),
         centerTitle: true,
+        leading: IconButton(
+          tooltip: 'GlitterWare',
+          padding: PassyTheme.appBarButtonPadding,
+          splashRadius: PassyTheme.appBarButtonSplashRadius,
+          icon: Image.asset('assets/images/gw_transparent.png'),
+          onPressed: () =>
+              window.open('https://glitterware.github.io', 'GlitterWare'),
+        ),
       ),
       body: ListView(
         children: [
