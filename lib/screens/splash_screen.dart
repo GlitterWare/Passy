@@ -47,8 +47,7 @@ class SplashScreen extends StatelessWidget {
             ),
             center: Text(localizations.download),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () =>
-                openUrl('https://github.com/GlitterWare/Passy/releases/latest'),
+            onPressed: () => openUrl('https://glitterware.github.io/Passy'),
           ),
         ),
       );
