@@ -47,7 +47,6 @@ class _MainScreen extends State<MainScreen> {
         centerTitle: true,
         leading: IconButton(
           tooltip: 'GlitterWare',
-          padding: PassyTheme.appBarButtonPadding,
           splashRadius: PassyTheme.appBarButtonSplashRadius,
           icon: Image.asset('assets/images/gw_transparent.png'),
           onPressed: () =>
