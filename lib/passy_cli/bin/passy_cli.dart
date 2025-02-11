@@ -948,7 +948,7 @@ Future<void> executeCommand(List<String> command,
           version = 'shell,$passyShellVersion\n'
               'passy,${pcommon.passyVersion}\n'
               'data,${pcommon.accountVersion}\n'
-              'sync,${pcommon.syncVersion}\n';
+              'sync,${pcommon.syncVersion}';
           log(version, id: id);
           return;
       }
