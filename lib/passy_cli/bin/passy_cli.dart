@@ -38,6 +38,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
@@ -238,6 +239,15 @@ Commands:
     autostart del <name>
         - Remove path from autostart by name.
           Returns `true` on success.
+
+  Theme
+    theme list
+        - List available themes.
+    theme get <username>
+        - Get account theme.
+    theme set <username> <theme>
+        - Set account theme.
+          Returns `true` on success, `false` otherwise.
 ''';
 // #endregion
 
@@ -3131,6 +3141,58 @@ Future<void> executeCommand(List<String> command,
             return;
           }
           log('true');
+          return;
+      }
+      break;
+    // #endregion
+
+    // #region theme
+    case 'theme':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'list':
+          log(PassyAppTheme.values.map((e) => e.name).join('\n'), id: id);
+        case 'get':
+          if (command.length < 3) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:theme:set:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          LocalSettingsFile localSettings =
+              LocalSettings.fromFile(File('${accPath}local_settings.json'));
+          log(localSettings.value.appTheme.name, id: id);
+          return;
+        case 'set':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:theme:set:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String theme = command[3];
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          LocalSettingsFile localSettings =
+              LocalSettings.fromFile(File('${accPath}local_settings.json'));
+          PassyAppTheme? appTheme = passyAppThemeFromName(theme);
+          if (appTheme == null) {
+            log('false', id: id);
+            return;
+          }
+          localSettings.value.appTheme = appTheme;
+          await localSettings.save();
+          log('true', id: id);
           return;
       }
       break;
