@@ -40,6 +40,8 @@ gh run download \
   -n passy-linux-arm64
 echo 'Done.'
 
+echo 'Preparing Passy Snap...'
+cp linux-snap/* .
 echo 'Preparing Passy CLI Linux ARM64...'
 cp passy-cli-linux-arm64/Passy-CLI-Linux-ARM64.zip ./Passy-CLI-v$version-Linux-ARM64.zip
 echo 'Preparing Passy CLI Linux ARMv7...'
