@@ -42,7 +42,7 @@ jobs:
           type: zip
           directory: ../build
           filename: Passy-CLI-Linux-ARM64.zip
-          path: cli
+          path: passy-cli
       - name: Archive Passy build
         uses: thedoctor0/zip-release@0.7.1
         with:

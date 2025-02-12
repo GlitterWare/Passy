@@ -39,7 +39,7 @@ echo "Build Passy CLI"
 echo "===================================================="
 
 bash build_cli.sh
-cp -r /Passy/build/cli/latest/. /passy-build/cli
+cp -r /Passy/build/cli/latest/. /passy-build/passy-cli
 
 echo "===================================================="
 echo "Build Passy"

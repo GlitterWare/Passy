@@ -56,6 +56,6 @@ echo "Prepare releases"
 echo "===================================================="
 
 cd /passy-build
-mkdir cli
-cp -r /Passy/build/cli/latest/. cli
+mkdir passy-cli
+cp -r /Passy/build/cli/latest/. passy-cli
 
