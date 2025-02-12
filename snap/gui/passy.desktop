@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=0.0.0
+Type=Application
+Exec=passy
+Terminal=false
+Name=Passy
+Terminal=false
+Icon=${SNAP}/meta/gui/passy.svg
+Categories=Utility;
+Comment=Cross-Platform Password Manager

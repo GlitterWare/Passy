@@ -46,7 +46,7 @@ app.*.map.json
 /android/app/release
 
 # Snap packaging files
-/snap/*
+/*.snap
 
 # Development log files
 /log/*
