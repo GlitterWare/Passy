@@ -40,10 +40,12 @@ gh run download \
   -n passy-linux-arm64
 echo 'Done.'
 
+echo 'Preparing Passy CLI Linux ARM64...'
+cp passy-cli-linux-arm64/Passy-CLI-Linux-ARM64.zip ./Passy-CLI-v$version-Linux-ARM64.zip
 echo 'Preparing Passy CLI Linux ARMv7...'
 cp passy-cli-linux-armv7/Passy-CLI-Linux-ARMv7.zip ./Passy-CLI-v$version-Linux-ARMv7.zip
-cp android/Passy-Android.apk ./Passy-v$version.apk
 echo 'Preparing Passy Android Apk...'
+cp android/Passy-Android.apk ./Passy-v$version.apk
 zip -9 ./Passy-v$version-Android-Apk.zip Passy-v$version.apk 
 rm Passy-v$version.apk
 echo 'Preparing Passy Linux ARM64...'
