@@ -31,3 +31,5 @@ echo 'INFO:Changing version in AppStream metadata.'
 sed -i 's/version="v'$version'"/version="v'$newVersion'"/' ./linux_assets/com.glitterware.passy.appdata.xml
 echo 'INFO:Changing version in `passy.iss`.'
 sed -i 's/"'$version'"/"'$newVersion'"/' ./passy.iss
+echo 'INFO:Changing version in `snap/snapcraft.yaml`.'
+sed -i 's/version: '\'v$version\''/version: '\'v$newVersion\''/' ./snap/snapcraft.yaml
