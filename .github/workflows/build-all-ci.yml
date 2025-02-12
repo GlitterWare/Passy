@@ -151,6 +151,8 @@ jobs:
         shell: bash
         run: |
           sudo snap install lxd
+          sudo usermod -a -G lxd $(whoami)
+          newgrp lxd
           lxd init --minimal
       - name: Build Linux Snap
         shell: bash
