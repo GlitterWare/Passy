@@ -18,6 +18,7 @@ mkdir /passy-build/Passy-No-Updates-Popup
 export PATH="$PATH:$PWD/submodules/flutter/bin"
 git config --global --add safe.directory /Passy
 git config --global --add safe.directory /Passy/submodules/flutter
+git config --global --add safe.directory /Passy/submodules/phc-winner-argon2
 git submodule init
 git submodule update
 
@@ -45,8 +46,6 @@ echo "Build Passy"
 echo "===================================================="
 
 flutter build linux
-rm /Passy/build/linux/arm64/release/bundle/lib/libargon2.so
-cp /Passy/build/cli/latest/lib/libargon2.so /Passy/build/linux/arm64/release/bundle/lib/
 cp -r /Passy/build/linux/arm64/release/bundle/. /passy-build/Passy
 
 echo "===================================================="
@@ -54,8 +53,6 @@ echo "Build Passy No Updates Popup"
 echo "===================================================="
 
 flutter build linux --dart-define=UPDATES_POPUP_ENABLED=false
-rm /Passy/build/linux/arm64/release/bundle/lib/libargon2.so
-cp /Passy/build/cli/latest/lib/libargon2.so /Passy/build/linux/arm64/release/bundle/lib/
 cp -r /Passy/build/linux/arm64/release/bundle/. /passy-build/Passy-No-Updates-Popup
 
 echo "All Done!"
