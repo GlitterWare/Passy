@@ -15,7 +15,7 @@ mkdir ./build/cli/latest
 mkdir ./build/cli/latest/lib
 flutter pub get
 echo 'Building Passy CLI...'
-dart compile exe ./lib/passy_cli/bin/passy_cli.dart -o ./build/cli/latest/passy_cli
+dart compile exe --suppress-analytics ./lib/passy_cli/bin/passy_cli.dart -o ./build/cli/latest/passy_cli
 cp ./lib/passy_cli/bin/passy_cli_native_messaging.sh ./build/cli/latest
 cp ./lib/passy_cli/passy_cli_native_messaging.json ./build/cli/latest
 cd ./build/cli
