@@ -1,4 +1,5 @@
 #! /bin/bash
+cd "$(dirname "$0")"
 
 user_interrupt() {
   exit
