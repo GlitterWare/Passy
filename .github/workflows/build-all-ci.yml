@@ -153,6 +153,9 @@ jobs:
           sudo snap install lxd
           sudo usermod -a -G lxd $(whoami)
           newgrp lxd
+          sudo chown root:lxd /var/snap/lxd/common/lxd/unix.socket
+          sudo chmod 660 /var/snap/lxd/common/lxd/unix.socket
+          sudo chmod u+s /var/snap/lxd/common/lxd/unix.socket
           lxd init --minimal
       - name: Build Linux Snap
         shell: bash
