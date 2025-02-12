@@ -7,7 +7,7 @@ echo "===================================================="
 
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync git file unzip zip wget curl libc6
-DEBIAN_FRONTEND=noninteractive apt-get -y install libayatana-appindicator3-dev libappindicator3-dev libmpv-dev mpv
+DEBIAN_FRONTEND=noninteractive apt-get -y install libappindicator3-1 libappindicator3-dev libmpv-dev mpv
 
 echo "===================================================="
 echo "Configure"
