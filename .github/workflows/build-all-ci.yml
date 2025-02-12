@@ -139,6 +139,29 @@ jobs:
         with:
           name: linux-appimage-no-updates-popup
           path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
+  build_linux_snap:
+    name: Build Passy for Snap Store
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v3
+      - name: Build Linux Snap
+        shell: bash
+        run: snapcraft
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          rm -rf build/*
+          mkdir -p build/linux-snap
+          cp Passy/*.snap build/linux-snap
+      - name: Upload Linux Snap
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-snap
+          path: /home/runner/work/Passy/build/linux-snap
   build_windows:
     name: Build Passy for Windows
     runs-on: windows-latest
