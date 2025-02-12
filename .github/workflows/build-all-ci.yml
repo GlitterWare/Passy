@@ -147,9 +147,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v3
-      - name: Install dependencies
+      - name: Install LXD
         shell: bash
-        run: sudo snap install lxd
+        run: |
+          sudo snap install lxd
+          lxd init --minimal
       - name: Build Linux Snap
         shell: bash
         run: snapcraft
