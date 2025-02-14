@@ -1,6 +1,7 @@
 [submodule "flutter"]
 	path = submodules/flutter
 	url = https://github.com/flutter/flutter.git
+	ignore = dirty
 
 [submodule "phc-winner-argon2"]
 	path = submodules/phc-winner-argon2
