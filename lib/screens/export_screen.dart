@@ -29,6 +29,8 @@ enum _ExportType { passy, csv }
 class _ExportScreen extends State<ExportScreen> {
   final LoadedAccount _account = data.loadedAccount!;
   late FormattedTextParser formattedTextParser;
+  bool advancedSettingsIsExpanded = false;
+  bool fileExportEnabled = true;
 
   Future<bool?> _showExportWarningDialog() {
     return showDialog<bool>(
@@ -100,12 +102,14 @@ class _ExportScreen extends State<ExportScreen> {
         case _ExportType.passy:
           await _account.exportPassy(
               outputDirectory: File(_expFile).parent,
-              fileName: path.basename(_expFile));
+              fileName: path.basename(_expFile),
+              fileExportEnabled: fileExportEnabled);
           break;
         case _ExportType.csv:
           await _account.exportCSV(
               outputDirectory: File(_expFile).parent,
-              fileName: path.basename(_expFile));
+              fileName: path.basename(_expFile),
+              fileExportEnabled: fileExportEnabled);
           break;
       }
       showSnackBar(
@@ -172,9 +176,69 @@ class _ExportScreen extends State<ExportScreen> {
             child: Icon(Icons.upload_file_outlined),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: () =>
-              Navigator.pushNamed(context, ConfirmKdbxExportScreen.routeName),
+          onPressed: () => Navigator.pushNamed(
+              context, ConfirmKdbxExportScreen.routeName,
+              arguments: ConfirmKdbxExportScreenArgs(
+                  fileExportEnabled: fileExportEnabled)),
         )),
+        Padding(
+          padding: EdgeInsets.only(
+              top: PassyTheme.of(context).passyPadding.top,
+              bottom: PassyTheme.of(context).passyPadding.bottom),
+          child: ExpansionPanelList(
+              expandedHeaderPadding: EdgeInsets.zero,
+              expansionCallback: (panelIndex, isExpanded) =>
+                  setState(() => advancedSettingsIsExpanded = isExpanded),
+              elevation: 0,
+              dividerColor:
+                  PassyTheme.of(context).highlightContentSecondaryColor,
+              children: [
+                ExpansionPanel(
+                    backgroundColor: PassyTheme.of(context).contentColor,
+                    isExpanded: advancedSettingsIsExpanded,
+                    canTapOnHeader: true,
+                    headerBuilder: (context, isExpanded) {
+                      return Padding(
+                          padding: EdgeInsets.only(
+                              left: PassyTheme.of(context).passyPadding.left),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(32.0)),
+                                  color: PassyTheme.of(context)
+                                      .accentContentColor),
+                              child: Row(
+                                children: [
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 20, right: 30),
+                                    child: Icon(Icons.error_outline_rounded),
+                                  ),
+                                  Text(localizations.advancedSettings),
+                                ],
+                              )));
+                    },
+                    body: Column(
+                      children: [
+                        PassyPadding(ThreeWidgetButton(
+                          center: Text(localizations.files),
+                          left: const Padding(
+                            padding: EdgeInsets.only(right: 30),
+                            child: Icon(Icons.description_outlined),
+                          ),
+                          right: Switch(
+                            activeColor: Colors.greenAccent,
+                            value: fileExportEnabled,
+                            onChanged: (value) =>
+                                setState(() => fileExportEnabled = value),
+                          ),
+                          onPressed: () => setState(
+                              () => fileExportEnabled = !fileExportEnabled),
+                        )),
+                      ],
+                    )),
+              ]),
+        ),
       ]),
     );
   }

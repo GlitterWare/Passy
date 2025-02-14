@@ -495,6 +495,7 @@ class LoadedAccount {
   Future<String> exportPassy({
     required Directory outputDirectory,
     String? fileName,
+    bool fileExportEnabled = true,
   }) async {
     if (fileName == null) {
       fileName = outputDirectory.path +
@@ -521,8 +522,10 @@ class LoadedAccount {
       await _tempAccDir.delete(recursive: true);
       await _tempAccDir.create();
       _jsonAcc.saveSync();
-      await _fileIndex
-          .export(_tempAccDir.path + Platform.pathSeparator + 'files');
+      if (fileExportEnabled) {
+        await _fileIndex
+            .export(_tempAccDir.path + Platform.pathSeparator + 'files');
+      }
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
@@ -535,6 +538,7 @@ class LoadedAccount {
   Future<String> exportCSV({
     required Directory outputDirectory,
     String? fileName,
+    bool fileExportEnabled = true,
   }) async {
     if (fileName == null) {
       fileName = outputDirectory.path +
@@ -592,7 +596,9 @@ class LoadedAccount {
           .writeAsString(encoder.convert(_fileSyncHistory.value.toJson()));
       await File('${tempPath}favorites.json')
           .writeAsString(encoder.convert(_favorites.value.toJson()));
-      await _fileIndex.export('${tempPath}files');
+      if (fileExportEnabled) {
+        await _fileIndex.export('${tempPath}files');
+      }
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
@@ -606,6 +612,7 @@ class LoadedAccount {
     required String password,
     required Directory outputDirectory,
     String? fileName,
+    bool fileExportEnabled = true,
   }) async {
     if (fileName == null) {
       fileName = outputDirectory.path +
@@ -662,7 +669,9 @@ class LoadedAccount {
           .writeAsString(encoder.convert(_fileSyncHistory.value.toJson()));
       await File('${tempPath}favorites.json')
           .writeAsString(encoder.convert(_favorites.value.toJson()));
-      await _fileIndex.export('${tempPath}files');
+      if (fileExportEnabled) {
+        await _fileIndex.export('${tempPath}files');
+      }
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);

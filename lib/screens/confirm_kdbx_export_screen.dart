@@ -13,6 +13,14 @@ import 'package:path/path.dart' as path;
 import 'export_screen.dart';
 import 'log_screen.dart';
 
+class ConfirmKdbxExportScreenArgs {
+  final bool fileExportEnabled;
+
+  const ConfirmKdbxExportScreenArgs({
+    this.fileExportEnabled = true,
+  });
+}
+
 class ConfirmKdbxExportScreen extends StatefulWidget {
   static const String routeName = '${ExportScreen.routeName}/kdbx';
 
@@ -28,7 +36,7 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
   String _newPassword = '';
   String _newPasswordConfirm = '';
 
-  void _onConfirmPressed() async {
+  void _onConfirmPressed(bool fileExportEnabled) async {
     if (_newPassword.isEmpty) {
       showSnackBar(
         message: localizations.passwordIsEmpty,
@@ -69,7 +77,8 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
       await _account.exportKdbx(
           outputDirectory: _file.parent,
           password: _newPassword,
-          fileName: path.basename(_file.path));
+          fileName: path.basename(_file.path),
+          fileExportEnabled: fileExportEnabled);
       Navigator.pop(context);
       Navigator.pop(context);
       showSnackBar(
@@ -100,6 +109,9 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ConfirmKdbxExportScreenArgs args = ModalRoute.of(context)!
+        .settings
+        .arguments as ConfirmKdbxExportScreenArgs;
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.kdbxExport),
@@ -132,8 +144,10 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
                         obscureText: true,
                         onChanged: (s) =>
                             setState(() => _newPasswordConfirm = s),
-                        onFieldSubmitted: (s) => _onConfirmPressed(),
-                        onPressed: _onConfirmPressed,
+                        onFieldSubmitted: (s) =>
+                            _onConfirmPressed(args.fileExportEnabled),
+                        onPressed: () =>
+                            _onConfirmPressed(args.fileExportEnabled),
                         buttonIcon: const Icon(Icons.arrow_forward_ios_rounded),
                       ),
                     ],
