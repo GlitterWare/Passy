@@ -530,7 +530,7 @@ class LoadedAccount {
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
-    _encoder.close();
+    await _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
   }
@@ -603,7 +603,7 @@ class LoadedAccount {
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
-    _encoder.close();
+    await _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
   }
@@ -676,7 +676,7 @@ class LoadedAccount {
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
-    _encoder.close();
+    await _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
   }
