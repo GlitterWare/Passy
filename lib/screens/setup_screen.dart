@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
@@ -22,6 +24,18 @@ class SetupScreen extends StatefulWidget {
 
 class _SetupScreen extends State<SetupScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+
+  void setMinimizeToTray(bool value) {
+    if (value) {
+      if (!trayEnabled) toggleTray(context);
+    } else {
+      if (trayEnabled) toggleTray(context);
+    }
+    setState(() {
+      _account.minimizeToTray = value;
+    });
+    _account.saveSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +97,20 @@ class _SetupScreen extends State<SetupScreen> {
             onPressed: () =>
                 Navigator.pushNamed(context, ThemeScreen.routeName),
           )),
+          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS)
+            PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.minimizeToTray),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.circle),
+              ),
+              right: Switch(
+                //activeColor: Colors.deepPurpleAccent,
+                value: _account.minimizeToTray,
+                onChanged: (value) => setMinimizeToTray(value),
+              ),
+              onPressed: () => setMinimizeToTray(!_account.minimizeToTray),
+            )),
           PassyPadding(ThreeWidgetButton(
             color: PassyTheme.of(context).highlightContentColor,
             center: Text(
