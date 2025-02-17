@@ -50,11 +50,16 @@ jobs:
           directory: ../build
           filename: Passy-Linux-ARM64.zip
           path: Passy
+      - name: Move Passy No Updates Popup build
+        shell: bash
+        run: |
+          sudo rm -rf ../build/Passy
+          sudo mv ../build/Passy-No-Updates-Popup ../build/Passy
       - name: Archive Passy No Updates Popup build
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: zip
-          directory: ../build/Passy-No-Updates-Popup
+          directory: ../build
           filename: Passy-Linux-ARM64-No-Updates-Popup.zip
           path: Passy
       - name: Upload Passy CLI build
