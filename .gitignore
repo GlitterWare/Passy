@@ -54,3 +54,6 @@ log/untranslated-messages.txt
 submodules/flutter/
 .directory
 submodules/phc-winner-argon2/
+
+# Snap packaging files
+/*.snap
