@@ -54,8 +54,10 @@ zip -9 ./Passy-v$version-Android-Apk.zip Passy-v$version.apk
 rm Passy-v$version.apk
 echo 'Preparing Passy Linux ARM64...'
 cp passy-linux-arm64/Passy-Linux-ARM64.zip ./Passy-v$version-Linux-ARM64-Bundle.zip
+cp passy-linux-arm64-no-updates-popup/Passy-Linux-ARM64-No-Updates-Popup.zip ./Passy-v$version-Linux-ARM64-Bundle-No-Updates-Popup.zip
 echo 'Preparing Passy Linux Bundle...'
 cp linux-bundle/Passy-Linux-Bundle.zip ./Passy-v$version-Linux-Bundle.zip
+cp linux-bundle-no-updates-popup/Passy-Linux-Bundle.zip ./Passy-v$version-Linux-Bundle-No-Updates-Popup.zip
 echo 'Preparing Passy Windows Installer...'
 cp windows-exe-installer/Passy-Windows-Installer.exe ./Passy-v$version-Windows-Installer.exe
 echo 'Preparing Passy Windows Portable...'
