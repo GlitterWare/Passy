@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
 import 'package:passy_website/widgets/android_dialog.dart';
+import 'package:passy_website/widgets/common.dart';
 import 'package:passy_website/widgets/extension_dialog.dart';
 import 'package:passy_website/widgets/linux_dialog.dart';
 
@@ -37,6 +38,14 @@ class _DownloadsScreen extends State<DownloadsScreen> {
       body: Center(
         child: ListView(
           children: [
+            const PassyPadding(Text(
+              'Stable release:\n$releaseVersion - $releaseTitle',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'FiraCode',
+                color: PassyTheme.lightContentSecondaryColor,
+              ),
+            )),
             Row(
               children: [
                 Expanded(
@@ -55,7 +64,7 @@ class _DownloadsScreen extends State<DownloadsScreen> {
                           textAlign: TextAlign.center,
                         ),
                         onPressed: () => window.open(
-                            'https://github.com/GlitterWare/Passy/releases/download/v1.8.0/Passy-v1.8.0-Windows-Installer.exe',
+                            'https://github.com/GlitterWare/Passy/releases/download/$releaseVersion/Passy-$releaseVersion-Windows-Installer.exe',
                             'Windows'),
                       ))),
                 ),

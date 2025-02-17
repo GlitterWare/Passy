@@ -7,6 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy_website/passy_flutter/passy_flutter.dart';
 import 'package:passy_website/screens/common.dart';
 
+import 'common.dart';
+
 class LinuxDialog extends StatelessWidget {
   const LinuxDialog({super.key});
 
@@ -75,7 +77,7 @@ class LinuxDialog extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   onPressed: () => window.open(
-                    'https://github.com/GlitterWare/Passy/releases/download/v1.8.0/Passy-v1.8.0-x86-64.AppImage',
+                    'https://github.com/GlitterWare/Passy/releases/download/$releaseVersion/Passy-$releaseVersion-x86-64.AppImage',
                     'AppImage',
                   ),
                 )),
