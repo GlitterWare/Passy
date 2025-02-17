@@ -975,7 +975,9 @@ Future<void> toggleTray(BuildContext context) async {
   } else {
     String path = Platform.isWindows
         ? 'assets/images/icon.ico'
-        : 'assets/images/icon48.png';
+        : Platform.environment.containsKey('container')
+            ? 'io.github.glitterware.Passy'
+            : 'assets/images/icon48.png';
     final menu = Menu();
     menu.buildFrom([
       MenuItemLabel(
