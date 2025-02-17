@@ -14,7 +14,7 @@ echo "===================================================="
 
 mkdir /passy-build/cli
 mkdir /passy-build/Passy
-mkdir /passy-build/Passy-No-Updates-Popup
+mkdir -p /passy-build/Passy-No-Updates-Popup/Passy
 export PATH="$PATH:$PWD/submodules/flutter/bin"
 git config --global --add safe.directory /Passy
 git config --global --add safe.directory /Passy/submodules/flutter
@@ -53,6 +53,6 @@ echo "Build Passy No Updates Popup"
 echo "===================================================="
 
 flutter build linux --dart-define=UPDATES_POPUP_ENABLED=false
-cp -r /Passy/build/linux/arm64/release/bundle/. /passy-build/Passy-No-Updates-Popup
+cp -r /Passy/build/linux/arm64/release/bundle/. /passy-build/Passy-No-Updates-Popup/Passy
 
 echo "All Done!"

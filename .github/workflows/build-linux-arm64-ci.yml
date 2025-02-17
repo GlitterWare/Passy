@@ -54,9 +54,9 @@ jobs:
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: zip
-          directory: ../build
+          directory: ../build/Passy-No-Updates-Popup
           filename: Passy-Linux-ARM64-No-Updates-Popup.zip
-          path: Passy-No-Updates-Popup
+          path: Passy
       - name: Upload Passy CLI build
         uses: actions/upload-artifact@v4
         with:
@@ -71,4 +71,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: passy-linux-arm64-no-updates-popup
-          path: /home/runner/work/Passy/build/Passy-Linux-ARM64-No-Updates-Popup.zip
+          path: /home/runner/work/Passy/build/Passy-No-Updates-Popup/Passy-Linux-ARM64-No-Updates-Popup.zip
