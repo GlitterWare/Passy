@@ -28,6 +28,7 @@ import 'package:passy/screens/payment_cards_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:uuid/uuid.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:zxing2/qrcode.dart';
 
@@ -899,6 +900,50 @@ setOnError(BuildContext context) {
   };
 }
 
+class PassyTray extends SystemTray {
+  static const String _kChannelName = "flutter/system_tray/tray";
+
+  static const String _kInitSystemTray = "InitSystemTray";
+
+  static const String _kTrayIdKey = "tray_id";
+  static const String _kTitleKey = "title";
+  static const String _kIconPathKey = "iconpath";
+  static const String _kToolTipKey = "tooltip";
+  static const String _kIsTemplateKey = "is_template";
+
+  static const MethodChannel _platformChannel = MethodChannel(_kChannelName);
+
+  PassyTray() : super();
+
+  @override
+  Future<bool> initSystemTray({
+    required String iconPath,
+    String? title,
+    String? toolTip,
+    bool isTemplate = false,
+  }) async {
+    if (!Platform.environment.containsKey('container')) {
+      return await super.initSystemTray(
+        iconPath: iconPath,
+        title: title,
+        toolTip: toolTip,
+        isTemplate: isTemplate,
+      );
+    }
+    // Flatpak
+    return await _platformChannel.invokeMethod(
+      _kInitSystemTray,
+      <String, dynamic>{
+        _kTrayIdKey: const Uuid().v1(),
+        _kTitleKey: title,
+        _kIconPathKey: iconPath,
+        _kToolTipKey: toolTip,
+        _kIsTemplateKey: isTemplate,
+      },
+    );
+  }
+}
+
 bool _trayEnabled = false;
 bool get trayEnabled => _trayEnabled;
 SystemTray? _systemTray;
@@ -907,7 +952,7 @@ Future<void> toggleTray(BuildContext context) async {
   SystemTray systemTray;
   if (_systemTray == null) {
     try {
-      systemTray = SystemTray();
+      systemTray = PassyTray();
       _systemTray = systemTray;
     } catch (e, s) {
       if (!context.mounted) return;
