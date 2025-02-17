@@ -38,7 +38,7 @@ gh run download \
   -n windows-portable \
   -n passy-cli-linux-arm64 \
   -n passy-cli-linux-armv7 \
-  -n passy-linux-arm64
+  -n passy-linux-arm64 \
   -n passy-linux-arm64-no-updates-popup
 echo 'Done.'
 
