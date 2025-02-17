@@ -32,12 +32,14 @@ gh run download \
   -n android \
   -n linux-appimage \
   -n linux-bundle \
+  -n linux-bundle-no-updates-popup \
   -n linux-snap \
   -n windows-exe-installer \
   -n windows-portable \
   -n passy-cli-linux-arm64 \
   -n passy-cli-linux-armv7 \
   -n passy-linux-arm64
+  -n passy-linux-arm64-no-updates-popup
 echo 'Done.'
 
 echo 'Preparing Passy Snap...'
