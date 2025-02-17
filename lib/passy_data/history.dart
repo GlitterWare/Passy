@@ -17,6 +17,7 @@ class History with JsonConvertable {
   final Map<String, EntryEvent> notes;
   final Map<String, EntryEvent> idCards;
   final Map<String, EntryEvent> identities;
+  final Map<String, EntryEvent> appSettings;
 
   int get length =>
       passwords.length +
@@ -24,7 +25,16 @@ class History with JsonConvertable {
       paymentCards.length +
       notes.length +
       idCards.length +
-      identities.length;
+      identities.length +
+      appSettings.length;
+
+  void _init() {
+    DateTime _time = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    if (!appSettings.containsKey('appTheme')) {
+      appSettings['appTheme'] = EntryEvent('appTheme',
+          status: EntryStatus.alive, lastModified: _time);
+    }
+  }
 
   History({
     //this.version = 0,
@@ -34,12 +44,16 @@ class History with JsonConvertable {
     Map<String, EntryEvent>? notes,
     Map<String, EntryEvent>? idCards,
     Map<String, EntryEvent>? identities,
+    Map<String, EntryEvent>? appSettings,
   })  : passwords = passwords ?? {},
         passwordIcons = passwordIcons ?? {},
         notes = notes ?? {},
         paymentCards = paymentCards ?? {},
         idCards = idCards ?? {},
-        identities = identities ?? {};
+        identities = identities ?? {},
+        appSettings = appSettings ?? {} {
+    _init();
+  }
 
   History.from(History other)
       : //version = other.version,
@@ -48,7 +62,10 @@ class History with JsonConvertable {
         paymentCards = Map<String, EntryEvent>.from(other.paymentCards),
         notes = Map<String, EntryEvent>.from(other.notes),
         idCards = Map<String, EntryEvent>.from(other.idCards),
-        identities = Map<String, EntryEvent>.from(other.identities);
+        identities = Map<String, EntryEvent>.from(other.identities),
+        appSettings = Map<String, EntryEvent>.from(other.appSettings) {
+    _init();
+  }
 
   History.fromJson(Map<String, dynamic> json)
       : //version = int.tryParse(json['version']) ?? 0,
@@ -63,7 +80,12 @@ class History with JsonConvertable {
         idCards = (json['idCards'] as Map<String, dynamic>)
             .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
         identities = (json['identities'] as Map<String, dynamic>)
-            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value)));
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))),
+        appSettings = ((json['appSettings'] ?? <String, dynamic>{})
+                as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, EntryEvent.fromJson(value))) {
+    _init();
+  }
 
   @override
   Map<String, dynamic> toJson() => {
@@ -79,6 +101,8 @@ class History with JsonConvertable {
         'idCards': idCards.map<String, dynamic>(
             (key, value) => MapEntry(key, value.toJson())),
         'identities': identities.map<String, dynamic>(
+            (key, value) => MapEntry(key, value.toJson())),
+        'appSettings': appSettings.map<String, dynamic>(
             (key, value) => MapEntry(key, value.toJson())),
       };
 
@@ -131,15 +155,18 @@ class History with JsonConvertable {
     notes.removeWhere((key, value) => value.status == EntryStatus.removed);
     idCards.removeWhere((key, value) => value.status == EntryStatus.removed);
     identities.removeWhere((key, value) => value.status == EntryStatus.removed);
+    appSettings
+        .removeWhere((key, value) => value.status == EntryStatus.removed);
   }
 
   void renew() {
     DateTime _time = DateTime.now().toUtc();
-    passwords.forEach((key, value) {});
+    passwords.forEach((key, value) => value.lastModified = _time);
     passwordIcons.forEach((key, value) => value.lastModified = _time);
     paymentCards.forEach((key, value) => value.lastModified = _time);
     notes.forEach((key, value) => value.lastModified = _time);
     idCards.forEach((key, value) => value.lastModified = _time);
     identities.forEach((key, value) => value.lastModified = _time);
+    appSettings.forEach((key, value) => value.lastModified = _time);
   }
 }

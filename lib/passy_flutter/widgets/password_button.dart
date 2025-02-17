@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PasswordButton extends StatelessWidget {
+  final Widget? leftWidget;
   final PasswordMeta password;
   final void Function()? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
@@ -11,6 +13,7 @@ class PasswordButton extends StatelessWidget {
 
   const PasswordButton({
     Key? key,
+    this.leftWidget,
     required this.password,
     this.onPressed,
     this.popupMenuItemBuilder,
@@ -19,13 +22,22 @@ class PasswordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
+      if (leftWidget != null) leftWidget!,
       Flexible(
         child: ThreeWidgetButton(
           left: Padding(
             padding: const EdgeInsets.only(right: 30),
-            child: password.website == ''
-                ? logoCircle50White
-                : FavIconImage(address: password.website),
+            child: password.websites[0] == ''
+                ? SvgPicture.asset(
+                    logoCircleSvg,
+                    colorFilter: ColorFilter.mode(
+                        PassyTheme.of(context)
+                            .highlightContentColor
+                            .withAlpha(180),
+                        BlendMode.srcIn),
+                    width: 50,
+                  )
+                : FavIconImage(address: password.websites[0]),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
           onPressed: onPressed,

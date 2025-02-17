@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class RenameFileDialog extends StatefulWidget {
@@ -45,10 +46,7 @@ class _RenameFileDialog extends State<RenameFileDialog> {
             maxLines: 1,
             onChanged: _onNameChanged,
             onFieldSubmitted: (value) => Navigator.pop(
-                context,
-                (_value == '' || _value == '.' || _value == '..')
-                    ? null
-                    : _value),
+                context, prohibitedFileNames.contains(_value) ? null : _value),
           )),
           Row(
             children: [
@@ -65,8 +63,8 @@ class _RenameFileDialog extends State<RenameFileDialog> {
                 FloatingActionButton(
                   heroTag: null,
                   tooltip: localizations.rename,
-                  onPressed: () =>
-                      Navigator.pop(context, _value.isEmpty ? null : _value),
+                  onPressed: () => Navigator.pop(context,
+                      prohibitedFileNames.contains(_value) ? null : _value),
                   child: const Icon(Icons.check_rounded),
                 ),
               ),

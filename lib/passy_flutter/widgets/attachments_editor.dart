@@ -96,10 +96,10 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: _attachments == null && widget.files.isNotEmpty
-          ? const [
+          ? [
               Center(
                 child: CircularProgressIndicator(
-                  color: PassyTheme.lightContentColor,
+                  color: PassyTheme.of(context).contentTextColor,
                 ),
               ),
             ]
@@ -115,7 +115,8 @@ class _AttachmentsEditor extends State<AttachmentsEditor> {
                     if (!mounted) return;
                     Navigator.pushNamed(context, FilesScreen.routeName,
                             arguments: FilesScreenArgs(
-                                path: '/sync/attach', attach: true))
+                                path: '/sync/attach',
+                                select: FilesScreenSelectMode.file))
                         .then((value) {
                       if (value is! FilesScreenResult) return _refresh();
                       if (widget.files.contains(value.key)) return _refresh();

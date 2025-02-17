@@ -3,9 +3,9 @@ export 'always_disabled_focus_node.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:passy/common/assets.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CardAssetPaths {
   const CardAssetPaths._();
@@ -84,7 +84,8 @@ String dateToString(DateTime date) {
 DateTime stringToDate(String value) {
   if (value == '') return DateTime.now();
   List<String> _dateSplit = value.split('/');
-  if (_dateSplit.length < 3) return DateTime.now();
+  if (_dateSplit.length < 2) return DateTime.now();
+  if (_dateSplit.length < 3) _dateSplit.insert(0, '01');
   int? yy = int.tryParse(_dateSplit[2]);
   if (yy == null) return DateTime.now();
   int? mm = int.tryParse(_dateSplit[1]);
@@ -94,17 +95,20 @@ DateTime stringToDate(String value) {
   return DateTime(yy, mm, dd);
 }
 
-Future<DateTime?> showPassyDatePicker(
-    {required BuildContext context,
-    required DateTime date,
-    ColorScheme colorScheme = PassyTheme.datePickerColorScheme}) {
+Future<DateTime?> showPassyDatePicker({
+  required BuildContext context,
+  required DateTime date,
+  ColorScheme? colorScheme,
+}) {
   return showDatePicker(
     context: context,
     initialDate: date,
     firstDate: DateTime.utc(0, 04, 20),
     lastDate: DateTime.utc(275760, 09, 13),
     builder: (context, w) => Theme(
-      data: ThemeData(colorScheme: colorScheme),
+      data: ThemeData(
+          colorScheme:
+              colorScheme ?? PassyTheme.of(context).datePickerColorScheme),
       child: w!,
     ),
   );
@@ -112,7 +116,11 @@ Future<DateTime?> showPassyDatePicker(
 
 Widget getCardTypeImage(CardType? cardType) {
   if (cardType == CardType.otherBrand) {
-    return logoCircle50White;
+    return SvgPicture.asset(
+      'assets/images/logo_circle.svg',
+      colorFilter: const ColorFilter.mode(Colors.purple, BlendMode.srcIn),
+      width: 50,
+    );
   }
 
   return Image.asset(
@@ -131,3 +139,32 @@ Future<bool> confirmUrlStatusCode(String url, {int statusCode = 200}) async {
   } catch (_) {}
   return false;
 }
+
+const List<String> prohibitedFileNames = [
+  '',
+  '.',
+  '..',
+  'CON',
+  'PRN',
+  'AUX',
+  'CLOCK\$',
+  'NUL',
+  'COM1',
+  'COM2',
+  'COM3',
+  'COM4',
+  'COM5',
+  'COM6',
+  'COM7',
+  'COM8',
+  'COM9',
+  'LPT1',
+  'LPT2',
+  'LPT3',
+  'LPT4',
+  'LPT5',
+  'LPT6',
+  'LPT7',
+  'LPT8',
+  'LPT9',
+];

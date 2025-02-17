@@ -34,10 +34,10 @@ class LogScreen extends StatelessWidget {
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: '```\n$_log\n```'));
                 showSnackBar(
-                    message:
-                        '${localizations.log} ${localizations.copied.toLowerCase()}',
-                    icon: const Icon(Icons.copy_rounded,
-                        color: PassyTheme.darkContentColor));
+                  message:
+                      '${localizations.log} ${localizations.copied.toLowerCase()}',
+                  icon: const Icon(Icons.copy_rounded),
+                );
               },
             ),
             IconButton(
@@ -46,8 +46,8 @@ class LogScreen extends StatelessWidget {
               icon: SvgPicture.asset(
                 width: PassyTheme.appBarButtonSplashRadius,
                 'assets/images/github_icon.svg',
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
               ),
               tooltip: localizations.submitAnIssue,
               onPressed: () =>

@@ -3,7 +3,7 @@ class GlareModule {
   final Future<Map<String, dynamic>?> Function(
     List<String> args, {
     required void Function(String key, GlareModule module) addModule,
-    required Future<Map<String, dynamic>> Function(int length) readBytes,
+    Map<String, List<int>>? binaryObjects,
   }) target;
 
   GlareModule({
@@ -20,7 +20,11 @@ class GlareModule {
   Future<Map<String, dynamic>?> run(
     List<String> args, {
     required void Function(String key, GlareModule module) addModule,
-    required Future<Map<String, dynamic>> Function(int length) readBytes,
+    Map<String, List<int>>? binaryObjects,
   }) =>
-      target(args, addModule: addModule, readBytes: readBytes);
+      target(
+        args,
+        addModule: addModule,
+        binaryObjects: binaryObjects,
+      );
 }

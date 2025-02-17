@@ -35,10 +35,12 @@ class _IDCardScreen extends State<IDCardScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.idCardsTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _idCard!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);
@@ -71,16 +73,16 @@ class _IDCardScreen extends State<IDCardScreen> {
                 TextButton(
                   child: Text(
                     localizations.cancel,
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor),
+                    style: TextStyle(
+                        color: PassyTheme.of(context)
+                            .highlightContentSecondaryColor),
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 TextButton(
                   child: Text(
                     localizations.remove,
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor),
+                    style: const TextStyle(color: Colors.red),
                   ),
                   onPressed: () {
                     Navigator.pushNamed(context, SplashScreen.routeName);
@@ -105,6 +107,11 @@ class _IDCardScreen extends State<IDCardScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: _onEditPressed,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.idCard,
         entryKey: _idCard!.key,
@@ -117,18 +124,12 @@ class _IDCardScreen extends State<IDCardScreen> {
             await _account.removeFavoriteIDCard(_idCard!.key);
             showSnackBar(
                 message: localizations.removedFromFavorites,
-                icon: const Icon(
-                  Icons.star_outline_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+                icon: const Icon(Icons.star_outline_rounded));
           } else {
             await _account.addFavoriteIDCard(_idCard!.key);
             showSnackBar(
                 message: localizations.addedToFavorites,
-                icon: const Icon(
-                  Icons.star_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+                icon: const Icon(Icons.star_rounded));
           }
           setState(() {});
         },
@@ -138,8 +139,8 @@ class _IDCardScreen extends State<IDCardScreen> {
           Center(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: PassyTheme.passyPadding.top / 2,
-                  bottom: PassyTheme.passyPadding.bottom / 2),
+                  top: PassyTheme.of(context).passyPadding.top / 2,
+                  bottom: PassyTheme.of(context).passyPadding.bottom / 2),
               child: !_tagsLoaded
                   ? const CircularProgressIndicator()
                   : EntryTagList(
@@ -160,8 +161,7 @@ class _IDCardScreen extends State<IDCardScreen> {
                           Navigator.pop(context);
                           showSnackBar(
                             message: localizations.somethingWentWrong,
-                            icon: const Icon(Icons.error_outline_rounded,
-                                color: PassyTheme.darkContentColor),
+                            icon: const Icon(Icons.error_outline_rounded),
                             action: SnackBarAction(
                               label: localizations.details,
                               onPressed: () => Navigator.pushNamed(
@@ -246,6 +246,7 @@ class _IDCardScreen extends State<IDCardScreen> {
             PassyPadding(RecordButton(
                 title: localizations.additionalInfo,
                 value: _idCard!.additionalInfo)),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

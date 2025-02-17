@@ -68,19 +68,19 @@ class _ServersScreen extends State<ServersScreen> {
     }
     if (_syncInterval < 1) {
       showSnackBar(
-          message:
-              '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
-          icon:
-              const Icon(Icons.timelapse, color: PassyTheme.darkContentColor));
+        message:
+            '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
+        icon: const Icon(Icons.timelapse),
+      );
       return;
     }
     if (_syncIntervalUnits == IntervalUnit.seconds) {
       if (_syncInterval < 5) {
         showSnackBar(
-            message:
-                '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
-            icon: const Icon(Icons.timelapse,
-                color: PassyTheme.darkContentColor));
+          message:
+              '${localizations.intervalIsLessThan}5 ${localizations.seconds.toLowerCase()}',
+          icon: const Icon(Icons.timelapse),
+        );
         return;
       }
     }
@@ -159,11 +159,12 @@ class _ServersScreen extends State<ServersScreen> {
                               context, ManageServersScreen.routeName)
                           .then((value) => setState(() {})))),
                 TextDivider.horizontal(
-                  color: PassyTheme.lightContentSecondaryColor,
+                  color: PassyTheme.of(context).highlightContentSecondaryColor,
                   text: Text(
                     localizations.synchronizationInterval,
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentSecondaryColor),
+                    style: TextStyle(
+                        color: PassyTheme.of(context)
+                            .highlightContentSecondaryColor),
                   ),
                 ),
                 PassyPadding(Row(
@@ -183,6 +184,7 @@ class _ServersScreen extends State<ServersScreen> {
                     Flexible(
                       flex: 2,
                       child: EnumDropDownButtonFormField<IntervalUnit>(
+                        isExpanded: true,
                         value: _syncIntervalUnits,
                         values: IntervalUnit.values,
                         itemBuilder: (unit) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passy/common/assets.dart';
+import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/screens/common.dart';
 
@@ -26,15 +27,16 @@ class PassyAboutDialog extends StatelessWidget {
             width: 128,
           )),
           const SizedBox(height: 32),
-          const Text.rich(
+          Text.rich(
             TextSpan(
               text: 'Passy ',
-              style: TextStyle(fontFamily: 'FiraCode'),
+              style: const TextStyle(fontFamily: 'FiraCode'),
               children: [
                 TextSpan(
                   text: 'v$passyVersion',
                   style: TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor,
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor,
                   ),
                 )
               ],
@@ -42,13 +44,13 @@ class PassyAboutDialog extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Account version: $accountVersion\nSync version: $syncVersion',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
               fontFamily: 'FiraCode',
-              color: PassyTheme.lightContentSecondaryColor,
+              color: PassyTheme.of(context).highlightContentSecondaryColor,
             ),
           ),
           const SizedBox(height: 24),
@@ -67,8 +69,9 @@ class PassyAboutDialog extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).highlightContentColor,
+                    BlendMode.srcIn),
               ),
             ),
             center: const Text('GitHub'),
@@ -76,6 +79,25 @@ class PassyAboutDialog extends StatelessWidget {
             onPressed: () => openUrl(
               'https://github.com/GlitterWare/Passy',
             ),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.notes),
+            ),
+            center: const Text('Licenses'),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => showLicensePage(context: context),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.privacyPolicy),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.shield_moon_outlined),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () => openUrl(
+                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md'),
           )),
         ],
       ),

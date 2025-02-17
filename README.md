@@ -1,22 +1,35 @@
 # Passy
 
-#### Want to translate the app to your language? It's simple! Read https://github.com/GlitterWare/Passy/blob/dev/LOCALIZATION.md to get started.
-
-https://glitterware.github.io/Passy
-
 Passy is an offline password manager with cross-platfrom synchronization. 🔒
+
+### Visit https://glitterware.github.io/Passy/ for easier installation with direct links to downloads, the website has recently been updated to provide a user-friendly installation experience.
+
+#### Want to translate the app to your language? It's simple! Read https://github.com/GlitterWare/Passy/blob/dev/LOCALIZATION.md#localization to get started.
+
+<details>
+
+<summary>Version shields</summary>
 
 [![Github Latest Release](https://img.shields.io/github/release/GlitterWare/Passy.svg?logo=github&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://github.com/GlitterWare/Passy/releases/latest) [![F-Droid Latest Release](https://img.shields.io/f-droid/v/com.glitterware.passy.svg?logo=F-Droid&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://f-droid.org/en/packages/com.glitterware.passy) [![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy) [![AUR Latest Release](https://img.shields.io/aur/version/passy?logo=Arch%20Linux&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://aur.archlinux.org/packages/passy)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md)
 
-Passy is currently being submitted to:
+</details>
+
+<details>
+
+<summary>Store submissions</summary>
+
 - ✔️ SnapCraft
 - ✔️ AppImageHub
 - ✔️ F-Droid
-- ❌ Google Play Store
+- ❌ Google Play Store (will be re-attempted at a later date)
 
-Submissions will be finished until June 1 2023.
+</details>
+
+<details>
+
+<summary>Contents</summary>
 
 ## Contents
 
@@ -43,21 +56,40 @@ Submissions will be finished until June 1 2023.
 6. [Links & Mentions](#links--mentions)
     - [Store Releases](#store-releases)
 
+</details>
+
+<details open>
+
+<summary>Features</summary>
+
 ## Features
 
 - 🔒 Security – All your information is encrypted in AES and stored offline on your devices, providing highest-tier security.
 - 🔄 Synchronization – Share data between separate devices within seconds.
+- 📱 2FA codes - Keep your 2FA codes safe and sound in offline storage.
 - 🤝 Entry sharing – Send entries to your friends and family.
 - 🖐️ Biometrics – Quickly unlock the app using your fingerprint.
 - 📚 Multipurpose – Store passwords, payment cards, notes, id cards and identities, all in one place.
 - ⚡ Autofill – Quickly fill fields in apps and websites without having to open the app.
 - 🧩 Browser extension - Use autofill and add new entries on the fly right from your browser. (See https://github.com/GlitterWare/Passy-Browser-Extension)
 
+</details>
+
+<details open>
+
+<summary>Installing</summary>
+
 ## Installing
 
-### Windows
+### Visit https://glitterware.github.io/Passy/ for easier installation with direct links to downloads, the website has recently been updated to provide a user-friendly installation experience.
 
-#### Installer (Recommended)
+<details>
+
+<summary>Windows</summary>
+
+## Windows
+
+### Installer (Recommended)
 
 1. Download the installer from [latest release](https://github.com/GlitterWare/Passy/releases/latest). Windows installers are named in format `Passy-<version>-Windows-Installer.exe`;
 2. Run the installer and follow the instructions to complete installation.
@@ -67,33 +99,55 @@ To update Passy, simply repeat same steps with a newer version.
 
 Passy can be removed by running its uninstaller from Programs and Features in the Control Panel. Your data will remain in `C:\Users\<username>\Documents\Passy`.
 
-#### Portable
+<details>
+
+<summary>Windows Portable</summary>
+
+### Portable
 
 1. Download the archive from [latest release](https://github.com/GlitterWare/Passy/releases/latest). Windows portable archives are named in format `Passy-<version>-Windows-Portable.zip`.
 2. Extract the archive to desired installation location.
 3. Run `passy.exe` inside the extracted folder to launch the app.
 
-### Android
+</details>
 
-#### F-Droid
+</details>
+
+<details>
+
+<summary>Android</summary>
+
+## Android
+
+### F-Droid
 
 <a href="https://f-droid.org/en/packages/com.glitterware.passy"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75"></a>
 
-### Linux
+</details>
 
-#### SnapCraft (Recommended)
+<details>
+
+<summary>Linux</summary>
+
+## Linux
+
+### SnapCraft (Recommended)
 
 For instructions on how to easily set up Passy using Ubuntu/Debian software app or Snap command-line, see https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md.
 
-#### Flathub
+### Flathub
 
 [![Flathub Latest Release](https://img.shields.io/flathub/v/io.github.glitterware.Passy?logo=Flathub&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://flathub.org/apps/details/io.github.glitterware.Passy)
 
-#### AUR
+### AUR
 
 [![AUR Latest Release](https://img.shields.io/aur/version/passy?logo=Arch%20Linux&labelColor=white&logoColor=black&color=7b1fa2&style=for-the-badge)](https://aur.archlinux.org/packages/passy)
 
-#### AppImage
+<details>
+
+<summary>Linux AppImage</summary>
+
+### AppImage
 
 It's most comfortable to run AppImages with the [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher/releases/latest) installed. It automatically integrates AppImages and their `.desktop` files into your program launcher for best user experience.
 
@@ -101,11 +155,27 @@ It's most comfortable to run AppImages with the [AppImageLauncher](https://githu
 2. Extract the `.AppImage` file to desired installation location.
 3. Run the `.AppImage` as a program.
 
-#### Bundle
+</details>
+
+<details>
+
+<summary>Linux Bundle</summary>
+
+### Bundle
 
 1. Download the archive from [latest release](https://github.com/GlitterWare/Passy/releases/latest). Linux bundle archives are named in format `Passy-<version>-Linux-Bundle.zip`.
 2. Extract the archive to desired installation location.
 3. Run `passy` inside the extracted folder to launch the app.
+
+</details>
+
+</details>
+
+</details>
+
+<details>
+
+<summary>Exporting / Backups</summary>
 
 ## Exporting / Backups
 
@@ -117,15 +187,33 @@ It's most comfortable to run AppImages with the [AppImageLauncher](https://githu
 4. Press `Backup & Restore`.
 5. From here you will be able to backup or restore your account data.
 
+<details>
+
+<summary>Windows</summary>
+
 ### Windows
 
 1. Go to `C:\Users\<username>\Documents`.
 2. All Passy data is stored inside the folder named `Passy`, you can make a copy of it elsewhere to backup all accounts if you wish.
 
+</details>
+
+<details>
+
+<summary>Linux</summary>
+
 ### Linux
 
 1. Go to `/home/<username>/Documents`.
 2. All Passy data is stored inside the folder named `Passy`, you can make a copy of it elsewhere to backup all accounts if you wish.
+
+</details>
+
+</details>
+
+<details>
+
+<summary>Building</summary>
 
 ## Building
 
@@ -135,12 +223,20 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 2. Clone the repository or [get the source code from the latest Passy release](https://github.com/GlitterWare/Passy/releases/latest).
 3. Run `flutter build [subcommand]` to build passy for your system. Passy can be built to `windows`, `linux`, `apk` and `aab`.
 
+If you are building for Linux, you will need to install several extra packages required to build Passy's GUI features: `libayatana-appindicator3-dev libmpv-dev mpv`.  
+On Ubuntu/Debian Linux, you can install them using apt:
+```bash
+sudo apt install -y libayatana-appindicator3-dev libmpv-dev mpv
+```
+
 ### Build Options
 
 Build options are specified with `--dart-define=<option name>=<option value>` (without angle brackets) after the build command.
 
 Available options:
 - `UPDATES_POPUP_ENABLED` - Default is `true`, if set to `false`, the update popup will never show up on the login screen.
+
+</details>
 
 ## Privacy Policy
 

@@ -4,14 +4,13 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
 
-import 'credentials_screen.dart';
+import 'security_screen.dart';
 import 'login_screen.dart';
 import 'main_screen.dart';
 import 'splash_screen.dart';
 
 class ChangeUsernameScreen extends StatefulWidget {
-  static const String routeName =
-      '${CredentialsScreen.routeName}/changeUsername';
+  static const String routeName = '${SecurityScreen.routeName}/changeUsername';
 
   const ChangeUsernameScreen({Key? key}) : super(key: key);
 
@@ -21,6 +20,13 @@ class ChangeUsernameScreen extends StatefulWidget {
 
 class _ChangeUsernameScreen extends State<StatefulWidget> {
   final LoadedAccount _account = data.loadedAccount!;
+  late FormattedTextParser formattedTextParser;
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +37,16 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
       onConfirmPressed: (context, value) {
         if (value.length < 2) {
           showSnackBar(
-              message: localizations.usernameShorterThan2Letters,
-              icon: const Icon(Icons.person_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.usernameShorterThan2Letters,
+            icon: const Icon(Icons.person_rounded),
+          );
           return;
         }
         if (data.hasAccount(value)) {
           showSnackBar(
-              message: localizations.usernameAlreadyInUse,
-              icon: const Icon(Icons.person_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.usernameAlreadyInUse,
+            icon: const Icon(Icons.person_rounded),
+          );
           return;
         }
         Navigator.popUntil(
@@ -65,17 +71,16 @@ class _ChangeUsernameScreen extends State<StatefulWidget> {
         );
       },
       message: Text.rich(
-        TextSpan(
+        formattedTextParser.parse(
           text: localizations.currentUsernameIs,
-          children: [
-            TextSpan(
+          placeholders: {
+            'u': TextSpan(
               text: _account.username,
-              style: const TextStyle(
-                color: PassyTheme.lightContentSecondaryColor,
+              style: TextStyle(
+                color: PassyTheme.of(context).highlightContentSecondaryColor,
               ),
             ),
-            TextSpan(text: '.\n\n${localizations.typeInTheNewUsername}.'),
-          ],
+          },
         ),
         textAlign: TextAlign.center,
       ),

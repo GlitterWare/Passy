@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crypton/crypton.dart';
 import 'package:event/event.dart';
+import 'package:passy/passy_data/glare/glare_message.dart';
 
 import 'common.dart';
 import 'rsa_client_socket.dart';
@@ -15,8 +16,7 @@ class GlareClient {
   final RSAClientSocket _socket;
   late StreamSubscription<Map<String, dynamic>> _socketSubscription;
   final Function(dynamic)? _log;
-  final Map<String, Completer<Map<String, dynamic>?>> _commandEvents = {};
-  final Map<String, List<int> Function(int length)> _readBytesEvents = {};
+  final Map<String, Completer<GlareMessage?>> _commandEvents = {};
   final Event _onDisconnect = Event();
 
   GlareClient._({
@@ -59,7 +59,7 @@ class GlareClient {
   Future<void> _cleanup() async {
     await _socketSubscription.cancel();
     await _socket.close();
-    for (Completer<Map<String, dynamic>?> completer in _commandEvents.values) {
+    for (Completer<GlareMessage?> completer in _commandEvents.values) {
       if (!completer.isCompleted) completer.complete();
     }
     _commandEvents.clear();
@@ -76,33 +76,14 @@ class GlareClient {
     if (arguments is! List) return;
     if (arguments.isEmpty) return;
     String argumentsJoined = arguments.join('\n');
-    Completer<Map<String, dynamic>?>? commandEvent =
-        _commandEvents[argumentsJoined];
+    Completer<GlareMessage?>? commandEvent = _commandEvents[argumentsJoined];
     if (commandEvent == null) {
       _log?.call('W:Unhandled command response:\n$data');
       return;
     }
-    dynamic action = data['action'];
-    if (action is Map<String, dynamic>) {
-      if (action['name'] == 'readBytes') {
-        if (action.containsKey('error')) {
-          return;
-        }
-        dynamic lengthStr = action['length'];
-        if (lengthStr is! String) return;
-        int length;
-        try {
-          length = int.parse(lengthStr);
-        } catch (_) {
-          return;
-        }
-        List<int>? bytes = _readBytesEvents[argumentsJoined]?.call(length);
-        if (bytes == null) return;
-        _socket.add(bytes);
-        return;
-      }
+    if (!commandEvent.isCompleted) {
+      commandEvent.complete(GlareMessage.fromSocketData(data));
     }
-    if (!commandEvent.isCompleted) commandEvent.complete(data);
     _commandEvents.remove(argumentsJoined);
   }
 
@@ -118,22 +99,28 @@ class GlareClient {
     }
   }
 
-  void writeJson(Map<String, dynamic> data) {
-    _socket.writeJson(data);
+  void writeJson(
+    Map<String, dynamic> data, {
+    Map<String, List<int>>? binaryObjects,
+  }) {
+    _socket.writeJson(
+      data,
+      binaryObjects: binaryObjects,
+    );
   }
 
-  Future<Map<String, dynamic>> ping() async {
+  Future<GlareMessage> ping() async {
     if (!_connected) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'error': {
           'type': 'Not connected',
         },
-      };
+      });
     }
-    Completer<Map<String, dynamic>?>? pingCompleter = _commandEvents['ping'];
+    Completer<GlareMessage?>? pingCompleter = _commandEvents['ping'];
     await pingCompleter?.future;
-    pingCompleter = Completer<Map<String, dynamic>?>();
+    pingCompleter = Completer<GlareMessage?>();
     _commandEvents['ping'] = pingCompleter;
     DateTime before = DateTime.now().toUtc();
     writeJson({
@@ -142,37 +129,36 @@ class GlareClient {
         'arguments': ['ping']
       }
     });
-    Map<String, dynamic>? response = await pingCompleter.future;
+    GlareMessage? response = await pingCompleter.future;
     if (response == null) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'response': response,
         'error': {
           'type': 'Invalid response received',
         },
-      };
+      });
     }
     DateTime now = DateTime.now().toUtc();
     int latency = now.millisecondsSinceEpoch - before.millisecondsSinceEpoch;
-    return {
+    return GlareMessage({
       'type': 'localResponse',
       'latency': latency,
-    };
+    });
   }
 
-  Future<Map<String, dynamic>> requestVersion() async {
+  Future<GlareMessage> requestVersion() async {
     if (!_connected) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'error': {
           'type': 'Not connected',
         },
-      };
+      });
     }
-    Completer<Map<String, dynamic>?>? versionCompleter =
-        _commandEvents['version'];
+    Completer<GlareMessage?>? versionCompleter = _commandEvents['version'];
     await versionCompleter?.future;
-    versionCompleter = Completer<Map<String, dynamic>?>();
+    versionCompleter = Completer<GlareMessage?>();
     _commandEvents['version'] = versionCompleter;
     writeJson({
       'type': 'command',
@@ -180,32 +166,32 @@ class GlareClient {
         'arguments': ['version']
       }
     });
-    Map<String, dynamic>? response = await versionCompleter.future;
+    GlareMessage? response = await versionCompleter.future;
     if (response == null) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'response': response,
         'error': {
           'type': 'Invalid response received',
         },
-      };
+      });
     }
     return response;
   }
 
-  Future<Map<String, dynamic>> listModules() async {
+  Future<GlareMessage> listModules() async {
     if (!_connected) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'error': {
           'type': 'Not connected',
         },
-      };
+      });
     }
-    Completer<Map<String, dynamic>?>? listModulesCompleter =
+    Completer<GlareMessage?>? listModulesCompleter =
         _commandEvents['list\nmodules'];
     await listModulesCompleter?.future;
-    listModulesCompleter = Completer<Map<String, dynamic>?>();
+    listModulesCompleter = Completer<GlareMessage?>();
     _commandEvents['list\nmodules'] = listModulesCompleter;
     writeJson({
       'type': 'command',
@@ -213,37 +199,37 @@ class GlareClient {
         'arguments': ['list', 'modules']
       }
     });
-    Map<String, dynamic>? response = await listModulesCompleter.future;
+    GlareMessage? response = await listModulesCompleter.future;
     if (response == null) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'response': response,
         'error': {
           'type': 'Invalid response received',
         },
-      };
+      });
     }
-    dynamic data = response['data'];
+    dynamic data = response.data['data'];
     if (data is! Map<String, dynamic>) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'response': response,
         'error': {
           'type': 'Invalid data received',
         },
-      };
+      });
     }
     dynamic modules = data['modules'];
     if (modules is! Map<String, dynamic>) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'response': response,
         'error': {
           'type': 'Invalid modules received',
         },
-      };
+      });
     }
-    if (modules.isEmpty) return {};
+    if (modules.isEmpty) return GlareMessage({'modules': {}});
     Map<String, dynamic> result = {};
     for (MapEntry<String, dynamic> module in modules.entries) {
       dynamic val = module.value;
@@ -253,44 +239,49 @@ class GlareClient {
         'name': name is String ? name : null,
       };
     }
-    return {
+    return GlareMessage({
       'modules': result,
-    };
+    });
   }
 
-  Future<Map<String, dynamic>> runModule(List<String> args,
-      {List<int> Function(int length)? onReadBytes}) async {
+  Future<GlareMessage> runModule(
+    List<String> args, {
+    List<int> Function(int length)? onReadBytes,
+    Map<String, List<int>>? binaryObjects,
+  }) async {
     if (args.isEmpty) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'arguments': args,
         'error': {
           'type': 'No arguments provided',
         },
-      };
+      });
     }
     String id = 'modules\nrun\n${args.join('\n')}';
-    Completer<Map<String, dynamic>?>? onModulesRun = _commandEvents[id];
+    Completer<GlareMessage?>? onModulesRun = _commandEvents[id];
     await onModulesRun?.future;
-    onModulesRun = Completer<Map<String, dynamic>?>();
+    onModulesRun = Completer<GlareMessage?>();
     _commandEvents[id] = onModulesRun;
-    if (onReadBytes != null) _readBytesEvents[id] = onReadBytes;
-    writeJson({
-      'type': 'command',
-      'data': {
-        'arguments': ['modules', 'run', ...args],
-      }
-    });
-    Map<String, dynamic>? response = await onModulesRun.future;
+    writeJson(
+      {
+        'type': 'command',
+        'data': {
+          'arguments': ['modules', 'run', ...args],
+        },
+      },
+      binaryObjects: binaryObjects,
+    );
+    GlareMessage? response = await onModulesRun.future;
     if (response == null) {
-      return {
+      return GlareMessage({
         'type': 'localError',
         'arguments': args,
         'response': response,
         'error': {
           'type': 'Invalid response received',
         },
-      };
+      });
     }
     return response;
   }

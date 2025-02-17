@@ -74,8 +74,9 @@ class FavIconImage extends StatelessWidget {
     String url = address;
     Widget placeholder = WebsafeSvg.asset(
       logoCircleSvg,
-      colorFilter:
-          const ColorFilter.mode(PassyTheme.lightContentColor, BlendMode.srcIn),
+      colorFilter: ColorFilter.mode(
+          PassyTheme.of(context).highlightContentColor.withAlpha(180),
+          BlendMode.srcIn),
       width: width,
     );
     url = 'http://${url.replaceFirst(RegExp('https://|http://'), '')}';

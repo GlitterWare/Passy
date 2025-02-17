@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/sync_entry_state.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class IdentityButtonListView extends StatelessWidget {
@@ -9,6 +10,7 @@ class IdentityButtonListView extends StatelessWidget {
   final List<PopupMenuEntry<dynamic>> Function(
       BuildContext context, IdentityMeta identityMeta)? popupMenuItemBuilder;
   final List<Widget>? topWidgets;
+  final Map<String, SyncEntryState> syncStates;
 
   const IdentityButtonListView({
     Key? key,
@@ -17,22 +19,54 @@ class IdentityButtonListView extends StatelessWidget {
     this.onPressed,
     this.popupMenuItemBuilder,
     this.topWidgets,
-  }) : super(key: key);
+    Map<String, SyncEntryState>? syncStates,
+  })  : syncStates = syncStates ?? const {},
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (shouldSort) PassySort.sortIdentities(identities);
+    List<Widget> _entriesWidgets = [];
+    for (IdentityMeta identity in identities) {
+      SyncEntryState? state = syncStates[identity.key];
+      Widget? stateIcon;
+      switch (state) {
+        case null:
+          break;
+        case SyncEntryState.added:
+          stateIcon = const Icon(Icons.add, color: Colors.green, size: 28);
+          break;
+        case SyncEntryState.removed:
+          stateIcon =
+              const Icon(Icons.delete_rounded, color: Colors.red, size: 28);
+          break;
+        case SyncEntryState.modified:
+          stateIcon = const Icon(Icons.edit, color: Colors.yellow, size: 28);
+          break;
+      }
+      _entriesWidgets.add(PassyPadding(IdentityButton(
+        leftWidget: stateIcon == null
+            ? null
+            : Padding(
+                padding: EdgeInsets.fromLTRB(
+                  PassyTheme.of(context).passyPadding.left,
+                  PassyTheme.of(context).passyPadding.top,
+                  PassyTheme.of(context).passyPadding.right * 2,
+                  PassyTheme.of(context).passyPadding.bottom,
+                ),
+                child: stateIcon,
+              ),
+        identity: identity,
+        onPressed: onPressed == null ? null : () => onPressed!(identity),
+        popupMenuItemBuilder: popupMenuItemBuilder == null
+            ? null
+            : (context) => popupMenuItemBuilder!(context, identity),
+      )));
+    }
     return ListView(
       children: [
         if (topWidgets != null) ...topWidgets!,
-        for (IdentityMeta identity in identities)
-          PassyPadding(IdentityButton(
-            identity: identity,
-            onPressed: onPressed == null ? null : () => onPressed!(identity),
-            popupMenuItemBuilder: popupMenuItemBuilder == null
-                ? null
-                : (context) => popupMenuItemBuilder!(context, identity),
-          )),
+        ..._entriesWidgets,
       ],
     );
   }

@@ -25,30 +25,28 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
   String? _address;
   int _port = 5592;
   bool _connectionChecked = false;
+  late FormattedTextParser formattedTextParser;
 
   Future<void> _onInstallPressed() async {
     String? address = _address;
     if (address == null) {
       showSnackBar(
         message: localizations.hostAddressIsEmpty,
-        icon: const Icon(Icons.desktop_windows_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.desktop_windows_rounded),
       );
       return;
     }
     if (address.isEmpty) {
       showSnackBar(
         message: localizations.hostAddressIsEmpty,
-        icon: const Icon(Icons.desktop_windows_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.desktop_windows_rounded),
       );
       return;
     }
     if (_port == 0) {
       showSnackBar(
         message: localizations.invalidPortSpecified,
-        icon: const Icon(Icons.numbers_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.numbers_rounded),
       );
       return;
     }
@@ -67,14 +65,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
       );
       showSnackBar(
         message: localizations.serverInstalled,
-        icon: const Icon(Icons.install_desktop_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.install_desktop_rounded),
       );
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotInstallServer,
-        icon: const Icon(Icons.install_desktop_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.install_desktop_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -90,24 +86,21 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     if (address == null) {
       showSnackBar(
         message: localizations.hostAddressIsEmpty,
-        icon: const Icon(Icons.desktop_windows_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.desktop_windows_rounded),
       );
       return;
     }
     if (address.isEmpty) {
       showSnackBar(
         message: localizations.hostAddressIsEmpty,
-        icon: const Icon(Icons.desktop_windows_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.desktop_windows_rounded),
       );
       return;
     }
     if (_port == 0) {
       showSnackBar(
         message: localizations.invalidPortSpecified,
-        icon: const Icon(Icons.numbers_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.numbers_rounded),
       );
       return;
     }
@@ -116,10 +109,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotConnectToServer,
-        icon: const Icon(
-          Icons.cast_rounded,
-          color: PassyTheme.darkContentColor,
-        ),
+        icon: const Icon(Icons.cast_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -136,6 +126,7 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
   void initState() {
     super.initState();
     getInternetAddress().then((value) => setState(() => _address = value));
+    formattedTextParser = FormattedTextParser(context: context);
   }
 
   @override
@@ -157,16 +148,16 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
             hasScrollBody: false,
             child: Column(
               children: _address == null
-                  ? const [
-                      Spacer(),
+                  ? [
+                      const Spacer(),
                       Expanded(
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: PassyTheme.lightContentColor,
+                            color: PassyTheme.of(context).contentTextColor,
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ]
                   : [
                       PassyPadding(Text(
@@ -179,11 +170,10 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '1. ',
                             children: [
                               TextSpan(
-                                text:
-                                    '${localizations.chooseHostAddressAndPort}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                text: localizations.chooseHostAddressAndPort,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -195,9 +185,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           Flexible(
                             child: Padding(
                               padding: EdgeInsets.only(
-                                  left: PassyTheme.passyPadding.right,
-                                  top: PassyTheme.passyPadding.top,
-                                  bottom: PassyTheme.passyPadding.bottom),
+                                  left:
+                                      PassyTheme.of(context).passyPadding.right,
+                                  top: PassyTheme.of(context).passyPadding.top,
+                                  bottom: PassyTheme.of(context)
+                                      .passyPadding
+                                      .bottom),
                               child: TextFormField(
                                 initialValue: _address,
                                 decoration: InputDecoration(
@@ -210,9 +203,12 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                           Flexible(
                             child: Padding(
                               padding: EdgeInsets.only(
-                                  left: PassyTheme.passyPadding.right,
-                                  top: PassyTheme.passyPadding.top,
-                                  bottom: PassyTheme.passyPadding.bottom),
+                                  left:
+                                      PassyTheme.of(context).passyPadding.right,
+                                  top: PassyTheme.of(context).passyPadding.top,
+                                  bottom: PassyTheme.of(context)
+                                      .passyPadding
+                                      .bottom),
                               child: TextFormField(
                                 initialValue: _port.toString(),
                                 decoration: InputDecoration(
@@ -236,10 +232,10 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '2. ',
                             children: [
                               TextSpan(
-                                text: '${localizations.installServer}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                text: localizations.installServer,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -260,10 +256,10 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '3. ',
                             children: [
                               TextSpan(
-                                text: '${localizations.startServer}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                text: localizations.startServer,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -271,31 +267,34 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         ),
                       ),
                       PassyPadding(Text.rich(
-                        TextSpan(
-                          text: localizations.doubleClickMessage,
-                          children: [
-                            TextSpan(
+                        formattedTextParser.parse(
+                          text: localizations.doubleClickMsg1,
+                          placeholders: {
+                            'e': TextSpan(
                               text: 'passy_cli' +
                                   (Platform.isWindows ? '.exe' : ''),
-                              style: const TextStyle(
-                                  color: PassyTheme.lightContentSecondaryColor),
+                              style: TextStyle(
+                                  color: PassyTheme.of(context)
+                                      .highlightContentSecondaryColor),
                             ),
-                            const TextSpan(text: '.'),
-                          ],
+                          },
                         ),
                         textAlign: TextAlign.center,
                       )),
-                      PassyPadding(Text(localizations.doubleClickMessage1)),
+                      PassyPadding(Text(
+                        localizations.doubleClickMsg2,
+                        textAlign: TextAlign.center,
+                      )),
                       PassyPadding(
                         Text.rich(
                           TextSpan(
                             text: '4. ',
                             children: [
                               TextSpan(
-                                text: '${localizations.testConnection}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                text: localizations.testConnection,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -337,10 +336,10 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                             text: '5. (${localizations.optional}) ',
                             children: [
                               TextSpan(
-                                text: '${localizations.addServerToAutostart}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                text: localizations.addServerToAutostart,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -348,31 +347,34 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                         ),
                       ),
                       PassyPadding(Text.rich(
-                        TextSpan(
-                          text: localizations.doubleClickMessage,
-                          children: [
-                            TextSpan(
+                        formattedTextParser.parse(
+                          text: localizations.doubleClickMsg1,
+                          placeholders: {
+                            'e': TextSpan(
                               text: 'autostart_add' +
                                   (Platform.isWindows ? '.bat' : '.sh'),
-                              style: const TextStyle(
-                                  color: PassyTheme.lightContentSecondaryColor),
+                              style: TextStyle(
+                                  color: PassyTheme.of(context)
+                                      .highlightContentSecondaryColor),
                             ),
-                            const TextSpan(text: '.'),
-                          ],
+                          },
                         ),
                         textAlign: TextAlign.center,
                       )),
-                      PassyPadding(Text(localizations.doubleClickMessage1)),
+                      PassyPadding(Text(
+                        localizations.doubleClickMsg2,
+                        textAlign: TextAlign.center,
+                      )),
                       PassyPadding(
                         Text.rich(
                           TextSpan(
                             text: '6. ',
                             children: [
                               TextSpan(
-                                text: '${localizations.connectToServer}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                text: localizations.connectToServer,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                             ],
                           ),
@@ -381,59 +383,66 @@ class _ServerSetupScreen extends State<ServerSetupScreen> {
                       ),
                       PassyPadding(
                         Text.rich(
-                          TextSpan(
-                            text: '${localizations.onClientDevices}: ',
-                            children: [
-                              const WidgetSpan(
-                                  child: Icon(
-                                Icons.settings_rounded,
-                                size: 18,
-                                color: PassyTheme.lightContentSecondaryColor,
-                              )),
-                              TextSpan(
-                                text: ' ${localizations.settings} ',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
-                              ),
-                              const WidgetSpan(
-                                  child: Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 18,
-                              )),
-                              const TextSpan(text: '  '),
-                              const WidgetSpan(
-                                  child: Icon(
-                                Icons.desktop_windows_rounded,
-                                size: 18,
-                                color: PassyTheme.lightContentSecondaryColor,
-                              )),
-                              TextSpan(
-                                text:
-                                    ' ${localizations.synchronizationServers} ',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
-                              ),
-                              const WidgetSpan(
-                                  child: Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 18,
-                              )),
-                              const TextSpan(text: '  '),
-                              const WidgetSpan(
-                                  child: Icon(
-                                Icons.cast,
-                                size: 18,
-                                color: PassyTheme.lightContentSecondaryColor,
-                              )),
-                              TextSpan(
-                                text: ' ${localizations.connectToServer} ',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
-                              ),
-                            ],
+                          formattedTextParser.parse(
+                            text: localizations.onClientDevicesMsg,
+                            placeholders: {
+                              'a': TextSpan(
+                                children: [
+                                  WidgetSpan(
+                                      child: Icon(
+                                    Icons.settings_rounded,
+                                    size: 18,
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor,
+                                  )),
+                                  TextSpan(
+                                    text: ' ${localizations.settings} ',
+                                    style: TextStyle(
+                                        color: PassyTheme.of(context)
+                                            .highlightContentSecondaryColor),
+                                  ),
+                                  const WidgetSpan(
+                                      child: Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 18,
+                                  )),
+                                  const TextSpan(text: '  '),
+                                  WidgetSpan(
+                                      child: Icon(
+                                    Icons.desktop_windows_rounded,
+                                    size: 18,
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor,
+                                  )),
+                                  TextSpan(
+                                    text:
+                                        ' ${localizations.synchronizationServers} ',
+                                    style: TextStyle(
+                                        color: PassyTheme.of(context)
+                                            .highlightContentSecondaryColor),
+                                  ),
+                                  const WidgetSpan(
+                                      child: Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 18,
+                                  )),
+                                  const TextSpan(text: '  '),
+                                  WidgetSpan(
+                                      child: Icon(
+                                    Icons.cast,
+                                    size: 18,
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor,
+                                  )),
+                                  TextSpan(
+                                    text: ' ${localizations.connectToServer} ',
+                                    style: TextStyle(
+                                        color: PassyTheme.of(context)
+                                            .highlightContentSecondaryColor),
+                                  ),
+                                ],
+                              )
+                            },
                           ),
                           textAlign: TextAlign.center,
                         ),

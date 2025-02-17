@@ -11,12 +11,11 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/screens/servers_screen.dart';
+import 'package:passy/screens/theme_screen.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
-import 'automatic_backup_screen.dart';
 import 'backup_and_restore_screen.dart';
 import 'common.dart';
-import 'credentials_screen.dart';
 import 'export_and_import_screen.dart';
 import 'main_screen.dart';
 
@@ -31,6 +30,18 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreen extends State<SettingsScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+
+  void setMinimizeToTray(bool value) {
+    if (value) {
+      if (!trayEnabled) toggleTray(context);
+    } else {
+      if (trayEnabled) toggleTray(context);
+    }
+    setState(() {
+      _account.minimizeToTray = value;
+    });
+    _account.saveSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,16 +93,29 @@ class _SettingsScreen extends State<SettingsScreen> {
                   'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
             )),
           PassyPadding(ThreeWidgetButton(
-            center: Text(localizations.automaticBackup),
+            center: Text(localizations.theme),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
-              child: Icon(Icons.save_outlined),
+              child: Icon(Icons.colorize),
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => Navigator.pushNamed(
-                context, AutomaticBackupScreen.routeName,
-                arguments: data.loadedAccount!.username),
+            onPressed: () =>
+                Navigator.pushNamed(context, ThemeScreen.routeName),
           )),
+          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS)
+            PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.minimizeToTray),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.circle),
+              ),
+              right: Switch(
+                //activeColor: Colors.deepPurpleAccent,
+                value: _account.minimizeToTray,
+                onChanged: (value) => setMinimizeToTray(value),
+              ),
+              onPressed: () => setMinimizeToTray(!_account.minimizeToTray),
+            )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.backupAndRestore),
             left: const Padding(
@@ -129,15 +153,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                   Navigator.pushNamed(context, SecurityScreen.routeName)
                       .then((value) => setState(() {})))),
           PassyPadding(ThreeWidgetButton(
-              center: Text(localizations.credentials),
-              left: const Padding(
-                padding: EdgeInsets.only(right: 30),
-                child: Icon(Icons.person_outline_rounded),
-              ),
-              right: const Icon(Icons.arrow_forward_ios_rounded),
-              onPressed: () =>
-                  Navigator.pushNamed(context, CredentialsScreen.routeName))),
-          PassyPadding(ThreeWidgetButton(
               center: Text(localizations.synchronizationServers),
               left: const Padding(
                 padding: EdgeInsets.only(right: 30),
@@ -148,8 +163,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 if (!data.loadedAccount!.isRSAKeypairLoaded) {
                   showSnackBar(
                     message: localizations.settingUpSynchronization,
-                    icon: const Icon(CupertinoIcons.clock_solid,
-                        color: PassyTheme.darkContentColor),
+                    icon: const Icon(CupertinoIcons.clock_solid),
                   );
                   return;
                 }
@@ -161,8 +175,8 @@ class _SettingsScreen extends State<SettingsScreen> {
               child: WebsafeSvg.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
               ),
             ),
             center: Text(localizations.requestAFeature),
@@ -170,16 +184,6 @@ class _SettingsScreen extends State<SettingsScreen> {
             onPressed: () => openUrl(
               'https://github.com/GlitterWare/Passy/issues',
             ),
-          )),
-          PassyPadding(ThreeWidgetButton(
-            center: Text(localizations.privacyPolicy),
-            left: const Padding(
-              padding: EdgeInsets.only(right: 30),
-              child: Icon(Icons.shield_moon_outlined),
-            ),
-            right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () => openUrl(
-                'https://github.com/GlitterWare/Passy/blob/main/PRIVACY-POLICY.md'),
           )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.about),

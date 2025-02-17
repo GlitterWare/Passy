@@ -6,7 +6,7 @@ echo "Install dependencies"
 echo "===================================================="
 
 apt-get update
-apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync git file unzip zip wget curl libc6
+DEBIAN_FRONTEND=noninteractive apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync git file unzip zip wget curl libc6
 
 echo "===================================================="
 echo "Configure"
@@ -27,7 +27,7 @@ flutter doctor
 export LAST_PWD=$PWD
 cd submodules/flutter/bin/cache
 rm -rf dart-sdk
-wget https://storage.googleapis.com/dart-archive/channels/stable/release/3.3.1/sdk/dartsdk-linux-arm-release.zip
+cp /passy-bin/dartsdk-linux-arm-release.zip .
 unzip dartsdk-linux-arm-release.zip
 rm dartsdk-linux-arm-release.zip
 cd $LAST_PWD
@@ -56,6 +56,6 @@ echo "Prepare releases"
 echo "===================================================="
 
 cd /passy-build
-mkdir cli
-cp -r /Passy/build/cli/latest/. cli
+mkdir passy-cli
+cp -r /Passy/build/cli/latest/. passy-cli
 

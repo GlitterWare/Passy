@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 
 import 'common.dart';
 import 'line_stream_subscription.dart';
+import 'rsa_socket_helpers.dart';
 
 class RSAServerSocket {
   static const version = rsaSocketVersion;
-  late final LineByteStreamSubscription _subscription;
   final Socket _socket;
   final RSAKeypair _keyPair;
   RSAPublicKey? _clientPublicKey;
@@ -19,8 +18,6 @@ class RSAServerSocket {
   final StreamController<Map<String, dynamic>> _streamController =
       StreamController<Map<String, dynamic>>();
   final Completer<void> _handshakeCompleter = Completer();
-  int _binaryIndex = 0;
-  Uint8List? _binaryData;
 
   Future<void> get handshakeComplete => _handshakeCompleter.future;
 
@@ -45,41 +42,13 @@ class RSAServerSocket {
   }
 
   void _onData(List<int> data) {
-    if (_encrypter == null) return;
-    Uint8List? binaryData = _binaryData;
-    if (binaryData != null) {
-      for (int d in data) {
-        binaryData[_binaryIndex] = d;
-        _binaryIndex++;
-        if (_binaryIndex == binaryData.length) {
-          _streamController.add({'bytes': _binaryData});
-          _binaryIndex = 0;
-          _binaryData = null;
-        }
-      }
-      return;
-    }
     Map<String, dynamic> decoded = {};
     try {
-      String decrypted = '';
-      for (String part in utf8.decode(data).split(' ')) {
-        List<String> partSplit = part.split(',');
-        if (partSplit.length < 2) return;
-        decrypted += _encrypter!
-            .decrypt64(partSplit[1], iv: IV.fromBase64(partSplit[0]));
-      }
-      decoded = jsonDecode(decrypted);
+      decoded = RSASocketHelpers.decodeData(data, encrypter: _encrypter)!;
     } catch (_) {
       return;
     }
     _streamController.add(decoded);
-  }
-
-  bool readBytes(int length) {
-    if (_binaryData != null) return false;
-    _subscription.receiveBinary(length);
-    _binaryData = Uint8List(length);
-    return true;
   }
 
   RSAServerSocket(Socket socket, {RSAKeypair? keypair})
@@ -93,15 +62,14 @@ class RSAServerSocket {
       if (_handshake(data)) {
         String _password = generatePassword();
         _encrypter = Encrypter(AES(Key.fromUtf8(_password)));
+        subscription.onData(_onData);
         _socket.writeln(
             _clientPublicKey!.encrypt(jsonEncode({'password': _password})));
-        subscription.onData(_onData);
       }
     });
     subscription.onError((Object error, StackTrace? stackTrace) {
       _streamController.addError(error, stackTrace);
     });
-    _subscription = subscription;
     _socket.writeln(jsonEncode({
       'socketVersion': version,
       'rsa': {'publicKey': _keyPair.publicKey.toString()},
@@ -124,11 +92,11 @@ class RSAServerSocket {
     );
   }
 
-  void writeJson(Map<String, dynamic> data) {
-    if (_encrypter == null) return;
-    String encoded = jsonEncode(data);
-    IV _iv = IV.fromSecureRandom(16);
-    encoded = _iv.base64 + ',' + _encrypter!.encrypt(encoded, iv: _iv).base64;
-    _socket.writeln(encoded);
+  void writeJson(
+    Map<String, dynamic> data, {
+    Map<String, List<int>>? binaryObjects,
+  }) {
+    RSASocketHelpers.writeJson(data,
+        socket: _socket, binaryObjects: binaryObjects, encrypter: _encrypter);
   }
 }

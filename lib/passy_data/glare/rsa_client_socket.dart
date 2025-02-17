@@ -7,6 +7,7 @@ import 'package:encrypt/encrypt.dart';
 
 import 'common.dart';
 import 'line_stream_subscription.dart';
+import 'rsa_socket_helpers.dart';
 
 class RSAClientSocket {
   static const version = rsaSocketVersion;
@@ -14,7 +15,7 @@ class RSAClientSocket {
   final InternetAddress address;
   final int port;
   final RSAKeypair _keyPair;
-  RSAPublicKey? _serverPublicKey;
+  //RSAPublicKey? _serverPublicKey;
   Encrypter? _encrypter;
   final StreamController<Map<String, dynamic>> _streamController =
       StreamController<Map<String, dynamic>>();
@@ -36,12 +37,13 @@ class RSAClientSocket {
     if (rsa is! Map) return false;
     dynamic publicKey = rsa['publicKey'];
     if (publicKey == null) return false;
+    /*
     try {
       _serverPublicKey = RSAPublicKey.fromString(publicKey);
     } catch (_) {
       return false;
     }
-    _socket.writeln('{"rsa":{"publicKey":"${_keyPair.publicKey.toString()}"}}');
+    */
     return true;
   }
 
@@ -49,18 +51,10 @@ class RSAClientSocket {
     if (_encrypter == null) return;
     Map<String, dynamic> decoded = {};
     try {
-      String decrypted = '';
-      for (String part in utf8.decode(data).split(' ')) {
-        List<String> partSplit = part.split(',');
-        if (partSplit.length < 2) return;
-        decrypted += _encrypter!
-            .decrypt64(partSplit[1], iv: IV.fromBase64(partSplit[0]));
-      }
-      decoded = jsonDecode(decrypted);
+      decoded = RSASocketHelpers.decodeData(data, encrypter: _encrypter)!;
     } catch (_) {
       return;
     }
-    if (_serverPublicKey == null) return;
     _streamController.add(decoded);
   }
 
@@ -96,6 +90,8 @@ class RSAClientSocket {
           subscription.onData(_onData);
           _onConnected.complete();
         });
+        _socket.writeln(
+            '{"rsa":{"publicKey":"${_keyPair.publicKey.toString()}"}}');
       }
     });
   }
@@ -131,15 +127,11 @@ class RSAClientSocket {
     );
   }
 
-  void add(List<int> bytes) {
-    _socket.add(bytes);
-  }
-
-  void writeJson(Map<String, dynamic> data) {
-    if (_encrypter == null) return;
-    String encoded = jsonEncode(data);
-    IV _iv = IV.fromSecureRandom(16);
-    encoded = _iv.base64 + ',' + _encrypter!.encrypt(encoded, iv: _iv).base64;
-    _socket.writeln(encoded);
+  void writeJson(
+    Map<String, dynamic> data, {
+    Map<String, List<int>>? binaryObjects,
+  }) {
+    RSASocketHelpers.writeJson(data,
+        socket: _socket, binaryObjects: binaryObjects, encrypter: _encrypter);
   }
 }

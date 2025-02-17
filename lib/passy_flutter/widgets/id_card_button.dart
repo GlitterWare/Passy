@@ -5,6 +5,7 @@ import 'package:passy/passy_data/id_card.dart';
 import '../passy_flutter.dart';
 
 class IDCardButton extends StatelessWidget {
+  final Widget? leftWidget;
   final IDCardMeta idCard;
   final void Function()? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
@@ -12,6 +13,7 @@ class IDCardButton extends StatelessWidget {
 
   const IDCardButton({
     Key? key,
+    this.leftWidget,
     required this.idCard,
     this.onPressed,
     this.popupMenuItemBuilder,
@@ -21,6 +23,7 @@ class IDCardButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        if (leftWidget != null) leftWidget!,
         Flexible(
           child: ThreeWidgetButton(
             left: const Padding(

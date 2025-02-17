@@ -4,7 +4,7 @@ import 'dart:typed_data';
 /// A stream subscription delimited by 0 bytes.
 /// When a 0 byte character is detected, the handler supplied through [onData] is fired
 /// for the received byte sequence.
-class PassyStreamSubscription extends StreamSubscription<List<int>> {
+class PassyStreamSubscription implements StreamSubscription<List<int>> {
   final StreamSubscription<Uint8List> _subscription;
   List<int> _data = [];
   void Function(List<int>)? _handleData;

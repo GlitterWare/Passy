@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/main.dart';
+import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/file_meta.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/passy_file_type.dart';
@@ -49,15 +50,20 @@ class AddFileScreenArgs {
 
 class _AddFileScreen extends State<AddFileScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+  UniqueKey _fileWidgetKey = UniqueKey();
   bool isLoaded = false;
   FileMeta? _fileMeta;
   GlobalKey _previewKey = GlobalKey();
   Widget? _preview;
+  CompressionType _compressionType = CompressionType.none;
+  bool _eraseFile = false;
 
   Future<void> _load(BuildContext context, AddFileScreenArgs args) async {
     FileMeta newFileMeta =
         await FileMeta.fromFile(args.file, virtualParent: args.parent);
     switch (args.type) {
+      case FileEntryType.folder:
+        break;
       case FileEntryType.plainText:
         newFileMeta.type = PassyFileType.text;
         break;
@@ -73,16 +79,40 @@ class _AddFileScreen extends State<AddFileScreen> {
       case FileEntryType.file:
         args.type = fileEntryTypeFromPassyFileType(newFileMeta.type);
         break;
-      case FileEntryType.folder:
+      case FileEntryType.audio:
+        newFileMeta.type = PassyFileType.audio;
+        break;
+      case FileEntryType.video:
+        newFileMeta.type = PassyFileType.video;
+        break;
+      case FileEntryType.pdf:
+        newFileMeta.type = PassyFileType.pdf;
         break;
     }
     setState(() {
       _fileMeta = newFileMeta;
       _preview = PassyFileWidget(
-          path: args.file.path,
-          name: basename(args.file.path),
-          isEncrypted: false,
-          type: args.type);
+        key: _fileWidgetKey,
+        path: args.file.path,
+        name: basename(args.file.path),
+        isEncrypted: false,
+        type: args.type,
+      )..errorStream.listen((e) {
+          showSnackBar(
+            message: localizations.somethingWentWrong,
+            icon: const Icon(Icons.error_outline_rounded),
+            action: SnackBarAction(
+              label: localizations.details,
+              onPressed: () => Navigator.pushNamed(
+                  navigatorKey.currentContext!, LogScreen.routeName,
+                  arguments: e.toString()),
+            ),
+          );
+          Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
+            setState(() => _fileWidgetKey = UniqueKey());
+          });
+        });
       _previewKey = GlobalKey();
     });
   }
@@ -92,13 +122,16 @@ class _AddFileScreen extends State<AddFileScreen> {
     Navigator.pushNamed(context, SplashScreen.routeName);
     String key;
     try {
-      key =
-          await _account.addFile(args.file, useIsolate: true, meta: _fileMeta);
+      key = (await _account.addFile(args.file,
+              useIsolate: true,
+              meta: _fileMeta,
+              compressionType: _compressionType,
+              eraseOriginalFile: _eraseFile))
+          .key;
     } catch (e, s) {
       showSnackBar(
         message: localizations.failedToAddFile,
-        icon:
-            const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.save_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(
@@ -134,7 +167,22 @@ class _AddFileScreen extends State<AddFileScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(basename(args.file.path)),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            padding: PassyTheme.appBarButtonPadding,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
+            onPressed: () => setState(() => _fileWidgetKey = UniqueKey()),
+            tooltip: localizations.refresh,
+            icon: const Icon(Icons.refresh),
+          ),
+          IconButton(
+            padding: PassyTheme.appBarButtonPadding,
+            splashRadius: PassyTheme.appBarButtonSplashRadius,
+            onPressed: () => _onAddPressed(context, args),
+            tooltip: localizations.addFile,
+            icon: const Icon(Icons.add_rounded),
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -142,16 +190,16 @@ class _AddFileScreen extends State<AddFileScreen> {
             hasScrollBody: true,
             child: Column(
               children: _fileMeta == null
-                  ? const [
-                      Spacer(),
+                  ? [
+                      const Spacer(),
                       Expanded(
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: PassyTheme.lightContentColor,
+                            color: PassyTheme.of(context).contentTextColor,
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                     ]
                   : [
                       const Spacer(),
@@ -162,10 +210,10 @@ class _AddFileScreen extends State<AddFileScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '${localizations.filePreview}:',
-                                style: const TextStyle(
-                                    color:
-                                        PassyTheme.lightContentSecondaryColor),
+                                localizations.filePreview,
+                                style: TextStyle(
+                                    color: PassyTheme.of(context)
+                                        .highlightContentSecondaryColor),
                               ),
                               Flexible(
                                   flex: 10,
@@ -174,8 +222,8 @@ class _AddFileScreen extends State<AddFileScreen> {
                                       borderRadius: BorderRadius.circular(18),
                                       border: Border.all(
                                         width: 10,
-                                        color: PassyTheme
-                                            .darkContentSecondaryColor,
+                                        color: PassyTheme.of(context)
+                                            .contentSecondaryColor,
                                       ),
                                     ),
                                     child: ClipRRect(
@@ -195,12 +243,17 @@ class _AddFileScreen extends State<AddFileScreen> {
                             InputDecoration(labelText: localizations.fileType),
                         values: const [
                           FileEntryType.photo,
+                          FileEntryType.audio,
+                          FileEntryType.video,
                           FileEntryType.plainText,
                           FileEntryType.markdown,
+                          FileEntryType.pdf,
                           FileEntryType.unknown,
                         ],
                         itemBuilder: (object) {
                           switch (object) {
+                            case FileEntryType.folder:
+                              return Text(localizations.folder);
                             case FileEntryType.plainText:
                               return Text(localizations.plainText);
                             case FileEntryType.markdown:
@@ -211,15 +264,59 @@ class _AddFileScreen extends State<AddFileScreen> {
                               return Text(localizations.unknown);
                             case FileEntryType.unknown:
                               return Text(localizations.unknown);
-                            case FileEntryType.folder:
-                              return Text(localizations.folder);
+                            case FileEntryType.audio:
+                              return Text(localizations.audio);
+                            case FileEntryType.video:
+                              return Text(localizations.video);
+                            case FileEntryType.pdf:
+                              return const Text('PDF');
                           }
                         },
                         onChanged: (value) {
                           if (value == null) return;
-                          args.type = value;
+                          setState(() => args.type = value);
                           _load(context, args);
                         },
+                      )),
+                      PassyPadding(EnumDropDownButtonFormField<CompressionType>(
+                        value: _compressionType,
+                        decoration: InputDecoration(
+                            labelText: localizations.compressionType),
+                        values: CompressionType.values,
+                        itemBuilder: (object) {
+                          switch (object) {
+                            case CompressionType.none:
+                              return Text(localizations.none);
+                            case CompressionType.tar:
+                              return const Text('Tar');
+                            case CompressionType.zlib:
+                              return const Text('ZLib');
+                            case CompressionType.gzip:
+                              return Text(
+                                  'GZip (${localizations.recommended})');
+                            case CompressionType.bzip2:
+                              return const Text('BZip2');
+                          }
+                        },
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _compressionType = value);
+                        },
+                      )),
+                      PassyPadding(ThreeWidgetButton(
+                        center: Text(localizations.eraseOriginalFile),
+                        left: const Padding(
+                          padding: EdgeInsets.only(right: 30),
+                          child: Icon(Icons.hide_source),
+                        ),
+                        right: Switch(
+                          activeColor: Colors.greenAccent,
+                          value: _eraseFile,
+                          onChanged: (value) =>
+                              setState(() => _eraseFile = value),
+                        ),
+                        onPressed: () =>
+                            setState(() => _eraseFile = !_eraseFile),
                       )),
                       Text.rich(
                         TextSpan(

@@ -184,7 +184,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
         ),
         body: ListView(children: [
           PassyPadding(Text(
-            '${localizations.csvImportMessage1}.\n\n${localizations.csvImportMessage2}.',
+            '${localizations.csvImportMsg1}\n\n${localizations.csvImportMsg2}',
             textAlign: TextAlign.center,
           )),
           ListView.builder(
@@ -192,6 +192,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return PassyPadding(DropdownButtonFormField<String>(
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
                 value: csvToJson[index],
                 items: entryJsonKeys,
                 onChanged: (value) {
@@ -241,8 +242,7 @@ class _CSVImportEntriesScreen extends State<CSVImportEntriesScreen> {
                     Navigator.pop(context);
                     showSnackBar(
                       message: localizations.couldNotImportAccount,
-                      icon: const Icon(Icons.download_for_offline_outlined,
-                          color: PassyTheme.darkContentColor),
+                      icon: const Icon(Icons.download_for_offline_outlined),
                       action: SnackBarAction(
                         label: localizations.details,
                         onPressed: () => Navigator.pushNamed(

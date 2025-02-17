@@ -38,7 +38,7 @@ class _PasswordScreen extends State<PasswordScreen> {
   Future<void>? generateTFA;
   String _tfaCode = '';
   double _tfaProgress = 0;
-  Color _tfaColor = PassyTheme.lightContentSecondaryColor;
+  Color _tfaColor = const Color.fromRGBO(144, 202, 249, 1);
   bool isFavorite = false;
 
   Future<void> _generateTFA(TFA tfa) async {
@@ -70,7 +70,7 @@ class _PasswordScreen extends State<PasswordScreen> {
           // Red
           if (_tfaProgress > 0.60) break;
           setState(() {
-            _tfaColor = PassyTheme.lightContentSecondaryColor;
+            _tfaColor = const Color.fromRGBO(144, 202, 249, 1);
           });
           break;
       }
@@ -102,8 +102,9 @@ class _PasswordScreen extends State<PasswordScreen> {
               TextButton(
                 child: Text(
                   localizations.cancel,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -136,10 +137,12 @@ class _PasswordScreen extends State<PasswordScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.passwordTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = password!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);
@@ -169,7 +172,8 @@ class _PasswordScreen extends State<PasswordScreen> {
     if (password!.tfa != null) {
       if (password!.tfa!.type == TFAType.HOTP) {
         tfaWidget = Container(
-          padding: EdgeInsets.only(right: PassyTheme.passyPadding.right),
+          padding:
+              EdgeInsets.only(right: PassyTheme.of(context).passyPadding.right),
           child: Row(
             children: [
               Flexible(
@@ -199,7 +203,7 @@ class _PasswordScreen extends State<PasswordScreen> {
         tfaWidget = Row(
           children: [
             SizedBox(
-              width: PassyTheme.passyPadding.left * 2,
+              width: PassyTheme.of(context).passyPadding.left * 2,
             ),
             SizedBox(
               child: CircularProgressIndicator(
@@ -223,6 +227,11 @@ class _PasswordScreen extends State<PasswordScreen> {
         _account.favoritePasswords[password!.key]?.status == EntryStatus.alive;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () => _onEditPressed(password!),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.password,
         entryKey: password!.key,
@@ -234,19 +243,15 @@ class _PasswordScreen extends State<PasswordScreen> {
           if (isFavorite) {
             await _account.removeFavoritePassword(password!.key);
             showSnackBar(
-                message: localizations.removedFromFavorites,
-                icon: const Icon(
-                  Icons.star_outline_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.removedFromFavorites,
+              icon: const Icon(Icons.star_outline_rounded),
+            );
           } else {
             await _account.addFavoritePassword(password!.key);
             showSnackBar(
-                message: localizations.addedToFavorites,
-                icon: const Icon(
-                  Icons.star_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.addedToFavorites,
+              icon: const Icon(Icons.star_rounded),
+            );
           }
           setState(() {});
         },
@@ -256,8 +261,8 @@ class _PasswordScreen extends State<PasswordScreen> {
           Center(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: PassyTheme.passyPadding.top / 2,
-                  bottom: PassyTheme.passyPadding.bottom / 2),
+                  top: PassyTheme.of(context).passyPadding.top / 2,
+                  bottom: PassyTheme.of(context).passyPadding.bottom / 2),
               child: !_tagsLoaded
                   ? const CircularProgressIndicator()
                   : EntryTagList(
@@ -278,8 +283,7 @@ class _PasswordScreen extends State<PasswordScreen> {
                           Navigator.pop(context);
                           showSnackBar(
                             message: localizations.somethingWentWrong,
-                            icon: const Icon(Icons.error_outline_rounded,
-                                color: PassyTheme.darkContentColor),
+                            icon: const Icon(Icons.error_outline_rounded),
                             action: SnackBarAction(
                               label: localizations.details,
                               onPressed: () => Navigator.pushNamed(
@@ -350,50 +354,54 @@ class _PasswordScreen extends State<PasswordScreen> {
               isPassword: true,
             )),
           if (tfaWidget != null) tfaWidget,
-          if (password!.website != '')
-            Row(
-              children: [
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: PassyTheme.passyPadding.left,
-                      bottom: PassyTheme.passyPadding.bottom,
-                      top: PassyTheme.passyPadding.top,
-                    ),
-                    child: RecordButton(
-                      title: localizations.website,
-                      value: password!.website,
-                      left: FavIconImage(address: password!.website, width: 40),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  child: PassyPadding(
-                    FloatingActionButton(
-                      heroTag: null,
-                      tooltip: localizations.visit,
-                      onPressed: () {
-                        String _url = password!.website;
-                        if (!_url
-                            .contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
-                          _url = 'http://' + _url;
-                        }
-                        try {
-                          openUrl(_url);
-                        } catch (_) {}
-                      },
-                      child: const Icon(Icons.open_in_browser_rounded),
+          if (password!.websites.firstOrNull != '')
+            for (int i = 0; i != password!.websites.length; i++)
+              Row(
+                children: [
+                  Flexible(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: PassyTheme.of(context).passyPadding.left,
+                        bottom: PassyTheme.of(context).passyPadding.bottom,
+                        top: PassyTheme.of(context).passyPadding.top,
+                      ),
+                      child: RecordButton(
+                        title:
+                            '${localizations.website}${i == 0 ? '' : ' ' + (i + 1).toString()}',
+                        value: password!.websites[i],
+                        left: FavIconImage(
+                            address: password!.websites[i], width: 40),
+                      ),
                     ),
                   ),
-                )
-              ],
-            ),
+                  SizedBox(
+                    child: PassyPadding(
+                      FloatingActionButton(
+                        heroTag: null,
+                        tooltip: localizations.visit,
+                        onPressed: () {
+                          String _url = password!.websites[i];
+                          if (!_url
+                              .contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
+                            _url = 'http://' + _url;
+                          }
+                          try {
+                            openUrl(_url);
+                          } catch (_) {}
+                        },
+                        child: const Icon(Icons.open_in_browser_rounded),
+                      ),
+                    ),
+                  )
+                ],
+              ),
           for (CustomField _customField in password!.customFields)
             PassyPadding(CustomFieldButton(customField: _customField)),
           if (password!.additionalInfo != '')
             PassyPadding(RecordButton(
                 title: localizations.additionalInfo,
                 value: password!.additionalInfo)),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

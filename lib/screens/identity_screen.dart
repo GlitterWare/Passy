@@ -35,10 +35,12 @@ class _IdentityScreen extends State<IdentityScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.identitiesTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _identity!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);
@@ -72,8 +74,9 @@ class _IdentityScreen extends State<IdentityScreen> {
               TextButton(
                 child: Text(
                   localizations.cancel,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -106,6 +109,11 @@ class _IdentityScreen extends State<IdentityScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: _onEditPressed,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.identity,
         entryKey: _identity!.key,
@@ -117,19 +125,15 @@ class _IdentityScreen extends State<IdentityScreen> {
           if (isFavorite) {
             await _account.removeFavoriteIdentity(_identity!.key);
             showSnackBar(
-                message: localizations.removedFromFavorites,
-                icon: const Icon(
-                  Icons.star_outline_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.removedFromFavorites,
+              icon: const Icon(Icons.star_outline_rounded),
+            );
           } else {
             await _account.addFavoriteIdentity(_identity!.key);
             showSnackBar(
-                message: localizations.addedToFavorites,
-                icon: const Icon(
-                  Icons.star_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.addedToFavorites,
+              icon: const Icon(Icons.star_rounded),
+            );
           }
           setState(() {});
         },
@@ -139,8 +143,8 @@ class _IdentityScreen extends State<IdentityScreen> {
           Center(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: PassyTheme.passyPadding.top / 2,
-                  bottom: PassyTheme.passyPadding.bottom / 2),
+                  top: PassyTheme.of(context).passyPadding.top / 2,
+                  bottom: PassyTheme.of(context).passyPadding.bottom / 2),
               child: !_tagsLoaded
                   ? const CircularProgressIndicator()
                   : EntryTagList(
@@ -161,8 +165,7 @@ class _IdentityScreen extends State<IdentityScreen> {
                           Navigator.pop(context);
                           showSnackBar(
                             message: localizations.somethingWentWrong,
-                            icon: const Icon(Icons.error_outline_rounded,
-                                color: PassyTheme.darkContentColor),
+                            icon: const Icon(Icons.error_outline_rounded),
                             action: SnackBarAction(
                               label: localizations.details,
                               onPressed: () => Navigator.pushNamed(
@@ -281,6 +284,7 @@ class _IdentityScreen extends State<IdentityScreen> {
             PassyPadding(RecordButton(
                 title: localizations.additionalInfo,
                 value: _identity!.additionalInfo)),
+          const SizedBox(height: floatingActionButtonPadding),
         ],
       ),
     );

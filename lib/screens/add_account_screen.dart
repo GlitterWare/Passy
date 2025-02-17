@@ -28,45 +28,48 @@ class _AddAccountScreen extends State<StatefulWidget> {
   String _password = '';
   String _confirmPassword = '';
   bool isCapsLockEnabled = false;
+  late FormattedTextParser formattedTextParser;
 
   void _addAccount() async {
     if (_username.isEmpty) {
       showSnackBar(
         message: localizations.usernameIsEmpty,
-        icon: const Icon(Icons.person_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.person_rounded),
       );
       return;
     }
     if (_username.length < 2) {
       showSnackBar(
         message: localizations.usernameShorterThan2Letters,
-        icon: const Icon(Icons.person_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.person_rounded),
+      );
+      return;
+    }
+    if (_username.startsWith('__gw__')) {
+      showSnackBar(
+        message: localizations.usernameAlreadyInUse,
+        icon: const Icon(Icons.person_rounded),
       );
       return;
     }
     if (data.hasAccount(_username)) {
       showSnackBar(
         message: localizations.usernameAlreadyInUse,
-        icon: const Icon(Icons.person_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.person_rounded),
       );
       return;
     }
     if (_password.isEmpty) {
       showSnackBar(
         message: localizations.passwordIsEmpty,
-        icon:
-            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.lock_rounded),
       );
       return;
     }
     if (_password != _confirmPassword) {
       showSnackBar(
         message: localizations.passwordsDoNotMatch,
-        icon:
-            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.lock_rounded),
       );
       return;
     }
@@ -79,8 +82,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
       if (!mounted) return;
       showSnackBar(
         message: localizations.couldNotAddAccount,
-        icon: const Icon(Icons.error_outline_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.error_outline_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -112,6 +114,12 @@ class _AddAccountScreen extends State<StatefulWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
@@ -140,16 +148,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
                 logo60Purple,
                 const Spacer(),
                 Text.rich(
-                  TextSpan(
-                    text: localizations.yourAccountWillBeStoredLocally1,
-                    children: [
-                      TextSpan(
-                          text: localizations
-                              .yourAccountWillBeStoredLocally2Highlighted,
-                          style: const TextStyle(
-                              color: PassyTheme.lightContentSecondaryColor)),
-                    ],
-                  ),
+                  formattedTextParser.parse(
+                      text: localizations
+                          .yourAccountWillBeStoredLocallyOnThisDevice),
                   textAlign: TextAlign.center,
                 ),
                 const Spacer(),
@@ -172,8 +173,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     autofocus: true,
                                     inputFormatters: [
                                       FilteringTextInputFormatter(
-                                          RegExp(
-                                              '^[a-zA-Z0-9](?:[a-zA-Z0-9 ._-]*[a-zA-Z0-9])?\$'),
+                                          RegExp('[a-zA-Z0-9 ._-]'),
                                           replacementString: _username,
                                           allow: true)
                                     ],

@@ -8,10 +8,21 @@ class FileButton extends StatelessWidget {
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
       popupMenuItemBuilder;
 
-  Widget _buildIcon(FileEntryType type) {
+  const FileButton({
+    Key? key,
+    required this.file,
+    this.onPressed,
+    this.popupMenuItemBuilder,
+  }) : super(key: key);
+
+  Widget _buildIcon(BuildContext context, FileEntryType type) {
+    Widget? icon = file.icon;
+    if (icon != null) return icon;
     switch (type) {
       case FileEntryType.unknown:
         return const Icon(Icons.file_open_outlined);
+      case FileEntryType.folder:
+        return const Icon(Icons.folder);
       case FileEntryType.file:
         return const Icon(Icons.file_open_outlined);
       case FileEntryType.plainText:
@@ -20,26 +31,28 @@ class FileButton extends StatelessWidget {
         return SvgPicture.asset(
           'assets/images/file-markdown-svgrepo-com.svg',
           width: 26,
-          colorFilter: const ColorFilter.mode(
-              PassyTheme.lightContentColor, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+              PassyTheme.of(context).highlightContentColor, BlendMode.srcIn),
         );
       case FileEntryType.photo:
         return const Icon(Icons.image_outlined);
-      case FileEntryType.folder:
-        return const Icon(Icons.folder);
+      case FileEntryType.audio:
+        return const Icon(Icons.music_note);
+      case FileEntryType.video:
+        return const Icon(Icons.video_file_outlined);
+      case FileEntryType.pdf:
+        return SvgPicture.asset(
+          'assets/images/pdf-file.svg',
+          width: 26,
+          colorFilter: ColorFilter.mode(
+              PassyTheme.of(context).highlightContentColor, BlendMode.srcIn),
+        );
     }
   }
 
-  const FileButton({
-    Key? key,
-    required this.file,
-    this.onPressed,
-    this.popupMenuItemBuilder,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    Widget icon = _buildIcon(file.type);
+    Widget icon = _buildIcon(context, file.type);
     return Row(
       children: [
         Flexible(
@@ -55,6 +68,9 @@ class FileButton extends StatelessWidget {
                 Align(
                   child: Text(
                     file.name,
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   alignment: Alignment.centerLeft,
                 ),

@@ -18,11 +18,16 @@ All keys starting with '@' are comments that may help you understand what each m
 
 The rest of the entries need translation.
 
+`<b></b>` tags make text <b>bold</b>.  
+For example, in `Hello <b>world</b>!`, `Hello` will be displayed in regular font and `world` will be bold.
+
+In `%x`, `x` is a placeholder variable, which will be replaced during runtime. You can find more information on such variables in localization comments.
+
+If you need to escape `<`, `%` or any other symbol, and prevent the formatter from recognizing them, you may prefix it with `\\`.
+
 If you wish to test your localization, we offer to build the app with your localization files for you to test on Windows/Linux/Android with unlimited test builds, but do make sure that your translation is complete before asking for a new build. If you are familiar with Git/GitHub, you may take advantage of our GitHub build workflow by submitting a pull request (see [How to submit](#how-to-submit)).
 
 Please keep to same capitalization as original if possible, e.g. if the English localization says 'Hello world' then your localization should have the first letter in uppercase and the rest of the first letters in lowercase, if applicable.
-
-Make sure to keep trailing spaces where it makes sense, some localizations make up multiple messages in the app and have to end with a trailing space for word separation.
 
 ## How to submit
 

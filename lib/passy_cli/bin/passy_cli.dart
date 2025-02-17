@@ -4,11 +4,16 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:base85/base85.dart';
+import 'package:basic_utils/basic_utils.dart';
+import 'package:compute/compute.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
 import 'package:passy/passy_cli/lib/common.dart' as cn;
 import 'package:passy/passy_cli/lib/qr.dart' as qr;
 import 'package:encrypt/encrypt.dart';
+import 'package:hotreloader/hotreloader.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:passy/passy_cli/lib/dart_app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
@@ -16,6 +21,10 @@ import 'package:passy/passy_data/common.dart' as pcommon;
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/favorites.dart';
+import 'package:passy/passy_data/file_index.dart';
+import 'package:passy/passy_data/file_meta.dart';
+import 'package:passy/passy_data/file_sync_history.dart';
+import 'package:passy/passy_data/file_utils.dart';
 import 'package:passy/passy_data/glare/glare_module.dart';
 import 'package:passy/passy_data/glare/glare_server.dart';
 import 'package:passy/passy_data/glare/line_stream_subscription.dart';
@@ -26,11 +35,15 @@ import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/loaded_account.dart';
+import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:passy/passy_data/passy_entry.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
+import 'package:passy/passy_data/passy_fs_meta.dart';
 import 'package:passy/passy_data/passy_info.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/synchronization.dart';
@@ -40,6 +53,7 @@ import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
 import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'package:win32/win32.dart';
 
+// #region Help message
 const String helpMsg = '''
 
 Passy Password Manager CLI.
@@ -71,6 +85,7 @@ Commands:
     version passy  Show Passy version.
     version data   Show account data version.
     version sync   Show synchronization version.
+    version all    Show all versions.
 
   Accounts
     accounts list
@@ -78,8 +93,9 @@ Commands:
           Each line is in CSV format and provides a username and a SHA512 password hash.
     accounts verify <username> <password>
         - Returns `true` if the password is correct, `false` otherwise.
-    accounts login <username> <password>
+    accounts login <username> [password]
         - Save account encrypter for the current interactive session.
+          If [password] is not supplied, takes password from stdin.
           Returns `true` if the password is correct, `false` otherwise.
     accounts is_logged_in <username>
         - Check if account encrypter is loaded for the specified username
@@ -124,6 +140,28 @@ Commands:
     favorites toggle <username> <entry type> <entry key> <toggle>
         - Toggle a favorite.
           The allowed value for toggle is `true` or `false`.
+
+  Tags
+    For all commands in this section, <entry type> argument is one of the following:
+    password, paymentCard, note, idCard, identity.
+
+    tags list <username> <entry type>
+        - List all tags of entry type.
+    tags list all
+        - List all tags of all entry types.
+
+  Files
+    files list <username> [path]
+        - List encrypted files.
+          If [path] is specified, lists files in the directory path, otherwise lists all files.
+    files get <username> <key> [encoding]
+        - Get decrypted file data.
+          [encoding] can be either `base64`, `hex` or `ascii85`, `base64` by default.
+    files serve <protocol> <username> <key> [content type] [run duration]
+        - Serve decrypted file data through an http server.
+          <protocol> can be either `http` or `https`.
+          [content type] can be any media type, `auto` by default - chooses content type automatically, see https://www.iana.org/assignments/media-types/media-types.xhtml
+          [run duration] specifies how long the server will run for in seconds, 15 minutes by default.
 
   Installation
     install temp
@@ -201,8 +239,19 @@ Commands:
     autostart del <name>
         - Remove path from autostart by name.
           Returns `true` on success.
-''';
 
+  Theme
+    theme list
+        - List available themes.
+    theme get <username>
+        - Get account theme.
+    theme set <username> <theme>
+        - Set account theme.
+          Returns `true` on success, `false` otherwise.
+''';
+// #endregion
+
+// #region Constants
 final List<String> upgradeCommands = [
   'sleep',
   '500',
@@ -224,12 +273,14 @@ final List<String> upgradeCommands = [
   '\$',
 ];
 
-const String passyShellVersion = '2.0.0';
+const String passyShellVersion = '2.1.0';
 // Worst case scenario: all characters weigh 4 bytes and each is escaped
 // (1000000/4)/2
 // + minus the extra messaging space
 const int maxNativeMessageLength = 120000;
+// #endregion
 
+// #region Runtime variables
 bool _isBigEndian = Endian.host == Endian.big;
 bool _isBusy = false;
 bool _isInteractive = false;
@@ -249,6 +300,8 @@ Map<String, Map<String, dynamic> Function()> _syncReportGetters = {};
 Map<String, Future Function()> _syncCloseMethods = {};
 String _curRunFile = '';
 int _curRunIndex = 0;
+HotReloader? _hotReloader;
+// #endregion
 
 Future<List<String>> parseCommand(List<String> command) async {
   List<String> parsedCommand = [];
@@ -445,6 +498,9 @@ Future<void> cleanup() async {
   try {
     stdin.echoMode = _stdinEchoMode;
     stdin.lineMode = _stdinLineMode;
+  } catch (_) {}
+  try {
+    await _hotReloader?.stop();
   } catch (_) {}
   exit(0);
 }
@@ -709,6 +765,7 @@ Future<void> executeCommand(List<String> command,
     {dynamic id, void Function(Object? object, {dynamic id}) log = log}) async {
   command = await parseCommand(command);
   switch (command[0]) {
+    // #region help
     case 'help':
       int index;
       if (command.length == 1) {
@@ -744,10 +801,16 @@ Future<void> executeCommand(List<String> command,
       help += '\n[Page $index/$maxIndex]';
       log(help, id: id);
       return;
+    // #endregion
+
+    // #region exit
     case 'exit':
       log('Have a splendid day!\n', id: id);
       cleanup();
       return;
+    // #endregion
+
+    // #region run
     case 'run':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -800,6 +863,9 @@ Future<void> executeCommand(List<String> command,
       _curRunFile = '';
       _curRunIndex = 0;
       return;
+    // #endregion
+
+    // #region sleep
     case 'sleep':
       if (command.length == 1) break;
       String msString = command[1];
@@ -812,6 +878,9 @@ Future<void> executeCommand(List<String> command,
       }
       await Future.delayed(Duration(milliseconds: ms));
       return;
+    // #endregion
+
+    // #region exec
     case 'exec':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -824,9 +893,15 @@ Future<void> executeCommand(List<String> command,
       }
       await Process.start(program, args, mode: ProcessStartMode.detached);
       return;
+    // #endregion
+
+    // #region $0
     case '\$0':
       log(Platform.resolvedExecutable, id: id);
       return;
+    // #endregion
+
+    // #region dirname
     case 'dirname':
       if (command.length == 1) break;
       File file = File(command[1]);
@@ -840,20 +915,29 @@ Future<void> executeCommand(List<String> command,
         log('.', id: id);
       }
       return;
+    // #endregion
+
+    // #region echo
     case 'echo':
       if (command.length == 1) break;
       log(command.sublist(1).join(' '), id: id);
       return;
+    // #endregion
+
+    // #region hide
     case 'hide':
       if (_isNativeMessaging) break;
       try {
-        ShowWindow(GetConsoleWindow(), SW_HIDE);
+        ShowWindow(GetConsoleWindow(), SHOW_WINDOW_CMD.SW_HIDE);
       } catch (e, s) {
         log('passy:hide:Failed to hide window:\n$e\n$s');
         return;
       }
       log('true');
       return;
+    // #endregion
+
+    // #region version
     case 'version':
       if (command.length == 1) break;
       String? version;
@@ -870,6 +954,13 @@ Future<void> executeCommand(List<String> command,
         case 'sync':
           version = pcommon.syncVersion;
           break;
+        case 'all':
+          version = 'shell,$passyShellVersion\n'
+              'passy,${pcommon.passyVersion}\n'
+              'data,${pcommon.accountVersion}\n'
+              'sync,${pcommon.syncVersion}';
+          log(version, id: id);
+          return;
       }
       if (version == null) {
         log('passy:version:Unknown version type provided: ${command[1]}.',
@@ -878,9 +969,13 @@ Future<void> executeCommand(List<String> command,
       }
       log('v$version', id: id);
       return;
+    // #endregion
+
+    // #region accounts
     case 'accounts':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region accounts list
         case 'list':
           refreshAccounts();
           log(
@@ -890,6 +985,9 @@ Future<void> executeCommand(List<String> command,
                   .join('\n'),
               id: id);
           return;
+        // #endregion
+
+        // #region accounts verify
         case 'verify':
           refreshAccounts();
           if (command.length < 4) break;
@@ -907,12 +1005,26 @@ Future<void> executeCommand(List<String> command,
                   .toString();
           log(match.toString(), id: id);
           return;
+        // #endregion
+
+        // #region accounts login
         case 'login':
-          if (command.length < 4) break;
+          if (command.length < 3) break;
           String accountName = command[2];
+          if (command.length < 4) {
+            if (!_isInteractive) break;
+            bool _stdinEchoMode = stdin.echoMode;
+            stdin.echoMode = false;
+            log('[accounts login] password for `$accountName`: ');
+            command.add(stdin.readLineSync()!);
+            stdin.echoMode = _stdinEchoMode;
+          }
           String password = command[3];
           log(await _login(accountName, password), id: id);
           return;
+        // #endregion
+
+        // #region accounts is_logged_in
         case 'is_logged_in':
           if (command.length == 2) break;
           String accountName = command[2];
@@ -922,19 +1034,29 @@ Future<void> executeCommand(List<String> command,
             log('false', id: id);
           }
           return;
+        // #endregion
+
+        // #region accounts logout
         case 'logout':
           if (command.length == 2) break;
           String accountName = command[2];
           _encrypters.remove(accountName);
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region accounts logout_all
         case 'logout_all':
           _encrypters.clear();
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region accounts export
         case 'export':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region accounts export json
             case 'json':
               if (command.length < 5) break;
               String accountName = command[3];
@@ -971,6 +1093,9 @@ Future<void> executeCommand(List<String> command,
               }
               log(fileName, id: id);
               return;
+            // #endregion
+
+            // #region accounts export csv
             case 'csv':
               if (command.length < 5) break;
               String accountName = command[3];
@@ -1008,6 +1133,9 @@ Future<void> executeCommand(List<String> command,
               }
               log(fileName, id: id);
               return;
+            // #endregion
+
+            // #region accounts export kdbx
             case 'kdbx':
               if (command.length < 6) break;
               String accountName = command[3];
@@ -1047,13 +1175,19 @@ Future<void> executeCommand(List<String> command,
               }
               log(fileName, id: id);
               return;
+            // #endregion
           }
           break;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region entries
     case 'entries':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region entries list
         case 'list':
           if (command.length < 4) break;
           String accountName = command[2];
@@ -1083,6 +1217,9 @@ Future<void> executeCommand(List<String> command,
                   .join('\n'),
               id: id);
           return;
+        // #endregion
+
+        // #region entries get
         case 'get':
           if (command.length < 5) break;
           String accountName = command[2];
@@ -1109,6 +1246,9 @@ Future<void> executeCommand(List<String> command,
               encrypter: encrypter);
           log(entriesFile.getEntryString(entryKey), id: id);
           return;
+        // #endregion
+
+        // #region entries set
         case 'set':
           if (command.length < 5) break;
           String accountName = command[2];
@@ -1167,6 +1307,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(true, id: id);
           return;
+        // #endregion
+
+        // #region entries remove
         case 'remove':
           if (command.length < 5) break;
           String accountName = command[2];
@@ -1222,11 +1365,16 @@ Future<void> executeCommand(List<String> command,
           }
           log(true, id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region favorites
     case 'favorites':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region favorites list
         case 'list':
           if (command.length < 4) break;
           String accountName = command[2];
@@ -1261,6 +1409,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(result.join('\n'), id: id);
           return;
+        // #endregion
+
+        // #region favorites toggle
         case 'toggle':
           if (command.length < 6) break;
           String accountName = command[2];
@@ -1304,19 +1455,360 @@ Future<void> executeCommand(List<String> command,
           }
           log(true, id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region tags
+    case 'tags':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'list':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:tags:list:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          if (command[3] == 'all') {
+            List<String> tags = [];
+            List<Future<List<String>>> tagsFutures = [];
+            for (EntryType entryType in EntryType.values) {
+              PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+                  File(_accountsPath +
+                      Platform.pathSeparator +
+                      accountName +
+                      Platform.pathSeparator +
+                      entryTypeToFilename(entryType)),
+                  type: entryType,
+                  encrypter: encrypter);
+              tagsFutures
+                  .add(compute((entriesFile) => entriesFile.tags, entriesFile));
+            }
+            for (Future<List<String>> tagsFuture in tagsFutures) {
+              List<String> newTags = await tagsFuture;
+              for (String tag in newTags) {
+                if (tags.contains(tag)) continue;
+                tags.add(tag);
+              }
+            }
+            tags.sort();
+            log(tags.join('\n'), id: id);
+            return;
+          }
+          EntryType? entryType = entryTypeFromName(command[3]);
+          if (entryType == null) {
+            log('passy:tags:list:Unknown entry type provided: ${command[3]}.',
+                id: id);
+            return;
+          }
+          PassyEntriesEncryptedCSVFile entriesFile = getEntriesFile(
+              File(_accountsPath +
+                  Platform.pathSeparator +
+                  accountName +
+                  Platform.pathSeparator +
+                  entryTypeToFilename(entryType)),
+              type: entryType,
+              encrypter: encrypter);
+          List<String> tags = entriesFile.tags;
+          tags.sort();
+          log(tags.join('\n'), id: id);
+          return;
+      }
+      break;
+    // #endregion
+
+    // #region files
+    case 'files':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        // #region files list
+        case 'list':
+          if (command.length == 2) break;
+          String accountName = command[2];
+          String? path = command.length == 3 ? null : command[3];
+          Key? key = _keys[accountName];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (key == null || encrypter == null) {
+            log('passy:files:list:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          FileIndex fileIndex = FileIndex(
+              file: File('${accPath}file_index.enc'),
+              saveDir: Directory('${accPath}files'),
+              key: key);
+          Map<String, PassyFsMeta> fileMeta = path == null
+              ? await fileIndex.getMetadata()
+              : await fileIndex.getPathMetadata(path);
+          log(
+              fileMeta
+                  .map<String, String>((index, meta) =>
+                      MapEntry(index, pcommon.csvEncode(meta.toCSV())))
+                  .values
+                  .join('\n'),
+              id: id);
+          return;
+        // #endregion
+
+        // #region files get
+        case 'get':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          String indexKey = command[3];
+          String encoding = command.length == 4 ? 'base64' : command[4];
+          Key? key = _keys[accountName];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (key == null || encrypter == null) {
+            log('passy:files:get:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          FileIndex fileIndex = FileIndex(
+              file: File('${accPath}file_index.enc'),
+              saveDir: Directory('${accPath}files'),
+              key: key);
+          if (!(await fileIndex.getMetadata()).containsKey(indexKey)) {
+            log('passy:files:get:Requested file does not exist.', id: id);
+            return;
+          }
+          Uint8List data;
+          try {
+            data = await fileIndex.readAsBytes(indexKey);
+          } catch (e, s) {
+            log('passy:files:get:Failed to read file:\n$e\n$s', id: id);
+            return;
+          }
+          String encoded;
+          try {
+            switch (encoding) {
+              case 'base64':
+                encoded = base64Encode(data);
+                break;
+              case 'hex':
+                encoded = HexUtils.encode(data);
+                break;
+              case 'ascii85':
+                encoded = Base85Codec(Alphabets.ascii85, AlgoType.ascii85)
+                    .encode(data);
+                break;
+              default:
+                log('passy:files:get:Unknown encoding provided:`$encoding`',
+                    id: id);
+                return;
+            }
+          } catch (e, s) {
+            log('passy:files:get:Failed to decode file:\n$e\n$s', id: id);
+            return;
+          }
+          log(encoded, id: id);
+          return;
+        // #endregion
+
+        // #region files serve
+        case 'serve':
+          if (command.length < 5) break;
+          String protocol = command[2];
+          if (protocol != 'http' && protocol != 'https') {
+            log('passy:files:serve:Unknown protocol provided:`$protocol`.',
+                id: id);
+            return;
+          }
+          String accountName = command[3];
+          String indexKey = command[4];
+          String? contentType = command.length < 6 ? null : command[5];
+          if (contentType == 'auto') contentType = null;
+          ContentType? parsedContentType;
+          if (contentType != null) {
+            try {
+              parsedContentType = ContentType.parse(contentType);
+            } catch (_) {
+              log('passy:files:serve:`$contentType` is not a valid MIME type.',
+                  id: id);
+              return;
+            }
+          }
+          String? runDuration = command.length < 7 ? null : command[6];
+          Duration? parsedRunDuration;
+          if (runDuration != null) {
+            try {
+              parsedRunDuration = Duration(seconds: int.parse(runDuration));
+            } catch (_) {
+              log('passy:files:serve:`$runDuration` is not a valid integer.',
+                  id: id);
+              return;
+            }
+          }
+          Key? key = _keys[accountName];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (key == null || encrypter == null) {
+            log('passy:files:serve:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          FileIndex fileIndex = FileIndex(
+              file: File('${accPath}file_index.enc'),
+              saveDir: Directory('${accPath}files'),
+              key: key);
+          PassyFsMeta? meta = (await fileIndex.getMetadata())[indexKey];
+          if (meta == null || meta is! FileMeta) {
+            log('passy:files:serve:Requested file does not exist.', id: id);
+            return;
+          }
+          bool renderMarkdown = false;
+          if (parsedContentType == null) {
+            switch (meta.type) {
+              case PassyFileType.unknown:
+                parsedContentType = ContentType.binary;
+                break;
+              case PassyFileType.text:
+                parsedContentType = ContentType.text;
+                break;
+              case PassyFileType.markdown:
+                if (parsedContentType == null) {
+                  parsedContentType = ContentType.html;
+                  renderMarkdown = true;
+                }
+                break;
+              case PassyFileType.photo:
+                if (meta.name.endsWith('.apng')) {
+                  parsedContentType = ContentType('image', 'apng');
+                } else if (meta.name.endsWith('.avif')) {
+                  parsedContentType = ContentType('image', 'avif');
+                } else if (meta.name.endsWith('.bmp')) {
+                  parsedContentType = ContentType('image', 'bmp');
+                } else if (meta.name.endsWith('.gif')) {
+                  parsedContentType = ContentType('image', 'gif');
+                } else if (meta.name.endsWith('.ico')) {
+                  parsedContentType =
+                      ContentType('image', 'vnd.microsoft.icon');
+                } else if (meta.name.endsWith('.jpg') ||
+                    meta.name.endsWith('.jpeg')) {
+                  parsedContentType = ContentType('image', 'jpeg');
+                } else if (meta.name.endsWith('.png')) {
+                  parsedContentType = ContentType('image', 'png');
+                } else if (meta.name.endsWith('.svg')) {
+                  parsedContentType = ContentType('image', 'svg+xml');
+                } else if (meta.name.endsWith('.tif') ||
+                    meta.name.endsWith('.tiff')) {
+                  parsedContentType = ContentType('image', 'tiff');
+                } else if (meta.name.endsWith('.webp')) {
+                  parsedContentType = ContentType('image', 'webp');
+                } else {
+                  parsedContentType = ContentType.binary;
+                }
+                break;
+              case PassyFileType.audio:
+                if (meta.name.endsWith('.aac')) {
+                  parsedContentType = ContentType('audio', 'aac');
+                } else if (meta.name.endsWith('.mpeg') ||
+                    meta.name.endsWith('.mp3')) {
+                  parsedContentType = ContentType('audio', 'mpeg');
+                } else if (meta.name.endsWith('.ogg')) {
+                  parsedContentType = ContentType('audio', 'ogg');
+                } else if (meta.name.endsWith('.wav')) {
+                  parsedContentType = ContentType('audio', 'wav');
+                } else if (meta.name.endsWith('.weba')) {
+                  parsedContentType = ContentType('audio', 'webm');
+                } else if (meta.name.endsWith('.3gp')) {
+                  parsedContentType = ContentType('audio', '3gpp');
+                } else if (meta.name.endsWith('.3g2')) {
+                  parsedContentType = ContentType('audio', '3gpp2');
+                } else {
+                  parsedContentType = ContentType.binary;
+                }
+                break;
+              case PassyFileType.video:
+                if (meta.name.endsWith('.avi')) {
+                  parsedContentType = ContentType('video', 'x-msvideo');
+                } else if (meta.name.endsWith('.mp4') ||
+                    meta.name.endsWith('.m4v') ||
+                    meta.name.endsWith('.mov')) {
+                  parsedContentType = ContentType('video', 'mp4');
+                } else if (meta.name.endsWith('.mpeg')) {
+                  parsedContentType = ContentType('video', 'mpeg');
+                } else if (meta.name.endsWith('.ogg')) {
+                  parsedContentType = ContentType('video', 'ogg');
+                } else if (meta.name.endsWith('.ts')) {
+                  parsedContentType = ContentType('video', 'mp2t');
+                } else if (meta.name.endsWith('.webm')) {
+                  parsedContentType = ContentType('video', 'webm');
+                } else if (meta.name.endsWith('.3gp')) {
+                  parsedContentType = ContentType('video', '3gpp');
+                } else if (meta.name.endsWith('.3g2')) {
+                  parsedContentType = ContentType('video', '3gpp2');
+                } else {
+                  parsedContentType = ContentType.binary;
+                }
+                break;
+              case PassyFileType.pdf:
+                parsedContentType = ContentType('application', 'pdf');
+                break;
+            }
+          }
+          Uint8List data;
+          try {
+            data = await fileIndex.readAsBytes(indexKey);
+            if (renderMarkdown) {
+              data = Uint8List.fromList(
+                  md.markdownToHtml(utf8.decode(data)).codeUnits);
+            }
+          } catch (e, s) {
+            log('passy:files:serve:Failed to read file:\n$e\n$s', id: id);
+            return;
+          }
+
+          FilePageResult result;
+          try {
+            result = await createFilePage(
+              data,
+              includePasswordInUrl: true,
+              contentType: parsedContentType,
+              runDuration: parsedRunDuration,
+              secure: protocol == 'https',
+            );
+          } catch (e, s) {
+            log('passy:files:serve:Failed to create file page:\n$e\n$s',
+                id: id);
+            return;
+          }
+          log(result.uri.toString(), id: id);
+          return;
+        // #endregion
+      }
+      break;
+    // #endregion
+
+    // #region sync
     case 'sync':
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region sync host
         case 'host':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region sync host classic
             case 'classic':
               if (command.length < 6) break;
               String accountName = command[5];
+              Key? key = _keys[accountName];
               Encrypter? encrypter = _encrypters[accountName];
-              if (encrypter == null) {
+              if (key == null || encrypter == null) {
                 log('passy:sync:host:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
                 return;
@@ -1361,6 +1853,8 @@ Future<void> executeCommand(List<String> command,
               AccountSettingsFile settings = AccountSettings.fromFile(
                   File('${accPath}settings.enc'),
                   encrypter: encrypter);
+              LocalSettingsFile localSettings =
+                  LocalSettings.fromFile(File('${accPath}local_settings.json'));
               Completer<void> syncCompleter = Completer();
               Completer<void> detachedCompleter = Completer();
               HostAddress? addr;
@@ -1382,12 +1876,20 @@ Future<void> executeCommand(List<String> command,
                   paymentCards: PaymentCards.fromFile(
                       File('${accPath}payment_cards.enc'),
                       encrypter: encrypter),
+                  fileIndex: FileIndex(
+                      file: File('${accPath}file_index.enc'),
+                      saveDir: Directory('${accPath}files'),
+                      key: key),
                 ),
                 history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                fileSyncHistory: FileSyncHistory.fromFile(
+                    File('${accPath}file_sync_history.enc'),
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                localSettings: localSettings,
                 credentials: AccountCredentials.fromFile(
                     File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
@@ -1407,10 +1909,11 @@ Future<void> executeCommand(List<String> command,
                   _syncCloseMethods.remove('${addr!.ip.address}:${addr.port}');
                   syncCompleter.complete();
                   if (detached) return;
+                  SynchronizationReport report = serverNullable!.getReport();
                   log('Synchronization server stopped.', id: id);
-                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
-                  log('Entries removed: ${serverNullable.entriesRemoved}',
-                      id: id);
+                  log('Entries added: ${report.entriesAdded}', id: id);
+                  log('Entries removed: ${report.entriesRemoved}', id: id);
+                  log('Entries changed: ${report.entriesChanged}', id: id);
                 },
               );
               Synchronization server = serverNullable;
@@ -1466,6 +1969,9 @@ Future<void> executeCommand(List<String> command,
               } catch (_) {}
               _pauseMainInput = false;
               return;
+            // #endregion
+
+            // #region sync host 2d0d0
             case '2d0d0':
               if (command.length < 5) break;
               String host = command[3];
@@ -1510,6 +2016,7 @@ Future<void> executeCommand(List<String> command,
                     username +
                     Platform.pathSeparator;
                 Encrypter encrypter = encrypterEntry.value;
+                Key key = _keys[encrypterEntry.key]!;
                 Map<String, GlareModule> syncModules =
                     buildSynchronization2d0d0Modules(
                   username: username,
@@ -1527,15 +2034,24 @@ Future<void> executeCommand(List<String> command,
                     paymentCards: PaymentCards.fromFile(
                         File('${accPath}payment_cards.enc'),
                         encrypter: encrypter),
+                    fileIndex: FileIndex(
+                        file: File('${accPath}file_index.enc'),
+                        saveDir: Directory('${accPath}files'),
+                        key: key),
                   ),
                   encrypter: encrypter,
                   history: History.fromFile(File('${accPath}history.enc'),
+                      encrypter: encrypter),
+                  fileSyncHistory: FileSyncHistory.fromFile(
+                      File('${accPath}file_sync_history.enc'),
                       encrypter: encrypter),
                   favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                       encrypter: encrypter),
                   settings: AccountSettings.fromFile(
                       File('${accPath}settings.enc'),
                       encrypter: encrypter),
+                  localSettings: LocalSettings.fromFile(
+                      File('${accPath}local_settings.json')),
                   credentials: AccountCredentials.fromFile(
                       File('${accPath}credentials.json')),
                   authWithIV: _accounts[username]!.value.keyDerivationType !=
@@ -1546,6 +2062,9 @@ Future<void> executeCommand(List<String> command,
                   loadedModules['${module.key}_$username'] = module.value;
                 }
               }
+              String lastAuth = '';
+              DateTime lastDate =
+                  DateTime.now().toUtc().subtract(const Duration(hours: 12));
               GlareServer glareHost = await GlareServer.bind(
                 maxBindTries: 0,
                 address: host,
@@ -1553,10 +2072,15 @@ Future<void> executeCommand(List<String> command,
                 keypair: RSAKeypair.fromRandom(keySize: 4096),
                 modules: {
                   ...loadedModules,
+
+                  // #region authenticate
                   'authenticate': GlareModule(
                     name: 'authenticate',
-                    target: (args,
-                        {required addModule, required readBytes}) async {
+                    target: (
+                      args, {
+                      required addModule,
+                      binaryObjects,
+                    }) async {
                       if (args.length < 5) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1573,10 +2097,13 @@ Future<void> executeCommand(List<String> command,
                       Encrypter usernameEncrypter =
                           pcommon.getPassyEncrypter(username);
                       try {
-                        util.verifyAuth(auth,
+                        lastDate = util.verifyAuth(auth,
+                            lastAuth: lastAuth,
+                            lastDate: lastDate,
                             encrypter: encrypter,
                             usernameEncrypter: usernameEncrypter,
                             withIV: true);
+                        lastAuth = auth;
                       } catch (_) {
                         return {
                           'error': {'type': 'Failed to authenticate'},
@@ -1591,10 +2118,16 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region getAccountCredentials
                   'getAccountCredentials': GlareModule(
                     name: 'getAccountCredentials',
-                    target: (args,
-                        {required addModule, required readBytes}) async {
+                    target: (
+                      args, {
+                      required addModule,
+                      binaryObjects,
+                    }) async {
                       if (args.length < 4) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1618,10 +2151,16 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region login
                   'login': GlareModule(
                     name: 'login',
-                    target: (args,
-                        {required addModule, required readBytes}) async {
+                    target: (
+                      args, {
+                      required addModule,
+                      binaryObjects,
+                    }) async {
                       if (args.length < 5) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1687,6 +2226,7 @@ Future<void> executeCommand(List<String> command,
                         };
                       }
                       Encrypter encrypter = _encrypters[username]!;
+                      Key key = _keys[username]!;
                       Map<String, GlareModule> syncModules =
                           buildSynchronization2d0d0Modules(
                         username: username,
@@ -1705,9 +2245,16 @@ Future<void> executeCommand(List<String> command,
                           paymentCards: PaymentCards.fromFile(
                               File('${accPath}payment_cards.enc'),
                               encrypter: encrypter),
+                          fileIndex: FileIndex(
+                              file: File('${accPath}file_index.enc'),
+                              saveDir: Directory('${accPath}files'),
+                              key: key),
                         ),
                         encrypter: encrypter,
                         history: History.fromFile(File('${accPath}history.enc'),
+                            encrypter: encrypter),
+                        fileSyncHistory: FileSyncHistory.fromFile(
+                            File('${accPath}file_sync_history.enc'),
                             encrypter: encrypter),
                         favorites: Favorites.fromFile(
                             File('${accPath}favorites.enc'),
@@ -1715,6 +2262,8 @@ Future<void> executeCommand(List<String> command,
                         settings: AccountSettings.fromFile(
                             File('${accPath}settings.enc'),
                             encrypter: encrypter),
+                        localSettings: LocalSettings.fromFile(
+                            File('${accPath}local_settings.json')),
                         credentials: AccountCredentials.fromFile(
                             File('${accPath}credentials.json')),
                         authWithIV:
@@ -1731,10 +2280,16 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region getDeviceId
                   'getDeviceId': GlareModule(
                     name: 'getDeviceId',
-                    target: (args,
-                        {required addModule, required readBytes}) async {
+                    target: (
+                      args, {
+                      required addModule,
+                      binaryObjects,
+                    }) async {
                       PassyInfoFile infoFile = PassyInfo.fromFile(File(
                           _passyDataPath +
                               Platform.pathSeparator +
@@ -1750,10 +2305,16 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region getTrustedConnection
                   'getTrustedConnection': GlareModule(
                     name: 'getTrustedConnection',
-                    target: (args,
-                        {required addModule, required readBytes}) async {
+                    target: (
+                      args, {
+                      required addModule,
+                      binaryObjects,
+                    }) async {
                       if (args.length < 5) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1793,10 +2354,16 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
+
+                  // #region setTrustedConnection
                   'setTrustedConnection': GlareModule(
                     name: 'setTrustedConnection',
-                    target: (args,
-                        {required addModule, required readBytes}) async {
+                    target: (
+                      args, {
+                      required addModule,
+                      binaryObjects,
+                    }) async {
                       if (args.length < 7) {
                         throw {
                           'error': {'type': 'Missing arguments'},
@@ -1820,10 +2387,13 @@ Future<void> executeCommand(List<String> command,
                         };
                       }
                       try {
-                        util.verifyAuth(auth,
+                        lastDate = util.verifyAuth(auth,
+                            lastAuth: lastAuth,
+                            lastDate: lastDate,
                             encrypter: encrypter,
                             usernameEncrypter: usernameEncrypter,
                             withIV: true);
+                        lastAuth = auth;
                       } catch (_) {
                         return {
                           'error': {'type': 'Failed to authenticate'},
@@ -1856,6 +2426,7 @@ Future<void> executeCommand(List<String> command,
                       };
                     },
                   ),
+                  // #endregion
                 },
                 serviceInfo:
                     'Passy cross-platform password manager dedicated entry synchronization server v${pcommon.syncVersion}',
@@ -1869,16 +2440,22 @@ Future<void> executeCommand(List<String> command,
               }
               log('$host:$port');
               return;
+            // #endregion
           }
           break;
+        // #endregion
+
+        // #region sync connect
         case 'connect':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region sync connect classic
             case 'classic':
               if (command.length == 5) break;
               String accountName = command[5];
+              Key? key = _keys[accountName];
               Encrypter? encrypter = _encrypters[accountName];
-              if (encrypter == null) {
+              if (key == null || encrypter == null) {
                 log('passy:sync:connect:classic:No account credentials provided, please use `accounts login` first.',
                     id: id);
                 return;
@@ -1933,6 +2510,8 @@ Future<void> executeCommand(List<String> command,
               AccountSettingsFile settings = AccountSettings.fromFile(
                   File('${accPath}settings.enc'),
                   encrypter: encrypter);
+              LocalSettingsFile localSettings =
+                  LocalSettings.fromFile(File('${accPath}local_settings.json'));
               Completer<void> syncCompleter = Completer();
               Synchronization? serverNullable;
               serverNullable = Synchronization(
@@ -1952,12 +2531,20 @@ Future<void> executeCommand(List<String> command,
                   paymentCards: PaymentCards.fromFile(
                       File('${accPath}payment_cards.enc'),
                       encrypter: encrypter),
+                  fileIndex: FileIndex(
+                      file: File('${accPath}file_index.enc'),
+                      saveDir: Directory('${accPath}files'),
+                      key: key),
                 ),
                 history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                fileSyncHistory: FileSyncHistory.fromFile(
+                    File('${accPath}file_sync_history.enc'),
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                localSettings: localSettings,
                 credentials: AccountCredentials.fromFile(
                     File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
@@ -1976,10 +2563,11 @@ Future<void> executeCommand(List<String> command,
                 onComplete: (p0) {
                   syncCompleter.complete();
                   if (detached) return;
+                  SynchronizationReport report = serverNullable!.getReport();
                   log('Synchronization client stopped.', id: id);
-                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
-                  log('Entries removed: ${serverNullable.entriesRemoved}',
-                      id: id);
+                  log('Entries added: ${report.entriesAdded}', id: id);
+                  log('Entries removed: ${report.entriesRemoved}', id: id);
+                  log('Entries changed: ${report.entriesChanged}', id: id);
                 },
               );
               Synchronization server = serverNullable;
@@ -2000,6 +2588,9 @@ Future<void> executeCommand(List<String> command,
                 log('', id: id);
               }
               return;
+            // #endregion
+
+            // #region sync connect 2d0d0
             case '2d0d0':
               if (command.length == 6) break;
               Synchronization? serverNullable;
@@ -2042,14 +2633,16 @@ Future<void> executeCommand(List<String> command,
               }
               String accountName = command[5];
               String password = command[6];
+              Key? key = _keys[accountName];
               Encrypter? encrypter = _encrypters[accountName];
-              if (encrypter == null) {
+              if (key == null || encrypter == null) {
                 String loginResponse = await _login(accountName, password);
                 if (loginResponse != 'true') {
                   log('passy:sync:connect:2d0d0:Failed to login:$loginResponse',
                       id: id);
                   return;
                 }
+                key = _keys[accountName]!;
                 encrypter = _encrypters[accountName]!;
               }
               String? encryptedPassword = _encryptedPasswords[accountName];
@@ -2065,6 +2658,8 @@ Future<void> executeCommand(List<String> command,
               AccountSettingsFile settings = AccountSettings.fromFile(
                   File('${accPath}settings.enc'),
                   encrypter: encrypter);
+              LocalSettingsFile localSettings =
+                  LocalSettings.fromFile(File('${accPath}local_settings.json'));
               serverNullable = Synchronization(
                 encrypter: encrypter,
                 encryptedPassword: encryptedPassword,
@@ -2082,12 +2677,20 @@ Future<void> executeCommand(List<String> command,
                   paymentCards: PaymentCards.fromFile(
                       File('${accPath}payment_cards.enc'),
                       encrypter: encrypter),
+                  fileIndex: FileIndex(
+                      file: File('${accPath}file_index.enc'),
+                      saveDir: Directory('${accPath}files'),
+                      key: key),
                 ),
                 history: History.fromFile(File('${accPath}history.enc'),
+                    encrypter: encrypter),
+                fileSyncHistory: FileSyncHistory.fromFile(
+                    File('${accPath}file_sync_history.enc'),
                     encrypter: encrypter),
                 favorites: Favorites.fromFile(File('${accPath}favorites.enc'),
                     encrypter: encrypter),
                 settings: settings,
+                localSettings: localSettings,
                 credentials: AccountCredentials.fromFile(
                     File('${accPath}credentials.json')),
                 rsaKeypair: settings.value.rsaKeypair!,
@@ -2105,10 +2708,11 @@ Future<void> executeCommand(List<String> command,
                 },
                 onComplete: (p0) {
                   if (detached) return;
+                  SynchronizationReport report = serverNullable!.getReport();
                   log('Synchronization client stopped.', id: id);
-                  log('Entries set: ${serverNullable!.entriesAdded}', id: id);
-                  log('Entries removed: ${serverNullable.entriesRemoved}',
-                      id: id);
+                  log('Entries added: ${report.entriesAdded}', id: id);
+                  log('Entries removed: ${report.entriesRemoved}', id: id);
+                  log('Entries changed: ${report.entriesChanged}', id: id);
                 },
               );
               Synchronization client = serverNullable;
@@ -2139,8 +2743,12 @@ Future<void> executeCommand(List<String> command,
                         Directory('${accPath}trusted_connections'));
               }
               return;
+            // #endregion
           }
           break;
+        // #endregion
+
+        // #region sync close
         case 'close':
           if (command.length == 2) break;
           Future<void> Function()? close = _syncCloseMethods[command[2]];
@@ -2151,6 +2759,9 @@ Future<void> executeCommand(List<String> command,
           await close();
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region sync report
         case 'report':
           if (command.length == 2) break;
           switch (command[2]) {
@@ -2171,12 +2782,17 @@ Future<void> executeCommand(List<String> command,
               return;
           }
           break;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region install
     case 'install':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region install temp
         case 'temp':
           File copy;
           try {
@@ -2188,6 +2804,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(copy.path, id: id);
           return;
+        // #endregion
+
+        // #region install full
         case 'full':
           if (command.length == 2) break;
           String installPath = command[2];
@@ -2203,6 +2822,9 @@ Future<void> executeCommand(List<String> command,
           }
           log(exe.path, id: id);
           return;
+        // #endregion
+
+        // #region install server
         case 'server':
           if (command.length < 5) break;
           String address = command[3];
@@ -2235,12 +2857,17 @@ Future<void> executeCommand(List<String> command,
           }
           log(exeFile.path, id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region uninstall
     case 'uninstall':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
       switch (command[1]) {
+        // #region uninstall full
         case 'full':
           if (command.length == 2) break;
           Directory installPath = Directory(command[2]);
@@ -2251,6 +2878,9 @@ Future<void> executeCommand(List<String> command,
           }
           log('true', id: id);
           return;
+        // #endregion
+
+        // #region uninstall dir
         case 'dir':
           if (command.length == 2) break;
           Directory installPath = Directory(command[2]);
@@ -2262,8 +2892,12 @@ Future<void> executeCommand(List<String> command,
           }
           log('true', id: id);
           return;
+        // #endregion
       }
       break;
+    // #endregion
+
+    // #region upgrade
     case 'upgrade':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -2295,6 +2929,9 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
+
+    // #region native_messaging
     case 'native_messaging':
       if (command.length == 1) break;
       switch (command[1]) {
@@ -2304,6 +2941,9 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
+
+    // #region ipc
     case 'ipc':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -2311,6 +2951,7 @@ Future<void> executeCommand(List<String> command,
         case 'server':
           if (command.length == 2) break;
           switch (command[2]) {
+            // #region ipc server start
             case 'start':
               File? save;
               if (command.length == 3) {
@@ -2393,6 +3034,9 @@ Future<void> executeCommand(List<String> command,
               log("${serverSocket.address.address}:${serverSocket.port}",
                   id: id);
               return;
+            // #endregion
+
+            // #region ipc server connect
             case 'connect':
               if (command.length == 3) break;
               List<String> arg4 = command[3].split(':');
@@ -2424,6 +3068,9 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               return;
+            // #endregion
+
+            // #region ipc server run
             case 'run':
               if (command.length < 5) break;
               List<String> arg4 = command[3].split(':');
@@ -2457,10 +3104,14 @@ Future<void> executeCommand(List<String> command,
                 return;
               }
               return;
+            // #endregion
           }
           break;
       }
       break;
+    // #endregion
+
+    // #region autostart
     case 'autostart':
       if (_isNativeMessaging) break;
       if (command.length == 1) break;
@@ -2493,13 +3144,70 @@ Future<void> executeCommand(List<String> command,
           return;
       }
       break;
+    // #endregion
+
+    // #region theme
+    case 'theme':
+      if (command.length == 1) break;
+      switch (command[1]) {
+        case 'list':
+          log(PassyAppTheme.values.map((e) => e.name).join('\n'), id: id);
+        case 'get':
+          if (command.length < 3) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:theme:set:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          LocalSettingsFile localSettings =
+              LocalSettings.fromFile(File('${accPath}local_settings.json'));
+          log(localSettings.value.appTheme.name, id: id);
+          return;
+        case 'set':
+          if (command.length < 4) break;
+          String accountName = command[2];
+          Encrypter? encrypter = _encrypters[accountName];
+          if (encrypter == null) {
+            log('passy:theme:set:No account credentials provided, please use `accounts login` first.',
+                id: id);
+            return;
+          }
+          String theme = command[3];
+          String accPath = _accountsPath +
+              Platform.pathSeparator +
+              accountName +
+              Platform.pathSeparator;
+          LocalSettingsFile localSettings =
+              LocalSettings.fromFile(File('${accPath}local_settings.json'));
+          PassyAppTheme? appTheme = passyAppThemeFromName(theme);
+          if (appTheme == null) {
+            log('false', id: id);
+            return;
+          }
+          localSettings.value.appTheme = appTheme;
+          await localSettings.save();
+          log('true', id: id);
+          return;
+      }
+      break;
+    // #endregion
   }
   if (_isNativeMessaging) return;
   log('passy:Unknown command:${command.join(' ')}.', id: id);
   if (!_isInteractive) log('Use `help` for guidance.', id: id);
 }
 
-void main(List<String> arguments) {
+Future<void> main(List<String> arguments) async {
+  try {
+    _hotReloader = await HotReloader.create(
+        onAfterReload: (ctx) => log('Hot reload complete.\n[passy]\$ '));
+  } catch (_) {}
   try {
     _stdinEchoMode = stdin.echoMode;
     _stdinLineMode = stdin.lineMode;

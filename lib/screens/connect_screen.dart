@@ -3,7 +3,7 @@ import 'package:passy/common/common.dart';
 
 import 'package:passy/common/synchronization_wrapper.dart';
 import 'package:passy/passy_data/loaded_account.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class ConnectScreen extends StatefulWidget {
   static const routeName = '/connect';
@@ -16,8 +16,15 @@ class ConnectScreen extends StatefulWidget {
 
 class _ConnectScreen extends State<ConnectScreen> {
   String _address = '';
+  late FormattedTextParser formattedTextParser;
 
   _ConnectScreen();
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,24 +49,9 @@ class _ConnectScreen extends State<ConnectScreen> {
             child: Column(children: [
               const Spacer(),
               Text.rich(
-                TextSpan(
-                  text: localizations.connect1,
-                  children: [
-                    TextSpan(
-                      text: localizations.connect2Highlighted,
-                      style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor),
-                    ),
-                    TextSpan(
-                        text:
-                            '${localizations.connect3}.\n\n${localizations.connect4}'),
-                    TextSpan(
-                      text: localizations.connect5Highlighted,
-                      style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor),
-                    ),
-                    const TextSpan(text: ':\n'),
-                  ],
+                formattedTextParser.parse(
+                  text:
+                      '${localizations.connectMsg1}\n\n${localizations.connectMsg2}',
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -67,9 +59,9 @@ class _ConnectScreen extends State<ConnectScreen> {
                 Flexible(
                   child: Padding(
                     padding: EdgeInsets.only(
-                        left: PassyTheme.passyPadding.right,
-                        top: PassyTheme.passyPadding.top,
-                        bottom: PassyTheme.passyPadding.bottom),
+                        left: PassyTheme.of(context).passyPadding.right,
+                        top: PassyTheme.of(context).passyPadding.top,
+                        bottom: PassyTheme.of(context).passyPadding.bottom),
                     child: TextFormField(
                       initialValue: _address,
                       decoration: InputDecoration(
@@ -81,8 +73,8 @@ class _ConnectScreen extends State<ConnectScreen> {
                 ),
                 SizedBox(
                   child: Padding(
-                    padding:
-                        EdgeInsets.only(right: PassyTheme.passyPadding.right),
+                    padding: EdgeInsets.only(
+                        right: PassyTheme.of(context).passyPadding.right),
                     child: FloatingActionButton(
                       tooltip: localizations.connect,
                       onPressed: () => SynchronizationWrapper(context: context)

@@ -1,14 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
-import 'package:passy/screens/automatic_backup_screen.dart';
-import 'package:passy/screens/import_screen.dart';
-import 'package:passy/screens/main_screen.dart';
-import 'package:passy/screens/security_screen.dart';
 
 import 'common.dart';
+import 'main_screen.dart';
+import 'theme_screen.dart';
+import 'security_screen.dart';
+import 'import_screen.dart';
+import 'backup_and_restore_screen.dart';
 
 class SetupScreen extends StatefulWidget {
   static const String routeName = '/setupScreen';
@@ -21,6 +24,18 @@ class SetupScreen extends StatefulWidget {
 
 class _SetupScreen extends State<SetupScreen> {
   final LoadedAccount _account = data.loadedAccount!;
+
+  void setMinimizeToTray(bool value) {
+    if (value) {
+      if (!trayEnabled) toggleTray(context);
+    } else {
+      if (trayEnabled) toggleTray(context);
+    }
+    setState(() {
+      _account.minimizeToTray = value;
+    });
+    _account.saveSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,29 +80,53 @@ class _SetupScreen extends State<SetupScreen> {
             center: Text(localizations.automaticBackup),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
-              child: Icon(Icons.save_outlined),
+              child: Icon(Icons.save_rounded),
             ),
             right: const Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () => Navigator.pushNamed(
-                context, AutomaticBackupScreen.routeName,
+                context, BackupAndRestoreScreen.routeName,
                 arguments: data.loadedAccount!.username),
           )),
           PassyPadding(ThreeWidgetButton(
-            color: PassyTheme.lightContentColor,
-            center: Text(
-              localizations.done,
-              style: const TextStyle(color: PassyTheme.darkContentColor),
-            ),
+            center: Text(localizations.theme),
             left: const Padding(
               padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.colorize),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, ThemeScreen.routeName),
+          )),
+          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS)
+            PassyPadding(ThreeWidgetButton(
+              center: Text(localizations.minimizeToTray),
+              left: const Padding(
+                padding: EdgeInsets.only(right: 30),
+                child: Icon(Icons.circle),
+              ),
+              right: Switch(
+                //activeColor: Colors.deepPurpleAccent,
+                value: _account.minimizeToTray,
+                onChanged: (value) => setMinimizeToTray(value),
+              ),
+              onPressed: () => setMinimizeToTray(!_account.minimizeToTray),
+            )),
+          PassyPadding(ThreeWidgetButton(
+            color: PassyTheme.of(context).highlightContentColor,
+            center: Text(
+              localizations.done,
+              style: TextStyle(color: PassyTheme.of(context).contentColor),
+            ),
+            left: Padding(
+              padding: const EdgeInsets.only(right: 30),
               child: Icon(
                 Icons.check_rounded,
-                color: PassyTheme.darkContentColor,
+                color: PassyTheme.of(context).contentColor,
               ),
             ),
-            right: const Icon(
+            right: Icon(
               Icons.arrow_forward_ios_rounded,
-              color: PassyTheme.darkContentColor,
+              color: PassyTheme.of(context).contentColor,
             ),
             onPressed: () =>
                 Navigator.pushReplacementNamed(context, MainScreen.routeName),

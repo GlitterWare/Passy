@@ -5,6 +5,7 @@ import 'package:passy/passy_flutter/common/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
 class PaymentCardButtonMini extends StatelessWidget {
+  final Widget? leftWidget;
   final PaymentCardMeta paymentCard;
   final void Function()? onPressed;
   final List<PopupMenuEntry<dynamic>> Function(BuildContext context)?
@@ -12,6 +13,7 @@ class PaymentCardButtonMini extends StatelessWidget {
 
   const PaymentCardButtonMini({
     Key? key,
+    this.leftWidget,
     required this.paymentCard,
     this.onPressed,
     this.popupMenuItemBuilder,
@@ -22,6 +24,7 @@ class PaymentCardButtonMini extends StatelessWidget {
     CardType _cardType =
         cardTypeFromNumber(paymentCard.cardNumber.replaceAll('*', '0'));
     return Row(children: [
+      if (leftWidget != null) leftWidget!,
       Flexible(
         child: ThreeWidgetButton(
           left: Padding(

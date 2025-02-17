@@ -8,16 +8,19 @@ import 'package:crypton/crypton.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:passy/passy_data/argon2_info.dart';
+import 'package:passy/passy_data/compression_type.dart';
 import 'package:passy/passy_data/convert_aegis.dart';
 import 'package:passy/passy_data/custom_field.dart';
 import 'package:passy/passy_data/file_index.dart';
 import 'package:passy/passy_data/file_meta.dart';
+import 'package:passy/passy_data/file_sync_history.dart';
 import 'package:passy/passy_data/json_file.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
 import 'package:archive/archive_io.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'dart:io';
@@ -38,6 +41,7 @@ import 'key_derivation_info.dart';
 import 'key_derivation_type.dart';
 import 'note.dart';
 import 'password.dart';
+import 'passy_app_theme.dart';
 import 'passy_entries.dart';
 import 'passy_entry.dart';
 import 'passy_fs_meta.dart';
@@ -54,6 +58,7 @@ class LoadedAccount {
   final LocalSettingsFile _localSettings;
   final AccountSettingsFile _settings;
   final HistoryFile _history;
+  final FileSyncHistoryFile _fileSyncHistory;
   final FavoritesFile _favorites;
   final PasswordsFile _passwords;
   final NotesFile _notes;
@@ -75,6 +80,7 @@ class LoadedAccount {
     required LocalSettingsFile localSettings,
     required AccountSettingsFile settings,
     required HistoryFile history,
+    required FileSyncHistoryFile fileSyncHistory,
     required FavoritesFile favorites,
     required PasswordsFile passwords,
     required NotesFile notes,
@@ -90,6 +96,7 @@ class LoadedAccount {
         _localSettings = localSettings,
         _settings = settings,
         _history = history,
+        _fileSyncHistory = fileSyncHistory,
         _favorites = favorites,
         _passwords = passwords,
         _notes = notes,
@@ -151,6 +158,17 @@ class LoadedAccount {
         shouldSaveHistory = true;
       }
     }
+    () async {
+      bool shouldSaveFileSyncHistory = false;
+      List<String> filesSyncKeys = await this.filesSyncKeys;
+      for (EntryEvent value in _fileSyncHistory.value.files.values) {
+        if (value.status == EntryStatus.removed) continue;
+        if (filesSyncKeys.contains(value.key)) continue;
+        value.status = EntryStatus.removed;
+        shouldSaveFileSyncHistory = true;
+      }
+      if (shouldSaveFileSyncHistory) _fileSyncHistory.saveSync();
+    }();
     if (shouldSaveHistory) _history.saveSync();
   }
 
@@ -165,6 +183,7 @@ class LoadedAccount {
     LocalSettingsFile? localSettings,
     AccountSettingsFile? settings,
     HistoryFile? history,
+    FileSyncHistoryFile? fileSyncHistory,
     FavoritesFile? favorites,
     PasswordsFile? passwords,
     NotesFile? notes,
@@ -183,6 +202,9 @@ class LoadedAccount {
         encrypter: encrypter);
     history ??= History.fromFile(
         File(path + Platform.pathSeparator + 'history.enc'),
+        encrypter: encrypter);
+    fileSyncHistory ??= FileSyncHistory.fromFile(
+        File(path + Platform.pathSeparator + 'file_sync_history.enc'),
         encrypter: encrypter);
     favorites ??= Favorites.fromFile(
         File(path + Platform.pathSeparator + 'favorites.enc'),
@@ -214,6 +236,7 @@ class LoadedAccount {
         localSettings: localSettings,
         settings: settings,
         history: history,
+        fileSyncHistory: fileSyncHistory,
         favorites: favorites,
         passwords: passwords,
         notes: notes,
@@ -253,6 +276,9 @@ class LoadedAccount {
     await _history.reload();
     _history.encrypter = _encrypter;
     await _history.save();
+    await _fileSyncHistory.reload();
+    _fileSyncHistory.encrypter = _encrypter;
+    await _fileSyncHistory.save();
     await _favorites.reload();
     _favorites.encrypter = _encrypter;
     await _favorites.save();
@@ -315,6 +341,7 @@ class LoadedAccount {
         _localSettings.save(),
         _settings.save(),
         _history.save(),
+        _fileSyncHistory.save(),
         _favorites.save(),
       ]);
 
@@ -324,6 +351,7 @@ class LoadedAccount {
     _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
+    _fileSyncHistory.saveSync();
     _favorites.saveSync();
   }
 
@@ -343,10 +371,13 @@ class LoadedAccount {
         paymentCards: _paymentCards,
         idCards: _idCards,
         identities: _identities,
+        fileIndex: _fileIndex,
       ),
       history: _history,
+      fileSyncHistory: _fileSyncHistory,
       favorites: _favorites,
       settings: _settings,
+      localSettings: _localSettings,
       credentials: _credentials,
       encrypter: _encrypter,
       rsaKeypair: rsaKeypair,
@@ -461,37 +492,10 @@ class LoadedAccount {
     _autoSyncCompleter = null;
   }
 
-  Future<void> _exportFiles(Directory dir) async {
-    if (await dir.exists()) {
-      List<FileSystemEntity> files = await dir.list().toList();
-      if (files.isNotEmpty) throw 'Directory is not empty';
-    } else {
-      await dir.create(recursive: true);
-    }
-    List<String> dirs = [''];
-    List<PassyFsMeta> metaValues =
-        (await _fileIndex.getMetadata()).values.toList();
-    for (PassyFsMeta meta in metaValues) {
-      List<String> pathSplit = meta.virtualPath.split('/');
-      String subDir = pathSplit
-          .sublist(0, pathSplit.length - 1)
-          .join(Platform.pathSeparator);
-      if (!dirs.contains(subDir)) {
-        String subDirPart = '';
-        for (int i = 1; i != pathSplit.length - 1; i++) {
-          subDirPart += Platform.pathSeparator + pathSplit[i];
-          await Directory(dir.path + subDirPart).create(recursive: true);
-          dirs.add(subDirPart);
-        }
-      }
-      await _fileIndex.saveDecrypted(meta.key,
-          file: File(dir.path + subDir + Platform.pathSeparator + meta.name));
-    }
-  }
-
   Future<String> exportPassy({
     required Directory outputDirectory,
     String? fileName,
+    bool fileExportEnabled = true,
   }) async {
     if (fileName == null) {
       fileName = outputDirectory.path +
@@ -518,13 +522,15 @@ class LoadedAccount {
       await _tempAccDir.delete(recursive: true);
       await _tempAccDir.create();
       _jsonAcc.saveSync();
-      await _exportFiles(
-          Directory(_tempAccDir.path + Platform.pathSeparator + 'files'));
+      if (fileExportEnabled) {
+        await _fileIndex
+            .export(_tempAccDir.path + Platform.pathSeparator + 'files');
+      }
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
-    _encoder.close();
+    await _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
   }
@@ -532,6 +538,7 @@ class LoadedAccount {
   Future<String> exportCSV({
     required Directory outputDirectory,
     String? fileName,
+    bool fileExportEnabled = true,
   }) async {
     if (fileName == null) {
       fileName = outputDirectory.path +
@@ -585,14 +592,18 @@ class LoadedAccount {
       JsonEncoder encoder = const JsonEncoder.withIndent('  ');
       await File('${tempPath}history.json')
           .writeAsString(encoder.convert(_history.value.toJson()));
+      await File('${tempPath}file_sync_history.json')
+          .writeAsString(encoder.convert(_fileSyncHistory.value.toJson()));
       await File('${tempPath}favorites.json')
           .writeAsString(encoder.convert(_favorites.value.toJson()));
-      await _exportFiles(Directory('${tempPath}files'));
+      if (fileExportEnabled) {
+        await _fileIndex.export('${tempPath}files');
+      }
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
-    _encoder.close();
+    await _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
   }
@@ -601,6 +612,7 @@ class LoadedAccount {
     required String password,
     required Directory outputDirectory,
     String? fileName,
+    bool fileExportEnabled = true,
   }) async {
     if (fileName == null) {
       fileName = outputDirectory.path +
@@ -653,14 +665,18 @@ class LoadedAccount {
       JsonEncoder encoder = const JsonEncoder.withIndent('  ');
       await File('${tempPath}history.json')
           .writeAsString(encoder.convert(_history.value.toJson()));
+      await File('${tempPath}file_sync_history.json')
+          .writeAsString(encoder.convert(_fileSyncHistory.value.toJson()));
       await File('${tempPath}favorites.json')
           .writeAsString(encoder.convert(_favorites.value.toJson()));
-      await _exportFiles(Directory('${tempPath}files'));
+      if (fileExportEnabled) {
+        await _fileIndex.export('${tempPath}files');
+      }
     }
     ZipFileEncoder _encoder = ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
-    _encoder.close();
+    await _encoder.close();
     await _tempDir.delete(recursive: true);
     return fileName;
   }
@@ -677,7 +693,7 @@ class LoadedAccount {
       String? email;
       String? password;
       TFA? tfa;
-      String? website;
+      List<String> websites = [];
       for (var e in entry.stringEntries) {
         String? val = e.value?.getText();
         if (val == null) continue;
@@ -701,7 +717,7 @@ class LoadedAccount {
             tfa = TFA(secret: val);
             continue;
           case KdbxKeyCommon.KEY_URL:
-            website = val;
+            websites.add(val);
             continue;
         }
         customFields.add(CustomField(
@@ -719,7 +735,7 @@ class LoadedAccount {
         email: email ?? '',
         password: password ?? '',
         tfa: tfa,
-        website: website ?? '',
+        websites: websites,
       );
     }
     await _history.reload();
@@ -831,6 +847,14 @@ class LoadedAccount {
   AutoBackupSettings? get autoBackup => _localSettings.value.autoBackup;
   set autoBackup(AutoBackupSettings? value) =>
       _localSettings.value.autoBackup = value;
+  PassyAppTheme get appTheme => _localSettings.value.appTheme;
+  set appTheme(PassyAppTheme value) {
+    _history.reloadSync();
+    _history.value.appSettings['appTheme'] = EntryEvent('appTheme',
+        status: EntryStatus.alive, lastModified: DateTime.now().toUtc());
+    _localSettings.value.appTheme = value;
+  }
+
   Future<void> saveLocalSettings() => _localSettings.save();
   void saveLocalSettingsSync() => _localSettings.saveSync();
 
@@ -839,6 +863,8 @@ class LoadedAccount {
   set protectScreen(bool value) => _settings.value.protectScreen = value;
   bool get autoScreenLock => _settings.value.autoScreenLock;
   set autoScreenLock(bool value) => _settings.value.autoScreenLock = value;
+  bool get minimizeToTray => _settings.value.minimizeToTray;
+  set minimizeToTray(bool value) => _settings.value.minimizeToTray = value;
   bool get isRSAKeypairLoaded {
     return _settings.value.rsaKeypair != null;
   }
@@ -868,6 +894,9 @@ class LoadedAccount {
 
   set lastSyncDate(DateTime? value) => _settings.value.lastSyncDate = value;
   DateTime? get lastSyncDate => _settings.value.lastSyncDate;
+  int get autoScreenLockDelay => _settings.value.autoScreenLockDelay;
+  set autoScreenLockDelay(int value) =>
+      _settings.value.autoScreenLockDelay = value;
 
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();
@@ -880,6 +909,8 @@ class LoadedAccount {
   Future<void> saveHistory() => _history.save();
   void saveHistorySync() => _history.saveSync();
   Digest get historyHash => getPassyHash(jsonEncode(_history.value.toJson()));
+  Map<String, EntryEvent> get appSettingsHistory =>
+      Map.from(_history.value.appSettings);
 
   // Favorites wrappers
   void clearRemovedFavorites() => _favorites.value.clearRemoved();
@@ -1094,8 +1125,9 @@ class LoadedAccount {
       paymentCardTags,
       idCardsTags,
       identitiesTags,
+      fsTags,
     ]);
-    List<String> result = [...tags.removeLast()];
+    List<String> result = tags.removeLast();
     for (List<String> list in tags) {
       for (String tag in list) {
         if (result.contains(tag)) continue;
@@ -1115,6 +1147,7 @@ class LoadedAccount {
       _paymentCards.renameTag(tag: tag, newTag: newTag),
       _identities.renameTag(tag: tag, newTag: newTag),
       _idCards.renameTag(tag: tag, newTag: newTag),
+      _fileIndex.renameTag(tag: tag, newTag: newTag),
     ]);
     for (String passwordKey in keyLists[0]) {
       _history.value.passwords[passwordKey] = EntryEvent(passwordKey,
@@ -1448,21 +1481,40 @@ class LoadedAccount {
   }
 
   // File index wrappers
+  Future<List<String>> get fsTags =>
+      compute((FileIndex _fileIndex) => _fileIndex.tags, _fileIndex);
   Future<Map<String, PassyFsMeta>> getFsMetadata() => _fileIndex.getMetadata();
   Future<Map<String, PassyFsMeta>> getFsEntries(List<String> keys) =>
       _fileIndex.getEntries(keys);
-  Future<String> addFile(
+  Future<FileMeta> addFile(
     File file, {
     bool useIsolate = false,
     FileMeta? meta,
+    CompressionType compressionType = CompressionType.none,
     String? parent,
-  }) {
+    bool eraseOriginalFile = false,
+  }) async {
     if (useIsolate) {
-      return compute<FileIndex, String>(
-          (index) => index.addFile(file, meta: meta, parent: parent),
+      meta = await compute<FileIndex, FileMeta>(
+          (index) => index.addFile(file,
+              meta: meta,
+              compressionType: compressionType,
+              parent: parent,
+              eraseOriginalFile: eraseOriginalFile),
           _fileIndex);
+    } else {
+      meta = await _fileIndex.addFile(file, meta: meta, parent: parent);
     }
-    return _fileIndex.addFile(file, meta: meta, parent: parent);
+    if (meta.virtualPath.startsWith('/sync/')) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[meta.key] = EntryEvent(
+        meta.key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+    return meta;
   }
 
   Future<Uint8List> readFileAsBytes(String key, {bool useIsolate = false}) {
@@ -1473,12 +1525,85 @@ class LoadedAccount {
     return _fileIndex.readAsBytes(key);
   }
 
-  Future<void> removeFile(String key) => _fileIndex.removeFile(key);
-  Future<void> removeFolder(String path) => _fileIndex.removeFolder(path);
-  Future<void> renameFile(String key, {required String name}) =>
-      _fileIndex.renameFile(key, name: name);
+  Future<void> removeFile(String key) async {
+    PassyFsMeta? meta = await _fileIndex.getEntry(key);
+    if (meta == null) return;
+    await _fileIndex.removeFile(key);
+    if (meta.virtualPath.startsWith('/sync/')) {
+      if (_fileSyncHistory.value.files.containsKey(meta.key)) {
+        await _fileSyncHistory.reload();
+        _fileSyncHistory.value.files[meta.key] = EntryEvent(
+          key,
+          status: EntryStatus.removed,
+          lastModified: DateTime.now().toUtc(),
+        );
+        await _fileSyncHistory.save();
+      }
+    }
+  }
+
+  Future<void> removeFolder(String path) async {
+    List<PassyFsMeta> files = await _fileIndex.removeFolder(path);
+    if (path.startsWith('/sync/')) {
+      await _fileSyncHistory.reload();
+      for (PassyFsMeta file in files) {
+        _fileSyncHistory.value.files[file.key] = EntryEvent(
+          file.key,
+          status: EntryStatus.removed,
+          lastModified: DateTime.now().toUtc(),
+        );
+      }
+      await _fileSyncHistory.save();
+    }
+  }
+
+  Future<void> renameFile(String key, {required String name}) async {
+    await _fileIndex.renameFile(key, name: name);
+    if (_fileSyncHistory.value.files.containsKey(key)) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[key] = EntryEvent(
+        key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+  }
+
+  Future<void> moveFile(String key, {required String path}) async {
+    await _fileIndex.moveFile(key, path: path);
+    if (_fileSyncHistory.value.files.containsKey(key) ||
+        path.startsWith('/sync/')) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[key] = EntryEvent(
+        key,
+        status:
+            path.startsWith('/sync/') ? EntryStatus.alive : EntryStatus.removed,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+  }
+
+  Future<void> changeFileType(String key, {required PassyFileType type}) async {
+    await _fileIndex.changeFileType(key, type: type);
+    if (_fileSyncHistory.value.files.containsKey(key)) {
+      await _fileSyncHistory.reload();
+      _fileSyncHistory.value.files[key] = EntryEvent(
+        key,
+        status: EntryStatus.alive,
+        lastModified: DateTime.now().toUtc(),
+      );
+      await _fileSyncHistory.save();
+    }
+  }
+
   Future<void> exportFile(String key, {required File file}) =>
       _fileIndex.saveDecrypted(key, file: file);
+
+  // Files sync wrappers
+  Future<List<String>> get filesSyncKeys async =>
+      (await _fileIndex.getPathMetadata('/sync/')).keys.toList();
 }
 
 class JSONLoadedAccount {
@@ -1488,6 +1613,7 @@ class JSONLoadedAccount {
   final LocalSettingsFile _localSettings;
   final JsonFile<AccountSettings> _settings;
   final JsonFile<History> _history;
+  final JsonFile<FileSyncHistory> _fileSyncHistory;
   final JsonFile<Favorites> _favorites;
   final PassyEntriesJSONFile<Password> _passwords;
   final PassyEntriesJSONFile<Note> _notes;
@@ -1502,6 +1628,7 @@ class JSONLoadedAccount {
     required LocalSettingsFile localSettings,
     required JsonFile<AccountSettings> settings,
     required JsonFile<History> history,
+    required JsonFile<FileSyncHistory> fileSyncHistory,
     required JsonFile<Favorites> favorites,
     required PassyEntriesJSONFile<Password> passwords,
     required PassyEntriesJSONFile<Note> notes,
@@ -1514,6 +1641,7 @@ class JSONLoadedAccount {
         _localSettings = localSettings,
         _settings = settings,
         _history = history,
+        _fileSyncHistory = fileSyncHistory,
         _favorites = favorites,
         _passwords = passwords,
         _notes = notes,
@@ -1529,6 +1657,7 @@ class JSONLoadedAccount {
     LocalSettingsFile? localSettings,
     JsonFile<AccountSettings>? settings,
     JsonFile<History>? history,
+    JsonFile<FileSyncHistory>? fileSyncHistory,
     JsonFile<Favorites>? favorites,
     PassyEntriesJSONFile<Password>? passwords,
     PassyEntriesJSONFile<Note>? notes,
@@ -1550,6 +1679,11 @@ class JSONLoadedAccount {
       File(path + Platform.pathSeparator + 'history.enc'),
       constructor: () => History(),
       fromJson: History.fromJson,
+    );
+    fileSyncHistory ??= JsonFile<FileSyncHistory>.fromFile(
+      File(path + Platform.pathSeparator + 'file_sync_history.enc'),
+      constructor: () => FileSyncHistory(),
+      fromJson: FileSyncHistory.fromJson,
     );
     favorites ??= JsonFile<Favorites>.fromFile(
       File(path + Platform.pathSeparator + 'favorites.enc'),
@@ -1578,6 +1712,7 @@ class JSONLoadedAccount {
         localSettings: localSettings,
         settings: settings,
         history: history,
+        fileSyncHistory: fileSyncHistory,
         favorites: favorites,
         passwords: passwords,
         notes: notes,
@@ -1595,6 +1730,7 @@ class JSONLoadedAccount {
     LocalSettingsFile? localSettings,
     JsonFile<AccountSettings>? settings,
     JsonFile<History>? history,
+    JsonFile<FileSyncHistory>? fileSyncHistory,
     JsonFile<Favorites>? favorites,
     PassyEntriesJSONFile<Password>? passwords,
     PassyEntriesJSONFile<Note>? notes,
@@ -1604,6 +1740,8 @@ class JSONLoadedAccount {
   }) {
     File _settingsFile = File(path + Platform.pathSeparator + 'settings.enc');
     File _historyFile = File(path + Platform.pathSeparator + 'history.enc');
+    File _fileSyncHistoryFile =
+        File(path + Platform.pathSeparator + 'file_sync_history.enc');
     File _favoritesFile = File(path + Platform.pathSeparator + 'favorites.enc');
     File _passwordsFile = File(path + Platform.pathSeparator + 'passwords.enc');
     File _notesFile = File(path + Platform.pathSeparator + 'notes.enc');
@@ -1625,6 +1763,12 @@ class JSONLoadedAccount {
         fromJson: History.fromJson,
         value: History.fromFile(
                 File(path + Platform.pathSeparator + 'history.enc'),
+                encrypter: encrypter)
+            .value);
+    fileSyncHistory ??= JsonFile<FileSyncHistory>(_fileSyncHistoryFile,
+        fromJson: FileSyncHistory.fromJson,
+        value: FileSyncHistory.fromFile(
+                File(path + Platform.pathSeparator + 'file_sync_history.enc'),
                 encrypter: encrypter)
             .value);
     favorites ??= JsonFile<Favorites>(_favoritesFile,
@@ -1664,6 +1808,7 @@ class JSONLoadedAccount {
       localSettings: localSettings,
       settings: settings,
       history: history,
+      fileSyncHistory: fileSyncHistory,
       favorites: favorites,
       passwords: passwords,
       notes: notes,
@@ -1684,6 +1829,7 @@ class JSONLoadedAccount {
       localSettings: _localSettings,
       settings: _settings.toEncryptedJSONFile(encrypter),
       history: _history.toEncryptedJSONFile(encrypter),
+      fileSyncHistory: _fileSyncHistory.toEncryptedJSONFile(encrypter),
       favorites: _favorites.toEncryptedJSONFile(encrypter),
       passwords: _passwords.toPassyEntriesEncryptedCSVFile(encrypter),
       notes: _notes.toPassyEntriesEncryptedCSVFile(encrypter),
@@ -1706,6 +1852,7 @@ class JSONLoadedAccount {
         _localSettings.save(),
         _settings.save(),
         _history.save(),
+        _fileSyncHistory.save(),
         _favorites.save(),
         _passwords.save(),
         _notes.save(),
@@ -1720,6 +1867,7 @@ class JSONLoadedAccount {
     _localSettings.saveSync();
     _settings.saveSync();
     _history.saveSync();
+    _fileSyncHistory.saveSync();
     _favorites.saveSync();
     _passwords.saveSync();
     _notes.saveSync();

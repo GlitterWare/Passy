@@ -5,6 +5,7 @@ import 'note.dart';
 import 'password.dart';
 import 'passy_entries_encrypted_csv_file.dart';
 import 'payment_card.dart';
+import 'file_index.dart';
 
 class PassyEntriesFileCollection {
   PasswordsFile? passwords;
@@ -12,6 +13,7 @@ class PassyEntriesFileCollection {
   PaymentCardsFile? paymentCards;
   IDCardsFile? idCards;
   IdentitiesFile? identities;
+  FileIndex? fileIndex;
 
   PassyEntriesFileCollection({
     this.passwords,
@@ -19,6 +21,7 @@ class PassyEntriesFileCollection {
     this.paymentCards,
     this.idCards,
     this.identities,
+    this.fileIndex,
   });
 
   toFull() => FullPassyEntriesFileCollection(
@@ -27,6 +30,7 @@ class PassyEntriesFileCollection {
         paymentCards: paymentCards!,
         idCards: idCards!,
         identities: identities!,
+        fileIndex: fileIndex!,
       );
 
   PassyEntriesEncryptedCSVFile? getEntries(EntryType type) {
@@ -52,12 +56,14 @@ class FullPassyEntriesFileCollection extends PassyEntriesFileCollection {
     required PaymentCardsFile paymentCards,
     required IDCardsFile idCards,
     required IdentitiesFile identities,
+    required FileIndex fileIndex,
   }) : super(
           passwords: passwords,
           notes: notes,
           paymentCards: paymentCards,
           idCards: idCards,
           identities: identities,
+          fileIndex: fileIndex,
         );
 
   @override

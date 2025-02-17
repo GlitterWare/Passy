@@ -46,7 +46,7 @@ app.*.map.json
 /android/app/release
 
 # Snap packaging files
-/snap/*
+/*.snap
 
 # Development log files
 /log/*
@@ -55,3 +55,5 @@ app.*.map.json
 # Passy CLI
 lib/passy_cli/bin/passy_cli
 
+.directory
+__Flutter_Output__

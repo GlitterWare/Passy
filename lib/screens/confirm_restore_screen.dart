@@ -19,25 +19,23 @@ class ConfirmRestoreScreen extends StatefulWidget {
 }
 
 class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
+  late FormattedTextParser formattedTextParser;
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     String _path = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
         title: Text(localizations.passyRestore),
         message: PassyPadding(Text.rich(
-          TextSpan(
-            text: localizations.confirmRestore1,
-            children: [
-              TextSpan(
-                text: localizations.confirmRestore2Highlighted,
-                style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor),
-              ),
-              TextSpan(
-                  text:
-                      '${localizations.confirmRestore3}.\n\n${localizations.enterAccountPasswordToRestore}.'),
-            ],
-          ),
+          formattedTextParser.parse(
+              text:
+                  '${localizations.confirmRestoreMsg}\n\n${localizations.enterAccountPasswordToRestore}'),
           textAlign: TextAlign.center,
         )),
         labelText: localizations.enterPassword,
@@ -54,8 +52,7 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
             onError: (e, s) {
               showSnackBar(
                 message: localizations.couldNotRestoreAccount,
-                icon: const Icon(Icons.settings_backup_restore_rounded,
-                    color: PassyTheme.darkContentColor),
+                icon: const Icon(Icons.settings_backup_restore_rounded),
                 action: SnackBarAction(
                   label: localizations.details,
                   onPressed: () => Navigator.pushNamed(

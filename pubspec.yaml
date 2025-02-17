@@ -15,10 +15,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.8.0+19
+version: 1.9.0+20
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.4.1 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -37,26 +37,29 @@ dependencies:
   websafe_svg: ^3.0.0+5
   crypto: ^3.0.1
   encrypt: ^5.0.1
-  image: ^3.1.3
+  image: ^4.2.0
   path_provider: ^2.0.9
   otp: ^3.0.2
   qr_flutter: ^4.0.0
-  file_picker: ^5.1.0
+  file_picker: ^8.1.2
   flutter_web_browser: ^0.17.1
   flutter_locker: ^2.1.2
   cached_network_image: ^3.3.1
-  flutter_credit_card: ^4.0.1
-  flutter_date_pickers: ^0.4.0
+  flutter_credit_card:
+    git:
+      url: https://github.com/SimformSolutionsPvtLtd/flutter_credit_card
+      ref: 7a754b0a44cd75d0689a3adfd778205da9c69f95
+  flutter_date_pickers: ^0.4.3
   credit_card_type_detector: ^2.0.0
   flutter_secure_screen: ^0.0.1
   camera: ^0.10.5+9
   flutter_autofill_service:
     git:
-      url: https://github.com/GlitterWare/flutter_autofill_service.git
-      ref: 23db7e69367606f91244884ea5c0abe3efee922e
+      url: https://github.com/kee-org/flutter_autofill_service
+      ref: f49e062c0eab85170e26712b2ba438b5f713a2b7
   url_launcher: ^6.0.20
   intranet_ip: ^1.0.2
-  zxing2: ^0.1.1
+  zxing2: ^0.2.3
   intl: any
   flutter_localizations:
     sdk: flutter
@@ -70,22 +73,39 @@ dependencies:
     git:
       url: https://github.com/GlitterWare/dargon2.git
       path: dargon2
-      ref: 180ec98990f8e1d7190a34f2c131e9d587d1a4ff
+      ref: 83c67239018b488512d9a553a93cf99d34ab2546
   dargon2_interface: ^1.1.1
-  system_info2: ^4.0.0
   flutter_markdown: ^0.6.17+1
   compute: ^1.0.2
   launch_at_startup: ^0.2.2
   kdbx:
     git:
       url: https://github.com/GlitterWare/kdbx.dart.git
-      ref: 7e24cacc9e469b2391cefb6e2619e5ffa9db84f8
+      ref: b248b712c7bf2684ee241543bc5553313bb94018
   dropdown_button2: ^2.3.9
   emoji_picker_flutter:
     git:
       url: https://github.com/GlitterWare/emoji_picker_flutter
       ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
   text_divider: ^1.0.0
+  archive: ^3.6.1
+  media_kit: ^1.1.10+1
+  media_kit_video: ^1.2.4
+  media_kit_libs_video: ^1.0.4
+  win32: ^5.5.1
+  basic_utils: ^5.7.0
+  chewie_media_kit:
+    git:
+      url: https://github.com/GlitterWare/chewie_media_kit
+      ref: 1720bb4c07aee96c1de3ad6753184265b91aaea7
+  window_manager: ^0.3.9
+  system_tray: ^2.0.3
+  flex_color_picker: ^3.6.0
+  pdfrx: ^1.0.94
+  base85: ^1.0.4
+
+dependency_overrides:
+  uuid: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -93,7 +113,7 @@ dev_dependencies:
   build_runner:
   json_serializable:
   rename:
-  flutter_launcher_icons: ^0.9.2
+  flutter_launcher_icons: ^0.13.1
   change_app_package_name: 1.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -102,6 +122,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  hotreloader: ^4.3.0
 
 flutter_icons:
   image_path: assets/images/icon.png
@@ -149,6 +170,7 @@ flutter:
     - assets/images/logo_circle.svg
     - assets/images/markdown-svgrepo-com.svg
     - assets/images/payment_card_bg.png
+    - assets/images/pdf-file.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

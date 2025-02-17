@@ -66,8 +66,8 @@ class _EntryTagList extends State<EntryTagList> {
       selectedButtons.add(
         Padding(
           padding: EdgeInsets.only(
-              left: PassyTheme.passyPadding.left / 2,
-              right: PassyTheme.passyPadding.right / 2,
+              left: PassyTheme.of(context).passyPadding.left / 2,
+              right: PassyTheme.of(context).passyPadding.right / 2,
               bottom: showScrollbar ? _bottomPadding : 0),
           child: EntryTagButton(
             tag,
@@ -87,8 +87,8 @@ class _EntryTagList extends State<EntryTagList> {
       notSelectedButtons.add(
         Padding(
           padding: EdgeInsets.only(
-              left: PassyTheme.passyPadding.left / 2,
-              right: PassyTheme.passyPadding.right / 2,
+              left: PassyTheme.of(context).passyPadding.left / 2,
+              right: PassyTheme.of(context).passyPadding.right / 2,
               bottom: showScrollbar ? _bottomPadding : 0),
           child: EntryTagButton(
             tag,
@@ -115,8 +115,8 @@ class _EntryTagList extends State<EntryTagList> {
                 if (selectedButtons.isEmpty && notSelectedButtons.isEmpty)
                   Padding(
                     padding: EdgeInsets.only(
-                        left: PassyTheme.passyPadding.left / 2,
-                        right: PassyTheme.passyPadding.right / 2,
+                        left: PassyTheme.of(context).passyPadding.left / 2,
+                        right: PassyTheme.of(context).passyPadding.right / 2,
                         bottom: showScrollbar ? _bottomPadding : 0),
                     child: Text(localizations.noTags),
                   ),
@@ -125,8 +125,8 @@ class _EntryTagList extends State<EntryTagList> {
                 if (widget.showAddButton)
                   Padding(
                     padding: EdgeInsets.only(
-                        left: PassyTheme.passyPadding.left / 2,
-                        right: PassyTheme.passyPadding.right / 2,
+                        left: PassyTheme.of(context).passyPadding.left / 2,
+                        right: PassyTheme.of(context).passyPadding.right / 2,
                         bottom: showScrollbar ? _bottomPadding : 0),
                     child: FloatingActionButton(
                       heroTag: null,
@@ -147,15 +147,16 @@ class _EntryTagList extends State<EntryTagList> {
                 if (selectedButtons.isNotEmpty && notSelectedButtons.isNotEmpty)
                   Padding(
                     padding: EdgeInsets.only(
-                        left: PassyTheme.passyPadding.left / 2,
-                        right: PassyTheme.passyPadding.right / 2,
+                        left: PassyTheme.of(context).passyPadding.left / 2,
+                        right: PassyTheme.of(context).passyPadding.right / 2,
                         bottom: showScrollbar ? _bottomPadding : 0),
-                    child: const SizedBox(
+                    child: SizedBox(
                       height: 36,
                       width: 2,
                       child: DecoratedBox(
-                        decoration:
-                            BoxDecoration(color: PassyTheme.lightContentColor),
+                        decoration: BoxDecoration(
+                            color:
+                                PassyTheme.of(context).highlightContentColor),
                       ),
                     ),
                   ),

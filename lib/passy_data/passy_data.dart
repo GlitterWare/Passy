@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:archive/archive_io.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
-import 'package:encrypt/encrypt.dart';
+import 'package:encrypt/encrypt.dart' as enc;
+import 'package:flutter/foundation.dart';
 import 'package:passy/passy_data/argon2_info.dart';
 import 'package:passy/passy_data/auto_backup_settings.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
@@ -12,18 +12,28 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/legacy/legacy.dart';
 import 'package:passy/passy_data/local_settings.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:system_info2/system_info2.dart';
 import 'dart:io';
 
 import 'account_credentials.dart';
 import 'common.dart';
 import 'key_derivation_info.dart';
+import 'passy_app_theme.dart';
 import 'passy_info.dart';
 
 import 'common.dart' as common;
 import 'loaded_account.dart';
 
 class PassyData {
+  static const Map<String, String> developmentAccountPasswords = {
+    '__gw__demo': 'gw',
+  };
+  static final Map<String, FutureOr<void> Function(LoadedAccount account)>
+      _developmentAccountSetup = {
+    '__gw__demo': (account) {
+      account.autoScreenLock = false;
+    },
+  };
+
   final PassyInfoFile info;
   bool get noAccounts => _accounts.isEmpty;
   Iterable<String> get usernames => _accounts.keys;
@@ -35,12 +45,17 @@ class PassyData {
   final String accountsPath;
   final Map<String, AccountCredentialsFile> _accounts = {};
   final Map<String, Timer> _autoBackupTimers = {};
+  final Map<String, PassyAppTheme> _appThemes = {};
   LoadedAccount? _loadedAccount;
 
   String? getPasswordHash(String username) {
     AccountCredentialsFile? account = _accounts[username];
     if (account == null) return null;
     return account.value.passwordHash;
+  }
+
+  PassyAppTheme? getAppTheme(String username) {
+    return _appThemes[username];
   }
 
   Future<String?> createPasswordHash(String username,
@@ -107,7 +122,7 @@ class PassyData {
     );
   }
 
-  Future<Key?> derivePassword(
+  Future<enc.Key?> derivePassword(
     String username, {
     required String password,
   }) async {
@@ -118,7 +133,7 @@ class PassyData {
         derivationInfo: account.value.keyDerivationInfo);
   }
 
-  Future<Encrypter?> getEncrypter(
+  Future<enc.Encrypter?> getEncrypter(
     String username, {
     required String password,
   }) async {
@@ -140,6 +155,30 @@ class PassyData {
   }
 
   bool hasAccount(String username) => _accounts.containsKey(username);
+
+  Future<void> createDevelopmentAccounts() async {
+    for (MapEntry<String, String> creds
+        in developmentAccountPasswords.entries) {
+      if (_accounts.containsKey(creds.key)) continue;
+      LoadedAccount account = await createAccount(creds.key, creds.value);
+      FutureOr<void> Function(LoadedAccount)? accountSetup =
+          _developmentAccountSetup[creds.key];
+      if (accountSetup == null) continue;
+      await accountSetup(account);
+    }
+  }
+
+  Future<bool> resetDevelopmentAccount(String username) async {
+    String? password = developmentAccountPasswords[username];
+    if (password == null) return false;
+    await removeAccount(username);
+    LoadedAccount account = await createAccount(username, password);
+    FutureOr<void> Function(LoadedAccount)? accountSetup =
+        _developmentAccountSetup[username];
+    if (accountSetup == null) return true;
+    await accountSetup(account);
+    return true;
+  }
 
   PassyData(String path)
       : passyPath = path,
@@ -167,6 +206,7 @@ class PassyData {
       }
       info.saveSync();
     }
+    if (!kReleaseMode) createDevelopmentAccounts();
   }
 
   void refreshAccounts() {
@@ -181,6 +221,9 @@ class PassyData {
     _autoBackupTimers.clear();
     for (FileSystemEntity d in _accountDirectories) {
       String _username = d.path.split(Platform.pathSeparator).last;
+      if (kReleaseMode) {
+        if (_username.startsWith('__gw__')) continue;
+      }
       _accounts[_username] = AccountCredentials.fromFile(
         File(accountsPath +
             Platform.pathSeparator +
@@ -197,6 +240,7 @@ class PassyData {
             Platform.pathSeparator +
             'local_settings.json'),
       );
+      _appThemes[_username] = _localSettings.value.appTheme;
       AutoBackupSettings? _autoBackup = _localSettings.value.autoBackup;
       if (_autoBackup != null) {
         void _autoBackupCycle() {
@@ -224,25 +268,33 @@ class PassyData {
     }
   }
 
-  Future<void> createAccount(String username, String password) async {
+  Future<LoadedAccount> createAccount(String username, String password) async {
     String _accountPath = accountsPath + Platform.pathSeparator + username;
     Salt _salt = Salt.newSalt();
-    int _memory = SysInfo.getFreePhysicalMemory();
-    if (_memory > 67108864) {
-      _memory = 65536;
-    } else if (_memory > 33554432) {
-      _memory = 32768;
-    } else if (_memory > 16777216) {
-      _memory = 16384;
-    } else if (_memory > 8388608) {
-      _memory = 8192;
-    } else if (_memory > 4194304) {
-      _memory = 4096;
-    } else if (_memory > 2097152) {
-      _memory = 2048;
+    DArgon2Result? result;
+    int _memory = 65536;
+    Object? lastE;
+    // Test 64MB allocation up to 3 times to provide the best security in environments with volatile memory
+    for (int memory in [65536, 65536, 65536, 32768, 16384, 8192, 4096, 2048]) {
+      try {
+        result =
+            await common.argon2ifyString(password, salt: _salt, memory: memory);
+        _memory = memory;
+        break;
+      } catch (e) {
+        if (e is! DArgon2Exception) {
+          rethrow;
+        } else if (e.errorCode !=
+            DArgon2ErrorCode.ARGON2_MEMORY_ALLOCATION_ERROR) {
+          rethrow;
+        }
+        lastE = e;
+      }
     }
-    DArgon2Result result =
-        await common.argon2ifyString(password, salt: _salt, memory: _memory);
+    if (result == null) {
+      lastE ??= 'Unknown Exception';
+      throw lastE;
+    }
     AccountCredentialsFile _file = AccountCredentials.fromFile(
         File(_accountPath + Platform.pathSeparator + 'credentials.json'),
         value: AccountCredentials(
@@ -256,14 +308,14 @@ class PassyData {
       ..writeAsStringSync(common.accountVersion);
     _accounts[username] = _file;
     await info.reload();
-    Encrypter encrypter =
+    enc.Encrypter encrypter =
         common.getPassyEncrypterFromBytes(Uint8List.fromList(result.rawBytes));
-    LoadedAccount.fromDirectory(
+    return LoadedAccount.fromDirectory(
       encryptedPassword: encrypt(password, encrypter: encrypter),
       path: _accountPath,
       credentials: _file,
       encrypter: encrypter,
-      key: Key(Uint8List.fromList(result.rawBytes)),
+      key: enc.Key(Uint8List.fromList(result.rawBytes)),
       deviceId: info.value.deviceId,
     );
   }
@@ -299,7 +351,7 @@ class PassyData {
   }
 
   Future<LoadedAccount> loadAccount(
-      String username, Encrypter encrypter, Key key,
+      String username, enc.Encrypter encrypter, enc.Key key,
       {required String encryptedPassword}) async {
     await info.reload();
     _loadedAccount = loadLegacyAccount(
@@ -376,10 +428,10 @@ class PassyData {
     {
       AccountCredentialsFile creds = AccountCredentials.fromFile(
           File(_tempAccountPath + Platform.pathSeparator + 'credentials.json'));
-      Key key = await common.derivePassword(password,
+      enc.Key key = await common.derivePassword(password,
           derivationType: creds.value.keyDerivationType,
           derivationInfo: creds.value.keyDerivationInfo);
-      Encrypter encrypter = common.getPassyEncrypterFromBytes(key.bytes);
+      enc.Encrypter encrypter = common.getPassyEncrypterFromBytes(key.bytes);
       await info.reload();
       LoadedAccount _account = loadLegacyAccount(
           encryptedPassword: encrypt(password, encrypter: encrypter),
@@ -414,8 +466,8 @@ class PassyData {
 
   Future<String> importAccount(
     String path, {
-    required Encrypter encrypter,
-    required Key key,
+    required enc.Encrypter encrypter,
+    required enc.Key key,
     required String encryptedPassword,
   }) async {
     String _tempPath = (await getTemporaryDirectory()).path +

@@ -17,28 +17,31 @@ class RemoveAccountScreen extends StatefulWidget {
 }
 
 class _RemoveAccountScreen extends State<RemoveAccountScreen> {
+  late FormattedTextParser formattedTextParser;
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     String _username = ModalRoute.of(context)!.settings.arguments as String;
     return ConfirmStringScaffold(
       title: Text(localizations.removeAccount),
       message: PassyPadding(Text.rich(
-        TextSpan(text: localizations.confirmRemoveAccount1, children: [
-          TextSpan(
-            text: '\'$_username\' ',
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-          ),
-          TextSpan(
-              text:
-                  '${localizations.confirmRemoveAccount2}.\n\n${localizations.confirmRemoveAccount3}'),
-          TextSpan(
-            text: localizations.confirmRemoveAccount4Highlighted,
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-          ),
-          const TextSpan(text: '.'),
-        ]),
+        formattedTextParser.parse(
+          text:
+              '${localizations.confirmRemoveAccountMsg}\n\n${localizations.thisActionIsIrreversible}',
+          placeholders: {
+            'u': TextSpan(
+              text: '\'$_username\'',
+              style: TextStyle(
+                  color: PassyTheme.of(context).highlightContentSecondaryColor),
+            ),
+          },
+        ),
         textAlign: TextAlign.center,
       )),
       labelText: localizations.confirmUsername,
@@ -47,9 +50,9 @@ class _RemoveAccountScreen extends State<RemoveAccountScreen> {
       onConfirmPressed: (context, value) {
         if (value != _username) {
           showSnackBar(
-              message: localizations.usernamesDoNotMatch,
-              icon: const Icon(Icons.error_outline_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.usernamesDoNotMatch,
+            icon: const Icon(Icons.error_outline_rounded),
+          );
           return;
         }
         Navigator.pop(context);

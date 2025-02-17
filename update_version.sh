@@ -1,4 +1,5 @@
 #! /bin/bash
+cd "$(dirname "$0")"
 
 export version=''
 
@@ -29,3 +30,7 @@ echo 'INFO:Changing version in `pubspec.yaml`.'
 sed -i 's/version: '$version'/version: '$newVersion'/' ./pubspec.yaml
 echo 'INFO:Changing version in AppStream metadata.'
 sed -i 's/version="v'$version'"/version="v'$newVersion'"/' ./linux_assets/com.glitterware.passy.appdata.xml
+echo 'INFO:Changing version in `passy.iss`.'
+sed -i 's/"'$version'"/"'$newVersion'"/' ./passy.iss
+echo 'INFO:Changing version in `snap/snapcraft.yaml`.'
+sed -i 's/version: '\'v$version\''/version: '\'v$newVersion\''/' ./snap/snapcraft.yaml

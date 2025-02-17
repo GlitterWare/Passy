@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:passy/main.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -40,14 +41,13 @@ class SplashScreen extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/images/github_icon.svg',
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                    PassyTheme.lightContentColor, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
               ),
             ),
             center: Text(localizations.download),
             right: const Icon(Icons.arrow_forward_ios_rounded),
-            onPressed: () =>
-                openUrl('https://github.com/GlitterWare/Passy/releases/latest'),
+            onPressed: () => openUrl('https://glitterware.github.io/Passy'),
           ),
         ),
       );
@@ -267,22 +267,23 @@ class SplashScreen extends StatelessWidget {
         if (isSnap()) {
           dynamic hasAccess = await _testNativeMessagingHostsInterfaceAccess();
           if (hasAccess != true) {
-            if (context.mounted) {
-              showSnackBar(
-                message: localizations.unableToConnectBrowserExtension,
-                icon: const Icon(Icons.extension_rounded,
-                    color: PassyTheme.lightContentColor),
-                duration: const Duration(seconds: 10),
-                action: SnackBarAction(
-                  textColor: PassyTheme.lightContentColor,
-                  label: localizations.details,
-                  onPressed: () => openUrl(
-                      'https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md#enabling-browser-extension-support'),
-                ),
-                textStyle: const TextStyle(color: PassyTheme.lightContentColor),
-                backgroundColor: const Color.fromRGBO(255, 82, 82, 1),
-              );
-            }
+            showSnackBar(
+              backgroundColor: const Color.fromRGBO(255, 82, 82, 1),
+              message: localizations.unableToConnectBrowserExtension,
+              icon: const Icon(Icons.extension_rounded,
+                  color: Color.fromRGBO(227, 242, 253, 1)),
+              duration: const Duration(seconds: 10),
+              action: SnackBarAction(
+                textColor: const Color.fromRGBO(227, 242, 253, 1),
+                label: localizations.details,
+                onPressed: () => openUrl(
+                    'https://github.com/GlitterWare/Passy/blob/dev/SNAP-STORE.md#enabling-browser-extension-support'),
+              ),
+              textStyle: const TextStyle(
+                color: Color.fromRGBO(227, 242, 253, 1),
+                backgroundColor: Color.fromRGBO(255, 82, 82, 1),
+              ),
+            );
             return;
           }
         }
@@ -297,6 +298,8 @@ class SplashScreen extends StatelessWidget {
       if (Platform.isWindows || Platform.isLinux) _copyExtensionFiles();
       data = await loadPassyData();
       loaded = true;
+      PassyAppTheme? appTheme = data.getAppTheme(data.info.value.lastUsername);
+      switchAppTheme(context, appTheme);
       if (data.noAccounts) {
         Navigator.pushReplacementNamed(context, AddAccountScreen.routeName);
         return;
@@ -349,8 +352,9 @@ class SplashScreen extends StatelessWidget {
                       children: [
                         Spacer(),
                         Expanded(
-                            child: PassyPadding(
-                                LinearProgressIndicator(color: Colors.purple))),
+                            child: PassyPadding(LinearProgressIndicator(
+                                backgroundColor: Colors.black,
+                                color: Colors.purple))),
                         Spacer(),
                       ],
                     )),

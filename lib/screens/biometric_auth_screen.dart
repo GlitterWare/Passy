@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locker/flutter_locker.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/bio_storage.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
@@ -34,8 +34,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
             data.loadedAccount!.passwordHash) {
           showSnackBar(
               message: localizations.incorrectPassword,
-              icon: const Icon(Icons.lock_rounded,
-                  color: PassyTheme.darkContentColor));
+              icon: const Icon(Icons.lock_rounded));
           return;
         }
         _bioData = BiometricStorageData(key: _username, password: _password);
@@ -49,8 +48,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
               .then((value) => UnlockScreen.shouldLockScreen = true);
           showSnackBar(
               message: localizations.couldNotAuthenticate,
-              icon: const Icon(Icons.fingerprint_rounded,
-                  color: PassyTheme.darkContentColor));
+              icon: const Icon(Icons.fingerprint_rounded));
           return;
         }
       } else {

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kdbx/kdbx.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
-import 'package:passy/screens/automatic_backup_screen.dart';
 import 'package:passy/screens/confirm_import_screen.dart';
 import 'package:passy/screens/confirm_kdbx_export_screen.dart';
 import 'package:passy/screens/export_and_import_screen.dart';
@@ -28,7 +28,6 @@ import 'screens/change_password_screen.dart';
 import 'screens/change_username_screen.dart';
 import 'screens/common.dart';
 import 'screens/confirm_restore_screen.dart';
-import 'screens/credentials_screen.dart';
 import 'screens/csv_import_screen.dart';
 import 'screens/csv_import_entries_screen.dart';
 import 'screens/remove_account_screen.dart';
@@ -61,55 +60,41 @@ import 'screens/payment_card_screen.dart';
 import 'screens/payment_cards_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/sync_details_screen.dart';
 import 'screens/synchronization_logs_screen.dart';
+import 'screens/theme_screen.dart';
 import 'screens/unlock_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-final ThemeData theme = ThemeData(
-  fontFamily: 'Roboto',
-  colorScheme: PassyTheme.theme.colorScheme,
-  snackBarTheme: PassyTheme.theme.snackBarTheme,
-  scaffoldBackgroundColor: PassyTheme.theme.scaffoldBackgroundColor,
-  inputDecorationTheme: PassyTheme.theme.inputDecorationTheme,
-  elevatedButtonTheme: PassyTheme.theme.elevatedButtonTheme,
-  textSelectionTheme: PassyTheme.theme.textSelectionTheme,
-);
+ThemeData _theme = PassyTheme.classicDark;
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    MediaKit.ensureInitialized();
+  } catch (e) {
+    // ignore: avoid_print
+    print('E:`MediaKit.ensureInitialized()` failed: $e');
+  }
   KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
-  runApp(const Passy());
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(PassyThemeWidget(theme: _theme, child: const Passy()));
 }
 
 @pragma('vm:entry-point')
 void autofillEntryPoint() {
   isAutofill = true;
-  runApp(MaterialApp(
-    title: 'Passy',
-    theme: theme,
-    navigatorKey: navigatorKey,
-    navigatorObservers: [
-      routeObserver,
-    ],
-    routes: {
-      AutofillSplashScreen.routeName: (context) => const AutofillSplashScreen(),
-      EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
-      LogScreen.routeName: (context) => const LogScreen(),
-      LoginScreen.routeName: (context) => const LoginScreen(),
-      NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
-      SearchScreen.routeName: (context) => const SearchScreen(),
-      UnlockScreen.routeName: (context) => const UnlockScreen(),
-    },
-    localizationsDelegates: const [
-      AppLocalizations.delegate, // Add this line
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    // LOCALIZATION TEST
-    //locale: const Locale('it'),
-    supportedLocales: supportedLocales,
-  ));
+  runApp(PassyThemeWidget(theme: _theme, child: const PassyAutofillApp()));
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -127,7 +112,7 @@ class Passy extends StatelessWidget {
     }
     return MaterialApp(
       title: 'Passy',
-      theme: theme,
+      theme: Theme.of(context),
       navigatorKey: navigatorKey,
       navigatorObservers: [
         routeObserver,
@@ -135,8 +120,6 @@ class Passy extends StatelessWidget {
       routes: {
         AddAccountScreen.routeName: (context) => const AddAccountScreen(),
         AddFileScreen.routeName: (context) => const AddFileScreen(),
-        AutomaticBackupScreen.routeName: (context) =>
-            const AutomaticBackupScreen(),
         BackupAndRestoreScreen.routeName: (context) =>
             const BackupAndRestoreScreen(),
         BiometricAuthScreen.routeName: (context) => const BiometricAuthScreen(),
@@ -150,7 +133,6 @@ class Passy extends StatelessWidget {
         ConfirmRestoreScreen.routeName: (context) =>
             const ConfirmRestoreScreen(),
         ConnectScreen.routeName: (context) => const ConnectScreen(),
-        CredentialsScreen.routeName: (context) => const CredentialsScreen(),
         CSVImportScreen.routeName: (context) => const CSVImportScreen(),
         CSVImportEntriesScreen.routeName: (context) =>
             const CSVImportEntriesScreen(),
@@ -194,8 +176,10 @@ class Passy extends StatelessWidget {
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         SetupScreen.routeName: (context) => const SetupScreen(),
         SplashScreen.routeName: (context) => const SplashScreen(),
+        SyncDetailsScreen.routeName: (context) => const SyncDetailsScreen(),
         SynchronizationLogsScreen.routeName: (context) =>
             const SynchronizationLogsScreen(),
+        ThemeScreen.routeName: (context) => const ThemeScreen(),
         UnlockScreen.routeName: (context) => const UnlockScreen(),
       },
       builder: (context, child) {
@@ -236,10 +220,46 @@ class Passy extends StatelessWidget {
   }
 }
 
+class PassyAutofillApp extends StatelessWidget {
+  const PassyAutofillApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Passy',
+      theme: Theme.of(context),
+      navigatorKey: navigatorKey,
+      navigatorObservers: [
+        routeObserver,
+      ],
+      routes: {
+        AutofillSplashScreen.routeName: (context) =>
+            const AutofillSplashScreen(),
+        EditPasswordScreen.routeName: (context) => const EditPasswordScreen(),
+        LogScreen.routeName: (context) => const LogScreen(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        NoAccountsScreen.routeName: (context) => const NoAccountsScreen(),
+        SearchScreen.routeName: (context) => const SearchScreen(),
+        UnlockScreen.routeName: (context) => const UnlockScreen(),
+      },
+      localizationsDelegates: const [
+        AppLocalizations.delegate, // Add this line
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      // LOCALIZATION TEST
+      //locale: const Locale('it'),
+      supportedLocales: supportedLocales,
+    );
+  }
+}
+
 const List<Locale> supportedLocales = [
   Locale('en'),
   Locale('it'),
   Locale('ru'),
   Locale('zh'),
   Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+  Locale('de'),
 ];

@@ -2,17 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart' as enc;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_secure_screen/flutter_secure_screen.dart';
-import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/bio_storage.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/key_derivation_info.dart';
 import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/passy_data/passy_search.dart';
 import 'package:passy/passy_flutter/common/common.dart';
+import 'package:passy/screens/autofill_splash_screen.dart';
 import 'package:passy/screens/remove_account_screen.dart';
 import 'package:passy/screens/search_screen.dart';
 import 'package:passy/common/common.dart';
@@ -41,7 +44,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> {
   static bool didRun = false;
-  Widget? _floatingActionButton;
+  bool initialized = false;
   String _password = '';
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
@@ -102,7 +105,9 @@ class _LoginScreen extends State<LoginScreen> {
   Widget _buildPasswords(
       String terms, List<String> tags, void Function() rebuild) {
     List<PasswordMeta> _found = PassySearch.searchPasswords(
-        passwords: data.loadedAccount!.passwordsMetadata.values, terms: terms);
+        passwords: data.loadedAccount!.passwordsMetadata.values,
+        terms: terms,
+        tags: tags);
     List<PwDataset> _dataSets = [];
     return PasswordButtonListView(
       topWidgets: [
@@ -119,12 +124,13 @@ class _LoginScreen extends State<LoginScreen> {
       ],
       passwords: _found,
       onPressed: (passwordMeta) async {
+        Navigator.pushNamed(context, AutofillSplashScreen.routeName);
         PasswordMeta password = PasswordMeta(
             key: passwordMeta.key,
             tags: passwordMeta.tags,
             nickname: '>>> ${passwordMeta.nickname} <<<<',
             username: passwordMeta.username,
-            website: passwordMeta.website);
+            websites: passwordMeta.websites);
         _found.remove(password);
         _found.insert(0, password);
         int max = _found.length < 5 ? _found.length : 5;
@@ -139,13 +145,20 @@ class _LoginScreen extends State<LoginScreen> {
           ));
         }
         await AutofillService().resultWithDatasets(_dataSets);
-        Navigator.pop(context);
       },
       shouldSort: true,
     );
   }
 
   void login() async {
+    if (!kReleaseMode) {
+      if (_username.startsWith('__gw__')) {
+        if (_password.isEmpty) {
+          String? password = PassyData.developmentAccountPasswords[_username];
+          if (password != null) _password = password;
+        }
+      }
+    }
     List<int>? _derivedPassword;
     bool _isPasswordWrong = false;
     switch (data.getKeyDerivationType(_username)) {
@@ -163,8 +176,7 @@ class _LoginScreen extends State<LoginScreen> {
         } catch (e, s) {
           showSnackBar(
             message: localizations.couldNotLogin,
-            icon: const Icon(Icons.lock_rounded,
-                color: PassyTheme.darkContentColor),
+            icon: const Icon(Icons.lock_rounded),
             action: SnackBarAction(
               label: localizations.details,
               onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -186,8 +198,7 @@ class _LoginScreen extends State<LoginScreen> {
     if (_isPasswordWrong) {
       showSnackBar(
         message: localizations.incorrectPassword,
-        icon:
-            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.lock_rounded),
       );
       setState(() {
         _password = '';
@@ -236,8 +247,7 @@ class _LoginScreen extends State<LoginScreen> {
     } catch (e, s) {
       showSnackBar(
         message: localizations.couldNotLogin,
-        icon:
-            const Icon(Icons.lock_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.lock_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -265,43 +275,22 @@ class _LoginScreen extends State<LoginScreen> {
   void initState() {
     super.initState();
     data.refreshAccounts();
-    if (!isAutofill) {
-      if (Platform.isAndroid) {
-        FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
-      }
-      _floatingActionButton =
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        FloatingActionButton(
-          foregroundColor: PassyTheme.lightContentColor,
-          backgroundColor: Colors.purple,
-          child: const Icon(Icons.settings_rounded),
-          tooltip: localizations.settings,
-          heroTag: null,
-          onPressed: () =>
-              Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
-        ),
-        if (!Platform.isAndroid && !Platform.isIOS)
-          Padding(
-            padding: EdgeInsets.only(left: PassyTheme.passyPadding.left),
-            child: FloatingActionButton(
-              foregroundColor: PassyTheme.lightContentColor,
-              backgroundColor: Colors.purple,
-              child: const Icon(Icons.extension_rounded),
-              tooltip: localizations.passyBrowserExtension,
-              heroTag: null,
-              onPressed: () => openUrl(
-                  'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
-            ),
-          ),
-      ]);
-    }
     if (didRun) return;
     didRun = true;
     _bioAuth();
+    if (_username.startsWith('__gw__')) login();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!initialized) {
+      if (!isAutofill) {
+        if (Platform.isAndroid) {
+          FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
+        }
+      }
+      initialized = true;
+    }
     updateBioAuthButton();
     List<String> usernamesSorted = data.usernames.toList();
     usernamesSorted.sort((a, b) => alphabeticalCompare(a, b));
@@ -312,6 +301,16 @@ class _LoginScreen extends State<LoginScreen> {
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    if (!kReleaseMode) {
+                      if (_username.startsWith('__gw__')) {
+                        data.removeAccount(_username).then((_) {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        });
+                        return;
+                      }
+                    }
                     Navigator.pushNamed(
                       context,
                       RemoveAccountScreen.routeName,
@@ -329,7 +328,32 @@ class _LoginScreen extends State<LoginScreen> {
         .toList();
 
     return Scaffold(
-      floatingActionButton: _floatingActionButton,
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        FloatingActionButton(
+          foregroundColor: PassyTheme.of(context).logoTextColor,
+          backgroundColor: PassyTheme.of(context).logoColor,
+          child: const Icon(Icons.settings_rounded),
+          tooltip: localizations.settings,
+          heroTag: null,
+          onPressed: () =>
+              Navigator.pushNamed(context, GlobalSettingsScreen.routeName),
+        ),
+        if (!Platform.isAndroid && !Platform.isIOS)
+          Padding(
+            padding:
+                EdgeInsets.only(left: PassyTheme.of(context).passyPadding.left),
+            child: FloatingActionButton(
+              foregroundColor: PassyTheme.of(context).logoTextColor,
+              backgroundColor: PassyTheme.of(context).logoColor,
+              child: const Icon(Icons.extension_rounded),
+              tooltip: localizations.passyBrowserExtension,
+              heroTag: null,
+              onPressed: () => openUrl(
+                  'https://github.com/GlitterWare/Passy-Browser-Extension/blob/main/DOWNLOADS.md'),
+            ),
+          ),
+      ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: CustomScrollView(
         slivers: [
@@ -352,8 +376,9 @@ class _LoginScreen extends State<LoginScreen> {
                                 if (!isAutofill)
                                   FloatingActionButton(
                                     foregroundColor:
-                                        PassyTheme.lightContentColor,
-                                    backgroundColor: Colors.purple,
+                                        PassyTheme.of(context).logoTextColor,
+                                    backgroundColor:
+                                        PassyTheme.of(context).logoColor,
                                     onPressed: () =>
                                         Navigator.pushReplacementNamed(context,
                                             AddAccountScreen.routeName),
@@ -375,6 +400,8 @@ class _LoginScreen extends State<LoginScreen> {
                                     },
                                     onChanged: (a) {
                                       setState(() => _username = a!);
+                                      switchAppTheme(
+                                          context, data.getAppTheme(_username));
                                     },
                                   ),
                                 ),

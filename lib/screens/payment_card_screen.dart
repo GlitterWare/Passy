@@ -45,8 +45,9 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
               TextButton(
                 child: Text(
                   localizations.cancel,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -80,10 +81,12 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
 
   Future<void> _load() async {
     List<String> newTags = await _account.paymentCardTags;
+    newTags.sort();
     if (mounted) {
       setState(() {
         _tags = newTags;
         _selected = _paymentCard!.tags.toList();
+        _selected.sort();
         for (String tag in _selected) {
           if (_tags.contains(tag)) {
             _tags.remove(tag);
@@ -105,6 +108,11 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         EntryStatus.alive;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () => _onEditPressed(_paymentCard!),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EntryScreenAppBar(
         entryType: EntryType.paymentCard,
         entryKey: _paymentCard!.key,
@@ -116,19 +124,15 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
           if (isFavorite) {
             await _account.removeFavoritePaymentCard(_paymentCard!.key);
             showSnackBar(
-                message: localizations.removedFromFavorites,
-                icon: const Icon(
-                  Icons.star_outline_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.removedFromFavorites,
+              icon: const Icon(Icons.star_outline_rounded),
+            );
           } else {
             await _account.addFavoritePaymentCard(_paymentCard!.key);
             showSnackBar(
-                message: localizations.addedToFavorites,
-                icon: const Icon(
-                  Icons.star_rounded,
-                  color: PassyTheme.darkContentColor,
-                ));
+              message: localizations.addedToFavorites,
+              icon: const Icon(Icons.star_rounded),
+            );
           }
           setState(() {});
         },
@@ -143,8 +147,8 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
         Center(
           child: Padding(
             padding: EdgeInsets.only(
-                top: PassyTheme.passyPadding.top / 2,
-                bottom: PassyTheme.passyPadding.bottom / 2),
+                top: PassyTheme.of(context).passyPadding.top / 2,
+                bottom: PassyTheme.of(context).passyPadding.bottom / 2),
             child: !_tagsLoaded
                 ? const CircularProgressIndicator()
                 : EntryTagList(
@@ -165,8 +169,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
                         Navigator.pop(context);
                         showSnackBar(
                           message: localizations.somethingWentWrong,
-                          icon: const Icon(Icons.error_outline_rounded,
-                              color: PassyTheme.darkContentColor),
+                          icon: const Icon(Icons.error_outline_rounded),
                           action: SnackBarAction(
                             label: localizations.details,
                             onPressed: () => Navigator.pushNamed(
@@ -251,6 +254,7 @@ class _PaymentCardScreen extends State<PaymentCardScreen> {
             title: localizations.additionalInfo,
             value: _paymentCard!.additionalInfo,
           )),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

@@ -12,7 +12,7 @@
 	<description>
 		<p>Store passwords, payment cards notes, ID cards and identities offline and safe, synchronized between all of your devices.</p>
 		<p>Features:</p>
-		<ul><li>Security - All your information is encrypted in AES and stored offline on your devices, providing highest-tier security.</li><li>Synchronization - Share data between separate devices within seconds.</li><li>Entry sharing – Send entries to your friends and family.</li><li>Biometrics - Quickly unlock the app using your fingerprint.</li><li>Multipurpose - Store passwords, payment cards, notes, id cards and identities, all in one place.</li><li>Autofill - Quickly fill fields in apps and websites without having to open the app.</li><li>Browser extension - Use autofill and add new entries on the fly right from your browser. (See https://github.com/GlitterWare/Passy-Browser-Extension)</li></ul>
+		<ul><li>Security - All your information is encrypted in AES and stored offline on your devices, providing highest-tier security.</li><li>Synchronization - Share data between separate devices within seconds.</li><li>2FA codes - Keep your 2FA codes safe and sound in offline storage.</li><li>Entry sharing – Send entries to your friends and family.</li><li>Biometrics - Quickly unlock the app using your fingerprint.</li><li>Multipurpose - Store passwords, payment cards, notes, id cards and identities, all in one place.</li><li>Autofill - Quickly fill fields in apps and websites without having to open the app.</li><li>Browser extension - Use autofill and add new entries on the fly right from your browser. (See https://github.com/GlitterWare/Passy-Browser-Extension)</li></ul>
 		<p>Official website: https://glitterware.github.io/Passy</p>
 	</description>
 	<launchable type="desktop-id">com.glitterware.passy.desktop</launchable>
@@ -60,7 +60,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
-		<release version="v1.8.0" date="2024-03-16">
+		<release version="v1.9.0" date="2025-02-10">
 		</release>
 	</releases>
 </component>

@@ -22,20 +22,19 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   bool _numbersEnabled = true;
   bool _symbolsEnabled = true;
   String _characterSet = _letters + _numbers + _symbols;
-
-  _StringGeneratorDialog() {
-    _generatePassword();
-  }
+  bool _shouldGenerate = false;
+  Future<void>? _generateLoopFuture;
 
   void _generatePassword() {
+    String newVal = '';
     int minSpecial;
     if (_numbersEnabled && _symbolsEnabled) {
       minSpecial = (_halfMinSpecial * _length).round();
       while (true) {
-        _value = PassyGen.generateString(_characterSet, _length);
+        newVal = PassyGen.generateString(_characterSet, _length);
         int numCount = 0;
         int symCount = 0;
-        for (String c in _value.characters) {
+        for (String c in newVal.characters) {
           if (_numbers.contains(c)) {
             numCount++;
             continue;
@@ -60,9 +59,9 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
         special = _symbols;
       }
       while (true) {
-        _value = PassyGen.generateString(_characterSet, _length);
+        newVal = PassyGen.generateString(_characterSet, _length);
         int specialCount = 0;
-        for (String c in _value.characters) {
+        for (String c in newVal.characters) {
           if (special.contains(c)) {
             specialCount++;
             continue;
@@ -71,8 +70,26 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
         if (specialCount >= minSpecial) break;
       }
     } else {
-      _value = PassyGen.generateString(_characterSet, _length);
-      return;
+      newVal = PassyGen.generateString(_characterSet, _length);
+    }
+    if (!mounted) return;
+    setState(() {
+      _value = newVal;
+    });
+  }
+
+  Future<void> _generateLoop() async {
+    while (true) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (!_shouldGenerate) {
+        if (_value.length != _length) {
+          _generatePassword();
+        }
+        continue;
+      }
+      _shouldGenerate = false;
+      _generatePassword();
+      if (!mounted) return;
     }
   }
 
@@ -86,7 +103,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
     setState(() {
       _numbersEnabled = value;
       _buildCharacterSet();
-      _generatePassword();
+      _shouldGenerate = true;
     });
   }
 
@@ -94,12 +111,19 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
     setState(() {
       _symbolsEnabled = value;
       _buildCharacterSet();
-      _generatePassword();
+      _shouldGenerate = true;
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    _generatePassword();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _generateLoopFuture ??= _generateLoop();
     return Dialog(
       shape: PassyTheme.dialogShape,
       child: ListView(
@@ -112,7 +136,6 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               child: Icon(Icons.numbers),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
               value: _numbersEnabled,
               onChanged: (value) => _setNumbersEnabled(value),
             ),
@@ -125,7 +148,6 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
               child: Icon(Icons.star),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
               value: _symbolsEnabled,
               onChanged: (value) => _setSymbolsEnabled(_symbolsEnabled = value),
             ),
@@ -133,9 +155,9 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
           )),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              PassyTheme.passyPadding.left,
-              PassyTheme.passyPadding.top,
-              PassyTheme.passyPadding.right,
+              PassyTheme.of(context).passyPadding.left,
+              PassyTheme.of(context).passyPadding.top,
+              PassyTheme.of(context).passyPadding.right,
               0,
             ),
             child: Text(
@@ -145,22 +167,20 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              PassyTheme.passyPadding.left,
+              PassyTheme.of(context).passyPadding.left,
               0,
-              PassyTheme.passyPadding.right,
+              PassyTheme.of(context).passyPadding.right,
               0,
             ),
             child: Slider(
               value: _length.toDouble(),
               onChanged: (value) => setState(() {
                 _length = value.toInt();
-                _generatePassword();
+                _shouldGenerate = true;
               }),
               min: 4.0,
               max: 200.0,
-              activeColor: Colors.cyan,
-              thumbColor: Colors.cyanAccent,
-              inactiveColor: PassyTheme.darkContentSecondaryColor,
+              inactiveColor: PassyTheme.of(context).contentSecondaryColor,
             ),
           ),
           PassyPadding(SelectableText(
@@ -184,7 +204,7 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
                 FloatingActionButton(
                   heroTag: null,
                   tooltip: localizations.generate,
-                  onPressed: () => setState(() => _generatePassword()),
+                  onPressed: () => setState(() => _shouldGenerate = true),
                   child: const Icon(Icons.refresh_rounded),
                 ),
               ),

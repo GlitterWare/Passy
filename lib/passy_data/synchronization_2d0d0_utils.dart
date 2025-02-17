@@ -14,12 +14,23 @@ import 'common.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'passy_entry.dart';
+import 'sync_entry_state.dart';
 
 class EntriesToSynchronize {
+  List<String> entriesToSend;
+  List<String> entriesToRetrieve;
+
+  EntriesToSynchronize({
+    required this.entriesToSend,
+    required this.entriesToRetrieve,
+  });
+}
+
+class TypedEntriesToSynchronize {
   Map<EntryType, List<String>> entriesToSend;
   Map<EntryType, List<String>> entriesToRetrieve;
 
-  EntriesToSynchronize({
+  TypedEntriesToSynchronize({
     required this.entriesToSend,
     required this.entriesToRetrieve,
   });
@@ -371,6 +382,38 @@ Map<EntryType, Map<String, EntryEvent>> getTypedEntryEvents(
 }
 
 EntriesToSynchronize findEntriesToSynchronize({
+  required Map<String, EntryEvent> localEntries,
+  required Map<String, EntryEvent> remoteEntries,
+}) {
+  List<String> entriesToSend = [];
+  List<String> entriesToRetrieve = [];
+  for (String key in localEntries.keys) {
+    if (remoteEntries.keys.contains(key)) {
+      if (!remoteEntries[key]!
+          .lastModified
+          .isBefore(localEntries[key]!.lastModified)) {
+        continue;
+      }
+    }
+    entriesToSend.add(key);
+  }
+  for (String key in remoteEntries.keys) {
+    if (localEntries.keys.contains(key)) {
+      if (!localEntries[key]!
+          .lastModified
+          .isBefore(remoteEntries[key]!.lastModified)) {
+        continue;
+      }
+    }
+    entriesToRetrieve.add(key);
+  }
+  return EntriesToSynchronize(
+    entriesToSend: entriesToSend,
+    entriesToRetrieve: entriesToRetrieve,
+  );
+}
+
+TypedEntriesToSynchronize findTypedEntriesToSynchronize({
   required Map<EntryType, Map<String, EntryEvent>> localEntries,
   required Map<EntryType, Map<String, EntryEvent>> remoteEntries,
 }) {
@@ -429,7 +472,7 @@ EntriesToSynchronize findEntriesToSynchronize({
       entriesToSend[entryType] = entriesToSendList;
     }
   }
-  return EntriesToSynchronize(
+  return TypedEntriesToSynchronize(
     entriesToSend: entriesToSend,
     entriesToRetrieve: entriesToRetrieve,
   );
@@ -439,15 +482,14 @@ Future<PassyEntry?> processExchangeEntry({
   required EntryType entryType,
   required ExchangeEntry entry,
   required HistoryFile history,
-  void Function()? onRemoveEntry,
-  void Function()? onSetEntry,
+  void Function(String key, SyncEntryState state)? onEntryChanged,
 }) async {
   EntryEvent? historyEntry = entry.historyEntry;
   if (historyEntry == null) {
     throw {'error': 'History entry not provided'};
   }
   if (historyEntry.status == EntryStatus.removed) {
-    onRemoveEntry?.call();
+    onEntryChanged?.call(historyEntry.key, SyncEntryState.removed);
     history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
     return null;
   }
@@ -455,8 +497,13 @@ Future<PassyEntry?> processExchangeEntry({
   if (passyEntry == null) {
     throw {'error': 'Passy entry not provided'};
   }
-  history.value.getEvents(entryType)[historyEntry.key] = historyEntry;
-  onSetEntry?.call();
+  Map<String, EntryEvent> events = history.value.getEvents(entryType);
+  if (events.keys.contains(historyEntry.key)) {
+    onEntryChanged?.call(historyEntry.key, SyncEntryState.modified);
+  } else {
+    onEntryChanged?.call(historyEntry.key, SyncEntryState.added);
+  }
+  events[historyEntry.key] = historyEntry;
   return passyEntry;
 }
 
@@ -465,8 +512,7 @@ Future<void> processExchangeEntries({
   required List<ExchangeEntry> entries,
   required PassyEntriesEncryptedCSVFile entriesFile,
   required HistoryFile history,
-  void Function()? onRemoveEntry,
-  void Function()? onSetEntry,
+  void Function(String key, SyncEntryState state)? onEntryChanged,
 }) async {
   Map<String, PassyEntry?> passyEntries = {};
   for (ExchangeEntry entry in entries) {
@@ -474,8 +520,7 @@ Future<void> processExchangeEntries({
       entryType: entryType,
       entry: entry,
       history: history,
-      onRemoveEntry: onRemoveEntry,
-      onSetEntry: onSetEntry,
+      onEntryChanged: onEntryChanged,
     );
     passyEntries[entry.key] = passyEntry;
   }
@@ -507,8 +552,8 @@ Future<void> processTypedExchangeEntries({
   required Map<EntryType, List<ExchangeEntry>> entries,
   required FullPassyEntriesFileCollection passyEntries,
   required HistoryFile history,
-  void Function()? onRemoveEntry,
-  void Function()? onSetEntry,
+  void Function(EntryType type, String key, SyncEntryState state)?
+      onEntryChanged,
 }) async {
   await history.reload();
   try {
@@ -521,8 +566,9 @@ Future<void> processTypedExchangeEntries({
         entries: exchangeEntries,
         entriesFile: passyEntries.getEntries(entryType),
         history: history,
-        onRemoveEntry: onRemoveEntry,
-        onSetEntry: onSetEntry,
+        onEntryChanged: onEntryChanged == null
+            ? null
+            : (key, state) => onEntryChanged(entryType, key, state),
       );
     }
     await history.save();
@@ -550,9 +596,10 @@ String generateAuth({
   }
 }
 
-void verifyAuth(
+DateTime verifyAuth(
   dynamic auth, {
   String lastAuth = '',
+  required DateTime lastDate,
   required Encrypter encrypter,
   required Encrypter usernameEncrypter,
   bool withIV = false,
@@ -639,10 +686,8 @@ void verifyAuth(
       },
     };
   }
-  if (DateTime.now()
-      .toUtc()
-      .subtract(const Duration(seconds: 5))
-      .isAfter(dateDecoded)) {
+  dateDecoded = dateDecoded.toUtc();
+  if (!dateDecoded.isAfter(lastDate)) {
     throw {
       'error': {
         'type': 'Stale auth',
@@ -652,4 +697,5 @@ void verifyAuth(
       },
     };
   }
+  return dateDecoded;
 }

@@ -12,9 +12,8 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/payment_card.dart';
-import 'package:passy/passy_flutter/search_entry_data.dart';
+import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
-import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/screens/id_card_screen.dart';
 import 'package:passy/screens/identity_screen.dart';
 import 'package:passy/screens/login_screen.dart';
@@ -24,9 +23,9 @@ import 'package:passy/screens/payment_card_screen.dart';
 import 'package:passy/screens/search_screen.dart';
 
 import 'package:passy/common/common.dart';
-import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 
+import 'files_screen.dart';
 import 'key_derivation_screen.dart';
 import 'payment_cards_screen.dart';
 import 'passwords_screen.dart';
@@ -48,7 +47,8 @@ class _MainScreen extends State<MainScreen>
     with SingleTickerProviderStateMixin, RouteAware {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final LoadedAccount _account = data.loadedAccount!;
-  String _lastSyncDate = 'NaN';
+  String? _lastSyncDate;
+  late FormattedTextParser formattedTextParser;
 
   Widget _searchBuilder(
       String terms, List<String> tags, void Function() rebuild) {
@@ -217,11 +217,14 @@ class _MainScreen extends State<MainScreen>
               children: [
                 const Spacer(flex: 7),
                 Text.rich(
-                  TextSpan(text: '${localizations.noFavorites}.', children: [
-                    TextSpan(text: '\n\n${localizations.noFavorites1}'),
-                    const WidgetSpan(child: Icon(Icons.star_outline_rounded)),
-                    TextSpan(text: ' ${localizations.noFavorites2}.'),
-                  ]),
+                  formattedTextParser.parse(
+                    text:
+                        '${localizations.noFavorites}\n\n${localizations.noFavoritesMsg}',
+                    placeholders: {
+                      'f': const WidgetSpan(
+                          child: Icon(Icons.star_outline_rounded))
+                    },
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const Spacer(flex: 7),
@@ -393,8 +396,9 @@ class _MainScreen extends State<MainScreen>
                 onPressed: () => Navigator.pop(ctx),
                 child: Text(
                   localizations.stay,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 )),
             TextButton(
                 onPressed: () {
@@ -405,8 +409,9 @@ class _MainScreen extends State<MainScreen>
                 },
                 child: Text(
                   localizations.logOut,
-                  style: const TextStyle(
-                      color: PassyTheme.lightContentSecondaryColor),
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
                 )),
           ],
           content: Text(localizations.areYouSureYouWantToLogOutQuestion),
@@ -430,6 +435,9 @@ class _MainScreen extends State<MainScreen>
   void dispose() {
     super.dispose();
     routeObserver.unsubscribe(this);
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      if (trayEnabled) toggleTray(context);
+    }
   }
 
   void _mainLoop() {
@@ -448,9 +456,14 @@ class _MainScreen extends State<MainScreen>
   @override
   void initState() {
     super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
     if (Platform.isAndroid) {
       FlutterSecureScreen.singleton
           .setAndroidScreenSecure(_account.protectScreen);
+    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      if (_account.minimizeToTray) {
+        if (!trayEnabled) toggleTray(context);
+      }
     }
     DateTime? lastSyncDate = _account.lastSyncDate?.toLocal();
     if (lastSyncDate != null) {
@@ -480,39 +493,6 @@ class _MainScreen extends State<MainScreen>
                   builder: _favoritesSearchBuilder,
                 ));
           }
-        },
-      )),
-      PassyPadding(ThreeWidgetButton(
-        left: const Padding(
-          padding: EdgeInsets.only(right: 30),
-          child: Icon(CupertinoIcons.globe),
-        ),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: Text(localizations.searchAllEntries),
-        onPressed: () => Navigator.pushNamed(context, SearchScreen.routeName,
-            arguments: SearchScreenArgs(
-              entryType: null,
-              title: localizations.allEntries,
-              builder: _searchBuilder,
-            )),
-      )),
-      PassyPadding(ThreeWidgetButton(
-        left: const Padding(
-          padding: EdgeInsets.only(right: 30),
-          child: Icon(Icons.qr_code_scanner),
-        ),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        center: Text(localizations.synchronize),
-        onPressed: () {
-          if (!_account.isRSAKeypairLoaded) {
-            showSnackBar(
-              message: localizations.settingUpSynchronization,
-              icon: const Icon(CupertinoIcons.clock_solid,
-                  color: PassyTheme.darkContentColor),
-            );
-            return;
-          }
-          showSynchronizationDialog(context);
         },
       )),
       PassyPadding(ThreeWidgetButton(
@@ -564,15 +544,14 @@ class _MainScreen extends State<MainScreen>
             Navigator.pushNamed(context, IdentitiesScreen.routeName),
       )),
       PassyPadding(ThreeWidgetButton(
-        center: Text(localizations.files + ' (Coming soon)'),
-        left: const Padding(
-          padding: EdgeInsets.only(right: 30),
-          child: Icon(Icons.description_outlined),
-        ),
-        right: const Icon(Icons.arrow_forward_ios_rounded),
-        //onPressed: () => Navigator.pushNamed(context, FilesScreen.routeName)
-        //    .then((value) => setState(() {})),
-      )),
+          center: Text(localizations.files),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.description_outlined),
+          ),
+          right: const Icon(Icons.arrow_forward_ios_rounded),
+          onPressed: () =>
+              Navigator.pushNamed(context, FilesScreen.routeName))),
       if ((_account.keyDerivationType == KeyDerivationType.none) &&
           recommendKeyDerivation)
         PassyPadding(ThreeWidgetButton(
@@ -609,6 +588,22 @@ class _MainScreen extends State<MainScreen>
           ),
           actions: [
             IconButton(
+              splashRadius: PassyTheme.appBarButtonSplashRadius,
+              padding: PassyTheme.appBarButtonPadding,
+              tooltip: localizations.synchronize,
+              onPressed: () {
+                if (!_account.isRSAKeypairLoaded) {
+                  showSnackBar(
+                    message: localizations.settingUpSynchronization,
+                    icon: const Icon(CupertinoIcons.clock_solid),
+                  );
+                  return;
+                }
+                showSynchronizationDialog(context);
+              },
+              icon: const Icon(Icons.sync_rounded),
+            ),
+            IconButton(
               padding: PassyTheme.appBarButtonPadding,
               tooltip: localizations.search,
               onPressed: () =>
@@ -620,23 +615,6 @@ class _MainScreen extends State<MainScreen>
                       )),
               icon: const Icon(Icons.search_rounded),
               splashRadius: PassyTheme.appBarButtonSplashRadius,
-            ),
-            IconButton(
-              splashRadius: PassyTheme.appBarButtonSplashRadius,
-              padding: PassyTheme.appBarButtonPadding,
-              tooltip: localizations.synchronize,
-              onPressed: () {
-                if (!_account.isRSAKeypairLoaded) {
-                  showSnackBar(
-                    message: localizations.settingUpSynchronization,
-                    icon: const Icon(CupertinoIcons.clock_solid,
-                        color: PassyTheme.darkContentColor),
-                  );
-                  return;
-                }
-                showSynchronizationDialog(context);
-              },
-              icon: const Icon(Icons.sync_rounded),
             ),
             IconButton(
               padding: PassyTheme.appBarButtonPadding,
@@ -663,7 +641,6 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[0],
                           _screenButtons[3],
                           _screenButtons[6],
-                          if (_screenButtons.length == 10) _screenButtons[9],
                         ],
                       )),
                       Expanded(
@@ -671,7 +648,7 @@ class _MainScreen extends State<MainScreen>
                         children: [
                           _screenButtons[1],
                           _screenButtons[4],
-                          _screenButtons[7],
+                          if (_screenButtons.length == 8) _screenButtons[7],
                         ],
                       )),
                       Expanded(
@@ -679,7 +656,6 @@ class _MainScreen extends State<MainScreen>
                         children: [
                           _screenButtons[2],
                           _screenButtons[5],
-                          _screenButtons[8],
                         ],
                       ))
                     ]);
@@ -692,7 +668,6 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[2],
                           _screenButtons[4],
                           _screenButtons[6],
-                          _screenButtons[8],
                         ]),
                       ),
                       Expanded(
@@ -701,8 +676,7 @@ class _MainScreen extends State<MainScreen>
                           _screenButtons[1],
                           _screenButtons[3],
                           _screenButtons[5],
-                          _screenButtons[7],
-                          if (_screenButtons.length == 10) _screenButtons[9],
+                          if (_screenButtons.length == 8) _screenButtons[7],
                         ],
                       )),
                     ]);
@@ -711,12 +685,14 @@ class _MainScreen extends State<MainScreen>
                 },
               ),
             ),
-            PassyPadding(Text(
-              '${localizations.lastSynchronization}: $_lastSyncDate',
-              textAlign: TextAlign.center,
-              style:
-                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
-            )),
+            if (_lastSyncDate != null)
+              PassyPadding(Text(
+                '${localizations.lastSynchronization}: $_lastSyncDate',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor),
+              )),
           ],
         ),
       ),

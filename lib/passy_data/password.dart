@@ -15,14 +15,14 @@ class PasswordMeta extends EntryMeta {
   final List<String> tags;
   final String nickname;
   final String username;
-  String website;
+  List<String> websites;
 
   PasswordMeta(
       {required String key,
       required this.tags,
       required this.nickname,
       required this.username,
-      required this.website})
+      required this.websites})
       : super(key);
 
   @override
@@ -31,7 +31,7 @@ class PasswordMeta extends EntryMeta {
         'tags': tags,
         'nickname': nickname,
         'username': username,
-        'website': website,
+        'website': websites.join('\n'),
       };
 }
 
@@ -45,7 +45,7 @@ class Password extends PassyEntry<Password> {
   String email;
   String password;
   TFA? tfa;
-  String website;
+  List<String> websites;
   List<String> attachments;
 
   Password({
@@ -59,10 +59,11 @@ class Password extends PassyEntry<Password> {
     this.email = '',
     this.password = '',
     this.tfa,
-    this.website = '',
+    List<String>? websites,
     List<String>? attachments,
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
+        websites = websites ?? [],
         attachments = attachments ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
 
@@ -72,7 +73,7 @@ class Password extends PassyEntry<Password> {
       tags: tags.toList(),
       nickname: nickname,
       username: username,
-      website: website);
+      websites: websites);
 
   Password.fromJson(Map<String, dynamic> json)
       : customFields = (json['customFields'] as List?)
@@ -87,7 +88,7 @@ class Password extends PassyEntry<Password> {
         email = json['email'] ?? '',
         password = json['password'] ?? '',
         tfa = json['tfa'] != null ? TFA.fromJson(json['tfa']) : null,
-        website = json['website'] ?? '',
+        websites = (json['website'] as String?)?.split('\n') ?? [],
         attachments = json['attachments'] == null
             ? []
             : (json['attachments'] as List<dynamic>)
@@ -108,7 +109,7 @@ class Password extends PassyEntry<Password> {
         email = csv[7] ?? '',
         password = csv[8] ?? '',
         tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9]) : null,
-        website = csv[10] ?? '',
+        websites = (csv[10] as String?)?.split('\n') ?? [],
         attachments =
             (csv[11] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
@@ -133,7 +134,7 @@ class Password extends PassyEntry<Password> {
         'email': email,
         'password': password,
         'tfa': tfa?.toJson(),
-        'website': website,
+        'website': websites.join('\n'),
         'attachments': attachments,
       };
 
@@ -149,21 +150,31 @@ class Password extends PassyEntry<Password> {
         email,
         password,
         tfa?.toCSV() ?? [],
-        website,
+        websites.join('\n'),
         attachments,
       ];
 
   @override
   PassyKdbxEntry toKdbx() {
+    List<CustomField> websiteFields = [];
+    if (websites.length > 1) {
+      for (int i = 1; i != websites.length; i++) {
+        websiteFields.add(CustomField(
+          title: 'Website ${i + 1}',
+          value: websites[i],
+        ));
+      }
+    }
     return PassyKdbxEntry(
       title: nickname,
       username: username.isEmpty ? email : username,
       password: password,
-      url: website,
+      url: websites[0],
       otp: tfa?.secret,
       customFields: [
         if (username.isNotEmpty && email.isNotEmpty)
           CustomField(title: 'Email', value: email),
+        ...websiteFields,
         ...customFields,
         if (tfa != null)
           CustomField(

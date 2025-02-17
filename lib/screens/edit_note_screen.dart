@@ -6,6 +6,7 @@ import 'package:passy/passy_flutter/widgets/widgets.dart';
 import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'common.dart';
 import 'note_screen.dart';
 import 'notes_screen.dart';
 import 'splash_screen.dart';
@@ -30,6 +31,22 @@ class _EditNoteScreen extends State<EditNoteScreen> {
   bool _isMarkdown = false;
   List<String> _attachments = [];
 
+  void _onSave() async {
+    final LoadedAccount _account = data.loadedAccount!;
+    Note _noteArgs = Note(
+      key: _key,
+      title: _title,
+      note: _note,
+      isMarkdown: _isMarkdown,
+      attachments: _attachments,
+    );
+    Navigator.pushNamed(context, SplashScreen.routeName);
+    await _account.setNote(_noteArgs);
+    Navigator.popUntil(context, (r) => r.settings.name == MainScreen.routeName);
+    Navigator.pushNamed(context, NotesScreen.routeName);
+    Navigator.pushNamed(context, NoteScreen.routeName, arguments: _noteArgs);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded) {
@@ -47,35 +64,22 @@ class _EditNoteScreen extends State<EditNoteScreen> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: _onSave,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: EditScreenAppBar(
         title: localizations.note.toLowerCase(),
         isNew: _isNew,
-        onSave: () async {
-          final LoadedAccount _account = data.loadedAccount!;
-          Note _noteArgs = Note(
-            key: _key,
-            title: _title,
-            note: _note,
-            isMarkdown: _isMarkdown,
-            attachments: _attachments,
-          );
-          Navigator.pushNamed(context, SplashScreen.routeName);
-          await _account.setNote(_noteArgs);
-          Navigator.popUntil(
-              context, (r) => r.settings.name == MainScreen.routeName);
-          Navigator.pushNamed(context, NotesScreen.routeName);
-          Navigator.pushNamed(context, NoteScreen.routeName,
-              arguments: _noteArgs);
-        },
+        onSave: _onSave,
       ),
       body: ListView(children: [
-        /*
         AttachmentsEditor(
           files: _attachments,
           onFileAdded: (key) => setState(() => _attachments.add(key)),
           onFileRemoved: (key) => setState(() => _attachments.remove(key)),
         ),
-        */
         PassyPadding(ThreeWidgetButton(
           center: Text(localizations.enableMarkdown),
           left: Padding(
@@ -83,8 +87,8 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             child: SvgPicture.asset(
               'assets/images/markdown-svgrepo-com.svg',
               width: 26,
-              colorFilter: const ColorFilter.mode(
-                  PassyTheme.lightContentColor, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                  PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
             ),
           ),
           right: Switch(
@@ -107,16 +111,18 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             labelText: localizations.note,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide:
-                  const BorderSide(color: PassyTheme.darkContentSecondaryColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).contentSecondaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
-              borderSide: const BorderSide(color: PassyTheme.lightContentColor),
+              borderSide: BorderSide(
+                  color: PassyTheme.of(context).highlightContentColor),
             ),
           ),
           onChanged: (value) => setState(() => _note = value),
@@ -124,17 +130,18 @@ class _EditNoteScreen extends State<EditNoteScreen> {
         if (_isMarkdown)
           PassyPadding(Text(
             localizations.markdownPreview,
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            style: TextStyle(
+                color: PassyTheme.of(context).highlightContentSecondaryColor),
           )),
         if (_isMarkdown)
           Padding(
               padding: EdgeInsets.fromLTRB(
                   20,
-                  PassyTheme.passyPadding.top,
-                  PassyTheme.passyPadding.right,
-                  PassyTheme.passyPadding.bottom),
+                  PassyTheme.of(context).passyPadding.top,
+                  PassyTheme.of(context).passyPadding.right,
+                  PassyTheme.of(context).passyPadding.bottom),
               child: PassyMarkdownBody(data: _note)),
+        const SizedBox(height: floatingActionButtonPadding),
       ]),
     );
   }

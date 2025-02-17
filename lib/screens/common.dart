@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:camera/camera.dart';
@@ -16,15 +15,21 @@ import 'package:passy/passy_data/id_card.dart';
 import 'package:passy/passy_data/identity.dart';
 import 'package:passy/passy_data/note.dart';
 import 'package:passy/passy_data/password.dart';
+import 'package:passy/passy_data/passy_app_theme.dart';
+import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/passy_data/screen.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
+import 'package:passy/screens/files_screen.dart';
 import 'package:passy/screens/id_cards_screen.dart';
 import 'package:passy/screens/identities_screen.dart';
 import 'package:passy/screens/notes_screen.dart';
 import 'package:passy/screens/payment_cards_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
+import 'package:system_tray/system_tray.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:uuid/uuid.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:zxing2/qrcode.dart';
 
 import 'connect_screen.dart';
@@ -52,6 +57,8 @@ const screenToRouteName = {
   Screen.idCards: IDCardsScreen.routeName,
   Screen.identities: IdentitiesScreen.routeName,
 };
+
+const double floatingActionButtonPadding = 72.0;
 
 String entryTypeToEntriesRouteName(EntryType entryType) {
   switch (entryType) {
@@ -127,21 +134,20 @@ Future<String?> backupAccount(
       fileName: _fileName,
     );
     showSnackBar(
-        message: localizations.backupSaved,
-        icon:
-            const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor));
+      message: localizations.backupSaved,
+      icon: const Icon(Icons.save_rounded),
+    );
     return _buDir;
   } catch (e, s) {
     if (e is FileSystemException) {
       showSnackBar(
-          message: localizations.accessDeniedTryAnotherFolder,
-          icon: const Icon(Icons.save_rounded,
-              color: PassyTheme.darkContentColor));
+        message: localizations.accessDeniedTryAnotherFolder,
+        icon: const Icon(Icons.save_rounded),
+      );
     } else {
       showSnackBar(
         message: localizations.couldNotBackup,
-        icon:
-            const Icon(Icons.save_rounded, color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.save_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
@@ -157,34 +163,35 @@ Future<String?> backupAccount(
 // Color
 imglib.Image imageFromBGRA8888(CameraImage image) {
   return imglib.Image.fromBytes(
-    image.width,
-    image.height,
-    image.planes[0].bytes,
-    format: imglib.Format.bgra,
+    width: image.width,
+    height: image.height,
+    bytes: image.planes[0].bytes.buffer,
+    order: imglib.ChannelOrder.bgra,
   );
 }
 
 // CameraImage YUV420_888 -> PNG -> Image (compresion:0, filter: none)
 // Black
 imglib.Image imageFromYUV420(CameraImage image) {
-  var img = imglib.Image(image.width, image.height); // Create Image buffer
-
-  Plane plane = image.planes[0];
-  const int shift = (0xFF << 24);
-
-  // Fill image buffer with plane[0] from YUV420_888
-  for (int x = 0; x < image.width; x++) {
-    for (int planeOffset = 0;
-        planeOffset < image.height * image.width;
-        planeOffset += image.width) {
-      final pixelColor = plane.bytes[planeOffset + x];
-      // color: 0x FF  FF  FF  FF
-      //           A   B   G   R
-      // Calculate pixel color
-      var newVal = shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
-
-      img.data[planeOffset + x] = newVal;
-    }
+  final uvRowStride = image.planes[1].bytesPerRow;
+  final uvPixelStride = image.planes[1].bytesPerPixel ?? 0;
+  final img = imglib.Image(width: image.width, height: image.height);
+  for (final p in img) {
+    final x = p.x;
+    final y = p.y;
+    final uvIndex =
+        uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+    final index = y * uvRowStride +
+        x; // Use the row stride instead of the image width as some devices pad the image data, and in those cases the image width != bytesPerRow. Using width will give you a distored image.
+    final yp = image.planes[0].bytes[index];
+    final up = image.planes[1].bytes[uvIndex];
+    final vp = image.planes[2].bytes[uvIndex];
+    p.r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255).toInt();
+    p.g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+        .round()
+        .clamp(0, 255)
+        .toInt();
+    p.b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255).toInt();
   }
 
   return img;
@@ -213,7 +220,13 @@ imglib.Image? imageFromCameraImage(CameraImage image) {
 Result? qrResultFromImage(imglib.Image image) {
   try {
     LuminanceSource _src = RGBLuminanceSource(
-        image.width, image.height, Int32List.fromList(image.data));
+        image.width,
+        image.height,
+        image
+            .convert(numChannels: 4)
+            .getBytes(order: imglib.ChannelOrder.abgr)
+            .buffer
+            .asInt32List());
     BinaryBitmap _bitmap = BinaryBitmap(HybridBinarizer(_src));
     QRCodeReader _reader = QRCodeReader();
     Result _result = _reader.decode(_bitmap);
@@ -236,7 +249,10 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showSnackBar({
   ScaffoldMessenger.of(context).clearSnackBars();
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Row(children: [
-      icon,
+      IconTheme(
+          data: IconThemeData(
+              color: PassyTheme.of(context).highlightContentTextColor),
+          child: icon),
       const SizedBox(width: 20),
       Expanded(
           child: Text(
@@ -273,9 +289,9 @@ List<PopupMenuEntry> idCardPopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIDCard(idCardMeta.key)!.idNumber));
         showSnackBar(
-            message: localizations.idNumber,
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.idNumber,
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
     if (idCardMeta.name != '')
@@ -285,9 +301,9 @@ List<PopupMenuEntry> idCardPopupMenuBuilder(
         onTap: () {
           Clipboard.setData(ClipboardData(text: idCardMeta.name));
           showSnackBar(
-              message: localizations.name,
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.name,
+            icon: const Icon(Icons.copy_rounded),
+          );
         },
       ),
   ];
@@ -315,9 +331,9 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
         }
         Clipboard.setData(ClipboardData(text: _name));
         showSnackBar(
-            message: localizations.name,
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.name,
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
     getIconedPopupMenuItem(
@@ -327,9 +343,9 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getIdentity(identityMeta.key)!.email));
         showSnackBar(
-            message: localizations.email,
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.email,
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
     if (identityMeta.firstAddressLine != '')
@@ -339,9 +355,9 @@ List<PopupMenuEntry> identityPopupMenuBuilder(
         onTap: () {
           Clipboard.setData(ClipboardData(text: identityMeta.firstAddressLine));
           showSnackBar(
-              message: localizations.firstAddresssLine,
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.firstAddresssLine,
+            icon: const Icon(Icons.copy_rounded),
+          );
         },
       ),
   ];
@@ -357,9 +373,9 @@ List<PopupMenuEntry> notePopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getNote(identityMeta.key)!.note));
         showSnackBar(
-            message: localizations.copied,
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.copied,
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
   ];
@@ -377,9 +393,9 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
               text:
                   data.loadedAccount!.getPassword(passwordMeta.key)!.username));
           showSnackBar(
-              message: localizations.username,
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.username,
+            icon: const Icon(Icons.copy_rounded),
+          );
         },
       ),
     getIconedPopupMenuItem(
@@ -389,9 +405,9 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.email));
         showSnackBar(
-            message: localizations.email,
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.email,
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
     getIconedPopupMenuItem(
@@ -401,26 +417,26 @@ List<PopupMenuEntry> passwordPopupMenuBuilder(
         Clipboard.setData(ClipboardData(
             text: data.loadedAccount!.getPassword(passwordMeta.key)!.password));
         showSnackBar(
-            message: localizations.password,
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: localizations.password,
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
-    if (passwordMeta.website != '')
-      getIconedPopupMenuItem(
-        content: Text(localizations.visit),
-        icon: const Icon(Icons.open_in_browser_outlined),
-        onTap: () {
-          String _url =
-              data.loadedAccount!.getPassword(passwordMeta.key)!.website;
-          if (!_url.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
-            _url = 'http://' + _url;
-          }
-          try {
-            openUrl(_url);
-          } catch (_) {}
-        },
-      ),
+    if (passwordMeta.websites.firstOrNull != '')
+      for (String website in passwordMeta.websites.sublist(0,
+          passwordMeta.websites.length < 5 ? passwordMeta.websites.length : 5))
+        getIconedPopupMenuItem(
+          content: Text(website),
+          icon: const Icon(Icons.open_in_browser_outlined),
+          onTap: () {
+            if (!website.contains(RegExp('http:\\/\\/|https:\\/\\/'))) {
+              website = 'http://' + website;
+            }
+            try {
+              openUrl(website);
+            } catch (_) {}
+          },
+        ),
   ];
 }
 
@@ -437,9 +453,9 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
                   .getPaymentCard(paymentCardMeta.key)!
                   .cardNumber));
           showSnackBar(
-              message: localizations.cardNumber,
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.cardNumber,
+            icon: const Icon(Icons.copy_rounded),
+          );
         },
       ),
     if (paymentCardMeta.cardholderName != '')
@@ -450,9 +466,9 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
           Clipboard.setData(
               ClipboardData(text: paymentCardMeta.cardholderName));
           showSnackBar(
-              message: localizations.cardHolderName,
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.cardHolderName,
+            icon: const Icon(Icons.copy_rounded),
+          );
         },
       ),
     if (paymentCardMeta.exp != '')
@@ -462,9 +478,9 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
         onTap: () {
           Clipboard.setData(ClipboardData(text: paymentCardMeta.exp));
           showSnackBar(
-              message: localizations.expirationDate,
-              icon: const Icon(Icons.copy_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.expirationDate,
+            icon: const Icon(Icons.copy_rounded),
+          );
         },
       ),
     getIconedPopupMenuItem(
@@ -475,9 +491,9 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
             text:
                 data.loadedAccount!.getPaymentCard(paymentCardMeta.key)!.cvv));
         showSnackBar(
-            message: 'CVV',
-            icon: const Icon(Icons.copy_rounded,
-                color: PassyTheme.darkContentColor));
+          message: 'CVV',
+          icon: const Icon(Icons.copy_rounded),
+        );
       },
     ),
   ];
@@ -486,26 +502,111 @@ List<PopupMenuEntry> paymentCardPopupMenuBuilder(
 List<PopupMenuEntry> filePopupMenuBuilder(
     BuildContext context, FileEntry fileEntry,
     {Future<void> Function()? onChanged}) {
+  List<String> originalPathSplit = fileEntry.path.split('/');
+  originalPathSplit.removeLast();
+  String originalPath = originalPathSplit.join('/') + '/';
   return [
     if (fileEntry.type != FileEntryType.folder)
       getIconedPopupMenuItem(
-        content: Text(localizations.rename),
+        content: Text(localizations.edit),
         icon: const Icon(Icons.edit_outlined),
         onTap: () async {
-          String? result = await showDialog(
+          EditFileDialogResponse? result = await showDialog(
               context: context,
-              builder: (context) => RenameFileDialog(name: fileEntry.name));
+              builder: (context) =>
+                  EditFileDialog(name: fileEntry.name, type: fileEntry.type));
           if (result == null) return;
+          PassyFileType? type = passyFileTypeFromFileEntryType(result.type);
           Navigator.pushNamed(context, SplashScreen.routeName);
           await Future.delayed(const Duration(milliseconds: 200));
-          await data.loadedAccount!.renameFile(fileEntry.key, name: result);
+          if (result.name != fileEntry.name) {
+            try {
+              await data.loadedAccount!
+                  .renameFile(fileEntry.key, name: result.name);
+            } catch (e, s) {
+              showSnackBar(
+                message: localizations.somethingWentWrong,
+                icon: const Icon(Icons.error_outline_rounded),
+                action: SnackBarAction(
+                  label: localizations.details,
+                  onPressed: () => Navigator.pushNamed(
+                      navigatorKey.currentContext!, LogScreen.routeName,
+                      arguments: e.toString() + '\n' + s.toString()),
+                ),
+              );
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              return;
+            }
+          }
+          if (type != null) {
+            if (result.type != fileEntry.type) {
+              await data.loadedAccount!
+                  .changeFileType(fileEntry.key, type: type);
+            }
+          }
           await (onChanged?.call());
           if (!context.mounted) return;
           Navigator.pop(context);
           showSnackBar(
-              message: 'File renamed',
-              icon: const Icon(Icons.edit_outlined,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.fileSaved,
+            icon: const Icon(Icons.edit_outlined),
+          );
+        },
+      ),
+    if (fileEntry.type != FileEntryType.folder)
+      getIconedPopupMenuItem(
+        content: Text(localizations.move),
+        icon: const Icon(Icons.move_down),
+        onTap: () async {
+          List<String> pathSplit = fileEntry.path.split('/');
+          pathSplit.removeLast();
+          String path;
+          if (pathSplit.length == 1) {
+            path = '/';
+          } else {
+            path = pathSplit.join('/');
+          }
+          dynamic result = await Navigator.pushNamed(
+              context, FilesScreen.routeName,
+              arguments: FilesScreenArgs(
+                  path: path, select: FilesScreenSelectMode.folder));
+          if (result is! FilesScreenResult) return;
+          String newPath;
+          if (result.key == '/') {
+            newPath = result.key;
+          } else {
+            newPath = result.key + '/';
+          }
+          Navigator.pushNamed(context, SplashScreen.routeName);
+          await Future.delayed(const Duration(milliseconds: 200));
+          if (newPath != originalPath) {
+            try {
+              await data.loadedAccount!
+                  .moveFile(fileEntry.key, path: newPath + fileEntry.name);
+            } catch (e, s) {
+              showSnackBar(
+                message: localizations.somethingWentWrong,
+                icon: const Icon(Icons.error_outline_rounded),
+                action: SnackBarAction(
+                  label: localizations.details,
+                  onPressed: () => Navigator.pushNamed(
+                      navigatorKey.currentContext!, LogScreen.routeName,
+                      arguments: e.toString() + '\n' + s.toString()),
+                ),
+              );
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              return;
+            }
+          }
+          await (onChanged?.call());
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          showSnackBar(
+            message: localizations.fileSaved,
+            icon: const Icon(Icons.edit_outlined),
+          );
         },
       ),
     if (fileEntry.type != FileEntryType.folder)
@@ -540,9 +641,9 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           if (!context.mounted) return;
           Navigator.pop(context);
           showSnackBar(
-              message: localizations.exportSaved,
-              icon: const Icon(Icons.ios_share_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: localizations.exportSaved,
+            icon: const Icon(Icons.ios_share_rounded),
+          );
         },
       ),
     getIconedPopupMenuItem(
@@ -561,8 +662,9 @@ List<PopupMenuEntry> filePopupMenuBuilder(
                   TextButton(
                     child: Text(
                       localizations.cancel,
-                      style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor),
+                      style: TextStyle(
+                          color: PassyTheme.of(context)
+                              .highlightContentSecondaryColor),
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -585,9 +687,9 @@ List<PopupMenuEntry> filePopupMenuBuilder(
           if (!context.mounted) return;
           Navigator.pop(context);
           showSnackBar(
-              message: 'Folder removed',
-              icon: const Icon(Icons.delete_outline_rounded,
-                  color: PassyTheme.darkContentColor));
+            message: 'Folder removed',
+            icon: const Icon(Icons.delete_outline_rounded),
+          );
           return;
         }
         await data.loadedAccount!.removeFile(fileEntry.key);
@@ -595,9 +697,9 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         if (!context.mounted) return;
         Navigator.pop(context);
         showSnackBar(
-            message: 'File removed',
-            icon: const Icon(Icons.delete_outline_rounded,
-                color: PassyTheme.darkContentColor));
+          message: 'File removed',
+          icon: const Icon(Icons.delete_outline_rounded),
+        );
       },
     ),
   ];
@@ -660,8 +762,9 @@ Future<void> showConnectDialog(BuildContext context,
                 },
                 child: Text(
                   localizations.canNotScanQuestion,
-                  style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor,
+                  style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor,
                   ),
                 ),
               ),
@@ -669,8 +772,9 @@ Future<void> showConnectDialog(BuildContext context,
                 onPressed: () => Navigator.pop(ctx),
                 child: Text(
                   localizations.cancel,
-                  style: const TextStyle(
-                    color: PassyTheme.lightContentSecondaryColor,
+                  style: TextStyle(
+                    color:
+                        PassyTheme.of(context).highlightContentSecondaryColor,
                   ),
                 ),
               )
@@ -680,7 +784,11 @@ Future<void> showConnectDialog(BuildContext context,
   });
   Future(() async {
     await _initializeControllerFuture;
+    bool isBusy = false;
     _controller.startImageStream((image) {
+      if (isBusy) return;
+      isBusy = true;
+      Future.delayed(const Duration(seconds: 1), () => isBusy = false);
       imglib.Image? _image = imageFromCameraImage(image);
       if (_image == null) return;
       Result? _result = qrResultFromImage(_image);
@@ -721,23 +829,23 @@ void showSynchronizationDialog(BuildContext context,
       title: Center(
           child: Text(
         localizations.synchronize,
-        style: const TextStyle(color: PassyTheme.lightContentColor),
+        style: TextStyle(color: PassyTheme.of(context).contentTextColor),
       )),
       actionsAlignment: MainAxisAlignment.center,
       actions: [
         TextButton(
             child: Text(
               localizations.host,
-              style:
-                  const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+              style: TextStyle(
+                  color: PassyTheme.of(context).highlightContentSecondaryColor),
             ),
             onPressed: () => SynchronizationWrapper(context: context)
                 .host(data.loadedAccount!)),
         TextButton(
           child: Text(
             localizations.connect,
-            style:
-                const TextStyle(color: PassyTheme.lightContentSecondaryColor),
+            style: TextStyle(
+                color: PassyTheme.of(context).highlightContentSecondaryColor),
           ),
           onPressed: _onConnectPressed,
         ),
@@ -765,8 +873,7 @@ setOnError(BuildContext context) {
     try {
       showSnackBar(
         message: localizations.somethingWentWrong,
-        icon: const Icon(Icons.error_outline_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.error_outline_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(
@@ -780,8 +887,7 @@ setOnError(BuildContext context) {
     try {
       showSnackBar(
         message: localizations.somethingWentWrong,
-        icon: const Icon(Icons.error_outline_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.error_outline_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(
@@ -792,4 +898,147 @@ setOnError(BuildContext context) {
     } catch (_) {}
     return false;
   };
+}
+
+class PassyTray extends SystemTray {
+  static const String _kChannelName = "flutter/system_tray/tray";
+
+  static const String _kInitSystemTray = "InitSystemTray";
+
+  static const String _kTrayIdKey = "tray_id";
+  static const String _kTitleKey = "title";
+  static const String _kIconPathKey = "iconpath";
+  static const String _kToolTipKey = "tooltip";
+  static const String _kIsTemplateKey = "is_template";
+
+  static const MethodChannel _platformChannel = MethodChannel(_kChannelName);
+
+  PassyTray() : super();
+
+  @override
+  Future<bool> initSystemTray({
+    required String iconPath,
+    String? title,
+    String? toolTip,
+    bool isTemplate = false,
+  }) async {
+    if (!Platform.environment.containsKey('container')) {
+      return await super.initSystemTray(
+        iconPath: iconPath,
+        title: title,
+        toolTip: toolTip,
+        isTemplate: isTemplate,
+      );
+    }
+    // Flatpak
+    return await _platformChannel.invokeMethod(
+      _kInitSystemTray,
+      <String, dynamic>{
+        _kTrayIdKey: const Uuid().v1(),
+        _kTitleKey: title,
+        _kIconPathKey: iconPath,
+        _kToolTipKey: toolTip,
+        _kIsTemplateKey: isTemplate,
+      },
+    );
+  }
+}
+
+bool _trayEnabled = false;
+bool get trayEnabled => _trayEnabled;
+SystemTray? _systemTray;
+
+Future<void> toggleTray(BuildContext context) async {
+  SystemTray systemTray;
+  if (_systemTray == null) {
+    try {
+      systemTray = PassyTray();
+      _systemTray = systemTray;
+    } catch (e, s) {
+      if (!context.mounted) return;
+      showSnackBar(
+        message: localizations.somethingWentWrong,
+        icon: const Icon(Icons.error_outline_rounded),
+        action: SnackBarAction(
+          label: localizations.details,
+          onPressed: () => Navigator.pushNamed(context, LogScreen.routeName,
+              arguments: e.toString() + '\n' + s.toString()),
+        ),
+      );
+      return;
+    }
+  } else {
+    systemTray = _systemTray!;
+  }
+  if (_trayEnabled) {
+    await systemTray.destroy();
+  } else {
+    String path = Platform.isWindows
+        ? 'assets/images/icon.ico'
+        : Platform.environment.containsKey('container')
+            ? 'io.github.glitterware.Passy'
+            : 'assets/images/icon48.png';
+    final menu = Menu();
+    menu.buildFrom([
+      MenuItemLabel(
+        label: localizations.showWindow,
+        onClicked: (_) async {
+          while (!await windowManager.isVisible()) {
+            await windowManager.show();
+            await windowManager.focus();
+            await Future.delayed(const Duration(milliseconds: 100));
+          }
+        },
+      ),
+      MenuItemLabel(
+        label: localizations.hideWindow,
+        onClicked: (_) {
+          windowManager.hide();
+        },
+      ),
+      MenuSeparator(),
+      MenuItemLabel(
+        label: localizations.exitPassy,
+        onClicked: (_) => SystemNavigator.pop(),
+      ),
+    ]);
+
+    // We first init the systray menu and then add the menu entries
+    await systemTray.initSystemTray(
+      title: 'Passy',
+      iconPath: path,
+    );
+
+    await systemTray.setContextMenu(menu);
+
+    // handle system tray event
+    systemTray.registerSystemTrayEventHandler((eventName) {
+      debugPrint("eventName: $eventName");
+      if (eventName == kSystemTrayEventClick) {
+        Platform.isWindows
+            ? windowManager.show()
+            : systemTray.popUpContextMenu();
+      } else if (eventName == kSystemTrayEventRightClick) {
+        Platform.isWindows
+            ? systemTray.popUpContextMenu()
+            : windowManager.show();
+      }
+    });
+  }
+  _trayEnabled = !_trayEnabled;
+}
+
+void switchAppTheme(BuildContext context, PassyAppTheme? appTheme) {
+  if (!context.mounted) return;
+  ThemeData? data;
+  if (appTheme == null) {
+    data = null;
+  } else {
+    data = PassyTheme.themes[appTheme];
+  }
+  if (data == null) {
+    PassyThemeNotification(PassyTheme.classicDark).dispatch(context);
+  } else {
+    PassyThemeNotification(data).dispatch(context);
+  }
 }

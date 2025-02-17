@@ -3,12 +3,11 @@ import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/common.dart';
-import 'package:passy/screens/credentials_screen.dart';
+import 'package:passy/screens/security_screen.dart';
 import 'package:passy/screens/splash_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  static const String routeName =
-      '${CredentialsScreen.routeName}/changePassword';
+  static const String routeName = '${SecurityScreen.routeName}/changePassword';
 
   const ChangePasswordScreen({Key? key}) : super(key: key);
 
@@ -25,44 +24,37 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
   bool _advancedSettingsIsExpanded = false;
   bool _doNotReencryptEntries = false;
   bool _isBackupComplete = false;
+  late FormattedTextParser formattedTextParser;
 
   void _onConfirmPressed() async {
     if (!_isBackupComplete) {
       showSnackBar(
-          message: localizations.backupYourAccountBeforeProceeding,
-          icon: const Icon(
-            Icons.save_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.backupYourAccountBeforeProceeding,
+        icon: const Icon(Icons.save_rounded),
+      );
       return;
     }
     if ((await data.createPasswordHash(_account.username,
             password: _password)) !=
         data.getPasswordHash(_account.username)) {
       showSnackBar(
-          message: localizations.incorrectPassword,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.incorrectPassword,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     if (_newPassword.isEmpty) {
       showSnackBar(
-          message: localizations.passwordIsEmpty,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.passwordIsEmpty,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     if (_newPassword != _newPasswordConfirm) {
       showSnackBar(
-          message: localizations.passwordsDoNotMatch,
-          icon: const Icon(
-            Icons.lock_rounded,
-            color: PassyTheme.darkContentColor,
-          ));
+        message: localizations.passwordsDoNotMatch,
+        icon: const Icon(Icons.lock_rounded),
+      );
       return;
     }
     Navigator.pushNamed(context, SplashScreen.routeName);
@@ -75,7 +67,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
       await _account.saveCredentials();
       if (mounted) {
         Navigator.popUntil(context,
-            (route) => route.settings.name == CredentialsScreen.routeName);
+            (route) => route.settings.name == SecurityScreen.routeName);
       }
     });
   }
@@ -91,6 +83,12 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
     setState(() {
       _isBackupComplete = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    formattedTextParser = FormattedTextParser(context: context);
   }
 
   @override
@@ -113,17 +111,18 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
             child: Column(children: [
               const Spacer(),
               Text.rich(
-                TextSpan(
-                    text: localizations.youAreChangingPasswordFor,
-                    children: [
-                      TextSpan(
-                        text: _account.username,
-                        style: const TextStyle(
-                          color: PassyTheme.lightContentSecondaryColor,
-                        ),
+                formattedTextParser.parse(
+                  text: localizations.youAreChangingPasswordFor,
+                  placeholders: {
+                    'u': TextSpan(
+                      text: _account.username,
+                      style: TextStyle(
+                        color: PassyTheme.of(context)
+                            .highlightContentSecondaryColor,
                       ),
-                      const TextSpan(text: '.')
-                    ]),
+                    ),
+                  },
+                ),
                 textAlign: TextAlign.center,
               ),
               Expanded(
@@ -146,15 +145,23 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                              child: PassyPadding(ThreeWidgetButton(
-                                  center: Text(localizations.backup),
-                                  left: const Padding(
-                                    padding: EdgeInsets.only(right: 30),
-                                    child: Icon(Icons.save_rounded),
-                                  ),
-                                  right: const Icon(
-                                      Icons.arrow_forward_ios_rounded),
-                                  onPressed: () => _onBackupPressed()))),
+                              child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: PassyTheme.of(context)
+                                          .passyPadding
+                                          .left,
+                                      bottom: PassyTheme.of(context)
+                                          .passyPadding
+                                          .left),
+                                  child: ThreeWidgetButton(
+                                      center: Text(localizations.backup),
+                                      left: const Padding(
+                                        padding: EdgeInsets.only(right: 30),
+                                        child: Icon(Icons.save_rounded),
+                                      ),
+                                      right: const Icon(
+                                          Icons.arrow_forward_ios_rounded),
+                                      onPressed: () => _onBackupPressed()))),
                           if (_isBackupComplete)
                             const Flexible(
                                 child: PassyPadding(Icon(
@@ -182,20 +189,22 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                   expansionCallback: (panelIndex, isExpanded) =>
                       setState(() => _advancedSettingsIsExpanded = isExpanded),
                   elevation: 0,
-                  dividerColor: PassyTheme.lightContentSecondaryColor,
+                  dividerColor:
+                      PassyTheme.of(context).highlightContentSecondaryColor,
                   children: [
                     ExpansionPanel(
-                        backgroundColor: PassyTheme.darkContentColor,
+                        backgroundColor: PassyTheme.of(context).contentColor,
                         isExpanded: _advancedSettingsIsExpanded,
                         canTapOnHeader: true,
                         headerBuilder: (context, isExpanded) {
                           return Padding(
                               padding: const EdgeInsets.only(left: 8),
                               child: Container(
-                                  decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
                                           Radius.circular(32.0)),
-                                      color: PassyTheme.darkPassyPurple),
+                                      color: PassyTheme.of(context)
+                                          .accentContentColor),
                                   child: PassyPadding(Row(
                                     children: [
                                       const Padding(
@@ -214,6 +223,8 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                         body: Column(
                           children: [
                             PassyPadding(DropdownButtonFormField(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(30)),
                               items: [
                                 DropdownMenuItem(
                                   child: Text(localizations.true_),

@@ -2,9 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
+import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
+import 'package:passy/passy_data/id_card.dart';
+import 'package:passy/passy_data/identity.dart';
+import 'package:passy/passy_data/note.dart';
+import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_entry.dart';
+import 'package:passy/passy_data/payment_card.dart';
 import 'package:passy/screens/common.dart';
+import 'package:passy/screens/sync_details_screen.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:passy/main.dart';
@@ -18,10 +25,25 @@ import 'package:passy/passy_flutter/passy_theme.dart';
 import 'package:passy/passy_data/synchronization_2d0d0_utils.dart' as util;
 
 class SynchronizationWrapper {
+  final LoadedAccount _account = data.loadedAccount!;
   final BuildContext _context;
+  late Map<String, PasswordMeta> _passwordsMetadata;
+  late Map<String, NoteMeta> _notesMetadata;
+  late Map<String, PaymentCardMeta> _paymentCardsMetadata;
+  late Map<String, IDCardMeta> _idCardsMetadata;
+  late Map<String, IdentityMeta> _identitiesMetadata;
+  EntryEvent _appThemeEvent = EntryEvent('appTheme',
+      status: EntryStatus.alive,
+      lastModified: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true));
   Synchronization? _sync;
 
-  SynchronizationWrapper({required BuildContext context}) : _context = context;
+  SynchronizationWrapper({required BuildContext context}) : _context = context {
+    _passwordsMetadata = _account.passwordsMetadata;
+    _notesMetadata = _account.notesMetadata;
+    _paymentCardsMetadata = _account.paymentCardsMetadata;
+    _idCardsMetadata = _account.idCardsMetadata;
+    _identitiesMetadata = _account.identitiesMetadata;
+  }
 
   void _onConnected() {
     Navigator.pushNamed(_context, SplashScreen.routeName);
@@ -32,6 +54,12 @@ class SynchronizationWrapper {
     required LoadedAccount account,
     String popUntilRouteName = MainScreen.routeName,
   }) {
+    EntryEvent? appThemeEvent = account.appSettingsHistory['appTheme'];
+    if (appThemeEvent != null) {
+      if (appThemeEvent.lastModified.isAfter(_appThemeEvent.lastModified)) {
+        switchAppTheme(_context, account.appTheme);
+      }
+    }
     Navigator.popUntil(_context, (r) => r.settings.name == popUntilRouteName);
     Map<EntryType, List<util.ExchangeEntry>>? sharedEntries =
         results.sharedEntries;
@@ -63,13 +91,59 @@ class SynchronizationWrapper {
         }
       }
     }
+    SynchronizationReport report = _sync!.getReport();
     showDialog(
         context: _context,
         builder: (ctx) => AlertDialog(
               shape: PassyTheme.dialogShape,
               title: Text(localizations.synchronizationComplete),
               content: Text(
-                  '${localizations.entriesAdded}: ${_sync!.entriesAdded}\n${localizations.entriesRemoved}: ${_sync!.entriesRemoved}'),
+                  '${localizations.entriesAdded}: ${report.entriesAdded}\n${localizations.entriesRemoved}: ${report.entriesRemoved}\n${localizations.entriesChanged}: ${report.entriesChanged}'),
+              actions: [
+                TextButton(
+                  child: Text(localizations.details,
+                      style: TextStyle(
+                          color: PassyTheme.of(_context)
+                              .highlightContentSecondaryColor)),
+                  onPressed: () => Navigator.pushNamed(
+                      navigatorKey.currentContext!, SyncDetailsScreen.routeName,
+                      arguments: SyncDetailsScreenArgs(
+                        report: report,
+                        passwordsMetadata: {
+                          ..._passwordsMetadata,
+                          ..._account.passwordsMetadata,
+                        }..removeWhere((key, value) =>
+                            !report.changedPasswords.keys.contains(key)),
+                        notesMetadata: {
+                          ..._notesMetadata,
+                          ..._account.notesMetadata
+                        }..removeWhere((key, value) =>
+                            !report.changedNotes.keys.contains(key)),
+                        paymentCardsMetadata: {
+                          ..._paymentCardsMetadata,
+                          ..._account.paymentCardsMetadata
+                        }..removeWhere((key, value) =>
+                            !report.changedPaymentCards.keys.contains(key)),
+                        idCardsMetadata: {
+                          ..._idCardsMetadata,
+                          ..._account.idCardsMetadata
+                        }..removeWhere((key, value) =>
+                            !report.changedIDCards.keys.contains(key)),
+                        identitiesMetadata: {
+                          ..._identitiesMetadata,
+                          ..._account.identitiesMetadata,
+                        }..removeWhere((key, value) =>
+                            !report.changedIdentities.keys.contains(key)),
+                      )),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(localizations.close,
+                      style: TextStyle(
+                          color: PassyTheme.of(_context)
+                              .highlightContentSecondaryColor)),
+                ),
+              ],
             ));
   }
 
@@ -78,8 +152,7 @@ class SynchronizationWrapper {
         .pushNamed(LogScreen.routeName, arguments: log);
     showSnackBar(
         message: localizations.syncError,
-        icon: const Icon(Icons.sync_problem_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.sync_problem_rounded),
         action:
             SnackBarAction(label: localizations.details, onPressed: _showLog));
   }
@@ -89,14 +162,14 @@ class SynchronizationWrapper {
     required String address,
     String popUntilRouteName = MainScreen.routeName,
   }) {
+    _appThemeEvent = account.appSettingsHistory['appTheme'] ?? _appThemeEvent;
     HostAddress _hostAddress;
     try {
       _hostAddress = HostAddress.parse(address);
     } catch (e) {
       showSnackBar(
         message: localizations.invalidAddressFormat,
-        icon: const Icon(Icons.sync_problem_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.sync_problem_rounded),
       );
       return;
     }
@@ -114,8 +187,7 @@ class SynchronizationWrapper {
     _sync!.connect(_hostAddress).onError((error, stackTrace) {
       showSnackBar(
         message: localizations.connectionFailed,
-        icon: const Icon(Icons.sync_problem_rounded,
-            color: PassyTheme.darkContentColor),
+        icon: const Icon(Icons.sync_problem_rounded),
         action: SnackBarAction(
           label: localizations.details,
           onPressed: () => Navigator.pushNamed(_context, LogScreen.routeName,
@@ -131,6 +203,7 @@ class SynchronizationWrapper {
     String popUntilRouteName = MainScreen.routeName,
     Widget? title,
   }) {
+    _appThemeEvent = account.appSettingsHistory['appTheme'] ?? _appThemeEvent;
     _sync = account.getSynchronization(
       onConnected: _onConnected,
       onComplete: (results) => _onSyncComplete(
@@ -159,14 +232,15 @@ class SynchronizationWrapper {
                     QrImageView(
                       data: value.toString(),
                       eyeStyle: QrEyeStyle(
-                          eyeShape: QrEyeShape.square, color: Colors.blue[50]),
+                          eyeShape: QrEyeShape.square,
+                          color: PassyTheme.of(_context).contentTextColor),
                       dataModuleStyle: QrDataModuleStyle(
                           dataModuleShape: QrDataModuleShape.square,
-                          color: Colors.blue[50]),
+                          color: PassyTheme.of(_context).contentTextColor),
                     ),
                     Expanded(
                       child: Center(
-                        child: Text(value.toString()),
+                        child: SelectableText(value.toString()),
                       ),
                     ),
                   ],

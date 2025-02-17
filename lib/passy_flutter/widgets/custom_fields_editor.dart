@@ -9,7 +9,6 @@ class CustomFieldsEditor extends StatefulWidget {
   final List<CustomField> customFields;
   final bool shouldSort;
   final EdgeInsetsGeometry padding;
-  final ColorScheme? datePickerColorScheme;
   final Future<CustomField?> Function() constructCustomField;
 
   const CustomFieldsEditor({
@@ -17,7 +16,6 @@ class CustomFieldsEditor extends StatefulWidget {
     required this.customFields,
     this.shouldSort = false,
     this.padding = EdgeInsets.zero,
-    this.datePickerColorScheme = PassyTheme.datePickerColorScheme,
     required this.constructCustomField,
   }) : super(key: key);
 
@@ -116,18 +114,18 @@ class _CustomFieldsEditor extends State<CustomFieldsEditor> {
                     labelText: _field.title,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
-                      borderSide:
-                          const BorderSide(color: PassyTheme.lightContentColor),
+                      borderSide: BorderSide(
+                          color: PassyTheme.of(context).highlightContentColor),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
-                      borderSide: const BorderSide(
-                          color: PassyTheme.darkContentSecondaryColor),
+                      borderSide: BorderSide(
+                          color: PassyTheme.of(context).contentSecondaryColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
-                      borderSide:
-                          const BorderSide(color: PassyTheme.lightContentColor),
+                      borderSide: BorderSide(
+                          color: PassyTheme.of(context).highlightContentColor),
                     ),
                   ),
                   onChanged: (value) => _field.value = value,

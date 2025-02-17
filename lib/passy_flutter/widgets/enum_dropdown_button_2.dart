@@ -14,27 +14,38 @@ class EnumDropdownButton2Item<T> {
   });
 }
 
-class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
-  final T value;
+class EnumDropdownButton2<T extends Enum> extends StatefulWidget {
+  final EnumDropdownButton2Item<T>? hint;
+  final T? value;
   final List<EnumDropdownButton2Item<T>> items;
   final void Function(T? value)? onChanged;
   final TextStyle? style;
   final bool isExpanded;
   final AlignmentGeometry alignment;
+  final DropdownStyleData dropdownStyleData;
 
   const EnumDropdownButton2({
     Key? key,
-    required this.value,
     required this.items,
+    this.hint,
+    this.value,
     this.onChanged,
     this.style,
     this.isExpanded = false,
     this.alignment = AlignmentDirectional.centerStart,
+    this.dropdownStyleData = const DropdownStyleData(),
   }) : super(key: key);
 
   @override
+  State<EnumDropdownButton2<T>> createState() => _EnumDropdownButton2<T>();
+}
+
+class _EnumDropdownButton2<T extends Enum>
+    extends State<EnumDropdownButton2<T>> {
+  final GlobalKey _dropdownButtonKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
-    GlobalKey _dropdownButtonKey = GlobalKey();
     void openDropdown() {
       _dropdownButtonKey.currentContext?.visitChildElements((element) {
         if (element.widget is Semantics) {
@@ -50,7 +61,7 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
     }
 
     List<DropdownMenuItem<T>> _menuItems = [];
-    for (EnumDropdownButton2Item<T> item in items) {
+    for (EnumDropdownButton2Item<T> item in widget.items) {
       _menuItems.add(DropdownMenuItem(
         child: Center(
             child: Row(
@@ -58,32 +69,47 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
           children: [
             Padding(
                 child: item.icon,
-                padding: EdgeInsets.fromLTRB(PassyTheme.passyPadding.left + 6,
-                    0, PassyTheme.passyPadding.right, 0)),
+                padding: EdgeInsets.fromLTRB(
+                    PassyTheme.of(context).passyPadding.left + 6,
+                    0,
+                    PassyTheme.of(context).passyPadding.right,
+                    0)),
             Expanded(child: item.text),
           ],
         )),
         value: item.value,
       ));
     }
-    EnumDropdownButton2Item<T> selected =
-        items.firstWhere((element) => element.value == value);
+    EnumDropdownButton2Item<T> selected;
+    if (widget.value == null) {
+      if (widget.hint == null) {
+        selected = widget.items[0];
+      } else {
+        selected = widget.hint!;
+      }
+    } else {
+      selected =
+          widget.items.firstWhere((element) => element.value == widget.value);
+    }
     return DropdownButton2(
+      dropdownStyleData: widget.dropdownStyleData,
+      buttonStyleData: const ButtonStyleData(
+          overlayColor: WidgetStatePropertyAll(Colors.transparent)),
       key: _dropdownButtonKey,
       items: _menuItems,
-      value: value,
-      onChanged: onChanged,
-      style: style,
-      isExpanded: isExpanded,
-      alignment: alignment,
+      value: widget.value,
+      onChanged: widget.onChanged,
+      style: widget.style,
+      isExpanded: widget.isExpanded,
+      alignment: widget.alignment,
       underline: const SizedBox.shrink(),
       customButton: PassyPadding(Material(
-          color: PassyTheme.darkPassyPurple,
+          color: PassyTheme.of(context).accentContentColor,
           borderRadius: BorderRadius.circular(100),
           child: InkWell(
-            splashFactory: InkRipple.splashFactory,
-            splashColor: Colors.white24,
-            hoverColor: Colors.white12,
+            splashFactory: Theme.of(context).splashFactory,
+            splashColor: Theme.of(context).splashColor,
+            hoverColor: Theme.of(context).hoverColor,
             child: Container(
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(100)),
@@ -95,14 +121,14 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
                   Padding(
                       child: selected.icon,
                       padding: EdgeInsets.fromLTRB(
-                          PassyTheme.passyPadding.left + 6,
+                          PassyTheme.of(context).passyPadding.left + 6,
                           0,
-                          PassyTheme.passyPadding.right,
+                          PassyTheme.of(context).passyPadding.right,
                           0)),
                   Expanded(
                       child: DefaultTextStyle(
-                    style: const TextStyle(
-                        color: PassyTheme.lightContentColor,
+                    style: TextStyle(
+                        color: PassyTheme.of(context).highlightContentColor,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w500),
                     child: selected.text,
@@ -113,9 +139,9 @@ class EnumDropdownButton2<T extends Enum> extends StatelessWidget {
                         size: 35,
                       ),
                       padding: EdgeInsets.fromLTRB(
-                          PassyTheme.passyPadding.left + 6,
+                          PassyTheme.of(context).passyPadding.left + 6,
                           0,
-                          PassyTheme.passyPadding.right,
+                          PassyTheme.of(context).passyPadding.right,
                           0)),
                 ],
               )),

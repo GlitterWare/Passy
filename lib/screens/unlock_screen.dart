@@ -1,15 +1,17 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/main.dart';
-import 'package:passy/passy_data/bio_starge.dart';
+import 'package:passy/passy_data/bio_storage.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/main_screen.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'common.dart';
 
@@ -25,13 +27,15 @@ class UnlockScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _UnlockScreen();
 }
 
-class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
+class _UnlockScreen extends State<UnlockScreen>
+    with WidgetsBindingObserver, WindowListener {
   bool _shouldPop = false;
   String _password = '';
   FloatingActionButton? _bioAuthButton;
   final TextEditingController _passwordController = TextEditingController();
   bool _unlockScreenOn = false;
   final FocusNode _passwordFocus = FocusNode();
+  Completer? _lockCompleter = Completer();
 
   void _logOut() {
     Navigator.popUntil(navigatorKey.currentContext!,
@@ -95,11 +99,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       return;
     }
     showSnackBar(
-        message: localizations.incorrectPassword,
-        icon: const Icon(
-          Icons.lock_rounded,
-          color: PassyTheme.darkContentColor,
-        ));
+      message: localizations.incorrectPassword,
+      icon: const Icon(Icons.lock_rounded),
+    );
     setState(() {
       _password = '';
       _passwordController.text = '';
@@ -115,6 +117,9 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       if (!_passwordFocus.hasFocus) _passwordFocus.requestFocus();
     });
     WidgetsBinding.instance.addObserver(this);
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.addListener(this);
+    }
   }
 
   @override
@@ -122,6 +127,30 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
     super.dispose();
     _passwordFocus.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.removeListener(this);
+    }
+  }
+
+  void _lockScreen({bool isResumed = false}) {
+    if (!UnlockScreen.shouldLockScreen) return;
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
+    if (!account.autoScreenLock) return;
+    if (account.autoScreenLockDelay == 0) {
+      setState(() => _unlockScreenOn = true);
+      return;
+    }
+    Completer? lockCompleter = _lockCompleter;
+    if (isResumed && lockCompleter != null) {
+      if (lockCompleter.isCompleted) setState(() => _unlockScreenOn = true);
+      _lockCompleter = null;
+    } else if (lockCompleter == null) {
+      lockCompleter = Completer();
+      _lockCompleter = lockCompleter;
+      Future.delayed(Duration(milliseconds: account.autoScreenLockDelay))
+          .then((value) => lockCompleter!.complete());
+    }
   }
 
   @override
@@ -134,14 +163,21 @@ class _UnlockScreen extends State<UnlockScreen> with WidgetsBindingObserver {
       }
       return;
     }
-    if (!UnlockScreen.shouldLockScreen) return;
-    LoadedAccount? account = data.loadedAccount;
-    if (account == null) return;
-    if (!account.autoScreenLock) return;
     if (UnlockScreen.isAuthenticating) return;
     if ((state != AppLifecycleState.resumed) &&
         (state != AppLifecycleState.inactive)) return;
-    setState(() => _unlockScreenOn = true);
+    _lockScreen(isResumed: state == AppLifecycleState.resumed);
+  }
+
+  @override
+  void onWindowMinimize() async {
+    if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) return;
+    LoadedAccount? account = data.loadedAccount;
+    if (account == null) return;
+    _lockScreen();
+    if (!account.minimizeToTray) return;
+    await windowManager.restore();
+    await windowManager.hide();
   }
 
   @override
