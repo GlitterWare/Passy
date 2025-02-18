@@ -142,25 +142,23 @@ class LinuxDialog extends StatelessWidget {
                 )),
               ),
             ]),
-            Expanded(
-              child: PassyPadding(IconedRectangleButton(
-                icon: Padding(
-                  padding: const EdgeInsets.only(top: dialogIconTopPadding),
-                  child: SvgPicture.asset(
-                    'assets/images/github_icon.svg',
-                    width: dialogIconSize,
-                  ),
+            PassyPadding(IconedRectangleButton(
+              icon: Padding(
+                padding: const EdgeInsets.only(top: dialogIconTopPadding),
+                child: SvgPicture.asset(
+                  'assets/images/github_icon.svg',
+                  width: dialogIconSize,
                 ),
-                label: const Text(
-                  'More',
-                  textAlign: TextAlign.center,
-                ),
-                onPressed: () => window.open(
-                  'https://github.com/GlitterWare/Passy/blob/main/DOWNLOADS.md#linux',
-                  'GitHub',
-                ),
-              )),
-            ),
+              ),
+              label: const Text(
+                'More',
+                textAlign: TextAlign.center,
+              ),
+              onPressed: () => window.open(
+                'https://github.com/GlitterWare/Passy/blob/main/DOWNLOADS.md#linux',
+                'GitHub',
+              ),
+            )),
             const SizedBox(height: 24),
           ],
         ),
