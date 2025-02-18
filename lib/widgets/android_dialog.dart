@@ -17,7 +17,7 @@ class AndroidDialog extends StatelessWidget {
       ),
       child: SizedBox(
         width: 350,
-        height: 520,
+        height: 530,
         child: ListView(
           children: [
             const SizedBox(height: 24),

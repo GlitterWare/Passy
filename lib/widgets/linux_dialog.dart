@@ -20,7 +20,7 @@ class LinuxDialog extends StatelessWidget {
       ),
       child: SizedBox(
         width: 350,
-        height: 610,
+        height: 750,
         child: ListView(
           children: [
             const SizedBox(height: 24),
@@ -108,6 +108,25 @@ class LinuxDialog extends StatelessWidget {
                   icon: Padding(
                     padding: const EdgeInsets.only(top: dialogIconTopPadding),
                     child: SvgPicture.asset(
+                      'assets/images/flathub.svg',
+                      width: dialogIconSize,
+                    ),
+                  ),
+                  label: const Text(
+                    'Flathub',
+                    textAlign: TextAlign.center,
+                  ),
+                  onPressed: () => window.open(
+                    'https://flathub.org/apps/io.github.glitterware.Passy',
+                    'Flathub',
+                  ),
+                )),
+              ),
+              Expanded(
+                child: PassyPadding(IconedRectangleButton(
+                  icon: Padding(
+                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
+                    child: SvgPicture.asset(
                       'assets/images/archlinux.svg',
                       width: dialogIconSize,
                     ),
@@ -122,26 +141,26 @@ class LinuxDialog extends StatelessWidget {
                   ),
                 )),
               ),
-              Expanded(
-                child: PassyPadding(IconedRectangleButton(
-                  icon: Padding(
-                    padding: const EdgeInsets.only(top: dialogIconTopPadding),
-                    child: SvgPicture.asset(
-                      'assets/images/github_icon.svg',
-                      width: dialogIconSize,
-                    ),
-                  ),
-                  label: const Text(
-                    'More',
-                    textAlign: TextAlign.center,
-                  ),
-                  onPressed: () => window.open(
-                    'https://github.com/GlitterWare/Passy/blob/main/DOWNLOADS.md#linux',
-                    'GitHub',
-                  ),
-                )),
-              ),
             ]),
+            Expanded(
+              child: PassyPadding(IconedRectangleButton(
+                icon: Padding(
+                  padding: const EdgeInsets.only(top: dialogIconTopPadding),
+                  child: SvgPicture.asset(
+                    'assets/images/github_icon.svg',
+                    width: dialogIconSize,
+                  ),
+                ),
+                label: const Text(
+                  'More',
+                  textAlign: TextAlign.center,
+                ),
+                onPressed: () => window.open(
+                  'https://github.com/GlitterWare/Passy/blob/main/DOWNLOADS.md#linux',
+                  'GitHub',
+                ),
+              )),
+            ),
             const SizedBox(height: 24),
           ],
         ),

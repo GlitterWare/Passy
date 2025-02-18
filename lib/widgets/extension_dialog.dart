@@ -18,7 +18,7 @@ class ExtensionDialog extends StatelessWidget {
       ),
       child: SizedBox(
         width: 350,
-        height: 520,
+        height: 630,
         child: ListView(
           children: [
             const SizedBox(height: 24),
@@ -99,6 +99,25 @@ class ExtensionDialog extends StatelessWidget {
                 'Mozilla Firefox',
               ),
             )),
+            Expanded(
+              child: PassyPadding(IconedRectangleButton(
+                icon: Padding(
+                  padding: const EdgeInsets.only(top: dialogIconTopPadding),
+                  child: SvgPicture.asset(
+                    'assets/images/github_icon.svg',
+                    width: dialogIconSize,
+                  ),
+                ),
+                label: const Text(
+                  'Source',
+                  textAlign: TextAlign.center,
+                ),
+                onPressed: () => window.open(
+                  'https://github.com/GlitterWare/Passy-Browser-Extension',
+                  'GitHub',
+                ),
+              )),
+            ),
             const SizedBox(height: 24),
           ],
         ),
