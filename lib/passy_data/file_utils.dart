@@ -24,8 +24,6 @@ Future<FilePageResult> createFilePage(
   Duration? runDuration = const Duration(minutes: 15),
   bool secure = true,
 }) async {
-  // Windows can not serve with HTTPS on localhost
-  if (Platform.isWindows) secure = false;
   HttpServer server;
   if (secure) {
     AsymmetricKeyPair pair = CryptoUtils.generateEcKeyPair();
