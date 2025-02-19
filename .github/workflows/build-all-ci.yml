@@ -66,6 +66,9 @@ jobs:
       - name: Configure flutter
         shell: bash
         run: flutter config --no-analytics
+      - name: Build Passy CLI
+        shell: bash
+        run: bash build_cli.sh
       - name: Build with updates popup
         shell: bash
         run: echo "echo 3;echo y;echo;" | bash | bash build_all.sh
@@ -74,8 +77,10 @@ jobs:
         run: |
           cd ..
           mkdir -p build/linux-bundle/Passy
+          mkdir build/cli
           cp -r Passy/build/linux/x64/release/bundle/. build/linux-bundle/Passy
           cp Passy/build/appimage/Passy-Latest-x86_64.AppImage build
+          cp -r Passy/build/cli/latest/. build/cli/passy-cli
           chmod +x build/linux-bundle/Passy/passy
           chmod +x build/Passy-Latest-x86_64.AppImage
       - name: Archive Linux bundle build
@@ -92,6 +97,13 @@ jobs:
           directory: ../build
           filename: Passy-Linux-AppImage.zip
           path: Passy-Latest-x86_64.AppImage
+      - name: Archive Linux CLI build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build/cli
+          filename: Passy-CLI-Linux.zip
+          path: passy-cli
       - name: Upload Linux bundle build
         uses: actions/upload-artifact@v4
         with:
@@ -102,6 +114,11 @@ jobs:
         with:
           name: linux-appimage
           path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
+      - name: Upload Linux CLI build
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-linux
+          path: /home/runner/work/Passy/build/cli/Passy-CLI-Linux.zip
       - name: Build without updates popup
         shell: bash
         run: echo "echo 3;echo n;echo;" | bash | bash build_all.sh
@@ -139,6 +156,118 @@ jobs:
         with:
           name: linux-appimage-no-updates-popup
           path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
+  build_linux_arm64:
+    name: Build Passy for Linux ARM64
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync libayatana-appindicator3-dev libmpv-dev mpv
+      - name: Install flutter
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
+      - name: Configure flutter
+        shell: bash
+        run: flutter config --no-analytics
+      - name: Build Passy CLI
+        shell: bash
+        run: bash build_cli.sh
+      - name: Build with updates popup
+        shell: bash
+        run: echo "echo 3;echo y;echo;" | bash | bash build_all.sh
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          ls Passy/build/linux/
+          ls Passy/build/appimage
+          mkdir -p build/linux-bundle/Passy
+          mkdir build/cli
+          cp -r Passy/build/linux/arm64/release/bundle/. build/linux-bundle/Passy
+          cp Passy/build/appimage/Passy-Latest-aarch64.AppImage build
+          cp -r Passy/build/cli/latest/. build/cli/passy-cli
+          chmod +x build/linux-bundle/Passy/passy
+          chmod +x build/Passy-Latest-aarch64.AppImage
+      - name: Archive Linux bundle build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build/linux-bundle
+          filename: Passy-Linux-ARM64-Bundle.zip
+          path: Passy
+      - name: Archive Linux AppImage build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-Linux-ARM64-AppImage.zip
+          path: Passy-Latest-aarch64.AppImage
+      - name: Archive Linux CLI build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build/cli
+          filename: Passy-CLI-Linux-ARM64.zip
+          path: passy-cli
+      - name: Upload Linux bundle build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-bundle
+          path: /home/runner/work/Passy/build/linux-bundle/Passy-Linux-ARM64-Bundle.zip
+      - name: Upload Linux AppImage build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-appimage
+          path: /home/runner/work/Passy/build/Passy-Linux-ARM64-AppImage.zip
+      - name: Upload Linux CLI build
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-linux-arm64
+          path: /home/runner/work/Passy/build/cli/Passy-CLI-Linux-ARM64.zip
+      - name: Build without updates popup
+        shell: bash
+        run: echo "echo 3;echo n;echo;" | bash | bash build_all.sh
+      - name: Prepare releases
+        shell: bash
+        run: |
+          cd ..
+          rm -rf build/*
+          mkdir -p build/linux-bundle/Passy
+          cp -r Passy/build/linux/arm64/release/bundle/. build/linux-bundle/Passy
+          cp Passy/build/appimage/Passy-Latest-aarch64.AppImage build
+          chmod +x build/linux-bundle/Passy/passy
+          chmod +x build/Passy-Latest-aarch64.AppImage
+      - name: Archive Linux bundle build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build/linux-bundle
+          filename: Passy-Linux-ARM64-Bundle.zip
+          path: Passy
+      - name: Archive Linux AppImage build
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          directory: ../build
+          filename: Passy-Linux-ARM64-AppImage.zip
+          path: Passy-Latest-aarch64.AppImage
+      - name: Upload Linux bundle no updates popup build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-bundle-no-updates-popup
+          path: /home/runner/work/Passy/build/linux-bundle/Passy-Linux-ARM64-Bundle.zip
+      - name: Upload Linux AppImage no updates popup build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-appimage-no-updates-popup
+          path: /home/runner/work/Passy/build/Passy-Linux-ARM64-AppImage.zip
   build_linux_snap:
     name: Build Passy for Snap Store
     runs-on: ubuntu-22.04
@@ -159,6 +288,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install Latest VC Redistributable
+        shell: pwsh
+        run: |
+          curl -o VC_redist.x64.exe -L https://aka.ms/vs/17/release/vc_redist.x64.exe
+          Start-Process VC_redist.x64.exe -ArgumentList "/install /quiet /norestart" -Wait
       - name: Install flutter
         shell: bash
         run: |
@@ -172,6 +306,9 @@ jobs:
       - name: Build Passy for Windows
         shell: bash
         run: flutter --no-version-check --suppress-analytics build windows
+      - name: Copy system msvcp140.dll
+        shell: bash
+        run: cp C:/Windows/System32/msvcp140.dll build/windows/x64/runner/Release
       - name: Build Windows .exe installer
         shell: bash
         run: |
