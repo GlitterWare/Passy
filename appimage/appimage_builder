@@ -60,7 +60,11 @@ function create_appdir() {
 }
 
 function after_bundle() {
-  cp -r ../build/linux/x64/release/bundle/* ../build/appimage/$appName.AppDir
+  export PASSY_BUNDLE_PATH="../build/linux/x64/release/bundle"
+  if [ ! -d "$PASSY_BUNDLE_PATH" ]; then
+    export PASSY_BUNDLE_PATH="../build/linux/arm64/release/bundle"
+  fi
+  cp -r "$PASSY_BUNDLE_PATH"/* ../build/appimage/$appName.AppDir
   # cp $appIcon AppDir/usr/share/icons/
 
   # cp -r build/linux/*/release/bundle/ $appName.AppDir
