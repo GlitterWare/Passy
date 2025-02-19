@@ -332,6 +332,8 @@ class FileIndex {
           curSize += 67108864;
         }
         await sink.flush();
+        await sink.close();
+        if (Platform.isWindows) await Future.delayed(Duration(seconds: 1));
         await file.delete();
       }
     }
@@ -361,6 +363,8 @@ class FileIndex {
         curSize += 67108864;
       }
       await sink.flush();
+      await sink.close();
+      if (Platform.isWindows) await Future.delayed(Duration(seconds: 1));
       await file.delete();
     }
     await _setEntry(key, null);
