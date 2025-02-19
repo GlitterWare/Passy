@@ -332,6 +332,7 @@ class FileIndex {
           curSize += 67108864;
         }
         await sink.flush();
+        await sink.close();
         await file.delete();
       }
     }
@@ -361,6 +362,7 @@ class FileIndex {
         curSize += 67108864;
       }
       await sink.flush();
+      await sink.close();
       await file.delete();
     }
     await _setEntry(key, null);
