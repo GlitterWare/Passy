@@ -62,10 +62,14 @@ Future<FilePageResult> createFilePage(
   if (runDuration != null) {
     Future.delayed(runDuration, () => server.close());
   }
+  // Some Windows configurations do not allow Passy to connect to 127.0.0.1
   return FilePageResult(
     server: server,
-    uri: (secure ? Uri.https : Uri.http)('127.0.0.1:${server.port}', '',
-        includePasswordInUrl ? {'password': password} : null),
+    uri: (secure ? Uri.https : Uri.http)(
+        '${Platform.isWindows ? 'localhost' : '127.0.0.1'}:${server.port}',
+        '',
+        includePasswordInUrl ? {'password': password} : null,
+    ),
     password: password,
   );
 }
