@@ -159,6 +159,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install Latest VC Redistributable
+        shell: pwsh
+        run: |
+          curl -o VC_redist.x64.exe -L https://aka.ms/vs/17/release/vc_redist.x64.exe
+          Start-Process VC_redist.x64.exe -ArgumentList "/install /quiet /norestart" -Wait
       - name: Install flutter
         shell: bash
         run: |
@@ -172,6 +177,9 @@ jobs:
       - name: Build Passy for Windows
         shell: bash
         run: flutter --no-version-check --suppress-analytics build windows
+      - name: Copy system msvcp140.dll
+        shell: bash
+        run: cp C:/Windows/System32/msvcp140.dll build/windows/x64/runner/Release
       - name: Build Windows .exe installer
         shell: bash
         run: |
