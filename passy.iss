@@ -3,7 +3,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName      "Passy"
-#define MyAppVersion   "1.9.0"
+#define MyAppVersion   "1.9.1"
 #define MyAppPublisher "GlitterWare"
 #define MyAppURL       "https://glitterware.github.io/Passy"
 #define MyAppExeName   "passy.exe"
@@ -53,6 +53,8 @@ SetupIconFile="icon48.ico"
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+Name: "de"; MessagesFile: "compiler:Languages\German.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
