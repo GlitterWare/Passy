@@ -64,8 +64,13 @@ elif [ $BUILD_TARGET = '3' ]; then
   build_linux
 fi
 
+export PASSY_APPIMAGE_PATH="$PWD/build/appimage/Passy-Latest-x86_64.AppImage"
+if [ ! -f "$PASSY_APPIMAGE_PATH" ]; then
+  export PASSY_APPIMAGE_PATH="$PWD/build/appimage/Passy-Latest-aarch64.AppImage"
+fi
+
 echo ''
 echo 'Builds can be found in:'
-echo '- Linux Bundle - '$PWD'/build/linux/x64/release/bundle'
-echo '- Linux AppImage - '$PWD'/build/appimage/Passy-Latest-x86_64.AppImage'
-echo '- Android Apk - '$PWD'/build/app/outputs/flutter-apk/app-release.apk'
+echo "- Linux Bundle - $PWD/build/linux/x64/release/bundle"
+echo "- Linux AppImage - $PASSY_APPIMAGE_PATH"
+echo "- Android Apk - $PWD/build/app/outputs/flutter-apk/app-release.apk"
