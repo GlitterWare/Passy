@@ -282,6 +282,20 @@ jobs:
         with:
           name: linux-snap
           path: ${{ steps.snapcraft.outputs.snap }}
+  build_linux_snap_arm64:
+    name: Build Passy for Snap Store ARM64
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build Linux Snap
+        uses: snapcore/action-build@v1
+        id: snapcraft
+      - name: Upload Linux Snap
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-snap-arm64
+          path: ${{ steps.snapcraft.outputs.snap }}
   build_windows:
     name: Build Passy for Windows
     runs-on: windows-latest

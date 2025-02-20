@@ -86,7 +86,11 @@ parts:
       craftctl default
       export PATH="$PATH:$PWD/submodules/flutter/bin"
       ./submodules/flutter/bin/flutter --no-version-check --suppress-analytics build linux --dart-define=UPDATES_POPUP_ENABLED=false
-      bash -c "shopt -s extglob dotglob;mkdir foobar;mv $SNAPCRAFT_PART_INSTALL/* foobar;mv foobar/etc $SNAPCRAFT_PART_INSTALL;mv foobar/lib/* $SNAPCRAFT_PART_INSTALL/lib;mv foobar/usr $SNAPCRAFT_PART_INSTALL;mv foobar/var $SNAPCRAFT_PART_INSTALL;rm -rf foobar;mv ./build/linux/x64/release/bundle/* $SNAPCRAFT_PART_INSTALL"
+      export PASSY_BUNDLE_PATH="./build/linux/x64/release/bundle"
+      if [ ! -d "$PASSY_BUNDLE_PATH" ]; then
+        export PASSY_BUNDLE_PATH="./build/linux/arm64/release/bundle"
+      fi
+      bash -c "shopt -s extglob dotglob;mkdir foobar;mv $SNAPCRAFT_PART_INSTALL/* foobar;mv foobar/etc $SNAPCRAFT_PART_INSTALL;mv foobar/usr $SNAPCRAFT_PART_INSTALL;mv foobar/var $SNAPCRAFT_PART_INSTALL;rm -rf foobar;mv $PASSY_BUNDLE_PATH/* $SNAPCRAFT_PART_INSTALL"
     organize:
       usr/lib/*-linux-gnu/blas/*: usr/lib/
       usr/lib/*-linux-gnu/lapack/*: usr/lib/
