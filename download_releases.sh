@@ -40,12 +40,15 @@ gh run download \
   -n linux-bundle \
   -n linux-bundle-no-updates-popup \
   -n linux-snap \
+  -n linux-snap-arm64 \
   -n windows-exe-installer \
   -n windows-portable
 echo 'Done.'
 
 echo 'Preparing Passy Snap...'
 cp linux-snap/* .
+echo 'Preparing Passy Snap ARM64...'
+cp linux-snap-arm64/* .
 echo 'Preparing Passy CLI Linux...'
 cp cli-linux/Passy-CLI-Linux.zip ./Passy-CLI-v$version-Linux.zip
 echo 'Preparing Passy CLI Linux ARM64...'
