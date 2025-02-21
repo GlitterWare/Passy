@@ -2067,371 +2067,378 @@ Future<void> executeCommand(List<String> command,
                 }
               }
               String lastAuth = '';
+
               DateTime lastDate =
                   DateTime.now().toUtc().subtract(const Duration(hours: 12));
-              GlareServer glareHost = await GlareServer.bind(
-                maxBindTries: 0,
-                address: host,
-                port: port,
-                keypair: RSAKeypair.fromRandom(keySize: 4096),
-                modules: {
-                  ...loadedModules,
+              Map<String, GlareModule> serverModules = {};
+              serverModules = {
+                ...loadedModules,
 
-                  // #region authenticate
-                  'authenticate': GlareModule(
-                    name: 'authenticate',
-                    target: (
-                      args, {
-                      required addModule,
-                      binaryObjects,
-                    }) async {
-                      if (args.length < 5) {
-                        throw {
-                          'error': {'type': 'Missing arguments'},
-                        };
-                      }
-                      String username = args[3];
-                      String auth = args[4];
-                      Encrypter? encrypter = _encrypters[username];
-                      if (encrypter == null) {
-                        return {
-                          'error': {'type': 'Failed to authenticate'},
-                        };
-                      }
-                      Encrypter usernameEncrypter =
-                          pcommon.getPassyEncrypter(username);
-                      try {
-                        lastDate = util.verifyAuth(auth,
-                            lastAuth: lastAuth,
-                            lastDate: lastDate,
-                            encrypter: encrypter,
-                            usernameEncrypter: usernameEncrypter,
-                            withIV: true);
-                        lastAuth = auth;
-                      } catch (_) {
-                        return {
-                          'error': {'type': 'Failed to authenticate'},
-                        };
-                      }
-                      return {
-                        'status': {'type': 'Success'},
-                        'auth': util.generateAuth(
-                            encrypter: encrypter,
-                            usernameEncrypter: usernameEncrypter,
-                            withIV: true),
+                // #region authenticate
+                'authenticate': GlareModule(
+                  name: 'authenticate',
+                  target: (
+                    args, {
+                    required addModule,
+                    binaryObjects,
+                  }) async {
+                    if (args.length < 5) {
+                      throw {
+                        'error': {'type': 'Missing arguments'},
                       };
-                    },
-                  ),
-                  // #endregion
+                    }
+                    String username = args[3];
+                    String auth = args[4];
+                    Encrypter? encrypter = _encrypters[username];
+                    if (encrypter == null) {
+                      return {
+                        'error': {'type': 'Failed to authenticate'},
+                      };
+                    }
+                    Encrypter usernameEncrypter =
+                        pcommon.getPassyEncrypter(username);
+                    try {
+                      lastDate = util.verifyAuth(auth,
+                          lastAuth: lastAuth,
+                          lastDate: lastDate,
+                          encrypter: encrypter,
+                          usernameEncrypter: usernameEncrypter,
+                          withIV: true);
+                      lastAuth = auth;
+                    } catch (_) {
+                      return {
+                        'error': {'type': 'Failed to authenticate'},
+                      };
+                    }
+                    return {
+                      'status': {'type': 'Success'},
+                      'auth': util.generateAuth(
+                          encrypter: encrypter,
+                          usernameEncrypter: usernameEncrypter,
+                          withIV: true),
+                    };
+                  },
+                ),
+                // #endregion
 
-                  // #region getAccountCredentials
-                  'getAccountCredentials': GlareModule(
-                    name: 'getAccountCredentials',
-                    target: (
-                      args, {
-                      required addModule,
-                      binaryObjects,
-                    }) async {
-                      if (args.length < 4) {
-                        throw {
-                          'error': {'type': 'Missing arguments'},
-                        };
-                      }
-                      String username = args[3];
+                // #region getAccountCredentials
+                'getAccountCredentials': GlareModule(
+                  name: 'getAccountCredentials',
+                  target: (
+                    args, {
+                    required addModule,
+                    binaryObjects,
+                  }) async {
+                    if (args.length < 4) {
+                      throw {
+                        'error': {'type': 'Missing arguments'},
+                      };
+                    }
+                    String username = args[3];
+                    refreshAccounts();
+                    AccountCredentialsFile? creds = _accounts[username];
+                    if (creds == null) {
+                      return {
+                        'error': {
+                          'type': 'Account not found',
+                        },
+                      };
+                    }
+                    Map<String, dynamic> credsJson = creds.value.toJson();
+                    credsJson.remove('passwordHash');
+                    credsJson.remove('bioAuthEnabled');
+                    return {
+                      'credentials': credsJson,
+                    };
+                  },
+                ),
+                // #endregion
+
+                // #region login
+                'login': GlareModule(
+                  name: 'login',
+                  target: (
+                    args, {
+                    required addModule,
+                    binaryObjects,
+                  }) async {
+                    if (args.length < 5) {
+                      throw {
+                        'error': {'type': 'Missing arguments'},
+                      };
+                    }
+                    String username = args[3];
+                    String password = args[4];
+                    String accPath = _accountsPath +
+                        Platform.pathSeparator +
+                        username +
+                        Platform.pathSeparator;
+                    if (loadedModules.containsKey('2d0d1_$username')) {
+                      AccountCredentialsFile oldCreds = _accounts[username]!;
                       refreshAccounts();
                       AccountCredentialsFile? creds = _accounts[username];
                       if (creds == null) {
-                        return {
-                          'error': {
-                            'type': 'Account not found',
-                          },
-                        };
-                      }
-                      Map<String, dynamic> credsJson = creds.value.toJson();
-                      credsJson.remove('passwordHash');
-                      credsJson.remove('bioAuthEnabled');
-                      return {
-                        'credentials': credsJson,
-                      };
-                    },
-                  ),
-                  // #endregion
-
-                  // #region login
-                  'login': GlareModule(
-                    name: 'login',
-                    target: (
-                      args, {
-                      required addModule,
-                      binaryObjects,
-                    }) async {
-                      if (args.length < 5) {
-                        throw {
-                          'error': {'type': 'Missing arguments'},
-                        };
-                      }
-                      String username = args[3];
-                      String password = args[4];
-                      String accPath = _accountsPath +
-                          Platform.pathSeparator +
-                          username +
-                          Platform.pathSeparator;
-                      if (loadedModules.containsKey('2d0d1_$username')) {
-                        AccountCredentialsFile oldCreds = _accounts[username]!;
-                        refreshAccounts();
-                        AccountCredentialsFile? creds = _accounts[username];
-                        if (creds == null) {
-                          loadedModules.remove('2d0d1_$username');
-                          return {
-                            'error': {
-                              'type': 'Failed to login',
-                            },
-                          };
-                        }
-                        if (oldCreds.value.passwordHash ==
-                            creds.value.passwordHash) {
-                          if (creds.value.passwordHash ==
-                              sha512.convert([
-                                ...base64Decode(password),
-                                if (password.length != 32)
-                                  ...utf8.encode(' ' * (32 - password.length)),
-                              ]).toString()) {
-                            return {
-                              'status': {'type': 'Success'},
-                            };
-                          }
-                          return {
-                            'error': {
-                              'type': 'Failed to login',
-                              'local': creds.value.passwordHash,
-                              'remote': sha512
-                                  .convert(base64Decode(password))
-                                  .toString(),
-                            },
-                          };
-                        }
-                      }
-                      loadedModules.remove('2d0d1_$username');
-                      Uint8List passwordBytes;
-                      try {
-                        passwordBytes = base64Decode(password);
-                      } catch (e) {
+                        loadedModules.remove('2d0d1_$username');
+                        serverModules.remove('2d0d1_$username');
                         return {
                           'error': {
                             'type': 'Failed to login',
                           },
                         };
                       }
-                      String result = await _login(username, passwordBytes);
-                      if (result != 'true') {
+                      if (oldCreds.value.passwordHash ==
+                          creds.value.passwordHash) {
+                        if (creds.value.passwordHash ==
+                            sha512.convert([
+                              ...base64Decode(password),
+                              if (password.length != 32)
+                                ...utf8.encode(' ' * (32 - password.length)),
+                            ]).toString()) {
+                          return {
+                            'status': {'type': 'Success'},
+                          };
+                        }
                         return {
-                          'error': {'type': 'Failed to login'},
-                          'hash': sha512.convert(passwordBytes).toString(),
+                          'error': {
+                            'type': 'Failed to login',
+                            'local': creds.value.passwordHash,
+                            'remote': sha512
+                                .convert(base64Decode(password))
+                                .toString(),
+                          },
                         };
                       }
-                      Encrypter encrypter = _encrypters[username]!;
-                      Key key = _keys[username]!;
-                      Map<String, GlareModule> syncModules =
-                          buildSynchronization2d0d0Modules(
-                        username: username,
-                        passyEntries: FullPassyEntriesFileCollection(
-                          idCards: IDCards.fromFile(
-                              File('${accPath}id_cards.enc'),
-                              encrypter: encrypter),
-                          identities: Identities.fromFile(
-                              File('${accPath}identities.enc'),
-                              encrypter: encrypter),
-                          notes: Notes.fromFile(File('${accPath}notes.enc'),
-                              encrypter: encrypter),
-                          passwords: Passwords.fromFile(
-                              File('${accPath}passwords.enc'),
-                              encrypter: encrypter),
-                          paymentCards: PaymentCards.fromFile(
-                              File('${accPath}payment_cards.enc'),
-                              encrypter: encrypter),
-                          fileIndex: FileIndex(
-                              file: File('${accPath}file_index.enc'),
-                              saveDir: Directory('${accPath}files'),
-                              key: key),
-                        ),
-                        encrypter: encrypter,
-                        history: History.fromFile(File('${accPath}history.enc'),
-                            encrypter: encrypter),
-                        fileSyncHistory: FileSyncHistory.fromFile(
-                            File('${accPath}file_sync_history.enc'),
-                            encrypter: encrypter),
-                        favorites: Favorites.fromFile(
-                            File('${accPath}favorites.enc'),
-                            encrypter: encrypter),
-                        settings: AccountSettings.fromFile(
-                            File('${accPath}settings.enc'),
-                            encrypter: encrypter),
-                        localSettings: LocalSettings.fromFile(
-                            File('${accPath}local_settings.json')),
-                        credentials: AccountCredentials.fromFile(
-                            File('${accPath}credentials.json')),
-                        authWithIV:
-                            _accounts[username]!.value.keyDerivationType !=
-                                KeyDerivationType.none,
-                      );
-                      for (MapEntry<String, GlareModule> module
-                          in syncModules.entries) {
-                        loadedModules['${module.key}_$username'] = module.value;
-                        addModule('${module.key}_$username', module.value);
-                      }
+                    }
+                    loadedModules.remove('2d0d1_$username');
+                    serverModules.remove('2d0d1_$username');
+                    Uint8List passwordBytes;
+                    try {
+                      passwordBytes = base64Decode(password);
+                    } catch (e) {
                       return {
-                        'status': {'type': 'Success'},
+                        'error': {
+                          'type': 'Failed to login',
+                        },
                       };
-                    },
-                  ),
-                  // #endregion
+                    }
+                    String result = await _login(username, passwordBytes);
+                    if (result != 'true') {
+                      return {
+                        'error': {'type': 'Failed to login'},
+                        'hash': sha512.convert(passwordBytes).toString(),
+                      };
+                    }
+                    Encrypter encrypter = _encrypters[username]!;
+                    Key key = _keys[username]!;
+                    Map<String, GlareModule> syncModules =
+                        buildSynchronization2d0d0Modules(
+                      username: username,
+                      passyEntries: FullPassyEntriesFileCollection(
+                        idCards: IDCards.fromFile(
+                            File('${accPath}id_cards.enc'),
+                            encrypter: encrypter),
+                        identities: Identities.fromFile(
+                            File('${accPath}identities.enc'),
+                            encrypter: encrypter),
+                        notes: Notes.fromFile(File('${accPath}notes.enc'),
+                            encrypter: encrypter),
+                        passwords: Passwords.fromFile(
+                            File('${accPath}passwords.enc'),
+                            encrypter: encrypter),
+                        paymentCards: PaymentCards.fromFile(
+                            File('${accPath}payment_cards.enc'),
+                            encrypter: encrypter),
+                        fileIndex: FileIndex(
+                            file: File('${accPath}file_index.enc'),
+                            saveDir: Directory('${accPath}files'),
+                            key: key),
+                      ),
+                      encrypter: encrypter,
+                      history: History.fromFile(File('${accPath}history.enc'),
+                          encrypter: encrypter),
+                      fileSyncHistory: FileSyncHistory.fromFile(
+                          File('${accPath}file_sync_history.enc'),
+                          encrypter: encrypter),
+                      favorites: Favorites.fromFile(
+                          File('${accPath}favorites.enc'),
+                          encrypter: encrypter),
+                      settings: AccountSettings.fromFile(
+                          File('${accPath}settings.enc'),
+                          encrypter: encrypter),
+                      localSettings: LocalSettings.fromFile(
+                          File('${accPath}local_settings.json')),
+                      credentials: AccountCredentials.fromFile(
+                          File('${accPath}credentials.json')),
+                      authWithIV:
+                          _accounts[username]!.value.keyDerivationType !=
+                              KeyDerivationType.none,
+                    );
+                    for (MapEntry<String, GlareModule> module
+                        in syncModules.entries) {
+                      loadedModules['${module.key}_$username'] = module.value;
+                      serverModules['${module.key}_$username'] = module.value;
+                      addModule('${module.key}_$username', module.value);
+                    }
+                    return {
+                      'status': {'type': 'Success'},
+                    };
+                  },
+                ),
+                // #endregion
 
-                  // #region getDeviceId
-                  'getDeviceId': GlareModule(
-                    name: 'getDeviceId',
-                    target: (
-                      args, {
-                      required addModule,
-                      binaryObjects,
-                    }) async {
-                      PassyInfoFile infoFile = PassyInfo.fromFile(File(
-                          _passyDataPath +
-                              Platform.pathSeparator +
-                              'passy.json'));
-                      if (infoFile.value.deviceId.isEmpty) {
-                        Random random = Random.secure();
-                        infoFile.value.deviceId =
-                            '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
-                        await infoFile.save();
-                      }
-                      return {
-                        'hostDeviceId': infoFile.value.deviceId,
-                      };
-                    },
-                  ),
-                  // #endregion
+                // #region getDeviceId
+                'getDeviceId': GlareModule(
+                  name: 'getDeviceId',
+                  target: (
+                    args, {
+                    required addModule,
+                    binaryObjects,
+                  }) async {
+                    PassyInfoFile infoFile = PassyInfo.fromFile(File(
+                        _passyDataPath +
+                            Platform.pathSeparator +
+                            'passy.json'));
+                    if (infoFile.value.deviceId.isEmpty) {
+                      Random random = Random.secure();
+                      infoFile.value.deviceId =
+                          '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
+                      await infoFile.save();
+                    }
+                    return {
+                      'hostDeviceId': infoFile.value.deviceId,
+                    };
+                  },
+                ),
+                // #endregion
 
-                  // #region getTrustedConnection
-                  'getTrustedConnection': GlareModule(
-                    name: 'getTrustedConnection',
-                    target: (
-                      args, {
-                      required addModule,
-                      binaryObjects,
-                    }) async {
-                      if (args.length < 5) {
-                        throw {
-                          'error': {'type': 'Missing arguments'},
-                        };
-                      }
-                      String username = args[3];
-                      String deviceId = args[4];
-                      if (deviceId.length < 16) {
-                        throw {
-                          'error': {'type': 'Invalid device id'},
-                        };
-                      }
-                      PassyInfoFile infoFile = PassyInfo.fromFile(File(
-                          _passyDataPath +
-                              Platform.pathSeparator +
-                              'passy.json'));
-                      if (infoFile.value.deviceId.isEmpty) {
-                        Random random = Random.secure();
-                        infoFile.value.deviceId =
-                            '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
-                        await infoFile.save();
-                      }
-                      File hashFile = File(_accountsPath +
-                          Platform.pathSeparator +
-                          username +
-                          Platform.pathSeparator +
-                          'trusted_connections' +
-                          Platform.pathSeparator +
-                          '${infoFile.value.deviceId}--$deviceId');
-                      String? fileData;
-                      if (await hashFile.exists()) {
-                        fileData = await hashFile.readAsString();
-                      }
-                      return {
-                        'hostDeviceId': infoFile.value.deviceId,
-                        'connectionData': fileData,
+                // #region getTrustedConnection
+                'getTrustedConnection': GlareModule(
+                  name: 'getTrustedConnection',
+                  target: (
+                    args, {
+                    required addModule,
+                    binaryObjects,
+                  }) async {
+                    if (args.length < 5) {
+                      throw {
+                        'error': {'type': 'Missing arguments'},
                       };
-                    },
-                  ),
-                  // #endregion
+                    }
+                    String username = args[3];
+                    String deviceId = args[4];
+                    if (deviceId.length < 16) {
+                      throw {
+                        'error': {'type': 'Invalid device id'},
+                      };
+                    }
+                    PassyInfoFile infoFile = PassyInfo.fromFile(File(
+                        _passyDataPath +
+                            Platform.pathSeparator +
+                            'passy.json'));
+                    if (infoFile.value.deviceId.isEmpty) {
+                      Random random = Random.secure();
+                      infoFile.value.deviceId =
+                          '${DateTime.now().toUtc().toIso8601String().replaceAll(':', 'c')}-${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}${random.nextInt(9)}';
+                      await infoFile.save();
+                    }
+                    File hashFile = File(_accountsPath +
+                        Platform.pathSeparator +
+                        username +
+                        Platform.pathSeparator +
+                        'trusted_connections' +
+                        Platform.pathSeparator +
+                        '${infoFile.value.deviceId}--$deviceId');
+                    String? fileData;
+                    if (await hashFile.exists()) {
+                      fileData = await hashFile.readAsString();
+                    }
+                    return {
+                      'hostDeviceId': infoFile.value.deviceId,
+                      'connectionData': fileData,
+                    };
+                  },
+                ),
+                // #endregion
 
-                  // #region setTrustedConnection
-                  'setTrustedConnection': GlareModule(
-                    name: 'setTrustedConnection',
-                    target: (
-                      args, {
-                      required addModule,
-                      binaryObjects,
-                    }) async {
-                      if (args.length < 7) {
-                        throw {
-                          'error': {'type': 'Missing arguments'},
-                        };
-                      }
-                      String username = args[3];
-                      String deviceId = args[4];
-                      String auth = args[5];
-                      String connectionData = args[6];
-                      if (deviceId.length < 16) {
-                        throw {
-                          'error': {'type': 'Invalid device id'},
-                        };
-                      }
-                      Encrypter? encrypter = _encrypters[username];
-                      Encrypter usernameEncrypter =
-                          pcommon.getPassyEncrypter(username);
-                      if (encrypter == null) {
-                        return {
-                          'error': {'type': 'Failed to authenticate'},
-                        };
-                      }
-                      try {
-                        lastDate = util.verifyAuth(auth,
-                            lastAuth: lastAuth,
-                            lastDate: lastDate,
-                            encrypter: encrypter,
-                            usernameEncrypter: usernameEncrypter,
-                            withIV: true);
-                        lastAuth = auth;
-                      } catch (_) {
-                        return {
-                          'error': {'type': 'Failed to authenticate'},
-                        };
-                      }
-                      PassyInfoFile infoFile = PassyInfo.fromFile(File(
-                          _passyDataPath +
-                              Platform.pathSeparator +
-                              'passy.json'));
-                      File hashFile = File(_accountsPath +
-                          Platform.pathSeparator +
-                          username +
-                          Platform.pathSeparator +
-                          'trusted_connections' +
-                          Platform.pathSeparator +
-                          '${infoFile.value.deviceId}--$deviceId');
-                      TrustedConnectionData connectionDataDecrypted =
-                          TrustedConnectionData.fromEncrypted(
-                              data: connectionData, encrypter: encrypter);
-                      connectionDataDecrypted.version = connectionDataDecrypted
-                          .version
-                          .add(const Duration(milliseconds: 1));
-                      if (!await hashFile.exists()) {
-                        await hashFile.create(recursive: true);
-                      }
-                      await hashFile.writeAsString(
-                          connectionDataDecrypted.toEncrypted(encrypter));
-                      return {
-                        'status': {'type': 'Success'},
+                // #region setTrustedConnection
+                'setTrustedConnection': GlareModule(
+                  name: 'setTrustedConnection',
+                  target: (
+                    args, {
+                    required addModule,
+                    binaryObjects,
+                  }) async {
+                    if (args.length < 7) {
+                      throw {
+                        'error': {'type': 'Missing arguments'},
                       };
-                    },
-                  ),
-                  // #endregion
-                },
+                    }
+                    String username = args[3];
+                    String deviceId = args[4];
+                    String auth = args[5];
+                    String connectionData = args[6];
+                    if (deviceId.length < 16) {
+                      throw {
+                        'error': {'type': 'Invalid device id'},
+                      };
+                    }
+                    Encrypter? encrypter = _encrypters[username];
+                    Encrypter usernameEncrypter =
+                        pcommon.getPassyEncrypter(username);
+                    if (encrypter == null) {
+                      return {
+                        'error': {'type': 'Failed to authenticate'},
+                      };
+                    }
+                    try {
+                      lastDate = util.verifyAuth(auth,
+                          lastAuth: lastAuth,
+                          lastDate: lastDate,
+                          encrypter: encrypter,
+                          usernameEncrypter: usernameEncrypter,
+                          withIV: true);
+                      lastAuth = auth;
+                    } catch (_) {
+                      return {
+                        'error': {'type': 'Failed to authenticate'},
+                      };
+                    }
+                    PassyInfoFile infoFile = PassyInfo.fromFile(File(
+                        _passyDataPath +
+                            Platform.pathSeparator +
+                            'passy.json'));
+                    File hashFile = File(_accountsPath +
+                        Platform.pathSeparator +
+                        username +
+                        Platform.pathSeparator +
+                        'trusted_connections' +
+                        Platform.pathSeparator +
+                        '${infoFile.value.deviceId}--$deviceId');
+                    TrustedConnectionData connectionDataDecrypted =
+                        TrustedConnectionData.fromEncrypted(
+                            data: connectionData, encrypter: encrypter);
+                    connectionDataDecrypted.version = connectionDataDecrypted
+                        .version
+                        .add(const Duration(milliseconds: 1));
+                    if (!await hashFile.exists()) {
+                      await hashFile.create(recursive: true);
+                    }
+                    await hashFile.writeAsString(
+                        connectionDataDecrypted.toEncrypted(encrypter));
+                    return {
+                      'status': {'type': 'Success'},
+                    };
+                  },
+                ),
+                // #endregion
+              };
+
+              GlareServer glareHost = await GlareServer.bind(
+                maxBindTries: 0,
+                address: host,
+                port: port,
+                keypair: RSAKeypair.fromRandom(keySize: 4096),
+                modules: serverModules,
                 serviceInfo:
                     'Passy cross-platform password manager dedicated entry synchronization server v${pcommon.syncVersion}',
               );
