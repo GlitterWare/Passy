@@ -927,6 +927,10 @@ Future<void> executeCommand(List<String> command,
     // #region hide
     case 'hide':
       if (_isNativeMessaging) break;
+      if (!Platform.isWindows) {
+        log('false', id: id);
+        return;
+      }
       try {
         ShowWindow(GetConsoleWindow(), SHOW_WINDOW_CMD.SW_HIDE);
       } catch (e, s) {
