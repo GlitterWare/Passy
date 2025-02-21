@@ -994,10 +994,10 @@ class Synchronization {
         apiVersion,
       ]));
       if (serverCommands.containsKey('error')) {
-        onTrustSaveFailed?.call();
-        _handleException(
-            '2.0.0+ synchronization host error:\n${jsonEncode(serverCommands)}');
-        return;
+        _syncLog +=
+            '\nWarning: 2.0.0+ synchronization host error:\n${jsonEncode(serverCommands)}\n';
+        serverCommands = {};
+        serverCommands['commands'] = <dynamic>[];
       }
       dynamic serverCommandsListJson = serverCommands['commands'];
       if (serverCommandsListJson is! List<dynamic>) {
