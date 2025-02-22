@@ -34,3 +34,5 @@ echo 'INFO:Changing version in `passy.iss`.'
 sed -i 's/"'$version'"/"'$newVersion'"/' ./passy.iss
 echo 'INFO:Changing version in `snap/snapcraft.yaml`.'
 sed -i 's/version: '\'v$version\''/version: '\'v$newVersion\''/' ./snap/snapcraft.yaml
+echo 'All done.'
+echo 'Please manually update the build number in `pubspec.yaml` and the build date in `linux_assets/com.glitterware.passy.appdata.xml`.'
