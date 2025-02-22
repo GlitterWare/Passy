@@ -21,6 +21,24 @@ import 'synchronization_2d0d0_utils.dart' as util;
 import 'common.dart';
 import 'favorites.dart';
 
+const sync2d0d0CommandsList = {
+  'commands': [
+    {'name': 'checkAccount'},
+    {'name': 'authenticate'},
+    {'name': 'getHashes'},
+    {'name': 'getHistoryEntries'},
+    {'name': 'getEntries'},
+    {'name': 'getSharedEntries'},
+    {'name': 'setEntries'},
+    {'name': 'getFavoritesEntries'},
+    {'name': 'setFavoritesEntries'},
+    {'name': 'getFileSyncHistoryEntries'},
+    {'name': 'getFile'},
+    {'name': 'setFile'},
+    {'name': 'exchangeAppSettings'},
+  ]
+};
+
 Map<String, GlareModule> buildSynchronization2d0d0Modules({
   required String username,
   required FullPassyEntriesFileCollection passyEntries,
@@ -75,23 +93,7 @@ Map<String, GlareModule> buildSynchronization2d0d0Modules({
         DateTime lastDate =
             DateTime.now().toUtc().subtract(const Duration(hours: 12));
         if (args.length == 3) {
-          return {
-            'commands': [
-              {'name': 'checkAccount'},
-              {'name': 'authenticate'},
-              {'name': 'getHashes'},
-              {'name': 'getHistoryEntries'},
-              {'name': 'getEntries'},
-              {'name': 'getSharedEntries'},
-              {'name': 'setEntries'},
-              {'name': 'getFavoritesEntries'},
-              {'name': 'setFavoritesEntries'},
-              {'name': 'getFileSyncHistoryEntries'},
-              {'name': 'getFile'},
-              {'name': 'setFile'},
-              {'name': 'exchangeAppSettings'},
-            ]
-          };
+          return sync2d0d0CommandsList;
         }
 
         Map<String, dynamic> checkArgs(List<String> args) {

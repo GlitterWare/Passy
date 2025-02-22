@@ -2071,7 +2071,18 @@ Future<void> executeCommand(List<String> command,
               DateTime lastDate =
                   DateTime.now().toUtc().subtract(const Duration(hours: 12));
               Map<String, GlareModule> serverModules = {};
+              String apiVersion = '2d0d1';
               serverModules = {
+                apiVersion: GlareModule(
+                    name: 'Passy 2.0.0+ Synchronization Modules',
+                    target: (
+                      args, {
+                      required addModule,
+                      Map<String, List<int>>? binaryObjects,
+                    }) async {
+                      return sync2d0d0CommandsList;
+                    }),
+
                 ...loadedModules,
 
                 // #region authenticate
