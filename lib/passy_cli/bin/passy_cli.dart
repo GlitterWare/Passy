@@ -2080,7 +2080,12 @@ Future<void> executeCommand(List<String> command,
                       required addModule,
                       Map<String, List<int>>? binaryObjects,
                     }) async {
-                      return sync2d0d0CommandsList;
+                      if (args.length == 3) {
+                        return sync2d0d0CommandsList;
+                      }
+                      throw {
+                        'error': {'type': 'No such command'}
+                      };
                     }),
 
                 ...loadedModules,
