@@ -80,7 +80,11 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    MediaKit.ensureInitialized();
+    if (Platform.isLinux) {
+      MediaKit.ensureInitialized(libmpv: 'libmpv.so');
+    } else {
+      MediaKit.ensureInitialized();
+    }
   } catch (e) {
     // ignore: avoid_print
     print('E:`MediaKit.ensureInitialized()` failed: $e');
