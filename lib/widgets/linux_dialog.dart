@@ -77,7 +77,7 @@ class LinuxDialog extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   onPressed: () => window.open(
-                    'https://github.com/GlitterWare/Passy/releases/download/$releaseVersion/Passy-$releaseVersion-x86-64.AppImage',
+                    'https://github.com/GlitterWare/Passy/releases/download/$releaseVersion$tagSuffix/Passy-$releaseVersion-x86-64.AppImage',
                     'AppImage',
                   ),
                 )),

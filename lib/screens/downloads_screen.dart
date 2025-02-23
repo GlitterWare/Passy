@@ -64,7 +64,7 @@ class _DownloadsScreen extends State<DownloadsScreen> {
                           textAlign: TextAlign.center,
                         ),
                         onPressed: () => window.open(
-                            'https://github.com/GlitterWare/Passy/releases/download/$releaseVersion/Passy-$releaseVersion-Windows-Installer.exe',
+                            'https://github.com/GlitterWare/Passy/releases/download/$releaseVersion$tagSuffix/Passy-$releaseVersion-Windows-Installer.exe',
                             'Windows'),
                       ))),
                 ),
