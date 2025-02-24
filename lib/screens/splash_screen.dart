@@ -192,6 +192,13 @@ class SplashScreen extends StatelessWidget {
           if (!(await nativeManifestFile.exists())) {
             await nativeManifestFile.create();
           }
+          // https://github.com/GlitterWare/Passy-Browser-Extension/issues/2
+          if (nativeManifestPath.contains('.mozilla')) {
+            await nativeManifestFile.writeAsString(contents.replaceFirst(
+                ',"allowed_origins":["chrome-extension://lndgiajgfcgocmgdiamhffipffjnpigl/","chrome-extension://khcfpejnhlonmipnjmlebjncibplamff/"]',
+                ''));
+            continue;
+          }
           await nativeManifestFile.writeAsString(contents);
         } catch (_) {}
       }
