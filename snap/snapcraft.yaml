@@ -76,7 +76,6 @@ parts:
       #region Passy dependencies
       - libayatana-appindicator3-dev
       - libmpv-dev
-      - mpv
       #endregion
     stage-packages:
       - zenity
