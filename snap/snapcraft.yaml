@@ -1,6 +1,6 @@
 name: passy
 base: core22
-version: 'v1.9.3'
+version: 'v1.9.4'
 summary: Offline password manager with cross-platform synchronization # 79 char long summary
 description: |
   Store passwords, payment cards notes, ID cards and identities offline and safe, synchronized between all of your devices.

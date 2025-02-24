@@ -18,7 +18,7 @@ import 'dart:io';
 import 'glare/glare_client.dart';
 import 'key_derivation_type.dart';
 
-const String passyVersion = '1.9.3';
+const String passyVersion = '1.9.4';
 const String syncVersion = '2.2.0';
 const String accountVersion = '2.5.0';
 
