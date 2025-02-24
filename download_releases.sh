@@ -64,6 +64,7 @@ cp linux-arm64-bundle/Passy-Linux-ARM64-Bundle.zip ./Passy-v$version-Linux-ARM64
 cp linux-arm64-bundle-no-updates-popup/Passy-Linux-ARM64-Bundle.zip ./Passy-v$version-Linux-ARM64-Bundle-No-Updates-Popup.zip
 echo 'Preparing Passy Linux Bundle...'
 cp linux-bundle/Passy-Linux-Bundle.zip ./Passy-v$version-Linux-Bundle.zip
+unzip ./Passy-v$version-Linux-Bundle.zip
 cp linux-bundle-no-updates-popup/Passy-Linux-Bundle.zip ./Passy-v$version-Linux-Bundle-No-Updates-Popup.zip
 echo 'Preparing Passy Windows Installer...'
 cp windows-exe-installer/Passy-Windows-Installer.exe ./Passy-v$version-Windows-Installer.exe
