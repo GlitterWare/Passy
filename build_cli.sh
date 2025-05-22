@@ -22,7 +22,7 @@ cd ./build/cli
 echo 'Cloning Argon2...'
 git submodule update --init --recursive
 if [ -d ./phc-winner-argon2 ]; then rm -rf ./phc-winner-argon2; fi
-make -C ../../submodules/phc-winner-argon2
+OPTTARGET=none make -C ../../submodules/phc-winner-argon2
 cp ../../submodules/phc-winner-argon2/libargon2.so.1 ./latest/lib/libargon2.so
 echo 'All done.'
 echo "Passy CLI: $PWD/latest"

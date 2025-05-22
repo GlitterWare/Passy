@@ -163,6 +163,7 @@ install(FILES "${CLI_BIN_FILE}" "${CLI_NATIVE_MESSAGING}" "${CLI_NATIVE_MESSAGIN
 # Build Argon2
 set(ARGON2_SOURCE "${SUBMODULES_DIR}/phc-winner-argon2")
 set(ARGON2_BIN "${ARGON2_SOURCE}/libargon2.so.1")
+set(ENV{OPTTARGET} "none")
 execute_process(COMMAND "make" "-C" "${ARGON2_SOURCE}" RESULT_VARIABLE ret)
 if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Argon2: Bad exit status")
