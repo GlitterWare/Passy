@@ -10,72 +10,18 @@ class StringGeneratorDialog extends StatefulWidget {
 }
 
 class _StringGeneratorDialog extends State<StringGeneratorDialog> {
-  static const String _letters =
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  static const String _numbers = '1234567890';
-  static const String _symbols = '.,;#&()^*_-';
-  static const double _minSpecial = 8 / 25;
-  static const double _halfMinSpecial = 4 / 25;
-
   String _value = '';
   int _length = 18;
   bool _numbersEnabled = true;
   bool _symbolsEnabled = true;
-  String _characterSet = _letters + _numbers + _symbols;
   bool _shouldGenerate = false;
   Future<void>? _generateLoopFuture;
 
   void _generatePassword() {
-    String newVal = '';
-    int minSpecial;
-    if (_numbersEnabled && _symbolsEnabled) {
-      minSpecial = (_halfMinSpecial * _length).round();
-      while (true) {
-        newVal = PassyGen.generateString(_characterSet, _length);
-        int numCount = 0;
-        int symCount = 0;
-        for (String c in newVal.characters) {
-          if (_numbers.contains(c)) {
-            numCount++;
-            continue;
-          }
-          if (_symbols.contains(c)) {
-            symCount++;
-            continue;
-          }
-        }
-        if (numCount >= minSpecial) {
-          if (symCount >= minSpecial) {
-            break;
-          }
-        }
-      }
-    } else if (_numbersEnabled || _symbolsEnabled) {
-      minSpecial = (_minSpecial * _length).round();
-      String special;
-      if (_numbersEnabled) {
-        special = _numbers;
-      } else {
-        special = _symbols;
-      }
-      while (true) {
-        newVal = PassyGen.generateString(_characterSet, _length);
-        int specialCount = 0;
-        for (String c in newVal.characters) {
-          if (special.contains(c)) {
-            specialCount++;
-            continue;
-          }
-        }
-        if (specialCount >= minSpecial) break;
-      }
-    } else {
-      newVal = PassyGen.generateString(_characterSet, _length);
-    }
-    if (!mounted) return;
-    setState(() {
-      _value = newVal;
-    });
+    setState(() => _value = PassyGen.generateComplexPassword(
+        length: _length,
+        includeNumbers: _numbersEnabled,
+        includeSymbols: _symbolsEnabled));
   }
 
   Future<void> _generateLoop() async {
@@ -93,16 +39,9 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
     }
   }
 
-  void _buildCharacterSet() {
-    _characterSet = _letters;
-    if (_numbersEnabled) _characterSet += _numbers;
-    if (_symbolsEnabled) _characterSet += _symbols;
-  }
-
   void _setNumbersEnabled(bool value) {
     setState(() {
       _numbersEnabled = value;
-      _buildCharacterSet();
       _shouldGenerate = true;
     });
   }
@@ -110,7 +49,6 @@ class _StringGeneratorDialog extends State<StringGeneratorDialog> {
   void _setSymbolsEnabled(bool value) {
     setState(() {
       _symbolsEnabled = value;
-      _buildCharacterSet();
       _shouldGenerate = true;
     });
   }
