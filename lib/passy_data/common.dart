@@ -7,7 +7,7 @@ import 'package:compute/compute.dart';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:crypton/crypton.dart';
-import 'package:dargon2_flutter/dargon2_flutter.dart';
+import 'dargon2.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:intranet_ip/intranet_ip.dart';
 import 'package:passy/passy_data/argon2_info.dart';
