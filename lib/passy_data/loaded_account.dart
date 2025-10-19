@@ -24,6 +24,7 @@ import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_data/trusted_connection_data.dart';
 import 'dart:io';
+import 'package:encrypt/encrypt.dart' as enc;
 
 import 'account_credentials.dart';
 import 'account_settings.dart';
@@ -70,6 +71,8 @@ class LoadedAccount {
   final Map<String, Sync2d0d0ServerInfo> _serversToTrust = {};
   final Map<String, Completer<void>> _serversToTrustCompleters = {};
   final Map<DateTime, String> _synchronizationLogs = {};
+
+  String get deviceId => _deviceId;
 
   LoadedAccount({
     required Encrypter encrypter,
@@ -244,6 +247,24 @@ class LoadedAccount {
         idCards: idCards,
         identities: identities,
         fileIndex: fileIndex);
+  }
+
+  Future<LoadedAccount> loadFromPath({required String path}) async {
+    final creds = AccountCredentials.fromFile(
+        File(path + Platform.pathSeparator + 'credentials.json'));
+    enc.Key key = await derivePassword(
+        decrypt(_encryptedPassword, encrypter: _encrypter),
+        derivationType: creds.value.keyDerivationType,
+        derivationInfo: creds.value.keyDerivationInfo);
+    enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
+    return LoadedAccount.fromDirectory(
+      path: path,
+      encrypter: encrypter,
+      encryptedPassword: _encryptedPassword,
+      key: key,
+      credentials: creds,
+      deviceId: _deviceId,
+    );
   }
 
   Future<void> setAccountPassword(
