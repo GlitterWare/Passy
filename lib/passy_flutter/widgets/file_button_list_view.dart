@@ -25,7 +25,7 @@ class FileButtonListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (shouldSort) PassySort.sortFiles(files);
-    return Column(
+    return ListView(
       children: [
         if (topWidgets != null) ...topWidgets!,
         for (FileEntry file in files)
