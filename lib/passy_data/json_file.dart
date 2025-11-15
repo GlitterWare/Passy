@@ -46,12 +46,13 @@ class JsonFile<T extends JsonConvertable> with SaveableFileBase {
   @override
   void saveSync() => _file.writeAsStringSync(jsonEncode(value));
 
-  EncryptedJsonFile<T> toEncryptedJSONFile(Encrypter encrypter) =>
+  EncryptedJsonFile<T> toEncryptedJSONFile(Encrypter encrypter, {IV? iv}) =>
       EncryptedJsonFile<T>(
         _file,
         encrypter: encrypter,
         fromJson: _fromJson,
         value: value,
+        iv: iv,
       );
 
   Future<void> reload() async =>
