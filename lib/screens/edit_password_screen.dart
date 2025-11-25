@@ -282,14 +282,20 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                                 '2FA ${localizations.secret.toLowerCase()}'),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-z]|[A-Z]|[2-7]')),
+                              RegExp(r'[a-z]|[A-Z]|[0-9]')),
                           TextInputFormatter.withFunction(
                               (oldValue, newValue) => TextEditingValue(
                                   text: newValue.text.toUpperCase(),
                                   selection: newValue.selection)),
                         ],
                         onChanged: (value) {
-                          if (value.length.isOdd) value += '=';
+                          if (!value.contains('0') &&
+                              !value.contains('1') &&
+                              !value.contains('8') &&
+                              !value.contains('9') &&
+                              value.length.isOdd) {
+                            value += '=';
+                          }
                           setState(() => _tfaSecret = value);
                         },
                       )),

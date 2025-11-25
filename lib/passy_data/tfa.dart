@@ -6,9 +6,9 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/csv_convertable.dart';
 import 'package:passy/passy_data/json_convertable.dart';
 import 'package:base32/base32.dart';
+import 'package:convert/convert.dart';
 
 enum TFAType {
-// ignore: constant_identifier_names
   TOTP,
 // ignore: constant_identifier_names
   HOTP,
@@ -41,29 +41,53 @@ Algorithm? algorithmFromName(String name) {
 }
 
 class TFA with JsonConvertable, CSVConvertable {
-  String secret;
+  String _secret;
+  String _secretFormatted = '';
   int length;
   int interval;
   Algorithm algorithm;
   bool isGoogle;
   TFAType type;
 
+  void _formatHex() {
+    // Format hex
+    if (_secret.contains('0') ||
+        _secret.contains('1') ||
+        _secret.contains('8') ||
+        _secret.contains('9')) {
+      _secretFormatted = base32.encode(Uint8List.fromList(hex.decode(_secret)));
+    } else {
+      _secretFormatted = _secret;
+    }
+  }
+
+  String get secret => _secret;
+  set secret(String value) {
+    _secret = value;
+    _formatHex();
+  }
+
   TFA({
-    this.secret = '',
+    String secret = '',
     this.length = 6,
     this.interval = 30,
     this.algorithm = Algorithm.SHA1,
     this.isGoogle = true,
     this.type = TFAType.TOTP,
-  });
+  }) : _secret = secret {
+    _formatHex();
+  }
 
   TFA.fromJson(Map<String, dynamic> json)
-      : secret = json['secret'],
+      : _secret = json['secret'],
         length = json['length'],
         interval = json['interval'],
         algorithm = algorithmFromName(json['algorithm']) ?? Algorithm.SHA1,
         isGoogle = json['isGoogle'] ?? true,
-        type = tfaTypeFromName(json['type'] ?? TFAType.TOTP.name) ?? TFAType.TOTP;
+        type =
+            tfaTypeFromName(json['type'] ?? TFAType.TOTP.name) ?? TFAType.TOTP {
+    _formatHex();
+  }
 
   factory TFA.fromCSV(List csv) {
     if (csv.length == 5) csv.add(TFAType.TOTP.name);
@@ -78,7 +102,7 @@ class TFA with JsonConvertable, CSVConvertable {
 
   @override
   Map<String, dynamic> toJson() => {
-        'secret': secret,
+        'secret': _secret,
         'length': length,
         'interval': interval,
         'algorithm': algorithm.name,
@@ -88,7 +112,7 @@ class TFA with JsonConvertable, CSVConvertable {
 
   @override
   List toCSV() => [
-        secret,
+        _secret,
         length.toString(),
         interval.toString(),
         algorithm.name,
@@ -98,7 +122,7 @@ class TFA with JsonConvertable, CSVConvertable {
 
   String _generateTOTP() {
     return OTP.generateTOTPCodeString(
-      secret,
+      _secretFormatted,
       DateTime.now().millisecondsSinceEpoch,
       length: length,
       interval: interval,
@@ -109,7 +133,7 @@ class TFA with JsonConvertable, CSVConvertable {
 
   String _generateHOTP() {
     return OTP.generateHOTPCodeString(
-      secret,
+      _secretFormatted,
       interval,
       length: length,
       algorithm: algorithm,
@@ -124,7 +148,7 @@ class TFA with JsonConvertable, CSVConvertable {
           4,
           ((DateTime.now().millisecondsSinceEpoch / 1000).floor() / 30).floor(),
           Endian.big);
-    Hmac hmac = Hmac(sha1, base32.decode(secret));
+    Hmac hmac = Hmac(sha1, base32.decode(_secret));
     Digest digest = hmac.convert(time.buffer.asUint8List());
     var bytes = digest.bytes;
     var start = bytes[19] & 0x0F;
