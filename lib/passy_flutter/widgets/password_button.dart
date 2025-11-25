@@ -27,7 +27,7 @@ class PasswordButton extends StatelessWidget {
         child: ThreeWidgetButton(
           left: Padding(
             padding: const EdgeInsets.only(right: 30),
-            child: password.websites[0] == ''
+            child: password.websites.isEmpty || password.websites[0].isEmpty
                 ? SvgPicture.asset(
                     logoCircleSvg,
                     colorFilter: ColorFilter.mode(
