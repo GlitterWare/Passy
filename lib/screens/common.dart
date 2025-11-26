@@ -614,16 +614,16 @@ List<PopupMenuEntry> filePopupMenuBuilder(
         content: Text(localizations.export),
         icon: const Icon(Icons.ios_share_rounded),
         onTap: () async {
+          Navigator.pushNamed(context, SplashScreen.routeName);
           await Future.delayed(const Duration(milliseconds: 200));
           String? expFile;
           if (Platform.isAndroid) {
-            String? expDir = await FilePicker.platform.getDirectoryPath(
+            Uint8List bytes = await data.loadedAccount!
+                .readFileAsBytes(fileEntry.key, useIsolate: true);
+            expFile = await FilePicker.platform.saveFile(
               dialogTitle: localizations.exportPassy,
-              lockParentWindow: true,
+              bytes: bytes,
             );
-            if (expDir != null) {
-              expFile = expDir + Platform.pathSeparator + fileEntry.name;
-            }
           } else {
             expFile = await FilePicker.platform.saveFile(
               dialogTitle: localizations.exportPassy,
@@ -631,15 +631,17 @@ List<PopupMenuEntry> filePopupMenuBuilder(
               fileName: fileEntry.name,
             );
           }
-          if (expFile == null) return;
-          Navigator.pushNamed(context, SplashScreen.routeName);
+          if (expFile == null) {
+            Navigator.pop(context);
+            return;
+          }
           await Future.delayed(const Duration(milliseconds: 200));
-          await data.loadedAccount!
-              .exportFile(fileEntry.key, file: File(expFile));
+          if (!Platform.isAndroid) {
+            await data.loadedAccount!
+                .exportFile(fileEntry.key, file: File(expFile));
+          }
           Navigator.pop(context);
           await (onChanged?.call());
-          if (!context.mounted) return;
-          Navigator.pop(context);
           showSnackBar(
             message: localizations.exportSaved,
             icon: const Icon(Icons.ios_share_rounded),
