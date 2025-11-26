@@ -121,24 +121,61 @@ class TFA with JsonConvertable, CSVConvertable {
       ];
 
   String _generateTOTP() {
-    return OTP.generateTOTPCodeString(
-      _secretFormatted,
-      DateTime.now().millisecondsSinceEpoch,
-      length: length,
-      interval: interval,
-      algorithm: algorithm,
-      isGoogle: isGoogle,
-    );
+    try {
+      return OTP.generateTOTPCodeString(
+        _secretFormatted,
+        DateTime.now().millisecondsSinceEpoch,
+        length: length,
+        interval: interval,
+        algorithm: algorithm,
+        isGoogle: isGoogle,
+      );
+    } catch (_) {
+      if (_secretFormatted == _secret) rethrow;
+      String secretHex = base32.encode(Uint8List.fromList(hex.decode(_secret)));
+      bool ok = true;
+      try {
+        return OTP.generateTOTPCodeString(
+          secretHex,
+          DateTime.now().millisecondsSinceEpoch,
+          length: length,
+          interval: interval,
+          algorithm: algorithm,
+          isGoogle: isGoogle,
+        );
+      } catch (_) {
+        ok = false;
+      }
+      if (!ok) rethrow;
+    }
   }
 
   String _generateHOTP() {
-    return OTP.generateHOTPCodeString(
-      _secretFormatted,
-      interval,
-      length: length,
-      algorithm: algorithm,
-      isGoogle: isGoogle,
-    );
+    try {
+      return OTP.generateHOTPCodeString(
+        _secretFormatted,
+        interval,
+        length: length,
+        algorithm: algorithm,
+        isGoogle: isGoogle,
+      );
+    } catch (_) {
+      if (_secretFormatted == _secret) rethrow;
+      String secretHex = base32.encode(Uint8List.fromList(hex.decode(_secret)));
+      bool ok = true;
+      try {
+        return OTP.generateHOTPCodeString(
+          secretHex,
+          interval,
+          length: length,
+          algorithm: algorithm,
+          isGoogle: isGoogle,
+        );
+      } catch (_) {
+        ok = false;
+      }
+      if (!ok) rethrow;
+    }
   }
 
   String _generateSteam() {
