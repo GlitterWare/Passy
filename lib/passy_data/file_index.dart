@@ -333,7 +333,9 @@ class FileIndex {
         }
         await sink.flush();
         await sink.close();
-        if (Platform.isWindows) await Future.delayed(Duration(seconds: 1));
+        if (Platform.isWindows) {
+          await Future.delayed(const Duration(seconds: 1));
+        }
         await file.delete();
       }
     }
@@ -364,7 +366,7 @@ class FileIndex {
       }
       await sink.flush();
       await sink.close();
-      if (Platform.isWindows) await Future.delayed(Duration(seconds: 1));
+      if (Platform.isWindows) await Future.delayed(const Duration(seconds: 1));
       await file.delete();
     }
     await _setEntry(key, null);

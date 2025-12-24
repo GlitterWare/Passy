@@ -9,6 +9,7 @@ import 'package:base32/base32.dart';
 import 'package:convert/convert.dart';
 
 enum TFAType {
+// ignore: constant_identifier_names
   TOTP,
 // ignore: constant_identifier_names
   HOTP,
