@@ -989,6 +989,7 @@ Future<void> toggleTray(BuildContext context) async {
             await windowManager.show();
             await windowManager.focus();
             await Future.delayed(const Duration(milliseconds: 100));
+            await windowManager.restore();
           }
         },
       ),

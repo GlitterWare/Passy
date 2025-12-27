@@ -35,7 +35,8 @@ class _UnlockScreen extends State<UnlockScreen>
   final TextEditingController _passwordController = TextEditingController();
   bool _unlockScreenOn = false;
   final FocusNode _passwordFocus = FocusNode();
-  Completer? _lockCompleter = Completer();
+  AppLifecycleState _lastState = AppLifecycleState.resumed;
+  DateTime _lastActive = DateTime.now().toUtc();
 
   void _logOut() {
     Navigator.popUntil(navigatorKey.currentContext!,
@@ -132,7 +133,7 @@ class _UnlockScreen extends State<UnlockScreen>
     }
   }
 
-  void _lockScreen({bool isResumed = false}) {
+  void _lockScreen() {
     if (!UnlockScreen.shouldLockScreen) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
@@ -141,41 +142,44 @@ class _UnlockScreen extends State<UnlockScreen>
       setState(() => _unlockScreenOn = true);
       return;
     }
-    Completer? lockCompleter = _lockCompleter;
-    if (isResumed && lockCompleter != null) {
-      if (lockCompleter.isCompleted) setState(() => _unlockScreenOn = true);
-      _lockCompleter = null;
-    } else if (lockCompleter == null) {
-      lockCompleter = Completer();
-      _lockCompleter = lockCompleter;
-      Future.delayed(Duration(milliseconds: account.autoScreenLockDelay))
-          .then((value) => lockCompleter!.complete());
+    if (_lastState == AppLifecycleState.resumed) {
+      _lastActive = DateTime.now().toUtc();
+    }
+    if (_lastActive
+        .add(Duration(milliseconds: account.autoScreenLockDelay))
+        .isBefore(DateTime.now().toUtc())) {
+      setState(() => _unlockScreenOn = true);
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
-    if (_unlockScreenOn) {
-      if (state == AppLifecycleState.resumed) {
-        _passwordFocus.requestFocus();
-        await _bioAuth();
+    try {
+      if (_unlockScreenOn) {
+        if (state == AppLifecycleState.resumed) {
+          _passwordFocus.requestFocus();
+          await _bioAuth();
+        }
+        return;
       }
-      return;
+      if (UnlockScreen.isAuthenticating) return;
+      if (state == _lastState) return;
+      if (state != AppLifecycleState.resumed &&
+          state != AppLifecycleState.inactive) return;
+      _lockScreen();
+    } finally {
+      _lastState = state;
     }
-    if (UnlockScreen.isAuthenticating) return;
-    if ((state != AppLifecycleState.resumed) &&
-        (state != AppLifecycleState.inactive)) return;
-    _lockScreen(isResumed: state == AppLifecycleState.resumed);
   }
 
   @override
   void onWindowMinimize() async {
-    if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) return;
     LoadedAccount? account = data.loadedAccount;
     if (account == null) return;
     _lockScreen();
     if (!account.minimizeToTray) return;
+    await windowManager.minimize();
     await windowManager.restore();
     await windowManager.hide();
   }
