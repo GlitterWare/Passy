@@ -153,13 +153,13 @@ class _UnlockScreen extends State<UnlockScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     try {
       if (_unlockScreenOn) {
         if (state == AppLifecycleState.resumed) {
           _passwordFocus.requestFocus();
-          await _bioAuth();
+          _bioAuth();
         }
         return;
       }
@@ -168,6 +168,9 @@ class _UnlockScreen extends State<UnlockScreen>
       if (state != AppLifecycleState.resumed &&
           state != AppLifecycleState.inactive) return;
       _lockScreen();
+      if (state == AppLifecycleState.inactive) {
+        _lastActive = DateTime.now().toUtc();
+      }
     } finally {
       _lastState = state;
     }
