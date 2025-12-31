@@ -56,14 +56,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync libayatana-appindicator3-dev libmpv-dev
-      - name: Trim unused dependencies
-        shell: bash
-        run: |
-          sudo rm /usr/lib/x86_64-linux-gnu/libmpv.so
-          sudo rm /usr/lib/x86_64-linux-gnu/libmpv.so.1
-          sudo mv /usr/lib/x86_64-linux-gnu/libmpv.so.1.109.0 /usr/lib/x86_64-linux-gnu/libmpv.so
-          sudo patchelf --set-soname libmpv.so /usr/lib/x86_64-linux-gnu/libmpv.so
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync libayatana-appindicator3-dev
       - name: Install flutter
         shell: bash
         run: |
@@ -173,14 +166,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync libayatana-appindicator3-dev libmpv-dev
-      - name: Trim unused dependencies
-        shell: bash
-        run: |
-          sudo rm /usr/lib/aarch64-linux-gnu/libmpv.so
-          sudo rm /usr/lib/aarch64-linux-gnu/libmpv.so.1
-          sudo mv /usr/lib/aarch64-linux-gnu/libmpv.so.1.109.0 /usr/lib/aarch64-linux-gnu/libmpv.so
-          sudo patchelf --set-soname libmpv.so /usr/lib/aarch64-linux-gnu/libmpv.so
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev binutils coreutils desktop-file-utils fakeroot fuse libgdk-pixbuf2.0-dev patchelf python3-pip python3-setuptools squashfs-tools strace util-linux zsync libayatana-appindicator3-dev
       - name: Install flutter
         shell: bash
         run: |
