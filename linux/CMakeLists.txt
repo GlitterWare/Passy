@@ -169,3 +169,11 @@ if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Argon2: Bad exit status")
 endif()
 install(FILES "${ARGON2_BIN}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" RENAME "libargon2.so" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+# Install appindicator
+install(CODE "
+execute_process(COMMAND \"${CMAKE_CURRENT_SOURCE_DIR}/install_appindicator.sh\" \"${INSTALL_BUNDLE_LIB_DIR}\" RESULT_VARIABLE ret)
+  if (ret AND NOT ret EQUAL 0)
+    message(FATAL_ERROR \"Installing appindicator: Bad exit status\")
+  endif()
+")
