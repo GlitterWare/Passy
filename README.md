@@ -151,10 +151,10 @@ For instructions on how to easily set up Passy using Ubuntu/Debian software app 
 
 It's most comfortable to run AppImages with the [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher/releases/latest) installed. It automatically integrates AppImages and their `.desktop` files into your program launcher for best user experience.
 
-You will need to install several extra packages required to run Passy: `libayatana-appindicator3-1 libmpv-dev`.  
-On Ubuntu/Debian Linux, you can install them using apt:
+You will need to install one extra package required to run Passy: `libayatana-appindicator3-1`.  
+On Ubuntu/Debian Linux, you can install it using apt:
 ```bash
-sudo apt install -y libayatana-appindicator3-1 libmpv-dev
+sudo apt install -y libayatana-appindicator3-1
 ```
 
 After installing the required packages, you can run Passy as follows:
@@ -170,10 +170,10 @@ After installing the required packages, you can run Passy as follows:
 
 ### Bundle
 
-You will need to install several extra packages required to run Passy: `libayatana-appindicator3-1 libmpv-dev`.  
-On Ubuntu/Debian Linux, you can install them using apt:
+You will need to install one extra package required to run Passy: `libayatana-appindicator3-1`.  
+On Ubuntu/Debian Linux, you can install it using apt:
 ```bash
-sudo apt install -y libayatana-appindicator3-1 libmpv-dev
+sudo apt install -y libayatana-appindicator3-1
 ```
 
 After installing the required packages, you can run Passy as follows:
@@ -237,10 +237,17 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 2. Clone the repository or [get the source code from the latest Passy release](https://github.com/GlitterWare/Passy/releases/latest).
 3. Run `flutter build [subcommand]` to build passy for your system. Passy can be built to `windows`, `linux`, `apk` and `aab`.
 
-If you are building for Linux, you will need to install several extra packages required to build Passy's GUI features: `libayatana-appindicator3-dev libmpv-dev`.  
-On Ubuntu/Debian Linux, you can install them using apt:
+If you are building for Linux, you will need to install one extra package required to build Passy's GUI features: `libayatana-appindicator3-dev`.  
+On Ubuntu/Debian Linux, you can install it using apt:
 ```bash
-sudo apt install -y libayatana-appindicator3-dev libmpv-dev
+sudo apt install -y libayatana-appindicator3-dev
+```
+
+If you are using the `build_all.sh` or the `build_with_mpv.sh` scripts, you do not need to install any extra packages, as they provide full hermetic builds of `libmpv`, as required by the media_kit plugin.  
+Otherwise, you will need to install the `libmpv-dev` package.
+On Ubuntu/Debian Linux, you can install it using apt:
+```bash
+sudo apt install -y libmpv-dev
 ```
 
 ### Build Options
