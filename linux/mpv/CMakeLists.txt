@@ -344,6 +344,7 @@ ExternalProject_Add(nettle
       --disable-static
       --enable-shared
       --disable-doc
+      --disable-info
 
   BUILD_COMMAND     make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${NETTLE_BUILD_DIR}" install
