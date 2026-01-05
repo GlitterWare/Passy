@@ -2,9 +2,6 @@
 cd "$(dirname "$0")"
 set -euo pipefail
 
-PASSY_RELEASE="$(echo $(pwd)/build/linux/*/release)"
-PATH="$PATH:$PASSY_RELEASE/prefix/bin"
-PASSY_LIB="$PASSY_RELEASE/bundle/lib"
 MPV_BUILD="$(pwd)/build/mpv"
 MPV_PREFIX="$MPV_BUILD/prefix"
 MPV_LIB="$MPV_PREFIX/lib"
@@ -27,6 +24,9 @@ cmake --build "$MPV_BUILD"
 echo "Building Passy with hermetic MPV..."
 export PKG_CONFIG_PATH="$(echo /usr/lib/*-linux-gnu/pkgconfig):/usr/share/pkgconfig:$MPV_PKGCONFIG"
 flutter build linux --no-version-check --suppress-analytics -v $@
+PASSY_RELEASE="$(echo $(pwd)/build/linux/*/release)"
+PATH="$PATH:$PASSY_RELEASE/prefix/bin"
+PASSY_LIB="$PASSY_RELEASE/bundle/lib"
 
 MPV_TEMP="$(mktemp -d)"
 cp -r -P "$MPV_LIB"/pulseaudio/*.so* "$MPV_TEMP"

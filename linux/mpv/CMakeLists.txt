@@ -150,6 +150,28 @@ ExternalProject_Add(vorbis
 
 add_dependencies(vorbis ogg)
 
+#region nasm
+set(NASM_SOURCE_DIR "${CMAKE_BINARY_DIR}/nasm")
+set(NASM_BUILD_DIR  "${CMAKE_BINARY_DIR}/nasm-build")
+
+ExternalProject_Add(nasm
+  URL https://www.nasm.us/pub/nasm/releasebuilds/2.15/nasm-2.15.tar.xz
+  URL_HASH SHA256=bc340c2604de5a9aa405b194aae3bcdd86c1631a68a5f4d2165e11d358c2c223
+
+  SOURCE_DIR        "${NASM_SOURCE_DIR}"
+  BINARY_DIR        "${NASM_BUILD_DIR}"
+  CONFIGURE_COMMAND
+    cd "${NASM_SOURCE_DIR}" &&
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    ./configure
+      --libdir=${MPV_LIB}
+      --prefix=${MPV_PREFIX}
+
+  BUILD_COMMAND     make -C "${NASM_SOURCE_DIR}" -j${NPROC}
+  INSTALL_COMMAND   make -C "${NASM_SOURCE_DIR}" install
+)
+#endregion
+
 #region x264
 set(X264_SOURCE_DIR "${CMAKE_BINARY_DIR}/x264")
 set(X264_BUILD_DIR  "${CMAKE_BINARY_DIR}/x264-build")
@@ -166,13 +188,16 @@ ExternalProject_Add(x264
     ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
     "${X264_SOURCE_DIR}/configure"
       --prefix=${MPV_PREFIX}
-      --disable-static
       --enable-shared
 
-  BUILD_COMMAND     make -C "${X264_BUILD_DIR}" -j${NPROC}
+  BUILD_COMMAND
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    make -C "${X264_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${X264_BUILD_DIR}" install
 )
 #endregion
+
+add_dependencies(x264 nasm)
 
 #region x265
 set(X265_SOURCE_DIR "${CMAKE_BINARY_DIR}/x265")
@@ -261,10 +286,14 @@ ExternalProject_Add(libvpx
       --disable-tools
       --disable-unit-tests
 
-  BUILD_COMMAND     make -C "${LIBVPX_BUILD_DIR}" -j${NPROC}
+  BUILD_COMMAND
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    make -C "${LIBVPX_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${LIBVPX_BUILD_DIR}" install
 )
 #endregion
+
+add_dependencies(libvpx nasm)
 
 #region numa
 set(NUMA_SOURCE_DIR "${CMAKE_BINARY_DIR}/numa")
@@ -394,6 +423,11 @@ ExternalProject_Add(ffmpeg
       --extra-cflags="-I${MPV_INCLUDE}"
       "--extra-ldflags=-L${MPV_LIB} -Wl,-rpath,${MPV_LIB}"
       --disable-autodetect
+      --disable-doc
+      --disable-htmlpages
+      --disable-manpages
+      --disable-podpages
+      --disable-txtpages
       --disable-nvenc
       --disable-nvdec
       --disable-cuvid
@@ -408,6 +442,24 @@ ExternalProject_Add(ffmpeg
       --disable-libass
       --disable-libfreetype
       --disable-libfontconfig
+      --disable-openssl
+      --disable-vaapi
+      --disable-vdpau
+      --disable-amf
+      --disable-libxcb
+      --disable-libxcb-shm
+      --disable-libxcb-xfixes
+      --disable-libxcb-shape
+      --disable-xlib
+      --disable-libbluray
+      --disable-libcdio
+      --disable-libxml2
+      --disable-libzvbi
+      --disable-librsvg
+      --disable-libwebp
+      --disable-libspeex
+      --disable-libmp3lame
+      --disable-libdav1d
       --enable-gpl
       --enable-libfribidi
       --enable-libvorbis
@@ -418,12 +470,14 @@ ExternalProject_Add(ffmpeg
       --enable-network
       --enable-gnutls
 
-  BUILD_COMMAND     make -C "${FFMPEG_BUILD_DIR}" -j${NPROC}
+  BUILD_COMMAND
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    make -C "${FFMPEG_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${FFMPEG_BUILD_DIR}" install
 )
 #endregion
 
-add_dependencies(ffmpeg fribidi opus vorbis x264 x265 libjpeg libvpx numa gmp gnutls)
+add_dependencies(ffmpeg fribidi opus vorbis nasm x264 x265 libjpeg libvpx numa gmp gnutls)
 
 #region freetype
 set(FREETYPE_SOURCE_DIR "${CMAKE_BINARY_DIR}/freetype")
@@ -446,6 +500,9 @@ ExternalProject_Add(freetype
       --prefix=${MPV_PREFIX}
       --disable-static
       --enable-shared
+      --without-png
+      --without-zlib
+      --without-bzip2
 
   BUILD_COMMAND     make -C ${FREETYPE_BUILD_DIR} -j${NPROC}
   INSTALL_COMMAND   make -C ${FREETYPE_BUILD_DIR} install
@@ -470,13 +527,15 @@ ExternalProject_Add(harfbuzz
       "${HARFBUZZ_SOURCE_DIR}"
       --warnlevel=0
       --prefix=${MPV_PREFIX}
+      --libdir=lib
       "-Dc_link_args=-Wl,-rpath=${MPV_LIB} -Wl,-rpath-link=${MPV_LIB}"
       "-Dcpp_link_args=-Wl,-rpath=${MPV_LIB} -Wl,-rpath-link=${MPV_LIB}"
       -Dglib=disabled
       -Dgobject=disabled
       -Dicu=disabled
-      --libdir=lib
       -Dtests=disabled
+      -Dcairo=disabled
+      -Dgraphite2=disabled
       -Dbuildtype=release
   BUILD_COMMAND     meson compile -C "${HARFBUZZ_BUILD_DIR}"
   INSTALL_COMMAND   meson install -C "${HARFBUZZ_BUILD_DIR}"
@@ -506,10 +565,13 @@ ExternalProject_Add(libass
       --disable-static
       --enable-shared
       --disable-require-system-font-provider
+      --disable-fontconfig
       CFLAGS=-fPIC
       CXXFLAGS=-fPIC
 
-  BUILD_COMMAND     make -C "${LIBASS_BUILD_DIR}" -j${NPROC}
+  BUILD_COMMAND
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    make -C "${LIBASS_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${LIBASS_BUILD_DIR}" install
 )
 #endregion
@@ -667,6 +729,14 @@ ExternalProject_Add(libmpv
       --disable-tests
       --disable-lua
       --disable-uchardet
+      --disable-x11
+      --disable-wayland
+      --disable-drm
+      --disable-gbm
+      --disable-sdl2
+      --disable-cocoa
+      --disable-win32
+      --disable-javascript
       --enable-libmpv-shared
       --enable-gl
       --enable-alsa
