@@ -350,6 +350,7 @@ ExternalProject_Add(nettle
   BUILD_COMMAND
     ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
     make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
+      dvi=false pdf=false ps=false html=false info=false
   INSTALL_COMMAND   make -C "${NETTLE_BUILD_DIR}" install
 )
 #endregion
