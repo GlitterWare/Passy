@@ -343,6 +343,7 @@ ExternalProject_Add(nettle
       --prefix=${MPV_PREFIX}
       --disable-static
       --enable-shared
+      --disable-doc
 
   BUILD_COMMAND     make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${NETTLE_BUILD_DIR}" install
