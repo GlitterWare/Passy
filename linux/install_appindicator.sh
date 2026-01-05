@@ -1,7 +1,8 @@
 #! /bin/bash
 set -euo pipefail
 
-PASSY_LIB=$1
+PATH="$1/prefix/bin:$PATH"
+PASSY_LIB="$1/bundle/lib"
 
 LIBS=(
   "libayatana-appindicator3.so"

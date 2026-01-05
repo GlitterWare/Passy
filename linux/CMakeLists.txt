@@ -2,6 +2,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
+include(ExternalProject)
+include(ProcessorCount)
+
+ProcessorCount(NPROC)
+if(NOT NPROC)
+  set(NPROC 1)
+endif()
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "passy")
@@ -143,13 +151,14 @@ set(LINUX_ASSETS_DIR "${APP_SOURCE_DIR}/linux_assets")
 set(CLI_LIB_DIR "${APP_SOURCE_DIR}/lib/passy_cli")
 set(CLI_BIN_DIR "${CLI_LIB_DIR}/bin")
 
-# Install linux assets
+#region Install linux assets
 set(LOGO_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.svg")
 set(APPSTREAM_METADATA_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.appdata.xml")
 set(DOT_DESKTOP_FILE "${LINUX_ASSETS_DIR}/com.glitterware.passy.desktop")
 install(FILES "${LOGO_FILE}" "${APPSTREAM_METADATA_FILE}" "${DOT_DESKTOP_FILE}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+#endregion
 
-# Build and install Passy CLI
+#region Build and install Passy CLI
 set(CLI_BIN_SOURCE_FILE "${CLI_BIN_DIR}/passy_cli.dart")
 set(CLI_BIN_FILE "${CLI_BIN_DIR}/passy_cli")
 set(CLI_NATIVE_MESSAGING "${CLI_BIN_DIR}/passy_cli_native_messaging.sh")
@@ -159,8 +168,9 @@ if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Passy CLI: Bad exit status")
 endif()
 install(FILES "${CLI_BIN_FILE}" "${CLI_NATIVE_MESSAGING}" "${CLI_NATIVE_MESSAGING_MANIFEST}" DESTINATION "${CMAKE_INSTALL_PREFIX}" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+#endregion
 
-# Build Argon2
+#region Build Argon2
 set(ARGON2_SOURCE "${SUBMODULES_DIR}/phc-winner-argon2")
 set(ARGON2_BIN "${ARGON2_SOURCE}/libargon2.so.1")
 set(ENV{OPTTARGET} "none")
@@ -169,11 +179,39 @@ if(ret AND NOT ret EQUAL 0)
   message(FATAL_ERROR "Building Argon2: Bad exit status")
 endif()
 install(FILES "${ARGON2_BIN}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" RENAME "libargon2.so" PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+#endregion
 
-# Install appindicator
+#region patchelf
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/prefix")
+
+set(PATCHELF_SOURCE_DIR "${CMAKE_BINARY_DIR}/patchelf")
+set(PATCHELF_BUILD_DIR  "${CMAKE_BINARY_DIR}/patchelf-build")
+
+ExternalProject_Add(patchelf
+  GIT_REPOSITORY  https://github.com/NixOS/patchelf.git
+  GIT_TAG         0.18.0
+  GIT_SHALLOW     1
+
+  SOURCE_DIR        "${PATCHELF_SOURCE_DIR}"
+  BINARY_DIR        "${PATCHELF_BUILD_DIR}"
+  CONFIGURE_COMMAND
+    cd "${PATCHELF_SOURCE_DIR}" &&
+    ./bootstrap.sh &&
+    cd "${PATCHELF_BUILD_DIR}" &&
+    ${PATCHELF_SOURCE_DIR}/configure
+      --prefix=${CMAKE_BINARY_DIR}/prefix
+  BUILD_COMMAND     make -j ${NPROC}
+  INSTALL_COMMAND   make install
+)
+
+add_dependencies(${BINARY_NAME} patchelf)
+#endregion
+
+#region Install appindicator
 install(CODE "
-execute_process(COMMAND \"${CMAKE_CURRENT_SOURCE_DIR}/install_appindicator.sh\" \"${INSTALL_BUNDLE_LIB_DIR}\" RESULT_VARIABLE ret)
+execute_process(COMMAND \"${CMAKE_CURRENT_SOURCE_DIR}/install_appindicator.sh\" \"${CMAKE_BINARY_DIR}\" RESULT_VARIABLE ret)
   if (ret AND NOT ret EQUAL 0)
     message(FATAL_ERROR \"Installing appindicator: Bad exit status\")
   endif()
 ")
+#endregion

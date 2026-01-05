@@ -1,5 +1,6 @@
 #! /bin/bash
 cd "$(dirname "$0")"
+set -euo pipefail
 
 user_interrupt() {
   exit
