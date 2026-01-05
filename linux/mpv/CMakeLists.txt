@@ -376,7 +376,7 @@ set(FFMPEG_BUILD_DIR  "${CMAKE_BINARY_DIR}/ffmpeg-build")
 
 ExternalProject_Add(ffmpeg
   GIT_REPOSITORY  https://github.com/FFmpeg/FFmpeg.git
-  GIT_TAG         n4.4.2
+  GIT_TAG         n4.2.11
   GIT_SHALLOW     1
 
   SOURCE_DIR        "${FFMPEG_SOURCE_DIR}"
@@ -622,6 +622,7 @@ ExternalProject_Add(pulseaudio
       -Ddaemon=false
       -Dtests=false
       -Dman=false
+      -Ddoxygen=false
       -Dsystemd=disabled
       -Ddbus=disabled
       -Dbluez5=disabled
