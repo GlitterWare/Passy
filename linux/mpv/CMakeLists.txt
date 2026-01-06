@@ -335,8 +335,8 @@ ExternalProject_Add(nettle
   BINARY_DIR        "${NETTLE_BUILD_DIR}"
   CONFIGURE_COMMAND
     cd "${NETTLE_SOURCE_DIR}" &&
-    ./.bootstrap &&
     rm ./nettle.texinfo | true &&
+    ./.bootstrap &&
     cd "${NETTLE_BUILD_DIR}" &&
     ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
     ${NETTLE_SOURCE_DIR}/configure
