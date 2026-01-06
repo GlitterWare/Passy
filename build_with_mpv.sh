@@ -23,7 +23,7 @@ cmake --build "$MPV_BUILD"
 
 echo "Building Passy with hermetic MPV..."
 export PKG_CONFIG_PATH="$(echo /usr/lib/*-linux-gnu/pkgconfig):/usr/share/pkgconfig:$MPV_PKGCONFIG"
-flutter build linux --no-version-check --suppress-analytics -v $@
+flutter build linux --no-version-check --suppress-analytics $@
 PASSY_RELEASE="$(echo $(pwd)/build/linux/*/release)"
 PATH="$PATH:$PASSY_RELEASE/prefix/bin"
 PASSY_LIB="$PASSY_RELEASE/bundle/lib"
