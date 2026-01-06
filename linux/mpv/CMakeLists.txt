@@ -36,7 +36,6 @@ set(PREFIX_ENV
   CFLAGS=${CFLAGS}
   CXXFLAGS=${CFLAGS}
   LDFLAGS=-L${MPV_LIB}
-  MAKEINFO=true
 )
 
 #region fribidi
@@ -337,6 +336,7 @@ ExternalProject_Add(nettle
   CONFIGURE_COMMAND
     cd "${NETTLE_SOURCE_DIR}" &&
     ./.bootstrap &&
+    rm ./nettle.texinfo | true &&
     cd "${NETTLE_BUILD_DIR}" &&
     ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
     ${NETTLE_SOURCE_DIR}/configure
@@ -347,10 +347,7 @@ ExternalProject_Add(nettle
       --disable-doc
       --disable-info
 
-  BUILD_COMMAND
-    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
-    make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
-      dvi=false pdf=false ps=false html=false info=false
+  BUILD_COMMAND     make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${NETTLE_BUILD_DIR}" install
 )
 #endregion
