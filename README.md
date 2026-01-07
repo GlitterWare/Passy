@@ -225,10 +225,10 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 2. Clone the repository or [get the source code from the latest Passy release](https://github.com/GlitterWare/Passy/releases/latest).
 3. Run `flutter build [subcommand]` to build passy for your system. Passy can be built to `windows`, `linux`, `apk` and `aab`.
 
-If you are building for Linux, you will need to install one extra package required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson`.  
+If you are building for Linux, you will need to install one extra package required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget`.  
 On Ubuntu/Debian Linux, you can install it using apt:
 ```bash
-sudo apt install -y libayatana-appindicator3-dev meson
+sudo apt install -y libayatana-appindicator3-dev meson wget
 ```
 
 If you are using the `build_all.sh` or the `build_with_mpv.sh` scripts, you do not need to install any extra packages, as they provide full hermetic builds of `libmpv`, as required by the media_kit plugin.  

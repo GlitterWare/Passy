@@ -1,5 +1,5 @@
 name: passy
-base: core22
+base: core24
 version: 'v1.9.5'
 summary: Offline password manager with cross-platform synchronization # 79 char long summary
 description: |
@@ -54,8 +54,7 @@ apps:
 
 parts:
   glitterware-passy:
-    source: https://github.com/GlitterWare/Passy.git
-    source-branch: dev
+    source: .
     plugin: dump
     build-packages:
       #region Flutter dependencies
@@ -73,23 +72,30 @@ parts:
       - liblzma-dev
       #endregion
 
+      #region CMake dependencies
+      - autoconf
+      - automake
+      - libtool
+      - perl
+      #endregion
+
       #region Passy dependencies
       - libayatana-appindicator3-dev
       - libmpv-dev
+      - meson
       #endregion
     stage-packages:
       - zenity
-      - libappindicator3-1
-      - libmpv1
+      - libmpv2
     override-build: |
+      export PATH="/usr/bin:$PATH"
       craftctl default
       export PATH="$PATH:$PWD/submodules/flutter/bin"
-      ./submodules/flutter/bin/flutter --no-version-check --suppress-analytics build linux --dart-define=UPDATES_POPUP_ENABLED=false
-      export PASSY_BUNDLE_PATH="./build/linux/x64/release/bundle"
-      if [ ! -d "$PASSY_BUNDLE_PATH" ]; then
-        export PASSY_BUNDLE_PATH="./build/linux/arm64/release/bundle"
-      fi
-      bash -c "shopt -s extglob dotglob;mkdir foobar;mv $SNAPCRAFT_PART_INSTALL/* foobar;mv foobar/etc $SNAPCRAFT_PART_INSTALL;mv foobar/usr $SNAPCRAFT_PART_INSTALL;mv foobar/var $SNAPCRAFT_PART_INSTALL;rm -rf foobar;mv $PASSY_BUNDLE_PATH/* $SNAPCRAFT_PART_INSTALL"
+      flutter build linux --no-version-check --suppress-analytics --dart-define=UPDATES_POPUP_ENABLED=false
+      bash -c "shopt -s extglob dotglob;mkdir foobar;mv $SNAPCRAFT_PART_INSTALL/* foobar;mv foobar/etc $SNAPCRAFT_PART_INSTALL;mv foobar/usr $SNAPCRAFT_PART_INSTALL;mv foobar/var $SNAPCRAFT_PART_INSTALL;rm -rf foobar;mv ./build/linux/*/release/bundle/* $SNAPCRAFT_PART_INSTALL"
+      libdir=$(echo "$SNAPCRAFT_PART_INSTALL"/usr/lib/*-linux-gnu)
+      ln -sf libmpv.so.2.2.0 "$libdir/libmpv.so.2"
+      ln -sf libmpv.so.2.2.0 "$libdir/libmpv.so"
     organize:
       usr/lib/*-linux-gnu/blas/*: usr/lib/
       usr/lib/*-linux-gnu/lapack/*: usr/lib/

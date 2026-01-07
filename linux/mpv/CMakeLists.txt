@@ -24,7 +24,7 @@ set(MPV_PKGCONFIG "${MPV_LIB}/pkgconfig")
 
 file(MAKE_DIRECTORY "${MPV_PREFIX}")
 
-set(CFLAGS "-I${MPV_INCLUDE} -fPIC")
+set(CFLAGS "-I${MPV_INCLUDE} -fPIC -w -Wno-everything")
 set(PREFIX_ENV
   PATH=${MPV_BIN}:$ENV{PATH}
   PKG_CONFIG_PATH=${MPV_PKGCONFIG}
@@ -322,6 +322,30 @@ ExternalProject_Add(numa
 )
 #endregion
 
+#region gmp
+set(GMP_SOURCE_DIR "${CMAKE_BINARY_DIR}/gmp")
+set(GMP_BUILD_DIR  "${CMAKE_BINARY_DIR}/gmp-build")
+
+ExternalProject_Add(gmp
+  URL https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
+  URL_HASH SHA256=fd4829912cddd12f84181c3451cc752be224643e87fac497b69edddadc49b4f2
+
+  SOURCE_DIR        "${GMP_SOURCE_DIR}"
+  BINARY_DIR        "${GMP_BUILD_DIR}"
+  CONFIGURE_COMMAND
+    cd "${GMP_BUILD_DIR}" &&
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    ${GMP_SOURCE_DIR}/configure
+      --libdir=${MPV_LIB}
+      --prefix=${MPV_PREFIX}
+      --disable-static
+      --enable-shared
+
+  BUILD_COMMAND     make -C "${GMP_BUILD_DIR}" -j${NPROC}
+  INSTALL_COMMAND   make -C "${GMP_BUILD_DIR}" install
+)
+#endregion
+
 #region nettle
 set(NETTLE_SOURCE_DIR "${CMAKE_BINARY_DIR}/nettle")
 set(NETTLE_BUILD_DIR  "${CMAKE_BINARY_DIR}/nettle-build")
@@ -346,34 +370,14 @@ ExternalProject_Add(nettle
       --enable-shared
       --disable-documentation
 
-  BUILD_COMMAND     make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
+  BUILD_COMMAND
+    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
+    make -C "${NETTLE_BUILD_DIR}" -j${NPROC}
   INSTALL_COMMAND   make -C "${NETTLE_BUILD_DIR}" install
 )
 #endregion
 
-#region gmp
-set(GMP_SOURCE_DIR "${CMAKE_BINARY_DIR}/gmp")
-set(GMP_BUILD_DIR  "${CMAKE_BINARY_DIR}/gmp-build")
-
-ExternalProject_Add(gmp
-  URL https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
-  URL_HASH SHA256=fd4829912cddd12f84181c3451cc752be224643e87fac497b69edddadc49b4f2
-
-  SOURCE_DIR        "${GMP_SOURCE_DIR}"
-  BINARY_DIR        "${GMP_BUILD_DIR}"
-  CONFIGURE_COMMAND
-    cd "${GMP_BUILD_DIR}" &&
-    ${CMAKE_COMMAND} -E env ${PREFIX_ENV}
-    ${GMP_SOURCE_DIR}/configure
-      --libdir=${MPV_LIB}
-      --prefix=${MPV_PREFIX}
-      --disable-static
-      --enable-shared
-
-  BUILD_COMMAND     make -C "${GMP_BUILD_DIR}" -j${NPROC}
-  INSTALL_COMMAND   make -C "${GMP_BUILD_DIR}" install
-)
-#endregion
+add_dependencies(nettle gmp)
 
 #region gnutls
 set(GNUTLS_SOURCE_DIR "${CMAKE_BINARY_DIR}/gnutls")

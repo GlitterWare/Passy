@@ -270,10 +270,20 @@ jobs:
           path: /home/runner/work/Passy/build/Passy-Linux-ARM64-AppImage.zip
   build_linux_snap:
     name: Build Passy for Snap Store
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install flutter
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
+          echo "$PWD/submodules/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+      - name: Configure flutter
+        shell: bash
+        run: flutter config --no-analytics
       - name: Build Linux Snap
         uses: snapcore/action-build@v1
         id: snapcraft
@@ -284,10 +294,20 @@ jobs:
           path: ${{ steps.snapcraft.outputs.snap }}
   build_linux_snap_arm64:
     name: Build Passy for Snap Store ARM64
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install flutter
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+          echo "$PWD/submodules/flutter/bin" >> $GITHUB_PATH
+          echo "$PWD/submodules/flutter/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+      - name: Configure flutter
+        shell: bash
+        run: flutter config --no-analytics
       - name: Build Linux Snap
         uses: snapcore/action-build@v1
         id: snapcraft
