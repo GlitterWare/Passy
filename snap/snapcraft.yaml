@@ -86,6 +86,7 @@ parts:
       #endregion
     stage-packages:
       - zenity
+      - libappindicator3-1
       - libmpv2
     override-build: |
       export PATH="/usr/bin:$PATH"
