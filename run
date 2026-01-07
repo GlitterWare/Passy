@@ -1,0 +1,13 @@
+#! /bin/bash
+set -euo pipefail
+
+source .mpv.env
+
+if [ ! -f "$MPV_LIB/libmpv.so" ]; then
+  echo "Building hermetic MPV..."
+  cmake -S "linux/mpv" -B "$MPV_BUILD" --log-level=ERROR
+  cmake --build "$MPV_BUILD"
+fi
+
+export PKG_CONFIG_PATH="$(echo /usr/lib/*-linux-gnu/pkgconfig):/usr/share/pkgconfig:$MPV_PKGCONFIG"
+flutter run --no-version-check --suppress-analytics $@
