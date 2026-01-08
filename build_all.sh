@@ -45,7 +45,7 @@ FLUTTER='flutter --no-version-check --suppress-analytics'
 build_linux() {
   echo 'INFO:Building Linux Bundle.'
   echo "Running \`$FLUTTER build linux $ENABLE_UPDATES_POPUP $BUILD_OPTIONS\`" 
-  ./build_with_mpv.sh $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
+  ./build_linux.sh $ENABLE_UPDATES_POPUP $BUILD_OPTIONS
   echo 'INFO:Building Linux AppImage.'
   echo 'v'$version | bash appimage/appimage_builder  
 }
