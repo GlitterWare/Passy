@@ -51,6 +51,7 @@ Passy is an offline password manager with cross-platfrom synchronization. 🔒
     - [Windows](#windows-1)
     - [Linux](#linux-1)
 4. [Building](#building)
+    - [Linux](#linux-2)
     - [Build Options](#build-options)
 5. [Privacy Policy](#privacy-policy)
 6. [Links & Mentions](#links--mentions)
@@ -225,18 +226,27 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 2. Clone the repository or [get the source code from the latest Passy release](https://github.com/GlitterWare/Passy/releases/latest).
 3. Run `flutter build [subcommand]` to build passy for your system. Passy can be built to `windows`, `linux`, `apk` and `aab`.
 
-If you are building for Linux, you will need to install one extra package required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget`.  
+### Linux
+
+If you are building for Linux, getting started is easy:
+1. Install one extra package required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget`.  
 On Ubuntu/Debian Linux, you can install it using apt:
 ```bash
 sudo apt install -y libayatana-appindicator3-dev meson wget
 ```
+2. Run Passy on Linux for development via the `./run` script, which will automatically compile and inject all Passy dependencies into the script environment before running Flutter.
+3. Build Passy for Linux using the `build_linux.sh` script.
+4. If you use the `./run`, `build_linux.sh` or `build_all.sh` scripts, you do not need to install any extra packages, as they provide full hermetic builds of `libmpv`, as required by the media_kit plugin.
+5. You can pass regular Flutter tool arguments to these scripts to configure your builds.
 
-If you are using the `build_all.sh` or the `build_with_mpv.sh` scripts, you do not need to install any extra packages, as they provide full hermetic builds of `libmpv`, as required by the media_kit plugin.  
-Otherwise, you will need to install the `libmpv-dev` package.
+Otherwise, you will need to install the `libmpv-dev` package.  
 On Ubuntu/Debian Linux, you can install it using apt:
 ```bash
 sudo apt install -y libmpv-dev
 ```
+
+At that point, you can run `flutter build linux` directly to build Passy for Linux.  
+Keep in mind that it is recommended that you remove the `libmpv-dev` package later if you decide to use the provided build scripts to compile Passy.
 
 ### Build Options
 
