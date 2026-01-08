@@ -229,8 +229,8 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 ### Linux
 
 If you are building for Linux, getting started is easy:
-1. Install one extra package required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget`.  
-On Ubuntu/Debian Linux, you can install it using apt:
+1. Install severall small packages required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget`.  
+On Ubuntu/Debian Linux, you can install them using apt:
 ```bash
 sudo apt install -y libayatana-appindicator3-dev meson wget
 ```
