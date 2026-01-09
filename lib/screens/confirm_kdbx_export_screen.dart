@@ -9,6 +9,7 @@ import 'package:passy/screens/common.dart';
 import 'package:passy/screens/splash_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 import 'export_screen.dart';
 import 'log_screen.dart';
@@ -57,13 +58,9 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
           'passy-kdbx-export-${_account.username}-${DateTime.now().toUtc().toIso8601String().replaceAll(':', ';')}.zip';
       String? _expFile;
       if (Platform.isAndroid) {
-        String? expDir = await FilePicker.platform.getDirectoryPath(
-          dialogTitle: localizations.exportPassy,
-          lockParentWindow: true,
-        );
-        if (expDir != null) {
-          _expFile = expDir + Platform.pathSeparator + fileName;
-        }
+        _expFile = (await getTemporaryDirectory()).path +
+            Platform.pathSeparator +
+            fileName;
       } else {
         _expFile = await FilePicker.platform.saveFile(
           dialogTitle: localizations.exportPassy,
@@ -74,11 +71,26 @@ class _ConfirmKdbxExportScreen extends State<ConfirmKdbxExportScreen> {
       if (_expFile == null) return;
       File _file = File(_expFile);
       Navigator.pushNamed(context, SplashScreen.routeName);
-      await _account.exportKdbx(
-          outputDirectory: _file.parent,
-          password: _newPassword,
-          fileName: path.basename(_file.path),
-          fileExportEnabled: fileExportEnabled);
+      try {
+        await _account.exportKdbx(
+            outputDirectory: _file.parent,
+            password: _newPassword,
+            fileName: path.basename(_file.path),
+            fileExportEnabled: fileExportEnabled);
+      } finally {
+        if (Platform.isAndroid) {
+          try {
+            await FilePicker.platform.saveFile(
+              dialogTitle: localizations.exportPassy,
+              lockParentWindow: true,
+              fileName: fileName,
+              bytes: File(_expFile).readAsBytesSync(),
+            );
+          } finally {
+            await File(_expFile).delete();
+          }
+        }
+      }
       Navigator.pop(context);
       Navigator.pop(context);
       showSnackBar(

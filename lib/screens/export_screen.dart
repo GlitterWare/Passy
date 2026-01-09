@@ -8,6 +8,7 @@ import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/unlock_screen.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 import 'package:passy/screens/common.dart';
 import 'package:passy/screens/confirm_kdbx_export_screen.dart';
@@ -83,13 +84,9 @@ class _ExportScreen extends State<ExportScreen> {
       }
       String? _expFile;
       if (Platform.isAndroid) {
-        String? expDir = await FilePicker.platform.getDirectoryPath(
-          dialogTitle: localizations.exportPassy,
-          lockParentWindow: true,
-        );
-        if (expDir != null) {
-          _expFile = expDir + Platform.pathSeparator + filename;
-        }
+        _expFile = (await getTemporaryDirectory()).path +
+            Platform.pathSeparator +
+            filename;
       } else {
         _expFile = await FilePicker.platform.saveFile(
           dialogTitle: localizations.exportPassy,
@@ -98,19 +95,34 @@ class _ExportScreen extends State<ExportScreen> {
         );
       }
       if (_expFile == null) return;
-      switch (type) {
-        case _ExportType.passy:
-          await _account.exportPassy(
-              outputDirectory: File(_expFile).parent,
-              fileName: path.basename(_expFile),
-              fileExportEnabled: fileExportEnabled);
-          break;
-        case _ExportType.csv:
-          await _account.exportCSV(
-              outputDirectory: File(_expFile).parent,
-              fileName: path.basename(_expFile),
-              fileExportEnabled: fileExportEnabled);
-          break;
+      try {
+        switch (type) {
+          case _ExportType.passy:
+            await _account.exportPassy(
+                outputDirectory: File(_expFile).parent,
+                fileName: path.basename(_expFile),
+                fileExportEnabled: fileExportEnabled);
+            break;
+          case _ExportType.csv:
+            await _account.exportCSV(
+                outputDirectory: File(_expFile).parent,
+                fileName: path.basename(_expFile),
+                fileExportEnabled: fileExportEnabled);
+            break;
+        }
+      } finally {
+        if (Platform.isAndroid) {
+          try {
+            await FilePicker.platform.saveFile(
+              dialogTitle: localizations.exportPassy,
+              lockParentWindow: true,
+              fileName: filename,
+              bytes: File(_expFile).readAsBytesSync(),
+            );
+          } finally {
+            await File(_expFile).delete();
+          }
+        }
       }
       showSnackBar(
         message: localizations.exportSaved,
