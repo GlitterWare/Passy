@@ -134,9 +134,20 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    await _file.delete();
-    await _tempFile.copy(_file.absolute.path);
-    await _tempFile.delete();
+    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    try {
+      await _tempFile.rename(_file.absolute.path);
+      try {
+        await oldFile.delete();
+      } catch (_) {}
+    } catch (_) {
+      try {
+        await _tempFile.delete();
+        await _file.delete();
+      } catch (_) {}
+      await oldFile.rename(_file.absolute.path);
+      rethrow;
+    }
     _encrypter = encrypter;
   }
 
@@ -276,9 +287,20 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    await _file.delete();
-    await _tempFile.copy(_file.absolute.path);
-    await _tempFile.delete();
+    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    try {
+      await _tempFile.rename(_file.absolute.path);
+      try {
+        await oldFile.delete();
+      } catch (_) {}
+    } catch (_) {
+      try {
+        await _tempFile.delete();
+        await _file.delete();
+      } catch (_) {}
+      await oldFile.rename(_file.absolute.path);
+      rethrow;
+    }
   }
 
   Future<void> setEntries(Map<String, T?> entries) async {
@@ -326,9 +348,20 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    await _file.delete();
-    await _tempFile.copy(_file.absolute.path);
-    await _tempFile.delete();
+    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    try {
+      await _tempFile.rename(_file.absolute.path);
+      try {
+        await oldFile.delete();
+      } catch (_) {}
+    } catch (_) {
+      try {
+        await _tempFile.delete();
+        await _file.delete();
+      } catch (_) {}
+      await oldFile.rename(_file.absolute.path);
+      rethrow;
+    }
   }
 
   Future<void> export(File file,
@@ -434,9 +467,20 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    await _file.delete();
-    await _tempFile.copy(_file.absolute.path);
-    await _tempFile.delete();
+    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    try {
+      await _tempFile.rename(_file.absolute.path);
+      try {
+        await oldFile.delete();
+      } catch (_) {}
+    } catch (_) {
+      try {
+        await _tempFile.delete();
+        await _file.delete();
+      } catch (_) {}
+      await oldFile.rename(_file.absolute.path);
+      rethrow;
+    }
     return keys;
   }
 }
