@@ -92,7 +92,7 @@ void convertLegacyAccount({
   _versionFile.writeAsStringSync(accountVersion);
 }
 
-LoadedAccount? loadLegacyAccount({
+LoadedAccount loadLegacyAccount({
   required String path,
   required Encrypter encrypter,
   required Key key,

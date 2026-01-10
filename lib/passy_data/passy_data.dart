@@ -438,7 +438,7 @@ class PassyData {
           path: _tempAccountPath,
           encrypter: encrypter,
           deviceId: info.value.deviceId,
-          key: key)!;
+          key: key);
       _account.bioAuthEnabled = false;
       _account.clearRemovedHistory();
       _account.renewHistory();

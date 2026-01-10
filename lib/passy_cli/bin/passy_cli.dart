@@ -646,7 +646,7 @@ Future<String> _login(String username, dynamic password) async {
           encryptedPassword: '',
           key: key,
           deviceId: infoFile.value.deviceId,
-          credentials: _credentialsFile!)!;
+          credentials: _credentialsFile!);
       while (!acc.isRSAKeypairLoaded) {
         await Future.delayed(const Duration(milliseconds: 500));
       }
