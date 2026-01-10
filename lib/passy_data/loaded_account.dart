@@ -30,6 +30,7 @@ import 'account_credentials.dart';
 import 'account_settings.dart';
 import 'auto_backup_settings.dart';
 import 'common.dart';
+import 'legacy/legacy.dart';
 import 'entry_event.dart';
 import 'entry_type.dart';
 import 'favorites.dart';
@@ -249,7 +250,8 @@ class LoadedAccount {
         fileIndex: fileIndex);
   }
 
-  Future<LoadedAccount> loadFromPath({required String path}) async {
+  Future<LoadedAccount> loadFromPath(
+      {required String path, bool legacy = true}) async {
     final creds = AccountCredentials.fromFile(
         File(path + Platform.pathSeparator + 'credentials.json'));
     enc.Key key = await derivePassword(
@@ -257,6 +259,16 @@ class LoadedAccount {
         derivationType: creds.value.keyDerivationType,
         derivationInfo: creds.value.keyDerivationInfo);
     enc.Encrypter encrypter = getPassyEncrypterFromBytes(key.bytes);
+    if (legacy) {
+      return loadLegacyAccount(
+        path: path,
+        encrypter: encrypter,
+        encryptedPassword: _encryptedPassword,
+        key: key,
+        credentials: creds,
+        deviceId: _deviceId,
+      );
+    }
     return LoadedAccount.fromDirectory(
       path: path,
       encrypter: encrypter,
@@ -1508,6 +1520,10 @@ class LoadedAccount {
   }
 
   // File index wrappers
+  Digest get fileSyncHistoryHash =>
+      getPassyHash(jsonEncode(_fileSyncHistory.value.toJson()));
+  List<EntryEvent> get fileSyncHistoryValues =>
+      _fileSyncHistory.value.files.values.toList();
   Future<List<String>> get fsTags =>
       compute((FileIndex _fileIndex) => _fileIndex.tags, _fileIndex);
   Future<Map<String, PassyFsMeta>> getFsMetadata() => _fileIndex.getMetadata();
