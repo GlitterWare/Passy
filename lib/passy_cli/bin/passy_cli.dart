@@ -14,7 +14,7 @@ import 'package:passy/passy_cli/lib/qr.dart' as qr;
 import 'package:encrypt/encrypt.dart';
 import 'package:hotreloader/hotreloader.dart';
 import 'package:markdown/markdown.dart' as md;
-import 'package:passy/passy_data/dart_app_data.dart';
+import 'package:passy/passy_data/app_data.dart';
 import 'package:passy/passy_data/account_credentials.dart';
 import 'package:passy/passy_data/account_settings.dart';
 import 'package:passy/passy_data/common.dart' as pcommon;
