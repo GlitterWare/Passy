@@ -4,12 +4,14 @@ import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_data/entry_meta.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/passy_entry.dart';
+import 'package:mutex/mutex.dart';
 import 'dart:io';
 
 import 'passy_kdbx_value.dart';
 
 class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
   final File _file;
+  final Mutex m = Mutex();
   Encrypter _encrypter;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
 
@@ -103,7 +105,11 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     );
   }
 
-  Future<void> setEncrypter(Encrypter encrypter,
+  Future<A> _transform<A>(Future<A> Function() transform) async {
+    return await m.protect(transform);
+  }
+
+  Future<void> _setEncrypter(Encrypter encrypter,
       {Encrypter? oldEncrypter}) async {
     Encrypter oldEncrypterA = oldEncrypter ?? _encrypter;
     File _tempFile;
@@ -134,22 +140,24 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
       try {
-        await oldFile.delete();
+        await backup.delete();
       } catch (_) {}
     } catch (_) {
       try {
         await _tempFile.delete();
-        await _file.delete();
       } catch (_) {}
-      await oldFile.rename(_file.absolute.path);
+      await _file.writeAsBytes(backup.readAsBytesSync());
       rethrow;
     }
     _encrypter = encrypter;
   }
+
+  Future<void> setEncrypter(Encrypter encrypter, {Encrypter? oldEncrypter}) =>
+      _transform(() => _setEncrypter(encrypter, oldEncrypter: oldEncrypter));
 
   String _encodeEntryForSaving(List<dynamic> entry) =>
       encodeCSVEntryForSaving(entry: entry, encrypter: _encrypter);
@@ -242,7 +250,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     return result;
   }
 
-  Future<void> setEntry(String key, {T? entry}) async {
+  Future<void> _setEntry(String key, {T? entry}) async {
     File _tempFile;
     {
       String _tempPath = (Directory.systemTemp).path +
@@ -287,23 +295,25 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
       try {
-        await oldFile.delete();
+        await backup.delete();
       } catch (_) {}
     } catch (_) {
       try {
         await _tempFile.delete();
-        await _file.delete();
       } catch (_) {}
-      await oldFile.rename(_file.absolute.path);
+      await _file.writeAsBytes(backup.readAsBytesSync());
       rethrow;
     }
   }
 
-  Future<void> setEntries(Map<String, T?> entries) async {
+  Future<void> setEntry(String key, {T? entry}) =>
+      _transform(() => _setEntry(key, entry: entry));
+
+  Future<void> _setEntries(Map<String, T?> entries) async {
     File _tempFile;
     {
       String _tempPath = (Directory.systemTemp).path +
@@ -348,18 +358,17 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
       try {
-        await oldFile.delete();
+        await backup.delete();
       } catch (_) {}
     } catch (_) {
       try {
         await _tempFile.delete();
-        await _file.delete();
       } catch (_) {}
-      await oldFile.rename(_file.absolute.path);
+      await _file.writeAsBytes(backup.readAsBytesSync());
       rethrow;
     }
   }
@@ -395,6 +404,9 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await rafExport.close();
   }
 
+  Future<void> setEntries(Map<String, T?> entries) =>
+      _transform(() => _setEntries(entries));
+
   Future<void> exportKdbx(KdbxFile file, {KdbxGroup? group}) async {
     final KdbxGroup groupFinal = group ?? file.body.rootGroup;
     RandomAccessFile _raf = await _file.open();
@@ -419,7 +431,7 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
   }
 
-  Future<List<String>> renameTag({
+  Future<List<String>> _renameTag({
     required String tag,
     required String newTag,
   }) async {
@@ -467,20 +479,25 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File oldFile = await _file.rename(_file.absolute.path + '.bak');
+    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
       try {
-        await oldFile.delete();
+        await backup.delete();
       } catch (_) {}
     } catch (_) {
       try {
         await _tempFile.delete();
-        await _file.delete();
       } catch (_) {}
-      await oldFile.rename(_file.absolute.path);
+      await _file.writeAsBytes(backup.readAsBytesSync());
       rethrow;
     }
     return keys;
   }
+
+  Future<List<String>> renameTag({
+    required String tag,
+    required String newTag,
+  }) =>
+      _transform(() => _renameTag(tag: tag, newTag: newTag));
 }

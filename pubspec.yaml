@@ -103,6 +103,7 @@ dependencies:
   flex_color_picker: ^3.6.0
   pdfrx: ^1.0.94
   base85: ^1.0.4
+  mutex: ^3.1.0
 
 dependency_overrides:
   uuid: ^4.0.0
