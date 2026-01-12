@@ -140,18 +140,10 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
-      try {
-        await backup.delete();
-      } catch (_) {}
     } catch (_) {
-      try {
-        await _tempFile.delete();
-      } catch (_) {}
-      await _file.writeAsBytes(backup.readAsBytesSync());
-      rethrow;
+      await _file.writeAsBytes(await _tempFile.readAsBytes());
     }
     _encrypter = encrypter;
   }
@@ -295,18 +287,10 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
-      try {
-        await backup.delete();
-      } catch (_) {}
     } catch (_) {
-      try {
-        await _tempFile.delete();
-      } catch (_) {}
-      await _file.writeAsBytes(backup.readAsBytesSync());
-      rethrow;
+      await _file.writeAsBytes(await _tempFile.readAsBytes());
     }
   }
 
@@ -358,18 +342,10 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
-      try {
-        await backup.delete();
-      } catch (_) {}
     } catch (_) {
-      try {
-        await _tempFile.delete();
-      } catch (_) {}
-      await _file.writeAsBytes(backup.readAsBytesSync());
-      rethrow;
+      await _file.writeAsBytes(await _tempFile.readAsBytes());
     }
   }
 
@@ -479,18 +455,10 @@ class PassyEntriesEncryptedCSVFile<T extends PassyEntry<T>> {
     await _raf.close();
     await _tempRaf.unlock();
     await _tempRaf.close();
-    File backup = await _file.copy(_tempFile.absolute.path + '.bak');
     try {
       await _tempFile.rename(_file.absolute.path);
-      try {
-        await backup.delete();
-      } catch (_) {}
     } catch (_) {
-      try {
-        await _tempFile.delete();
-      } catch (_) {}
-      await _file.writeAsBytes(backup.readAsBytesSync());
-      rethrow;
+      await _file.writeAsBytes(await _tempFile.readAsBytes());
     }
     return keys;
   }
