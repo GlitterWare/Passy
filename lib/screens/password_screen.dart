@@ -350,6 +350,7 @@ class _PasswordScreen extends State<PasswordScreen> {
             PassyPadding(RecordButton(
               title: localizations.password,
               value: password!.password,
+              oldValues: password!.oldPasswords,
               obscureValue: true,
               isPassword: true,
             )),

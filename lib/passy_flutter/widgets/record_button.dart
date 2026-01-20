@@ -10,6 +10,7 @@ class RecordButton extends StatelessWidget {
   final String title;
   final TextStyle? titleStyle;
   final String value;
+  final List<String>? oldValues;
   final bool obscureValue;
   final bool isPassword;
   final TextAlign valueAlign;
@@ -20,6 +21,7 @@ class RecordButton extends StatelessWidget {
     required this.title,
     this.titleStyle,
     required this.value,
+    this.oldValues,
     this.obscureValue = false,
     this.isPassword = false,
     this.valueAlign = TextAlign.center,
@@ -49,7 +51,7 @@ class RecordButton extends StatelessWidget {
       onPressed: () => showDialog(
         context: context,
         builder: (_) => RecordDialog(
-            value: value, highlightSpecial: isPassword, textAlign: valueAlign),
+            value: value, oldValues: oldValues, highlightSpecial: isPassword, textAlign: valueAlign),
       ),
       right: CircleAvatar(
         backgroundColor: PassyTheme.of(context).highlightContentColor,

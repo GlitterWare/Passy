@@ -44,6 +44,7 @@ class Password extends PassyEntry<Password> {
   String username;
   String email;
   String password;
+  List<String> oldPasswords;
   TFA? tfa;
   List<String> websites;
   List<String> attachments;
@@ -58,11 +59,13 @@ class Password extends PassyEntry<Password> {
     this.username = '',
     this.email = '',
     this.password = '',
+    List<String>? oldPasswords,
     this.tfa,
     List<String>? websites,
     List<String>? attachments,
   })  : customFields = customFields ?? [],
         tags = tags ?? [],
+        oldPasswords = oldPasswords ?? [],
         websites = websites ?? [],
         attachments = attachments ?? [],
         super(key ?? DateTime.now().toUtc().toIso8601String());
@@ -87,13 +90,16 @@ class Password extends PassyEntry<Password> {
         username = json['username'] ?? '',
         email = json['email'] ?? '',
         password = json['password'] ?? '',
+        oldPasswords = (json['oldPasswords'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
         tfa = json['tfa'] != null ? TFA.fromJson(json['tfa']) : null,
         websites = (json['website'] as String?)?.split('\n') ?? [],
-        attachments = json['attachments'] == null
-            ? []
-            : (json['attachments'] as List<dynamic>)
-                .map((e) => e.toString())
-                .toList(),
+        attachments = (json['attachments'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
         super(json['key'] ?? DateTime.now().toUtc().toIso8601String());
 
   Password._fromCSV(List csv)
@@ -107,12 +113,16 @@ class Password extends PassyEntry<Password> {
         iconName = csv[5] ?? '',
         username = csv[6] ?? '',
         email = csv[7] ?? '',
-        password = csv[8] ?? '',
+        password = '',
+        oldPasswords = csv[8].split('\n') ?? [''],
         tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9]) : null,
         websites = (csv[10] as String?)?.split('\n') ?? [],
         attachments =
             (csv[11] as List<dynamic>).map((e) => e.toString()).toList(),
-        super(csv[0] ?? DateTime.now().toUtc().toIso8601String());
+        super(csv[0] ?? DateTime.now().toUtc().toIso8601String()) {
+    password = oldPasswords[0];
+    oldPasswords.removeAt(0);
+  }
 
   factory Password.fromCSV(List csv) {
     if (csv.length == 11) csv.add([]);
@@ -133,26 +143,29 @@ class Password extends PassyEntry<Password> {
         'username': username,
         'email': email,
         'password': password,
+        'oldPasswords': oldPasswords,
         'tfa': tfa?.toJson(),
         'website': websites.join('\n'),
         'attachments': attachments,
       };
 
   @override
-  List toCSV() => [
-        key,
-        customFields.map((e) => e.toCSV()).toList(),
-        additionalInfo,
-        tags,
-        nickname,
-        iconName,
-        username,
-        email,
-        password,
-        tfa?.toCSV() ?? [],
-        websites.join('\n'),
-        attachments,
-      ];
+  List toCSV() {
+    return [
+      key,
+      customFields.map((e) => e.toCSV()).toList(),
+      additionalInfo,
+      tags,
+      nickname,
+      iconName,
+      username,
+      email,
+      (oldPasswords.toList()..insert(0, password)).join('\n'),
+      tfa?.toCSV() ?? [],
+      websites.join('\n'),
+      attachments,
+    ];
+  }
 
   @override
   PassyKdbxEntry toKdbx() {

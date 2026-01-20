@@ -20,7 +20,7 @@ import 'key_derivation_type.dart';
 
 const String passyVersion = '1.9.5';
 const String syncVersion = '2.2.0';
-const String accountVersion = '2.5.0';
+const String accountVersion = '2.6.0';
 
 bool isSnap() {
   return Platform.environment['SNAP_NAME'] == 'passy';

@@ -42,6 +42,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   String _username = '';
   String _email = '';
   String _password = '';
+  String _lastPassword = '';
+  List<String> _oldPasswords = [];
   String _tfaSecret = '';
   int _tfaLength = 6;
   int _tfaInterval = 30;
@@ -67,6 +69,14 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   void _onSave() async {
     final LoadedAccount _account = data.loadedAccount!;
     _customFields.removeWhere((element) => element.value == '');
+    if (_lastPassword.isNotEmpty) {
+      if (_password != _lastPassword) {
+        if (_oldPasswords.length > 1) {
+          _oldPasswords.removeLast();
+        }
+        _oldPasswords.insert(0, _lastPassword);
+      }
+    }
     Password _passwordArgs = Password(
       key: _key,
       customFields: _customFields,
@@ -76,6 +86,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
       username: _username,
       email: _email,
       password: _password,
+      oldPasswords: _oldPasswords,
       tfa: _tfaSecret == ''
           ? null
           : TFA(
@@ -135,6 +146,8 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
         _username = _passwordArgs.username;
         _email = _passwordArgs.email;
         _password = _passwordArgs.password;
+        _lastPassword = _password;
+        _oldPasswords = _passwordArgs.oldPasswords;
         _passwordController.text = _password;
         if (_tfa != null) {
           _tfaSecret = _tfa.secret;
