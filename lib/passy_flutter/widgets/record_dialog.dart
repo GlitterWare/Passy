@@ -32,7 +32,8 @@ class RecordDialog extends StatelessWidget {
           _children.add(TextSpan(
               text: _iterator.current,
               style: TextStyle(
-                fontFamily: 'FiraCode',
+                fontFamily: _iterator.current == '&' ? null : 'FiraCode',
+                fontWeight: _iterator.current == '&' ? FontWeight.bold : null,
                 color: specialColor ??
                     PassyTheme.of(context).highlightContentSecondaryColor,
               )));
