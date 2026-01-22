@@ -49,7 +49,7 @@ function download_appimagetool() {
   if [ ! -d ../build/appimage ]; then mkdir ../build/appimage; fi
   if [ ! -d ../build/appimage/appimage-build ]; then mkdir ../build/appimage/appimage-build; fi
   if [ ! -x ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage ]; then
-    curl -L -o ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$ARCH.AppImage
+    curl -L -o ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage
     chmod a+x ../build/appimage/appimage-build/appimagetool-$ARCH.AppImage 
   fi
 }
