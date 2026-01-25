@@ -55,6 +55,8 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
                 return Text(localizations.date);
               case FieldType.number:
                 return Text(localizations.number);
+              case FieldType.tfa:
+                return Text(localizations.twoFactorAuthentication);
             }
           },
           value: _customField.fieldType,

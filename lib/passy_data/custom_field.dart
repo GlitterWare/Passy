@@ -2,8 +2,9 @@ import 'package:passy/passy_data/common.dart';
 
 import 'csv_convertable.dart';
 import 'json_convertable.dart';
+import 'tfa.dart';
 
-enum FieldType { text, password, date, number }
+enum FieldType { text, password, date, number, tfa }
 
 FieldType? fieldTypeFromName(String name) {
   switch (name) {
@@ -15,6 +16,8 @@ FieldType? fieldTypeFromName(String name) {
       return FieldType.password;
     case 'date':
       return FieldType.date;
+    case 'tfa':
+      return FieldType.tfa;
   }
   return null;
 }
@@ -25,6 +28,7 @@ class CustomField with JsonConvertable, CSVConvertable {
   String value;
   bool obscured;
   bool multiline;
+  TFA? tfa;
 
   CustomField({
     this.title = 'Custom Field',
@@ -32,6 +36,7 @@ class CustomField with JsonConvertable, CSVConvertable {
     this.value = '',
     this.obscured = false,
     this.multiline = false,
+    this.tfa,
   });
 
   CustomField.fromJson(Map<String, dynamic> json)
@@ -39,7 +44,8 @@ class CustomField with JsonConvertable, CSVConvertable {
         fieldType = fieldTypeFromName(json['fieldType']) ?? FieldType.text,
         value = json['value'] ?? '',
         obscured = json['obscured'] ?? false,
-        multiline = json['multiline'] ?? false;
+        multiline = json['multiline'] ?? false,
+        tfa = json.containsKey('tfa') ? TFA.fromJson(json['tfa']) : null;
 
   CustomField.fromCSV(List csv)
       : title = csv.isNotEmpty ? csv[0] : 'Custom Field',
@@ -47,7 +53,8 @@ class CustomField with JsonConvertable, CSVConvertable {
             fieldTypeFromName(csv.length >= 2 ? csv[1] : '') ?? FieldType.text,
         value = csv.length >= 3 ? csv[2] : '',
         obscured = boolFromString(csv.length >= 4 ? csv[3] : '') ?? false,
-        multiline = boolFromString(csv.length >= 5 ? csv[4] : '') ?? false;
+        multiline = boolFromString(csv.length >= 5 ? csv[4] : '') ?? false,
+        tfa = csv.length >= 6 ? TFA.fromCSV(csv[5] as List) : null;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -56,6 +63,7 @@ class CustomField with JsonConvertable, CSVConvertable {
         'value': value,
         'obscured': obscured,
         'multiline': multiline,
+        'tfa': tfa?.toJson(),
       };
 
   @override
@@ -65,5 +73,6 @@ class CustomField with JsonConvertable, CSVConvertable {
         value,
         obscured.toString(),
         multiline.toString(),
+        tfa?.toCSV(),
       ];
 }
