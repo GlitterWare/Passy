@@ -45,7 +45,7 @@ class CustomField with JsonConvertable, CSVConvertable {
         value = json['value'] ?? '',
         obscured = json['obscured'] ?? false,
         multiline = json['multiline'] ?? false,
-        tfa = json.containsKey('tfa') ? TFA.fromJson(json['tfa']) : null;
+        tfa = json['tfa'] == null ? null : TFA.fromJson(json['tfa']);
 
   CustomField.fromCSV(List csv)
       : title = csv.isNotEmpty ? csv[0] : 'Custom Field',
@@ -54,7 +54,11 @@ class CustomField with JsonConvertable, CSVConvertable {
         value = csv.length >= 3 ? csv[2] : '',
         obscured = boolFromString(csv.length >= 4 ? csv[3] : '') ?? false,
         multiline = boolFromString(csv.length >= 5 ? csv[4] : '') ?? false,
-        tfa = csv.length >= 6 ? TFA.fromCSV(csv[5] as List) : null;
+        tfa = csv.length >= 6
+            ? csv[5] == null
+                ? null
+                : TFA.fromCSV(csv[5] as List)
+            : null;
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
