@@ -608,14 +608,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  flutter_markdown:
+  flutter_markdown_plus:
     dependency: "direct main"
     description:
-      name: flutter_markdown
-      sha256: a10979814c5f4ddbe2b6143fba25d927599e21e3ba65b3862995960606fae78f
+      name: flutter_markdown_plus
+      sha256: "587693bb0e4474dff58a9dd0db34dcea06e8928d144104e78063c89ac0a1ab50"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.17+3"
+    version: "1.0.0+1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

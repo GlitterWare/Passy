@@ -75,7 +75,7 @@ dependencies:
       path: dargon2
       ref: 83c67239018b488512d9a553a93cf99d34ab2546
   dargon2_interface: ^1.1.1
-  flutter_markdown: ^0.6.17+1
+  flutter_markdown_plus: ^1.0.0+1
   compute: ^1.0.2
   launch_at_startup: ^0.2.2
   kdbx:
