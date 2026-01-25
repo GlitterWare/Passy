@@ -5,7 +5,7 @@ updates:
       interval: "weekly"
 
 update:
-  - package-ecosystem: "flutter"
+  - package-ecosystem: "pub"
     directory: "/"
     schedule:
       interval: "weekly"
