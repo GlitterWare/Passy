@@ -944,12 +944,16 @@ class LoadedAccount {
   Digest get historyHash => getPassyHash(jsonEncode(_history.value.toJson()));
   Map<String, EntryEvent> get appSettingsHistory =>
       Map.from(_history.value.appSettings);
-  bool passwordExists(String key) => _history.value.passwords.containsKey(key);
+  bool passwordExists(String key) =>
+      _history.value.passwords[key]?.status == EntryStatus.alive;
   bool paymentCardExists(String key) =>
-      _history.value.paymentCards.containsKey(key);
-  bool noteExists(String key) => _history.value.notes.containsKey(key);
-  bool idCardExists(String key) => _history.value.idCards.containsKey(key);
-  bool identityExists(String key) => _history.value.identities.containsKey(key);
+      _history.value.paymentCards[key]?.status == EntryStatus.alive;
+  bool noteExists(String key) =>
+      _history.value.notes[key]?.status == EntryStatus.alive;
+  bool idCardExists(String key) =>
+      _history.value.idCards[key]?.status == EntryStatus.alive;
+  bool identityExists(String key) =>
+      _history.value.identities[key]?.status == EntryStatus.alive;
 
   // Favorites wrappers
   void clearRemovedFavorites() => _favorites.value.clearRemoved();
