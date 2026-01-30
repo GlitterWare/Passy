@@ -120,8 +120,7 @@ class Password extends PassyEntry<Password> {
         attachments =
             (csv[11] as List<dynamic>).map((e) => e.toString()).toList(),
         super(csv[0] ?? DateTime.now().toUtc().toIso8601String()) {
-    password = oldPasswords[0];
-    oldPasswords.removeAt(0);
+    password = oldPasswords.removeAt(0);
   }
 
   factory Password.fromCSV(List csv) {
