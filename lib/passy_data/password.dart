@@ -142,7 +142,7 @@ class Password extends PassyEntry<Password> {
         'username': username,
         'email': email,
         'password': password,
-        'oldPasswords': oldPasswords,
+        'oldPasswords': oldPasswords.map<dynamic>((e) => e).toList(),
         'tfa': tfa?.toJson(),
         'website': websites.join('\n'),
         'attachments': attachments,
