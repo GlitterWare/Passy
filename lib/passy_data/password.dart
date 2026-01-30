@@ -114,7 +114,7 @@ class Password extends PassyEntry<Password> {
         username = csv[6] ?? '',
         email = csv[7] ?? '',
         password = '',
-        oldPasswords = csv[8].split('\n') ?? [''],
+        oldPasswords = csv[8].split('\n'),
         tfa = csv[9].isNotEmpty ? TFA.fromCSV(csv[9]) : null,
         websites = (csv[10] as String?)?.split('\n') ?? [],
         attachments =
