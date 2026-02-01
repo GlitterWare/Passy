@@ -47,18 +47,20 @@ class CustomField with JsonConvertable, CSVConvertable {
         multiline = json['multiline'] ?? false,
         tfa = json['tfa'] == null ? null : TFA.fromJson(json['tfa']);
 
-  CustomField.fromCSV(List csv)
-      : title = csv.isNotEmpty ? csv[0] : 'Custom Field',
-        fieldType =
-            fieldTypeFromName(csv.length >= 2 ? csv[1] : '') ?? FieldType.text,
-        value = csv.length >= 3 ? csv[2] : '',
-        obscured = boolFromString(csv.length >= 4 ? csv[3] : '') ?? false,
-        multiline = boolFromString(csv.length >= 5 ? csv[4] : '') ?? false,
-        tfa = csv.length >= 6
-            ? csv[5] == null
-                ? null
-                : TFA.fromCSV(csv[5] as List)
-            : null;
+  CustomField._fromCSV(List csv)
+      : title = csv[0],
+        fieldType = fieldTypeFromName(csv[1]) ?? FieldType.text,
+        value = csv[2],
+        obscured = boolFromString(csv[3]) ?? false,
+        multiline = boolFromString(csv[4]) ?? false,
+        tfa = csv[5].isEmpty ? null : TFA.fromCSV(csv[5] as List);
+
+  factory CustomField.fromCSV(List csv) {
+    while (csv.length < 6) {
+      csv.add('');
+    }
+    return CustomField._fromCSV(csv);
+  }
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -77,6 +79,6 @@ class CustomField with JsonConvertable, CSVConvertable {
         value,
         obscured.toString(),
         multiline.toString(),
-        tfa?.toCSV(),
+        tfa?.toCSV() ?? '',
       ];
 }
