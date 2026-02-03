@@ -38,6 +38,7 @@ export 'payment_card_button_list_view.dart';
 export 'payment_card_button_mini_list_view.dart';
 export 'payment_card_button_mini.dart';
 export 'payment_card_button.dart';
+export 'plan_card.dart';
 export 'record_button.dart';
 export 'record_dialog.dart';
 export 'rename_file_dialog.dart';

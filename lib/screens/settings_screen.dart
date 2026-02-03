@@ -37,9 +37,13 @@ class _SettingsScreen extends State<SettingsScreen> {
     } else {
       if (trayEnabled) toggleTray(context);
     }
-    setState(() {
-      _account.minimizeToTray = value;
-    });
+    setState(() => _account.minimizeToTray = value);
+    _account.saveSettings();
+  }
+
+  void setHideCloudService(bool value) {
+    if (_account.cloudEnabled) value = false;
+    setState(() => _account.hideCloudService = value);
     _account.saveSettings();
   }
 
@@ -116,6 +120,19 @@ class _SettingsScreen extends State<SettingsScreen> {
               ),
               onPressed: () => setMinimizeToTray(!_account.minimizeToTray),
             )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.hideCloudService),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.cloud_off_rounded),
+            ),
+            right: Switch(
+              //activeColor: Colors.deepPurpleAccent,
+              value: _account.hideCloudService,
+              onChanged: (value) => setHideCloudService(value),
+            ),
+            onPressed: () => setHideCloudService(!_account.hideCloudService),
+          )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.backupAndRestore),
             left: const Padding(

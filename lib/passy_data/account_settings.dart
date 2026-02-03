@@ -17,6 +17,10 @@ class AccountSettings with JsonConvertable {
   int serverSyncInterval;
   Map<String, Sync2d0d0ServerInfo> serverInfo;
   DateTime? lastSyncDate;
+  bool cloudEnabled = false;
+  String? cloudToken;
+  String? cloudRefreshToken;
+  bool hideCloudService = false;
 
   AccountSettings.fromJson(Map<String, dynamic> json)
       : protectScreen = json['protectScreen'] ?? true,
@@ -39,7 +43,11 @@ class AccountSettings with JsonConvertable {
             : {},
         lastSyncDate = json['lastSyncDate'] == null
             ? null
-            : DateTime.parse(json['lastSyncDate']);
+            : DateTime.parse(json['lastSyncDate']),
+        cloudEnabled = json['cloudEnabled'] ?? false,
+        cloudToken = json['cloudToken'],
+        cloudRefreshToken = json['cloudRefreshToken'],
+        hideCloudService = json['hideCloudService'] ?? false;
 
   AccountSettings({
     this.protectScreen = true,
@@ -50,6 +58,8 @@ class AccountSettings with JsonConvertable {
     this.serverSyncInterval = 15000,
     Map<String, Sync2d0d0ServerInfo>? serverInfo,
     this.lastSyncDate,
+    this.cloudEnabled = false,
+    this.cloudToken,
   })  : rsaKeypair =
             rsaPrivateKey is RSAPrivateKey ? RSAKeypair(rsaPrivateKey) : null,
         serverInfo = serverInfo ?? {};
@@ -64,6 +74,10 @@ class AccountSettings with JsonConvertable {
         'serverSyncInterval': serverSyncInterval.toString(),
         'serverInfo': serverInfo.values.map((e) => e.toJson()).toList(),
         'lastSyncDate': lastSyncDate?.toIso8601String(),
+        'cloudEnabled': cloudEnabled,
+        'cloudToken': cloudToken,
+        'cloudRefreshToken': cloudRefreshToken,
+        'hideCloudService': hideCloudService,
       };
 
   static AccountSettingsFile fromFile(

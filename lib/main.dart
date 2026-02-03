@@ -6,6 +6,7 @@ import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:passy/passy_data/passy_cloud.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_file_screen.dart';
 import 'package:passy/screens/autofill_splash_screen.dart';
@@ -26,6 +27,13 @@ import 'package:passy/screens/servers_screen.dart';
 import 'common/common.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/change_username_screen.dart';
+import 'screens/cloud_manage_screen.dart';
+import 'screens/cloud_privacy_policy_screen.dart';
+import 'screens/cloud_register_screen.dart';
+import 'screens/cloud_reset_password_screen.dart';
+import 'screens/cloud_sync_screen.dart';
+import 'screens/cloud_update_email_screen.dart';
+import 'screens/cloud_user_agreement_screen.dart';
 import 'screens/common.dart';
 import 'screens/confirm_restore_screen.dart';
 import 'screens/csv_import_screen.dart';
@@ -92,6 +100,35 @@ void main() {
   KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
   HttpOverrides.global = MyHttpOverrides();
+  bool cloudSyncScreenOn = false;
+  PassyCloudLoop.status.listen((status) {
+    if (cloudSyncScreenOn) {
+      if (status == PassyCloudSyncStatus.completed) {
+        cloudSyncScreenOn = false;
+        Navigator.pop(navigatorKey.currentContext!);
+        return;
+      }
+    } else {
+      if (status == PassyCloudSyncStatus.downloadingAccount ||
+          status == PassyCloudSyncStatus.downloadingFiles ||
+          status == PassyCloudSyncStatus.uploadingAccount) {
+        cloudSyncScreenOn = true;
+        Navigator.push(
+            navigatorKey.currentContext!,
+            PageRouteBuilder(
+              opaque: false,
+              barrierColor: Colors.transparent,
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const CloudSyncScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return child;
+              },
+            ));
+        return;
+      }
+    }
+  });
   runApp(PassyThemeWidget(theme: _theme, child: const Passy()));
 }
 
@@ -131,6 +168,18 @@ class Passy extends StatelessWidget {
             const ChangePasswordScreen(),
         ChangeUsernameScreen.routeName: (context) =>
             const ChangeUsernameScreen(),
+        CloudManageScreen.routeName: (context) => const CloudManageScreen(),
+        CloudPrivacyPolicyScreen.routeName: (context) =>
+            const CloudPrivacyPolicyScreen(),
+        CloudRegisterScreen.routeName: (context) => const CloudRegisterScreen(),
+        CloudResetPasswordScreen.routeName: (context) =>
+            const CloudResetPasswordScreen(),
+        CloudSyncScreen.routeName: (context) => const CloudSyncScreen(),
+        // ignore: equal_keys_in_map
+        CloudUpdateEmailScreen.routeName: (context) =>
+            const CloudUpdateEmailScreen(),
+        CloudUserAgreementScreen.routeName: (context) =>
+            const CloudUserAgreementScreen(),
         ConfirmImportScreen.routeName: (context) => const ConfirmImportScreen(),
         ConfirmKdbxExportScreen.routeName: (context) =>
             const ConfirmKdbxExportScreen(),

@@ -930,6 +930,23 @@ class LoadedAccount {
   int get autoScreenLockDelay => _settings.value.autoScreenLockDelay;
   set autoScreenLockDelay(int value) =>
       _settings.value.autoScreenLockDelay = value;
+  bool get cloudEnabled => _settings.value.cloudEnabled;
+  set cloudEnabled(bool value) {
+    if (value) {
+      _settings.value.hideCloudService = false;
+    }
+    _settings.value.cloudEnabled = value;
+  }
+
+  String? get cloudToken => _settings.value.cloudToken;
+  set cloudToken(String? value) => _settings.value.cloudToken = value;
+  String? get cloudRefreshToken => _settings.value.cloudRefreshToken;
+  set cloudRefreshToken(String? value) => _settings.value.cloudRefreshToken = value;
+  bool get hideCloudService => _settings.value.hideCloudService;
+  set hideCloudService(bool value) {
+    if (_settings.value.cloudEnabled) value = false;
+    _settings.value.hideCloudService = value;
+  }
 
   Future<void> saveSettings() => _settings.save();
   void saveSettingsSync() => _settings.saveSync();

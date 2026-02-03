@@ -304,6 +304,7 @@ class SplashScreen extends StatelessWidget {
       await Future.delayed(const Duration(milliseconds: 5));
       if (Platform.isWindows || Platform.isLinux) _copyExtensionFiles();
       data = await loadPassyData();
+      PassyCloudLoop.start();
       loaded = true;
       PassyAppTheme? appTheme = data.getAppTheme(data.info.value.lastUsername);
       switchAppTheme(context, appTheme);

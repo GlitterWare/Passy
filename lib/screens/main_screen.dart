@@ -33,6 +33,8 @@ import 'settings_screen.dart';
 import 'id_cards_screen.dart';
 import 'identities_screen.dart';
 import 'notes_screen.dart';
+import 'cloud_manage_screen.dart';
+import 'cloud_register_screen.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main';
@@ -571,129 +573,157 @@ class _MainScreen extends State<MainScreen>
     return PopScope(
       canPop: false,
       onPopInvoked: _onWillPop,
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text('Passy'),
-          leading: IconButton(
-            splashRadius: PassyTheme.appBarButtonSplashRadius,
-            padding: PassyTheme.appBarButtonPadding,
-            tooltip: localizations.logOut,
-            icon: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationY(pi),
-              child: const Icon(Icons.exit_to_app_rounded),
-            ),
-            onPressed: _logOut,
-          ),
-          actions: [
-            IconButton(
-              splashRadius: PassyTheme.appBarButtonSplashRadius,
-              padding: PassyTheme.appBarButtonPadding,
-              tooltip: localizations.synchronize,
-              onPressed: () {
-                if (!_account.isRSAKeypairLoaded) {
-                  showSnackBar(
-                    message: localizations.settingUpSynchronization,
-                    icon: const Icon(CupertinoIcons.clock_solid),
-                  );
-                  return;
-                }
-                showSynchronizationDialog(context);
-              },
-              icon: const Icon(Icons.sync_rounded),
-            ),
-            IconButton(
-              padding: PassyTheme.appBarButtonPadding,
-              tooltip: localizations.search,
-              onPressed: () =>
-                  Navigator.pushNamed(context, SearchScreen.routeName,
-                      arguments: SearchScreenArgs(
-                        entryType: null,
-                        title: localizations.allEntries,
-                        builder: _searchBuilder,
-                      )),
-              icon: const Icon(Icons.search_rounded),
-              splashRadius: PassyTheme.appBarButtonSplashRadius,
-            ),
-            IconButton(
-              padding: PassyTheme.appBarButtonPadding,
-              tooltip: localizations.settings,
-              onPressed: () =>
-                  Navigator.pushNamed(context, SettingsScreen.routeName)
-                      .then((value) => setState(() {})),
-              icon: const Icon(Icons.settings),
-              splashRadius: PassyTheme.appBarButtonSplashRadius,
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              child: LayoutBuilder(
-                builder: (ctx, constr) {
-                  if (constr.maxWidth >= 1100) {
-                    return Row(children: [
-                      Expanded(
-                          child: ListView(
-                        children: [
-                          _screenButtons[0],
-                          _screenButtons[3],
-                          _screenButtons[6],
-                        ],
-                      )),
-                      Expanded(
-                          child: ListView(
-                        children: [
-                          _screenButtons[1],
-                          _screenButtons[4],
-                          if (_screenButtons.length == 8) _screenButtons[7],
-                        ],
-                      )),
-                      Expanded(
-                          child: ListView(
-                        children: [
-                          _screenButtons[2],
-                          _screenButtons[5],
-                        ],
-                      ))
-                    ]);
-                  }
-                  if (constr.maxWidth >= 700) {
-                    return Row(children: [
-                      Expanded(
-                        child: ListView(children: [
-                          _screenButtons[0],
-                          _screenButtons[2],
-                          _screenButtons[4],
-                          _screenButtons[6],
-                        ]),
+      child: OrientationBuilder(
+        builder: (context, orientation) => Scaffold(
+          floatingActionButtonLocation: orientation == Orientation.landscape
+              ? FloatingActionButtonLocation.centerFloat
+              : FloatingActionButtonLocation.endFloat,
+          floatingActionButton: !_account.cloudEnabled &&
+                  _account.hideCloudService
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: 24, right: 0),
+                  child: FloatingActionButton(
+                      heroTag: 'cloudButton',
+                      tooltip: 'Passy Cloud',
+                      backgroundColor:
+                          PassyTheme.of(context).accentContentColor,
+                      child: Icon(
+                        Icons.cloud_rounded,
+                        color: PassyTheme.of(context).accentContentTextColor,
                       ),
-                      Expanded(
-                          child: ListView(
-                        children: [
-                          _screenButtons[1],
-                          _screenButtons[3],
-                          _screenButtons[5],
-                          if (_screenButtons.length == 8) _screenButtons[7],
-                        ],
-                      )),
-                    ]);
-                  }
-                  return ListView(children: _screenButtons);
-                },
+                      onPressed: () {
+                        if (_account.cloudEnabled) {
+                          Navigator.pushNamed(
+                              context, CloudManageScreen.routeName);
+                        } else {
+                          Navigator.pushNamed(
+                              context, CloudRegisterScreen.routeName);
+                        }
+                      })),
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('Passy'),
+            leading: IconButton(
+              splashRadius: PassyTheme.appBarButtonSplashRadius,
+              padding: PassyTheme.appBarButtonPadding,
+              tooltip: localizations.logOut,
+              icon: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(pi),
+                child: const Icon(Icons.exit_to_app_rounded),
               ),
+              onPressed: _logOut,
             ),
-            if (_lastSyncDate != null)
-              PassyPadding(Text(
-                '${localizations.lastSynchronization}: $_lastSyncDate',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color:
-                        PassyTheme.of(context).highlightContentSecondaryColor),
-              )),
-          ],
+            actions: [
+              IconButton(
+                splashRadius: PassyTheme.appBarButtonSplashRadius,
+                padding: PassyTheme.appBarButtonPadding,
+                tooltip: localizations.synchronize,
+                onPressed: () {
+                  if (!_account.isRSAKeypairLoaded) {
+                    showSnackBar(
+                      message: localizations.settingUpSynchronization,
+                      icon: const Icon(CupertinoIcons.clock_solid),
+                    );
+                    return;
+                  }
+                  showSynchronizationDialog(context);
+                },
+                icon: const Icon(Icons.sync_rounded),
+              ),
+              IconButton(
+                padding: PassyTheme.appBarButtonPadding,
+                tooltip: localizations.search,
+                onPressed: () =>
+                    Navigator.pushNamed(context, SearchScreen.routeName,
+                        arguments: SearchScreenArgs(
+                          entryType: null,
+                          title: localizations.allEntries,
+                          builder: _searchBuilder,
+                        )),
+                icon: const Icon(Icons.search_rounded),
+                splashRadius: PassyTheme.appBarButtonSplashRadius,
+              ),
+              IconButton(
+                padding: PassyTheme.appBarButtonPadding,
+                tooltip: localizations.settings,
+                onPressed: () =>
+                    Navigator.pushNamed(context, SettingsScreen.routeName)
+                        .then((value) => setState(() {})),
+                icon: const Icon(Icons.settings),
+                splashRadius: PassyTheme.appBarButtonSplashRadius,
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              Flexible(
+                fit: FlexFit.tight,
+                child: LayoutBuilder(
+                  builder: (ctx, constr) {
+                    if (constr.maxWidth >= 1100) {
+                      return Row(children: [
+                        Expanded(
+                            child: ListView(
+                          children: [
+                            _screenButtons[0],
+                            _screenButtons[3],
+                            _screenButtons[6],
+                          ],
+                        )),
+                        Expanded(
+                            child: ListView(
+                          children: [
+                            _screenButtons[1],
+                            _screenButtons[4],
+                            if (_screenButtons.length == 8) _screenButtons[7],
+                          ],
+                        )),
+                        Expanded(
+                            child: ListView(
+                          children: [
+                            _screenButtons[2],
+                            _screenButtons[5],
+                          ],
+                        ))
+                      ]);
+                    }
+                    if (constr.maxWidth >= 700) {
+                      return Row(children: [
+                        Expanded(
+                          child: ListView(children: [
+                            _screenButtons[0],
+                            _screenButtons[2],
+                            _screenButtons[4],
+                            _screenButtons[6],
+                          ]),
+                        ),
+                        Expanded(
+                            child: ListView(
+                          children: [
+                            _screenButtons[1],
+                            _screenButtons[3],
+                            _screenButtons[5],
+                            if (_screenButtons.length == 8) _screenButtons[7],
+                          ],
+                        )),
+                      ]);
+                    }
+                    return ListView(children: _screenButtons);
+                  },
+                ),
+              ),
+              if (_lastSyncDate != null)
+                PassyPadding(Text(
+                  '${localizations.lastSynchronization}: $_lastSyncDate',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: PassyTheme.of(context)
+                          .highlightContentSecondaryColor),
+                )),
+            ],
+          ),
         ),
       ),
     );

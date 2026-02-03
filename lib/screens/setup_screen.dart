@@ -6,6 +6,7 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 
+import 'cloud_register_screen.dart';
 import 'common.dart';
 import 'main_screen.dart';
 import 'theme_screen.dart';
@@ -86,6 +87,16 @@ class _SetupScreen extends State<SetupScreen> {
             onPressed: () => Navigator.pushNamed(
                 context, BackupAndRestoreScreen.routeName,
                 arguments: data.loadedAccount!.username),
+          )),
+          PassyPadding(ThreeWidgetButton(
+            center: const Text('Passy Cloud'),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.cloud_rounded),
+            ),
+            right: const Icon(Icons.arrow_forward_ios_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, CloudRegisterScreen.routeName),
           )),
           PassyPadding(ThreeWidgetButton(
             center: Text(localizations.theme),
