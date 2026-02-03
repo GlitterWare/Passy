@@ -214,7 +214,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
               }
               return (emailsCount.entries.toList()
                     ..sort((a, b) => b.value - a.value))
-                  .where((e) => e.key.contains(textEditingValue.text))
+                  .where((e) => e.key.startsWith(textEditingValue.text))
                   .map((e) => e.key);
             },
             fieldViewBuilder: (
