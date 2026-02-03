@@ -7,7 +7,6 @@ import 'package:otp/otp.dart';
 import 'package:base32/base32.dart';
 import 'package:passy/common/common.dart';
 import 'package:passy/passy_data/custom_field.dart';
-import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -29,6 +28,7 @@ class EditPasswordScreen extends StatefulWidget {
 }
 
 class _EditPasswordScreen extends State<EditPasswordScreen> {
+  final _account = data.loadedAccount!;
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoaded = false;
@@ -67,7 +67,6 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   }
 
   void _onSave() async {
-    final LoadedAccount _account = data.loadedAccount!;
     _customFields.removeWhere((element) => element.value == '');
     if (_lastPassword.isNotEmpty) {
       if (_password != _lastPassword) {
@@ -202,11 +201,39 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           decoration: InputDecoration(labelText: localizations.username),
           onChanged: (value) => setState(() => _username = value.trim()),
         )),
-        PassyPadding(TextFormField(
-          initialValue: _email,
-          decoration: InputDecoration(labelText: localizations.email),
-          onChanged: (value) => setState(() => _email = value.trim()),
-        )),
+        PassyPadding(
+          Autocomplete<String>(
+            initialValue: TextEditingValue(text: _email),
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              final emails =
+                  _account.passwords.values.map((e) => e.email).toList();
+              Map<String, int> emailsCount = {};
+              for (String email in emails) {
+                if (email.isEmpty) continue;
+                emailsCount[email] = (emailsCount[email] ?? 0) + 1;
+              }
+              return (emailsCount.entries.toList()
+                    ..sort((a, b) => b.value - a.value))
+                  .where((e) => e.key.contains(textEditingValue.text))
+                  .map((e) => e.key);
+            },
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController controller,
+              FocusNode focusNode,
+              VoidCallback onFieldSubmitted,
+            ) =>
+                TextFormField(
+              decoration: InputDecoration(labelText: localizations.email),
+              onChanged: (value) => setState(() => _email = value.trim()),
+              autofillHints: const [AutofillHints.email],
+              inputFormatters: [FilteringTextInputFormatter.deny(' ')],
+              controller: controller,
+              focusNode: focusNode,
+              onFieldSubmitted: (_) => onFieldSubmitted(),
+            ),
+          ),
+        ),
         PassyPadding(ButtonedTextFormField(
           controller: _passwordController,
           labelText: localizations.password,
