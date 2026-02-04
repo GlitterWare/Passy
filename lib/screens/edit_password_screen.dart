@@ -232,6 +232,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
               focusNode: focusNode,
               onFieldSubmitted: (_) => onFieldSubmitted(),
             ),
+            onSelected: (value) => setState(() => _email = value),
           ),
         ),
         PassyPadding(ButtonedTextFormField(
