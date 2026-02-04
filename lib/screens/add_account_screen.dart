@@ -164,12 +164,19 @@ class _AddAccountScreen extends State<StatefulWidget> {
                             Row(
                               children: [
                                 Expanded(
+                                    child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: PassyTheme.of(context)
+                                          .passyPadding
+                                          .top,
+                                      bottom: PassyTheme.of(context)
+                                          .passyPadding
+                                          .bottom),
                                   child: TextField(
                                     onChanged: (a) =>
                                         setState(() => _username = a),
                                     decoration: InputDecoration(
-                                      hintText: localizations.username,
-                                    ),
+                                        labelText: localizations.username),
                                     autofocus: true,
                                     inputFormatters: [
                                       FilteringTextInputFormatter(
@@ -178,7 +185,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                           allow: true)
                                     ],
                                   ),
-                                )
+                                )),
                               ],
                             ),
                             Row(
@@ -189,6 +196,14 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     color: Color.fromRGBO(255, 82, 82, 1),
                                   )),
                                 Expanded(
+                                    child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: PassyTheme.of(context)
+                                          .passyPadding
+                                          .top,
+                                      bottom: PassyTheme.of(context)
+                                          .passyPadding
+                                          .bottom),
                                   child: TextField(
                                     obscureText: true,
                                     onChanged: (a) => setState(() {
@@ -203,10 +218,9 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                       _password = a;
                                     }),
                                     decoration: InputDecoration(
-                                      hintText: localizations.password,
-                                    ),
+                                        labelText: localizations.password),
                                   ),
-                                )
+                                )),
                               ],
                             ),
                             Row(
@@ -217,11 +231,19 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     color: Color.fromRGBO(255, 82, 82, 1),
                                   )),
                                 Expanded(
+                                    child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: PassyTheme.of(context)
+                                          .passyPadding
+                                          .top,
+                                      bottom: PassyTheme.of(context)
+                                          .passyPadding
+                                          .bottom),
                                   child: TextField(
                                     obscureText: true,
                                     decoration: InputDecoration(
-                                      hintText: localizations.confirmPassword,
-                                    ),
+                                        labelText:
+                                            localizations.confirmPassword),
                                     onChanged: (a) => setState(() {
                                       if (HardwareKeyboard
                                           .instance.lockModesEnabled
@@ -235,7 +257,7 @@ class _AddAccountScreen extends State<StatefulWidget> {
                                     }),
                                     onSubmitted: (value) => _addAccount(),
                                   ),
-                                ),
+                                )),
                                 FloatingActionButton(
                                   onPressed: _addAccount,
                                   child: const Icon(
