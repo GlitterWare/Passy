@@ -41,6 +41,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
   String _nickname = '';
   String _username = '';
   String _email = '';
+  Map<String, int>? _emailsCount;
   String _password = '';
   String _lastPassword = '';
   List<String> _oldPasswords = [];
@@ -205,12 +206,17 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
           Autocomplete<String>(
             initialValue: TextEditingValue(text: _email),
             optionsBuilder: (TextEditingValue textEditingValue) {
-              final emails =
-                  _account.passwords.values.map((e) => e.email).toList();
-              Map<String, int> emailsCount = {};
-              for (String email in emails) {
-                if (email.isEmpty) continue;
-                emailsCount[email] = (emailsCount[email] ?? 0) + 1;
+              Map<String, int>? emailsCount = _emailsCount;
+              if (emailsCount == null) {
+                emailsCount = {};
+                final emails = _account.passwords.values
+                    .map((e) => e.email)
+                    .where((e) => e.isNotEmpty)
+                    .toList();
+                for (String email in emails) {
+                  emailsCount[email] = (emailsCount[email] ?? 0) + 1;
+                }
+                _emailsCount = emailsCount;
               }
               return (emailsCount.entries.toList()
                     ..sort((a, b) => b.value - a.value))
