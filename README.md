@@ -73,6 +73,7 @@ Passy is an offline password manager with cross-platfrom synchronization. 🔒
 - 📚 Multipurpose – Store passwords, payment cards, notes, id cards and identities, all in one place.
 - ⚡ Autofill – Quickly fill fields in apps and websites without having to open the app.
 - 🧩 Browser extension - Use autofill and add new entries on the fly right from your browser. (See https://github.com/GlitterWare/Passy-Browser-Extension)
+- ☁️ Passy Cloud - Support this free project and get secure, automatic online synchronization in return. 🤟 (disabled by default - base app and manual QR-powered sync remain free forever)
 
 </details>
 
