@@ -62,7 +62,7 @@ class _MainScreen extends State<MainScreen>
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     if (_lastSearch
         .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
-      _searchEntries = [];
+      _searchEntries.clear();
       Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
       Map<String, IdentityMeta> identitiesMetadata =
           _account.identitiesMetadata;
@@ -249,7 +249,7 @@ class _MainScreen extends State<MainScreen>
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
     if (_lastSearch
         .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
-      _searchEntries = [];
+      _searchEntries.clear();
       Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
       Map<String, IdentityMeta> identitiesMetadata =
           _account.identitiesMetadata;
