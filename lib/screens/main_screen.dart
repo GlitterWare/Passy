@@ -52,79 +52,87 @@ class _MainScreen extends State<MainScreen>
   String? _lastSyncDate;
   late FormattedTextParser formattedTextParser;
 
+  //#region Search
+  final List<SearchEntryData> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   Widget _searchBuilder(
       String terms, List<String> tags, void Function() rebuild) {
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
-    final List<SearchEntryData> _searchEntries = [];
-    Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
-    Map<String, IdentityMeta> identitiesMetadata = _account.identitiesMetadata;
-    Map<String, NoteMeta> notesMetadata = _account.notesMetadata;
-    Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
-    Map<String, PaymentCardMeta> paymentCardsMetadata =
-        _account.paymentCardsMetadata;
-    if (idCardsMetadata.isEmpty &&
-        identitiesMetadata.isEmpty &&
-        notesMetadata.isEmpty &&
-        passwordsMetadata.isEmpty &&
-        paymentCardsMetadata.isEmpty) {
-      return CustomScrollView(
-        slivers: [
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Column(
-              children: [
-                const Spacer(flex: 7),
-                Text(
-                  localizations.noEntries,
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(flex: 7),
-              ],
+    if (_lastSearch
+        .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
+      Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
+      Map<String, IdentityMeta> identitiesMetadata =
+          _account.identitiesMetadata;
+      Map<String, NoteMeta> notesMetadata = _account.notesMetadata;
+      Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
+      Map<String, PaymentCardMeta> paymentCardsMetadata =
+          _account.paymentCardsMetadata;
+      if (idCardsMetadata.isEmpty &&
+          identitiesMetadata.isEmpty &&
+          notesMetadata.isEmpty &&
+          passwordsMetadata.isEmpty &&
+          paymentCardsMetadata.isEmpty) {
+        return CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Column(
+                children: [
+                  const Spacer(flex: 7),
+                  Text(
+                    localizations.noEntries,
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(flex: 7),
+                ],
+              ),
             ),
-          ),
-        ],
-      );
-    }
-    for (IDCardMeta idCard in idCardsMetadata.values) {
-      _searchEntries.add(SearchEntryData(
-          name: idCard.nickname,
-          description: idCard.name,
-          type: EntryType.idCard,
-          meta: idCard,
-          tags: idCard.tags));
-    }
-    for (IdentityMeta _identity in identitiesMetadata.values) {
-      _searchEntries.add(SearchEntryData(
-          name: _identity.nickname,
-          description: _identity.firstAddressLine,
-          type: EntryType.identity,
-          meta: _identity,
-          tags: _identity.tags));
-    }
-    for (NoteMeta _note in notesMetadata.values) {
-      _searchEntries.add(SearchEntryData(
-          name: _note.title,
-          description: '',
-          type: EntryType.note,
-          meta: _note,
-          tags: _note.tags));
-    }
-    for (PasswordMeta _password in passwordsMetadata.values) {
-      _searchEntries.add(SearchEntryData(
-          name: _password.nickname,
-          description: _password.username,
-          type: EntryType.password,
-          meta: _password,
-          tags: _password.tags));
-    }
-    for (PaymentCardMeta _paymentCard in paymentCardsMetadata.values) {
-      _searchEntries.add(SearchEntryData(
-          name: _paymentCard.nickname,
-          description: _paymentCard.cardholderName,
-          type: EntryType.paymentCard,
-          meta: _paymentCard,
-          tags: _paymentCard.tags));
+          ],
+        );
+      }
+      for (IDCardMeta idCard in idCardsMetadata.values) {
+        _searchEntries.add(SearchEntryData(
+            name: idCard.nickname,
+            description: idCard.name,
+            type: EntryType.idCard,
+            meta: idCard,
+            tags: idCard.tags));
+      }
+      for (IdentityMeta _identity in identitiesMetadata.values) {
+        _searchEntries.add(SearchEntryData(
+            name: _identity.nickname,
+            description: _identity.firstAddressLine,
+            type: EntryType.identity,
+            meta: _identity,
+            tags: _identity.tags));
+      }
+      for (NoteMeta _note in notesMetadata.values) {
+        _searchEntries.add(SearchEntryData(
+            name: _note.title,
+            description: '',
+            type: EntryType.note,
+            meta: _note,
+            tags: _note.tags));
+      }
+      for (PasswordMeta _password in passwordsMetadata.values) {
+        _searchEntries.add(SearchEntryData(
+            name: _password.nickname,
+            description: _password.username,
+            type: EntryType.password,
+            meta: _password,
+            tags: _password.tags));
+      }
+      for (PaymentCardMeta _paymentCard in paymentCardsMetadata.values) {
+        _searchEntries.add(SearchEntryData(
+            name: _paymentCard.nickname,
+            description: _paymentCard.cardholderName,
+            type: EntryType.paymentCard,
+            meta: _paymentCard,
+            tags: _paymentCard.tags));
+      }
+      _lastSearch = DateTime.now();
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
@@ -238,68 +246,72 @@ class _MainScreen extends State<MainScreen>
     }
     final List<SearchEntryData> _found = [];
     final List<String> _terms = terms.trim().toLowerCase().split(' ');
-    final List<SearchEntryData> _searchEntries = [];
-    Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
-    Map<String, IdentityMeta> identitiesMetadata = _account.identitiesMetadata;
-    Map<String, NoteMeta> notesMetadata = _account.notesMetadata;
-    Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
-    Map<String, PaymentCardMeta> paymentCardsMetadata =
-        _account.paymentCardsMetadata;
-    _account.reloadFavoritesSync();
-    for (EntryEvent event in _account.favoriteIDCards.values) {
-      if (event.status == EntryStatus.removed) continue;
-      IDCardMeta? idCard = idCardsMetadata[event.key];
-      if (idCard == null) continue;
-      _searchEntries.add(SearchEntryData(
-          name: idCard.nickname,
-          description: idCard.name,
-          type: EntryType.idCard,
-          meta: idCard,
-          tags: idCard.tags));
-    }
-    for (EntryEvent event in _account.favoriteIdentities.values) {
-      if (event.status == EntryStatus.removed) continue;
-      IdentityMeta? _identity = identitiesMetadata[event.key];
-      if (_identity == null) continue;
-      _searchEntries.add(SearchEntryData(
-          name: _identity.nickname,
-          description: _identity.firstAddressLine,
-          type: EntryType.identity,
-          meta: _identity,
-          tags: _identity.tags));
-    }
-    for (EntryEvent event in _account.favoriteNotes.values) {
-      if (event.status == EntryStatus.removed) continue;
-      NoteMeta? _note = notesMetadata[event.key];
-      if (_note == null) continue;
-      _searchEntries.add(SearchEntryData(
-          name: _note.title,
-          description: '',
-          type: EntryType.note,
-          meta: _note,
-          tags: _note.tags));
-    }
-    for (EntryEvent event in _account.favoritePasswords.values) {
-      if (event.status == EntryStatus.removed) continue;
-      PasswordMeta? _password = passwordsMetadata[event.key];
-      if (_password == null) continue;
-      _searchEntries.add(SearchEntryData(
-          name: _password.nickname,
-          description: _password.username,
-          type: EntryType.password,
-          meta: _password,
-          tags: _password.tags));
-    }
-    for (EntryEvent event in _account.favoritePaymentCards.values) {
-      if (event.status == EntryStatus.removed) continue;
-      PaymentCardMeta? _paymentCard = paymentCardsMetadata[event.key];
-      if (_paymentCard == null) continue;
-      _searchEntries.add(SearchEntryData(
-          name: _paymentCard.nickname,
-          description: _paymentCard.cardholderName,
-          type: EntryType.paymentCard,
-          meta: _paymentCard,
-          tags: _paymentCard.tags));
+    if (_lastSearch
+        .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
+      Map<String, IDCardMeta> idCardsMetadata = _account.idCardsMetadata;
+      Map<String, IdentityMeta> identitiesMetadata =
+          _account.identitiesMetadata;
+      Map<String, NoteMeta> notesMetadata = _account.notesMetadata;
+      Map<String, PasswordMeta> passwordsMetadata = _account.passwordsMetadata;
+      Map<String, PaymentCardMeta> paymentCardsMetadata =
+          _account.paymentCardsMetadata;
+      _account.reloadFavoritesSync();
+      for (EntryEvent event in _account.favoriteIDCards.values) {
+        if (event.status == EntryStatus.removed) continue;
+        IDCardMeta? idCard = idCardsMetadata[event.key];
+        if (idCard == null) continue;
+        _searchEntries.add(SearchEntryData(
+            name: idCard.nickname,
+            description: idCard.name,
+            type: EntryType.idCard,
+            meta: idCard,
+            tags: idCard.tags));
+      }
+      for (EntryEvent event in _account.favoriteIdentities.values) {
+        if (event.status == EntryStatus.removed) continue;
+        IdentityMeta? _identity = identitiesMetadata[event.key];
+        if (_identity == null) continue;
+        _searchEntries.add(SearchEntryData(
+            name: _identity.nickname,
+            description: _identity.firstAddressLine,
+            type: EntryType.identity,
+            meta: _identity,
+            tags: _identity.tags));
+      }
+      for (EntryEvent event in _account.favoriteNotes.values) {
+        if (event.status == EntryStatus.removed) continue;
+        NoteMeta? _note = notesMetadata[event.key];
+        if (_note == null) continue;
+        _searchEntries.add(SearchEntryData(
+            name: _note.title,
+            description: '',
+            type: EntryType.note,
+            meta: _note,
+            tags: _note.tags));
+      }
+      for (EntryEvent event in _account.favoritePasswords.values) {
+        if (event.status == EntryStatus.removed) continue;
+        PasswordMeta? _password = passwordsMetadata[event.key];
+        if (_password == null) continue;
+        _searchEntries.add(SearchEntryData(
+            name: _password.nickname,
+            description: _password.username,
+            type: EntryType.password,
+            meta: _password,
+            tags: _password.tags));
+      }
+      for (EntryEvent event in _account.favoritePaymentCards.values) {
+        if (event.status == EntryStatus.removed) continue;
+        PaymentCardMeta? _paymentCard = paymentCardsMetadata[event.key];
+        if (_paymentCard == null) continue;
+        _searchEntries.add(SearchEntryData(
+            name: _paymentCard.nickname,
+            description: _paymentCard.cardholderName,
+            type: EntryType.paymentCard,
+            meta: _paymentCard,
+            tags: _paymentCard.tags));
+      }
+      _lastSearch = DateTime.now();
     }
     for (SearchEntryData _searchEntry in _searchEntries) {
       {
@@ -385,6 +397,7 @@ class _MainScreen extends State<MainScreen>
       popupMenuItemBuilder: passyEntryPopupMenuItemBuilder,
     );
   }
+  //#endregion
 
   void _logOut() {
     showDialog(
