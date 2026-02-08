@@ -735,12 +735,18 @@ class _MainScreen extends State<MainScreen>
                 ),
               ),
               if (_lastSyncDate != null)
-                PassyPadding(Text(
-                  '${localizations.lastSynchronization}: $_lastSyncDate',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: PassyTheme.of(context)
-                          .highlightContentSecondaryColor),
+                PassyPadding(Padding(
+                  padding: EdgeInsets.only(
+                      bottom: Platform.isAndroid
+                          ? PassyTheme.of(context).passyPadding.bottom
+                          : 0),
+                  child: Text(
+                    '${localizations.lastSynchronization}: $_lastSyncDate',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: PassyTheme.of(context)
+                            .highlightContentSecondaryColor),
+                  ),
                 )),
             ],
           ),
