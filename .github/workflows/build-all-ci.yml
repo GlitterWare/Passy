@@ -34,7 +34,9 @@ jobs:
         run: flutter config --no-analytics
       - name: Build Android
         shell: bash
-        run: bash build_android.sh
+        run: |
+          export GRADLE_OPTS="-Xmx4096m -Dorg.gradle.jvmargs='-Xmx4096m'"
+          bash build_android.sh
       - name: Prepare releases
         shell: bash
         run: |
