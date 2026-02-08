@@ -217,7 +217,7 @@ String encrypt(String data, {required Encrypter encrypter, IV? iv}) {
   return encrypter
       .encrypt(
         data,
-        iv: iv ?? IV.fromLength(16),
+        iv: iv ?? IV.allZerosOfLength(16),
       )
       .base64;
 }
@@ -226,7 +226,7 @@ String decrypt(String data, {required Encrypter encrypter, IV? iv}) {
   if (data.isEmpty) return '';
   return encrypter.decrypt64(
     data,
-    iv: iv ?? IV.fromLength(16),
+    iv: iv ?? IV.allZerosOfLength(16),
   );
 }
 

@@ -148,7 +148,7 @@ class PassyBinaryFile {
         false,
         PaddedBlockCipherParameters(
             ParametersWithIV<KeyParameter>(
-                KeyParameter(_key.bytes), iv?.bytes ?? IV.fromLength(16).bytes),
+                KeyParameter(_key.bytes), iv?.bytes ?? IV.allZerosOfLength(16).bytes),
             null));
     while (offset < fileLen) {
       Uint8List block = Uint8List(16);

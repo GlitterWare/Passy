@@ -624,7 +624,7 @@ Future<String> _login(String username, dynamic password) async {
         ...utf8.encode(' ' * (32 - password.length)),
       ]));
     }
-    return Key.fromLength(32);
+    return Key.allZerosOfLength(32);
   }
 
   bool match = _credentials.passwordHash == await getHash();
