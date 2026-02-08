@@ -7,6 +7,7 @@ import 'package:passy/passy_data/passy_app_theme.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:screen_secure/screen_secure.dart';
 import 'package:passy/passy_data/common.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/add_account_screen.dart';
@@ -92,7 +93,9 @@ class SplashScreen extends StatelessWidget {
                     in (await (dir.list(recursive: true)).toList())) {
                   try {
                     if ((await file.stat()).type ==
-                        FileSystemEntityType.directory) continue;
+                        FileSystemEntityType.directory) {
+                      continue;
+                    }
                     await File(file.path).writeAsString('');
                     await file.delete();
                   } catch (_) {
@@ -302,6 +305,12 @@ class SplashScreen extends StatelessWidget {
 
     Future<void> _load() async {
       await Future.delayed(const Duration(milliseconds: 5));
+      if (Platform.isAndroid) {
+        ScreenSecure.init(
+          screenshotBlock: true,
+          screenRecordBlock: true,
+        );
+      }
       if (Platform.isWindows || Platform.isLinux) _copyExtensionFiles();
       data = await loadPassyData();
       PassyCloudLoop.start();
@@ -325,15 +334,21 @@ class SplashScreen extends StatelessWidget {
           List<String> _newVersionSplit = _version.split('.');
           List<String> _currentVersionSplit = passyVersion.split('.');
           if (int.parse(_newVersionSplit[0]) <
-              int.parse(_currentVersionSplit[0])) return;
+              int.parse(_currentVersionSplit[0])) {
+            return;
+          }
           if (int.parse(_newVersionSplit[0]) ==
               int.parse(_currentVersionSplit[0])) {
             if (int.parse(_newVersionSplit[1]) <
-                int.parse(_currentVersionSplit[1])) return;
+                int.parse(_currentVersionSplit[1])) {
+              return;
+            }
             if (int.parse(_newVersionSplit[1]) ==
                 int.parse(_currentVersionSplit[1])) {
               if (int.parse(_newVersionSplit[2]) <=
-                  int.parse(_currentVersionSplit[2])) return;
+                  int.parse(_currentVersionSplit[2])) {
+                return;
+              }
             }
           }
           showUpdateDialog();

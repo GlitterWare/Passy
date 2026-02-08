@@ -10,7 +10,7 @@ class CloudSyncScreen extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.black.withOpacity(0.3),
+        backgroundColor: Colors.black.withAlpha((255.0 * 0.3).round()),
         body: SafeArea(
           child: Stack(
             children: [
@@ -28,7 +28,7 @@ class CloudSyncScreen extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withAlpha((255.0 * 0.2).round()),
                         blurRadius: 6,
                         offset: const Offset(0, -2),
                       ),
@@ -38,8 +38,9 @@ class CloudSyncScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       LinearProgressIndicator(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.surfaceContainerHighest,
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           Theme.of(context).colorScheme.primary,
                         ),

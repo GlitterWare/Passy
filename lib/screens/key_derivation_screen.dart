@@ -156,7 +156,7 @@ class _KeyDerivationScreen extends State<KeyDerivationScreen> {
                       value: KeyDerivationType.none,
                     ),
                   ],
-                  value: _type,
+                  initialValue: _type,
                   decoration: InputDecoration(
                       labelText: localizations.keyDerivationType),
                   onChanged: (value) {

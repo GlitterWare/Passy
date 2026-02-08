@@ -42,7 +42,7 @@ dependencies:
   otp: ^3.0.2
   qr_flutter: ^4.0.0
   file_picker: ^8.1.2
-  flutter_web_browser: ^0.17.1
+  flutter_web_browser: ^0.17.3
   flutter_locker: ^2.1.2
   cached_network_image: ^3.3.1
   flutter_credit_card:
@@ -51,12 +51,9 @@ dependencies:
       ref: 7a754b0a44cd75d0689a3adfd778205da9c69f95
   flutter_date_pickers: ^0.4.3
   credit_card_type_detector: ^2.0.0
-  flutter_secure_screen: ^0.0.1
-  camera: ^0.10.5+9
-  flutter_autofill_service:
-    git:
-      url: https://github.com/kee-org/flutter_autofill_service
-      ref: f49e062c0eab85170e26712b2ba438b5f713a2b7
+  screen_secure: ^1.0.3
+  camera: ^0.11.3
+  flutter_autofill_service: ^0.21.0
   url_launcher: ^6.0.20
   intranet_ip: ^1.0.2
   zxing2: ^0.2.3
@@ -80,18 +77,15 @@ dependencies:
   launch_at_startup: ^0.2.2
   kdbx:
     git:
-      url: https://github.com/GlitterWare/kdbx.dart.git
-      ref: b248b712c7bf2684ee241543bc5553313bb94018
+      url: https://github.com/authpass/kdbx.dart.git
+      ref: 90830e11bb0a6f177229a0644c559fbf2b088b03
   dropdown_button2: ^2.3.9
-  emoji_picker_flutter:
-    git:
-      url: https://github.com/GlitterWare/emoji_picker_flutter
-      ref: ba7e1116380e37bb3fac0d53277dd6937d8849d5
+  emoji_picker_flutter: ^4.4.0
   text_divider: ^1.0.0
-  archive: ^3.6.1
+  archive: ^4.0.7
   media_kit: ^1.1.10+1
   media_kit_video: ^1.2.4
-  media_kit_libs_video: ^1.0.4
+  media_kit_libs_video: ^1.0.7
   win32: ^5.5.1
   basic_utils: ^5.7.0
   chewie_media_kit:
@@ -101,12 +95,13 @@ dependencies:
   window_manager: ^0.3.9
   system_tray: ^2.0.3
   flex_color_picker: ^3.6.0
-  pdfrx: ^1.0.94
+  pdfrx: ^2.2.24
   base85: ^1.0.4
   mutex: ^3.1.0
 
 dependency_overrides:
   uuid: ^4.0.0
+  volume_controller: ^3.0.0
 
 dev_dependencies:
   flutter_test:

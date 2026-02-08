@@ -19,7 +19,7 @@ import 'package:passy/passy_data/local_settings.dart';
 import 'package:passy/passy_data/passy_entires_json_file.dart';
 import 'package:passy/passy_data/passy_entries_encrypted_csv_file.dart';
 import 'package:passy/passy_data/passy_entries_file_collection.dart';
-import 'package:archive/archive_io.dart';
+import 'package:archive/archive_io.dart' as archive;
 import 'package:passy/passy_data/passy_file_type.dart';
 import 'package:passy/passy_data/tfa.dart';
 import 'package:passy/passy_data/trusted_connection_data.dart';
@@ -560,7 +560,7 @@ class LoadedAccount {
             .export(_tempAccDir.path + Platform.pathSeparator + 'files');
       }
     }
-    ZipFileEncoder _encoder = ZipFileEncoder();
+    final _encoder = archive.ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
     await _encoder.close();
@@ -633,7 +633,7 @@ class LoadedAccount {
         await _fileIndex.export('${tempPath}files');
       }
     }
-    ZipFileEncoder _encoder = ZipFileEncoder();
+    final _encoder = archive.ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
     await _encoder.close();
@@ -706,7 +706,7 @@ class LoadedAccount {
         await _fileIndex.export('${tempPath}files');
       }
     }
-    ZipFileEncoder _encoder = ZipFileEncoder();
+    final _encoder = archive.ZipFileEncoder();
     _encoder.create(fileName, level: 9);
     await _encoder.addDirectory(_tempAccDir);
     await _encoder.close();
@@ -806,8 +806,6 @@ class LoadedAccount {
         return (PassyEntry value) => setIDCard(value as IDCard);
       case EntryType.identity:
         return (PassyEntry value) => setIdentity(value as Identity);
-      default:
-        throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
@@ -828,8 +826,6 @@ class LoadedAccount {
       case EntryType.identity:
         return (List<PassyEntry> value) =>
             setIdentities(value.map((e) => e as Identity).toList());
-      default:
-        throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
@@ -845,8 +841,6 @@ class LoadedAccount {
         return getIDCard;
       case EntryType.identity:
         return getIdentity;
-      default:
-        throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
@@ -862,8 +856,6 @@ class LoadedAccount {
         return removeIDCard;
       case EntryType.identity:
         return removeIdentity;
-      default:
-        throw Exception('Unsupported entry type \'${type.name}\'');
     }
   }
 
@@ -941,7 +933,8 @@ class LoadedAccount {
   String? get cloudToken => _settings.value.cloudToken;
   set cloudToken(String? value) => _settings.value.cloudToken = value;
   String? get cloudRefreshToken => _settings.value.cloudRefreshToken;
-  set cloudRefreshToken(String? value) => _settings.value.cloudRefreshToken = value;
+  set cloudRefreshToken(String? value) =>
+      _settings.value.cloudRefreshToken = value;
   bool get hideCloudService => _settings.value.hideCloudService;
   set hideCloudService(bool value) {
     if (_settings.value.cloudEnabled) value = false;

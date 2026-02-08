@@ -236,7 +236,7 @@ class _ChangePasswordScreen extends State<ChangePasswordScreen> {
                                   value: false,
                                 ),
                               ],
-                              value: _doNotReencryptEntries,
+                              initialValue: _doNotReencryptEntries,
                               decoration: const InputDecoration(
                                   labelText:
                                       'Disable entry re-encryption (Maintenance use only)'),

@@ -83,7 +83,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
             child: Icon(Icons.hide_source),
           ),
           right: Switch(
-            activeColor: Colors.greenAccent,
+            activeThumbColor: Colors.greenAccent,
             value: _customField.obscured,
             onChanged: (value) => setState(() => _customField.obscured = value),
           ),
@@ -97,7 +97,7 @@ class _EditCustomFieldScreen extends State<EditCustomFieldScreen> {
             child: Icon(Icons.list_outlined),
           ),
           right: Switch(
-            activeColor: Colors.greenAccent,
+            activeThumbColor: Colors.greenAccent,
             value: _customField.multiline,
             onChanged: (value) =>
                 setState(() => _customField.multiline = value),

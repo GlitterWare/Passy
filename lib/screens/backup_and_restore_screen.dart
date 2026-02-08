@@ -175,7 +175,7 @@ class _BackupAndRestoreScreen extends State<BackupAndRestoreScreen> {
               child: Icon(Icons.save_outlined),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
+              activeThumbColor: Colors.greenAccent,
               value: _account.autoBackup != null,
               onChanged: (value) => _setAutoBackupEnabled(value),
             ),

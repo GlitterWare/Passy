@@ -51,7 +51,7 @@ class _PasswordScreen extends State<PasswordScreen> {
       setState(() {
         _tfaProgress = _tfaCycles - _tfaCycles.floor();
       });
-      switch (_tfaColor.value) {
+      switch (_tfaColor.toARGB32()) {
         case 4287679225:
           // Blue
           if (_tfaProgress < 0.60) break;

@@ -12,9 +12,9 @@ import 'package:passy/passy_data/password.dart';
 import 'package:passy/passy_data/passy_data.dart';
 import 'package:passy/passy_data/passy_cloud.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:xdg_directories/xdg_directories.dart';
+import 'package:passy/l10n/app_localizations.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();

@@ -105,7 +105,6 @@ class _EntryTagCreationDialog extends State<EntryTagCreationDialog> {
                               ? 1.20
                               : 1.0),
                     ),
-                    swapCategoryAndBottomBar: false,
                     skinToneConfig: const ep.SkinToneConfig(),
                     categoryViewConfig: ep.CategoryViewConfig(
                         backgroundColor: PassyTheme.of(context).contentColor),

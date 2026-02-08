@@ -353,7 +353,6 @@ class _PassyFileWidget extends State<PassyFileWidget> {
                       //passwordProvider: () => passwordDialog(context),
                       controller: controller,
                       params: PdfViewerParams(
-                        enableTextSelection: true,
                         maxScale: 8,
                         backgroundColor:
                             PassyTheme.of(context).secondaryContentColor,

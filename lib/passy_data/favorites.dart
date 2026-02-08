@@ -104,8 +104,6 @@ class Favorites with JsonConvertable {
         return idCards;
       case EntryType.identity:
         return identities;
-      default:
-        return {};
     }
   }
 

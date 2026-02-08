@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 /build/
+/lib/l10n/*.dart
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -44,6 +45,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build
 
 # Snap packaging files
 /*.snap

@@ -38,6 +38,12 @@ class _SetupScreen extends State<SetupScreen> {
     _account.saveSettings();
   }
 
+  void setHideCloudService(bool value) {
+    if (_account.cloudEnabled) value = false;
+    setState(() => _account.hideCloudService = value);
+    _account.saveSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,12 +122,25 @@ class _SetupScreen extends State<SetupScreen> {
                 child: Icon(Icons.circle),
               ),
               right: Switch(
-                //activeColor: Colors.deepPurpleAccent,
+                //activeThumbColor: Colors.deepPurpleAccent,
                 value: _account.minimizeToTray,
                 onChanged: (value) => setMinimizeToTray(value),
               ),
               onPressed: () => setMinimizeToTray(!_account.minimizeToTray),
             )),
+          PassyPadding(ThreeWidgetButton(
+            center: Text(localizations.hideCloudService),
+            left: const Padding(
+              padding: EdgeInsets.only(right: 30),
+              child: Icon(Icons.cloud_off_rounded),
+            ),
+            right: Switch(
+              //activeThumbColor: Colors.deepPurpleAccent,
+              value: _account.hideCloudService,
+              onChanged: (value) => setHideCloudService(value),
+            ),
+            onPressed: () => setHideCloudService(!_account.hideCloudService),
+          )),
           PassyPadding(ThreeWidgetButton(
             color: PassyTheme.of(context).highlightContentColor,
             center: Text(

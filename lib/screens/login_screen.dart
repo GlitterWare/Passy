@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
-import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:screen_secure/screen_secure.dart';
 import 'package:passy/passy_data/bio_storage.dart';
 import 'package:passy/passy_data/biometric_storage_data.dart';
 import 'package:passy/passy_data/key_derivation_info.dart';
@@ -44,7 +44,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> {
   static bool didRun = false;
-  bool initialized = false;
   String _password = '';
   String _username = data.info.value.lastUsername;
   FloatingActionButton? _bioAuthButton;
@@ -240,8 +239,13 @@ class _LoginScreen extends State<LoginScreen> {
       }
       _account.startAutoSync();
       if (Platform.isAndroid) {
-        FlutterSecureScreen.singleton
-            .setAndroidScreenSecure(_account.protectScreen);
+        if (_account.protectScreen) {
+          await ScreenSecure.enableScreenshotBlock();
+          await ScreenSecure.enableScreenRecordBlock();
+        } else {
+          await ScreenSecure.disableScreenshotBlock();
+          await ScreenSecure.disableScreenRecordBlock();
+        }
       }
       Navigator.pushReplacementNamed(context, MainScreen.routeName);
     } catch (e, s) {
@@ -283,14 +287,6 @@ class _LoginScreen extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!initialized) {
-      if (!isAutofill) {
-        if (Platform.isAndroid) {
-          FlutterSecureScreen.singleton.setAndroidScreenSecure(true);
-        }
-      }
-      initialized = true;
-    }
     updateBioAuthButton();
     List<String> usernamesSorted = data.usernames.toList();
     usernamesSorted.sort((a, b) => alphabeticalCompare(a, b));
@@ -391,7 +387,7 @@ class _LoginScreen extends State<LoginScreen> {
                                     isDense: false,
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(30)),
-                                    value: _username,
+                                    initialValue: _username,
                                     items: usernames,
                                     selectedItemBuilder: (context) {
                                       return usernames.map<Widget>((item) {

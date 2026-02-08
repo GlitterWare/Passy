@@ -100,7 +100,7 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
         backgroundColor: highlightContentColor,
         foregroundColor: highlightContentTextColor,
       ),
-      appBarTheme: AppBarTheme(color: secondaryContentColor),
+      appBarTheme: AppBarTheme(backgroundColor: secondaryContentColor),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: highlightContentColor,
         actionTextColor: contentColor,
@@ -131,6 +131,7 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
           backgroundColor: WidgetStatePropertyAll<Color>(accentContentColor),
           foregroundColor:
               WidgetStatePropertyAll<Color>(accentContentTextColor),
+          iconSize: WidgetStatePropertyAll<double>(24),
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(

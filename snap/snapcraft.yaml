@@ -83,6 +83,7 @@ parts:
       - libayatana-appindicator3-dev
       - libmpv-dev
       - meson
+      - libasound2-dev
       #endregion
     stage-packages:
       - zenity

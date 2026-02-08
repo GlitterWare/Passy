@@ -932,7 +932,7 @@ Future<void> executeCommand(List<String> command,
         return;
       }
       try {
-        ShowWindow(GetConsoleWindow(), SHOW_WINDOW_CMD.SW_HIDE);
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
       } catch (e, s) {
         log('passy:hide:Failed to hide window:\n$e\n$s');
         return;

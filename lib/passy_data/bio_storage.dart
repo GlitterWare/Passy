@@ -36,7 +36,9 @@ extension BioStorage on BiometricStorageData {
     }
     if ((await data.createPasswordHash(username, password: _bioData.password))
             .toString() !=
-        data.getPasswordHash(username)) return false;
+        data.getPasswordHash(username)) {
+      return false;
+    }
     data.info.value.lastUsername = username;
     await data.info.save();
     Key key =

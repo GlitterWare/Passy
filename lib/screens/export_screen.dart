@@ -239,7 +239,7 @@ class _ExportScreen extends State<ExportScreen> {
                             child: Icon(Icons.description_outlined),
                           ),
                           right: Switch(
-                            activeColor: Colors.greenAccent,
+                            activeThumbColor: Colors.greenAccent,
                             value: fileExportEnabled,
                             onChanged: (value) =>
                                 setState(() => fileExportEnabled = value),

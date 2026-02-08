@@ -114,7 +114,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                 child: Icon(Icons.circle),
               ),
               right: Switch(
-                //activeColor: Colors.deepPurpleAccent,
+                //activeThumbColor: Colors.deepPurpleAccent,
                 value: _account.minimizeToTray,
                 onChanged: (value) => setMinimizeToTray(value),
               ),
@@ -127,7 +127,7 @@ class _SettingsScreen extends State<SettingsScreen> {
               child: Icon(Icons.cloud_off_rounded),
             ),
             right: Switch(
-              //activeColor: Colors.deepPurpleAccent,
+              //activeThumbColor: Colors.deepPurpleAccent,
               value: _account.hideCloudService,
               onChanged: (value) => setHideCloudService(value),
             ),

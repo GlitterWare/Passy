@@ -79,7 +79,7 @@ class _BiometricAuthScreen extends State<BiometricAuthScreen> {
               child: Icon(Icons.fingerprint_rounded),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
+              activeThumbColor: Colors.greenAccent,
               value: data.loadedAccount!.bioAuthEnabled,
               onChanged: (value) => setBioAuthEnabled(value),
             ),

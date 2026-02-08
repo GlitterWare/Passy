@@ -12,9 +12,6 @@ abstract class KeyDerivationInfo with JsonConvertable, CSVConvertable {
         return null;
       case KeyDerivationType.argon2:
         return Argon2Info.fromJson;
-      default:
-        throw Exception(
-            'Json conversion not supported for KeyDerivationType \'${type.name}\'');
     }
   }
 }

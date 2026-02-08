@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:screen_secure/screen_secure.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:kdbx/kdbx.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:passy/passy_data/passy_cloud.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -72,7 +72,7 @@ import 'screens/sync_details_screen.dart';
 import 'screens/synchronization_logs_screen.dart';
 import 'screens/theme_screen.dart';
 import 'screens/unlock_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 ThemeData _theme = PassyTheme.classicDark;
 
@@ -97,7 +97,6 @@ void main() {
     // ignore: avoid_print
     print('E:`MediaKit.ensureInitialized()` failed: $e');
   }
-  KdbxDargon2().initialize(KdbxDargon2Platform.flutter);
   DArgon2Flutter.init();
   HttpOverrides.global = MyHttpOverrides();
   bool cloudSyncScreenOn = false;

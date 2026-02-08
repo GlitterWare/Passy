@@ -111,7 +111,9 @@ class _ThemeScreen extends State<ThemeScreen> {
                     colorPickerKey = UniqueKey();
                   });
                   if (!loadedAccount.appTheme.name.contains('DarkOLED') &&
-                      loadedAccount.appTheme.name.contains('Dark')) return;
+                      loadedAccount.appTheme.name.contains('Dark')) {
+                    return;
+                  }
                   setTheme(passyAppThemeFromName(loadedAccount.appTheme.name
                       .replaceFirst('DarkOLED', 'Dark')
                       .replaceFirst('Light', 'Dark')));

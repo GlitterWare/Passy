@@ -433,7 +433,7 @@ class _EditPasswordScreen extends State<EditPasswordScreen> {
                               value: false,
                             ),
                           ],
-                          value: _tfaIsGoogle,
+                          initialValue: _tfaIsGoogle,
                           decoration: InputDecoration(
                               labelText:
                                   '2FA ${localizations.isGoogle.replaceRange(0, 1, localizations.isGoogle[0].toLowerCase())}'),

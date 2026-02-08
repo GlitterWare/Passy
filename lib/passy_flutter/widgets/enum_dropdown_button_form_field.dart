@@ -35,20 +35,17 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
     for (T value in values) {
       String _name;
       switch (textCapitalization) {
-        case (TextCapitalization.characters):
+        case TextCapitalization.characters:
           _name = value.name.toUpperCase();
           break;
-        case (TextCapitalization.none):
+        case TextCapitalization.none:
           _name = value.name;
           break;
-        case (TextCapitalization.sentences):
+        case TextCapitalization.sentences:
           _name = capitalize(value.name);
           break;
-        case (TextCapitalization.words):
+        case TextCapitalization.words:
           _name = capitalize(value.name);
-          break;
-        default:
-          _name = value.name;
           break;
       }
       _menuItems.add(DropdownMenuItem(
@@ -59,7 +56,7 @@ class EnumDropDownButtonFormField<T extends Enum> extends StatelessWidget {
     return DropdownButtonFormField(
       borderRadius: const BorderRadius.all(Radius.circular(30)),
       items: _menuItems,
-      value: value,
+      initialValue: value,
       decoration: decoration,
       onChanged: onChanged,
       style: style,

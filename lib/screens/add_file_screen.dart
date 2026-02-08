@@ -310,7 +310,7 @@ class _AddFileScreen extends State<AddFileScreen> {
                           child: Icon(Icons.hide_source),
                         ),
                         right: Switch(
-                          activeColor: Colors.greenAccent,
+                          activeThumbColor: Colors.greenAccent,
                           value: _eraseFile,
                           onChanged: (value) =>
                               setState(() => _eraseFile = value),

@@ -92,7 +92,7 @@ class _EditNoteScreen extends State<EditNoteScreen> {
             ),
           ),
           right: Switch(
-            activeColor: Colors.greenAccent,
+            activeThumbColor: Colors.greenAccent,
             value: _isMarkdown,
             onChanged: (value) => setState(() => _isMarkdown = value),
           ),

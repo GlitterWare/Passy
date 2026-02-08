@@ -12,11 +12,12 @@ subprojects {
     afterEvaluate { project ->
         if (project.hasProperty('android')) {
             project.android {
-                if (project.toString() == "project ':dargon2_flutter_mobile'" || project.toString() == "project ':flutter_secure_screen'") {
-                    compileSdkVersion 34
+                if (project.toString() == "project ':dargon2_flutter_mobile'" || project.toString() == "project ':flutter_autofill_service'") {
+                    compileSdkVersion 36
 
                     defaultConfig {
-                        minSdkVersion 29
+                        minSdkVersion 27
+                        targetSdkVersion 36
                     }
                 }
                 if (namespace == null) {

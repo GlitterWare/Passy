@@ -50,7 +50,7 @@ class _UnlockScreen extends State<UnlockScreen>
     });
   }
 
-  void _onWillPop(bool isPopped) {
+  void _onWillPop(bool isPopped, dynamic result) {
     if (isPopped) return;
     if (_shouldPop) {
       setState(() {
@@ -166,7 +166,9 @@ class _UnlockScreen extends State<UnlockScreen>
       if (UnlockScreen.isAuthenticating) return;
       if (state == _lastState) return;
       if (state != AppLifecycleState.resumed &&
-          state != AppLifecycleState.inactive) return;
+          state != AppLifecycleState.inactive) {
+        return;
+      }
       _lockScreen();
       if (state == AppLifecycleState.inactive) {
         _lastActive = DateTime.now().toUtc();
@@ -214,7 +216,7 @@ class _UnlockScreen extends State<UnlockScreen>
     }
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: Text(localizations.unlock),

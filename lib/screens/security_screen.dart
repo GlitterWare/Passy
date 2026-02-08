@@ -9,7 +9,7 @@ import 'package:passy/passy_data/key_derivation_type.dart';
 import 'package:passy/passy_data/loaded_account.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
 import 'package:passy/screens/key_derivation_screen.dart';
-import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:screen_secure/screen_secure.dart';
 import 'package:text_divider/text_divider.dart';
 
 import 'biometric_auth_screen.dart';
@@ -38,8 +38,13 @@ class _SecurityScreen extends State<SecurityScreen> {
       loadedAccount.protectScreen = value;
     });
     if (Platform.isAndroid) {
-      FlutterSecureScreen.singleton
-          .setAndroidScreenSecure(loadedAccount.protectScreen);
+      if (loadedAccount.protectScreen) {
+        ScreenSecure.enableScreenshotBlock();
+        ScreenSecure.enableScreenRecordBlock();
+      } else {
+        ScreenSecure.disableScreenshotBlock();
+        ScreenSecure.disableScreenRecordBlock();
+      }
     }
     loadedAccount.saveSettings();
   }
@@ -135,7 +140,7 @@ class _SecurityScreen extends State<SecurityScreen> {
                 child: Icon(Icons.smart_display),
               ),
               right: Switch(
-                activeColor: Colors.greenAccent,
+                activeThumbColor: Colors.greenAccent,
                 value: loadedAccount.protectScreen,
                 onChanged: (value) => setProtectScreen(value),
               ),
@@ -148,7 +153,7 @@ class _SecurityScreen extends State<SecurityScreen> {
               child: Icon(Icons.security),
             ),
             right: Switch(
-              activeColor: Colors.greenAccent,
+              activeThumbColor: Colors.greenAccent,
               value: loadedAccount.autoScreenLock,
               onChanged: (value) => setAutoScreenLock(value),
             ),

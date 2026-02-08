@@ -118,8 +118,6 @@ class History with JsonConvertable {
         return idCards;
       case EntryType.identity:
         return identities;
-      default:
-        return {};
     }
   }
 
@@ -135,8 +133,6 @@ class History with JsonConvertable {
         return idCards.keys;
       case EntryType.identity:
         return identities.keys;
-      default:
-        return {};
     }
   }
 

@@ -20,8 +20,6 @@ String _nameFromEntry(EntryType type, EntryMeta entry) {
       return (entry as PasswordMeta).nickname;
     case EntryType.paymentCard:
       return (entry as PaymentCardMeta).nickname;
-    default:
-      return '';
   }
 }
 
@@ -37,8 +35,6 @@ String _descriptionFromEntry(EntryType type, EntryMeta entry) {
       return (entry as PasswordMeta).username;
     case EntryType.paymentCard:
       return (entry as PaymentCardMeta).cardholderName;
-    default:
-      return '';
   }
 }
 
@@ -54,8 +50,6 @@ List<String> _tagsFromEntry(EntryType type, EntryMeta entry) {
       return (entry as PasswordMeta).tags;
     case EntryType.paymentCard:
       return (entry as PaymentCardMeta).tags;
-    default:
-      return [];
   }
 }
 

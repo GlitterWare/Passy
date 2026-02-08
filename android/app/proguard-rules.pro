@@ -2,6 +2,11 @@
 -dontwarn java.lang.**
 -dontwarn javax.naming.**
 -dontwarn sun.reflect.Reflection
+-dontwarn ch.qos.logback.classic.Level
+-dontwarn ch.qos.logback.classic.Logger
+-dontwarn ch.qos.logback.classic.LoggerContext
+-dontwarn ch.qos.logback.classic.spi.ILoggingEvent
+-dontwarn ch.qos.logback.classic.spi.LoggingEvent
 
 -keepnames interface org.tinylog.**
 -keepnames class * implements org.tinylog.**

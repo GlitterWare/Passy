@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_screen/flutter_secure_screen.dart';
+import 'package:screen_secure/screen_secure.dart';
 import 'package:passy/passy_data/entry_event.dart';
 import 'package:passy/passy_data/entry_type.dart';
 import 'package:passy/passy_data/id_card.dart';
@@ -437,7 +437,7 @@ class _MainScreen extends State<MainScreen>
     );
   }
 
-  void _onWillPop(bool isPopped) {
+  void _onWillPop(bool isPopped, dynamic result) {
     if (isPopped) return;
     _logOut();
   }
@@ -475,8 +475,13 @@ class _MainScreen extends State<MainScreen>
     super.initState();
     formattedTextParser = FormattedTextParser(context: context);
     if (Platform.isAndroid) {
-      FlutterSecureScreen.singleton
-          .setAndroidScreenSecure(_account.protectScreen);
+      if (_account.protectScreen) {
+        ScreenSecure.enableScreenshotBlock();
+        ScreenSecure.enableScreenRecordBlock();
+      } else {
+        ScreenSecure.disableScreenshotBlock();
+        ScreenSecure.disableScreenRecordBlock();
+      }
     } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       if (_account.minimizeToTray) {
         if (!trayEnabled) toggleTray(context);
@@ -587,7 +592,7 @@ class _MainScreen extends State<MainScreen>
 
     return PopScope(
       canPop: false,
-      onPopInvoked: _onWillPop,
+      onPopInvokedWithResult: _onWillPop,
       child: OrientationBuilder(
         builder: (context, orientation) => Scaffold(
           floatingActionButtonLocation: orientation == Orientation.landscape

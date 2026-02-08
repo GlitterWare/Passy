@@ -230,10 +230,10 @@ Passy is open-source, feel free to make modifications to it and build it yoursel
 ### Linux
 
 If you are building for Linux, getting started is easy:
-1. Install severall small packages required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget`.  
+1. Install severall small packages required to build Passy's GUI and video features: `libayatana-appindicator3-dev meson wget libasound2-dev`.  
 On Ubuntu/Debian Linux, you can install them using apt:
 ```bash
-sudo apt install -y libayatana-appindicator3-dev meson wget
+sudo apt install -y libayatana-appindicator3-dev meson wget libasound2-dev
 ```
 2. Run Passy on Linux for development via the `./run` script, which will automatically compile and inject all Passy dependencies into the script environment before running Flutter.
 3. Build Passy for Linux using the `build_linux.sh` script.

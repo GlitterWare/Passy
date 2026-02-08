@@ -33,9 +33,6 @@ abstract class PassyEntry<T>
         return IDCard.fromJson;
       case EntryType.identity:
         return Identity.fromJson;
-      default:
-        throw Exception(
-            'Json conversion not supported for EntryType \'${entryType.name}\'');
     }
   }
 

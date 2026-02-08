@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -43,7 +45,24 @@ class PaymentCardButton extends StatelessWidget {
                           .accentContentColor
                           .withAlpha(100)),
                   textColor: PassyTheme.of(context).contentTextColor,
-                  glassmorphismConfig: Glassmorphism.defaultConfig(),
+                  glassmorphismConfig: Platform.isAndroid
+                      ? Glassmorphism(
+                          blurX: 1.0,
+                          blurY: 1.0,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: <Color>[
+                              Colors.grey.withAlpha(20),
+                              Colors.white.withAlpha(20),
+                            ],
+                            stops: const <double>[
+                              0.3,
+                              0,
+                            ],
+                          ),
+                        )
+                      : Glassmorphism.defaultConfig(),
                   width: 350,
                   height: 200,
                   cardNumber: beautifyCardNumber(paymentCard.cardNumber),

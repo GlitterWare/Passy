@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 import 'package:passy/passy_data/compression_type.dart';
 import 'package:pointycastle/api.dart';
-import 'package:archive/archive.dart';
+import 'package:archive/archive.dart' as archive;
 
 class PassyBinaryFile {
   final Key _key;
@@ -29,19 +29,18 @@ class PassyBinaryFile {
       case CompressionType.none:
         break;
       case CompressionType.tar:
-        Archive archive = Archive();
-        archive.addFile(
-            ArchiveFile.stream('data', input.length, InputStream(input)));
-        input = Uint8List.fromList(TarEncoder().encode(archive));
+        final file = archive.Archive();
+        file.addFile(archive.ArchiveFile.bytes('data', input));
+        input = Uint8List.fromList(archive.TarEncoder().encode(file));
         break;
       case CompressionType.zlib:
-        input = Uint8List.fromList(const ZLibEncoder().encode(input));
+        input = Uint8List.fromList(const archive.ZLibEncoder().encode(input));
         break;
       case CompressionType.gzip:
-        input = Uint8List.fromList(GZipEncoder().encode(input)!);
+        input = Uint8List.fromList(const archive.GZipEncoder().encode(input));
         break;
       case CompressionType.bzip2:
-        input = Uint8List.fromList(BZip2Encoder().encode(input));
+        input = Uint8List.fromList(archive.BZip2Encoder().encode(input));
         break;
     }
     int inLen = input.length;
@@ -174,22 +173,20 @@ class PassyBinaryFile {
       case CompressionType.none:
         break;
       case CompressionType.tar:
-        ArchiveFile file =
-            TarDecoder().decodeBuffer(InputStream(result)).findFile('data')!;
+        final file = archive.TarDecoder().decodeBytes(result).findFile('data')!;
         file.decompress();
-        result = Uint8List.fromList(file.rawContent!.toUint8List());
+        result = Uint8List.fromList(file.rawContent!.readBytes());
         break;
       case CompressionType.zlib:
-        result = Uint8List.fromList(
-            const ZLibDecoder().decodeBuffer(InputStream(result)));
+        result =
+            Uint8List.fromList(const archive.ZLibDecoder().decodeBytes(result));
         break;
       case CompressionType.gzip:
         result =
-            Uint8List.fromList(GZipDecoder().decodeBuffer(InputStream(result)));
+            Uint8List.fromList(const archive.GZipDecoder().decodeBytes(result));
         break;
       case CompressionType.bzip2:
-        result = Uint8List.fromList(
-            BZip2Decoder().decodeBuffer(InputStream(result)));
+        result = Uint8List.fromList(archive.BZip2Decoder().decodeBytes(result));
         break;
     }
     return result;
