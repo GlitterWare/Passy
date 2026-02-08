@@ -101,12 +101,19 @@ class _LoginScreen extends State<LoginScreen> {
     }
   }
 
+  //#region Search
+  Iterable<PasswordMeta> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   Widget _buildPasswords(
       String terms, List<String> tags, void Function() rebuild) {
+    if (_lastSearch
+        .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
+      _searchEntries = data.loadedAccount!.passwordsMetadata.values;
+      _lastSearch = DateTime.now();
+    }
     List<PasswordMeta> _found = PassySearch.searchPasswords(
-        passwords: data.loadedAccount!.passwordsMetadata.values,
-        terms: terms,
-        tags: tags);
+        passwords: _searchEntries, terms: terms, tags: tags);
     List<PwDataset> _dataSets = [];
     return PasswordButtonListView(
       topWidgets: [
@@ -148,6 +155,7 @@ class _LoginScreen extends State<LoginScreen> {
       shouldSort: true,
     );
   }
+  //#endregion
 
   void login() async {
     if (!kReleaseMode) {

@@ -25,16 +25,24 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
   List<String> _tags = [];
   bool _isLoading = false;
 
+  //#region Search
+  Iterable<PaymentCardMeta> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
           entryType: EntryType.paymentCard,
           selectedTags: tag == null ? [] : [tag],
           builder: (String terms, List<String> tags, void Function() rebuild) {
+            if (_lastSearch.isBefore(
+                DateTime.now().subtract(const Duration(seconds: 10)))) {
+              _searchEntries = _account.paymentCardsMetadata.values;
+              _lastSearch = DateTime.now();
+            }
             final List<PaymentCardMeta> _found = [];
             final List<String> _terms = terms.trim().toLowerCase().split(' ');
-            for (PaymentCardMeta _paymentCard
-                in data.loadedAccount!.paymentCardsMetadata.values) {
+            for (PaymentCardMeta _paymentCard in _searchEntries) {
               {
                 bool testPaymentCard(PaymentCardMeta value) =>
                     _paymentCard.key == value.key;
@@ -102,6 +110,7 @@ class _PaymentCardsScreen extends State<PaymentCardsScreen> {
           },
         ));
   }
+  //#endregion
 
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPaymentCardScreen.routeName);

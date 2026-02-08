@@ -29,6 +29,10 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIdentityScreen.routeName);
 
+  //#region Search
+  Iterable<IdentityMeta> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
@@ -36,10 +40,14 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
             selectedTags: tag == null ? [] : [tag],
             builder:
                 (String terms, List<String> tags, void Function() rebuild) {
+              if (_lastSearch.isBefore(
+                  DateTime.now().subtract(const Duration(seconds: 10)))) {
+                _searchEntries = _account.identitiesMetadata.values;
+                _lastSearch = DateTime.now();
+              }
               final List<IdentityMeta> _found = [];
               final List<String> _terms = terms.trim().toLowerCase().split(' ');
-              for (IdentityMeta _identity
-                  in _account.identitiesMetadata.values) {
+              for (IdentityMeta _identity in _searchEntries) {
                 {
                   bool testIdentity(IdentityMeta value) =>
                       _identity.key == value.key;
@@ -104,6 +112,7 @@ class _IdentitiesScreen extends State<IdentitiesScreen> {
               );
             }));
   }
+  //#endregion
 
   Future<void> _load() async {
     _isLoading = true;

@@ -31,13 +31,22 @@ class _PasswordsScreen extends State<PasswordsScreen> {
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditPasswordScreen.routeName);
 
+  //#region Search
+  Iterable<PasswordMeta> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   Widget _buildPasswords(
     String terms,
     List<String> tags,
     void Function() rebuild,
   ) {
+    if (_lastSearch
+        .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
+      _searchEntries = _account.passwordsMetadata.values;
+      _lastSearch = DateTime.now();
+    }
     List<PasswordMeta> _found = PassySearch.searchPasswords(
-        passwords: _account.passwordsMetadata.values, terms: terms, tags: tags);
+        passwords: _searchEntries, terms: terms, tags: tags);
     if (_found.isEmpty) {
       return CustomScrollView(
         slivers: [
@@ -66,6 +75,7 @@ class _PasswordsScreen extends State<PasswordsScreen> {
       popupMenuItemBuilder: passwordPopupMenuBuilder,
     );
   }
+  //#endregion
 
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,

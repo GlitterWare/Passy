@@ -30,6 +30,10 @@ class _IDCardsScreen extends State<IDCardsScreen> {
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditIDCardScreen.routeName);
 
+  //#region Search
+  Iterable<IDCardMeta> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(context, SearchScreen.routeName,
         arguments: SearchScreenArgs(
@@ -37,9 +41,14 @@ class _IDCardsScreen extends State<IDCardsScreen> {
             selectedTags: tag == null ? [] : [tag],
             builder:
                 (String terms, List<String> tags, void Function() rebuild) {
+              if (_lastSearch.isBefore(
+                  DateTime.now().subtract(const Duration(seconds: 10)))) {
+                _searchEntries = _account.idCardsMetadata.values;
+                _lastSearch = DateTime.now();
+              }
               final List<IDCardMeta> _found = [];
               final List<String> _terms = terms.trim().toLowerCase().split(' ');
-              for (IDCardMeta _idCard in _account.idCardsMetadata.values) {
+              for (IDCardMeta _idCard in _searchEntries) {
                 {
                   bool testIDCard(IDCardMeta value) => _idCard.key == value.key;
 
@@ -101,6 +110,7 @@ class _IDCardsScreen extends State<IDCardsScreen> {
               );
             }));
   }
+  //#endregion
 
   Future<void> _load() async {
     _isLoading = true;

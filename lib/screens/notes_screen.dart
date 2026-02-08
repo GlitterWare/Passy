@@ -30,6 +30,10 @@ class _NotesScreen extends State<NotesScreen> {
   void _onAddPressed() =>
       Navigator.pushNamed(context, EditNoteScreen.routeName);
 
+  //#region Search
+  Iterable<NoteMeta> _searchEntries = [];
+  DateTime _lastSearch = DateTime.now().subtract(const Duration(days: 1));
+
   void _onSearchPressed({String? tag}) {
     Navigator.pushNamed(
       context,
@@ -38,9 +42,14 @@ class _NotesScreen extends State<NotesScreen> {
         entryType: EntryType.note,
         selectedTags: tag == null ? [] : [tag],
         builder: (String terms, List<String> tags, void Function() rebuild) {
+          if (_lastSearch
+              .isBefore(DateTime.now().subtract(const Duration(seconds: 10)))) {
+            _searchEntries = _account.notesMetadata.values;
+            _lastSearch = DateTime.now();
+          }
           final List<NoteMeta> _found = [];
           final List<String> _terms = terms.trim().toLowerCase().split(' ');
-          for (NoteMeta _note in _account.notesMetadata.values) {
+          for (NoteMeta _note in _searchEntries) {
             {
               bool testNote(NoteMeta value) => _note.key == value.key;
 
@@ -98,6 +107,7 @@ class _NotesScreen extends State<NotesScreen> {
       ),
     );
   }
+  //#endregion
 
   Future<void> _load() async {
     _isLoading = true;
