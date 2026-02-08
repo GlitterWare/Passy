@@ -208,10 +208,14 @@ add_dependencies(${BINARY_NAME} patchelf)
 #endregion
 
 #region Install appindicator
-install(CODE "
-execute_process(COMMAND \"${CMAKE_CURRENT_SOURCE_DIR}/install_appindicator.sh\" \"${CMAKE_BINARY_DIR}\" RESULT_VARIABLE ret)
-  if (ret AND NOT ret EQUAL 0)
-    message(FATAL_ERROR \"Installing appindicator: Bad exit status\")
-  endif()
-")
+if(DEFINED ENV{FLATPAK_BUILD})
+  message(STATUS "Flatpak build detected: skipping appindicator installation")
+else()
+  install(CODE "
+  execute_process(COMMAND \"${CMAKE_CURRENT_SOURCE_DIR}/install_appindicator.sh\" \"${CMAKE_BINARY_DIR}\" RESULT_VARIABLE ret)
+    if (ret AND NOT ret EQUAL 0)
+      message(FATAL_ERROR \"Installing appindicator: Bad exit status\")
+    endif()
+  ")
+endif()
 #endregion
