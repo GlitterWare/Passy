@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:screen_secure/screen_secure.dart';
 import 'package:dargon2_flutter/dargon2_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
