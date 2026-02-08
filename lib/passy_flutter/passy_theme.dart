@@ -131,7 +131,7 @@ class PassyTheme extends ThemeExtension<PassyTheme> {
           backgroundColor: WidgetStatePropertyAll<Color>(accentContentColor),
           foregroundColor:
               WidgetStatePropertyAll<Color>(accentContentTextColor),
-          iconSize: WidgetStatePropertyAll<double>(24),
+          iconSize: const WidgetStatePropertyAll<double>(24),
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(
