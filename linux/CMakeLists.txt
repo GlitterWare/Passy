@@ -182,29 +182,33 @@ install(FILES "${ARGON2_BIN}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" RENAME "li
 #endregion
 
 #region patchelf
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/prefix")
+if(DEFINED ENV{FLATPAK_BUILD})
+  message(STATUS "Flatpak build detected: skipping patchelf installation")
+else()
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/prefix")
 
-set(PATCHELF_SOURCE_DIR "${CMAKE_BINARY_DIR}/patchelf")
-set(PATCHELF_BUILD_DIR  "${CMAKE_BINARY_DIR}/patchelf-build")
+  set(PATCHELF_SOURCE_DIR "${CMAKE_BINARY_DIR}/patchelf")
+  set(PATCHELF_BUILD_DIR  "${CMAKE_BINARY_DIR}/patchelf-build")
 
-ExternalProject_Add(patchelf
-  GIT_REPOSITORY  https://github.com/NixOS/patchelf.git
-  GIT_TAG         0.18.0
-  GIT_SHALLOW     1
+  ExternalProject_Add(patchelf
+    GIT_REPOSITORY  https://github.com/NixOS/patchelf.git
+    GIT_TAG         0.18.0
+    GIT_SHALLOW     1
 
-  SOURCE_DIR        "${PATCHELF_SOURCE_DIR}"
-  BINARY_DIR        "${PATCHELF_BUILD_DIR}"
-  CONFIGURE_COMMAND
-    cd "${PATCHELF_SOURCE_DIR}" &&
-    ./bootstrap.sh &&
-    cd "${PATCHELF_BUILD_DIR}" &&
-    ${PATCHELF_SOURCE_DIR}/configure
-      --prefix=${CMAKE_BINARY_DIR}/prefix
-  BUILD_COMMAND     make -j ${NPROC}
-  INSTALL_COMMAND   make install
-)
+    SOURCE_DIR        "${PATCHELF_SOURCE_DIR}"
+    BINARY_DIR        "${PATCHELF_BUILD_DIR}"
+    CONFIGURE_COMMAND
+      cd "${PATCHELF_SOURCE_DIR}" &&
+      ./bootstrap.sh &&
+      cd "${PATCHELF_BUILD_DIR}" &&
+      ${PATCHELF_SOURCE_DIR}/configure
+        --prefix=${CMAKE_BINARY_DIR}/prefix
+    BUILD_COMMAND     make -j ${NPROC}
+    INSTALL_COMMAND   make install
+  )
 
-add_dependencies(${BINARY_NAME} patchelf)
+  add_dependencies(${BINARY_NAME} patchelf)
+endif()
 #endregion
 
 #region Install appindicator
