@@ -182,7 +182,7 @@ install(FILES "${ARGON2_BIN}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" RENAME "li
 #endregion
 
 #region patchelf
-if(DEFINED ENV{FLATPAK_BUILD})
+if(DEFINED ENV{FLATPAK_BUILDER_N_JOBS})
   message(STATUS "Flatpak build detected: skipping patchelf installation")
 else()
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/prefix")
@@ -212,7 +212,7 @@ endif()
 #endregion
 
 #region Install appindicator
-if(DEFINED ENV{FLATPAK_BUILD})
+if(DEFINED ENV{FLATPAK_BUILDER_N_JOBS})
   message(STATUS "Flatpak build detected: skipping appindicator installation")
 else()
   install(CODE "
