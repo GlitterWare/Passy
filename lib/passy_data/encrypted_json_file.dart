@@ -67,35 +67,49 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
 
   Future<void> reload() async {
     String read = await _file.readAsString();
+    if (read.isEmpty) return;
     List<String> split = read.split(',');
-    _iv = IV.fromBase64(split[0]);
-    read = split[1];
-    String encoded = decrypt(read, encrypter: _encrypter, iv: _iv);
+    String encoded;
+    if (split.length > 1) {
+      _iv = IV.fromBase64(split[0]);
+      read = split[1];
+      encoded = decrypt(read, encrypter: _encrypter, iv: _iv);
+    } else {
+      encoded = decrypt(read, encrypter: _encrypter);
+    }
     if (encoded.isEmpty) return;
     value = _fromJson(jsonDecode(encoded));
   }
 
   void reloadSync() {
     String read = _file.readAsStringSync();
+    if (read.isEmpty) return;
     List<String> split = read.split(',');
-    _iv = IV.fromBase64(split[0]);
-    read = split[1];
-    String encoded = decrypt(read, encrypter: _encrypter, iv: _iv);
+    String encoded;
+    if (split.length > 1) {
+      _iv = IV.fromBase64(split[0]);
+      read = split[1];
+      encoded = decrypt(read, encrypter: _encrypter, iv: _iv);
+    } else {
+      encoded = decrypt(read, encrypter: _encrypter);
+    }
     if (encoded.isEmpty) return;
     value = _fromJson(jsonDecode(encoded));
   }
 
   @override
   Future<void> save() {
-    _iv = IV.fromSecureRandom(16);
+    IV iv = IV.fromSecureRandom(16);
+    _iv = iv;
     return _file.writeAsString(
-        '${_iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: _iv)}');
+        '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
   }
 
   @override
   void saveSync() {
-    _iv = IV.fromSecureRandom(16);
+    IV iv = IV.fromSecureRandom(16);
+    _iv = iv;
     _file.writeAsStringSync(
-        '${_iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: _iv)}');
+        '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
   }
 }
