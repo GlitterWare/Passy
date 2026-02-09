@@ -11,7 +11,6 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
   T value;
   final File _file;
   Encrypter _encrypter;
-  IV _iv;
   set encrypter(Encrypter encrypter) => _encrypter = encrypter;
   final T Function(Map<String, dynamic> json) _fromJson;
 
@@ -20,10 +19,8 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     required Encrypter encrypter,
     required T Function(Map<String, dynamic> json) fromJson,
     required this.value,
-    IV? iv,
   })  : _encrypter = encrypter,
-        _fromJson = fromJson,
-        _iv = iv ?? IV.fromSecureRandom(16);
+        _fromJson = fromJson;
 
   factory EncryptedJsonFile.fromFile(
     File file, {
@@ -32,15 +29,14 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     required T Function(Map<String, dynamic> json) fromJson,
   }) {
     if (file.existsSync()) {
-      IV? iv;
       String encrypted = file.readAsStringSync();
       List<String> split = encrypted.split(',');
       String decrypted;
       if (split.length > 1) {
-        iv = IV.fromBase64(split[0]);
+        final iv = IV.fromBase64(split[0]);
         decrypted = decrypt(split[1], encrypter: encrypter, iv: iv);
       } else {
-        iv = IV.fromSecureRandom(16);
+        final iv = IV.fromSecureRandom(16);
         decrypted = decrypt(encrypted, encrypter: encrypter);
         encrypted = encrypt(decrypted, encrypter: encrypter, iv: iv);
         file.writeAsStringSync('${iv.base64},$encrypted');
@@ -50,7 +46,6 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
         encrypter: encrypter,
         fromJson: fromJson,
         value: fromJson(jsonDecode(decrypted)),
-        iv: iv,
       );
     }
     file.createSync(recursive: true);
@@ -59,7 +54,6 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
       encrypter: encrypter,
       fromJson: fromJson,
       value: constructor(),
-      iv: IV.fromSecureRandom(16),
     );
     _file.saveSync();
     return _file;
@@ -71,9 +65,9 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     List<String> split = read.split(',');
     String encoded;
     if (split.length > 1) {
-      _iv = IV.fromBase64(split[0]);
+      final iv = IV.fromBase64(split[0]);
       read = split[1];
-      encoded = decrypt(read, encrypter: _encrypter, iv: _iv);
+      encoded = decrypt(read, encrypter: _encrypter, iv: iv);
     } else {
       encoded = decrypt(read, encrypter: _encrypter);
     }
@@ -87,9 +81,9 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     List<String> split = read.split(',');
     String encoded;
     if (split.length > 1) {
-      _iv = IV.fromBase64(split[0]);
+      final iv = IV.fromBase64(split[0]);
       read = split[1];
-      encoded = decrypt(read, encrypter: _encrypter, iv: _iv);
+      encoded = decrypt(read, encrypter: _encrypter, iv: iv);
     } else {
       encoded = decrypt(read, encrypter: _encrypter);
     }
@@ -99,16 +93,14 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
 
   @override
   Future<void> save() {
-    IV iv = IV.fromSecureRandom(16);
-    _iv = iv;
+    final iv = IV.fromSecureRandom(16);
     return _file.writeAsString(
         '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
   }
 
   @override
   void saveSync() {
-    IV iv = IV.fromSecureRandom(16);
-    _iv = iv;
+    final iv = IV.fromSecureRandom(16);
     _file.writeAsStringSync(
         '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
   }
