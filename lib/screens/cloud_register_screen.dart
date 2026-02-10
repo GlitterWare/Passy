@@ -55,7 +55,7 @@ class _CloudRegisterScreenState extends State<CloudRegisterScreen> {
       );
       if (!_account.passwordExists('gw_cloud') &&
           !_account.passwordExists('gw_cloud_new')) {
-        _account.setPassword(newPassword);
+        await _account.setPassword(newPassword);
       }
       await PassyCloud.requestLoginCode(email: _email);
       setState(() {

@@ -163,9 +163,9 @@ class PassyCloudLoop {
           password: newPassword.password,
           websites: newPassword.websites,
         );
-        _account.setPassword(newPassword);
+        await _account.setPassword(newPassword);
       }
-      _account.removePassword('gw_cloud_new');
+      await _account.removePassword('gw_cloud_new');
       await _account.saveSettings();
     }
   }
