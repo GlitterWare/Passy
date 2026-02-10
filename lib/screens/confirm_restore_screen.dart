@@ -45,8 +45,11 @@ class _ConfirmRestoreScreen extends State<ConfirmRestoreScreen> {
         onConfirmPressed: (context, value) {
           data.restoreAccount(_path, password: value).then(
             (value) {
-              Navigator.popUntil(context,
-                  (route) => route.settings.name == MainScreen.routeName);
+              Navigator.popUntil(
+                  context,
+                  (route) =>
+                      route.settings.name == MainScreen.routeName ||
+                      route.settings.name == SetupScreen.routeName);
               Navigator.pushReplacementNamed(context, LoginScreen.routeName);
             },
             onError: (e, s) {
