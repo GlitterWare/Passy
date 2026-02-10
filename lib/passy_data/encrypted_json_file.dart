@@ -63,7 +63,8 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     final raf = await _file.open();
     await raf.lock(FileLock.shared);
     try {
-      String read = utf8.decode(await raf.read(1 << 30));
+      String read = utf8.decode(
+          await raf.read(1 << 29)); // 512mb - Android doesn't support more
       if (read.isEmpty) return;
       List<String> split = read.split(',');
       String encoded;
@@ -86,7 +87,8 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
     final raf = _file.openSync();
     raf.lockSync(FileLock.shared);
     try {
-      String read = utf8.decode(raf.readSync(1 << 30));
+      String read = utf8.decode(
+          raf.readSync(1 << 29)); // 512mb - Android doesn't support more
       if (read.isEmpty) return;
       List<String> split = read.split(',');
       String encoded;
