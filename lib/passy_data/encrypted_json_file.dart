@@ -114,6 +114,7 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
         '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
     await raf.flush();
     await raf.unlock();
+    await raf.close();
   }
 
   @override
@@ -125,5 +126,6 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
         '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
     raf.flushSync();
     raf.unlockSync();
+    raf.closeSync();
   }
 }
