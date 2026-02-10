@@ -11,6 +11,7 @@ import 'package:passy/screens/csv_import_screen.dart';
 import 'package:passy/screens/unlock_screen.dart';
 
 import 'export_and_import_screen.dart';
+import 'backup_and_restore_screen.dart';
 
 class ImportScreen extends StatefulWidget {
   const ImportScreen({Key? key}) : super(key: key);
@@ -22,6 +23,8 @@ class ImportScreen extends StatefulWidget {
 }
 
 class _ImportScreen extends State<ImportScreen> {
+  bool _advancedSettingsIsExpanded = false;
+
   void _onPassyImportPressed() {
     UnlockScreen.shouldLockScreen = false;
     FilePicker.platform
@@ -144,19 +147,64 @@ class _ImportScreen extends State<ImportScreen> {
           onPressed: _onAegisImportPressed,
         )),
         PassyPadding(ThreeWidgetButton(
-          center: Text(localizations.passyImport),
-          left: Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: SvgPicture.asset(
-              logoCircleSvg,
-              width: 24,
-              colorFilter: ColorFilter.mode(
-                  PassyTheme.of(context).contentTextColor, BlendMode.srcIn),
-            ),
+          center: Text(localizations.restore),
+          left: const Padding(
+            padding: EdgeInsets.only(right: 30),
+            child: Icon(Icons.settings_backup_restore_rounded),
           ),
           right: const Icon(Icons.arrow_forward_ios_rounded),
-          onPressed: _onPassyImportPressed,
+          onPressed: () =>
+              Navigator.pushNamed(context, BackupAndRestoreScreen.routeName, arguments: data.loadedAccount!.username),
         )),
+        ExpansionPanelList(
+          expandedHeaderPadding: EdgeInsets.zero,
+          expansionCallback: (panelIndex, isExpanded) =>
+              setState(() => _advancedSettingsIsExpanded = isExpanded),
+          elevation: 0,
+          dividerColor: PassyTheme.of(context).highlightContentSecondaryColor,
+          children: [
+            ExpansionPanel(
+              backgroundColor: PassyTheme.of(context).contentColor,
+              isExpanded: _advancedSettingsIsExpanded,
+              canTapOnHeader: true,
+              headerBuilder: (context, isExpanded) {
+                return PassyPadding(Container(
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(32.0)),
+                        color: PassyTheme.of(context).accentContentColor),
+                    child: PassyPadding(Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 5),
+                          child: Icon(Icons.error_outline_rounded),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: Text(localizations.advancedSettings)),
+                      ],
+                    ))));
+              },
+              body: Column(children: [
+                PassyPadding(ThreeWidgetButton(
+                  center: Text(localizations.passyImport),
+                  left: Padding(
+                    padding: const EdgeInsets.only(right: 30),
+                    child: SvgPicture.asset(
+                      logoCircleSvg,
+                      width: 24,
+                      colorFilter: ColorFilter.mode(
+                          PassyTheme.of(context).contentTextColor,
+                          BlendMode.srcIn),
+                    ),
+                  ),
+                  right: const Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: _onPassyImportPressed,
+                )),
+              ]),
+            ),
+          ],
+        ),
       ]),
     );
   }
