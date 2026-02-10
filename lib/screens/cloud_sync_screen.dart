@@ -11,7 +11,9 @@ class CloudSyncScreen extends StatelessWidget {
       canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black.withAlpha((255.0 * 0.3).round()),
+        extendBody: true,
         body: SafeArea(
+          bottom: false,
           child: Stack(
             children: [
               Align(
