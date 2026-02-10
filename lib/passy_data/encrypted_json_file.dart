@@ -60,48 +60,70 @@ class EncryptedJsonFile<T extends JsonConvertable> with SaveableFileBase {
   }
 
   Future<void> reload() async {
-    String read = await _file.readAsString();
-    if (read.isEmpty) return;
-    List<String> split = read.split(',');
-    String encoded;
-    if (split.length > 1) {
-      final iv = IV.fromBase64(split[0]);
-      read = split[1];
-      encoded = decrypt(read, encrypter: _encrypter, iv: iv);
-    } else {
-      encoded = decrypt(read, encrypter: _encrypter);
+    final raf = await _file.open();
+    await raf.lock(FileLock.shared);
+    try {
+      String read = utf8.decode(await raf.read(1 << 30));
+      if (read.isEmpty) return;
+      List<String> split = read.split(',');
+      String encoded;
+      if (split.length > 1) {
+        final iv = IV.fromBase64(split[0]);
+        read = split[1];
+        encoded = decrypt(read, encrypter: _encrypter, iv: iv);
+      } else {
+        encoded = decrypt(read, encrypter: _encrypter);
+      }
+      if (encoded.isEmpty) return;
+      value = _fromJson(jsonDecode(encoded));
+    } finally {
+      await raf.unlock();
+      await raf.close();
     }
-    if (encoded.isEmpty) return;
-    value = _fromJson(jsonDecode(encoded));
   }
 
   void reloadSync() {
-    String read = _file.readAsStringSync();
-    if (read.isEmpty) return;
-    List<String> split = read.split(',');
-    String encoded;
-    if (split.length > 1) {
-      final iv = IV.fromBase64(split[0]);
-      read = split[1];
-      encoded = decrypt(read, encrypter: _encrypter, iv: iv);
-    } else {
-      encoded = decrypt(read, encrypter: _encrypter);
+    final raf = _file.openSync();
+    raf.lockSync(FileLock.shared);
+    try {
+      String read = utf8.decode(raf.readSync(1 << 30));
+      if (read.isEmpty) return;
+      List<String> split = read.split(',');
+      String encoded;
+      if (split.length > 1) {
+        final iv = IV.fromBase64(split[0]);
+        read = split[1];
+        encoded = decrypt(read, encrypter: _encrypter, iv: iv);
+      } else {
+        encoded = decrypt(read, encrypter: _encrypter);
+      }
+      if (encoded.isEmpty) return;
+      value = _fromJson(jsonDecode(encoded));
+    } finally {
+      raf.unlockSync();
+      raf.closeSync();
     }
-    if (encoded.isEmpty) return;
-    value = _fromJson(jsonDecode(encoded));
   }
 
   @override
-  Future<void> save() {
+  Future<void> save() async {
+    final raf = await _file.open(mode: FileMode.write);
+    await raf.lock();
     final iv = IV.fromSecureRandom(16);
-    return _file.writeAsString(
+    await raf.writeString(
         '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
+    await raf.flush();
+    await raf.unlock();
   }
 
   @override
   void saveSync() {
+    final raf = _file.openSync(mode: FileMode.write);
+    raf.lockSync();
     final iv = IV.fromSecureRandom(16);
-    _file.writeAsStringSync(
+    raf.writeStringSync(
         '${iv.base64},${encrypt(jsonEncode(value), encrypter: _encrypter, iv: iv)}');
+    raf.flushSync();
+    raf.unlockSync();
   }
 }

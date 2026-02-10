@@ -20,11 +20,35 @@ class FileIndex {
   Encrypter _encrypter;
   final List<String> _vPaths = [];
 
+  Future<RandomAccessFile> _open(File file,
+      {FileMode mode = FileMode.read}) async {
+    final raf = await file.open(mode: mode);
+    await raf
+        .lock(mode == FileMode.read ? FileLock.shared : FileLock.exclusive);
+    return raf;
+  }
+
+  RandomAccessFile _openSync(File file, {FileMode mode = FileMode.read}) {
+    final raf = file.openSync(mode: mode);
+    raf.lockSync(mode == FileMode.read ? FileLock.shared : FileLock.exclusive);
+    return raf;
+  }
+
+  Future<void> _close(RandomAccessFile raf) async {
+    await raf.unlock();
+    await raf.close();
+  }
+
+  void _closeSync(RandomAccessFile raf) {
+    raf.unlockSync();
+    raf.closeSync();
+  }
+
   List<String> get tags {
     List<String> _tags = [];
-    RandomAccessFile _raf = _file.openSync();
+    RandomAccessFile _raf = _openSync(_file);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      _raf.closeSync();
+      _closeSync(_raf);
       return _tags;
     }
     const int _tagIndex = 2;
@@ -44,7 +68,7 @@ class FileIndex {
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
     });
-    _raf.closeSync();
+    _closeSync(_raf);
     return _tags;
   }
 
@@ -70,9 +94,9 @@ class FileIndex {
 
   Map<String, PassyFsMeta> get metadataSync {
     Map<String, PassyFsMeta> _meta = {};
-    RandomAccessFile _raf = _file.openSync();
+    RandomAccessFile _raf = _openSync(_file);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      _raf.closeSync();
+      _closeSync(_raf);
       return _meta;
     }
     processLines(_raf, onLine: (entry, eofReached) {
@@ -85,12 +109,12 @@ class FileIndex {
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
     });
-    _raf.closeSync();
+    _closeSync(_raf);
     return _meta;
   }
 
   Future<String?> getEntryString(String key) async {
-    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile _raf = await _open(_file);
     String? _entry;
     await processLinesAsync(_raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
@@ -106,13 +130,13 @@ class FileIndex {
           encrypter: _encrypter, iv: IV.fromBase64(_decoded[0]));
       return true;
     });
-    await _raf.close();
+    await _close(_raf);
     return _entry;
   }
 
   Future<Map<String, String>> getEntryStrings(List<String> keys) async {
     Map<String, String> result = {};
-    RandomAccessFile raf = await _file.open();
+    RandomAccessFile raf = await _open(_file);
     await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (key, eofReached) async {
       if (eofReached) return true;
@@ -128,7 +152,7 @@ class FileIndex {
       if (skipLine(raf) == -1) return true;
       return null;
     });
-    await raf.close();
+    await _close(raf);
     return result;
   }
 
@@ -184,9 +208,8 @@ class FileIndex {
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
       tempFile = await File(tempPath).create();
     }
-    RandomAccessFile raf = await _file.open();
-    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
-    await tempRaf.lock();
+    RandomAccessFile raf = await _open(_file);
+    RandomAccessFile tempRaf = await _open(tempFile, mode: FileMode.append);
     bool isEntrySet = false;
     void onEOF() {
       if (isEntrySet) return;
@@ -218,9 +241,8 @@ class FileIndex {
           isEntrySet = true;
           return null;
         }
-        await raf.close();
-        await tempRaf.unlock();
-        await tempRaf.close();
+        await _close(raf);
+        await _close(tempRaf);
         await tempFile.delete();
         throw 'Matching key found: duplicate files not allowed.';
       }
@@ -231,9 +253,8 @@ class FileIndex {
       }
       List<String> entrySplit = _entry.split(',');
       if (fileHash == entrySplit[1]) {
-        await raf.close();
-        await tempRaf.unlock();
-        await tempRaf.close();
+        await _close(raf);
+        await _close(tempRaf);
         await tempFile.delete();
         throw 'Matching file path found: duplicate paths not allowed.';
       }
@@ -241,19 +262,22 @@ class FileIndex {
       return null;
     });
     onEOF();
-    await raf.close();
-    await tempRaf.unlock();
-    await tempRaf.close();
-    await _file.delete();
-    await tempFile.copy(_file.absolute.path);
-    await tempFile.delete();
+    await _close(raf);
+    await tempRaf.flush();
+    await _close(tempRaf);
+    try {
+      await tempFile.rename(_file.absolute.path);
+    } catch (_) {
+      await _file.writeAsBytes(await tempFile.readAsBytes());
+      await tempFile.delete();
+    }
   }
 
   Future<Map<String, PassyFsMeta>> getMetadata() async {
     Map<String, PassyFsMeta> _meta = {};
-    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile _raf = await _open(_file);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      await _raf.close();
+      await _close(_raf);
       return _meta;
     }
     await processLinesAsync(_raf, onLine: (entry, eofReached) async {
@@ -266,15 +290,15 @@ class FileIndex {
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
     });
-    await _raf.close();
+    await _close(_raf);
     return _meta;
   }
 
   Future<Map<String, PassyFsMeta>> getPathMetadata(String path) async {
     Map<String, PassyFsMeta> _meta = {};
-    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile _raf = await _open(_file);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      await _raf.close();
+      await _close(_raf);
       return _meta;
     }
     await processLinesAsync(_raf, onLine: (entry, eofReached) async {
@@ -291,7 +315,7 @@ class FileIndex {
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
     });
-    await _raf.close();
+    await _close(_raf);
     return _meta;
   }
 
@@ -387,9 +411,8 @@ class FileIndex {
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
       tempFile = await File(tempPath).create();
     }
-    RandomAccessFile raf = await _file.open();
-    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
-    await tempRaf.lock();
+    RandomAccessFile raf = await _open(_file);
+    RandomAccessFile tempRaf = await _open(tempFile, mode: FileMode.append);
 
     await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (key, eofReached) async {
@@ -409,12 +432,15 @@ class FileIndex {
       await tempRaf.writeString('$key,$entry\n');
       return null;
     });
-    await raf.close();
-    await tempRaf.unlock();
-    await tempRaf.close();
-    await _file.delete();
-    await tempFile.copy(_file.absolute.path);
-    await tempFile.delete();
+    await _close(raf);
+    await tempRaf.flush();
+    await _close(tempRaf);
+    try {
+      await tempFile.rename(_file.absolute.path);
+    } catch (_) {
+      await _file.writeAsBytes(await tempFile.readAsBytes());
+      await tempFile.delete();
+    }
     return result;
   }
 
@@ -428,9 +454,8 @@ class FileIndex {
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
       tempFile = await File(tempPath).create();
     }
-    RandomAccessFile raf = await _file.open();
-    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
-    await tempRaf.lock();
+    RandomAccessFile raf = await _open(_file);
+    RandomAccessFile tempRaf = await _open(tempFile, mode: FileMode.append);
 
     await processLinesAsync(raf, lineDelimiter: ',',
         onLine: (_key, eofReached) async {
@@ -447,9 +472,8 @@ class FileIndex {
         try {
           meta = transform(meta);
         } catch (_) {
-          await raf.close();
-          await tempRaf.unlock();
-          await tempRaf.close();
+          await _close(raf);
+          await _close(tempRaf);
           await tempFile.delete();
           rethrow;
         }
@@ -459,12 +483,15 @@ class FileIndex {
       await tempRaf.writeString('$_key,$entry\n');
       return null;
     });
-    await raf.close();
-    await tempRaf.unlock();
-    await tempRaf.close();
-    await _file.delete();
-    await tempFile.copy(_file.absolute.path);
-    await tempFile.delete();
+    await _close(raf);
+    await tempRaf.flush();
+    await _close(tempRaf);
+    try {
+      await tempFile.rename(_file.absolute.path);
+    } catch (_) {
+      await _file.writeAsBytes(await tempFile.readAsBytes());
+      await tempFile.delete();
+    }
   }
 
   Future<void> renameFile(String key, {required String name}) async {
@@ -548,9 +575,8 @@ class FileIndex {
           DateTime.now().toUtc().toIso8601String().replaceAll(':', ';');
       tempFile = await File(tempPath).create();
     }
-    RandomAccessFile raf = await _file.open();
-    RandomAccessFile tempRaf = await tempFile.open(mode: FileMode.append);
-    await tempRaf.lock();
+    RandomAccessFile raf = await _open(_file);
+    RandomAccessFile tempRaf = await _open(tempFile, mode: FileMode.append);
     List<String> keys = [];
 
     await processLinesAsync(raf, lineDelimiter: ',',
@@ -567,12 +593,15 @@ class FileIndex {
       await tempRaf.writeString('$_key,${iv.base64},${decoded[1]},$entry\n');
       return null;
     });
-    await raf.close();
-    await tempRaf.unlock();
-    await tempRaf.close();
-    await _file.delete();
-    await tempFile.copy(_file.absolute.path);
-    await tempFile.delete();
+    await _close(raf);
+    await tempRaf.flush();
+    await _close(tempRaf);
+    try {
+      await tempFile.rename(_file.absolute.path);
+    } catch (_) {
+      await _file.writeAsBytes(await tempFile.readAsBytes());
+      await tempFile.delete();
+    }
     Key _oldKey = _key;
     _key = key;
     _encrypter = encrypter;
@@ -589,9 +618,9 @@ class FileIndex {
     required String newTag,
   }) async {
     List<String> keys = [];
-    RandomAccessFile _raf = await _file.open();
+    RandomAccessFile _raf = await _open(_file);
     if (skipLine(_raf, lineDelimiter: ',') == -1) {
-      await _raf.close();
+      await _close(_raf);
       return const [];
     }
     File _tempFile;
@@ -603,8 +632,7 @@ class FileIndex {
       _tempFile = await File(_tempPath).create();
     }
     const int _tagIndex = 2;
-    RandomAccessFile _tempRaf = await _tempFile.open(mode: FileMode.append);
-    await _tempRaf.lock();
+    RandomAccessFile _tempRaf = await _open(_tempFile, mode: FileMode.append);
     await processLinesAsync(_raf, onLine: (entry, eofReached) async {
       if (eofReached) return true;
       List<String> _decoded = entry.split(',');
@@ -629,12 +657,15 @@ class FileIndex {
       if (skipLine(_raf, lineDelimiter: ',') == -1) return true;
       return null;
     });
-    await _raf.close();
-    await _tempRaf.unlock();
-    await _tempRaf.close();
-    await _file.delete();
-    await _tempFile.copy(_file.absolute.path);
-    await _tempFile.delete();
+    await _close(_raf);
+    await _tempRaf.flush();
+    await _close(_tempRaf);
+    try {
+      await _tempFile.rename(_file.absolute.path);
+    } catch (_) {
+      await _file.writeAsBytes(await _tempFile.readAsBytes());
+      await _tempFile.delete();
+    }
     return keys;
   }
 
