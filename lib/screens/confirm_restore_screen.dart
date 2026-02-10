@@ -7,6 +7,7 @@ import 'package:passy/screens/login_screen.dart';
 import 'package:passy/screens/main_screen.dart';
 
 import 'log_screen.dart';
+import 'setup_screen.dart';
 
 class ConfirmRestoreScreen extends StatefulWidget {
   static const String routeName =
