@@ -41,7 +41,7 @@ dependencies:
   path_provider: ^2.0.9
   otp: ^3.0.2
   qr_flutter: ^4.0.0
-  file_picker: ^8.1.2
+  file_picker: ^10.3.10
   flutter_web_browser: ^0.17.3
   flutter_locker: ^2.1.2
   cached_network_image: ^3.3.1
