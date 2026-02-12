@@ -789,10 +789,10 @@ packages:
     dependency: "direct main"
     description:
       name: launch_at_startup
-      sha256: "93fc5638e088290004fae358bae691486673d469957d461d9dae5b12248593eb"
+      sha256: "7db33398b76ec0ed9e27f9f4640553e239977437564046625e215be89c91f084"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.2"
+    version: "0.5.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -1730,10 +1730,10 @@ packages:
     dependency: transitive
     description:
       name: win32_registry
-      sha256: "21ec76dfc731550fd3e2ce7a33a9ea90b828fdf19a5c3bcf556fa992cfa99852"
+      sha256: "6f1b564492d0147b330dd794fee8f512cec4977957f310f9951b5f9d83618dae"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.5"
+    version: "2.1.0"
   window_manager:
     dependency: "direct main"
     description:
