@@ -1,3 +1,3 @@
-const String releaseVersion = 'v1.9.5';
-const String tagSuffix = '-pre';
-const String releaseTitle = 'Files and Attachments';
+const String releaseVersion = 'v1.10.0';
+const String tagSuffix = '';
+const String releaseTitle = 'Passy Cloud';
