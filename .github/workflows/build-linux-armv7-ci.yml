@@ -49,7 +49,7 @@ jobs:
           filename: Passy-CLI-Linux-ARMv7.zip
           path: passy-cli
       - name: Upload Passy CLI build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cli-linux-armv7
           path: /home/runner/work/Passy/build/Passy-CLI-Linux-ARMv7.zip
