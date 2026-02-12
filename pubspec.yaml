@@ -61,7 +61,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   crypton: ^2.1.0
-  event: ^2.1.2
+  event: ^3.1.0
   favicon: ^1.1.1
   csv: ^5.0.2
   dargon2_flutter: ^3.3.0
