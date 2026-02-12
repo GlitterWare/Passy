@@ -42,7 +42,7 @@ jobs:
           options: --rm --platform linux/arm/v7 -v $PWD:/Passy -v /home/runner/work/Passy/build:/passy-build -v /home/runner/work/Passy/bin:/passy-bin
           args: /passy-bin/armv7.sh
       - name: Archive Passy CLI build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build
