@@ -44,7 +44,7 @@ jobs:
           mkdir build
           cp Passy/build/app/outputs/flutter-apk/app-release.apk build/Passy-Android.apk
       - name: Upload Android build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android
           path: /home/runner/work/Passy/build/Passy-Android.apk
@@ -107,17 +107,17 @@ jobs:
           filename: Passy-CLI-Linux.zip
           path: passy-cli
       - name: Upload Linux bundle build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-bundle
           path: /home/runner/work/Passy/build/linux-bundle/Passy-Linux-Bundle.zip
       - name: Upload Linux AppImage build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-appimage
           path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
       - name: Upload Linux CLI build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cli-linux
           path: /home/runner/work/Passy/build/cli/Passy-CLI-Linux.zip
@@ -149,12 +149,12 @@ jobs:
           filename: Passy-Linux-AppImage.zip
           path: Passy-Latest-x86_64.AppImage
       - name: Upload Linux bundle no updates popup build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-bundle-no-updates-popup
           path: /home/runner/work/Passy/build/linux-bundle/Passy-Linux-Bundle.zip
       - name: Upload Linux AppImage no updates popup build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-appimage-no-updates-popup
           path: /home/runner/work/Passy/build/Passy-Linux-AppImage.zip
@@ -219,17 +219,17 @@ jobs:
           filename: Passy-CLI-Linux-ARM64.zip
           path: passy-cli
       - name: Upload Linux bundle build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-arm64-bundle
           path: /home/runner/work/Passy/build/linux-bundle/Passy-Linux-ARM64-Bundle.zip
       - name: Upload Linux AppImage build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-arm64-appimage
           path: /home/runner/work/Passy/build/Passy-Linux-ARM64-AppImage.zip
       - name: Upload Linux CLI build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cli-linux-arm64
           path: /home/runner/work/Passy/build/cli/Passy-CLI-Linux-ARM64.zip
@@ -261,12 +261,12 @@ jobs:
           filename: Passy-Linux-ARM64-AppImage.zip
           path: Passy-Latest-aarch64.AppImage
       - name: Upload Linux bundle no updates popup build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-arm64-bundle-no-updates-popup
           path: /home/runner/work/Passy/build/linux-bundle/Passy-Linux-ARM64-Bundle.zip
       - name: Upload Linux AppImage no updates popup build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-arm64-appimage-no-updates-popup
           path: /home/runner/work/Passy/build/Passy-Linux-ARM64-AppImage.zip
@@ -290,7 +290,7 @@ jobs:
         uses: snapcore/action-build@v1
         id: snapcraft
       - name: Upload Linux Snap
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-snap
           path: ${{ steps.snapcraft.outputs.snap }}
@@ -314,7 +314,7 @@ jobs:
         uses: snapcore/action-build@v1
         id: snapcraft
       - name: Upload Linux Snap
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-snap-arm64
           path: ${{ steps.snapcraft.outputs.snap }}
@@ -358,12 +358,12 @@ jobs:
           cp -r Passy/build/windows/x64/runner/Release/. build/windows-portable/Passy
           cp Passy/build/Passy-Windows-Installer.exe build/Passy-Windows-Installer.exe
       - name: Upload Windows portable build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-portable
           path: D:\a\Passy\build\windows-portable
       - name: Upload Windows .exe installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-exe-installer
           path: D:\a\Passy\build\Passy-Windows-Installer.exe
