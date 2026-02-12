@@ -86,21 +86,21 @@ jobs:
           chmod +x build/linux-bundle/Passy/passy
           chmod +x build/Passy-Latest-x86_64.AppImage
       - name: Archive Linux bundle build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build/linux-bundle
           filename: Passy-Linux-Bundle.zip
           path: Passy
       - name: Archive Linux AppImage build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build
           filename: Passy-Linux-AppImage.zip
           path: Passy-Latest-x86_64.AppImage
       - name: Archive Linux CLI build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build/cli
@@ -135,14 +135,14 @@ jobs:
           chmod +x build/linux-bundle/Passy/passy
           chmod +x build/Passy-Latest-x86_64.AppImage
       - name: Archive Linux bundle build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build/linux-bundle
           filename: Passy-Linux-Bundle.zip
           path: Passy
       - name: Archive Linux AppImage build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build
@@ -198,21 +198,21 @@ jobs:
           chmod +x build/linux-bundle/Passy/passy
           chmod +x build/Passy-Latest-aarch64.AppImage
       - name: Archive Linux bundle build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build/linux-bundle
           filename: Passy-Linux-ARM64-Bundle.zip
           path: Passy
       - name: Archive Linux AppImage build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build
           filename: Passy-Linux-ARM64-AppImage.zip
           path: Passy-Latest-aarch64.AppImage
       - name: Archive Linux CLI build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build/cli
@@ -247,14 +247,14 @@ jobs:
           chmod +x build/linux-bundle/Passy/passy
           chmod +x build/Passy-Latest-aarch64.AppImage
       - name: Archive Linux bundle build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build/linux-bundle
           filename: Passy-Linux-ARM64-Bundle.zip
           path: Passy
       - name: Archive Linux AppImage build
-        uses: thedoctor0/zip-release@0.7.1
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: zip
           directory: ../build
