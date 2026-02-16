@@ -63,7 +63,7 @@ dependencies:
   crypton: ^2.1.0
   event: ^2.1.2
   favicon: ^1.1.1
-  csv: ^5.0.2
+  csv: ^7.1.0
   dargon2_flutter: ^3.3.0
   dargon2_flutter_mobile: ^3.3.0
   dargon2:
