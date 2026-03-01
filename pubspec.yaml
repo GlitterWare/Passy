@@ -109,7 +109,7 @@ dev_dependencies:
   build_runner:
   json_serializable: 6.13.0
   rename:
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
   change_app_package_name: 1.5.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
