@@ -37,7 +37,7 @@ dependencies:
   websafe_svg: ^3.0.0+5
   crypto: ^3.0.1
   encrypt: ^5.0.1
-  image: ^4.2.0
+  image: ^4.8.0
   path_provider: ^2.0.9
   otp: ^3.0.2
   qr_flutter: ^4.0.0
