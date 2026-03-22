@@ -106,7 +106,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner:
+  build_runner: 2.13.1
   json_serializable: 6.13.0
   rename:
   flutter_launcher_icons: ^0.14.4
