@@ -92,7 +92,7 @@ dependencies:
     git:
       url: https://github.com/GlitterWare/chewie_media_kit
       ref: 1720bb4c07aee96c1de3ad6753184265b91aaea7
-  window_manager: ^0.3.9
+  window_manager: ^0.5.1
   system_tray: ^2.0.3
   flex_color_picker: ^3.6.0
   pdfrx: ^2.2.24
