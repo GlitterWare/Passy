@@ -1,6 +1,8 @@
 export 'always_disabled_focus_node.dart';
 
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+import 'package:credit_card_type_detector/constants.dart';
+import 'package:credit_card_type_detector/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:passy/passy_flutter/passy_flutter.dart';
@@ -39,18 +41,19 @@ String capitalize(String string) {
   return '$_firstLetter${string.substring(1)}';
 }
 
-CardType cardTypeFromCreditCardType(CreditCardType cardType) {
-  switch (cardType) {
-    case CreditCardType.visa:
-      return CardType.visa;
-    case CreditCardType.mastercard:
-      return CardType.mastercard;
-    case CreditCardType.amex:
-      return CardType.americanExpress;
-    case CreditCardType.discover:
-      return CardType.discover;
-    default:
-      return CardType.otherBrand;
+CardType cardTypeFromCreditCardType(List<CreditCardType> cardTypes) {
+  if (cardTypes.isEmpty) return CardType.otherBrand;
+  final cardType = cardTypes.first;
+  if (cardType.type == TYPE_VISA) {
+    return CardType.visa;
+  } else if (cardType.type == TYPE_MASTERCARD) {
+    return CardType.mastercard;
+  } else if (cardType.type == TYPE_AMEX) {
+    return CardType.americanExpress;
+  } else if (cardType.type == TYPE_DISCOVER) {
+    return CardType.discover;
+  } else {
+    return CardType.otherBrand;
   }
 }
 
