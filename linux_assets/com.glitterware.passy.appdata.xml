@@ -60,7 +60,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
-		<release version="v1.10.1" date="2026-03-21">
+		<release version="v1.10.2" date="2026-06-26">
 		</release>
 	</releases>
 </component>
