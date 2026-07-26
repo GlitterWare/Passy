@@ -85,7 +85,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         right: const Icon(Icons.arrow_forward_ios_rounded),
         onPressed: () {
           Navigator.pushNamed(context, LogScreen.routeName,
-              arguments: "${e.toString()}\n${s.toString()}");
+              arguments: '${e.toString()}\n${s.toString()}');
         },
       )),
     ]);
@@ -111,10 +111,6 @@ class _PassyFileWidget extends State<PassyFileWidget> {
   }
 
   Future<Widget?> _loadWidget() async {
-    if (widget.type == FileEntryType.unknown ||
-        widget.type == FileEntryType.file) {
-      throw 'Unknown entry type.';
-    }
     Uint8List data;
     if (widget.isEncrypted) {
       data = await _account.readFileAsBytes(widget.path, useIsolate: true);
@@ -124,11 +120,21 @@ class _PassyFileWidget extends State<PassyFileWidget> {
     switch (widget.type) {
       // #region Unknown
       case FileEntryType.unknown:
-        throw 'Unknown entry type.';
+        return Column(children: [
+          Text('${localizations.unknown}:'),
+          Text('size: ${(data.length / 1024).toStringAsFixed(2)} kB'),
+          Text(
+              'hex: ${uint8ListToHexString(Uint8List.sublistView(data, 0, data.length < 16 ? data.length : 16))}...'),
+        ]);
       case FileEntryType.folder:
         throw 'Unknown entry type.';
       case FileEntryType.file:
-        throw 'Unknown entry type.';
+        return Column(children: [
+          Text('${localizations.unknown}:'),
+          Text('size: ${(data.length / 1024).toStringAsFixed(2)} kB'),
+          Text(
+              'hex: ${uint8ListToHexString(Uint8List.sublistView(data, 0, data.length < 16 ? data.length : 16))}...'),
+        ]);
       // #endregion
 
       // #region Text

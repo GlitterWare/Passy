@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -196,4 +197,16 @@ class PassyCloudLoop {
     _started = true;
     _cloudLoop();
   }
+}
+
+String uint8ListToHexString(Uint8List uint8list) {
+  var hex = '';
+  for (var i in uint8list) {
+    var x = i.toRadixString(16);
+    if (x.length == 1) {
+      x = '0$x';
+    }
+    hex += x;
+  }
+  return hex;
 }
