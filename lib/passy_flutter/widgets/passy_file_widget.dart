@@ -85,7 +85,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         right: const Icon(Icons.arrow_forward_ios_rounded),
         onPressed: () {
           Navigator.pushNamed(context, LogScreen.routeName,
-              arguments: e.toString() + '\n' + s.toString());
+              arguments: "${e.toString()}\n${s.toString()}");
         },
       )),
     ]);
@@ -195,6 +195,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         VideoController controller = VideoController(player);
         _playMedia(
             resource: pageResult.uri.toString(), password: pageResult.password);
+        if (!mounted) return SizedBox.shrink();
         return PassyAudioProgressBar(
           controller: controller,
           colors: ChewieProgressColors(
@@ -217,6 +218,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         VideoController controller = VideoController(player);
         _playMedia(
             resource: pageResult.uri.toString(), password: pageResult.password);
+        if (!mounted) return SizedBox.shrink();
         return Chewie(
           controller: ChewieController(
             cupertinoProgressColors: ChewieProgressColors(
@@ -237,8 +239,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
 
       // #region PDF
       case FileEntryType.pdf:
-        FilePageResult pageResult = await createPdfPage(data);
-        _server = pageResult.server;
+        if (!mounted) return SizedBox.shrink();
         return Scaffold(
           backgroundColor: PassyTheme.of(context).secondaryContentColor,
           appBar: AppBar(
@@ -342,8 +343,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
               Expanded(
                 child: Stack(
                   children: [
-                    PdfViewer.uri(
-                      pageResult.uri,
+                    PdfViewer(
+                      PdfDocumentRefData(data, sourceName: widget.name),
                       // PdfViewer.file(
                       //   r"D:\pdfrx\example\assets\hello.pdf",
                       // PdfViewer.uri(

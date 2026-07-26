@@ -75,15 +75,6 @@ import 'l10n/app_localizations.dart';
 
 ThemeData _theme = PassyTheme.classicDark;
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-  }
-}
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -97,7 +88,6 @@ void main() {
     print('E:`MediaKit.ensureInitialized()` failed: $e');
   }
   DArgon2Flutter.init();
-  HttpOverrides.global = MyHttpOverrides();
   bool cloudSyncScreenOn = false;
   PassyCloudLoop.status.listen((status) {
     if (cloudSyncScreenOn) {
