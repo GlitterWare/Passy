@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.10.1+27
+version: 1.10.2+28
 
 environment:
   sdk: ">=3.4.1 <4.0.0"
@@ -50,7 +50,7 @@ dependencies:
       url: https://github.com/SimformSolutionsPvtLtd/flutter_credit_card
       ref: 7a754b0a44cd75d0689a3adfd778205da9c69f95
   flutter_date_pickers: ^0.4.3
-  credit_card_type_detector: ^2.0.0
+  credit_card_type_detector: ^3.0.0
   screen_secure: ^1.0.3
   camera: ^0.11.3
   flutter_autofill_service: ^0.21.0
@@ -92,10 +92,10 @@ dependencies:
     git:
       url: https://github.com/GlitterWare/chewie_media_kit
       ref: 1720bb4c07aee96c1de3ad6753184265b91aaea7
-  window_manager: ^0.3.9
+  window_manager: ^0.5.1
   system_tray: ^2.0.3
   flex_color_picker: ^3.6.0
-  pdfrx: ^2.2.24
+  pdfrx: ^1.0.94
   base85: ^1.0.4
   mutex: ^3.1.0
 

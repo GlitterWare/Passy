@@ -85,7 +85,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         right: const Icon(Icons.arrow_forward_ios_rounded),
         onPressed: () {
           Navigator.pushNamed(context, LogScreen.routeName,
-              arguments: e.toString() + '\n' + s.toString());
+              arguments: '${e.toString()}\n${s.toString()}');
         },
       )),
     ]);
@@ -111,10 +111,6 @@ class _PassyFileWidget extends State<PassyFileWidget> {
   }
 
   Future<Widget?> _loadWidget() async {
-    if (widget.type == FileEntryType.unknown ||
-        widget.type == FileEntryType.file) {
-      throw 'Unknown entry type.';
-    }
     Uint8List data;
     if (widget.isEncrypted) {
       data = await _account.readFileAsBytes(widget.path, useIsolate: true);
@@ -124,11 +120,21 @@ class _PassyFileWidget extends State<PassyFileWidget> {
     switch (widget.type) {
       // #region Unknown
       case FileEntryType.unknown:
-        throw 'Unknown entry type.';
+        return Column(children: [
+          Text('${localizations.unknown}:'),
+          Text('size: ${(data.length / 1024).toStringAsFixed(2)} kB'),
+          Text(
+              'hex: ${uint8ListToHexString(Uint8List.sublistView(data, 0, data.length < 16 ? data.length : 16))}...'),
+        ]);
       case FileEntryType.folder:
         throw 'Unknown entry type.';
       case FileEntryType.file:
-        throw 'Unknown entry type.';
+        return Column(children: [
+          Text('${localizations.unknown}:'),
+          Text('size: ${(data.length / 1024).toStringAsFixed(2)} kB'),
+          Text(
+              'hex: ${uint8ListToHexString(Uint8List.sublistView(data, 0, data.length < 16 ? data.length : 16))}...'),
+        ]);
       // #endregion
 
       // #region Text
@@ -195,6 +201,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         VideoController controller = VideoController(player);
         _playMedia(
             resource: pageResult.uri.toString(), password: pageResult.password);
+        if (!mounted) return SizedBox.shrink();
         return PassyAudioProgressBar(
           controller: controller,
           colors: ChewieProgressColors(
@@ -217,6 +224,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
         VideoController controller = VideoController(player);
         _playMedia(
             resource: pageResult.uri.toString(), password: pageResult.password);
+        if (!mounted) return SizedBox.shrink();
         return Chewie(
           controller: ChewieController(
             cupertinoProgressColors: ChewieProgressColors(
@@ -237,8 +245,7 @@ class _PassyFileWidget extends State<PassyFileWidget> {
 
       // #region PDF
       case FileEntryType.pdf:
-        FilePageResult pageResult = await createPdfPage(data);
-        _server = pageResult.server;
+        if (!mounted) return SizedBox.shrink();
         return Scaffold(
           backgroundColor: PassyTheme.of(context).secondaryContentColor,
           appBar: AppBar(
@@ -342,8 +349,8 @@ class _PassyFileWidget extends State<PassyFileWidget> {
               Expanded(
                 child: Stack(
                   children: [
-                    PdfViewer.uri(
-                      pageResult.uri,
+                    PdfViewer(
+                      PdfDocumentRefData(data, sourceName: widget.name),
                       // PdfViewer.file(
                       //   r"D:\pdfrx\example\assets\hello.pdf",
                       // PdfViewer.uri(
