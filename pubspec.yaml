@@ -74,7 +74,7 @@ dependencies:
   dargon2_interface: ^1.1.1
   flutter_markdown_plus: ^1.0.0+1
   compute: ^1.0.2
-  launch_at_startup: ^0.2.2
+  launch_at_startup: ^0.5.1
   kdbx:
     git:
       url: https://github.com/authpass/kdbx.dart.git
