@@ -79,7 +79,7 @@ dependencies:
     git:
       url: https://github.com/authpass/kdbx.dart.git
       ref: 90830e11bb0a6f177229a0644c559fbf2b088b03
-  dropdown_button2: ^2.3.9
+  dropdown_button2: ^3.1.0
   emoji_picker_flutter: ^4.4.0
   text_divider: ^1.0.0
   archive: ^4.0.9
